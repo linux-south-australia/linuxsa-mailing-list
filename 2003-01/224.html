@@ -1,0 +1,396 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Port Forwarding" -->
+<!-- FromName="'Michael T. Cheshire'" -->
+<!-- FromEmail="michael.cheshire@microarts.com.au" -->
+<!-- ToName="'Raymond Chin'" -->
+<!-- ToEmail="raymond@esquare.com.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 7 Jan 2003 12:05:04 +1030" -->
+<!-- Id="1678A60022973E4E936ABA52D4D86A6126AF27@exchange.microarts.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Port Forwarding</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael T. Cheshire &lt;<I><A HREF="mailto:michael.cheshire@microarts.com.au">michael.cheshire@microarts.com.au</A></I>&gt;
+  To  : Raymond Chin &lt;<I><A HREF="mailto:raymond@esquare.com.au">raymond@esquare.com.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 7 Jan 2003 12:05:04 +1030
+</PRE>
+<H1>RE: Port Forwarding</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+For port forwarding to work, I believe you must NAT running to the box
+you are forwarding to, also the Webserver must have the firewall box as
+its default gateway.
+
+M.
+-----Original Message-----
+From: Raymond Chin [mailto:<A HREF="mailto:raymond@esquare.com.au">raymond@esquare.com.au</A>] 
+Sent: Tuesday, 7 January 2003 11:55 AM
+To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+Subject: Port Forwarding
+
+
+Hi,
+
+I want to allow a webserver on my internal LAN to be accessible from the
+outside world via the firewall RedHat 8 linux box.
+
+External IP address is 203.152.226.142
+Internal IP address is 10.0.0.55
+
+Internal Webserver is 10.0.0.2
+
+I have configured my firewall script to do this. However, it isn't
+working as I'm unable to connect to the web server using the external IP
+address.
+
+What do I need to check out to fix the problem?
+
+
+Here is my firewall script.
+
+#!/bin/sh
+#
+# rc.firewall-2.4
+FWVER=0.70
+#
+#               Initial SIMPLE IP Masquerade test for 2.4.x kernels
+#               using IPTABLES.
+#
+#               Once IP Masquerading has been tested, with this simple
+#               ruleset, it is highly recommended to use a stronger
+#               IPTABLES ruleset either given later in this HOWTO or
+#               from another reputable resource.
+#
+#
+#
+# Log:
+#       0.70 - Added commented option for IRC nat module
+#            - Added additional use of environment variables
+#            - Added additional formatting
+#       0.63 - Added support for the IRC IPTABLES module
+#       0.62 - Fixed a typo on the MASQ enable line that used eth0
+#              instead of $EXTIF
+#       0.61 - Changed the firewall to use variables for the internal
+#              and external interfaces.
+#       0.60 - 0.50 had a mistake where the ruleset had a rule to DROP
+#              all forwarded packets but it didn't have a rule to ACCEPT
+#              any packets to be forwarded either
+#            - Load the ip_nat_ftp and ip_conntrack_ftp modules by
+default
+#       0.50 - Initial draft
+#
+
+echo -e "\n\nLoading simple rc.firewall version $FWVER..\n"
+
+# The location of the iptables and kernel module programs
+#
+#   If your Linux distribution came with a copy of iptables,
+#   most likely all the programs will be located in /sbin.  If
+#   you manually compiled iptables, the default location will
+#   be in /usr/local/sbin
+#
+# ** Please use the "whereis iptables" command to figure out
+# ** where your copy is and change the path below to reflect
+# ** your setup
+#
+IPTABLES=/sbin/iptables
+#IPTABLES=/usr/local/sbin/iptables
+DEPMOD=/sbin/depmod
+INSMOD=/sbin/insmod
+
+#Setting the EXTERNAL and INTERNAL interfaces for the network
+#
+#  Each IP Masquerade network needs to have at least one
+#  external and one internal network.  The external network
+#  is where the natting will occur and the internal network
+#  should preferably be addressed with a RFC1918 private address #
+scheme. # #  For this example, "eth0" is external and "eth1" is
+internal" # #  NOTE:  If this doesnt EXACTLY fit your configuration, you
+must
+#         change the EXTIF or INTIF variables above. For example:
+#
+#               EXTIF="ppp0"
+#
+#            if you are a modem user.
+#
+EXTIF="eth0"
+INTIF="eth1"
+echo "   External Interface:  $EXTIF"
+echo "   Internal Interface:  $INTIF"
+
+#======================================================================
+#== No editing beyond this line is required for initial MASQ testing ==
+
+echo -en "   loading modules: "
+
+# Need to verify that all modules have all required dependencies # echo
+"  - Verifying that all kernel modules are ok" $DEPMOD -a
+
+# With the new IPTABLES code, the core MASQ functionality is now either
+# modular or compiled into the kernel.  This HOWTO shows ALL IPTABLES #
+options as MODULES.  If your kernel is compiled correctly, there is # NO
+need to load the kernel modules manually. # #  NOTE: The following items
+are listed ONLY for informational reasons.
+#        There is no reason to manual load these modules unless your
+#        kernel is either mis-configured or you intentionally disabled
+#        the kernel module autoloader.
+#
+
+# Upon the commands of starting up IP Masq on the server, the
+# following kernel modules will be automatically loaded:
+#
+# NOTE:  Only load the IP MASQ modules you need.  All current IP MASQ
+#        modules are shown below but are commented out from loading.
+# ===============================================================
+
+echo
+"----------------------------------------------------------------------"
+
+#Load the main body of the IPTABLES module - "iptable"
+#  - Loaded automatically when the "iptables" command is invoked # #  -
+Loaded manually to clean up kernel auto-loading timing issues ## echo
+-en "ip_tables, " $INSMOD ip_tables
+
+#Load the IPTABLES filtering module - "iptable_filter"
+#  - Loaded automatically when filter policies are activated
+
+#Load the stateful connection tracking framework - "ip_conntrack" # #
+The conntrack  module in itself does nothing without other specific #
+conntrack modules being loaded afterwards such as the "ip_conntrack_ftp"
+# module # #  - This module is loaded automatically when MASQ
+functionality is
+#    enabled
+#
+#  - Loaded manually to clean up kernel auto-loading timing issues #
+echo -en "ip_conntrack, " $INSMOD ip_conntrack
+
+#Load the FTP tracking mechanism for full FTP tracking
+#
+# Enabled by default -- insert a "#" on the next line to deactivate #
+echo -en "ip_conntrack_ftp, " $INSMOD ip_conntrack_ftp
+
+#Load the IRC tracking mechanism for full IRC tracking
+#
+# Enabled by default -- insert a "#" on the next line to deactivate #
+echo -en "ip_conntrack_irc, " $INSMOD ip_conntrack_irc
+
+#Load the general IPTABLES NAT code - "iptable_nat"
+#  - Loaded automatically when MASQ functionality is turned on # #  -
+Loaded manually to clean up kernel auto-loading timing issues # echo -en
+"iptable_nat, " $INSMOD iptable_nat
+
+#Loads the FTP NAT functionality into the core IPTABLES code
+# Required to support non-PASV FTP.
+#
+# Enabled by default -- insert a "#" on the next line to deactivate #
+echo -en "ip_nat_ftp, " $INSMOD ip_nat_ftp
+
+#Loads the IRC NAT functionality into the core IPTABLES code
+# Require to support NAT of IRC DCC requests
+#
+# Disabled by default -- remove the "#" on the next line to activate #
+#echo -e "ip_nat_irc" #$INSMOD ip_nat_irc
+
+echo
+"----------------------------------------------------------------------"
+
+# Just to be complete, here is a list of the remaining kernel modules #
+and their function.  Please note that several modules should be only #
+loaded by the correct master kernel module for proper operation. #
+--------------------------------------------------------------------
+#
+#    ipt_mark       - this target marks a given packet for future
+action.
+#                     This automatically loads the ipt_MARK module
+#
+#    ipt_tcpmss     - this target allows to manipulate the TCP MSS
+#                     option for braindead remote firewalls.
+#                     This automatically loads the ipt_TCPMSS module
+#
+#    ipt_limit      - this target allows for packets to be limited to
+#                     to many hits per sec/min/hr
+#
+#    ipt_multiport  - this match allows for targets within a range
+#                     of port numbers vs. listing each port individually
+#
+#    ipt_state      - this match allows to catch packets with various
+#                     IP and TCP flags set/unset
+#
+#    ipt_unclean    - this match allows to catch packets that have
+invalid
+#                     IP/TCP flags set
+#
+#    iptable_filter - this module allows for packets to be DROPped,
+#                     REJECTed, or LOGged.  This module automatically
+#                     loads the following modules:
+#
+#                     ipt_LOG - this target allows for packets to be
+#                               logged
+#
+#                     ipt_REJECT - this target DROPs the packet and
+returns
+#                                  a configurable ICMP packet back to
+the
+#                                  sender.
+#
+#    iptable_mangle - this target allows for packets to be manipulated
+#                     for things like the TCPMSS option, etc.
+
+echo ".  Done loading modules."
+
+#CRITICAL:  Enable IP forwarding since it is disabled by default since #
+#           Redhat Users:  you may try changing the options in
+#                          /etc/sysconfig/network from:
+#
+#                       FORWARD_IPV4=false
+#                             to
+#                       FORWARD_IPV4=true
+#
+echo "   enabling forwarding.."
+echo "1" &gt; /proc/sys/net/ipv4/ip_forward
+
+# Dynamic IP users:
+#
+#   If you get your IP address dynamically from SLIP, PPP, or DHCP,
+#   enable this following option.  This enables dynamic-address hacking
+#   which makes the life with Diald and similar programs much easier.
+#
+echo "   enabling DynamicAddr.."
+echo "1" &gt; /proc/sys/net/ipv4/ip_dynaddr
+
+# Enable simple IP forwarding and Masquerading
+#
+#  NOTE:  In IPTABLES speak, IP Masquerading is a form of SourceNAT or
+SNAT. # #  NOTE #2:  The following is an example for an internal LAN
+address in the
+#            192.168.0.x network with a 255.255.255.0 or a "24" bit
+subnet mask
+#            connecting to the Internet on external interface "eth0".
+This
+#            example will MASQ internal traffic out to the Internet but
+not
+#            allow non-initiated traffic into your internal network.
+#
+#
+#         ** Please change the above network numbers, subnet mask, and
+your
+#         *** Internet connection interface name to match your setup
+#
+
+#Clearing any previous configuration
+#
+#  Unless specified, the defaults for INPUT and OUTPUT is ACCEPT
+#    The default for FORWARD is DROP
+#
+echo "   clearing any existing rules and setting default policy.."
+$IPTABLES -P INPUT ACCEPT
+$IPTABLES -F INPUT
+$IPTABLES -P OUTPUT ACCEPT
+$IPTABLES -F OUTPUT
+$IPTABLES -P FORWARD DROP
+$IPTABLES -F FORWARD
+$IPTABLES -t nat -F
+
+echo "   FWD: Allow all connections OUT and only existing and related
+ones IN"
+$IPTABLES -A FORWARD -i $EXTIF -o $INTIF -m state --state
+ESTABLISHED,RELATED -j  ACCEPT $IPTABLES -A FORWARD -i $INTIF -o $EXTIF
+-j ACCEPT $IPTABLES -A FORWARD -j LOG
+
+echo "   Enabling PORT FORWARDING Redirection on the external LAN"
+PORTFWIP="10.0.0.2"
+EXTIP="203.152.226.142"
+$IPTABLES -A FORWARD -i $EXTIF -p tcp --dport 80 -m state --state
+NEW,ESTABLISHED,RELATED -j ACCEPT $IPTABLES -t nat -A PREROUTING -p tcp
+-d $EXTIP --dport 80 -j DNAT --to $PORTFWIP:80
+
+$IPTABLES -t nat -A PREROUTING -d $EXTIP -p tcp --dport 80 -m state
+--state NEW,ESTABLISHED,RELATED -j DNAT --to $PORTFWIP
+
+echo "   Enabling SNAT (MASQUERADE) functionality on $EXTIF"
+$IPTABLES -t nat -A POSTROUTING -o $EXTIF -j MASQUERADE
+
+echo -e "\nrc.firewall-2.4 v$FWVER done.\n"
+
+
+
+Below is the listed iptables rulesets (iptables -L)
+
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain FORWARD (policy DROP)
+target     prot opt source               destination
+ACCEPT     all  --  anywhere             anywhere           state
+RELATED,ESTABLISHED
+ACCEPT     all  --  anywhere             anywhere
+LOG        all  --  anywhere             anywhere           LOG level
+warning
+ACCEPT     tcp  --  anywhere             anywhere           tcp dpt:http
+state NEW,RELATED,ESTABLISHED
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+
+
+And below is the listed iptables rulesets for NAT (iptables -t nat -L)
+
+Chain PREROUTING (policy ACCEPT)
+target     prot opt source               destination
+DNAT       tcp  --  anywhere             203.152.226.142    tcp dpt:http
+to:10.0.0.2:80
+DNAT       tcp  --  anywhere             203.152.226.142    tcp dpt:http
+state NEW,RELATED,ESTABLISHED to:10.0.0.2
+
+Chain POSTROUTING (policy ACCEPT)
+target     prot opt source               destination
+MASQUERADE  all  --  anywhere             anywhere
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+
+
+Thanks
+--Raymond Chin
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on
+irc.openprojects.net To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

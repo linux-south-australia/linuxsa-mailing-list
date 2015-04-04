@@ -1,0 +1,372 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="my notes on upgrading to Linux 2.2" -->
+<!-- FromName="Jason Nunn" -->
+<!-- FromEmail="jsno@downunder.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 7 Feb 1999 20:07:14 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.04.9902072002220.985-100000@cleanhacks.cluster" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: my notes on upgrading to Linux 2.2</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jason Nunn &lt;<I><A HREF="mailto:jsno@downunder.net.au">jsno@downunder.net.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sun, 7 Feb 1999 20:07:14 +0930 (CST)
+</PRE>
+<H1>my notes on upgrading to Linux 2.2</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+to anybody interested...
+
+if anybody has posted anything similar, then i apologise.
+
+
+---------------------------------------------------------------------
+
+Upgrading to Linux 2.2 from a Redhat 5.2 base
+---------------------------------------------
+
+Synopsis
+
+these notes have been derived after many installation attempts, and
+hopefully, will be of use to anybody who wishes to upgrade their RH 5.2
+system with as little pain as possible.
+
+Nb/ it took me over a week to acquire, and install all distributions, and
+8+ attempts.
+
+I'm not much of a technical writer. I've tried my best to be as detailed
+as possible... and i hope that you read ahead before starting the upgrade
+so that you know what you're getting yourself into. I'll be happy to clear
+up any abiguous areas and i'm sure there are plenty... anyway, without
+further adue..
+
+
+Disclaimer:
+
+To put simply... if you banana your system using my notes, then i will not
+be held responsible. in life there are no certainties.
+
+Fully backup any existing fs you decide to upgrade. If you can't do this,
+then don't continue.
+
+
+
+needed 'things':
+
+- Kernel Modules  2.1.121
+- Dynamic Linker  1.9.9
+- glibc2          2.0.7pre6
+- Procinfo        15
+- Net-Tools       1.49
+- Util-Linux      2.9h
+- ipchains        version ???
+- ipmasqadm       version ???
+- rescue disks, or another linux system  (with RPM program installed).
+- lots of spare time
+
+Files i used:
+
+i got them mostly off sunsite.unc.edu, ftp.funet.fi and www.linuxhq.com
+
+ld.so-1.9.9.tar.gz
+glibc-2.0.7pre6.tar.gz
+glibc-crypt-2.0.6.tar.gz
+glibc-linuxthreads-2.0.7pre6.tar.gz
+linux-2.2.0.tar.gz
+util-linux-2.9h.tar.gz
+net-tools-1.50.tar.gz
+procinfo-16.tar.gz
+modutils-2.1.121.tar.gz
+patch-2.2.1.gz
+ipchains-1.3.8.tar.gz
+ipmasqadm-0.4.2.tar.gz
+
+some of them are very hard to get.
+
+
+There was some distributions i didn't install as i don't need them (also,
+these were a bit hard to get hold of). But if you read the
+<A HREF="http://www.linuxhq.com">http://www.linuxhq.com</A> and the Documentation/Changes file in the Linux
+kernel dist, then that will give you a full detail of what you need...
+infact, i recommend that you read it.
+
+
+To do:
+
+-------------------------------------------------------------------------
+* back up
+
+backup the following areas:
+
+/bin
+/etc
+/lib
+/sbin
+/usr
+
+i found it handly to write a script to do this.
+
+-------------------------------------------------------------------------
+* Install kernel 2.2, and configure only   (linux-2.2.0.tar.gz)
+
+  - copy linux-2.2.0.tar.gz into /usr/src and extract it.
+  - configure it by typing in:
+      - make mrproper
+      - make menuconfig
+
+        enter in any old settings... it doesn't matter at this point.
+
+      - make dep
+      - make clean
+
+the purpose of this is to set of necessary links and header files so that
+glibc and other distributions compile without errors. if you don't do
+this, then glibc2 and other distributions won't compile.
+
+-------------------------------------------------------------------------
+* Install Dynamic Linker   (ld.so-1.9.9.tar.gz)
+
+this step is pretty simple. this distribution has all the binaries
+pre-compiled, and it's just a matter of running a script:
+
+  - extract and go into distribution
+
+Nb/ from here on in, when i say "extract", i mean
+
+     - gunzip &lt;dist&gt;.tar.gz
+     - tar -xf &lt;dist&gt;.tar.gz
+     cd &lt;dist&gt;
+
+
+  - run ./instldso.sh -- force
+  - rm /lib/ld-linux.so.1.9.5
+  - rm /lib/ld.so.1.9.5
+  - rm /lib/libdl.so.1.9.5
+
+Nb/ don't try to remove the ld.so RPM. this linker is live, and killing it
+will kill your system. be very careful. (unless you do it offline with
+rescue disks).
+
+-------------------------------------------------------------------------
+* backup again
+
+
+-------------------------------------------------------------------------
+* install glibc2   (glibc-2.0.7pre.tar.gz)
+
+this is the fun bit.........
+
+you have to be very careful. glibc is live.. and this distribution
+replaces files in the /lib directory that are actively loaded with
+executables.
+
+ - get
+
+  glibc-2.0.7pre.tar.gz
+  glibc-crypt-2.0.6.tar.gz,
+  glibc-linuxthreads-2.0.7pre.tar.gz 
+
+  and extract them.
+
+
+Nb/ i couldn't get hold of matching "addon's", but the crypt-2.0.6 works fine.
+
+
+ - move crypt and linuxthread directories into the glibc-2.0.7pre6
+directory.
+
+ - enter into the glibc-2.0.7pre6 directory.
+
+ - ./configure --with-gnu-binutils --enable-add-ons=crypt,linuxthreads
+
+Nb/ crypt and linuxthreads are the directories you moved into the glibc
+directory.
+
+there is another addon called locale (foreign langauge support), but i
+didn't bother putting it in. it wasn't mandatory.
+
+ - edit the config.make file  (even, though it says not to).. ammend the
+file paths as follows:
+
+     install_root = /root/new
+     prefix       = /usr
+     exec_prefix  = /usr
+     slib_dir     = /lib
+     sysconfdir   = /etc
+     rootsbindir  = /sbin
+
+ - create a directory called "new".
+
+    mkdir ../new
+
+when you go to make, glibc will build in a nice safe location. by default,
+glibc will install the libraries in /lib and /usr/lib hence removing the
+live libraries and effectively halting your system..
+
+ - run make
+
+this will take a good hour to do. I noticed when i did it, that the dist.
+compiles very cleanly.
+
+ - make dvi   (optional)
+
+if you're a programmer, then you'll want the dvi manual.
+
+ - make install
+
+this will take about the same time as a kernel build..
+
+after it's complete, go into the new directory  (cd ../new) and have a
+look at what has been built.
+
+
+
+ - Reboot with a rescue disk, and install to live areas
+
+Now we have to reboot the machine on some other fs (ie rescue disk) so
+that we can copy the newly created libraries to their respective places.
+make sure that your rescue disk has a working copy of RPM tool on it.
+
+
+Once booted with a rescue disk, mount your main fs and delete the old
+glibc2 libraries using the rpm utility. this will ensure that there is no
+old files laying around that could upset our new install-
+
+ for example
+
+    mount /dev/hda1 /mnt
+    rpm -e --root /mnt glibc-devel-*
+    rpm -e --root /mnt glibc-*
+
+Nb/ wildcards are to signify that i've forgotten the names of the RPM
+distributions. you will have to find out the exact names by doing an 'rpm
+-q -a --root /mnt'.
+
+now we will put the new files in place-
+
+    cd /mnt/root/new
+    cp -faR * /mnt
+
+
+That's it. It's installed. hopefully, correctly...
+
+Now reboot the machine and see if it fires up. If it does, then
+log on to a shell, and type in-
+
+ldconfig
+
+if you get no errors, then glibc2 has been installed correctly.
+
+To finish off the glibc2 install, ensure that this link is inplace-
+
+ln -s /usr/share/zoneinfo/Australia/Darwin /etc/localtime
+
+ofcourse, you will have to link it to your correct time zone. the above is
+what i did.
+
+
+---------------------------------------------------------------------
+* Configure/Build/Install new kernel  (linux-2.2.0.tar.gz)
+
+This bit is easy.
+
+ - cd /usr/src/linux
+ - make menuconfig
+
+configure as required. Nb/ i have left out frame buffering and Unix98 pty
+for now until i learn more about them.
+
+ - make dep
+ - make clean
+ - make zImage
+ - make modules
+ - cp /usr/src/linux/arch/i386/boot/zImage /boot
+
+make sure your lilo is configured to read zImage... have a look in the
+/etc/lilo.conf file to be sure. here's mine-
+
+boot=/dev/hda
+map=/boot/map
+install=/boot/boot.b
+prompt
+timeout=50
+image=/boot/zImage            &lt;&lt;------------- check here
+        label=linux
+        root=/dev/hda2
+        read-only
+
+
+ - lilo
+ - rm /boot/System.map
+ - cp System.map /boot
+ - sync
+ - make modules_install
+
+ - cd /lib/modules
+ - ln -s 2.2.0 preferred
+
+if you have a 2.2.1 kernel, then link that file instead.
+
+
+---------------------------------------------------------------------
+*backup
+
+---------------------------------------------------------------------
+*Install Util-Linux (util-linux-2.9h.tar.gz)
+
+this one (like glibc2) is a bit dangerous to install, hence the need to
+backup..
+
+ - extract
+ - edit the MCONFIG file and make the following ammendments-
+
+       HAVE_PAM=yes
+       HAVE_SLN=yes
+
+ - make
+
+/nb refer to "compilication problems" in the INSTALL file
+
+  - make install
+  - sync
+  - reboot
+
+
+Nb/ don't remove the existing RPM Util-linux distribution, as it deletes
+more than you bargain for (i learnt this the hard way).
+
+If your system boots up, you'll know that you're successful.
+
+---------------------------------------------------------------------
+* Install ProcInfo  (procinfo-16.tar.gz)
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

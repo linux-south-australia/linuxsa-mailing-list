@@ -1,0 +1,109 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Forcing a 10/100 NIC into 10mb mode ... conf.modules?" -->
+<!-- FromName="Ian Hogben" -->
+<!-- FromEmail="ian@safcol.com.au" -->
+<!-- ToName="Linuxsa" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 23 Jul 2000 14:27:26 +0930" -->
+<!-- Id="NDBBJCENILPHMJMEFMGNKEDCCLAA.ian@safcol.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Forcing a 10/100 NIC into 10mb mode ... conf.modules?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Ian Hogben &lt;<I><A HREF="mailto:ian@safcol.com.au">ian@safcol.com.au</A></I>&gt;
+  To  : Linuxsa &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 23 Jul 2000 14:27:26 +0930
+</PRE>
+<H1>Re: Forcing a 10/100 NIC into 10mb mode ... conf.modules?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hello, all:
+
+I've done some looking into the source code of the tulip.c driver, hoping to
+find a conf.modules switch I can add to force it down into 10m mode. I think
+I may have found something:
+
+/*  The possible media types that can be set in options[] are: */
+static const char * const medianame[] = {
+    "10baseT", "10base2", "AUI", "100baseTx",
+    "10baseT-FD", "100baseTx-FD", "100baseT4", "100baseFx",
+    "100baseFx-FD", "MII 10baseT", "MII 10baseT-FD", "MII",
+    "10baseT(forced)", "MII 100baseTx", "MII 100baseTx-FD", "MII 100baseT4",
+};
+
+Now, this is promising. I'm hoping that I can set an option in conf.modules
+to specify the medianame to "10baseT(forced)". Am I reading the source
+correctly? Looking at the manpage for depmod (I can't find a conf.modules
+manpage), I read the following:
+
+       The  behaviour  of  depmod and modprobe can be adjusted by
+       the (optional) configuration file /etc/conf.modules
+
+       The configuration file consists of a set of lines.
+       All empty lines, and all text on a line after a '#',  will
+       be ignored.
+       Lines may be continued by ending the line with a '\'.
+       The  remaining lines should all conform to one of the fol­
+       lowing formats:
+
+         keep
+         parameter=value
+         options module symbol=value ...
+         alias module real_name
+         pre-install module command ...
+         install module command ...
+         post-install module command ...
+         pre-remove module command ...
+         remove module command ...
+         post-remove module command ...
+
+So. It must be a syntax error when I enter the following in conf.modules and
+nothing happens. Can anyone enlighten me?
+
+options tulip medianame[] = 10baseT(forced)
+
+-+-+-+-+-+-+-+-+-+-
+Ian Hogben | Safcol Australia
+
+<A HREF="mailto:ian">mailto:ian</A>@safcol.com.au | fon:(08)82821082 | fax:(08)82821099
+-+-+-+-+-+-+-+-+-+-
+Ho! Tom Bombadil, Tom Bombadillo!
+By water, wood and hill, by reed and willow,
+By fire, sun and moon, harken now and hear us!
+Come, Tom Bombadil, for our need is near us!
+		-- J. R. R. Tolkien
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

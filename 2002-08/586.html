@@ -1,0 +1,166 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Round 1 to Apache (was: Tomcat4 - Apache )" -->
+<!-- FromName="'nik [tm]'" -->
+<!-- FromEmail="tmcruisin@sond.com.au" -->
+<!-- ToName="'LinuxSA Mailing List'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 22 Aug 2002 15:17:23 +0930" -->
+<!-- Id="3D647AEB.9050101@sond.com.au" -->
+<!-- Reference="62D5F72B69A7BB4DA9D72477134ADE090738F2@einstein" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Round 1 to Apache (was: Tomcat4 - Apache )</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: nik [tm] &lt;<I><A HREF="mailto:tmcruisin@sond.com.au">tmcruisin@sond.com.au</A></I>&gt;
+  To  : LinuxSA Mailing List &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 22 Aug 2002 15:17:23 +0930
+</PRE>
+<H1>Re: Round 1 to Apache (was: Tomcat4 - Apache )</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+hmm round 3 to MTA's
+tabs dont come out in the finished email!
+its the conn part that had the config error, not the WebbAppDeploy as 
+the email suggests!
+
+
+
+
+nik [tm] wrote:
+&gt; round 2 to nik!
+&gt; 
+&gt; found the error in the Virtualhost directive
+&gt;  &gt;   WebAppConnection conn warp 150.101.236.173:8180
+&gt;  &gt;   WebAppDeploy recharge conn /recharge
+&gt;               ^^^^
+&gt; 
+&gt; fixed the apache error refeerring to the connection not configured..
+&gt; trying to run it without a DocmentRoot set, as I know the tomcat server 
+&gt; knows the document root??
+&gt; 
+&gt; well it might work!
+&gt; 
+&gt; cheers
+&gt; nik [tm]
+&gt; 
+&gt; 
+&gt; nik [tm] wrote:
+&gt; 
+&gt;&gt;
+&gt;&gt; hmmm..
+&gt;&gt;
+&gt;&gt; just had a go at setting this one up (the webapp module for apache to 
+&gt;&gt; work with tomcat) and run into a problem.
+&gt;&gt; I have currently two seperate machines (one apache server, the other 
+&gt;&gt; tomcat)
+&gt;&gt; thought I would see how they go working like that.
+&gt;&gt;
+&gt;&gt; now the problem I have is that apache seems to want a local 
+&gt;&gt; DocumentRoot location, but the jsp's are all on the other machine.
+&gt;&gt;
+&gt;&gt; httpd.conf;
+&gt;&gt;
+&gt;&gt; #tomcat config
+&gt;&gt;  &lt;VirtualHost 150.101.236.172&gt;
+&gt;&gt;   ServerName tomcat.sond.com.au
+&gt;&gt;   DocumentRoot /var/tomcat4/webapps
+&gt;&gt;   WebAppConnection conn warp 150.101.236.173:8180
+&gt;&gt;   WebAppDeploy recharge warpConnection /recharge
+&gt;&gt;  &lt;/VirtualHost&gt;
+&gt;&gt;
+&gt;&gt; when I run the 'apachectl configtest' it complains that DocumentRoot 
+&gt;&gt; doesnt exist locally.
+&gt;&gt;
+&gt;&gt; Warning: DocumentRoot [/var/tomcat4/webapps] does not exist
+&gt;&gt;
+&gt;&gt; now I wish the files to be run form the other server..is it possible 
+&gt;&gt; to do that?
+&gt;&gt;
+&gt;&gt; and then to match the apache config, is this correct as the tomcat 
+&gt;&gt; config?
+&gt;&gt;
+&gt;&gt;   &lt;!-- Define an Apache-Connector Service --&gt;
+&gt;&gt;   &lt;Service name="Tomcat-Apache"&gt;
+&gt;&gt;
+&gt;&gt;     &lt;Connector 
+&gt;&gt; className="org.apache.catalina.connector.warp.WarpConnector"
+&gt;&gt;      port="8180" minProcessors="5" maxProcessors="75"
+&gt;&gt;      enableLookups="false" appBase="webapps"
+&gt;&gt;      acceptCount="10" debug="0"/&gt;
+&gt;&gt;
+&gt;&gt;     &lt;!-- Replace "localhost" with what your Apache "ServerName" is set 
+&gt;&gt; to --&gt;
+&gt;&gt;     &lt;Engine className="org.apache.catalina.connector.warp.WarpEngine"
+&gt;&gt;      name="tomcat.sond.com.au" debug="0"&gt;
+&gt;&gt;
+&gt;&gt;       &lt;!-- Global logger unless overridden at lower levels --&gt;
+&gt;&gt;       &lt;Logger className="org.apache.catalina.logger.FileLogger"
+&gt;&gt;               prefix="apache_log." suffix=".txt"
+&gt;&gt;               timestamp="true"/&gt;
+&gt;&gt;
+&gt;&gt;       &lt;!-- Because this Realm is here, an instance will be shared 
+&gt;&gt; globally --&gt;
+&gt;&gt;       &lt;Realm className="org.apache.catalina.realm.MemoryRealm" /&gt;
+&gt;&gt;
+&gt;&gt;     &lt;/Engine&gt;
+&gt;&gt;
+&gt;&gt;   &lt;/Service&gt;
+&gt;&gt;
+&gt;&gt; as the 'apachectl configtest' also complains of;
+&gt;&gt;
+&gt;&gt; Syntax error on line 1146 of /usr/local/apache/conf/httpd.conf:
+&gt;&gt; Specified connection not configured
+&gt;&gt;
+&gt;&gt; line 1146 is the WebAppDeploy line of the Virtualhost directive, but 
+&gt;&gt; this is probably due to not finding DocumentRoot, therefore cannot 
+&gt;&gt; find the recharge folder in DocumentRoot right??
+&gt;&gt;
+&gt;&gt; anyone have any suggestion?
+&gt;&gt; do the jsp's need to be on the apache machine? then get compiled into 
+&gt;&gt; servlets across the internet? (doesnt sound right to me, and I dont 
+&gt;&gt; think i like the idea of doing that)
+&gt;&gt;
+&gt;&gt;
+&gt;&gt; tia
+&gt;&gt; nik [tm]
+&gt;&gt;
+&gt;&gt;
+&gt; 
+&gt; 
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

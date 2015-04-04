@@ -1,0 +1,133 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PPP, Dynamic IP, and an IPCHAINS script" -->
+<!-- FromName="Jake Hawkes" -->
+<!-- FromEmail="jake@infinitylimited.net" -->
+<!-- ToName="Adam J. Sulis" -->
+<!-- ToEmail="asulis@range.on.ca" -->
+<!-- Date="Mon, 19 Jun 2000 08:59:31 +0930" -->
+<!-- Id="394D5B5B.78B318DD@infinitylimited.net" -->
+<!-- Reference="4.3.2.7.0.20000618193806.00ac9590@pop3.sprint.ca" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PPP, Dynamic IP, and an IPCHAINS script</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  To  : Adam J. Sulis &lt;<I><A HREF="mailto:asulis@range.on.ca">asulis@range.on.ca</A></I>&gt;
+  Date: Mon, 19 Jun 2000 08:59:31 +0930
+</PRE>
+<H1>Re: PPP, Dynamic IP, and an IPCHAINS script</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+also, you might like to look at the scripts that bring the interfaces up
+and down. that is, the scripts is /etc/sysconfig/network-scripts/
+
+ifup calls ifup-ppp, ifup-ppp execute pppd, then ifup calls ifup-post.
+
+all these scripts are passed like 6 arguments, including interface IP
+address, interface device name and so on.
+
+so for the example where you only have 1 ppp interface, using ppp+ in
+ipchains will work ok, but if the box has many modems, some which are
+dial in some which are dial out, then you will run into problems.
+
+one of the thing I found was that if you run "ifup ppp0" but for example
+a dial-in line had already been established, it (the dialin) will grab
+ppp0, and your dialout will grab (most likely) ppp1.
+
+problem - because you cant be sure what interface name it will have.
+
+something I would like to know is, where is the doco that explains what
+these arguments are, *because* they change from script to script....
+
+"Adam J. Sulis" wrote:
+&gt; 
+&gt; Whoa, I never even considered that idea. Much better indeed, and more
+&gt; secure (I preferred having the services independant, but resigned myself to
+&gt; tying them together.
+&gt; 
+&gt; This group rocks. Thanks Daryl, I owe you one. I'll try this tomorrow.
+&gt; 
+&gt; At 09:55 AM 6/19/00 +0930, you wrote:
+&gt; &gt;"Adam J. Sulis" wrote:
+&gt; &gt;
+&gt; &gt; &gt; I hope this doesn't transmit in HTML - first email using Eudora (I think I
+&gt; &gt; &gt; have it all config'd).
+&gt; &gt;
+&gt; &gt;All text-amundo.
+&gt; &gt;
+&gt; &gt; &gt; Here is the glitch: Once dialed in, my ppp0 interface is given a dynamic,
+&gt; &gt; &gt; random IP from the ISP's pool. However, a few lines of code later in the
+&gt; &gt; &gt; script, my firewall script pre-sets a number of variables, one of which is
+&gt; &gt; &gt; the external interface IP, "IPADDR". I need to find a way to pass the new
+&gt; &gt; &gt; IP address to this variable on-the-fly so that IPCHAINS can pick it up and
+&gt; &gt; &gt; use it. The affected part of the script (trimmed for size) appears at the
+&gt; &gt; &gt; end of this message.
+&gt; &gt;
+&gt; &gt;Rather than using the IP address, why not use the interface?  eg, excerpt
+&gt; &gt;from my firewall script -
+&gt; &gt;
+&gt; &gt;##  I like pinging, boing boing boing ...
+&gt; &gt;##  Up and down until I get a pain in me groin ...
+&gt; &gt;/sbin/ipchains -A input -i ppp+ -p icmp -j ACCEPT
+&gt; &gt;
+&gt; &gt;##  Expose services SMTP, SSHD to PPP interface.
+&gt; &gt;/sbin/ipchains -A input -i ppp+ -p tcp --dport ssh --syn -j ACCEPT -l
+&gt; &gt;/sbin/ipchains -A input -i ppp+ -p tcp --dport smtp --syn -j ACCEPT -l
+&gt; &gt;
+&gt; &gt;ppp+ denotes all ppp interfaces, so if it should happen to come up
+&gt; &gt;on ppp1, things remain OK.  Used this way, the ipchain config can be
+&gt; &gt;in place _before_ your link is brought up, and can work independantly.
+&gt; &gt;Otherwise, there exists a small window of opportunity to get at your
+&gt; &gt;system.
+&gt; &gt;
+&gt; &gt;Regards,
+&gt; &gt;   Daryl Tester
+&gt; &gt;
+&gt; &gt;--
+&gt; &gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; &gt;To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+--
+Jake Hawkes B.Eng, (CSE)
+
+"I'm only smart enough to know how stupid I am", Joe Strummer.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,113 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: crontab/crondaily questions" -->
+<!-- FromName="'Darryl Ross'" -->
+<!-- FromEmail="dross@syc.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="kortschak@rsbs.anu.edu.au" -->
+<!-- Date="Thu, 5 Dec 2002 07:47:42 +1030 (CST)" -->
+<!-- Id="59264.192.168.14.4.1039036662.squirrel@test.syc.net.au" -->
+<!-- Reference="Pine.LNX.4.44.0212050742560.32257-100000@sunya.rsbs.anu.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: crontab/crondaily questions</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Darryl Ross &lt;<I><A HREF="mailto:dross@syc.net.au">dross@syc.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:kortschak@rsbs.anu.edu.au">kortschak@rsbs.anu.edu.au</A></I>&gt;
+  Date: Thu, 5 Dec 2002 07:47:42 +1030 (CST)
+</PRE>
+<H1>Re: crontab/crondaily questions</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; However, it still runs around 7:30 in the morning
+
+Is the cron job *starting* at around 7.30, or is it *still running* at
+around 7.30? How long does the job take to complete if you run it by hand?
+
+Perhaps the cron job is not finishing for 4 hours? I've had some problems
+with the mgetty logrotate script on RH that caused it to not delete the
+old log files, so instead of having:
+
+mgetty.log.ttyS0
+mgetty.log.ttyS0.1
+mgetty.log.ttyS0.2
+mgetty.log.ttyS0.3
+mgetty.log.ttyS0.4
+
+It would end up doing something like this:
+
+mgetty.log.ttyS0
+mgetty.log.ttyS0.1
+mgetty.log.ttyS0.1.1
+mgetty.log.ttyS0.1.1.1
+mgetty.log.ttyS0.1.1.1.1
+mgetty.log.ttyS0.1.1.1.1.1
+mgetty.log.ttyS0.1.1.1.1.1.1
+mgetty.log.ttyS0.1.1.1.1.1.1.1
+mgetty.log.ttyS0.1.1.1.1.1.1.1.1
+mgetty.log.ttyS0.1.1.1.1.1.1.1.1.1
+mgetty.log.ttyS0.1.1.1.1.1.1.1.1.1.1
+
+And it would keep going until it filled the /var partition up. The end
+result was that 1) the logrotate cronjob would take long to run, due to
+needing to rotate more and more files each day, and 2) other scripts like
+updatedb took longer as well.
+
+For those that are interested in fixing the above problem, you need to
+edit the /etc/logrotate.d/mgetty script and change the:
+
+/var/log/mgetty.log.* {
+        nocompress
+        missingok
+}
+
+To something like the following:
+
+/var/log/mgetty.log.ttyS0 {
+        nocompress
+        missingok
+}
+
+Note that you will need to put in a block for each modem that's generating
+a log file. Damn wildcards!
+
+Anyways, not saying that's your problem, but hopefully it will help.
+
+Regards
+Darryl
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

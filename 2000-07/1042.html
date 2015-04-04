@@ -1,0 +1,85 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PostgreSQL and perl" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Matthew Geddes" -->
+<!-- ToEmail="mgeddes@xavier.sa.edu.au" -->
+<!-- Date="Thu, 20 Jul 2000 10:17:00 +0930" -->
+<!-- Id="20000720101700.C94507@atdot.dotat.org" -->
+<!-- Reference="3975519D.D19CE64E@xavier.sa.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PostgreSQL and perl</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@xavier.sa.edu.au">mgeddes@xavier.sa.edu.au</A></I>&gt;
+  Date: Thu, 20 Jul 2000 10:17:00 +0930
+</PRE>
+<H1>Re: PostgreSQL and perl</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Jul 19, 2000 at 04:28:37PM +0930, Matthew Geddes wrote:
+
+ &gt; I have a perl script which reads from and writes to a portgres database.
+ &gt; I need to be able to pick rows out from an index field (the primary
+ &gt; key). Is there a way of having postgres take care of what is in this
+ &gt; field (like the AutoNumber feature in - I hate to say it - Access)?
+
+Use the "serial" attribute when you create the table:
+
+   create table foo (
+      id serial,
+      some_random_value varchar(16)
+   );
+
+The "id" field will autoincrement when you insert rows.
+
+A warning, though:  If you use pg_dump to dump the table, then restore
+it back, the state of the serial number is not maintained:  After 
+the restore creates the table, the serial number will be initialized
+to 0, which means your inserts will fail because they attempt to create
+duplicate keys.  This "feature" sucks so badly that words fail me.
+You can work around it by writing a bit of perl to parse the pg_dump
+output and reinstate table rows via INSERT statements instead of 
+the COPY FROM STDIN command pg_dump writes out.
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

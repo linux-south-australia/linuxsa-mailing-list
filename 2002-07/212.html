@@ -1,0 +1,141 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Calculating Netmask Values" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'Andrew Pullin'" -->
+<!-- ToEmail="andrew@hotspurbgc.com.au" -->
+<!-- Date="Mon, 8 Jul 2002 10:13:14 +0930" -->
+<!-- Id="20020708101314.I4242@yellowgoanna.com" -->
+<!-- Reference="002201c2250b$d17a0ce0$c2de26cb@hotspurbgc.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Calculating Netmask Values</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : Andrew Pullin &lt;<I><A HREF="mailto:andrew@hotspurbgc.com.au">andrew@hotspurbgc.com.au</A></I>&gt;
+  Date: Mon, 8 Jul 2002 10:13:14 +0930
+</PRE>
+<H1>Re: Calculating Netmask Values</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, Jul 07, 2002 at 02:40:17AM +1000, Andrew Pullin wrote:
+&gt; Hi All,
+&gt;     I have a rather annoying problem with a dual boot
+&gt; desktop at present. It works fine with the Redmond Product,
+&gt; but when I boot Linux (Suse 7.2 Pro) I discovered I couldn't
+&gt; surf with Netscape. On further investigation (I initially
+&gt; thought it was a DNS problem), I came across the following
+&gt; error msg in the boot log:
+&gt; 
+&gt; Setting up network device eth0
+&gt; doneSetting up IPv6 network interface (no address)done
+&gt; Setting up routing (using /etc/route.conf)
+&gt; Error while excuting:
+&gt;     /sbin/route add -net 203.XX.YYY.193 netmask 255.255.0.0
+&gt; gw 203.XX.YYY.193 dev eth0
+&gt;     route: netmask doesn't match route address
+
+I would suggest two things:
+
+1) network addresses are all 0's in the host part, so your address
+should be 203.XX.0.0 if the netmask is correct. Alternately, if you
+meant "-net 203.XX.YYY.192", then your netmask probably should have
+been "255.255.255.192" or 255.255.255.224 or ...240 or ...248 or
+...252, depending on the size of your subnet (that's /26, /27, /28,
+/29 and /30 respectively -- meaning the number of bits in the network
+address ... )
+
+2) Your gateway appears to be on the network you are routing. The
+gateway needs to be accessible -- on your current network or some
+other accessible route. It is the "gateway" (forget the jargon, think
+garden gate) to the network you are specifying. What you are saying
+above is: "to get to this area, go via this gate", and if the gate is
+only accessible from in the area, it won't work :)
+
+2) 203.anything is a Class C network, so your netmask has to be at
+least 255.255.255.0 ...
+<A HREF="http://www.webopedia.com/DidYouKnow/Internet/2002/IPaddressing.html">http://www.webopedia.com/DidYouKnow/Internet/2002/IPaddressing.html</A>
+
+Briefly, network classes, while being superseded by the CIDR concept,
+are still important, and I have a feeling that any CIDR networks
+(anything with other than 255 or 0 in the netmask) need to actually
+subnet an old style network class -- you can't aggregate 16 class C's
+into one /20 network AFAIK...
+
+HTH
+
+rr
+
+
+&gt; Setting up routingfailed
+&gt; 
+&gt;     Now I know that the Netmask here is wrong (everything
+&gt; else uses 255.255.255.192), but it occurred to me that if it
+&gt; was something different I don't have a clue how to calculate
+&gt; a Netmask anyhow, and after a bit of a search I couldn't
+&gt; find anything on the Net about how to either. Further to
+&gt; this problem, the 255.255.255.192 works on all the M$ boxes
+&gt; and my Server, but when I tried to manually run the command
+&gt; as root on the Linux Desktop with what I thought to be the
+&gt; correct Netmask, I got the same error. Now I have had a
+&gt; routing problem before that was solved when someone kindly
+&gt; calculated the Netmask for me (ie 255.255.255.192), but to
+&gt; be honest I just took their word for it because it worked.
+&gt; Can someone help me out here and show me and everybody else
+&gt; here who might have run into this problem - How do you
+&gt; calculate a Netmask? Any suggestions as to why the route
+&gt; command doesn't work for other resons would also be
+&gt; appreciated.
+&gt;     Cheers!
+&gt;         Andrew.
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+&gt; 
+
+-- 
+-- 
+Richard Russell
+Yellow Goanna P/L
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+m: +61 412 827 805
+f: +61 8 8462 2362
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

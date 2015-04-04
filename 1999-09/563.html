@@ -1,0 +1,111 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba/FTP Question" -->
+<!-- FromName="Adrian Butterworth" -->
+<!-- FromEmail="adrian@econ-outlook.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="LinuxSA <linuxsa@linuxsa.org.au>, ka3uww@iname.com" -->
+<!-- Date="Sun, 26 Sep 1999 15:37:46 +0930" -->
+<!-- Id="99092617563901.08731@groc.econ-outlook.com.au" -->
+<!-- Reference="37EBCFE1.D49D1954@zelie.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba/FTP Question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adrian Butterworth &lt;<I><A HREF="mailto:adrian@econ-outlook.com.au">adrian@econ-outlook.com.au</A></I>&gt;
+  To  : <A HREF="mailto:LinuxSA <linuxsa@linuxsa.org.au>">LinuxSA <linuxsa@linuxsa.org.au></A>, <A HREF="mailto:ka3uww@iname.com">ka3uww@iname.com</A>
+  Date: Sun, 26 Sep 1999 15:37:46 +0930
+</PRE>
+<H1>Re: Samba/FTP Question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Frank
+
+On Sat, 25 Sep 1999, Frank W. Holden Jr. wrote:
+&gt; Here is the deal guys and gals, I want to be able to play my mp3's via
+&gt; SAMBA on my LAN, BUT (here it comes) I do NOT want people that
+&gt; anonymous FTP in to my box to SEE any files or download those files,
+&gt; BUT (the biggie one) I do want the users that FTP in to their own
+&gt; accounts to be able to FTP the mp3 files. Sounds like a lot of butt
+&gt; here huh??? &gt;[;^)
+&gt; 
+&gt; Lets see if I can say it like this:
+&gt; 1. On the LAN using Samba, YES to play mp3 files 
+&gt; 2. FTP from inet w/ account, YES dl mp3's
+&gt; 3. FTP from LAN, YES dl mp3's
+&gt; 4. FTP anonymous, NO see no mp3's
+&gt; 
+&lt;snip&gt;
+
+There are several approaches possible but given you want to control
+access from several services I'd use the underlying file system
+security. 
+
+1. select a existing group like "users" (cat /etc/group for a list) or
+   create a new one - say "mp3".
+
+2. add all existing "real" users to this group or the subset you want
+   to be able to access the mp3s.
+   (don't include ftp, nobody... or any UIDs below 100)
+
+3. change the mp3 direcory and its contents group
+   # chgrp -R users /home/samba/mp3
+   (substitute the group you've chosen, and the mp3 directory) then
+   remove all privileges for "other" users with
+   # chmod -R o-rwx /home/samba/mp3 
+
+4. Also unless your happy for all users to be able to delete/change
+   your mp3's its a good idea to remove group write access
+   # chmod -R g-w /home/samba/mp3
+
+To make maintenance easier.
+1. make the mp3 directory setGID this will ensure any new files placed
+   in it inherit the directories group irrespective of who puts them
+   there.
+   # chmod g+s /home/samba/mp3
+   If there are any existing subdirectories do the same for them. The
+   following will do this automatically if you have a lot!
+   # find /home/samba/mp3 -type d -exec chmod g+s {} \; 
+   (you need the " \;" - man find for explanation of the syntax)
+
+2. If you add lots of users you may want to tweak or wrap your preferred
+   user add utility to automatically add new users to the group you
+   are using, if it doesn't already
+
+E&OE
+Regards
+
+Adrian Butterworth
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

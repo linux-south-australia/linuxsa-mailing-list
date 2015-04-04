@@ -1,0 +1,164 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba Authentication [Was: Samba user management]" -->
+<!-- FromName="'Adam Smith'" -->
+<!-- FromEmail="adam.smith@sageautomation.com" -->
+<!-- ToName="'Matthew Geddes'" -->
+<!-- ToEmail="mgeddes@tellurian.com.au" -->
+<!-- Date="Wed, 12 Mar 2003 15:35:56 +1030" -->
+<!-- Id="20030312050556.GD20516@sageautomation.com" -->
+<!-- Reference="1047441534.27365.43.camel@hilarious" -->
+<!-- X-Face="$vsV$1FNbZN\JVpjV#&+/!oVW`Kw$j?w_,te\SS}(tKD21c+l$t%\RCS(r$G;XXk]6,(!N:&(N3EV0bY`3):UrgG7'*qsj3l.75IaHV1<`i*{[L\:F*l6fH##C:-p2]xW/R-Z:!bo;5g3GP-{I{}7O>tN}`Xm/=-:8NG?f-r'$Qc3y[aW-7'W_S<`KYU!_;`7K=kuC$-.7J2*kk=~`c@ADp+xhsv(!a@eW-R_5wtx+tC)(]%W+" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba Authentication [Was: Samba user management]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adam Smith &lt;<I><A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A></I>&gt;
+  To  : Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  Date: Wed, 12 Mar 2003 15:35:56 +1030
+</PRE>
+<H1>Re: Samba Authentication [Was: Samba user management]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Mar 12, 2003 at 02:28:54PM +1030, Matthew Geddes said:
+&gt; This e-mail's quite long and hopefully some use. I've tried to address
+&gt; the first question and most of the rest in the first chunk and I'll try
+&gt; to address the bits I've missed as I get to them.
+
+Big long useful ones are the best :-)
+
+&gt; &gt; On this topic, what is generally seen as the "best" way to authenticate
+&gt; &gt; users?
+ 
+&gt; My recommendation for a Windows system would be to make use of it's own
+&gt; native protocols. Many applications make an assumption that this will be
+&gt; the case and it will save you much grief later.
+
+When you say a "Windows system," are you talking about a purely Windows
+environment?  If so I couldn't agree more.
+
+&gt; For Linux and other PAM-enabled systems, I'd go with whatever you like
+&gt; :-). LDAP is quite popular and a personal favourite of mine and has
+&gt; other advantages which I'll try to cover a little further down this
+&gt; page.
+
+I think LDAP offers the most functionality across the board.  I think LDAP
+takes quite a bit of getting used to, however, if you've never set it up
+before.
+
+&gt; &gt; 	o  Clients authenticating from Windows workstations via a Samba
+&gt; &gt; 	   Domain
+&gt; 
+&gt; When using the 'encrypt passwords = no' option in smb.conf, Samba can
+&gt; (if compiled to do so) authenticate using PAM. If you have the 'encrypt
+&gt; passwords' option set to yes, you cannot.
+
+Encrypt passwords is set to yes.  I think with Windows XP it is a
+requirement for Samba to have "encrypt passwords" set to yes.  Is this a
+complication when authenticating with PAM, if so, how so, and what do you
+do about it?
+
+&gt; &gt; 	o  Dial-Up clients
+&gt; 
+&gt; This one kinda depends on what the modems are plugged into. If it's some
+&gt; kind of RADIUS speaking device, it can use RADIUS :-).
+
+They're currently connected to a NT RAS server on serial ports, and they're
+just modems, but I'd like to move them to FreeBSD eventually.  I assume
+that if I configure that NT server to authenticate against the Samba
+domain, which authenticates to LDAP through PAM, those current RAS users
+can still authenticate against NT, through PAM to LDAP, right? :)  ...
+without any additional configurations.
+
+&gt;   * Authenticate the users of UNIX services using PAM, where possible.
+
+I agree.
+
+&gt;   * Have PAM configured to authenticate the users based on information
+&gt; 	stored in an LDAP directory (doesn't have to be on UNIX
+&gt;  	machines)
+
+LDAP to me is the most difficult part at this time.  It's one of the
+reasons I never bothered with it when I began this project, because I
+didn't want to tackle too much at once.  It seems like something reasonably
+complicated.
+
+&gt;   * Turn on password encryption on the Samba PDC
+
+(as above) how does this integrate with PAM?
+
+&gt;   * Have Samba compiled and configured to store it's authentication in
+&gt; 	the same LDAP directory
+
+Oh -- so Samba authenticates outside of PAM, directly into LDAP, whereas
+everything else authenticates through PAM into LDAP?
+
+&gt;   * Configure Samba to update unix passwords (unix passwd sync smb.conf 
+&gt; 	option) in the LDAP directory when Samba password changes
+
+Well that answers that, it must, or that wouldn't work.  If I turn on "unix
+password sync," is that all I need to do once Samba is compiled with
+--enable-ldap (or whatever it is?)
+
+&gt;   * Let users change their passwords using the Windows control panel
+
+Is there any functionality for strong passwording or forced password
+changes every n days, because as far as I know, PAM can do this.  Can Samba
+do it when querying LDAP directly, or do I still have to wait for Samba
+3.x?
+
+&gt;   * Use Directory Administrator or some custom tool for your own
+&gt; 	management purposes.
+
+Directory Administrator?  An LDAP tool?
+
+&gt;   * The dialup lines can use one or more of the above methods or you can
+&gt; 	set up FreeRADIUS on one of the UNIX machines and tell it to use
+&gt; 	PAM and therefore the LDAP directory.
+
+That was the option I was considering for these users.
+
+
+Thanks for your input so far :)
+
+-- 
+Adam Smith
+Information Technology Officer
+SAGE Automation Ltd.
+
+<A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A>
+<A HREF="http://www.sageautomation.com">http://www.sageautomation.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

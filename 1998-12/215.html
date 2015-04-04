@@ -1,0 +1,148 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IP Masquerading questions" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Darryl Ross" -->
+<!-- ToEmail="darryl@bachblue.com.au" -->
+<!-- Date="Tue, 15 Dec 1998 10:54:39 +1030 (CST)" -->
+<!-- Id="199812150024.KAA05832@atdot.dotat.org" -->
+<!-- Reference="000201be27bc$c17d45a0$0201a8c0@darryl-ws" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IP Masquerading questions</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Darryl Ross &lt;<I><A HREF="mailto:darryl@bachblue.com.au">darryl@bachblue.com.au</A></I>&gt;
+  Date: Tue, 15 Dec 1998 10:54:39 +1030 (CST)
+</PRE>
+<H1>Re: IP Masquerading questions</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Darryl Ross wrote:
+
+ &gt; &gt;As for the "the packets include the LAN ip address" thing, what I think
+ &gt; &gt;happens here is that some sort of connection is established by you sending
+ &gt; &gt;the message, and the icq on the remote end sends packets through this
+ &gt; &gt;connection. This is handled the normal masq way.
+ &gt; 
+ &gt; The way I understood how masquerading works, when my Win box sends a packet
+ &gt; out over the LAN, destined for the Net, it has only got a LAN header in the
+ &gt; packets and what the linux gateway machine does is to add an Internet header
+ &gt; to the packets, so the packets have 2 lots of headers.
+
+Not quite.
+
+When your Winblows box sends a packet it just transmits it as a perfectly
+normal IP packet, no different from any other IP packet it'd send if it
+wasn't masquerading (remember, the whole point of masquerading is that
+the machines behind the firewall aren't aware that masquerading is 
+happening).
+
+Let's try a worked example:  Imagine your Winblows box is 192.168.30.1
+and your Linux box is 192.168.30.2, with a PPP interface on 203.23.150.33.
+
+Here's what happens when you telnet from the Winblows box to archie.au:
+
+1.  At connection establishment time, the Winblows box allocates
+    an essentially random port number for its end of the connection
+    (let's call it port 12345).  Because you're telneting to archie.au
+    the destination port number is 23.
+
+         [ 192.168.30.1 : 12345 ] -&gt; [ archie.au : 23 ]
+
+    This packet is sent via the default router, as judged by the Winblows
+    box's routing table.
+
+2.  The default router, your Linux system, receives the packet and sucks
+    it into the kernel.  The kernel says, "Ah, I'm masquerading," and
+    allocates a random port number for the masqueraded connection (let's
+    say it's port 23456) and rewrites the IP header in the packet from
+    the Winblows box before retransmitting it.  So the packet becomes:
+
+         [ 203.23.150.33 : 23456 ] -&gt; [ archie.au : 23 ]
+
+3.  This packet makes its way out onto the net, and eventually arrives
+    at archie.au.  archie.au will want to ACK it or send some other data
+    back;  when it does that it transmits to the source address/port in
+    the IP header used at connection establishment time;  In this case,
+    that's the PPP interface IP address on your Linux box and port number
+    23456.  So returning packets look like:
+
+         [ archie.au : 23 ] -&gt; [ 203.23.150.33 : 23456 ]
+
+4.  When such a packet arrives on your Linux PPP interface the reverse
+    of step (2) is carried out:  The linux box says, "Ah, port 23456 
+    belongs to a masqueraded connection.  When I established it I made
+    sure I remembered that port 23456 actually corresponds to 
+    192.168.30.1 port 12345, so I'll rewrite the *destination* address
+    accordingly:
+
+         [ archie.au : 23 ] -&gt; [ 192.168.30.2 : 12345 ]
+
+Results:
+
+ a. Winblows box thinks it's directly connected to the net even though it
+    is firewalled;
+
+ b. Internet machines can't get packets to the Winblows box unless it has
+    already established a connection (i.e.: incoming connections yield a
+    connection refused message from the Linux machine, assuming they're 
+    routable at all).
+
+(b) is sometimes seen as a security benefit, but it's also sometimes
+seen as a problem (if you want an ftp or web server on your LAN, for
+example).  You can get ride of the problematic aspects of it by saying
+to your Linux box, "here's a port number:  Whenever you see packets 
+coming in on this port number, forward them to this other port number on
+this other IP address".  For instance, you might say, "forward packets
+destined for [ 203.23.150.33 : 80 ] to [ 192.168.30.1 : 1025 ]."  Then
+HTTP connections to your Linux box would be redirected to a web server
+running on port 1025 on your Winblows box (yech).
+
+That's what you have to set up to make ICQ work.  The above also explains
+why many network interactions are asymmetric when you use masquerading
+(i.e.: you can do something to other hosts, but they can't do it back to
+you).
+
+Hope this helps,
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1958-3414 ------------- Fax: +61-8-83034403 -----
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

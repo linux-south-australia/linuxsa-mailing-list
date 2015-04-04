@@ -1,0 +1,131 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: more (lowish impact) SuSE 7.1 woe+travail" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 5 Apr 2001 04:11:24 +0930" -->
+<!-- Id="20010405041124.A5933@dog.topology.org" -->
+<!-- Reference="20010403160500.A418@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: more (lowish impact) SuSE 7.1 woe+travail</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 5 Apr 2001 04:11:24 +0930
+</PRE>
+<H1>Re: more (lowish impact) SuSE 7.1 woe+travail</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, Apr 03, 2001 at 04:05:00PM +0930, Alan Kennington wrote:
+&gt; Here's a minor saga in getting some basic things working
+&gt; on SuSE 7.1. 
+[....]
+ 
+&gt; 6.	The server isn't running any more.
+&gt; 	So I try 
+&gt; 	    cd /etc/rc.d
+&gt; 	    ./apache start
+&gt; 	and get:
+&gt; 
+&gt; Starting httpd [ SuSEHelp SSL PHP3 mod_perl contrib backhand ]
+&gt; see /var/log/httpd/rcapache.log for details
+&gt; 
+&gt; 	and the file /var/log/httpd/rcapache.log contains:
+&gt; 
+&gt; Syntax error on line 199 of /etc/httpd/httpd.conf:
+&gt; Cannot load /usr/lib/apache/libphp3.so into server: shared object not open
+
+Well, no one sent me a solution to this problem.
+So I brought out the big guns: "strace" and "vi".
+
+Result, when I traced through /etc/rc.d/apache, there was nothing
+suspicious. But the child "httpd" process had a long
+string of attempts to locate files like "libgd" - thusly:
+
+========================================================
+open("/lib/i586/mmx/libgd.so.4", O_RDONLY) = -1 ENOENT (No such file or directory)
+stat64("/lib/i586/mmx", 0xbfffcac4)     = -1 ENOENT (No such file or directory)
+open("/lib/i586/libgd.so.4", O_RDONLY)  = -1 ENOENT (No such file or directory)
+stat64("/lib/i586", 0xbfffcac4)         = -1 ENOENT (No such file or directory)
+open("/lib/mmx/libgd.so.4", O_RDONLY)   = -1 ENOENT (No such file or directory)
+stat64("/lib/mmx", 0xbfffcac4)          = -1 ENOENT (No such file or directory)
+open("/lib/libgd.so.4", O_RDONLY)       = -1 ENOENT (No such file or directory)
+stat64("/lib", {st_mode=S_IFDIR|0755, st_size=2265, ...}) = 0
+open("/usr/lib/i586/mmx/libgd.so.4", O_RDONLY) = -1 ENOENT (No such file or directory)
+stat64("/usr/lib/i586/mmx", 0xbfffcac4) = -1 ENOENT (No such file or directory)
+open("/usr/lib/i586/libgd.so.4", O_RDONLY) = -1 ENOENT (No such file or directory)
+stat64("/usr/lib/i586", 0xbfffcac4)     = -1 ENOENT (No such file or directory)
+open("/usr/lib/mmx/libgd.so.4", O_RDONLY) = -1 ENOENT (No such file or directory)
+stat64("/usr/lib/mmx", 0xbfffcac4)      = -1 ENOENT (No such file or directory)
+open("/usr/lib/libgd.so.4", O_RDONLY)   = -1 ENOENT (No such file or directory)   
+========================================================
+
+This was a bit of a clue that I needed to load up the "gd" library.
+But I'm pretty sure that this was there before.
+Somehow it just disappeared.
+
+So I re-installed this from the SuSE 7.1 disks, and .....
+Now "httpd" works as advertised.
+
+-----------------------------------------------
+Moral:
+It seems like when the dlopen() function is called (or something
+like that) to load a shared-object library, it must be trying
+to link up the libraries upon which it depends, in this case "libgd".
+And if any cited library is not openable, it returns through
+dlerror() (or something like that) the message:
+
+    shared object not open
+
+This is less clear than mud!
+How is anyone supposed to know that this means you have to run
+"strace" to find out the missing library and install it???
+
+Anyway, now, after 6 hours of wasted effort (and finding that
+the latest stable version of Apache does not compile as is
+on SuSE 7.1, which is still an issue...), I've got back to
+square one.
+This is why I don't recommend linux to anyone who doesn't have a
+huge reserve of energy, stamina, time, bravado, gumption,
+and mongrel doggedness.
+
+Cheers, and goodnight,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

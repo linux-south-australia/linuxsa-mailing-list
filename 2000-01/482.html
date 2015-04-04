@@ -1,0 +1,90 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Zombies" -->
+<!-- FromName="behoffski" -->
+<!-- FromEmail="behoffski@grouse.com.au" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 14 Jan 2000 17:08:41 +1030" -->
+<!-- Id="387EC471.6608C724@grouse.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Zombies</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: behoffski &lt;<I><A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 14 Jan 2000 17:08:41 +1030
+</PRE>
+<H1>Re: Zombies</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Zombies are implemented in order to ensure that last-gasp 
+information about the child process can be captured by the parent 
+process.  In particular, this includes the exit status 
+and the net resource usage of the child.  These are 
+part of the complete support for multiprocessing provided 
+by Unix.  
+
+However, this feature creates a (smallish) management 
+problem for the programmer: where a program spawns 
+child processes, it must also register a signal handler 
+to receive the child process exit, and must call 
+waitpid(2) to finally dispose of the carcass of the 
+child process.  This call can be difficult to 
+schedule amongst other activities unless you've 
+designed your program really, really carefully, 
+and there are tricky race conditions that can lead 
+to these exit signals being missed (can happen with 
+wait(2)).  
+
+Zombies must be reaped, as otherwise all the slots 
+in the kernel's process table will (eventually) be 
+filled.  The init process will reap any zombies if a 
+parent process exits without properly cleaning up.  
+
+So your code must handle zombies as part of its 
+normal operation.  If some package is leaving zombies 
+lying around, it suggests that the package has 
+become tied up on some operation and isn't cleaning 
+up properly after itself -- if operations don't 
+complete in a reasonable time frame, you can assume 
+that the code's got its knickers in a twist somehow, 
+and by killing the parent process, the zombies will 
+be cleaned up as well.  
+
+cheers,
+
+bjh
+
+-- 
+behoffski (Brenton Hoff) | Software Engineer, Grouse Software
+<A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A>  | <A HREF="http://www.grouse.com.au/">http://www.grouse.com.au/</A>
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,138 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: perl help" -->
+<!-- FromName="Daryl Tester" -->
+<!-- FromEmail="dt@picknowl.com.au" -->
+<!-- ToName="Jake Hawkes" -->
+<!-- ToEmail="jake@infinitylimited.net" -->
+<!-- Date="Sun, 06 Aug 2000 21:06:45 +0930" -->
+<!-- Id="398D4DCD.29C73297@picknowl.com.au" -->
+<!-- Reference="398C7727.BC4B95BB@infinitylimited.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: perl help</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  To  : Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  Date: Sun, 06 Aug 2000 21:06:45 +0930
+</PRE>
+<H1>Re: perl help</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Jake Hawkes wrote:
+
+&gt; ok, i'm doing some funky[1] stuff with perl and IMAP.
+
+Caveat:  I don't grok Perl no more, so there may be typoes
+I've introduced here and can't immediately spot.
+
+OK, presuming that you don't suffer from NIH[1], and you trust
+in the code that others produce, point thyself to CPAN and
+fetch the Mail::* (can't remember the CPAN package they reside
+in, but they're there).
+
+(This is from a script I wrote a while ago)  Then, with
+something like:
+
+====
+use Mail::Internet;
+use Mail::Header;
+use Mail::Address;
+
+##  Retrieve "From:", "To:" line for local recipients.
+##  $msgref is a reference to an array of strings.
+my ($mail)   = Mail::Internet-&gt;new($msgref);
+my ($header) = $mail-&gt;head();
+my (@toaddrs)  = Mail::Address-&gt;parse($header-&gt;get("To"));
+my (@fromaddr) = Mail::Address-&gt;parse($header-&gt;get("From"));
+
+##  Process only the local addresses we can handle.
+for $addr (@toaddrs) {
+    my $whom = $addr-&gt;address;
+    push(@localdudes, $whom) if $whom =~ /domain\.com\.au$/i;
+}
+====
+
+you can easily retrieve your fields of interest.
+
+In answer to your originaly problem:
+
+&gt; I getting the IMAP message from my server (in perl) as a reference to an
+&gt; array of lines.
+&gt;
+&gt;     # get the message, returned as a _reference_ to an array of lines
+&gt;     $lines = $server-&gt;get( $msg );
+
+[Sniptitude]
+
+&gt; sub get_header {
+
+[...]
+&gt;         $lookline =~ s/\r//g;
+&gt;         $lookline =~ s/\n//g;
+[etc]
+
+Perhaps because you're passing a reference to an array to get_header(),
+the original array is being modified so that subsequent passes aren't
+working?
+
+Also ...
+
+&gt;                 # the header we are getting is split over multiple lines
+&gt;                 $bigline = join(", ", $bigline, $lookline);
+
+Headers split over multiple lines aren't joined by commas; they're
+just joined by a single white space character (or "Linear White Space",
+as RFC822 puts it).
+
+Plus ...
+
+It doesn't look like you're breaking out of get_header() when
+encountering a single empty line, delineating the end of the
+headers from the start of the body of the message.
+
+Use the Mail::* stuff.  It's easier, and been beaten to death
+(read: tested) by cleverer people that you or I.
+
+&gt; Thanks for reading this far. If you can help, that'd be sweet.
+
+I expect my cheque for the usual amount at the usual spot.
+
+
+Regards,
+  Daryl Tester
+
+[1]  Not Invented Here.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

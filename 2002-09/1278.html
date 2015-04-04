@@ -1,0 +1,129 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: The VM" -->
+<!-- FromName="'David Lloyd'" -->
+<!-- FromEmail="lloy0076@adam.com.au" -->
+<!-- ToName="'Brian Marr'" -->
+<!-- ToEmail="cabernet@internode.on.net" -->
+<!-- Date="Mon, 30 Sep 2002 08:33:33 +0930" -->
+<!-- Id="3D9786C5.D7015646@adam.com.au" -->
+<!-- Reference="200209300719.10499.cabernet@internode.on.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: The VM</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@adam.com.au">lloy0076@adam.com.au</A></I>&gt;
+  To  : Brian Marr &lt;<I><A HREF="mailto:cabernet@internode.on.net">cabernet@internode.on.net</A></I>&gt;
+  Date: Mon, 30 Sep 2002 08:33:33 +0930
+</PRE>
+<H1>Re: The VM</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Brian,
+ 
+&gt; Can someone explain what the VM is inside the Linux Kernel - what it does ?
+
+Do you mean the Virtual Memory? 
+
+If you do then it's the amount of memory the system thinks it has. It
+can be comprised of:
+
+* RAM
+* Swap Partitions
+* Swap Files
+
+There's probably other types of memory but these are the most common.
+The kernel tries to use the fastest type of memory which is the RAM (1).
+If you use a certain amount of RAM (2) then the kernel will start
+swapping memory pages (3) if it is able. This "swapping" is done to your
+swap partitions or files and you will notice in the documentation for
+swapon (4) that partitions and files can have priorities. You probably
+want your fastest swap to be used first. Swap partitions are faster than
+swap files (5).
+
+Once you've used all of your RAM and swap partitions and files you've
+run out of memory; you will notice this long before you do run out of
+memory because what will happen is your virtual memory manager(6) will
+start to "thrash" -- it will spend more time swapping memory pages to
+swap partitions and/or files than actually using the memory.
+
+DSL
+
+(1) Currently at least; I wonder whether we'll ever see the day when
+mass storage is faster than current RAM
+
+(2) The kernel doesn't let you use all the RAM and then start swapping
+to disk. Reason? The kernel needs a little bit of RAM to manage the swap
+to disk efficiently.
+
+(3) Memory is organised into pages. Onboard, hardware chips know about
+these pages and assist the kernel by providing hardware signals )eg,
+page faults) to the main processor. Currently I think the pages are
+about 4Kb but don't quote me.
+
+(4) man swapon
+
+(5) Reason? File systems generally use memory themselves because they
+assume that storing your most recent requests in RAM will be faster than
+requesting it from disk. Also they can do all sorts of things like
+journal buffering, require permission tests and so forth. Now, if your
+aim is to get some memory pages ONTO DISK then having your file system
+keeping those pages IN RAM is a rather silly exercise.
+
+I don't know the details of a swap partition but I suspect it would be
+designed to be much more efficient for memory pages than any current
+file system.
+
+(6) Deciding what pages to swap in and what pages to swap out and when
+is, at best, a black art. It can get highly mathematical (queuing
+theory, operations research) and not all methods will work for all
+situations. Let's say I have 128Mb of RAM and a process that takes 95%
+of RAM but that's the only process. I don't want any of those pages
+swapped to disk but some algorithms might. However, if I also ran lots
+of other processes than having only 5% of RAM available could be a total
+pain.
+
+Ones mileage definitely varies.
+
+
+
+-- 
+Qualcuno no mi basta.
+  Vivere cercando il grande amore.
+  Vivere come se mai dovessimo morire.
+(Anastasio, Valli e Travato)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

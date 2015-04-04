@@ -1,0 +1,106 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: setting sendmail to use an interface" -->
+<!-- FromName="'Jake Hawkes'" -->
+<!-- FromEmail="jake@infinitylimited.net" -->
+<!-- ToName="'David Newall'" -->
+<!-- ToEmail="davidn@rebel.net.au" -->
+<!-- Date="Sat, 25 Nov 2000 20:44:42 -0700" -->
+<!-- Id="3A20872A.7C6AAB5C@infinitylimited.net" -->
+<!-- Reference="3A1EC9E7.835A68A7@infinitylimited.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: setting sendmail to use an interface</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  To  : David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  Date: Sat, 25 Nov 2000 20:44:42 -0700
+</PRE>
+<H1>Re: setting sendmail to use an interface</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+David Newall wrote:
+&gt; Perhaps sendmail can be reconfigured to use a "smart relay" in the small
+&gt; ISP's network?  They're bound to have an SMTP relay for their clients' use.
+
+thing is, I'm not using a smart relay. Here is the answer I was looking
+for:
+
+cf/README:
+
+confCLIENT_OPTIONS      ClientPortOption
+			[none] Options for outgoing SMTP client connections.
+
+doc/op/op.{me,ps}:
+
+      ClientPortOptions=options
+                [O] Set client SMTP  options.   The  options
+                are  key=value  pairs  separated  by commas.
+                Known keys are:
+
+                    Port      Name/number of source port for connection
+                              (defaults to any free port)
+            &gt;&gt;&gt;&gt;    Addr      Address mask (defaults INADDR_ANY)
+                    Family    Address family (defaults to INET)
+                    SndBufSizeSize of TCP send buffer
+                    RcvBufSizeSize of TCP receive buffer
+                    Modifier  Options (flags) for the daemon
+
+this is all a bunch of gobildegook to me, but what it means is put an
+entry like this into /etc/mail/sendmail.mc
+
+define(`confCLIENT_OPTIONS', Addr=w.x.y.z)
+
+where w.x.y.z is the interface you want sendmail to use. Tried it, works
+a treat.
+
+btw: i've set it up like this:
+define(`confCLIENT_OPTIONS', Addr=2.2.2.2)
+
+and then:
+ifconfig ppp0:1 inet 2.2.2.2
+
+that way, it doesn't which of the three dialup accounts I use, it will
+alwyas work.
+
+nifty huh?
+
+--
+Jake Hawkes B.Eng, (CSE)
+
+All generalizations are false.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

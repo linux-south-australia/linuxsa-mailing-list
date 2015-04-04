@@ -1,0 +1,106 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: RH7.1 make modules fails ... more info ..." -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxSA@linuxsa.org.au" -->
+<!-- Date="Wed, 13 Jun 2001 11:48:03 +0900" -->
+<!-- Id="3.0.6.32.20010613114803.00df8240@10.0.2.1" -->
+<!-- Reference="3.0.6.32.20010613105751.00de6de0@10.0.2.1" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: RH7.1 make modules fails ... more info ...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxSA@linuxsa.org.au">linuxSA@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 13 Jun 2001 11:48:03 +0900
+</PRE>
+<H1>Re: RH7.1 make modules fails ... more info ...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 10:57 AM 6/13/01 +0900, Richard Sharpe wrote:
+&gt;Hi,
+&gt;
+&gt;&gt;Has anyone seen this. If you do a 'make modules' after doing a 
+&gt;&gt;'make bzImage' for a stock standard RH7.1 install with the 
+&gt;&gt;2.4.2-2 kernel source, it fails with complaints about lots of module 
+&gt;&gt;related include files?
+&gt;
+&gt;OK, even more info ...
+&gt;
+&gt;Quick comparison of a clean 2.4.2 from kernel.org with the RH installed one.
+&gt;
+&gt;RH includes an include file rhconfig.h, which defines a macro _ver_str
+&gt;which seems to fail, because its definition should be something like:
+&gt;
+&gt; #define _ver_str(sym) sym
+&gt;
+&gt;but it is being left in, so that variables and functions are coming out as:
+&gt;
+&gt;  extern int console_log_level_R_ver_str(80ce1b8e)
+&gt;
+&gt;rather than
+&gt;
+&gt;  extern int console_log_level_R80ce1b8e)
+&gt;
+&gt;Damn, this is two releases in a row that RH have screwed up the source RPMs
+&gt;in some way. I guess I should know better than to trust them by now!
+
+Arrrghhh! Problem was a broken Makefile with the shipping RH7.1!
+
+Solution (courtesy of Kieth Owens):
+
+ mv .config ..
+ make mrproper   # Make clean not enough!
+ mv ../.config .
+ make oldconfig
+ make dep clean bzImage
+ make modules
+
+FRH! [1]
+
+[1] You guess!
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.ethereal.com)
+Contributing author, SAMS Teach Yourself Samba in 24 Hours
+Author, Special Edition, Using Samba
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

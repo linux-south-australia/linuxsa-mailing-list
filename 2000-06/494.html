@@ -1,0 +1,128 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Postgresql vs MySQL" -->
+<!-- FromName="Dan Shearer" -->
+<!-- FromEmail="dan@linuxcare.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 16 Jun 2000 16:01:13 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.10.10006161534510.24404-100000@localhost.localdomain" -->
+<!-- Reference="3949B6E1.BFE34A45@active-ideas.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Postgresql vs MySQL</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@linuxcare.com">dan@linuxcare.com</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Fri, 16 Jun 2000 16:01:13 +0930 (CST)
+</PRE>
+<H1>Re: Postgresql vs MySQL</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Carlo wrote:
+
+&gt; &gt; Here is one tiny example of something that Mysql just can't do: A
+&gt; &gt; user triggers a complicated query that takes one second. 
+&gt; &gt; In that period, another user causes one of the queried records to be
+&gt; &gt; changed, a process that only take 1/4 second. 
+&gt; &gt; The first user's query completes using the affected records as
+&gt; &gt; they were when the query was initiated, and the second user's write
+&gt; &gt; happens without delay.
+&gt; 
+&gt; Tell me if Im wrong here? But cant it be done with mysql lock tables.
+&gt; The bit that I posted TWICE shows a query trying to access a locked
+&gt; table will wait and not time out until the table is unlocked or the
+&gt; thread is closed. 
+
+This is the bit of the above that MySQL can't do, no matter what
+SQL programming effort you apply:
+
+    "The first user's query completes using the affected records as
+     they were when the query was initiated, and the second user's write
+     happens without delay."
+
+MySQL can't do this because it doesn't have the concept of remembering
+what has happened recently and then blending that into the database (to
+gloss over the technicalities somewhat:) In MySQL you have to explicitly
+say, in effect:
+
+    - Stop everything! Tables locked
+    - Write write write write write
+    - Ok! Open for read access again
+
+Whereas a RDBMS says:
+
+    - A wants to write? Ok, I've copied the current status to a working
+      area, and now I've locked the affected rows
+
+    - B wants to read? Fine, take this copy (the real one is
+      being written to at the moment, terribly sorry about that)
+
+    - A finished writing? Ok, no reads in progress so I'll 
+      open up the new-look rows, then delete the copy I made
+
+It is a much more parallel process.
+
+&gt; More programming work than an RDBMS to make sure its all done
+&gt; correctly, but an RDBMS working throughout the Globe via internet
+&gt; connection??? It may be slow enough to warrant not using it at all and
+&gt; staying with traditional methods.
+
+I think you can see from the example I have given that in fact in a busy
+database MySQL may well in fact be slower than an RDBMS. If there are 5
+queries for every write, and the queries are never blocked waiting for a
+locked table, there's a fair chance that overall the whole application
+will be faster with an RDBMS.
+
+This is not to say that RDBMS' are faster than MySQL, for a lot of things
+they won't be. They are carrying a lot of extra baggage around! But you
+might be surprised how little difference it makes even from an
+architectural point of view as the size of the problem to be solved gets
+larger.
+
+&gt; &gt; How many times a day would this scenario happen on a busy database, say of
+&gt; &gt; airline bookings? Many, I'm sure.
+&gt; 
+&gt; If the majority of your SQL's are transaction type, I would opt for a
+&gt; RDBMS. But if performance is critical, (ie internet already slowing
+&gt; things down) you may not have a choice. 
+
+But real-world practice doesn't support what you say. I am no Oracle fan
+at all, but it is certainly true that Oracle is used in many, many
+Internet sites with good-to-excellent performance.
+
+Dan
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

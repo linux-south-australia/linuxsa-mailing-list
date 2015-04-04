@@ -1,0 +1,123 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="plpgsql question" -->
+<!-- FromName="Jake Hawkes" -->
+<!-- FromEmail="jake@infinitylimited.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 23 May 2000 23:16:03 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.10.10005232301510.8474-100000@zero.infinitylimited.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: plpgsql question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Tue, 23 May 2000 23:16:03 +0930 (CST)
+</PRE>
+<H1>plpgsql question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Does anyone know why this plpgsql trigger function wont work?
+
+Its a trigger that gets called after inserts on each row.
+
+the error I'm getting is "parse error near LOOP", so its obviously barfing
+on this bit:
+..
+FOR etype IN weeknum,rcpts,emailtypeid from emailtypes where flex = caserec.flex LOOP
+..
+
+ok, so according to the doco, the syntax is:
+    FOR record | row IN select_clause LOOP
+              statements
+    END LOOP;
+
+so, what is a ''select_clause''?
+
+while debugging this bugger, I noticed that I could stop it complaining
+about the parse error at "LOOP" if I removed the "where..." bit. but then,
+it complained:
+ERROR:  parser: parse error at or near "$1"
+
+*heaps* good error message!!!!!!!!
+
+ferk.
+
+
+here is the complete code, any pointers would be *great*.
+
+
+
+create function fn_placement() returns opaque as '
+DECLARE
+        ercptlist text;
+        casemgremail text;
+        ecreate date;
+        edeliver date;
+        caserec RECORD; 
+BEGIN
+        -- get email creation date --
+        ecreate := now();
+
+        -- get general case info --
+        select * into caserec from cases 
+		where ies = new.ies and casenum = new.casenum;
+
+        -- get casemanager email --
+        select email into casemgremail from people 
+		where personid = caserec.casemgr;
+
+        FOR etype IN weeknum,rcpts,emailtypeid from emailtypes where flex = caserec.flex LOOP
+          -- create an entry into the email table --
+          edeliver := now() + etype.weeknum;
+          ercptlist := etype.rcpts || '' '' || casemgremail;
+          insert into emails (...keys...)
+		VALUES (..values..);
+        END LOOP;
+        
+        
+        return new;
+END;
+' language 'plpgsql';
+
+
+--
+Jake Hawkes B. Eng (CSE)
+
+"It seems Microsoft is setting a new standard: Emails without attachments."
+	-- Reemi (poster on slashdot)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

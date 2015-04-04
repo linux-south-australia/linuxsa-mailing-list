@@ -1,0 +1,154 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: USB flash drive" -->
+<!-- FromName="'Mark Brown'" -->
+<!-- FromEmail="mark@complex.psych.adelaide.edu.au" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="25 Sep 2002 15:00:31 +0930" -->
+<!-- Id="1032931831.26262.223.camel@xcomplex" -->
+<!-- Reference="Pine.LNX.4.44.0209251001310.4727-100000@localhost.localdomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: USB flash drive</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Brown &lt;<I><A HREF="mailto:mark@complex.psych.adelaide.edu.au">mark@complex.psych.adelaide.edu.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 25 Sep 2002 15:00:31 +0930
+</PRE>
+<H1>Re: USB flash drive</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Do they work? The answer is - it all depends!
+
+They are presented as scsi disks. So you need scsi support as well as
+usb turned on in the kernel. In particular you need the usb-storage
+module, which basically works as a kernel interface between the USB and
+SCSI subsystems. You also need the hotplug scripts available if you want
+the device auto-detected.
+
+There are a number of companies producing USB flash drive's. The Apacer
+ones are supposed to work with Linux. I tried one from Transend the
+other day which almost works ie it doesn't work.
+
+Hotplug see's it, usb-storage recognises it and generates a scsi device
+at the proc fs level:
+
+Host: scsi0 Channel: 00 Id: 00 Lun: 00
+  Vendor: GENERIC  Model: USB Mass Storage Rev: 1.00
+  Type:   Direct-Access                    ANSI SCSI revision: 02
+
+But sadly /dev/sda doen't seem to exist (can't open). Which I guess
+means the scsi driver can't talk at the device (using a 2.4.19 kernel).
+
+On Wed, 2002-09-25 at 10:05, Geoff Russell wrote:
+&gt; Hello,
+&gt; 
+&gt; I plugged just such a borrowed device in to my RH7.3 box the other
+&gt; day. It appeared to be recognised when I did more /proc/bus/usb, but I
+&gt; didn't know what to do next. There was no line in fstab (like when you
+&gt; plug in a USB-zip), nor did I know how to make one. I did a net search
+&gt; and got nowhere.
+&gt; 
+&gt; Cheers,
+&gt; Geoff Russell
+&gt; 
+&gt; On Tue, 24 Sep 2002, Mike O'Connor wrote:
+&gt; 
+&gt; &gt; Hi Andrew
+&gt; &gt;
+&gt; &gt; Most of these devices work with Linux using the USB-storage driver.
+&gt; &gt;
+&gt; &gt; Cheers
+&gt; &gt;  Mike
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; ----- Original Message -----
+&gt; &gt; From: "Andrew Galdes" &lt;<A HREF="mailto:AGaldes@elders.com.au">AGaldes@elders.com.au</A>&gt;
+&gt; &gt; To: "Linux Group (E-mail)" &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+&gt; &gt; Sent: Tuesday, September 24, 2002 4:43 PM
+&gt; &gt; Subject: USB flash drive
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; &gt; Hello,
+&gt; &gt; &gt;
+&gt; &gt; &gt; A work mate just showed me the coolest little device. The size of a my
+&gt; &gt; &gt; middle finger (a little fater though), a USB storage device which you plug
+&gt; &gt; &gt; into the back of a win2k+ system and it appears as a storage device.
+&gt; &gt; &gt;
+&gt; &gt; &gt; This "did" work on my win2k system here at work. The question is, has
+&gt; &gt; anyone
+&gt; &gt; &gt; had this working on linux?
+&gt; &gt; &gt;
+&gt; &gt; &gt; Price : $35 for 16mb and $50 for 32mb. No, this is not an add :)
+&gt; &gt; &gt;
+&gt; &gt; &gt; Thanks,
+&gt; &gt; &gt;
+&gt; &gt; &gt; Andrew Galdes
+&gt; &gt; &gt;
+&gt; &gt; &gt; --
+&gt; &gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; &gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt;
+&gt; 
+&gt; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+&gt; 6 Fifth Ave           +618-8332-5069 (Home)          |
+&gt; St Morris SA 5068     +618-8207-2029 (Work)          | <A HREF="mailto:geoff@austrics.com.au">geoff@austrics.com.au</A>
+&gt; Adelaide, AUSTRALIA   +618-8364-1543 (Fax-Home)      |
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+-- 
+Mark.
+
+   _-_|\    Mark Brown
+  /     \   Psychology Dept
+  \_.-*_/   University of Adelaide
+       v    SA, 5005
+            Australia
+            Phone:  +61 8 8303 3181
+            Fax:    +61 8 8303 3770
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

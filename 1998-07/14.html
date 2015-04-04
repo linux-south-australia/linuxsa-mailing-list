@@ -1,0 +1,158 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: hacker last night!" -->
+<!-- FromName="Geoffrey D. Bennett" -->
+<!-- FromEmail="g@netcraft.com.au" -->
+<!-- ToName="Steven Ellison" -->
+<!-- ToEmail="sellison@pcsa.net.au" -->
+<!-- Date="Sat, 4 Jul 1998 16:45:32 +0930 (CST)" -->
+<!-- Id="199807040715.QAA27426@Kara.netcraft.com.au" -->
+<!-- Reference="Pine.LNX.3.95.980704131602.33C-100000@freddo.pcsa.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: hacker last night!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Geoffrey D. Bennett &lt;<I><A HREF="mailto:g@netcraft.com.au">g@netcraft.com.au</A></I>&gt;
+  To  : Steven Ellison &lt;<I><A HREF="mailto:sellison@pcsa.net.au">sellison@pcsa.net.au</A></I>&gt;
+  Date: Sat, 4 Jul 1998 16:45:32 +0930 (CST)
+</PRE>
+<H1>Re: hacker last night!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Hi all,
+&gt;     We seem to have a hacker doing the rounds!  I have not managed to
+&gt; track down how he got in yet, but I think I will....  Bellow is the bash
+&gt; history from his short visit.  He had previously created a directory
+&gt; called " " in the /tmp directory.  You can see he has used this directory
+&gt; to download some tools.  The tools he has downloaded are to cover his
+&gt; tracks.
+
+Hi Steven,
+
+You have my sympathies!  Cleaning up after an attack is no fun at all.
+
+The following applies to anyone running any version of Linux that is
+ever connected to the Internet or other network where there are
+untrusted people around.  I say "Red Hat" below because I can point
+you to the appropriate mailing lists and web sites.  People running
+other distributions should locate the similar resources for their
+distribution.
+
+Are you running named, and if so, what version of named do you have
+installed?  If it's &lt; 4.9.7 you should almost definately upgrade.
+There is a BIG hole in older versions of bind that allows remote users
+to gain local access.  I know of a couple of other people who have
+been bitten by this problem, and this would be my guess as to how they
+got in to yours.
+
+If you are not subscribed to <A HREF="mailto:redhat-announce-list@redhat.com">redhat-announce-list@redhat.com</A>, do so
+now; this is where announcements of security problems (& fixes!)
+appear.  Instructions on how to subscribe are available at
+<A HREF="http://archive.redhat.com/regular-posting-3.html.">http://archive.redhat.com/regular-posting-3.html.</A>  Also, the errata is
+kept at <A HREF="http://www.redhat.com/errata/">http://www.redhat.com/errata/</A> if you want to make sure that
+your system is currently up to date with known bugs & security
+problems (this is a _good idea_).
+
+&gt;     I will have to completly rebuild the system again as I can not be that
+&gt; sure what has been tampered with.  Maybe its about time I took a closer
+&gt; look at tripwire!
+
+You may not have to rebuild your system.  If you're running an
+RPM-based system, you can verify installed packages against either
+RPM's database or the original package file.
+
+To verify a package against the RPM database:
+  rpm -V package
+To verify all packages against the RPM database:
+  rpm -Va
+To verify a package against the original package <A HREF="file:">file:</A>
+  rpm -V -p package.i386.rpm
+To look for all files in /bin that aren't owned by any package:
+  rpm -qf /bin/* | grep 'not found'
+  (you should do the same for at least /dev, /sbin, /usr/bin,
+  /usr/sbin, and /usr/X11R6/bin as well)
+
+Of course, an intruder may have modified your RPM database to make the
+file checksums match up, so it may be safer to verify against your
+original packages from the Red Hat CD.  Also, tripwire is only really
+necessary for data files, configuration files, and local binaries; RPM
+can easily take care of the majority of your binaries (but if you plan
+to do this right, apply the same care to your RPM database as to your
+Tripwire database).
+
+'find' can also be useful to locate files that were modified on or
+after the day of the intrusion.  Look for files with the ctime or the
+mtime matching that day or after.
+
+Sidenote: All files under Unix have three times associated with them:
+    atime is the last time the file was read ("accessed")
+    ctime is the last time the status of the file was changed
+    mtime is the last time the file was modified.
+  The mtime is what ls displays by default.  It is trivial for an
+  attacker to reset the mtime backwards to make it appear that the
+  file hasn't been modified.  It is a lot harder to change the ctime
+  backwards (utime(2) only allows changing the atime and mtime).
+
+Note that the above hints should pick up nearly everything that
+someone may have done if their expertise isn't much beyond untarring
+lrk3 and installing it (and this IMO applies to most people who don't
+respect the privacy of other's systems esp. those who leave
+.bash_history files around), but to be certain you would need to do a
+reinstall.
+
+&gt;     Please all take note of this warning!!!  Check your logs and
+&gt; investigate anything abnormal, no matter how insignificant it might seem.
+
+Two other very important warnings:
+
+- Don't run any services you don't need to.  If you don't need imapd,
+  don't run it.  If you don't need named, don't run it.  If you don't
+  need inetd, don't run it.  (etc).  The idea behind this is that your
+  system cannot be compromised by someone exploiting a bug in a
+  service that you're not running.  The fewer services you run, the
+  fewer potential bugs & exploits available for an attacker to try.
+
+- Stay current with the Red Hat errata.  I mentioned the errata
+  before, but this is really important.  I know of a number of
+  compromised systems that wouldn't have been compromised had the
+  system administrator kept up to date with the errata packages.
+
+Regards,
+-- 
+Geoffrey D. Bennett (<A HREF="mailto:geoffrey@netcraft.com.au">geoffrey@netcraft.com.au</A>)
+Computer Systems Manager, NetCraft Australia
+<A HREF="http://www.netcraft.com.au/geoffrey/">http://www.netcraft.com.au/geoffrey/</A>
+Red Hat Linux Resellers: <A HREF="http://www.netcraft.com.au/redhat/">http://www.netcraft.com.au/redhat/</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

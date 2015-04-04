@@ -1,0 +1,77 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Still going on about that modem" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Darryl Ross" -->
+<!-- ToEmail="darryl@bachblue.com.au" -->
+<!-- Date="Mon, 8 Mar 1999 16:33:54 +1030 (CST)" -->
+<!-- Id="Pine.BSF.3.96.990308162703.10942E-100000@augustus.tellurian.com.au" -->
+<!-- Reference="006401be6926$0fecbf40$0201a8c0@darryl" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Still going on about that modem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Darryl Ross &lt;<I><A HREF="mailto:darryl@bachblue.com.au">darryl@bachblue.com.au</A></I>&gt;
+  Date: Mon, 8 Mar 1999 16:33:54 +1030 (CST)
+</PRE>
+<H1>Re: Still going on about that modem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, 8 Mar 1999, Darryl Ross wrote:
+&gt; Now for a really stupid question... How do I get the modem to listen to what
+&gt; I am telling it while it is in data mode? Can I just do a "echo +++,,ATO1 &gt;
+&gt; /dev/cua2" as root??
+
+No.  The commas would never be correct.  You could do
+
+    (echo -n "+++"; sleep 1; echo "ATO1") &gt; /dev/cua2
+
+however you need to ensure the appropriate period of silence.  I
+think you will find that the +++ sequence could be sufficient to
+cause a flurry of PPP control messages to go back and forth, which
+would defeat your purpose.
+
+When you configure your modem for dial-out, one of the commands
+strings you are likely to use is AT&Dx, where x indicates what you
+want to occur when you lower DTR.  Commonly you would use an x
+which instructs the modem to hang up (e.g. AT&D2 or AT&D3 for many
+brands of modem.)  You could use AT&D1 (it works for my modems) to
+cause the modem to drop to online command mode.  Thus you would
+lower and then raise DTR on /dev/cua2, then issue echo AT01 &gt; /dev/cua2.
+I don't know how you lower DTR.  Read up on your serial port,
+particularly looking at ioctl or termio.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

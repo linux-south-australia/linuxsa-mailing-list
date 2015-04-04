@@ -1,0 +1,128 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: File Copy Question?" -->
+<!-- FromName="" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="'Martin Stacey'" -->
+<!-- ToEmail="martin@safcol.com.au" -->
+<!-- Date="Tue, 3 Sep 2002 11:58:54 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0209031119560.16861-100000@huachuca.tellurian.com.au" -->
+<!-- Reference="FGEFIJAGPBKMLNKMFKJPOEJJFFAA.martin@safcol.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: File Copy Question?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Martin Stacey &lt;<I><A HREF="mailto:martin@safcol.com.au">martin@safcol.com.au</A></I>&gt;
+  Date: Tue, 3 Sep 2002 11:58:54 +0930 (CST)
+</PRE>
+<H1>Re: File Copy Question?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Martin Stacey &lt;<A HREF="mailto:martin@safcol.com.au">martin@safcol.com.au</A>&gt; wrote:
+&gt; I want to copy a file between two servers every night.
+&gt; Of course, I want this to be done automatically and in a secure manner.
+
+Automatically implies cron, although there are many other ways you can
+automate a task.  But cron is intended to run commands on a regular basis,
+so that's probably what you should use.
+
+Secure is not a very well defined word.  It means different things to
+different people.  For example, some people might understand that to
+mean that the contents of the file should be encrypted during transit,
+whereas other people might understand it to mean that you should have to
+type a password before the command runs.  Obviously since you want this
+to be automatic, you don't mean the latter.  You probably mean that you
+don't want the facility to be able to be abused.
+
+I'd suggest using ssh, because you can configure it so that it doesn't
+require a password, and can only be used to copy receive the file.  You do
+that by creating a public/private key pair, which stands in place of a
+password, and setting th receiving machine so that it only permits you to
+save to the one file.  You do still need to keep the private certificate
+secure on the sending machine, otherwise anybody who obtains it might
+be able to send their own arbitrary garbage in place of your file.
+
+I've done this (sort of thing) using SSH2.  First you need to construct
+the key pair.  On the sending machine, use ssh-keygen2.  There are many
+options that you can tweak, so read the man page, but as a minimum you
+should use a command like this to generate your key pair:
+
+   ssh-keygen2 -P -o server1
+
+This will generate a key pair, with a NULL passphrase, and store it in
+the two files, server1 and server1.pub.  There's no point in having a
+passphrase, since you won't be around to type it anyway.
+
+The file, sendtoserver2.pub, contains no really vital information, so
+keeping its content secret is not hugely vital.  Transfer that file to
+the receiving machine, and store it in the .ssh2 directory of the
+account that will receive the file.  If you were really paranoice you
+might create a new account just to receive the file, but I do think
+that's a little over the top.
+
+Next you need to create an authorization file on the receiving machine,
+to limit what can be done with the key.  A file like this will do:
+
+   server1:
+   Host server1.my.domain.au
+   Key server1.pub
+   Command /home/martin/bin/receivefile
+   *:
+
+This will ensure that the command, /home/martin/bin/receivefile, is
+the *only* command that can be run when server1 authenticates using the
+matching private key.
+
+You also need to create the command, /home/martin/bin/receivefile.
+It doesn't need to be fancy:
+
+   #!/bin/sh
+   cat &gt; /home/martin/incoming/file
+
+Finally, your cron entry, on server1, should invoke ssh to copy the file.
+You need to make sure that ssh won't ask any questions (because you
+aren't there to answer them!)  To send the file, say every Sunday at 2
+minutes past midnight:
+
+   2 0 * * 0 ssh2 -i /home/martin/etc/server1 -q -e none <A HREF="mailto:martin@server2">martin@server2</A> &lt; /home/martin/outgoing/file
+
+(Beware possible line wrapping on the above line.)
+
+This specifies that your private key is in /home/martin/etc/server1, and
+assumes that you want to transfer the file, /home/martin/outgoing/file.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

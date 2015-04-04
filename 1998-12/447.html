@@ -1,0 +1,124 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: pppd goes mad!" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="Stephen Baxter" -->
+<!-- ToEmail="steve@senet.com.au" -->
+<!-- Date="Tue, 22 Dec 1998 18:07:02 +1030" -->
+<!-- Id="199812220737.SAA09250@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: pppd goes mad!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : Stephen Baxter &lt;<I><A HREF="mailto:steve@senet.com.au">steve@senet.com.au</A></I>&gt;
+  Date: Tue, 22 Dec 1998 18:07:02 +1030
+</PRE>
+<H1>Re: pppd goes mad!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Steve,
+
+I'm very reluctant to copy this to linuxSA list again,
+but someone just might recognise what's going on here.
+At the moment, I have two hypotheses:
+1.	There's a bug in the ppp.o driver which makes it
+	not wake up properly.
+2.	There's a bug in the ethernet card which makes it
+	not wake up the CPU properly.
+
+The following tcp dump shows the behaviour that is occurring.
+
+First a ping packet is sent out every second, and then they all
+come back at intervals of (almost) always 1 mS.
+This is very suspicious, and suggests that the bottom half of the
+ppp driver is only being activated each time the top half is run
+by the net_bh() routine (or whatver it's called).
+
+
+==========================================================================
+17:50:13.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:14.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:15.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:16.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:17.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:18.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:19.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:20.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:21.430159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:21.440159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:21.440159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:21.450159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:21.460159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:21.470159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:21.470159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:21.480159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+==========================================================================
+
+The same pattern then repeats itself.
+Come to think of it, if a net_bh() call activated the bottom half every time,
+then the returning ping packets should return to the IP stack
+more regularly.
+There's pretty obviously something wrong with the sleep/interrupt/wakeup
+scheme here though.
+
+==========================================================================
+17:50:21.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:21.830159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:22.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:23.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:24.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:25.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:26.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:27.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:28.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:29.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:30.640159 alanke.lnk.telstra.net &gt; gw.way7.Adelaide.telstra.net: icmp: echo request
+17:50:30.950159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:30.950159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:30.960159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:30.970159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:30.980159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:30.990159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:30.990159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:31.000159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+17:50:31.010159 gw.way7.Adelaide.telstra.net &gt; alanke.lnk.telstra.net: icmp: echo reply
+==========================================================================
+
+Cheers,
+Alan Kennington.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

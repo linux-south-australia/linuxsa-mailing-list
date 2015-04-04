@@ -1,0 +1,103 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Linux/Unix VPN's" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Phil Pittard" -->
+<!-- ToEmail="vk5ham@seol.net.au" -->
+<!-- Date="Thu, 23 Mar 2000 00:52:23 +1030" -->
+<!-- Id="20000323005223.D10920@atdot.dotat.org" -->
+<!-- Reference="38CF7E28.E13C20F@seol.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Linux/Unix VPN's</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Phil Pittard &lt;<I><A HREF="mailto:vk5ham@seol.net.au">vk5ham@seol.net.au</A></I>&gt;
+  Date: Thu, 23 Mar 2000 00:52:23 +1030
+</PRE>
+<H1>Re: Linux/Unix VPN's</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Mar 15, 2000 at 10:42:24PM +1030, Phil Pittard wrote:
+
+ &gt; There is quite a lot of documentation on vpn's but most just describe
+ &gt; "hacks" using ppp & ssh etc etc... I need something "straight" for
+ &gt; this... I know that FreeBSD-4.0 is coming out shortly & has IPSec/VPN
+ &gt; stuff in it and OpenBSD has similar stuff... does anyone know if any of
+ &gt; the latest Linux distro's have similar offerings?? I have done searches
+ &gt; on "linux+vpn" but am yet to find a "straight" option comparable to the
+ &gt; windoze-based offerings. A URL would be good :)
+ 
+Probably the simplest way of doing it is to tunnel ppp over an ssh
+connection.
+
+Example:
+
+  remoteoffice# ssh -C -f -x -L 123:localhost:456 centraloffice
+
+... will establish a tunnel between TCP port 123 on the machine
+called "remoteoffice" and TCP port 456 on the machine called 
+"centraloffice".
+
+You can then configure pppd on "centraloffice" to listen for
+ppp-over-TCP connections on port 456.  Once you've done that,
+you can establish your VPN by setting up pppd on "remoteoffice"
+as a client which "dials" TCP port 123 on localhost.  ssh will
+port-forward that connection to the pppd server listening on 
+the centraloffice system, so you'll end up with a point-to-point
+PPP session between the two systems which uses an ssh tunnel as
+a virtualized physical layer.
+
+ &gt; Also, if anyone has any experience setting up a VPN using any "unixy
+ &gt; thing" I would appreciate any info re "problem areas" that could cost ME
+ &gt; if unprepared!
+
+For performance reasons you'll probably want to jack-up the MTU on
+the PPP link to 16k or so.  The reason is that TCP is already going
+to be fragmenting your conversation into smaller datagrams than
+your applications really need, and by default ppp will produce *further*
+fragmentation by breaking your datagrams up into 1500-byte chunks.
+If you increase the MTU, fragmentation can be left to happen where
+it really needs to happen, which is in the data link layer of the 
+underlying packet transport.
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

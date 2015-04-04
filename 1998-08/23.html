@@ -1,0 +1,154 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PPP server What to use? mgetty? or is there better" -->
+<!-- FromName="Steven Ellison" -->
+<!-- FromEmail="sellison@pcsa.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 4 Aug 1998 18:12:24 +0930 (CST)" -->
+<!-- Id="Pine.LNX.3.95.980804175732.6161A-100000@freddo.pcsa.net.au" -->
+<!-- Reference="199808040738.RAA03189@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PPP server What to use? mgetty? or is there better</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Steven Ellison &lt;<I><A HREF="mailto:sellison@pcsa.net.au">sellison@pcsa.net.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Tue, 4 Aug 1998 18:12:24 +0930 (CST)
+</PRE>
+<H1>Re: PPP server What to use? mgetty? or is there better</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+If all you need is PPP with PAP then you could permently
+attach pppd to your serial port with the modem on auto answer.
+
+Very simple, clean and easy!
+
+/etc/ppp/options 
+	Your.Host.IP.address:10.0.0.5
+	asyncmap 0
+	+pap
+	-mn
+	#ipcp-accept-remote   (uncomment this if remote is allowed 
+	crtscts			to specify their own address)
+	lock
+	modem
+	lcp-echo-interval 30
+	lcp-echo-failure 4	(How many failures before forced
+	-detach			disconnect)
+
+A small script with an endless loop that restarts pppd in case it dies and
+away it goes!
+
+Set the pap secrets file to
+ 
+/etc/ppp/pap-secrets
+
+# Secrets for authentication using PAP
+# client        server  secret                  IP addresses
+demo            *       ""                      10.0.0.5
+
+^^^		^	^			^^^^^^^
+|||		|	|			|||||||
+Login name   anyhost Use /etc/passwd		The only allowable address
+						Leave blank if any allowed
+
+No shell access and low overhead ;-)
+
+	Steve Ellison  
+
+On Tue, 4 Aug 1998, David Newall wrote:
+
+&gt; Date: Tue, 4 Aug 1998 17:08:40 +0930 (CST)
+&gt; From: David Newall &lt;<A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A>&gt;
+&gt; To: "Geoffrey D. Bennett" &lt;<A HREF="mailto:g@netcraft.com.au">g@netcraft.com.au</A>&gt;
+&gt; Cc: <A HREF="mailto:Johnson.Brandon.BR@bhp.com.au">Johnson.Brandon.BR@bhp.com.au</A>, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; Subject: Re: PPP server What to use? mgetty? or is there better
+&gt; Resent-Date: Tue, 4 Aug 1998 17:09:00 +0930
+&gt; Resent-From: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; 
+&gt; &gt;&gt; Its all pretty much in the title, for a PPP server what does everybody
+&gt; &gt;&gt; else run to handle the Dial-in access part? I have currently got mgetty
+&gt; &gt;&gt; handling a modem [it has problems].
+&gt; &gt;
+&gt; &gt; Yes.  Check out the AutoPPP option to mgetty.  It presents the login
+&gt; 
+&gt; I run uugetty, not mgetty, and it doesn't (didn't) support auto ppp
+&gt; detection, so I grafted some bits from mgetty into uugetty.  Now it
+&gt; seems to work like a champ.  I have a patch for getty_ps-2.0.7h, which
+&gt; makes it recognise PPP the same way that mgetty does.  It also permits
+&gt; you to add a new option to the uugetty.conf file, PPP=path, which is
+&gt; how you tell it what program to execute when it detects a PPP session.
+&gt; (It's analogous to a FIDO session.)  If you would like it, the patch is
+&gt; at <A HREF="http://www.rebel.net.au/~davidn/getty_ps-2.0.7h-rebel.patch.">http://www.rebel.net.au/~davidn/getty_ps-2.0.7h-rebel.patch.</A>
+&gt; 
+&gt; Apart from installing the patched version of uugetty, you must also
+&gt; modify your uugetty.conf file(s): Add PPP=path, where path points to
+&gt; your ppp daemon which must be configured to login using PAP + /etc/passwd
+&gt; (so put the login option into your /etc/ppp/options file); or else point
+&gt; path to a shell script which invokes pppd with the login option.  My users
+&gt; all used to login to a shell prompt and then exec pppd, and they no doubt
+&gt; will expect that to continue to work; so I have PPP=/etc/ppp/autoppp in
+&gt; my uugetty.conf files, where /etc/ppp/autoppp is an executable shell
+&gt; script containing:
+&gt; 
+&gt;    #!/bin/bash
+&gt;    exec /usr/sbin/pppd +pap login
+&gt; 
+&gt; Probably +pap is not needed; but it doesn't hurt.
+&gt; 
+&gt; I found that I also had to modify pppd because it wasn't compiled for
+&gt; shadow passwords, nor for Microsoft's extension which permits the client
+&gt; to querey for DNS addresses.  In addition, when you specify the login
+&gt; option to pppd, and if the secrets file exists, and if the client doesn't
+&gt; have a secret in the secrets file, pppd would refuse access to the client.
+&gt; I want to be able to have a secrets file for some clients, while also
+&gt; allowing my users to authenticate themself with their password, so I also
+&gt; modified pppd so that it permits a client to have no secret if the login
+&gt; option is given.  For those who are interested, the patch is available at
+&gt; <A HREF="http://www.rebel.net.au/~davidn/ppp-2.2.0f-rebel.patch.">http://www.rebel.net.au/~davidn/ppp-2.2.0f-rebel.patch.</A>
+&gt; 
+&gt; As this is a new facility I have only told a small number of people about
+&gt; it: staff plus three reliable subscribers.  It was installed August 2, has
+&gt; been used successfully 10 times and has failed to permit a login three
+&gt; times: once when I was testing; once for an unknown user; and once when
+&gt; the password had expired.  It seems okay to me.
+&gt; 
+&gt; -- 
+&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

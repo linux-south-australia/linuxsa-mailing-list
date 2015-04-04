@@ -1,0 +1,139 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Sendmail features and firewalls" -->
+<!-- FromName="Alex Garner" -->
+<!-- FromEmail="alex@netcraft.com.au" -->
+<!-- ToName="Richard Sharpe" -->
+<!-- ToEmail="sharpe@ns.aus.com" -->
+<!-- Date="Thu, 13 Jul 2000 13:06:20 +0930 (CST)" -->
+<!-- Id="200007130336.NAA06606@Kara.netcraft.com.au" -->
+<!-- Reference="3.0.6.32.20000713043816.00af11b0@203.16.214.248" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Sendmail features and firewalls</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alex Garner &lt;<I><A HREF="mailto:alex@netcraft.com.au">alex@netcraft.com.au</A></I>&gt;
+  To  : Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  Date: Thu, 13 Jul 2000 13:06:20 +0930 (CST)
+</PRE>
+<H1>Re: Sendmail features and firewalls</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; I am no sendmail guru (well, I knew a lot about it years ago, but have
+&gt; slipped), but ...
+
+Neither am I, but "thanks to the wonders of the sendmail-cf package,
+now you too can configure sendmail in the comfort of your own home!"
+
+I realise you know this, I just needed to say that.
+
+&gt; I have been reviewing the sendmail config at one customer site recently to
+&gt; make it simpler and more maintainable ...
+&gt; 
+&gt; We have what is a standard config in this situation:
+&gt; 
+&gt; 
+&gt;   [Big Bad Internet]----[Firewall]-----[Internal Mail Server]
+&gt; 
+&gt; All mail is received on the firewall and relayed to the Internal Mail Server.
+&gt; 
+&gt; All internal addresses are from one of the Private IP domains. 
+&gt; 
+&gt; When I set this up four years ago, I had to hack the sendmail config file
+&gt; to defeat DNS name lookups on the internal mail server name so the IP
+&gt; address could be looked up in the hosts file. 
+&gt; 
+&gt; The ways to handle this these days is to use the LOCAL_RULES stuff in your
+&gt; sendmail.mc file, or to use split DNS.  
+&gt; 
+&gt; However, both of these are quite complicated, and it seemed to me that
+&gt; there is a need for a FEATURE, perhaps called internal_mail_hub that allows
+&gt; people who are trying to set this sort of system up to do so easily.
+
+It's actually already pretty simple with existing sendmail-cf
+FEATUREs. This is all straight from www.sendmail.org BTW.
+
+Use the standard /usr/lib/sendmail-cf/cf/redhat.mc file and comment
+out the recomended line. Compile and use.
+
+Allow RELAY access to the necessary machines in /etc/mail/access
+
+	localhost.localdomain           RELAY
+	localhost                       RELAY
+	127.0.0.1                       RELAY
+	192.168.0.1                     RELAY
+	example.com                     RELAY
+
+Where 192.168.0.1 is the IP address of your internal mail server, and
+example.com is the domain name to receive mail for.
+
+Now do the forwarding bit in /etc/mail/mailertable
+
+	example.com                    smtp:[192.168.0.1]
+
+Next build your hash tables by typing 'make' from /etc/mail, and
+restart sendmail.
+
+Go to your internal mail machine and get it to forward all outgoing
+mail to the gateway machine. In the case of Exchange boxes you can do
+this from one of the quaint little GUI dialogue boxes. In the case of
+sendmail you can read <A HREF="http://www.sendmail.org/faq/section4.html">http://www.sendmail.org/faq/section4.html</A>#4.12
+to get you started on using "smart hosts". The syntax escapes me now.
+It looks something like the example above.
+
+<A HREF="http://www.sendmail.org/faq/section4.html">http://www.sendmail.org/faq/section4.html</A>#4.12 tells you how to
+deliver local mail and batch remote mail if you care.
+
+I don't know if their are any domain resolution issues that I may have
+missed here, complain loudly if I misunderstood or am answering the
+wrong question. This may be a help.
+<A HREF="http://www.sendmail.org/faq/section3.html">http://www.sendmail.org/faq/section3.html</A>#3.22
+
+
+Cheers
+
+Alex!
+
+
+-- 
+
+Alex Garner &lt;<A HREF="mailto:alex@netcraft.com.au">alex@netcraft.com.au</A>&gt;
+
+NetCraft Australia
+Phone (08) 8370 3650
+<A HREF="http://www.netcraft.com.au">http://www.netcraft.com.au</A>
+
+"#define QUESTION ((bb) || !(bb)) // Shakespeare."
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

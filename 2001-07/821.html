@@ -1,0 +1,140 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: NFS time-stamp problems" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richardrussell@internode.on.net" -->
+<!-- ToName="'David Newall'" -->
+<!-- ToEmail="davidn@rebel.net.au" -->
+<!-- Date="Mon, 16 Jul 2001 21:43:09 +0930" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: NFS time-stamp problems</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richardrussell@internode.on.net">richardrussell@internode.on.net</A></I>&gt;
+  To  : David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  Date: Mon, 16 Jul 2001 21:43:09 +0930
+</PRE>
+<H1>RE: NFS time-stamp problems</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; &gt; I propose putting this in NFS, not in user programs...
+&gt;
+&gt; Ah.  That's a much better idea than what I originally thought you meant.
+&gt; And yet... If you change the date on the NFS server, suddenly all the
+&gt; files on it have different modification times.
+
+yeah... but which is the greater evil? I would assume that servers (by their
+nature as servers) should normally keep better time than clients... (present
+case excluded)...
+
+My reasoning is as follows:
+
+Assume: Severs keep better, more linear time than clients.
+
+Assume: Accuracy in "how long ago" something happened is more important then
+exactly when it happened... (and if the when is important, then you'd better
+have your clock right...)
+
+Hence, get the server to tell you how long ago an event occured, and then
+calculate when this was according to your own time system... Hence, relative
+times should always be pretty accurate...
+
+This will be good for things like Make. However, it will be bad for things
+like "I created that file last wednesday"... but then again, if your client
+clock is wrong (or was wrong when you created said file), then you have
+little hope of that anyway...  hmm: a table would be good here...
+
+Possibilities:
+
+1. Client slow, Server slow
+	Not much hope of any sense here... although if Server time is at least
+linear, relative times will remain correct. Files will look the right age to
+the software, but old to the user.
+
+2. Client slow, Server correct
+	Make would normally die in this situation, but in this case, would work
+perfectly. However, files will all look like they are older than they are,
+as opposed to looking like they were created in the future to the client,
+whilst looking correct to the user
+
+3. Client slow, Server fast
+	same as 2 above, but files will look even older than they are...
+
+4. Client correct, server slow
+	Make would normally succeed here, but may do more work thna it needs...
+Files will look (to the user) to be created at the correct time, although
+the server will be out of sync.
+
+5. Client correct, server correct
+	woohoo
+
+6. Client correct, server fast
+	to the user, files will appear the correct age, and also to tools...
+Normally, make would fail here...
+
+7. Client fast, server slow
+	the user would see files that looked to be in the future, although tools
+would be fine. Normally, make would succeed here, but may do more work than
+needed.
+
+8. Client fast, server correct
+	as above, but times on server would at least be correct.
+
+9. Client fast, server fast
+	not much hope here...
+
+Hmmm
+
+I think the main issue I see here is that users may make assumptions about
+files -- I cna imagine someone saying "I created that file on monday,
+therefore it should be on monday's backup of the server" and looking there
+and not finding it becasue it was actually tuesday or something. Ideally,
+there would be some sort of user-space flag to change this behaviour for
+each program run, without modifying that program whatsoever... (kinda like
+making it dynamically link with a differnt file access library, but I can't
+see that as being practical at all...) I'd suspect it would have to be an
+admin decision, per-server/client pairing, and I can't see that happening
+either... too hard to change perhaps? Are there any file sharing protocols
+out there that deal in time deltas and not absolute times? IMHO, time deltas
+are more sensible when talking about networks, but yeah, I know that it's
+impossible to absolutely ensure clock synchronisation -- I did physics, you
+know :)
+
+rr
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

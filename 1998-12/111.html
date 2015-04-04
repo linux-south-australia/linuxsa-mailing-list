@@ -1,0 +1,143 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Linux and memory usage." -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Adam Hawes" -->
+<!-- ToEmail="adam.hawes@ace.net.au" -->
+<!-- Date="Tue, 8 Dec 1998 08:07:56 +1030 (CST)" -->
+<!-- Id="199812072137.IAA12390@atdot.dotat.org" -->
+<!-- Reference="366BC47B.FBEE8281@ace.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Linux and memory usage.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Adam Hawes &lt;<I><A HREF="mailto:adam.hawes@ace.net.au">adam.hawes@ace.net.au</A></I>&gt;
+  Date: Tue, 8 Dec 1998 08:07:56 +1030 (CST)
+</PRE>
+<H1>Re: Linux and memory usage.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Adam Hawes wrote:
+
+ &gt; I have a question that is eluding me. I want to make linux reduce the
+ &gt; size of the buffers and caches it stores in memory. I want to do this
+ &gt; because I have 64 meg, and Xosview reports that over half of it is
+ &gt; being used as a cache. The problem is that if I run an application like
+ &gt; netscape, the system starts swapping to disk and thrashing around
+ &gt; even though that there would be pleanty of memory if it reduced the
+ &gt; cache size.
+
+Ok, so your question can be roughly translated to, "I think my system
+isn't running fast enough, but it might be a good idea to make it slower
+by limiting the cache."
+
+The way the cache operates means that any memory that isn't otherwise
+in use for user processes will be used as cache memory;  That means if
+half of your memory is cache, you probably don't have a high demand
+for memory resources.
+
+The real metric you can use to see if you're short of memory is to
+monitor pageouts.  Pageouts occur when you have *really* run out of
+memory, so the system sends pages from active processes out to disk.
+It'll only do this after freeing cache blocks to make room;  even
+once it has cleared all the cache blocks it'll try to throw away 
+"clean" pages before paging out dirty ones.
+
+If you're not paging out when you start Netscape, you probably don't
+have a memory problem.  There are probably other problems causing you
+grief (or, alternatively, you might just be suffering from the fact
+that Netscape is miserable bloatware that uses far too much memory).
+
+Linux has historically had a problem with performance when a process
+or group of processes exhibit high demand for memory and high demand
+for I/O at the same time -- You've probably seen this when you try
+to run the C compiler and the X at the same time on a 16Mbyte machine.
+Consider:
+
+   1.  Process requesting I/O (disk reads/writes) sends requests to 
+       the cache to receive the blocks it needs.
+
+   2.  Cache says, "Hmm.  Performance issues caused by heavy demand
+       for I/O can be mitigated by increasing the size of the cache
+       so that it gets a greater hit rate."
+
+   3.  Cache increases in size.  Clean pages from current processes
+       may be freed to accomplish this.
+
+   4.  If (1) thru (3) happen often enough (because I/O demand is high
+       enough), processes exhibiting high demand for memory find that
+       their pages have disappeared out from under them, so they fault
+       them back in.  But the cache must be reduced in size to make
+       room.
+
+   5.  Extra paging overhead caused by (4) actually adds to the I/O
+       demand that caused the problem in the first place.  Negative
+       feedback makes problem worse -- Go back to step (1).
+
+It's actually a problem shared by other UNIXes with unified filesystem
+and VM cache (including IRIX and HP-UX).  The accepted solution is,
+"Buy more memory."  The alternative approach is to either not use an
+adaptive cache (by fixing its size at boot time, a-la SunOS 4.x, 
+Ultrix) or by having an adaptive cache with an upper-bound on its
+size (a-la Solaris and *BSD).  Both of these approaches allow the
+C compiler and window system to run quite happily in 16Mbytes (well --
+as happily as they can, anyway :-)
+
+Machines with workstation workloads typically benefit from a fully
+adaptive cache, which is why Linux probably uses one.  Machines with
+server workloads find better results by either having a shitload of
+physical memory and an adaptive cache, or by having less memory and
+a cache which is limited to a bit less than 50% of physical memory
+(although that should be tuned from workload-to-workload).  Ideally,
+a server machine should have enough memory to never page out at all
+(because delays from pageouts on a server can potentially affect lots
+of users, whereas delays from pageouts on a workstation only affect
+the person who has the machine in front of them), so in practice this
+isn't really an issue.
+
+ &gt; Is there any way to tell Linux to use smaller caches or to reduce them
+ &gt; even smaller when it needs to use the memory otherwise?
+
+The cache is adaptive -- It does this whether you ask it to or not.
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1958-3414 ------------- Fax: +61-8-83034403 -----
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

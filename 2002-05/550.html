@@ -1,0 +1,103 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: scewed clock time?" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Steve Donaldson'" -->
+<!-- ToEmail="steelrat@dingoblue.net.au" -->
+<!-- Date="Fri, 17 May 2002 11:05:19 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.44.0205171051090.1416-100000@bush.aarnet.adelaide.edu.au" -->
+<!-- Reference="3CE4414E.29143.1741447@localhost" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: scewed clock time?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Steve Donaldson &lt;<I><A HREF="mailto:steelrat@dingoblue.net.au">steelrat@dingoblue.net.au</A></I>&gt;
+  Date: Fri, 17 May 2002 11:05:19 +0930 (CST)
+</PRE>
+<H1>Re: scewed clock time?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; A couple of builds recently had a warning during boot time about 'skewed
+&gt; clock time' with a comment about the build being incomplete?
+&gt; 
+&gt; Any one cast some light on the message or the problem? So far everything
+&gt; seems ok.
+
+The time changed during the 'make' or between two 'makes'.  As make uses
+time-stamps to say "this source file is newer than this object file" some
+files may not be built.
+
+For example a normal compile and the associated file modified
+timestamps might be
+   t.c    10:00
+   t.o    10:01
+     t    10:02
+
+Let's modify t.c and compile again
+   t.c    10:03
+changing the clock back during compilation (say, starting NTP)
+   t.o     9:58
+as far as make is concerned "t" need not be rebuilt, as "t.o" is 'older'
+than "t" (according to the timestamps).
+
+It depends on your exact scenario what is rebuilt or not, and whether this
+matters or not.
+
+Safest option is to start from just the source files and build again,
+this is traditionally
+
+   make clean
+   make
+
+If you work in a programming team ensure that each machine runs NTP, even
+if you sychronise the machines merely with each other (you may not be able
+to reach an external time source if you work on a defence project).
+
+Your networking staff can help here, as it's pretty trivial to configure
+the routers to provide a NTP multicast service to all parts of the
+network.  This makes setting up NTP on the hosts trivial (the default
+settings then work).
+
+-- 
+Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

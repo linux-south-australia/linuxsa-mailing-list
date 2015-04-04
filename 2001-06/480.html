@@ -1,0 +1,109 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PHP question" -->
+<!-- FromName="'David Lloyd'" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="'James Mclean'" -->
+<!-- ToEmail="james@adam.com.au" -->
+<!-- Date="Wed, 13 Jun 2001 16:45:31 +0930" -->
+<!-- Id="3B271313.778B3CB2@rebel.net.au" -->
+<!-- Reference="992412481.3b2703411837d@thunder.adam.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PHP question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : James Mclean &lt;<I><A HREF="mailto:james@adam.com.au">james@adam.com.au</A></I>&gt;
+  Date: Wed, 13 Jun 2001 16:45:31 +0930
+</PRE>
+<H1>Re: PHP question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Well...
+
+"mysql_insert_id() is maintained in the client and is set for each
+query. The value of LAST_MODIFIED_ID() is maintained in the server and
+persists from query to query.
+
+The values returned by mysql_insert_id() are connection specific and are
+not affected by the AUTO_INCREMENT on other connections"
+
+[Paul DuBois - MySQL published by New Riders, PHP Api Reference]
+
+What you're doing _looks_ like it should work...why don't you try:
+
+1) Using mysql (the client that comes with mysql)
+ - and inserting bogus data into it that you believe should set the
+auto_increment up
+ - and check whether it actually does go up
+
+2) Causing php to print something to STDERR or deliberately die on the
+result returned by the mysql_insert_id() function
+
+Providing you can get the value back from the funtion, then $artist
+should keep that value within that &lt;? and ?&gt; block. I don't know enough
+about PHP to tell you if it's globally scoped or locally scoped to that
+&lt;? and ?&gt; block...
+
+As a byside, why do you call the function with:
+
+***
+function findart($art,$artn) {
+                 ^^^^^^^^^^
+    $asql = "SELECT artist FROM artists WHERE artist='$art'";
+    $aqu = mysql_query($asql) or die(mysql_error());
+
+    if(mysql_affected_rows()=='0') {
+        $isql = "INSERT INTO artists (artist) VALUES ('$art')";
+        $iqu = mysql_query($isql) or die(mysql_error());
+        return mysql_insert_id();
+    } else {
+        return $artn;
+    }
+}
+***
+
+But you never really use $artn. What you're doing, I think, is making
+sure there are no artists where artist='$art', which makes that column a
+unique column. Which implies that there could only be one artist...or
+the artist doesn't exist...without knowing the rest of the code I could
+do "findart("Picasso", 1919119)" and if Picasso exists (let's pretend
+here) I'd get 1919119 back despite the fact that that's probably not a
+real ID number...
+
+DSL
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

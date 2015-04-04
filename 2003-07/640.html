@@ -1,0 +1,147 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: My kernel clock has caught fire" -->
+<!-- FromName="'jonathan soong'" -->
+<!-- FromEmail="jon.soong@imvs.sa.gov.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 17 Jul 2003 11:42:29 +0930" -->
+<!-- Id="3F16060D.9060702@imvs.sa.gov.au" -->
+<!-- Reference="1058407467.6300.62.camel@explo.its.adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: My kernel clock has caught fire</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: jonathan soong &lt;<I><A HREF="mailto:jon.soong@imvs.sa.gov.au">jon.soong@imvs.sa.gov.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 17 Jul 2003 11:42:29 +0930
+</PRE>
+<H1>Re: My kernel clock has caught fire</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+<A HREF="http://www.timecube.com">http://www.timecube.com</A> has the answers
+
+Sean Burford wrote:
+
+&gt;Hi,
+&gt;
+&gt;Have you ever seen the kernel clock do this (kernel 2.4.18-3smp #1 on
+&gt;Redhat 7.3):
+&gt;$ date
+&gt;Wed Jul 16 20:10:04 CST 2003
+&gt;$ date
+&gt;Wed Jul 16 20:10:05 CST 2003
+&gt;$ date
+&gt;Wed Jul 16 20:10:02 CST 2003
+&gt;$ date
+&gt;Wed Jul 16 20:10:03 CST 2003
+&gt;
+&gt;NTP was running, but the clock started skipping back like this every few
+&gt;seconds so I killed it.  The clock continued skipping backwards after I
+&gt;stopped ntpd.  The NTP config is below (yes, I know huon is mentioned
+&gt;twice, it rejected the first instance, so this shouldnt be a problem):
+&gt;ntpq&gt; lopeers
+&gt;     remote           local      st t when poll reach   delay  
+&gt;offset    disp
+&gt;                                      (s)  (s)          (ms)    
+&gt;(ms)     (ms)
+&gt;==============================================================================
+&gt; huon.itd.adelai 10.0.10.2       16 u    - 1024    0    0.000    0.000
+&gt;4000.00
+&gt;+ns1.adelaide.ed 10.0.10.2        4 u  372 1024  377    0.472    6.065  
+&gt;1.657
+&gt;+ns2.adelaide.ed 10.0.10.2        4 u  340 1024  377    0.599    5.982  
+&gt;1.805
+&gt;*huon.itd.adelai 10.0.10.2        2 u  346 1024  377    0.330    7.133  
+&gt;2.108
+&gt;ntpq&gt; lassoc
+&gt;ind assID status  conf reach auth condition  last_event cnt
+&gt;===========================================================
+&gt;  1 54028  8000   yes   yes  none    reject
+&gt;  2 54029  9414   yes   yes  none  candidat   reachable  1
+&gt;  3 54030  9414   yes   yes  none  candidat   reachable  1
+&gt;  4 54031  9614   yes   yes  none  sys.peer   reachable  1
+&gt;
+&gt;I don't know that much about adjtimex, but the output looks normal to
+&gt;me:
+&gt;# /sbin/adjtimex --print
+&gt;         mode: 0
+&gt;       offset: 6410
+&gt;    frequency: 3183310
+&gt;     maxerror: 239883
+&gt;     esterror: 2602
+&gt;       status: 1
+&gt;time_constant: 6
+&gt;    precision: 1
+&gt;    tolerance: 33554432
+&gt;         tick: 10000
+&gt;     raw time:  1058352003s 708956us = 1058352003.708956
+&gt;
+&gt;Sleep and ntpdate dont work, so I start updating the kernel clock from
+&gt;the hardware clock:
+&gt;# ( while(/sbin/hwclock --hctosys)
+&gt;  
+&gt;
+&gt;&gt;do
+&gt;&gt;  echo &gt; /dev/null
+&gt;&gt;done ) &
+&gt;&gt;    
+&gt;&gt;
+&gt;sleep and ntpdate still dont work.  The time still skips backwards.
+&gt;
+&gt;Restarting ntpd with logging shows nothing unuual.  It also doesn't fix
+&gt;the skipping backwards problem:
+&gt;# tail -f /tmp/ntpd.log 
+&gt;17 Jul 11:14:07 ntpd[24815]: logging to file /tmp/ntpd.log
+&gt;17 Jul 11:14:07 ntpd[24815]: ntpd <A HREF="mailto:4.1.1@1.786">4.1.1@1.786</A> Mon Apr  8 06:30:52 EDT
+&gt;2002 (1)
+&gt;17 Jul 11:14:07 ntpd[24815]: signal_no_reset: signal 13 had flags
+&gt;4000000
+&gt;17 Jul 11:14:08 ntpd[24815]: precision = 10 usec
+&gt;17 Jul 11:14:08 ntpd[24815]: kernel time discipline status 0040
+&gt;17 Jul 11:14:08 ntpd[24815]: frequency initialized 48.523 from
+&gt;/etc/ntp/drift
+&gt;
+&gt;No unusual or time setting processes are running.  This machine has done
+&gt;this twice before.
+&gt;
+&gt;I'll leave it like this for a while, then reboot it if nobody has any
+&gt;auggestions.
+&gt;
+&gt;  
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

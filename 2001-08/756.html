@@ -1,0 +1,159 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Hard Disk Layout/Virus Info - A good read guarenteed" -->
+<!-- FromName="'Benjamin Close'" -->
+<!-- FromEmail="cisbjc@cs.unisa.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 21 Aug 2001 10:21:54 +0930" -->
+<!-- Id="3B81B0AA.84CDC94C@reason.levels.unisa.edu.au" -->
+<!-- Reference="004e01c1299d$760d1e20$1101a8c0@festy.x" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Hard Disk Layout/Virus Info - A good read guarenteed</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Benjamin Close &lt;<I><A HREF="mailto:cisbjc@cs.unisa.edu.au">cisbjc@cs.unisa.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 21 Aug 2001 10:21:54 +0930
+</PRE>
+<H1>Hard Disk Layout/Virus Info - A good read guarenteed</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi All,
+	Just though you might be interested in a 10 minute run down of hard
+disk layout. It could aid in removing viruses which have lodged
+themselves in the MBR/ partitions boot sector.
+
+Consider the following basic, one partition setup of a hard disk.
+
++-----------------+
+| 1. MBR          |
++-----------------+
+| 2.Free Space Gap|
++-----------------+
+| 3. BootSectorP1 |
++-----------------+
+| 4. Data...      |
++-----------------+
+
+The master boot record (more correctly called the partition sector)
+contains:
+- An initial Startup program
+- The Partition Table
+
+The initial startup program tells the computer where to look next when
+booting your computer. Lilo puts itself in this area and so does fdisk
+/mbr or an installation of DOS/Windows. Hence if you reinstall windows
+lilo dissapears.
+
+The partition table indicates how the disk is divided into parts. Such
+as Dos has 4GB, and linux has 6GB. It also indicates the 'Active'
+partition. This is the part of the disk which should be consulted next
+if the computer is not told to do something else by the inital startup
+program.
+
+The Free Space gap is a left over tragedy from days gone by. With LBA
+(linear block addressing) it really isn't needed. However, it's kept
+around for compatibility. (For the more technically minded, it's 62
+sectors left in the cylinder so that partition 1's boot sector is
+cylinder boundary aligned).
+
+The boot sector of partition 1 is next (3 in the diagram). This area
+contains some more information about how to start your computer. Each
+partition has a boot sector. This area generally know how to start the
+operating system. SYS C: will write information to this area. Lilo
+installs information into it (it copies the contents of  /boot/boot.b to
+it).
+
+Finally you have the data for the operating system. This varies between
+operating systems vastly. So I won't bother explaining it.
+
+What about viruses?
+--------------------
+A virus can write itself into either the 'Initial startup program' area
+of the MBR or into the boot sector of a partition. Booting the hard disk
+will execute the virus. However, booting a floppy disk which reads the
+boot sector of a partition may also execute the virus ( MSDOS 6.2+ does
+this to determine if the filesystem is compressed - yes they still
+exists). 
+
+Booting a linux boot disk should not cause the virus to execute.
+
+Clearing a particular area of the disk
+---------------------------------------
+If you can get to linux/bsd you can clear out any area of the disk using
+the dd command. This can be really useful if a virus has lodged itself
+in the master boot record or the boot sector of a partition.
+
+I warn you though these commands can cause bad damage if used
+incorrectly. Make sure you take a backup of everything before running
+them. (That includes your partition table layout).
+
+First You can backup the MBR:
+
+dd if=/dev/hda of=/mtn/floppy/mbr_backup_datehere.dmp bs=512 count=1
+
+and manually record your partition table information:
+
+fdisk -l /dev/hda
+
+Next you can clear the initial startup program 
+(keeping the partition table intact)
+
+dd if=/dev/zero of=/dev/hda bs=446 count=1
+
+Finally you can clear the boot sector of the first partition:
+
+dd if=/dev/zero of=/dev/hda1 bs=446 count=1
+
+Then it's time to reinstall them with the correct versions. Lilo will
+rebuild the MBR & if selected the boot sector of a partition. FDISK /MBR
+will reinstall the initial startup program in the MBR. SYS C: will
+reinstall the boot sector for that dos partition.
+
+Windows 2000/ME do weird things with SYS C: and so restoring thier boot
+sector will be harder.
+
+Cheers,
+	Benjamin
+--
+3D Research Assistant                            +61 8 8302 3669
+School of Computer and Information Science       Room D1-07, Levels
+Campus  
+University of South Australia                    Mawson Lakes Blvd.   
+<A HREF="mailto:Benjamin.Close@cs.unisa.edu.au">Benjamin.Close@cs.unisa.edu.au</A>                   South Australia, 5095
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

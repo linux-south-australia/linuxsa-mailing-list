@@ -1,0 +1,168 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: New Motherboard with onboard lan" -->
+<!-- FromName="'Evan Bourlotos'" -->
+<!-- FromEmail="evan@cs.adelaide.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 13 Aug 2003 11:50:19 +0900" -->
+<!-- Id="3.0.5.32.20030813115019.00ff8980@rosemary.cs.adelaide.edu.au" -->
+<!-- Reference="002c01c36006$d7095850$0d00000a@nb" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: New Motherboard with onboard lan</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Evan Bourlotos &lt;<I><A HREF="mailto:evan@cs.adelaide.edu.au">evan@cs.adelaide.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 13 Aug 2003 11:50:19 +0900
+</PRE>
+<H1>Re: New Motherboard with onboard lan</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Well thanks to all the help 
+I managed to get online and networked.
+I actually had managed (in a half baked fashion) to get most of it sorted
+out but needed confirmation and some minor pointers to get it up and
+running on boot.
+
+I do have a question regarding add-on modules.
+I managed to install the module into /lib/modules/..../kernel/drivers/net/
+and loaded and on reboot it magically worked. 
+How does the mechanism work to identify the location of the module to load
+at boot.
+Is there an implicit assumption for nics to look in /drivers/net ?
+I would have thought the modules.conf would allow for path to a module to
+be specified
+
+I'd appreciate this as it will give me a better understanding of it.
+
+thanks
+Evan
+
+ps Rick: I am running Rh9.0 and sys specs are p4 2.4c-&gt; 3.2ghz /ddr-400/wd
+120gb 8mb
+PPS as this is a HT enabled CPU I get 2 options for boot non SMP and SMP
+versions of the kernel which is interesting I wasn't aware the kernels
+recognised the HT at all.
+
+
+
+
+
+At 18:12 12/08/03 +0930, Rick Harris wrote:
+&gt;Hi Evan,
+&gt;
+&gt;On Mon, 2003-08-11 at 22:18, Evan Bourlotos wrote:
+&gt;&gt; Hi List,
+&gt;&gt; I have recently upgraded my system by installing a new ABIT IS7 (p4)
+&gt;&gt; motherboard. The board is good and has on board gigabit lan (even
+&gt;&gt; though
+&gt;&gt; the specs say otherwise)
+&gt;&gt; So far I have managed to track down a module for the LAN from ASUS
+&gt;&gt; (of all places) (which runs the same 3com onboard chip) The module
+&gt;&gt; appears
+&gt;&gt; to work as I compiled it and fired up eth0 and I could ping my other
+&gt;&gt; machines.
+&gt;
+&gt;Great !
+&gt;
+&gt;&gt; 
+&gt;&gt; The problem is I have tried running insmod 3c2000.o and it placed it
+&gt;&gt; in
+&gt;&gt; /proc/modules I pinged but I cant do much else - the gateway and other
+&gt;&gt; things are not setup (normally done from the DHCP server but seeing I
+&gt;&gt; manually ifconfig up I hardcoded the ip address ). I have never faced
+&gt;&gt; this
+&gt;&gt; (installing a custom module) before as most of my hardware was always
+&gt;&gt; a
+&gt;&gt; generation behind and always autodetected.
+&gt;
+&gt;To get dhcp up, bring eth0 down with 'ifconfig eth0 down'
+&gt;then try 'dhcpcd eth0'.
+&gt;This should auto-get the IP address & gateway info from the dhcp server.
+&gt;Check it with 'ifconfig' & 'route'
+&gt;
+&gt;If dhcp is giving problems, less /var/log/messages & /var/log/syslog on
+&gt;the dhcp server to check for any errors. If your dhcpd.conf on the
+&gt;server is using MAC addresses to identify hosts on the network, then it
+&gt;will need to be changed to include the MAC address (HWaddr: in ifconfig)
+&gt;of your new NIC.
+&gt;
+&gt;If it does get the IP address, but not the gateway, you can manually set
+&gt;it up like so:
+&gt;'route del default'
+&gt;'routed add default gw &lt;ip-address_of_gateway&gt;'
+&gt;
+&gt;If all is well & you can now ping remote IP's through the gateway, then
+&gt;it's time to make it automatically set your network up on boot. How this
+&gt;is done depends largely on what linux distribution you're using. If it's
+&gt;either Slackware or Gentoo, I can help, otherwise I wouldn't have a clue
+&gt;:)
+&gt;
+&gt;But to make this transition easier you want to be able to modprobe the
+&gt;3c2000.o module.
+&gt;
+&gt;'cp 3c2000.o /lib/modules/`uname -r`/kernel/drivers/net/'
+&gt;then run 'depmod -a'
+&gt;You should now be able to 'modprobe 3c2000'
+&gt;
+&gt;&gt; I may have another question regarding with ac97 sound
+&gt;
+&gt;If memory serves, ac97 is a type of audio codec used by many different
+&gt;manufacturers of soundcards. So, if it's your soundcard your looking to
+&gt;setup here you'll need to provide the brand.
+&gt;'lspci | grep audio' should do the trick.
+&gt;
+&gt;Hope at least some of this helps. Nice specs on the new box btw ;-)
+&gt;
+&gt;Regards,
+&gt;Rick
+&gt;
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
++------------------------------------------------------------------------+
+| Evan Bourlotos              Email: <A HREF="mailto:evan@cs.adelaide.edu.au">evan@cs.adelaide.edu.au</A>             |
+| BSc, MCS                    WWW:   <A HREF="http://www.cs.adelaide.edu.au/~evan">http://www.cs.adelaide.edu.au/~evan</A> |
+| University of Adelaide      Phone: +61 8 8234 5522 (Work)              |
+| South Australia 5005        Fax:   +61 8 8234 5530 (Work Fax)          |
++------------------------------------------------------------------------+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

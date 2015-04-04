@@ -1,0 +1,131 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba/Win2K - browse lists over different subnets" -->
+<!-- FromName="'Ryan Verner'" -->
+<!-- FromEmail="xfesty@computeraddictions.com.au" -->
+<!-- ToName="'Matthew Geddes'" -->
+<!-- ToEmail="mgeddes@tellurian.com.au" -->
+<!-- Date="Thu, 10 Apr 2003 15:10:12 +0930" -->
+<!-- Id="20030410054012.M5354@computeraddictions.com.au" -->
+<!-- Reference="1F56E86E-6AF9-11D7-987D-000393103866@computeraddictions.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba/Win2K - browse lists over different subnets</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Ryan Verner &lt;<I><A HREF="mailto:xfesty@computeraddictions.com.au">xfesty@computeraddictions.com.au</A></I>&gt;
+  To  : Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  Date: Thu, 10 Apr 2003 15:10:12 +0930
+</PRE>
+<H1>Re: Samba/Win2K - browse lists over different subnets</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; On Thu, 2003-04-10 at 11:37, Ryan Verner wrote:
+&gt; 
+&gt; &gt; Doesn't seem to work, or likely, I'm doing something wrong. :(
+&gt; 
+&gt; Any chance of you posting the [global] section of the smb.conf file?
+
+This is what it is currently; I've tried changing around various things, but samba doesn't seem to want to talk to the Windows 2000 WINS server properly.
+
+(fyi; 
+10.10.2/24 is the subnet that the Win2K PDC server is on - domain "DOMAIN".
+10.10.3/24 is the subnet the other network linked via wireless is on.  I want all machines on this subnet being able to talk to the PDC server (10.10.2.1) for domain logins.)
+
+[global]
+   workgroup = DOMAIN
+   interfaces = eth0 ;(only just added this to stop broadcast on other subnets; this isn't the problem)
+   server string = %h server (Samba %v)
+   invalid users = root
+   log file = /var/log/samba/log.%m
+   max log size = 1000
+   syslog = 0
+   security = share
+   encrypt passwords = false
+   socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192
+   local master = yes
+   os level = 65
+   domain master = no
+   preferred master = yes 
+  ;wins support = yes
+   wins server = 10.10.2.1
+   remote announce = 10.10.2.1
+   remote browse sync = 10.10.2.1
+   wins proxy = yes
+   dns proxy = yes
+   name resolve order = wins lmhosts bcast host
+   obey pam restrictions = yes
+
+and log.nmbd:
+
+[2003/04/10 15:42:58, 0] nmbd/nmbd.c:main(783)
+  Netbios nameserver version 2.2.3a-12.1 for Debian started.
+  Copyright Andrew Tridgell and the Samba Team 1994-2002
+[2003/04/10 15:43:02, 0] nmbd/nmbd_responserecordsdb.c:find_response_record(237)
+  find_response_record: response packet id 2235 received with no matching record.
+[2003/04/10 15:43:02, 0] nmbd/nmbd_responserecordsdb.c:find_response_record(237)
+  find_response_record: response packet id 2236 received with no matching record.
+[2003/04/10 15:43:21, 0] nmbd/nmbd_become_lmb.c:become_local_master_stage2(404)
+  *****
+  
+  Samba name server NETBOX-ROOM2 is now a local master browser for workgroup DOMAIN on subnet 10.10.3.1
+  
+  *****
+[2003/04/10 15:43:21, 0] nmbd/nmbd_browsesync.c:find_domain_master_name_query_fail(359)
+  find_domain_master_name_query_fail:
+  Unable to find the Domain Master Browser name DOMAIN&lt;1b&gt; for the workgroup DOMAIN.
+  Unable to sync browse lists in this workgroup.
+
+
+
+&gt; &gt; They cover more of the theory.
+&gt; 
+&gt; BROWSING-Config.txt seems to have a fair bit in it relating to the 
+&gt; use of the remote-browse related options.
+
+Samba -&gt; Samba, not Samba -&gt; Win2K.  Talks about NT; seems the documentation is out of date.
+
+In any case, it aint working for me.  I'm guessing there's something on the 2K end of things that needs configuring; I've tried adding the samba server IP to be part of WINS replication, but this isn't working either.  The documentation states this isn't possible, in any case.
+
+R
+
+&gt; thx,
+&gt; Matt
+
+
+--
+Open WebMail Project (<A HREF="http://openwebmail.org">http://openwebmail.org</A>)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

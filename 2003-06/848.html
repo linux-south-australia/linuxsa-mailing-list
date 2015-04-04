@@ -1,0 +1,116 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: A few CUPS questions" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Matthew Geddes'" -->
+<!-- ToEmail="mgeddes@tellurian.com.au" -->
+<!-- Date="Tue, 24 Jun 2003 10:33:17 +0930" -->
+<!-- Id="3EF7A355.2040701@aarnet.edu.au" -->
+<!-- Reference="1056341510.2134.107.camel@hilarious" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: A few CUPS questions</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  Date: Tue, 24 Jun 2003 10:33:17 +0930
+</PRE>
+<H1>Re: A few CUPS questions</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Matthew Geddes wrote:
+
+&gt;   - RedHat's CUPS RPMs appear to ship with support for PAM
+&gt; authentication. Is this a RedHat-added-some-patches thing, or is it
+&gt; possible to have CUPS use PAM for all of it's authentication?
+
+See the original source at
+
+&lt;<A HREF="http://cvs.easysw.com/cvsweb.cgi/cups/scheduler/auth.c?rev">http://cvs.easysw.com/cvsweb.cgi/cups/scheduler/auth.c?rev</A>=1.70&content-type=text/x-cvsweb-markup&logsort=cvs&gt;
+
+which shows that PAM is in the mainline code (with support for Linux, Sun and
+HPUX).
+
+&gt;   - the lpadmin utility allows you to grant / deny access to certain
+&gt; printers by certain users. Does this access control only apply to the
+&gt; administration of that printer, or is it possible to have users
+&gt; authenticated when printing through a printer
+
+The insight you need is that IPP printing protocol used by CUPs
+works using URLs, there are differing URLs for printing and admin,
+and CUPS' access controls effect access to URLs.
+
+So you can have differing policies for ipp:/printers/...
+URLs and a ipp:/admin/... URLs, using pretty much the same
+syntax in /etc/cups/cupsd.conf as in Apache.
+
+Access control is described in the manual.
+
+&gt;   - Is it the case that the page count per job is calculated based on
+&gt; part of the postscript that is the print job and that a different
+&gt; something-&gt;postscript filter (say, printing from a Windows box) might
+&gt; make it hard/impossible for CUPS to tally the number of pages printed?
+
+CUPS has a good modular design, so you can check this easily
+if you have some PostScript you want to test (in test.ps):
+
+   /usr/lib/cups/filters/pstops "1" "root" "Test" "1" "" &lt; test.ps
+
+and look for the last "PAGE:" written to stderr.
+
+The filter protocol used by CUPS is in the documentation,
+including the accounting protocol (the PAGE messages
+to stderr).
+
+CUPS isn't as good as LPD-NG.  It sends a job to get
+the  NVRAM page count (PostScript printers can send
+text back to the computer), sends the user's print job,
+and sends a job to get the page count again.
+This has the advantage of always working, no matter how
+tricky the PostScript or even if the user has pressed
+the Job Cancel button on the printer itself.
+
+
+-- 
+  Glen Turner         Tel: (08) 8303 3936 or +61 8 8303 3936
+  Network Engineer          Email: <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>
+  Australian Academic & Research Network   www.aarnet.edu.au
+-- 
+  linux.conf.au 2004, Adelaide          lca2004.linux.org.au
+  Main conference 14-17 January 2004   Miniconfs from 12 Jan
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

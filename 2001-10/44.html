@@ -1,0 +1,131 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Squid and DNS lookups" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 2 Oct 2001 10:38:56 +0930" -->
+<!-- Id="20011002103856.B23574@yellowgoanna.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Squid and DNS lookups</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 2 Oct 2001 10:38:56 +0930
+</PRE>
+<H1>Squid and DNS lookups</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all...
+
+I use squid for a webcache (obviously), and many users tend to set
+their browsers to use it not just for external addresses, but internal
+also... No worries, except that many of our internal HTML contains
+links such as: "<A HREF="http://server/file.html">http://server/file.html</A>" (ie, an unqualified
+servername). Squid can't resolve these. Squid gives me: 
+
+-----
+The following error was encountered: 
+
+       Unable to determine IP address from host name for blaze 
+
+The dnsserver returned: 
+
+       DNS Domain 'blaze' is invalid: Host not found (authoritative). 
+-----
+
+However, when logged on to the server that squid is running on, I can
+do:
+
+-----
+<A HREF="mailto:richard@proxy">richard@proxy</A>:~$ ping -c 1 server
+PING server.domain.com.au (x.x.x.x): 56 data bytes
+64 bytes from x.x.x.x: icmp_seq=0 ttl=255 time=0.4 ms
+
+--- server.domain.com.au ping statistics ---
+1 packets transmitted, 1 packets received, 0% packet loss
+round-trip min/avg/max = 0.4/0.4/0.4 ms
+-----
+
+and...
+
+-----
+<A HREF="mailto:richard@proxy">richard@proxy</A>:~$ nslookup server
+Server:  localhost
+Address:  127.0.0.1
+
+Name:    server.domain.com.au
+Address:  143.216.69.2
+-----
+
+I've been puzzling over this for some time now -- how does Squid do
+DNS lookups, and why does it ignore my resolv.conf and nsswitch.conf
+files?
+
+-----
+<A HREF="mailto:richard@proxy">richard@proxy</A>:~$ cat /etc/resolv.conf
+domain domain.com.au
+search domain.com.au
+nameserver 127.0.0.1
+-----
+
+and...
+
+-----
+<A HREF="mailto:richard@proxy">richard@proxy</A>:~$ cat /etc/nsswitch.conf |grep hosts 
+hosts:          files dns
+-----
+
+I've now fixed this by adding "server" to my hosts files, but amd
+still wondering why this was neccessary... Note that changing my
+nsswitch to "hosts:   dns files" didn't help either...
+
+Anyone got any ideas? Can I make this so that I don't need to add
+everything to the hosts file?
+
+TIA
+
+rr
+
+
+-- 
+Richard Russell
+Yellow Goanna Pty Ltd
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

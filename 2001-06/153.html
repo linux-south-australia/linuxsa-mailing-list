@@ -1,0 +1,149 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: how to send mail" -->
+<!-- FromName="'David Newall'" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="'Prakash Pandya'" -->
+<!-- ToEmail="pandyap@rolta.com" -->
+<!-- Date="Mon, 4 Jun 2001 15:23:58 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0106041522230.732-100000@smart-panel.tellurian.com.au" -->
+<!-- Reference="008401c0ecb7$98d30370$3e1ea8c0@rolta.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: how to send mail</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Prakash Pandya &lt;<I><A HREF="mailto:pandyap@rolta.com">pandyap@rolta.com</A></I>&gt;
+  Date: Mon, 4 Jun 2001 15:23:58 +0930 (CST)
+</PRE>
+<H1>Re: how to send mail</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; anybody can tell me how to send mail using shell script
+
+A question, that came up before, was how to send MIME attachments using
+shell scripts; and Glen Turner provided a very nice explanation which
+I attach below...
+
+-----------------------------------------------------------------
+
+michael wrote:
+&gt; Is there some utility to do this and have the file recognised by it's type
+&gt; at the other end? I'm thinking that I can cat the file and pipe it to
+&gt; mail, but that will just send an email with the contents of the file in
+&gt; the body, right? What is required is a mime-aware email client that can
+&gt; be driven from the command line...
+
+E-mail attachments are implemented by putting special markers
+into e-mail to mark the limits of the attachment and its type.
+You can see what this looks by typing
+
+  less /var/spool/mail/$USER
+
+and looking at an e-mail with a header containing
+
+  Content-Type: multipart/...
+
+If the attachment is binary, then it is converted to text.
+The program mimencode will do this for you.
+
+The entire process is known as MIME (Internet mail multimedia
+extension).  MIME is defined in RFC1341 available everywhere
+including
+
+  <A HREF="http://mirror.aarnet.edu.au/ietf/rfc/rfc1341.txt">http://mirror.aarnet.edu.au/ietf/rfc/rfc1341.txt</A>
+
+So to send a MIME email you end up doing something like
+
+  writemail ${TO} ${BODYFILE} ${ATTACHFILE} | sendmail ${SMOPTIONS}
+
+where writemail looks vaguely like
+
+  FROM='Glen Turner &lt;<A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>&gt;'
+  TO= 'Fred Bloggs &lt;<A HREF="mailto:fred.bloggs@example.edu.au">fred.bloggs@example.edu.au</A>&gt;'
+  SUBJECT='A file for you'
+
+  BODYFILE=fred.txt
+  ATTACHFILE=fred.jpeg
+  ATTACHFILETYPE='image/jpeg'
+
+  MIMEPART=`date +%s`
+  MIMEPART="--${USER}${MIMEPART}"
+
+  # E-mail header
+  cat &lt;&lt;EOF
+  From: ${FROM}
+  To: ${TO}
+  Subject: ${SUBJECT}
+  MIME-Version: 1.0
+  Content-Type: multipart/mixed;boundary="---=NextPart1"
+
+  EOF
+
+  # Main text header
+  cat &lt;&lt;EOF
+  ${MIMEPART}
+  Content-Type: text/plain; charset="iso-9958-1"
+  Content-Transfer-Encoding: 7bit
+
+  EOF
+
+  # Main text
+  cat ${BODYFILE}
+  
+  # Attachment header
+  cat &lt;&lt;EOF
+  ${MIMEPART}
+  Content-Type: ${ATTACHFILETYPE}; name="${ATTACHFILE}"
+  Content-transfer-Encoding: base64
+  Content-Disposition: attachment; filename="${ATTACHFILE}"
+
+  EOF
+
+  # Attachment
+  mimencode ${ATTACHFILE}  
+
+  # The end
+  echo ${MIMEPART}--
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ Earth is a single point of failure
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

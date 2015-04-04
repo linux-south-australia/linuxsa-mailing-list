@@ -1,0 +1,121 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Simple MASQ - FTP Not working." -->
+<!-- FromName="'Matthew Western'" -->
+<!-- FromEmail="mwestern@affairs.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 22 Aug 2002 15:09:07 +0930" -->
+<!-- Id="FD14944A4C95D211AF350004AC4C55A406417DDA@mx.sola.com.au" -->
+<!-- Reference="FD14944A4C95D211AF350004AC4C55A405A95EE6@mx.sola.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Simple MASQ - FTP Not working.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Western &lt;<I><A HREF="mailto:mwestern@affairs.net.au">mwestern@affairs.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 22 Aug 2002 15:09:07 +0930
+</PRE>
+<H1>Simple MASQ - FTP Not working.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi All,
+
+This question seems to crop up a bit, but after reading the previous replies
+I am no closer to solving this problem.
+
+I've got a simple router that i'm trying to add Masquerading to.  Everything
+works AFAIK but FTP fails to do anything useful.  I can login sucessfully to
+the FTP server 'out there' but as soon as i do an 'ls' or try to upload
+something, it goes to sleep and says '425 Can't build data connection:
+Operation already in progress.'
+
+I've changed from using ipchains to using iptables but this exact same
+problem has cropped up.  I've attached my iptables script which is very
+basic.  I've changed the IPs to something fictitious.
+
+I've been reading this:
+<A HREF="http://www.netfilter.org/documentation/HOWTO//NAT-HOWTO-4.html">http://www.netfilter.org/documentation/HOWTO//NAT-HOWTO-4.html</A>#ss4.1
+but FTP doesn't work for me.
+
+any ideas people?
+Thanks
+Matt
+
+
+
+Inside Machine - 10.1.1.2
+|
+10.1.1.1
+Router
+203.20.20.1
+|
+internet
+
+-------------------------------------------------------
+
+#Point this to your copy of ip_tables
+IPT="/sbin/iptables"
+
+#Load the module.
+modprobe ip_tables
+modprobe iptable_nat
+modprobe ip_conntrack_ftp
+
+#Flush old rules etc
+$IPT -F
+$IPT -F -t nat
+#$IPT -X firewall
+
+#enable IP forwarding
+echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+
+#Disabling IP Spoofing attacks.
+echo 2 &gt; /proc/sys/net/ipv4/conf/all/rp_filter
+
+#default policies
+$IPT -A POSTROUTING -t nat -s 10.1.1.0/24 -o eth0 -j MASQUERADE
+$IPT -P FORWARD ACCEPT
+$IPT -P INPUT ACCEPT
+$IPT -P OUTPUT ACCEPT
+
+#NAT stuff out
+$IPT -A FORWARD -p all -s 10.1.1.2 -m state --state NEW,ESTABLISHED -j
+ACCEPT
+$IPT -A FORWARD -p all -d 10.1.1.2 -m state --state ESTABLISHED -j ACCEPT
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

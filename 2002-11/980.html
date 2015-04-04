@@ -1,0 +1,90 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Kernel buffering" -->
+<!-- FromName="'David Newall'" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="'Matthew Geddes'" -->
+<!-- ToEmail="mgeddes@tellurian.com.au" -->
+<!-- Date="22 Nov 2002 16:30:05 +1030" -->
+<!-- Id="1037944808.1995.78.camel@localhost.localdomain" -->
+<!-- Reference="Pine.LNX.4.33.0211221537000.10905-100000@ns.aus.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Kernel buffering</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  Date: 22 Nov 2002 16:30:05 +1030
+</PRE>
+<H1>Re: Kernel buffering</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, 2002-11-22 at 15:39, Richard Sharpe wrote:
+&gt; On Fri, 22 Nov 2002, Matthew Geddes wrote:
+&gt;&gt; The problem I have is that on a "busy" system my cruddy, fixed-size buffer is
+&gt;&gt; not up to the job when it comes to receiving a bunch of data and caching it
+&gt;&gt; until the userland program gets around to reading from the device.
+&gt;
+&gt; Couple of suggestions:
+
+I'm not sure either of those will really help Matthew, since his problem
+apparently is that the userland process can't run soon or often enough
+during "peak" times.  I presume you are adding instrumentation to the
+kernel, perhaps as simple as (syscall, time, pid), and I also presume
+your problem is that occasionally you get mad bursts of activity such
+that your fixed size buffer overflows before the user process can be
+scheduled to flush it.  Obviously you could have a bigger buffer, but
+then there's still no guarantee that it's big enough, and you get the
+added disadvantage of tying up even more kernel memory.  Probably the
+solution would be to use a chain of modest sized buffers.  When your
+current pool is full you add another block to the chain, and when a
+block has been flushed you release it.  Note, however, that this can
+badly fragment kernel memory, leaving you with lots of available memory
+but all chopped up into little, dis-contiguous pieces.  Were it me, I'd
+assume the user process will empty the buffer at opportune moments, and
+thus release all blocks only when they are empty, or maybe move the
+unflushed bit at the end of the last block into the first block when
+that unflushed bit is small enough.
+
+I know that copying buffers is not efficient, but I'd argue that the
+"correct" unix way to implement this sort of instrumentation is as a
+file.  Data is gathered when the file is open (for reading), and the
+reader blocks (assuming blocking i/o) until there's some data available
+to read.  I guess you could use ioctl to pass a user buffer instead, and
+collected data could be written directly into that, but somehow that
+seems less elegant than a simple device file.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

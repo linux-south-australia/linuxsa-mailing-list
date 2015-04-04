@@ -1,0 +1,116 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Firewall rejecting local network" -->
+<!-- FromName="'Brian Marr'" -->
+<!-- FromEmail="cabernet@ihug.com.au" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 25 Jul 2003 09:01:35 +0930" -->
+<!-- Id="20030724233134.GA2789@Gringo" -->
+<!-- Reference="OF5BBF6363.E311EA41-ONE9256D6D.00006BFF@int.csc.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Firewall rejecting local network</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Brian Marr &lt;<I><A HREF="mailto:cabernet@ihug.com.au">cabernet@ihug.com.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 25 Jul 2003 09:01:35 +0930
+</PRE>
+<H1>Re: Firewall rejecting local network</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Jul 23, 2003 at 09:36:33AM +0930, Brandon Johnson wrote:
+&gt; Which way would you like your icmp traffic? Both?
+&gt; then specify the following as well t
+&gt;    ACCEPT fw loc icmp 0
+&gt;    ACCEPT loc fw icmp 0
+&gt; 
+&gt; This will allow you to ping in both directions echo and echo-reply.
+&gt; 
+
+
+Thanks for the above. Things are looking up. The only references in the logs
+to my local network now appear while off the Internet. While on the net 
+they seem to vanish (see below). I notice they refer to port 53. These are
+the rules in place for this port. Should I add something to this ?
+Brian Marr
+
+
+
+#       Accept DNS connections from the firewall to the network
+#
+ACCEPT          fw              net             tcp     53
+ACCEPT          fw              net             udp     53
+
+
+
+<A HREF="mailto:root@Poncho">root@Poncho</A>:/home/magpie# tail -f /var/log/messages
+Jul 25 07:55:43 Poncho kernel: Shorewall:all2all:REJECT:IN= OUT=eth0
+SRC=192.168.50.3 DST=192.168.50.1 LEN=81 TOS=0x10 PREC=0xC0 TTL=64 ID=65136
+PROTO=ICMP TYPE=3 CODE=0 [SRC=192.168.50.1 DST=203.194.56.150 LEN=53
+TOS=0x10 PREC=0x00 TTL=64 ID=0 DF PROTO=UDP SPT=32774 DPT=53 LEN=33 ]
+Jul 25 07:55:44 Poncho kernel: Shorewall:all2all:REJECT:IN= OUT=eth0
+SRC=192.168.50.3 DST=192.168.50.1 LEN=81 TOS=0x10 PREC=0xC0 TTL=64 ID=65137
+PROTO=ICMP TYPE=3 CODE=0 [SRC=192.168.50.1 DST=203.194.27.57 LEN=53 TOS=0x10
+PREC=0x00 TTL=64 ID=0 DF PROTO=UDP SPT=32774 DPT=53 LEN=33 ]
+Jul 25 07:58:02 Poncho FaxGetty[352]: ANSWER: Can not lock modem device
+Jul 25 07:58:29 Poncho pppd[750]: pppd 2.4.1 started by root, uid 0
+Jul 25 07:58:29 Poncho pppd[750]: Using interface ppp0
+Jul 25 07:58:29 Poncho pppd[750]: Connect: ppp0 &lt;--&gt; /dev/usb/ttyACM0
+Jul 25 07:58:30 Poncho pppd[750]: local  IP address 203.220.225.184
+Jul 25 07:58:30 Poncho pppd[750]: remote IP address 203.220.252.49
+Jul 25 07:58:30 Poncho pppd[750]: primary   DNS address 203.194.27.57
+Jul 25 07:58:30 Poncho pppd[750]: secondary DNS address 203.194.56.150
+Jul 25 08:03:17 Poncho kernel: Shorewall:net2all:DROP:IN=ppp0 OUT= MAC=
+SRC=4.38.108.205 DST=203.220.225.184 LEN=48 TOS=0x00 PREC=0x00 TTL=112
+ID=3588 DF PROTO=TCP SPT=2373 DPT=1080 WINDOW=16384 RES=0x00 SYN URGP=0
+Jul 25 08:03:20 Poncho kernel: Shorewall:net2all:DROP:IN=ppp0 OUT= MAC=
+SRC=4.38.108.205 DST=203.220.225.184 LEN=48 TOS=0x00 PREC=0x00 TTL=112
+ID=5133 DF PROTO=TCP SPT=2373 DPT=1080 WINDOW=16384 RES=0x00 SYN URGP=0
+Jul 25 08:06:13 Poncho kernel: Shorewall:net2all:DROP:IN=ppp0 OUT= MAC=
+SRC=81.117.164.203 DST=203.220.225.184 LEN=404 TOS=0x00 PREC=0x00 TTL=104
+ID=33377 PROTO=UDP SPT=1051 DPT=1434 LEN=384
+Jul 25 08:24:14 Poncho kernel: Shorewall:logdrop:DROP:IN=ppp0 OUT= MAC=
+SRC=10.18.34.36 DST=203.220.225.184 LEN=1500 TOS=0x00 PREC=0x00 TTL=48
+ID=54098 DF PROTO=TCP SPT=80 DPT=32950 WINDOW=24616 RES=0x00 ACK PSH URGP=0
+Jul 25 08:24:30 Poncho kernel: Shorewall:logdrop:DROP:IN=ppp0 OUT= MAC=
+SRC=10.18.34.36 DST=203.220.225.184 LEN=1500 TOS=0x00 PREC=0x00 TTL=48
+ID=23829 DF PROTO=TCP SPT=80 DPT=32950 WINDOW=24616 RES=0x00 ACK PSH URGP=0
+Jul 25 08:24:45 Poncho kernel: Shorewall:logdrop:DROP:IN=ppp0 OUT= MAC=
+SRC=10.18.34.36 DST=203.220.225.184 LEN=1500 TOS=0x00 PREC=0x00 TTL=48
+ID=23830 DF PROTO=TCP SPT=80 DPT=32950 WINDOW=24616 RES=0x00 ACK PSH URGP=0
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

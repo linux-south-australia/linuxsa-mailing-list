@@ -1,0 +1,137 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SMTP callouts for email really work" -->
+<!-- FromName="'Anithen'" -->
+<!-- FromEmail="naota@tampabay.rr.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 27 Sep 2003 12:18:17 -0400" -->
+<!-- Id="oprv518rypqnsadz@smtp-server.tampabay.rr.com" -->
+<!-- Reference="20030927144713.GZ12846@erizo.shearer.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SMTP callouts for email really work</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Anithen &lt;<I><A HREF="mailto:naota@tampabay.rr.com">naota@tampabay.rr.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 27 Sep 2003 12:18:17 -0400
+</PRE>
+<H1>Re: SMTP callouts for email really work</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, 28 Sep 2003 00:17:13 +0930, Dan Shearer &lt;<A HREF="mailto:dan@shearer.org">dan@shearer.org</A>&gt; wrote:
+
+&gt; I just had reason to check my reject logs, because people have been
+&gt; telling me that this latest Microsoft worm is generating lots of
+&gt; messages. My conclusion is that rcpt-time block _really_ works. I
+&gt; haven't even bothered to look at my anti-spam checks for months, but I am 
+&gt; not vulnerable to the latest auto-spam doing the rounds. And my CPU
+&gt; has been bumbling along near zero :-)
+&gt;
+&gt; According to the logs I have rejected 400 messages containing the string
+&gt; "microsoft.com" in the headers, out of 7000 rejected messages in total.
+&gt; And not one of these messages cost me significant data, because I
+&gt; dropped the message as soon as the sender was identified as bogus
+&gt; (before the SMTP "DATA" command.)
+&gt;
+&gt; RCPT-time checking is implemented in Exim in an ACL structure, ie you
+&gt; put together a simple ACL statement along the lines of what you might do
+&gt; in a Squid or Apache config file. There is also a milter for Sendmail
+&gt; that will do something similar.
+&gt;
+&gt; The two checks I do which stop huge amounts of spam are:
+&gt;
+&gt; 	1. Does "<A HREF="mailto:sender@senderdomain">sender@senderdomain</A>" positively not exist? Spammers
+&gt; 	still usually post from spoofed or otherwise unrepliable places.
+&gt; 	A callout starts an SMTP delivery but stops before the DATA
+&gt; 	statement, unless there was previously an error message (if
+&gt; 	there is an MTA at all, or an MX at all, etc.)
+&gt;
+&gt; 		==&gt; one line in a config file.
+&gt;
+&gt; 	2. Does "<A HREF="mailto:postmaster@senderdomain">postmaster@senderdomain</A>" positively not exist? Would
+&gt; 	you believe, neither spammers nor automated virus-generated
+&gt; 	addresses tend to survive this test because they don't tend
+&gt; 	to have properly-run domains :-)
+&gt;
+&gt; 		==&gt; one line in a config file.
+&gt;
+&gt; This saves bandwidth and CPU. I simply don't have to process any of that
+&gt; junk because it never crossed the border into my network.
+&gt;
+&gt; After that, I push the surviving mail through Spam Assassin at DATA
+&gt; time, before I accept the message into a queue. So if SA doesn't like it
+&gt; I have paid for the bandwidth and the CPU, but at least it hasn't
+&gt; clogged my spool areas (and in a site that runs Windows I would then
+&gt; need to virusscan the messages, so SA saves that step at least.)
+&gt;
+&gt; Exim is so far the only main MTA that has got this facility neatly
+&gt; packaged by default. Postfix/qmail require source hacking as far as I
+&gt; know and there is an addon for Sendmail that can do something similar,
+&gt; but it isn't handled in any kind of integrated way. Interestingly there
+&gt; has been a lot of discussion about covering this sort of checking
+&gt; behaviour in the RFCs.
+&gt;
+&gt; Wietse lead a discussion on the Postfix development list a while ago
+&gt; exploring the cases in which callouts can cause problems, but I think
+&gt; practical experience shows that it is a very effective tool with no
+&gt; serious side-effects.
+&gt;
+&gt; If Exim is out of your experience and you don't have time to investigate
+&gt; it, consider putting it in as a skinny application proxy in front of
+&gt; your existing mail gateway. It really isn't that hard and your users
+&gt; will thank you for it!
+&gt;
+
+I recently solved a personal spam problem involving the stupid MS spam 
+mail.  My method was mailfilter.  I enjoy the simplicity of it; runs nicely 
+with fetchmail, matter-of-factly.
+
+My .mailfilterrc file consists of rules that delete mail that is not 
+addressed to any of the three pop accounts it checks.  Also, it deletes 
+mail from *microsoft, *ms, and *patch, and from likewise. What kills 90% of 
+the garbage is the "&lt;&gt;^(To|Cc):.*<A HREF="mailto:naota@tampabay">naota@tampabay</A>\.rr\.com" rule (deletes 
+mail that isn't addressed to me).
+
+How is an SMTP callout different from mailfilter?
+
+
+
+-- 
+-&gt;
+Curtis.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

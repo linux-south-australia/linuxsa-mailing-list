@@ -1,0 +1,103 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Security" -->
+<!-- FromName="Geoffrey D. Bennett" -->
+<!-- FromEmail="g@netcraft.com.au" -->
+<!-- ToName="Ismail Ibrahim" -->
+<!-- ToEmail="mi-mi@sbs.itc.usm.my" -->
+<!-- Date="Mon, 7 Jul 1997 20:47:48 +0930 (CST)" -->
+<!-- Id="199707071117.UAA20701@Mich.netcraft.com.au" -->
+<!-- Reference="Pine.A32.3.91.970707175231.12011A-100000@sbs.itc.usm.my" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Security</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Geoffrey D. Bennett &lt;<I><A HREF="mailto:g@netcraft.com.au">g@netcraft.com.au</A></I>&gt;
+  To  : Ismail Ibrahim &lt;<I><A HREF="mailto:mi-mi@sbs.itc.usm.my">mi-mi@sbs.itc.usm.my</A></I>&gt;
+  Date: Mon, 7 Jul 1997 20:47:48 +0930 (CST)
+</PRE>
+<H1>Re: Security</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; &gt; You should also remove or disable any incoming services that you don't
+&gt; &gt; use (eg. rlogin, rsh, telnet, ftp, talk, sendmail, pop, imap, http,
+&gt; &gt; samba, etc).
+&gt; 
+&gt; 	OK, I intend to disable some of these services, but how do I do that?
+
+For rlogin, rsh, telnet, talk, the best way is to edit /etc/inetd.conf
+and put a hash mark ("#") at the start of the appropriate line, then
+restart inetd ("ps aux | grep inetd" and
+"kill -1 whatever-inetd's-pid-is").  This leaves those servers
+installed, but they can't be used.
+
+For ftp, pop, imap, http, and samba the best way is:
+rpm -e wu-ftpd
+rpm -e imap
+rpm -e apache
+rpm -e samba  (unless you need the samba client)
+This method completely removes those servers from your system (don't
+worry, RPM makes it just as easy to reinstall them :).
+
+If you need the samba client, but not the server:
+cd /etc/rc.d/rc3.d
+mv S91smb s91smb
+cd ../rc5.d
+mv S91smb s91smb
+This disables the server from starting up.
+
+&gt; &gt; Yep.  One to set up the shadow file, and another to set the
+&gt; &gt; permissions on the backup and/or shadow file correctly.
+&gt; 
+&gt; 	Great!, I thought I had to recompile the programs to use shadow 
+&gt; password. 
+
+Nope.  That is the beauty of PAM (Pluggable Authentication Module).
+Anything compiled to use it (like Red Hat's telnet, ftp, samba, etc
+servers) will use whatever authentication scheme you have installed.
+
+&gt; 	One other thing..whenever I boot up Linux (before I had installed a 
+&gt; network card), one of the messages that scroll down the screen says:
+&gt; 
+&gt; 	sysquery: sendto 198.41.0.4
+&gt; 
+&gt; This turned out to be one of the root servers: a.root-servers.net
+&gt; Does it have to do this?
+
+Did it go away when you installed a network card?  Do you have bind
+installed?
+
+Regards,
+-- 
+Geoffrey D. Bennett (<A HREF="mailto:geoffrey@netcraft.com.au">geoffrey@netcraft.com.au</A>)
+Computer Systems Manager, NetCraft Australia
+<A HREF="http://www.netcraft.com.au/geoffrey/">http://www.netcraft.com.au/geoffrey/</A>
+Red Hat Linux Resellers: <A HREF="http://www.netcraft.com.au/redhat/">http://www.netcraft.com.au/redhat/</A>
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

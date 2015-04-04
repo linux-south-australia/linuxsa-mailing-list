@@ -1,0 +1,91 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Kernel buffering" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="rsharpe@ns.aus.com" -->
+<!-- ToName="'Matthew Geddes'" -->
+<!-- ToEmail="mgeddes@tellurian.com.au" -->
+<!-- Date="Fri, 22 Nov 2002 16:29:17 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0211221627120.3283-100000@ns.aus.com" -->
+<!-- Reference="20021122051327.GI19573@hilarious.tellurian.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Kernel buffering</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A></I>&gt;
+  To  : Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  Date: Fri, 22 Nov 2002 16:29:17 +1030 (CST)
+</PRE>
+<H1>Re: Kernel buffering</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, 22 Nov 2002, Matthew Geddes wrote:
+
+&gt; On Fri, Nov 22, 2002 at 03:39:34PM +1030, Richard Sharpe wrote:
+&gt; &gt; 
+&gt; &gt; Couple of suggestions:
+&gt; &gt; 
+&gt; &gt; 1. signal the application that the data is ready to pick up.
+&gt; 
+&gt; As in a SIGUSR1 type signal, or were you meaning to signal in a different
+&gt; way?
+&gt; 
+&gt; &gt; 2. Have the application call into the kernel via a syscall, and only 
+&gt; &gt; return when either the buffer is full, or a timeout occurs. Here you would 
+&gt; &gt; want two buffers, and the syscall would provide a userland buffer that the 
+&gt; &gt; kernel should fill when the data is ready. So, when the primary buffer 
+&gt; &gt; fills, flip them, copy the full buffer to userland, call wakeone or 
+&gt; &gt; wakeup on the waiting process, and then return.
+&gt; 
+&gt; I like the idea of the device file too. Is there a way of having the read()
+&gt; block on the device file without too much hassle?
+
+Hmmm, this is actually easier than I was thinking of. 
+
+In the read routine for the device, simply wait or whatever the Linux 
+primitive is on the buffer if it is not full.
+
+In the code that fills the buffer, wakeone on the buffer when it fills, 
+but just after flipping the buffer and copying the data to userspace.
+
+The details left as an exercise for ...
+
+Regards
+-----
+Richard Sharpe, rsharpe[at]ns.aus.com, rsharpe[at]samba.org, 
+sharpe[at]ethereal.com, <A HREF="http://www.richardsharpe.com">http://www.richardsharpe.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

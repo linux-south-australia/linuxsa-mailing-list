@@ -1,0 +1,140 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Linux/Unix VPN's" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Glen Turner" -->
+<!-- ToEmail="glen.turner@aarnet.edu.au" -->
+<!-- Date="Thu, 23 Mar 2000 08:36:25 +1030" -->
+<!-- Id="20000323083625.A73485@atdot.dotat.org" -->
+<!-- Reference="38D94037.4ED7E6A1@aarnet.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Linux/Unix VPN's</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  Date: Thu, 23 Mar 2000 08:36:25 +1030
+</PRE>
+<H1>Re: Linux/Unix VPN's</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, Mar 23, 2000 at 08:20:48AM +1030, Glen Turner wrote:
+
+ &gt; Mark Newton wrote:
+ &gt; &gt; For performance reasons you'll probably want to jack-up the MTU on
+ &gt; &gt; the PPP link to 16k or so.  The reason is that TCP is already going
+ &gt; &gt; to be fragmenting your conversation into smaller datagrams than
+ &gt; &gt; your applications really need, and by default ppp will produce *further*
+ &gt; &gt; fragmentation by breaking your datagrams up into 1500-byte chunks.
+ &gt; &gt; If you increase the MTU, fragmentation can be left to happen where
+ &gt; &gt; it really needs to happen, which is in the data link layer of the
+ &gt; &gt; underlying packet transport.
+ &gt; 
+ &gt; If you need to so this, then something bad is happening.
+
+Nope - Think about the following scenario.  You're running PPP-over-TCP
+with one of the endpoints on a system which is connected to you network
+via ethernet.  The ethernet, of course, has a 1500 byte MTU;  so does the
+PPP interface.
+
+You transmit, say, 1600 bytes on the PPP interface.  The IP code in
+the kernel will submit two fragments to the PPP interface driver:  a
+1500 byte frame and a 100 byte frame.  The PPP interface will start
+transmitting the 1500 byte frame, which means your machine will attempt
+to send the data via TCP over your ethernet.
+
+... but, of course, by the time PPP has finished transmitting it, it
+isn't 1500 bytes anymore:  It's a 1500 byte segment of data with a 
+TCP header, an IP header and a PPP link-layer header crammed onto
+the front, so it's actually quite a bit larger than 1500 bytes.
+
+So, TCP on the machine ends up submitting, say, 1600 (:-) bytes to
+the IP layer, which fragments it for your ethernet, so you end up 
+transmitting two frames on the ethernet:  approx 1500 bytes, followed by
+approx 100 bytes.
+
+Your second frame, 100 bytes over the PPP interface, will probably get
+through unmolested.
+
+So what have we achived?
+
+   - Our original 1600 byte write has turned into two PPP frames, which
+     have, in turn, been transmitted as THREE ethernet frames.
+
+   - Those three ethernet frames won't undergo fragment reassembly until
+     they reach their destination.
+
+   - Along the way, the physical transport is carrying 33% more header
+     overhead than the "virtual" PPP transport, on account of the fact
+     that there's an extra short frame corresponding to the second chunk
+     of the first PPP frame.
+
+   - If your tunnel is exclusively over ethernet, that means you'll also
+     have 33% more inter-frame spacing, which will slow-down your PPP 
+     session.
+
+   - Additional fragmentation also involves additional memory-to-memory
+     copies in the kernel, so your gateway machine will use more CPU time
+     (which probably won't contribute to its load average, it'll show up
+     as "system" or "interrupt" time).
+
+What happens if the PPP interface's MTU is increased?  Well, your 
+original 1600 byte write is emitted as a single PPP frame (1600 bytes + 
+link-layer overhead), which will be broken into two fragments before the
+data is emitted on the ethernet -- Header overhead and inter-frame spacing
+is reduced by a factor of one-third.
+
+ &gt; Setting a flow's source MTU to the size of the smallest
+ &gt; physical MTU along the path is always optimal.
+
+In an IP-over-IP or IP-over-UDP tunnel, yes -- There are additional 
+arguments in favour of making it slightly smaller too (like the fact
+that stupid gateway machines might block ICMP, which will disable
+MTU path discovery, which will make fragmented packets suck even
+more).
+
+ &gt; Perhaps due to encapsulating everything in a single TCP flow.
+ &gt; Hmmm.
+
+That's it.
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

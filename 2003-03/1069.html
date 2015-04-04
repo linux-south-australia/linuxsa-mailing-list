@@ -1,0 +1,414 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="NKFS Incompatable Pointer Types" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="linuxcpa@netscape.net" -->
+<!-- ToName="'linuxsa'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 21 Mar 2003 10:09:09 -0800" -->
+<!-- Id="3E7B5545.4090404@netscape.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: NKFS Incompatable Pointer Types</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:linuxcpa@netscape.net">linuxcpa@netscape.net</A></I>&gt;
+  To  : linuxsa &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 21 Mar 2003 10:09:09 -0800
+</PRE>
+<H1>NKFS Incompatable Pointer Types</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I am posting this mostly because it may help someone else.
+
+Yesterday I couldn't fall asleap,  so I decided to take a look at SCO's 
+Netware Kernel File System (NKFS) module source that I had acquired a 
+long time ago.  I thought it would be as simple as specifying the kernel 
+version being 2.4 instead of 2.2, but it was more than that.
+
+Basically I am walking blind here. So far, if I ran make and it 
+generated an error message, I would try to read the message and take a 
+wild guess at what the solution might be.
+
+So far I was able to make the errors quoted at the far bottom of this 
+message disappear.  However, I don't know if that means what I did is 
+correct.   ;-)
+
+Anyway, I untarred and unzipped the nkfs-4.2.1.tgz file, and edited and 
+moved the nkfs.h, nkfs_mount.h and nkfs_rpc.h files which were located 
+in the unzipped /nkfs-4.2.1/linclude directory. This is what I did 
+specifically:
+
+    * I changed "nkfs.h" and "nkfs_mount.h",  from reading"#include
+      &lt;nkfs_rpc.h&gt;" at the top of the file to: "#include
+      &lt;linux/nkfs_rpc.h&gt;". 
+    * I copied all three of the files into
+      /usr/src/linux-2.4.19.SuSE/include/linux
+
+
+After I ran make again, only these errors remained:
+
+
+&gt; nkfs_driver.c: In function 'nkfs_send'
+&gt; nkfs_driver.c:132 warning: passing arg 1 of 'waitque_active' from 
+&gt; incompatable pointer type.
+
+(I figured out this means something is wrong with line 132 of the 
+nkfs_driver.c file. )
+
+Here is what it reads right now:
+
+&gt;     /* Wake up reader */
+&gt;     if (waitqueue_active(&(driver-&gt;wait)))
+&gt;         wake_up_interruptible(&(driver-&gt;wait));
+&gt;
+&gt;     return;
+&gt; }
+
+
+Here are the remaining errors that are similar:
+
+&gt; nkfs_driver.c: In function `nkfs_send':
+&gt;
+&gt; nkfs_driver.c:135: warning: passing arg 1 of
+&gt; `waitqueue_active' from incompatible pointer type
+&gt;
+&gt; nkfs_driver.c:136: warning: passing arg 1 of
+&gt; `__wake_up' from incompatible pointer type
+&gt;
+&gt; nkfs_driver.c: In function `nkfs_rpc':
+&gt;
+&gt; nkfs_driver.c:189: warning: implicit declaration of
+&gt; function `init_waitqueue'
+&gt;
+&gt; nkfs_driver.c:220: structure has no member named `signal'
+&gt;
+&gt; nkfs_driver.c:220: structure has no member named `signal'
+&gt;
+&gt; nkfs_driver.c:230: warning: passing arg 1 of
+&gt; `waitqueue_active' from incompatible pointer type
+&gt;
+&gt; nkfs_driver.c:232: warning: passing arg 1 of
+&gt; `__wake_up' from incompatible pointer type
+&gt;
+&gt; nkfs_driver.c:239: warning: passing arg 1 of
+&gt; `interruptible_sleep_on' from incompatible pointer type
+&gt;
+&gt; nkfs_driver.c:247: structure has no member named `signal'
+&gt;
+&gt; nkfs_driver.c:263: warning: passing arg 1 of
+&gt; `waitqueue_active' from incompatible pointer type
+&gt;
+&gt; nkfs_driver.c:264: warning: passing arg 1 of
+&gt; `__wake_up' from incompatible pointer type
+&gt;
+&gt; nkfs_driver.c: In function `free_nkfs_driver':
+&gt;
+&gt; nkfs_driver.c:308: warning: passing arg 1 of
+&gt; `waitqueue_active' from incompatible pointer type
+&gt;
+&gt; nkfs_driver.c:309: warning: passing arg 1 of
+&gt; `__wake_up' from incompatible pointer type
+&gt;
+&gt; nkfs_driver.c:322: warning: passing arg 1 of
+&gt; `interruptible_sleep_on' from incompatible pointer type
+&gt;
+&gt; nkfs_driver.c: At top level:
+&gt;
+&gt; nkfs_driver.c:351: warning: initialization from
+&gt; incompatible pointer type
+&gt;
+&gt; nkfs_driver.c:352: warning: initialization from
+&gt; incompatible pointer type
+&gt;
+&gt; nkfs_driver.c:354: warning: initialization from
+&gt; incompatible pointer type
+&gt;
+&gt; nkfs_driver.c:355: warning: initialization from
+&gt; incompatible pointer type
+&gt;
+&gt; nkfs_driver.c:357: warning: initialization from
+&gt; incompatible pointer type
+&gt;
+&gt; nkfs_driver.c:359: warning: initialization from
+&gt; incompatible pointer type
+&gt;
+&gt; nkfs_driver.c: In function `nkfsd_read':
+&gt;
+&gt; nkfs_driver.c:397: warning: passing arg 1 of
+&gt; `interruptible_sleep_on' from incompatible pointer type
+&gt;
+&gt; nkfs_driver.c: In function `nkfsd_write':
+&gt;
+&gt; nkfs_driver.c:450: warning: passing arg 1 of
+&gt; `waitqueue_active' from incompatible pointer type
+&gt;
+&gt; nkfs_driver.c:451: warning: passing arg 1 of
+&gt; `__wake_up' from incompatible pointer type
+&gt;
+&gt; nkfs_driver.c: In function `nkfsd_poll':
+&gt;
+&gt; nkfs_driver.c:471: warning: passing arg 2 of
+&gt; `poll_wait' from incompatible pointer type
+&gt;
+&gt; make[1]: *** [nkfs_driver.o] Error 1
+&gt;
+&gt; make[1]: Leaving directory
+
+
+Anybody know what I should do?
+
+Give up?   :-D
+
+
+James Leone
+
+&gt; james:/windows/D/Applications/nkfs-4.2.1 # make
+&gt;
+&gt; make[1]: Entering directory
+&gt; `/windows/D/Applications/nkfs-4.2.1/src'
+&gt;
+&gt; gcc -D__KERNEL__ -Wall -Wstrict-prototypes -O2
+&gt; -fomit-frame-pointer -DMODULE -DMODVERSIONS
+&gt; -I/usr/include -I. -I../include -DLINUX1_3_x -c -o
+&gt; nkfs_driver.o nkfs_driver.c
+&gt;
+&gt; cc1: warning: changing search order for system
+&gt; directory "/usr/include"
+&gt;
+&gt; cc1: warning: as it has already been specified as a
+&gt; non-system directory
+&gt;
+&gt; nkfs_driver.c:27:31: linux/modversions.h: No such file
+&gt; or directory
+&gt;
+&gt; In file included from /usr/include/linux/module.h:297,
+&gt;
+&gt; from nkfs_driver.c:28:
+&gt;
+&gt; /usr/include/linux/version.h:2:2: #error
+&gt; "======================================================="
+&gt;
+&gt; /usr/include/linux/version.h:3:2: #error "You should
+&gt; not include /usr/include/{linux,asm}/ header"
+&gt;
+&gt; /usr/include/linux/version.h:4:2: #error "files
+&gt; directly for the compilation of kernel modules."
+&gt;
+&gt; /usr/include/linux/version.h:5:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:6:2: #error "glibc now
+&gt; uses kernel header files from a well-defined"
+&gt;
+&gt; /usr/include/linux/version.h:7:2: #error "working
+&gt; kernel version (as recommended by Linus Torvalds)"
+&gt;
+&gt; /usr/include/linux/version.h:8:2: #error "These files
+&gt; are glibc internal and may not match the"
+&gt;
+&gt; /usr/include/linux/version.h:9:2: #error "currently
+&gt; running kernel. They should only be"
+&gt;
+&gt; /usr/include/linux/version.h:10:2: #error "included via
+&gt; other system header files - user space"
+&gt;
+&gt; /usr/include/linux/version.h:11:2: #error "programs
+&gt; should not directly include &lt;linux/*.h&gt; or"
+&gt;
+&gt; /usr/include/linux/version.h:12:2: #error "&lt;asm/*.h&gt; as well."
+&gt;
+&gt; /usr/include/linux/version.h:13:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:14:2: #error "To build
+&gt; kernel modules please do the following:"
+&gt;
+&gt; /usr/include/linux/version.h:15:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:16:2: #error " o Have the
+&gt; kernel sources installed"
+&gt;
+&gt; /usr/include/linux/version.h:17:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:18:2: #error " o Make sure
+&gt; that the symbolic link"
+&gt;
+&gt; /usr/include/linux/version.h:19:2: #error "
+&gt; /lib/modules/`uname -r`/build exists and points to"
+&gt;
+&gt; /usr/include/linux/version.h:20:2: #error " the
+&gt; matching kernel source directory"
+&gt;
+&gt; /usr/include/linux/version.h:21:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:22:2: #error " o Now copy
+&gt; /boot/vmlinuz.version.h to"
+&gt;
+&gt; /usr/include/linux/version.h:23:2: #error "
+&gt; /lib/modules/`uname -r`/build/include/linux/version.h"
+&gt;
+&gt; /usr/include/linux/version.h:24:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:25:2: #error " o When
+&gt; compiling, make sure to use the following"
+&gt;
+&gt; /usr/include/linux/version.h:26:2: #error " compiler
+&gt; option to use the correct include files:"
+&gt;
+&gt; /usr/include/linux/version.h:27:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:28:2: #error "
+&gt; -I/lib/modules/`uname -r`/build/include"
+&gt;
+&gt; /usr/include/linux/version.h:29:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:30:2: #error " instead of"
+&gt;
+&gt; /usr/include/linux/version.h:31:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:32:2: #error " -I/usr/include/linux"
+&gt;
+&gt; /usr/include/linux/version.h:33:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:34:2: #error " Please
+&gt; adjust the Makefile accordingly."
+&gt;
+&gt; /usr/include/linux/version.h:35:2: #error
+&gt; "======================================================="
+&gt;
+&gt; In file included from nkfs_driver.c:28:
+&gt;
+&gt; /usr/include/linux/module.h:299: parse error before "UTS_RELEASE"
+&gt;
+&gt; In file included from nkfs_driver.c:29:
+&gt;
+&gt; /usr/include/linux/version.h:2:2: #error
+&gt; "======================================================="
+&gt;
+&gt; /usr/include/linux/version.h:3:2: #error "You should
+&gt; not include /usr/include/{linux,asm}/ header"
+&gt;
+&gt; /usr/include/linux/version.h:4:2: #error "files
+&gt; directly for the compilation of kernel modules."
+&gt;
+&gt; /usr/include/linux/version.h:5:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:6:2: #error "glibc now
+&gt; uses kernel header files from a well-defined"
+&gt;
+&gt; /usr/include/linux/version.h:7:2: #error "working
+&gt; kernel version (as recommended by Linus Torvalds)"
+&gt;
+&gt; /usr/include/linux/version.h:8:2: #error "These files
+&gt; are glibc internal and may not match the"
+&gt;
+&gt; /usr/include/linux/version.h:9:2: #error "currently
+&gt; running kernel. They should only be"
+&gt;
+&gt; /usr/include/linux/version.h:10:2: #error "included via
+&gt; other system header files - user space"
+&gt;
+&gt; /usr/include/linux/version.h:11:2: #error "programs
+&gt; should not directly include &lt;linux/*.h&gt; or"
+&gt;
+&gt; /usr/include/linux/version.h:12:2: #error "&lt;asm/*.h&gt; as well."
+&gt;
+&gt; /usr/include/linux/version.h:13:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:14:2: #error "To build
+&gt; kernel modules please do the following:"
+&gt;
+&gt; /usr/include/linux/version.h:15:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:16:2: #error " o Have the
+&gt; kernel sources installed"
+&gt;
+&gt; /usr/include/linux/version.h:17:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:18:2: #error " o Make sure
+&gt; that the symbolic link"
+&gt;
+&gt; /usr/include/linux/version.h:19:2: #error "
+&gt; /lib/modules/`uname -r`/build exists and points to"
+&gt;
+&gt; /usr/include/linux/version.h:20:2: #error " the
+&gt; matching kernel source directory"
+&gt;
+&gt; /usr/include/linux/version.h:21:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:22:2: #error " o Now copy
+&gt; /boot/vmlinuz.version.h to"
+&gt;
+&gt; /usr/include/linux/version.h:23:2: #error "
+&gt; /lib/modules/`uname -r`/build/include/linux/version.h"
+&gt;
+&gt; /usr/include/linux/version.h:24:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:25:2: #error " o When
+&gt; compiling, make sure to use the following"
+&gt;
+&gt; /usr/include/linux/version.h:26:2: #error " compiler
+&gt; option to use the correct include files:"
+&gt;
+&gt; /usr/include/linux/version.h:27:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:28:2: #error "
+&gt; -I/lib/modules/`uname -r`/build/include"
+&gt;
+&gt; /usr/include/linux/version.h:29:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:30:2: #error " instead of"
+&gt;
+&gt; /usr/include/linux/version.h:31:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:32:2: #error " -I/usr/include/linux"
+&gt;
+&gt; /usr/include/linux/version.h:33:2: #error ""
+&gt;
+&gt; /usr/include/linux/version.h:34:2: #error " Please
+&gt; adjust the Makefile accordingly."
+&gt;
+&gt; /usr/include/linux/version.h:35:2: #error
+&gt; "======================================================="
+&gt;
+&gt; In file included from nkfs_driver.c:31:
+&gt;
+&gt; /usr/include/linux/malloc.h:4:2: warning: #warning
+&gt; linux/malloc.h is deprecated, use linux/slab.h instead.
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

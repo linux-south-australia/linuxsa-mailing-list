@@ -1,0 +1,111 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Route or IPChains: What is the right way?" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Darryl Ross" -->
+<!-- ToEmail="darryl@bachblue.com.au" -->
+<!-- Date="Wed, 8 Dec 1999 10:22:11 +1030" -->
+<!-- Id="19991208102211.A47559@atdot.dotat.org" -->
+<!-- Reference="384D9C4E.BF7FE067@bachblue.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Route or IPChains: What is the right way?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Darryl Ross &lt;<I><A HREF="mailto:darryl@bachblue.com.au">darryl@bachblue.com.au</A></I>&gt;
+  Date: Wed, 8 Dec 1999 10:22:11 +1030
+</PRE>
+<H1>Re: Route or IPChains: What is the right way?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Dec 08, 1999 at 10:16:22AM +1030, Darryl Ross wrote:
+
+ &gt; &gt; To follow-through the same rationale for another subnet:  For a block
+ &gt; &gt; of 64 addresses, 6 bits can change, so that leaves 26 bits we "care"
+ &gt; &gt; about, 26 * 8 = 208... uh.  The mask should be 255.255.255.192.
+ &gt; &gt; Where did you get the 8 from?
+ &gt; 
+ &gt; OK, maybe I don't understand it 100% then, 256 / 32 = 8
+ &gt; how does it work?
+
+As you said before, the key is to think of IP addresses as binary
+numbers.  A note to the casual reader:  If you don't understand
+binary, you'l *never* understand netmasks.
+
+Let us assume your ISP has said you can use all the addresses between
+203.1.2.32 and 203.1.2.63 (bearing in mind that you can use the .32 
+and .63 addresses because they're reserved).  What netmask should you
+use?
+
+Let's convert the addresses to binary:
+
+             203    .     1    .     2    .    32
+           11001011 . 00000001 . 00000010 . 00100000
+
+             203    .     1    .     2    .    63
+	   11001011 . 00000001 . 00000010 . 00111111
+
+Note that, as you described earlier, the only bits which change in
+the entire range between 203.1.2.32 and 203.1.2.63 are the five 
+least-significant bits:  The number of bits we "care" about is
+27.
+
+To obtain a netmask, we create another 32 bit binary number which
+has a 1 in positions which aren't allowed to change, and a 0 in 
+positions which are:
+
+           11111111 . 11111111 . 11111111 . 11100000
+
+Converting that back to a dotted quad, we get:
+
+             255    .   255    .   255    .   224
+
+... so that's the netmask you need to use with that subnet:  The
+subnet is 203.1.2.32 with a netmask of 255.255.255.224.
+
+Note that an alternative notation for the same thing is 203.1.2.32/27.
+The /27 indicates that we only "care" about 27 bits, and we can work
+out the netmask by writing 27 "1" bits followed by enough "0" bits
+to pad it out to 32 bits and then converting the result to decimal.
+255.255.255.224 has 27 "1" bits as expected.
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

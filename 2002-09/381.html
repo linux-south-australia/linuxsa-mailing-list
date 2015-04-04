@@ -1,0 +1,191 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: cdrom, unable to find source of i/o errors..." -->
+<!-- FromName="'Branko Bratkovic'" -->
+<!-- FromEmail="branko@senet.com.au" -->
+<!-- ToName="'Daniel Mundy','LinuxSA'" -->
+<!-- ToEmail="djmunds@gmx.net,linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 10 Sep 2002 22:38:50 +0930" -->
+<!-- Id="E17okl9-0000JY-00@scorpio" -->
+<!-- Reference="1031595037.493.56.camel@xion" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: cdrom, unable to find source of i/o errors...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Branko Bratkovic &lt;<I><A HREF="mailto:branko@senet.com.au">branko@senet.com.au</A></I>&gt;
+  To  : Daniel Mundy &lt;<I><A HREF="mailto:djmunds@gmx.net">djmunds@gmx.net</A></I>&gt;<BR>        LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 10 Sep 2002 22:38:50 +0930
+</PRE>
+<H1>Re: cdrom, unable to find source of i/o errors...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Daniel,
+
+I've had quite a bit of experience with Sony CDRW on Debian 2.2 and Woody 
+with kernels 2.2 and 2.4.18 so here goes...
+
+Contrary to another post on this topic, I don't think an automounter is 
+causing your problems because I noticed that automounters were not 
+installed by default on my platform.
+
+Getting the burner part working is best left to last (IMHO).  The SCSI 
+emulation has a number of traps and I can see that your first priority is to 
+get the bugger to read and hence prove, or otherwise, that the lower levels 
+are OK.  If you agree, just undo the SCSI related steps described below.  
+
+According to your drive allocation, you appear to have put both CDs on the 
+same ide channel.  This is discouraged in one of the HOWTO's - reason given 
+is that CDs are slow yet demand attention at critical times so it is best to 
+pair them with a fast HDD.  May I suggest that you disconnect one of your CDs 
+at least during fault finding to eliminate this potential problem.  Better 
+that you find out AFTER the individual drives are sorted.  While you are at 
+it, double check the master/slave settings on both devices connected to each 
+IDE channel.  I had a problem with an older HDD that wouldn't be a slave to a 
+CD yet it was OK with another HDD (some sort of snobbery perhaps? ;-)
+
+Next try to mount CDs as ide devices (assuming you have switched off SCSI 
+emulation).   eg #&gt; mount /dev/hdc /mnt  As you anticipated, dd is also a 
+good thing to try; hdparm could also be used for diagnostics.  If all else 
+fails, turn to the dark side and see if Windoz can access the hardware, good 
+old DOS combined with MSCDEX on a floppy is all you need.
+
+Assuming that the above has satisfied you that nothing is broken, please have 
+a read of CD-Writing-HOWTO.gz  My experience with Debian 2.2 was that things 
+didn't work from a standard installation and this HOWTO was essential to get 
+it right.
+
+The HOWTO stipulates that some of the SCSI emulation must be built into 
+modules.  Contrary to my Deb 2.2 experience, I have reason to believe that 
+Deb 3.0 does come with the correct modules but I didn't get to confirm this 
+because I had to recompile my kernel out of a different necessity.  
+
+According to my notes, I had to add these items to /etc/modules.. 
+	loop 
+	ide-scsi 
+Again, you should check with the HOWTO because on my system I compiled as 
+much as I could as built-in rather than modules so your list may be longer.  
+Just to be safe run update-modules to ensure that these changes are put into 
+place (this is a Debian thing).  If still in doubt, ask again on the list for 
+another Debian user to describe their /etc/modules.
+
+Just one more configuration item, your lilo configuration should have a line 
+like this:  append="hdc=ide-scsi"
+
+Reboot and repeat the CD reading tests with /dev/scd0 (or whatever).  By the 
+way, on my system...
+brw-rw----    1 root     cdrom     11,   0 Mar 15 08:24 /dev/scd0
+
+Finally, do:
+	cdrecord -scanbus
+On your multi-burner system this should be very useful.
+
+.. and for something just a little different, visit the "coaster factory" at:
+	<A HREF="http://www.ping.be/satcp/software.htm">http://www.ping.be/satcp/software.htm</A>
+
+and this site...
+<A HREF="http://www.cdrinfo.com/Sections/Firmware/LatestFirmwareUpdates.asp">http://www.cdrinfo.com/Sections/Firmware/LatestFirmwareUpdates.asp</A>
+
+I went there and found some firmware updates which the Sony site didn't even 
+mention - unfortunately you must turn to the Dark Side to use these.  I 
+haven't had a chance to try them out, maybe somebody else on this list could 
+save me the effort.  My Sony drive has this bug whereby it takes about 10 to 
+20 seconds to start reading a CD after loading it, and not just under Linux.  
+Has anyone fixed a problem like this (or even unlike this) through a firmware 
+update??
+
+Good Luck,
+-- 
+Branko
+
+On Tue, 10 Sep 2002 03:40, Daniel Mundy wrote:
+&gt; Hi,
+&gt;
+&gt; I have been trying to get my cdrom working for quite some time now, and
+&gt; am almost ready to give up... thought I'd try a post to the list as a
+&gt; last resort.
+&gt;
+&gt; It seems whenever I try to use dd or cp to copy a cd, it gives me an i/o
+&gt; error. This is my setup:
+&gt;
+&gt; Debian Woody, 2.4.18 kernel, using xfs.
+&gt; hda: / on xfs
+&gt; hdb: currently unmounted xfs drive
+&gt; hdc: ide cdrw, is /dev/scd0
+&gt; hdd: ide cdrom
+&gt; (Both cd drives are made by Sony)
+&gt;
+&gt; The problem could be a number of things, but (as far as I know) I've
+&gt; elimenated most of these...
+&gt;
+&gt; 1. Hardware problem
+&gt;
+&gt; I have tried both of the currently installed drives, with the same
+&gt; errors (although weirdly (?) the filesizes I get with a dd if=/dev/hdd
+&gt; and dd if=/dev/scd0 give different filesizes...). The cdrom drive is
+&gt; quite new (I bought it maybe half a year ago because my previous drive
+&gt; had the same problem, and I was trying to rule out faulty cdrom) but has
+&gt; not had a lot of use since I got the i/o errors the very first time I
+&gt; tried it after plugging it in.
+&gt;
+&gt; Also, this new drive was bought before my latest hardware upgrade, and
+&gt; so I have got the error with both a Pentium-1 200MHz and a Pentium-II
+&gt; 400MHz, both naturally using different motherboards.
+&gt;
+&gt; 2. IDE bus itself
+&gt;
+&gt; I have plugged the cdrom into both hdb and hdd, so I am guessing that it
+&gt; is not a matter of one of my IDE channels being faulty. I also tried
+&gt; using a different IDE cable I had lying around.
+&gt;
+&gt; 3. Faulty media
+&gt;
+&gt; I have so far tried 11 of the CD's in my collection for testing, most of
+&gt; them being normal data CD's of varying ages/condition, and one being a
+&gt; VCD that was burned only a few days ago on a TDK CD (reliable brand?)
+&gt; with no scratches or dust to be seen. Of these, only one (fairly old) cd
+&gt; copied without error.
+&gt;
+&gt; I have so far been pretty much avoiding the use of my cdrom drive, but I
+&gt; am getting rather annoyed with it.. My friends come around and when I
+&gt; tell them it's not working I get "why don't you read it in Windows it
+&gt; worked in my computer..." as you can imagine it's really annoying.
+&gt;
+&gt; If anyone knows anything that could help, I really would love to hear
+&gt; from you. Thanks,
+&gt;
+&gt; Daniel Mundy
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

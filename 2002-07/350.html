@@ -1,0 +1,87 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE:  thumbnails, mogrify and large filesizes" -->
+<!-- FromName="'David Fitch'" -->
+<!-- FromEmail="davidf@parachilna.com" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="12 Jul 2002 21:04:53 +0930" -->
+<!-- Id="1026473694.15761.14.camel@spiral" -->
+<!-- Reference="1026388903.13754.7.camel@spiral" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE:  thumbnails, mogrify and large filesizes</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Fitch &lt;<I><A HREF="mailto:davidf@parachilna.com">davidf@parachilna.com</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 12 Jul 2002 21:04:53 +0930
+</PRE>
+<H1>RE:  thumbnails, mogrify and large filesizes</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, 2002-07-11 at 21:50, David de Groot wrote:
+&gt; mkGallery is written in perl and uses ImageMagik.
+&gt; Using the default quality settings, I get 1 - 3 kb thumbnails from
+&gt; jpeg images around 100 - 300kb.
+
+sounds the right size.  I found my problem:
+
+I had assumed jpeg was a standard format but it's a collection
+of formats.  I didn't mention before but all these photos are
+from my digital camera, this is relevent info as most (all?)
+digital cameras write EXIF format jpegs which is a normal jpeg
+but with lots of extra headers and crap including a builtin
+little thumbnail (which the camera uses to display on it's
+LCD screen - I always kinda vaguely wondered how cameras can
+do that more or less instantly yet it takes my PC several
+seconds to resize a 1024x768 res image!!).
+
+So... to cut a long story short, when I created the thumbnails
+with igal (which uses convert/mogrify from ImageMagick) all
+that extra crap was still in there resulting in a 26k thumbnail
+instead of 3k (regardless of the quality/compression settings
+I used).  I found the answer on the imagemagick user mailing list
+(via google), it's run "convert +profile APP1 pic.jpg pic.jpg"
+to strip out the crap, then create thumbnails etc as normal.
+
+So anyone with largish sized thumbnails might like to run:
+"identify -verbose pic.jpg" and look for a label saying something
+like "Profile-APP1: 24995 bytes", if you've got that label at all,
+then you've most likely got the same problem.
+
+Dave.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,115 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IP identifier field for linux UDP/IP equals zero??!" -->
+<!-- FromName="'Mark Newton'" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="'Alan Kennington'" -->
+<!-- ToEmail="ak.linuxsa@topology.org" -->
+<!-- Date="Thu, 15 May 2003 11:19:02 +0930" -->
+<!-- Id="20030515111902.A50580@atdot.dotat.org" -->
+<!-- Reference="20030515104724.C4065@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IP identifier field for linux UDP/IP equals zero??!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  Date: Thu, 15 May 2003 11:19:02 +0930
+</PRE>
+<H1>Re: IP identifier field for linux UDP/IP equals zero??!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, May 15, 2003 at 10:47:24AM +0930, Alan Kennington wrote:
+
+ &gt; It's RFC 3095. 
+ &gt; <A HREF="http://www.rfc-editor.org/rfc/rfc3095.txt">http://www.rfc-editor.org/rfc/rfc3095.txt</A>
+
+Sect 4.5.5 says, 
+
+  This section assumes (initially) that the IPv4 stack at the source
+  host assigns IP-ID according to the value of a 2-byte counter which
+  is increased by one after each assignment to an outgoing packet.
+
+That's a horrible assumption.  Even if your reading of STD-5 was correct
+(and I still claim that it isn't!), assuming that the header Identification
+is a monotonically increasing integer is bizarre.  There is -nothing-
+in STD-5 which says that needs to be the case;  And there are good reasons
+for using a PRNG or a CRC16 for working out the "unique" identifier, which
+would ruin the dodgy assumption in sect 4.5.5 just as resolutely as
+setting the Identification to zero.
+
+RFC-3095 is making an assumption which isn't backed-up by any other 
+standard.  That's the source of your problem.  I could answer all of 
+your complaints about the Linux kernel failing to honor STD-5 by 
+writing a subroutine which calculated a 16 bit CRC and stuffed it into
+the IP-ID field;  But that wouldn't help you at all with RFC-3095, would
+it?
+
+ &gt; Sooner or later it will come out into the open that the linux OS
+ &gt; has an inefficient interaction with voice and video over 3G (and 2.5G)
+ &gt; networks. Eventually, the linux kernel people will feel the pressure and
+ &gt; they will put back the varying IP ID fields as they no doubt used to
+ &gt; be before some bright spark removed them.  (I'm making assumptions here.)
+
+The problem is with the authors of RFC-3095, not the Linux kernel.
+
+ &gt; But briefly, RFC 3095 reduces the IP/UDP/RTP header on all
+ &gt; voice and video traffic from typically 40 bytes down to 1 or 2 bytes
+ &gt; most of the time. With linux IP/UDP/RTP headers, that will be 3 or 4 bytes
+ &gt; because a constant ID field can't be compressed. 
+
+&lt;aghast&gt;  Then we're talking about a difference of two bytes...?
+
+ &gt; That's because of a clever compression algorithm which exploits the
+ &gt; fact that the ID field increases by 1 per packet in most OSs.
+ &gt; It just didn't occur to the RFC 3095 standards people that anyone would
+ &gt; use constant ID values. So they didn't cater for that possibility.
+
+They don't cater for any possibility -except- the id increasing by 1 per 
+packet.
+
+Serious question, Alan:  If there was code in the kernel which used a 
+CRC16 to set the IP-ID field, would you have "difficulties" with the 
+kernel or with RFC-3095?
+
+  - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

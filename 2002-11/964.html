@@ -1,0 +1,88 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Bash variable" -->
+<!-- FromName="'Freeman, Peter (ERHS)'" -->
+<!-- FromEmail="Freeman.Peter@saugov.sa.gov.au" -->
+<!-- ToName="'Andrew Galdes'" -->
+<!-- ToEmail="AGaldes@elders.com.au" -->
+<!-- Date="Fri, 22 Nov 2002 11:00:02 +1030" -->
+<!-- Id="957F5820F786D511AEDF0002A56B67FC07342B18@sagemsg0012.sagemsmrd01.sa.gov.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Bash variable</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Freeman, Peter (ERHS) &lt;<I><A HREF="mailto:Freeman.Peter@saugov.sa.gov.au">Freeman.Peter@saugov.sa.gov.au</A></I>&gt;
+  To  : Andrew Galdes &lt;<I><A HREF="mailto:AGaldes@elders.com.au">AGaldes@elders.com.au</A></I>&gt;
+  Date: Fri, 22 Nov 2002 11:00:02 +1030
+</PRE>
+<H1>RE: Bash variable</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt;In more detail, i am adding users to linux from a text file 
+&gt;list. There are
+&gt;thousands of entries. So i have started doing it by starting 
+&gt;letters; "a"
+&gt;first and then all the "b's". But still it doesn't work. It 
+&gt;only works with small numbers of entries.
+
+Maybe you should doing it a different way.
+If the text file is in delimited format it should be very 
+straigtforward.
+
+if textfile is in the following format:
+username,f2,f3,f4
+
+for f in `cat textfile |cut -d, -f1`
+do
+useradd &lt;params&gt; $f
+done
+
+
+Possibly this will still complain about too many entries, so
+maybe try using awk instead.  Below is what I use to add users
+from delimited text dump out of an NT box (using pwdump).
+
+awk -F , '
+{
+	# Field 1 = username, Field 2 = UID
+	system("useradd -n -d /dev/null -s /bin/false -u " $2 " " $1)
+}' /home/user/ntpasswdfile
+
+
+HTH
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

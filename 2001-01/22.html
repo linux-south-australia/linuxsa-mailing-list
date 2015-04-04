@@ -1,0 +1,120 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Firewall Development" -->
+<!-- FromName="'Adam Hawes'" -->
+<!-- FromEmail="adam_hawes@dingoblue.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 02 Jan 2001 23:31:58 +1030" -->
+<!-- Id="3A51D146.63EC97A@dingoblue.net.au" -->
+<!-- Reference="Pine.LNX.3.95.1010102223856.2260C-100000@rebel.rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Firewall Development</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adam Hawes &lt;<I><A HREF="mailto:adam_hawes@dingoblue.net.au">adam_hawes@dingoblue.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 02 Jan 2001 23:31:58 +1030
+</PRE>
+<H1>Re: Firewall Development</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Just assuming there were nasty people on the list, wouldn't they just say
+&gt; (offlist) " i am a nice guy and  security expert, I will look at your
+&gt; set up for you "?
+&gt; 
+&gt; In this case, they get a look at your rules anyway.
+
+Okay :-)
+
+I'll rephrase the question as there was only one thing that I was really
+interested in finding an answer for anyway.
+
+What rules are required to allow DNS queries:
+
+1. into a box (on eth0 interface, address 192.168.1.1)
+
+2. out of that box (on ppp0 interface, address dynamic)
+
+I essentially want to make sure that internal computers on
+192.168.1.0/24 can query the DNS server on 192.168.1.1, and that the DNS
+server on 192.168.1.1 can query external nameservers.
+
+The rest of my rules are pretty much wrapped up; default policy to DENY
+and only allow acces to my proxy server, and a few other ports for ICQ
+and things to masquerade through. I have no doubts about the ICQ or
+proxy ports because I use that already.  What I want to do is change the
+default policies from ACCEPT to DENY.  This will block DNS queries too
+so I need to ensure that they are getting through.
+
+Cheers,
+Adam
+#!/bin/sh
+
+EXTIP=$4
+INTIP=192.168.1.1
+
+EXTNET=ppp0
+INTNET=eth0
+
+#
+# Flush ALL rules
+#
+/sbin/ipchains -F
+/sbin/ipchains -X
+/usr/sbin/ipmasqadm portfw -f
+
+#
+# Explicitly deny everything
+#
+/sbin/ipchains -P input DENY
+/sbin/ipchains -P output DENY
+/sbin/ipchians -P forward DENY
+
+#
+# Allow DNS connections
+#
+/sbin/ipchains -A output -s 192.168.1.0/24 53 -j ACCEPT
+/sbin/ipchains -A input -s 192.168.1.0/24 53 -j ACCEPT
+/sbin/ipchains -A forward -s 192.168.1.0/24 53 -J ACCEPT
+
+#
+# Allow loopback interface traffic
+#
+/sbin/ipchains -A input -i lo -j ACCEPT
+/sbin/ipchains -A output -i lo -j ACCEPT
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

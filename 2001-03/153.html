@@ -1,0 +1,130 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: script problem" -->
+<!-- FromName="'Vladimir V. Bashkirtsev'" -->
+<!-- FromEmail="mega@konectanet.com.au" -->
+<!-- ToName="'Michael Kratz'" -->
+<!-- ToEmail="michael_kratz@hotmail.com,linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 5 Mar 2001 14:08:17 +1030" -->
+<!-- Id="003801c0a525$b7ee61c0$7aba26cb@konectanet.com.au" -->
+<!-- Reference="F236U6xfPTeip68V8zD00004814@hotmail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: script problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Vladimir V. Bashkirtsev &lt;<I><A HREF="mailto:mega@konectanet.com.au">mega@konectanet.com.au</A></I>&gt;
+  To  : Michael Kratz &lt;<I><A HREF="mailto:michael_kratz@hotmail.com">michael_kratz@hotmail.com</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 5 Mar 2001 14:08:17 +1030
+</PRE>
+<H1>Re: script problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; I got this script from somewhere a couple of days ago, I can't remember
+&gt; where. It is supposed to redial the ppp link if it drops. But the script
+&gt; kind of hangs in the middle, it won't release command if you know what I
+&gt; mean. ie. if i put it in the rc.local it just hangs the boot process. I
+can
+&gt; still hit ctrl alt del and reboot cleanly, but there is something it cant
+&gt; get past.
+&gt; Here is the script could, someone please tell me what is wrong:
+&gt;
+&gt; #!/usr/bin/perl
+&gt; #
+&gt; # Link monitor Script
+&gt;
+&gt; #
+&gt; # Set Constants
+&gt; #
+&gt; $SLEEP_INC = 600;
+&gt; $RETRIES = 8;
+&gt; $mailprog = "/usr/lib/sendmail";
+&gt; $CONNECT_SCRIPT = "/etc/ppp/ip-up";
+&gt; $LOG_FILE = "/var/log/redial";
+&gt;
+&gt; # IP Address of ISP server.
+&gt; $ISP_IP = "xxx.xxx.xxx";
+&gt;
+&gt; #
+&gt; # Initialise Variables.
+&gt; #
+&gt; $SLEEP_TIME = $SLEEPINC;
+&gt; $ATTEMPTS = 0;
+&gt;
+&gt; #
+&gt; # Main Script.
+&gt; #
+&gt; do
+&gt; {
+&gt;
+&gt; sleep $SLEEPTIME;
+&gt;
+&gt; if ( `/sbin/ifconfig | /bin/grep -c $ISP_IP` == 0 ) {
+&gt;     sleep 90;
+&gt;   if ( `/sbin/ifconfig | /bin/grep -c $ISP_IP` == 0 ) {
+&gt;     system ( $CONNECT_SCRIPT );
+&gt;     $ATTEMPTS = $ATTEMPTS + 1;
+&gt;     $SLEEP_TIME = $SLEEP_TIME + $SLEEP_INC * $ATTEMPTS;
+&gt;     system("echo ReDial $ATTEMPTS : `date` &gt;&gt; $LOG_FILE");
+&gt;   }
+&gt; } else {
+&gt;    $SLEEPTIME = $SLEEPINC;
+&gt;    $ATTEMPTS = 0;
+&gt;   }
+&gt; }
+&gt; until  $ATTEMPTS == $RETRIES ;
+&gt;
+&gt; #
+&gt; # Mail out advise
+&gt; #
+&gt;    open( MAIL , "|$mailprog -t");
+&gt;
+&gt;    print MAIL "To: root\n";
+&gt;    print MAIL "From: cron\n";
+&gt;    print MAIL "Subject: Link Script Termination\n\n";
+&gt;
+&gt;    print MAIL "The Linkchecker Script has Ended.\n";
+&gt;    print MAIL "Too many call attempts.\n";
+&gt;
+&gt;    close (MAIL);
+
+You need to fork this script by using & in the end of command which
+launching this script
+
+Vladimir
+
+BTW: If you will wait for 80 minutes your system will boot up... :)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

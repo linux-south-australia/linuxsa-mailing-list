@@ -1,0 +1,342 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: jpeg converter" -->
+<!-- FromName="'Andrew Braund'" -->
+<!-- FromEmail="abraund_news@mail.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="lloy0076@rebel.net.au,benw@webmedia.com.au" -->
+<!-- Date="Thu, 14 Jun 2001 12:13:56 +0930" -->
+<!-- Id="NDBBIFBEJKPAFOALJJAPKEKAGPAA.abraund_news@mail.com" -->
+<!-- Reference="3B2814C7.F6BC2D60@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: jpeg converter</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Braund &lt;<I><A HREF="mailto:abraund_news@mail.com">abraund_news@mail.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:benw@webmedia.com.au">benw@webmedia.com.au</A></I>&gt;
+  Date: Thu, 14 Jun 2001 12:13:56 +0930
+</PRE>
+<H1>RE: jpeg converter</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Snipets from PHP list (when it was working) from the mighty Rasmus around
+July 2000 so may not be current.
+HTH
+Andrew Braund
+
+
+
+
+&gt; So, my first question is what role does ImageMagick play in PHP's
+&gt; configuration/installation, since it does look for it? I haven't seen any
+&gt; ImageMagick specific functions, nor have I seen any configuration options
+&gt; (such as --with-imagemagick or the like).
+
+None, ImageMagick support is broken and deprecated.
+
+&lt;snip&gt;
+
+
+&gt;      I have a form where I allow a user to upload either a jpg, png, or
+gif.
+&gt; I'd like to have PHP automatically generate a thumbnail to scale; however,
+I
+&gt; don't know what function to use.
+
+There is no decent built in function to do this.  I use the command line
+conversion tools from the pbmplus package.
+
+My thumbnail function looks like this:
+
+
+    /* globals */
+    $theight=96;
+    $djpeg = "/usr/bin/djpeg"; /* decompresses a jpeg to ppm format    */
+    $cjpeg = "/usr/bin/cjpeg"; /* compreses a ppm to jpeg format       */
+    $pnmscale = "/usr/bin/pnmscale"; /* scales a ppm image          */
+    $giftopnm = "/usr/bin/giftopnm"; /* convert a gif to ppm format */
+    $ppmtogif = "/usr/bin/ppmtogif"; /* convert a ppm to gif format */
+    $ppmquant = "/usr/bin/ppmquant"; /* colour quantize a ppm image */
+    $pnmpad = "/usr/bin/pnmpad";
+    $shadow = "/usr/local/bin/shadow"; /* Put a drop-shadow on a GIF */
+
+    /*
+     * The thumbnail function uses the pnmscale program from
+     * the popular Netpbm image manipulation tools package
+     * to create a thumbnail of the given image.  If a thumbnail
+     * already exists for the image, the function simply returns.
+     */
+    function thumbnail($filename) {
+        global $theight, $djpeg, $cjpeg, $pnmscale, $giftopnm, $ppmtogif,
+$ppmquant, $pnmpad, $shadow;
+
+        $tdir = dirname($filename)."/thumbnails"; /* thumbnail directory */
+        if(!filetype($tdir)) {
+            if(!@mkdir($tdir,0777)) {
+                echo "Unable to create $tdir directory - check
+permissions&lt;br&gt;\n";
+                return;
+            }
+        }
+        $tfile = $tdir."/".basename($filename);   /* thumbnail file */
+        $tfile = ereg_replace("\.[^\.]+$",".gif",$tfile);
+        if(!filesize($tfile)) {
+            if(eregi("\.gif$",$filename)) {  /* Look for .gif extension */
+                exec("$giftopnm $filename | $pnmscale -height $theight |
+$pnmpad -white -l6 -b6 | $ppmquant 248 | $ppmtogif | $shadow &gt; $tfile");
+            } elseif(eregi("\.jpe?g",$filename)) { /* Look for .jpg or .jpeg
+extension */
+                exec("$djpeg $filename | $pnmscale -height $theight |
+$pnmpad -white -l6 -b6 | $ppmquant 248 | $ppmtogif | $shadow &gt; $tfile");
+            } else {  /* not a GIF or JPG file */
+                return("");
+            }
+        }
+        return($tfile);
+    }
+
+/usr/local/bin/shadow is pretty funny actually.  It is a little script I
+wrote to stick a drop shadow on a thumbnail.  It was written as a bit of a
+joke, but turned out to actually be somewhat useful:
+
+#!/usr/local/bin/php -q
+&lt;?
+    $arr = array("000000",
+                 "000011",
+                 "001122",
+                 "011334",
+                 "124556",
+                 "145666");
+    $ary = array("045566",
+                 "034556",
+                 "024556",
+                 "011445",
+                 "000124",
+                 "000001");
+    $bot = "666541";
+
+    $im = imagecreatefromgif("/dev/stdin");
+    $black = ImageColorAllocate($im, 0,0,0);
+    $c0 = ImageColorAllocate($im, 255,255,255);
+    $c1 = ImageColorAllocate($im, 220,220,220);
+    $c2 = ImageColorAllocate($im, 185,185,185);
+    $c3 = ImageColorAllocate($im, 150,150,150);
+    $c4 = ImageColorAllocate($im, 135,135,135);
+    $c5 = ImageColorAllocate($im, 95,95,95);
+    $c6 = ImageColorAllocate($im, 45,45,45);
+    $x=0; $y=0;
+    $sy = imagesy($im);
+    $sx = imagesx($im);
+    /* top left */
+    while(list(,$v)=each($arr)) {
+        $x=0;
+        while($x&lt;strlen($v)) {
+            ImageSetPixel($im,$x,$y,${"c".$v[$x]});
+            $x++;
+        }
+        $y++;
+        $last=$v;
+    }
+    /* left edge */
+    $x=0;
+    while($x&lt;strlen($last)) {
+        ImageLine($im,$x,$y,$x,$sy-5,${"c".$last[$x]});
+        $x++;
+    }
+    $y=$sy-5;
+    /* bottom left */
+    while($y&lt;=$sy) {
+        $x=0;
+        while($x&lt;strlen($ary[$y-$sy+5])) {
+            $l = $ary[$y-$sy+5];
+            ImageSetPixel($im,$x,$y,${"c".$l[$x]});
+            $x++;
+        }
+        $y++;
+    }
+    /* bottom edge */
+    $y=$sy-6;
+    while($y&lt;$sy) {
+        ImageLine($im,$x-1,$y,$sx-5,$y,${"c".$bot[$y-$sy+6]});
+        $y++;
+    }
+    /* bottom right */
+    $y=$sy-6;
+    while($y&lt;$sy) {
+        $x=$sx-6;
+        while($x-$sx+6 &lt; strlen($ary[$y-$sy+6])) {
+            $l = $ary[$y-$sy+6];
+            ImageSetPixel($im,$x,$y,${"c".$l[$sx-$x-1]});
+            $x++;
+        }
+        $y++;
+    }
+    ImageGif($im);
+    ImageDestroy($im);
+?&gt;
+
+Sorry for the lack of comments in that second one.  But you should be able
+to read through it and figure out what it does.  And when you do you will
+see why it is so silly.
+
+-Rasmus
+
+
+
+
+
+
+
+
+
+
+
+I wrote a little command-line shadow tool in PHP that puts a drop shadow
+on an image thumbnail.  I'll let the code speak for itself.  It's a pretty
+weird way to approach it, I know.  But it only took me about 20 minutes to
+write and it solved the immediate problem.
+
+
+#!/usr/local/bin/php -q
+&lt;?
+    $arr = array("000000",
+                 "000011",
+                 "001122",
+                 "011334",
+                 "124556",
+                 "145666");
+    $ary = array("045566",
+                 "034556",
+                 "024556",
+                 "011445",
+                 "000124",
+                 "000001");
+    $bot = "666541";
+
+    $im = imagecreatefromgif("/dev/stdin");
+    $black = ImageColorAllocate($im, 0,0,0);
+    $c0 = ImageColorAllocate($im, 255,255,255);
+    $c1 = ImageColorAllocate($im, 220,220,220);
+    $c2 = ImageColorAllocate($im, 185,185,185);
+    $c3 = ImageColorAllocate($im, 150,150,150);
+    $c4 = ImageColorAllocate($im, 135,135,135);
+    $c5 = ImageColorAllocate($im, 95,95,95);
+    $c6 = ImageColorAllocate($im, 45,45,45);
+    $x=0; $y=0;
+    $sy = imagesy($im);
+    $sx = imagesx($im);
+    /* top left */
+    while(list(,$v)=each($arr)) {
+        $x=0;
+        while($x&lt;strlen($v)) {
+            ImageSetPixel($im,$x,$y,${"c".$v[$x]});
+            $x++;
+        }
+        $y++;
+        $last=$v;
+    }
+    /* left edge */
+    $x=0;
+    while($x&lt;strlen($last)) {
+        ImageLine($im,$x,$y,$x,$sy-5,${"c".$last[$x]});
+        $x++;
+    }
+    $y=$sy-5;
+    /* bottom left */
+    while($y&lt;=$sy) {
+        $x=0;
+        while($x&lt;strlen($ary[$y-$sy+5])) {
+            $l = $ary[$y-$sy+5];
+            ImageSetPixel($im,$x,$y,${"c".$l[$x]});
+            $x++;
+        }
+        $y++;
+    }
+    /* bottom edge */
+    $y=$sy-6;
+    while($y&lt;$sy) {
+        ImageLine($im,$x-1,$y,$sx-5,$y,${"c".$bot[$y-$sy+6]});
+        $y++;
+    }
+    /* bottom right */
+    $y=$sy-6;
+    while($y&lt;$sy) {
+        $x=$sx-6;
+        while($x-$sx+6 &lt; strlen($ary[$y-$sy+6])) {
+            $l = $ary[$y-$sy+6];
+            ImageSetPixel($im,$x,$y,${"c".$l[$sx-$x-1]});
+            $x++;
+        }
+        $y++;
+    }
+    ImageGif($im);
+    ImageDestroy($im);
+?&gt;
+
+
+&gt; -----Original Message-----
+&gt; From: <A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A> [mailto:<A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A>]
+&gt; Sent: Thursday, 14 June 2001 11:05
+&gt; To: Ben Williams
+&gt; Cc: LinuxSA
+&gt; Subject: Re: jpeg converter
+&gt;
+&gt;
+&gt;
+&gt; Ben!
+&gt;
+&gt; &gt; i need a program that can take a jpg image and make a thumbnail
+&gt; out of it
+&gt; &gt; (i.e. resize it and produce a new, smaller file) on the command
+&gt; line (i need
+&gt; &gt; to call it from a PHP script). does anyone know any suitable
+&gt; packages off
+&gt;
+&gt; <A HREF="http://www.imagemagick.org/">http://www.imagemagick.org/</A>
+&gt;
+&gt; Is probably what you want. There's no direct PHP interface but it does
+&gt; mention a tool that's part of the whole package called "montage" which,
+&gt; it says, does thumbnails...
+&gt;
+&gt; DSL
+&gt; --
+&gt; ACCUSATION:
+&gt;  "David Newall, you have not read your Microsoft Manual"
+&gt; REPLY:
+&gt;  "No I haven't" (quoting David Newall with permission)
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

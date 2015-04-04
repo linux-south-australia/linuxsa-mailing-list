@@ -1,0 +1,109 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re:" -->
+<!-- FromName="behoffski" -->
+<!-- FromEmail="behoffski@grouse.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="Prashanth N V <nv@sasi.com>, linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 16 May 1999 15:47:41 +0930" -->
+<!-- Id="373E6305.542C16CE@grouse.com.au" -->
+<!-- Reference="Pine.SUN.3.96.990515135425.25506A-100000@sunc2.sasi.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re:</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: behoffski &lt;<I><A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A></I>&gt;
+  To  : <A HREF="mailto:Prashanth N V <nv@sasi.com>">Prashanth N V <nv@sasi.com></A>, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sun, 16 May 1999 15:47:41 +0930
+</PRE>
+<H1>Re:</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Prashanth N V wrote:
+&gt; I want to run a file (demon)all ways when ever my linux reboots ,now i
+&gt; have to run manully the file if a machine reboots .
+&gt; so can you let me know is there any way how i can make a particular file
+&gt; run every time the machine boots or reboots.
+
+I'm not an expert at Linux, so the following is guesswork:
+
+The system starts from init -- try "man init" for a long 
+explanation on how Init works.  In Red Hat Linux (the only 
+variant I'm familiar with), the init file /etc/inittab works 
+through a tree of files that divide the bootstrap into various 
+phases (runlevels) -- with more capabilities appearing at 
+the end of each level.  
+
+The files are in /etc/rd.c, with individual scripts in 
+subdirectories.  Scripts are either Kill scripts or 
+Start scripts -- scripts have filenames starting with K or S.  
+Next a two-digit number allows some specification of order 
+of execution -- 00 to 99.  Finally the remainder of the 
+script helps describe what is being started or stopped.  
+So you've got lots of control over what happens when 
+while starting or stopping.  It's easy to add or subtract 
+components merely by adding, removing or renaming files.  
+Order of execution within a level is trivial to change 
+merely by changing the two-digit number.  You can modify 
+the bootstrap and shutdown without having to modify your 
+or anybody else's script(s).  
+
+For example, the line printer daemon (lpd) is started 
+when you enter runlevel 2: 
+
+	/etc/rc.d/rc2.d/S60lpd
+
+and the daemon is stopped when the "shutdown" runlevel 6 
+is entered:
+
+	/etc/rc.d/rc6.d/K60lpd
+
+Exactly where you add your script(s) depends on how much 
+of the overall capabilities of the machine need to available.  
+For example, most of the networking facilities, such as 
+NFS, come up in runlevel 3.  
+
+I'm rather hazy on the finer details of this stuff -- I'm 
+more of a coder than a Linux administrator.  There may be 
+gross errors in my explanation above.  Would one of the 
+real gurus out there like to explain things properly?  
+(Or point to the relevant HOWTO, or whatever.)  
+
+behoffski
+
+-- 
+behoffski (Brenton Hoff) | Software Engineer, Grouse Software
+<A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A>  | <A HREF="http://www.grouse.com.au/">http://www.grouse.com.au/</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

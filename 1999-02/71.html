@@ -1,0 +1,107 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Turning off unnecessary services" -->
+<!-- FromName="Daniel Callan" -->
+<!-- FromEmail="dcallan@dataline.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 03 Feb 1999 20:51:54 +1100" -->
+<!-- Id="3.0.32.19990203205031.00699190@hub.dataline.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Turning off unnecessary services</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Callan &lt;<I><A HREF="mailto:dcallan@dataline.net.au">dcallan@dataline.net.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Wed, 03 Feb 1999 20:51:54 +1100
+</PRE>
+<H1>Re: Turning off unnecessary services</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 10:17 3/02/99 +0000, João wrote:
+&gt;Hi.
+&gt;
+&gt;I can shut down all the services I'm not providing by following the
+&gt;instructions on /etc/inetd.conf , but how to NOT start the services that
+&gt;aren't controlled by the inetd super server, like httpd?
+&gt;
+
+Most services/daemons that aren't invoked by request (and that run in 
+the background) can be found in startup scripts.
+I know that RedHat has some slight differences in startup scripts
+but anyway here's how it would work on a Slackware server:
+
+httpd, sendmail and other daemons can be found in your /etc/rc.d/rc.*
+scripts. Sendmail and other more "standard" daemons are in the "rc.M" 
+(multiuser-runlevel startup script).
+daemons like httpd and squid are more likely found in either "rc.local"
+or in something like "rc.httpd". Any such rc. files are invoked by lines
+in the "rc.M"  (see below)
+
+You can disable startup of entries in an rc. file by commenting them
+OR if the daemon has it's own rc. file, you can remove the executable
+permission from that script (chmod 644).
+
+Anyone have any additions/alterations for this info to suit RedHat?
+(if not I hope it helps you in the right direction ;-)
+
+Regards,
+-Daniel
+
+
+#########example rc.M lines#########
+
+Daemon startup example:
+
+#Start the sendmail daemon:
+if [ -x /usr/sbin/sendmail ]; then
+  echo "Starting sendmail daemon (/usr/sbin/sendmail -bd -q 15m)..."
+  /usr/sbin/sendmail -bd -q 15m
+fi
+
+
+sundry rc. file example:
+
+# If you don't have a CD-ROM and want to disable this, set the
+# /etc/rc.d/rc.cdrom permissions to non-executable: chmod 644
+/etc/rc.d/rc.cdrom
+#
+if [ -x /etc/rc.d/rc.cdrom ]; then
+  . /etc/rc.d/rc.cdrom
+fi
+
+#############END EXAMPLES###############
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

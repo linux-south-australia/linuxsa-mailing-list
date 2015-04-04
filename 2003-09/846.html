@@ -1,0 +1,121 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: MS security patch spam storm" -->
+<!-- FromName="'Greg 'groggy' Lehey'" -->
+<!-- FromEmail="grog@lemis.com" -->
+<!-- ToName="'Luke Vanderfluit'" -->
+<!-- ToEmail="luke@chipcity.com.au" -->
+<!-- Date="Sun, 21 Sep 2003 12:05:46 +0930" -->
+<!-- Id="20030921023546.GA37917@wantadilla.lemis.com" -->
+<!-- Reference="1064111185.1536.9.camel@bench.chipcity.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: MS security patch spam storm</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Greg  &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  To  : Luke Vanderfluit &lt;<I><A HREF="mailto:luke@chipcity.com.au">luke@chipcity.com.au</A></I>&gt;
+  Date: Sun, 21 Sep 2003 12:05:46 +0930
+</PRE>
+<H1>Re: MS security patch spam storm</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sunday, 21 September 2003 at 11:56:26 +0930, Luke Vanderfluit wrote:
+&gt; Hi,
+&gt;
+&gt; I've been experiencing quite a deluge of these emails,
+
+Tell me about it.  From Friday evening to Saturday morning I got 106
+of them, totalling 15 MB :-(
+
+&gt; I got this info off the nylug,
+&gt;
+&gt; <A HREF="http://www.theregister.co.uk/content/56/32925.html">http://www.theregister.co.uk/content/56/32925.html</A>
+
+More interesting is protection.  I've found two things:
+
+1.  Modify spamassassin to treat Microsoft executables as spam:
+
+--- 50 scores.cf        2003/09/18 00:38:00     1.1
++++ 50 scores.cf        2003/09/20 00:28:56
+@@ -968,7 +968,7 @@
+ 
+ # highly generic tests for viruses that are scored just high enough to run
+ 
+-score MICROSOFT EXECUTABLE 0.100
++score MICROSOFT EXECUTABLE 10.0
+ score MIME SUSPECT NAME 0.100
+ 
+ # GA never changes the whitelist/blacklist scores
+
+2.  Modify Postfix to reject all sorts of things.  This one thanks to
+    Perry Metzger of the NetBSD project.
+
+    a.  Create a file header checks in your postfix config directory
+        (/usr/local/etc/postfix in FreeBSD, /etc/postfix in the only
+        postfix on a Linux machine to which I have access).  Contents
+        are (one line, in case your MUA breaks it):
+
+/^Content-(Type|Disposition):.*(file)?name=.*\.(asd|bat|chm|cmd|com|dll|exe|hlp|hta|js|jse|lnk|ocx|pif|scr|shb|shm|shs|vb|vbe|vbs|vbx|vxd|wsf|wsh)/     REJECT We do not accept .${3} file types.  Please see <A HREF="http://www.lemis.">http://www.lemis.</A>com/email.html for further details.
+
+    b.  Add this to your postfix/main.cf:
+
+@@ -154,6 +156,8 @@
+ #
+ # Insert text from sample-transport.cf if you need explicit routing.
+ 
++transport maps = hash:/usr/local/etc/postfix/transport
++
+ # ALIAS DATABASE
+ #
+ # The alias maps parameter specifies the list of alias databases used
+
+This rejects mail with those attachments; I'm not sure how far the
+transmission gets before it gets rejected, however.
+
+Greg
+--
+Finger <A HREF="mailto:grog@lemis.com">grog@lemis.com</A> for PGP public key
+See complete headers for address and phone numbers
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.0 (FreeBSD)
+
+iD8DBQE/bQ6CIubykFB6QiMRAux8AJ0bkdkFAcsfjqDB+BwqhovS60POQgCeKBuX
+Uy3K+/S7U1z0zek8Vq0iqIM=
+=oTuR
+-----END PGP SIGNATURE-----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

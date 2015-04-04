@@ -1,0 +1,174 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Server Hacked." -->
+<!-- FromName="Dan Shearer" -->
+<!-- FromEmail="dan@shearer.org" -->
+<!-- ToName="Tristan Ball" -->
+<!-- ToEmail="Tristan.Ball@vsl.com.au" -->
+<!-- Date="Tue, 4 Jul 2000 14:25:42 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.10.10007041423050.6133-100000@localhost.localdomain" -->
+<!-- Reference="3961803B.CCF75B38@vsl.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Server Hacked.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@shearer.org">dan@shearer.org</A></I>&gt;
+  To  : Tristan Ball &lt;<I><A HREF="mailto:Tristan.Ball@vsl.com.au">Tristan.Ball@vsl.com.au</A></I>&gt;
+  Date: Tue, 4 Jul 2000 14:25:42 +0930 (CST)
+</PRE>
+<H1>Re: Server Hacked.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, 4 Jul 2000, Tristan Ball wrote:
+
+&gt; blitzd ring any bells for anyone?
+
+Yes, it's a lauchpad for a denial of service attack.  Here's the README
+for Blitznet (downloadable from <A HREF="http://www.self-evident.com/security/dos">http://www.self-evident.com/security/dos</A>)
+
+Dan
+
+
+TABLE OF CONTENTS
+-----------------
+ I. Information
+ II. Concept
+ III. Usage
+
+
+I. Information
+--------------
+Package Name: BlitzNet
+Archive Name: blitznet.tar.gz
+Author      : phreeon
+Contact     : <A HREF="mailto:phreeon@EFnet">phreeon@EFnet</A>
+Affiliation : Legend
+
+
+II. Concept
+-----------
+   A Blitz Network's purpose in a nutshell; to
+launch a spoofed syn flood attack via slice2 from
+many different computers without logging on any
+of them.
+
+
+III. Usage
+----------
+   How it works; two files are placed on all of
+computers which will be the actual 'attackers.'
+One file is the daemon (blitzd) and the other is
+the actual spoofed syn flooder (slice2).  (NOTE:
+slice2 is a seperate program and I did not code
+it)  After the two files have been placed on
+an 'attacker' computer, blitzd should be executed
+as such:
+  nohup ./blitzd &lt;port&gt; &lt;stealth&gt; &
+The port argument may be any port you wish, and
+the stealth argument must be a one-word string
+used to mask the process name in the process
+table.  (NOTE: The stealth option is known not
+to work on *BSD* systems)
+
+  After doing this to several (100's ?) of
+computers, you must now prepare the host
+that you will use to control all of these
+attack computers.  Four files will be needed
+for your main computer (preferrably your
+localhost), rush.tcl, shell.list, blitz,
+and strobe. (NOTE: rush.tcl uses blitz to connect
+to each attacker computer, and strobe is used
+to check if hosts are up, when you use the
+'-check' option.) The remaining file you
+must create yourself is shell.list, whose
+contents should look like this:
+192.9.49.33     31337
+199.185.137.3   9999
+216.200.201.193 6969
+
+Each line represents an attack computer.
+The first part is the ip address of the
+computer, and the second part is the
+port that that attack computer has blitzd
+listening on. Spacing does not matter here,
+1 and 100 spaces are treated equally.
+However, the first blank line rush.tcl
+encouters in shell.list, rush.tcl will
+stop reading from the file.  This is so
+that you can keep other notes/information
+at the bottom of shell.list like your
+l/p to microsoft.com!
+
+  Now, by running './rush.tcl' or
+'tclsh rush.tcl' you will be shown the
+syntax of how to control your new
+BlitzNet. The syntax should appear as:
+  rush (for blitz) v0.4.7 by phreeon
+  syntax: ./rush -check | &lt;source&gt; &lt;dest[,dest]&gt; &lt;start&gt; &lt;stop&gt; &lt;dupes&gt; &lt;duration&gt;
+
+  You may run rush.tcl in two modes: the check
+mode, or attack mode. By running the check mode:
+  ./rush.tcl -check
+This will use strobe to check which of your
+attacker computers are down, so that you may
+logon them and restart blitzd as shown earlier.
+
+  In the attack mode of rush.tcl, you simply
+follow the syntax starting from &lt;source&gt;. So
+Say you have one target at the ip address of
+1.2.3.4, you would attack him like so:
+./rush.tcl 0 1.2.3.4 1 600 10 400
+
+  That line will attack 1.2.3.4 with random
+source addresses (0 == random source addresses),
+on ports 1 to 600 (where most important services
+run), using 10 dupes (duplicate threads of slice2),
+for 400 seconds (360 is normal timeout in seconds
+for ircd servers).
+
+  You may also use multiple targets, and rush.tcl
+will split up the attack computers evenly among
+the targets. To attack multiple targets, a line
+like such would work:
+./rush.tcl 0 1.2.3.4,6.7.8.9,10.11.12.13 1 600 10 400
+
+  Multiple targets must only be seperated by 1 comma
+and NO SPACES.
+
+  Well, that should do it for this release of BlitzNet!
+Do not packet too much :\
+
+  - phreeon
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,134 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Versa Note VX/Kernel build" -->
+<!-- FromName="Mike Andrew" -->
+<!-- FromEmail="mikero@norfolk.nf" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 15 Jun 2000 11:35:23 +1130" -->
+<!-- Id="00061511555109.01896@mikero.nf" -->
+<!-- Reference="Pine.GSO.4.05.10006141057070.24133-100000@magnum" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Versa Note VX/Kernel build</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mike Andrew &lt;<I><A HREF="mailto:mikero@norfolk.nf">mikero@norfolk.nf</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Thu, 15 Jun 2000 11:35:23 +1130
+</PRE>
+<H1>Re: Versa Note VX/Kernel build</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 14 Jun 2000, Geoff Russell wrote:
+&gt;       - Xconfigurator finds the ATI Mobility chip
+&gt;           but reckons it only does 8 bit color, changing
+&gt;           the XF86Config file entry from 8 to 24 works and
+&gt;           produces 24 bit color. The screen is 12.1 TFT SVGA and
+
+If you can, either reduce that to 16 bit, or increase it to 32 bit. 24bit
+colour is not supported very well in *most* of the svga drivers. It tends to be
+the last item developed for any specific driver, if at all. Additionally,
+Netscape hates it. Almost all 24 bit drivers are simply kludged by their
+authors to handle a 16 bit colour table.
+
+&gt;         plugs I find less useful. network card is etherpro100 so I
+&gt;         don't anticipate problems.
+
+The module driver comes standard with most distros 
+
+&gt;       - Sound doesn't work at all, sndconfig says that it
+&gt;         can find an Intel chipset but it is unsupported. 
+
+If this is the I810a series, no, probably not. A quickfix is to pay the $20 or
+so and get the OSS/4Front sound drivers. They are very good at what they do.
+They aren't at all necessary for your average SB16 etc but for leading edge
+stuff I would recomend it (you can evaluate if the driver works for 3 hours at
+a stretch)
+
+
+&gt;       - haven't tried the internal modem yet.
+
+and you probably shouldn't. Being a laptop, it is _probably_ pci based and is
+most likely to be a winmodem. The only winmodems I am aware of that are
+'supported' under Linux are the lucent variety. You have to go to their website
+to download a binary only module. Your mileage will truly vary. Most would
+recommend you avoid winmodem regardless. You will suffer pain. A practical
+solution for a laptop is a pcmcia card.
+
+&gt;APM
+
+It is almost mandatory to do a kernel re-compile for apm anything, particularly
+laptops. About 7 options cannot be second guessed and need to be built /not
+built into the kernel. Unfortunately, this section of apm cannot be modularised
+(= options in /etc/conf.modules) you need a rebuild.
+
+&gt;     results in about 100 "Unresolved Symbol" messages, then the nice
+
+yes and precisely and your system still boots, right?
+
+the answer is /lib/modules/&lt;version&gt;/blah blah contains modules that were
+loaded by the distro at install time. You have subsequently done a recompile of
+the same kernel version with some modules missing (like you didn't really need
+AX25 packet radio did you?). 
+
+Trouble is, modprobe / depmod does'nt know anything about this and has holes in
+/lib/modules/&lt;version&gt;/ where it's trying to reconcile stale, old, unused,
+unloved unwanted modules against your new ones.
+
+The cleanest way out of this is to
+
+mv /lib/modules/&lt;version&gt;   /lib/modules/somewhere_else
+
+and _then_ do a recompile. Only the specific modules you want will then end up
+in /lib/modules/(new)&lt;version&gt;
+
+immediately after a _succesfull_ compile (as in make modules_install) do a 
+
+depmod -a
+
+---
+
+If this is one of your first attempts at recompiles expect speed bumps, there
+are some 'options' and selections you wont have selected and didn't realise you
+needed. They rarely stop you rebooting, but will slow you down somewhat. The
+answer that anyone will tell you, is when re-compiling be very very
+conservative with what you chop out, and to successive recompiles until it
+breaks.
+
+further info is on recompiles-&gt; on the site below
+
+ -- 
+<A HREF="http://linux.nf/stepbystep.htm">http://linux.nf/stepbystep.htm</A> +mirrors
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,104 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: more spooky stuff on the net!" -->
+<!-- FromName="Daryl Tester" -->
+<!-- FromEmail="dt@picknowl.com.au" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 17 Nov 1999 11:49:33 +1030 (CST)" -->
+<!-- Id="199911170119.LAA01120@orac.picknowl.com.au" -->
+<!-- Reference="199911162214.IAA20777@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: more spooky stuff on the net!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 17 Nov 1999 11:49:33 +1030 (CST)
+</PRE>
+<H1>Re: more spooky stuff on the net!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Alan Kennington wrote:
+
+&gt; Maybe telnet creates it's own "helper" to feed incorrect
+&gt; IP addresses to it.
+
+No, telnet should be using gethostbyname.  Try executing this:
+
+---&lt;Cut here for a new monitor&gt;---
+
+#!/usr/bin/env python
+
+import socket
+for host in ['www.geekboys.org', 'geekboys.org']:
+    print host, '=&gt;', socket.gethostbyname(host)
+
+---&lt;Cut here for a new monitor&gt;---
+
+I get:
+
+www.geekboys.org =&gt; 212.78.193.215
+geekboys.org =&gt; 212.78.193.215
+
+which is as it should be.  Your result is ...?
+
+&gt; Very sneaky access to a Unix socket!!!
+&gt; This does not show up in tcpdump -i lo.
+&gt; What does it get from there?
+&gt; =====================================================
+&gt; socket(PF_UNIX, SOCK_STREAM, 0)         = 3
+
+It's a unix domain socket, which (kinda) lives on the file system, not an
+Inet socket.  If you did an ls -l of it, it would show up as something like:
+
+ls -l /tmp/.X11-unix/X0 
+srwxrwxrwx   1 root     root            0 Nov 17 09:26 /tmp/.X11-unix/X0
+
+However, I have no idea what /var/run/.nscd_socket is.
+
+&gt; Does this libnss_db package have something to do with
+&gt; name service databases?
+
+Yup.  It's the "db" entry in nsswitch.conf
+
+&gt; Also opens libnss_files package.
+&gt; Also connected with name lookup?
+
+Yup.  It's the "files" entry in nsswitch.conf
+
+Regards,
+  Daryl Tester
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

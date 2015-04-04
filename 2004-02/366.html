@@ -1,0 +1,130 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: corrupt /dev/lvm - bizzare properties" -->
+<!-- FromName="'Chris Doherty'" -->
+<!-- FromEmail="chris.doherty@adelaide.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 09 Feb 2004 13:19:31 +1030" -->
+<!-- Id="4026F53B.7000401@adelaide.edu.au" -->
+<!-- Reference="40264D38.FB8EFFA8@iocane.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: corrupt /dev/lvm - bizzare properties</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Chris Doherty &lt;<I><A HREF="mailto:chris.doherty@adelaide.edu.au">chris.doherty@adelaide.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 09 Feb 2004 13:19:31 +1030
+</PRE>
+<H1>Re: corrupt /dev/lvm - bizzare properties</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Daryl Tester wrote:
+
+&gt; Chris Doherty wrote:
+&gt; 
+&gt;&gt;&gt;&gt;<A HREF="mailto:root@connect4">root@connect4</A>:~# ls -la /dev/lvm
+&gt;&gt;&gt;&gt;?---rws-w-  8306 840966198 976250230 875573298 Sep 24  2004 /dev/lvm
+&gt;&gt;&gt;
+&gt;&gt;&gt;Did fsck actually report this as a problem?  My guess is that the
+&gt;&gt;
+&gt;&gt;the filesystem can't be mounted (which is the really worrying part) so i can't
+&gt;&gt;fsck it.
+&gt; 
+&gt; Firstly, you leave a file system unmounted if you are going to fsck it.
+
+no, sorry my last statement was ambiguous.  what i meant was that the
+filesystem can't be mounted *and* fsck refuses to acknowledge that it is (or
+was?) a filesystem.
+
+<A HREF="mailto:root@connect4">root@connect4</A>:~# fsck -cvf -t ext3 /dev/vg1/lv1
+fsck 1.32 (09-Nov-2002)
+e2fsck 1.32 (09-Nov-2002)
+fsck.ext3: No such device or address while trying to open /dev/vg1/lv1
+Possibly non-existent or swap device?
+
+it looks like what i need is a non-destructive MAKEDEV which can repair 
+/dev/lvm (in a dream world) or, more realistically to create a new LVM device 
+and reassign all of the logical volumes to it.  can any LVM gurus confirm 
+whether this would work?
+
+&gt; OK, you didn't quite get what I meant.  /dev/lvm is supposed to be a
+&gt; character mode device.  It isn't anymore.  That means that it's been
+&gt; corrupted (the *entry* for the device, not the device itself).  The
+&gt; fsck that I was talking about is the one run on the file system where
+&gt; /dev resides, which is most likely the root file system, "/".
+
+i'll try that tonight with crossed fingers.
+
+&gt; I originally thought /dev/lvm might have been a special device for talking
+&gt; to the underlying LVM module, but then -
+&gt; 
+&gt;&gt;<A HREF="mailto:root@connect4">root@connect4</A>:~# mount -t ext3 /dev/vg1/lv1 /data
+&gt;&gt;mount: /dev/vg1/lv1 is not a valid block device
+&gt;&gt;<A HREF="mailto:root@connect4">root@connect4</A>:~# ls /dev/vg1/
+&gt;&gt;total 124
+&gt;&gt;dr-xr-xr-x    2 root     root         4096 Feb  6 18:46 ./
+&gt;&gt;drwxr-xr-x   22 root     root       118784 Feb  8 14:19 ../
+&gt;&gt;crw-r-----    1 root     disk     109,   0 Feb  6 18:46 group
+&gt;&gt;brw-rw----    1 root     disk      58,   0 Feb  6 18:46 lv1
+&gt; 
+&gt; shows /dev/vg1/group with the exact same major/minor number as what
+&gt; you wrote before.
+&gt; 
+&gt; What does "vgdisplay -v /dev/vg1" show?
+
+i don't have that info at work, so i'll send it tonight.
+
+&gt; You didn't run fsck on a *live* file system, did you?
+
+no. :)
+
+<A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A> wrote:
+ &gt; Chris Doherty &lt;<A HREF="mailto:chris.doherty@adelaide.edu.au">chris.doherty@adelaide.edu.au</A>&gt; wrote:
+ &gt;
+ &gt;&gt;<A HREF="mailto:root@connect4">root@connect4</A>:~# tar cvf lvm.tar /dev/lvm
+ &gt;&gt;tar: /dev/lvm: Unknown file type; file ignored
+ &gt;&gt;tar: Error exit delayed from previous errors
+ &gt;
+ &gt; I'm sure you can't get files out of a special file.  If you want to
+ &gt; backup files using tar you say what those files (or directories) are.  Try
+ &gt;
+ &gt;   tar cvf lvm.tar /mnt/wherever
+
+but i can't mount the filesystem so tar will have no way of knowing where the 
+data is on the disk.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

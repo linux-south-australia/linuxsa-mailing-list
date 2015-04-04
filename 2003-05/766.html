@@ -1,0 +1,127 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="C++ ifstream buffering from named pipe" -->
+<!-- FromName="'Joshua Cole'" -->
+<!-- FromEmail="joshua.cole@anu.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="22 May 2003 16:56:42 +1000" -->
+<!-- Id="1053586602.30882.12.camel@mucro" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: C++ ifstream buffering from named pipe</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Joshua Cole &lt;<I><A HREF="mailto:joshua.cole@anu.edu.au">joshua.cole@anu.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 22 May 2003 16:56:42 +1000
+</PRE>
+<H1>C++ ifstream buffering from named pipe</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hello,
+
+I have a problem reading from a named pipe using a C++ ifstream.
+
+The problem seems to be that the reading is buffered.  Does anyone know
+how to set up an unbuffered ifstream in C++?  It works if I read the
+named pipe using C style FILE * streams, but I would like to avoid doing
+this if possible.
+
+To demonstrate:
+
+% gcc test_c.c -o test_c
+% gcc test_cpp.cc o test_cpp
+% mknod if
+
+% ./test_c & cat -u &gt; if
+(This demonstrates that C-style FILE reading is line buffered -- OK)
+
+% ./test_cpp & cat -u &gt; if
+(This demonstrates that C++ style ifstream reading is buffered -- how do
+I get around this?)
+
+Thanks in advance for any advice.
+
+Josh
+
+------------------------------------------------------------
+--------------------------
+test_cpp.cc (C++ ifstream)
+--------------------------
+
+#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+
+using namespace std;
+
+int main() {
+  char ch;
+  ifstream ain("if");
+//  FILE * ain = fopen("if", "r");
+
+  while ( true ) {
+    cerr &lt;&lt; "reading ch... ";
+    ain &gt;&gt; ch;
+//    ch=fgetc(ain);
+    cerr &lt;&lt; "got: " &lt;&lt; ch &lt;&lt; endl;
+   }
+}
+
+-----------------
+test_c.cc (C FILE)
+-----------------
+
+#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+
+using namespace std;
+
+int main() {
+  char ch;
+  ifstream ain("if");
+//  FILE * ain = fopen("if", "r");
+
+  while ( true ) {
+    cerr &lt;&lt; "reading ch... ";
+    ain &gt;&gt; ch;
+//    ch=fgetc(ain);
+    cerr &lt;&lt; "got: " &lt;&lt; ch &lt;&lt; endl;
+   }
+}
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

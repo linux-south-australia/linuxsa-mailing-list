@@ -1,0 +1,190 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Discovering RCS" -->
+<!-- FromName="" -->
+<!-- FromEmail="KEpstein@uti.co.za" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au, michael@home.lyppard.com.au" -->
+<!-- Date="Sat, 14 Oct 2000 17:13:56 +0200" -->
+<!-- Id="199A311E798CD311BCA7009027B710C70CC32D@jnbmail1" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Discovering RCS</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: <A HREF="mailto:KEpstein@uti.co.za">KEpstein@uti.co.za</A>
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>, <A HREF="mailto:michael@home.lyppard.com.au">michael@home.lyppard.com.au</A>
+  Date: Sat, 14 Oct 2000 17:13:56 +0200
+</PRE>
+<H1>RE: Discovering RCS</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Michael, 
+
+&gt;&gt;How do I set up rcs or my environment so that I create a central store for
+the rcs files? 
+The solutions I came up with was to have a symbolic link called RCS in each
+directory
+
+For example:
+mkdir /tmp/RCS
+cd /etc
+ln -s /tmp/RCS RCS
+
+Now I can use RCS is the normal fashion. EG:
+cd /etc
+ci -l login.defs
+...
+...
+
+Once you're back at the prompt do the following:
+# ll /tmp/RCS
+total 2
+-r--r--r--   1 root     root         1376 Oct 14 17:01 login.defs,v
+#
+
+You could apply this to any directory. 
+I've not ever worried about the perms on a file before, so I cant help you
+out on your second question. Hope this helps though
+
+
+-----Original Message-----
+From: michael [<A HREF="mailto:michael">mailto:michael</A>@home.lyppard.com.au]
+Sent: Saturday, October 14, 2000 4:28 AM
+To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+Subject: Discovering RCS
+
+
+Hi.
+
+I had the unfortunate experience the other day of accidentally trashing a
+perfectly good config file whilst attempting to make a minor change. I am
+aware that the revision control system that is used to control versioning
+in program development can be used for the same ends in configuration
+files on the system, so I decided to do a bit of exploring. Here is what I
+found, and I have some questions for any RCS guru's out there.
+
+The RCS system seems to revolve (for me, anyway)  around two commands - ci
+'Check in' and co 'Check out'
+
+With a bit of experimentation, I found that I could check a file 'in'
+quite easily by using 'ci -l filename', which created a RCS file in the
+same directory called filename,v thus:
+
+[<A HREF="mailto:michael@celery">michael@celery</A> michael]$ ci -l filename
+RCS/filename,v  &lt;--  filename
+enter description, terminated with single '.' or end of <A HREF="file:">file:</A>
+NOTE: This is NOT the log message!
+&gt;&gt; 
+
+at those 2 '&gt;&gt;', I have the opportunity of describing the file or purpose
+in adding it to rcs. ctrl-d or a '.' on it's own line completes the
+submission, and the rcs system assigns a default version number of 1.1 to
+the file.
+
+If I accidentally trash the file, I can 'Check' it out of rcs thus:
+
+[<A HREF="mailto:michael@celery">michael@celery</A> michael]$ co filename
+RCS/filename,v  --&gt;  filename
+revision 1.1
+done
+
+And it magically re-appears, exactly as it was before deletion.
+
+Another great feature is when experimenting with changes to a file - You
+know, tinkering with a config such that after a few tries, it looks
+nothing like the original, and you may have forgotton how to get back to a
+'sane' version that you know works.
+
+At each revision that still works, you can check it in:
+
+After you change filename (use vi or whatever. I prefer to use pico - I
+get the job done while the others are arguing about which is better
+&lt;grin&gt;)
+
+Then check it in again: 
+
+ ci -l filename
+RCS/filename,v  &lt;--  filename
+new revision: 1.2; previous revision: 1.1
+
+then, I have the luxury of being able to get any of the rcs stored
+versions back into the running system:
+
+ co -r1.1 filename
+RCS/filename,v  --&gt;  filename
+revision 1.1
+done
+
+ co -r1.2 filename
+RCS/filename,v  --&gt;  filename
+revision 1.2
+done
+
+So, now I have some usable knowledge on this rcs thing. It's neat, and
+clearly way more powerful than I will ever need for maintaining the odd
+system config files.
+
+Questions:
+
+How do I set up rcs or my environment so that I create a central store for
+the rcs files? At the moment, they are stored in the same directory, or
+the RCS directory in that directory, if the RCS directory exists. That's
+ok, but I have to create a RCS/ in any directory I want to use rcs in. It
+would be neat to have them all in one place - I could tar the whole lot up
+and keep them on another machine for backup.
+
+When I co a file from rcs, it is set to Mode: (0444/-r--r--r--), which
+means that I need to chmod it before being able to edit it. What should I
+be doing here? Ideally, it should retain the original file's mode, to
+protect against errors by some processes that expect a particular set of
+permissions on their files.
+
+Thanks,
+
+Michael
+
+ps. I didn't need to install anything on my RedHat 6.1 system. It seems
+rcs is installed by default - probably with the development stuff.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+###########################################
+
+This message has been scanned by the Anti Virus Server at UTi South Africa
+For more information, connect to <A HREF="http://www.F-Secure.com/">http://www.F-Secure.com/</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,112 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: install w/out floppy/CDROM" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="Michael Davies" -->
+<!-- ToEmail="michaeld@senet.com.au" -->
+<!-- Date="Mon, 29 Nov 1999 00:53:09 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.10.9911290025400.2190-100000@andromache.itd.adelaide.edu.au" -->
+<!-- Reference="3840F84B.DF1A85DE@senet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: install w/out floppy/CDROM</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Michael Davies &lt;<I><A HREF="mailto:michaeld@senet.com.au">michaeld@senet.com.au</A></I>&gt;
+  Date: Mon, 29 Nov 1999 00:53:09 +1030 (CST)
+</PRE>
+<H1>Re: install w/out floppy/CDROM</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, 28 Nov 1999, Michael Davies wrote:
+&gt; I have a RedHat 5.2 box that needs^h^h^h^hcould do with an upgrade.  It
+&gt; doesn't have a floppy or CD-ROM, but sits on the same ethernet run as
+&gt; another RedHat box with 6.1 on it - this one has CD and floppy.
+&gt; 
+&gt; I'd like to do a clean install of 6.1 on the first box.  Possible?  If
+&gt; so, how?
+
+
+It's an unusual circumstance, thus the lack of documentation.  Can
+you boot off anything other than the hard disk?
+
+The CD-ROM is easy -- you can export it using NFS, FTP or HTTP. I'd
+suggest using HTTP -- use the alias(?) command in /etc/httpd/access.conf
+to export /mnt/cdrom as <A HREF="http://.../cdrom/.">http://.../cdrom/.</A>
+
+If possible, I'd pinch the floppy drive from the other machine and
+boot the network install disk.
+
+Otherwise... 
+
+TACTIC 1
+
+Pinch one cylinder of your swap space, below the 1023th cylinder (ie: mess
+about with /etc/fstab, boot into single user mode, use fdisk, reformat the
+swap, reboot). Make a network install image of that size on your 6.1
+machine.  FTP it to the target machine and use dd to write it to the
+cylinder. Change lilo and boot off that cylinder.
+
+You might actually be able to use the floppy network install image
+as it is -- I imagine your cylinder is bigger than 1440K.
+
+TACTIC 2
+
+The upgrade program basically copies down all the rpms you have
+installed and runs "rpm -U".
+
+The newer version of rpm on 6.1 has a "-F" option that will
+not upgrade the RPM if it has not been installed.
+
+Backup the machine.  Boot into single user mode.
+
+Download the 6.1 SRPM and build it -- statically link it and
+put it in your home directory.  Now run
+
+  ~/rpm -Fvh <A HREF="http://.../cdrom/">http://.../cdrom/</A>*.rpm
+
+As it is statically linked you should be OK when the C libraries
+are upgraded.  Hopefully nothing too bad will crash -- we are
+in single user mode.  Boot into stand alone mode.  Check things
+out.  Boot into 3.  I'd re-run Xconfigurator and the sound
+config packages.  Boot into 5.
+
+TACTIC 3
+
+Recompile the 6.1 installer against the 5.2 libraries.
+Statically, and in your home directory.
+Run the 6.1 installer.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

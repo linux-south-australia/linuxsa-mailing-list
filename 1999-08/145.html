@@ -1,0 +1,177 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PPP and compression and 56kbps modems" -->
+<!-- FromName="Toby Corkindale" -->
+<!-- FromEmail="tjcorkin@steadycom.com.au" -->
+<!-- ToName="David Newall" -->
+<!-- ToEmail="davidn@rebel.net.au" -->
+<!-- Date="Mon, 09 Aug 1999 14:21:18 +0930" -->
+<!-- Id="37AE5E46.9E2EE24E@steadycom.com.au" -->
+<!-- Reference="Pine.BSF.3.96.990809130045.1894D-100000@augustus.tellurian.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PPP and compression and 56kbps modems</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@steadycom.com.au">tjcorkin@steadycom.com.au</A></I>&gt;
+  To  : David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  Date: Mon, 09 Aug 1999 14:21:18 +0930
+</PRE>
+<H1>Re: PPP and compression and 56kbps modems</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Just a couple of points here, that I _believe_ to be correct, but may be
+obsolete and not relevant to modern technology.
+Firstly, I believe that error correction, and compression, are not
+neccessarily combined within the modem. This is speaking from experience
+of my old 14.4 and 28.8 modems, mind you. While MNP and LAPM protocols
+both do error correction as well as compression, on my Multitech I'm
+pretty sure there was a way to disable one or the other within the
+protocol. Whether this was automatically recognized and adopted by the
+remote modem, I do not know. 
+
+On the subject of compression, I think I heard that the way the modem
+does compression varies slightly to the way that typical compressors
+like gzip work, and this the schemes can complement each other. I'm
+pretty sure that in my BBS days I experimented with downloading pkzipped
+files while my modem had compression turned on all the different
+options, including off, to see what difference it made. (When you have a
+2400 bps modem, you want to squeeze every last bps out of it, and you
+have plenty of time to experiment..)
+I think my conclusion was that I may as well leave all the error
+correction and compression turned on for the best results. However, this
+was when I was using a modem that is ancient by modern standards, and
+ANSI BBS software with zmodem, hslink, bimodem, etc....So your mileage
+now may vary.
+
+As far as deciding between which is better out of PPP requesting
+retransmission, or letting the modem handle the errors itself, keep in
+mind that the modem is talking to the other modem on a direct link,
+whereas PPP is probably getting warnings from the TCP/IP stack, then
+going via the kernel and the serial port, thru the modem, out the other
+end and thru the kernel, serial port, PPP and the tcp/ip stack again.
+Even if my idea of the flow is completely wrong, the point is that the
+modem-&gt;modem link has a much lower latency. If it detects a wrong bit,
+it can request retransmission, and receive it, in less time than it
+takes PPP to do so.
+Thus, I'd assume that it makes sense to let the modem keep track of any
+errors induced during the analogue transmission. Any thoughts on this
+logic?
+
+As far as the point about getting info out of your modem re errors -
+well, I know my old 28.8 had a diagnostics mode where you could get all
+kinds of statistics out of it, including a little ascii bar graph and
+stuff like that. THere's no way pppd would support this extension of
+course, but if you really wanted to know about your phone line, the
+possibilities are there.
+
+If anyone has any info on comparisions between the different PPP
+compression modes (bsdcomp, deflate) and the relevant parameters, on
+performance, I'd be interested to see them.
+I tend to select the "best" mode that the other end supports, with the
+largest lookup tables, but I really have no idea what this really
+entails 8)
+
+Toby
+
+
+David Newall wrote:
+&gt; 
+&gt; On Sat, 7 Aug 1999, Richard Sharpe wrote:
+&gt; &gt; Most modems available these days are 56k capable (V90?), BUT it is my
+&gt; &gt; understanding that you only gain a benefit when one end is a digital modem
+&gt; &gt; like in an access server of some sort.  In a modem to modem situation, the
+&gt; &gt; best you can get is 33.6kbps.  Can anyone confirm or deny?
+&gt; 
+&gt; The simple answer is yes.
+&gt; 
+&gt; V90 is an asymetric protocol in more ways than one.  First to note, the
+&gt; modem that you use at home, called the consumer modem, is completely
+&gt; different to the one that you use at the server, called the digital modem.
+&gt; The digital modem must be connected to a digital line, such as ISDN, and
+&gt; there may be no analogue component in the communication link between the
+&gt; digital modem and the consumer modem other than the very last link.  The
+&gt; link between the consumer modem and the exchange may be analogue.  All
+&gt; other parts must be digital.
+&gt; 
+&gt; V90 (Kflex, X2) works on the basis that modern telephone networks are
+&gt; almost totally digital.  From handset to exchange is analogue, at which
+&gt; point the signal is digitised using a codec; and that digital signal is
+&gt; transported without possibility of error.
+&gt; 
+&gt; Analogue modems work by splitting the audio spectrum into a number of fixed
+&gt; points, each very loosely described by volume + frequency.  These points
+&gt; are known as a constellation.  Each point on the constellation represents
+&gt; a symbol that the modem can transmit or receive.  Due to imperfections in
+&gt; analogue technology, the signal that is received can be a little different
+&gt; to the one that was sent--perhaps a little different in volume, perhaps a
+&gt; little different in frequency--so the receiving modem must decide what
+&gt; symbol a signal is supposed to represent.
+&gt; 
+&gt; V90 works by "knowing" certain characteristics of the codec used in the
+&gt; exchange, and only transmitting those symbols "known" to be optimal.
+&gt; Fortunately modern exchanges "all" use the same codec.  (Hmmm, anyone want
+&gt; to place bets on how long V90 continues to work?)  Any digital to analogue
+&gt; conversion causes loss of accuracy and makes V90 unusable.  During initial
+&gt; handshake, V90 modems test the communications pathway.  If it is not
+&gt; sufficient, for example if there is more than one analogue component,
+&gt; they revert to analogue standards such as V.34.  Two consumer modems, even
+&gt; if one or both are connected to an ISDN line, are guaranteed to revert to
+&gt; this analogue mode (because consumer modems use analogue signaling.)
+&gt; 
+&gt; &gt; While PPP is capable of compression, most modems also do very good
+&gt; &gt; compression, and if I enable PPP compression, I may be fighting the
+&gt; &gt; compression the modems can do.  So, I am better off letting the modems do
+&gt; &gt; the compression.  Can anyone confirm or deny?
+&gt; 
+&gt; If you permit the modem to do compression ipso facto you permit it to do
+&gt; error recovery.  This can result in long delays between received bytes
+&gt; where no long delay ought to be.  Will PPP cope with this elegantly, or
+&gt; will it request retransmission?  It will almost always cause loss of error
+&gt; counts, so you'll have no way of telling whether the line is good or bad.
+&gt; 
+&gt; There was a time when I perceived better performance allowing PPP to do
+&gt; error recovery.  On the other hand perception, unlike scientific
+&gt; measurement, can be most misleading.  I advise you either to conduct your
+&gt; own scientific experiments, and please to report back to us; or else toss
+&gt; a coin.
+&gt; 
+&gt; --
+&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+..I started out with nothing...and I still have most of it left
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

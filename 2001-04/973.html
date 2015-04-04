@@ -1,0 +1,172 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: gateway setting with two ethernet" -->
+<!-- FromName="'Mark'" -->
+<!-- FromEmail="markc@trinity.sa.edu.au" -->
+<!-- ToName="'Essy Ren'" -->
+<!-- ToEmail="essy@plasmedia.com" -->
+<!-- Date="Tue, 24 Apr 2001 19:13:29 +0930" -->
+<!-- Id="5.1.0.14.2.20010424191013.009fcdf0@mail" -->
+<!-- Reference="5.1.0.14.2.20010424165602.009febb0@mail" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: gateway setting with two ethernet</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark &lt;<I><A HREF="mailto:markc@trinity.sa.edu.au">markc@trinity.sa.edu.au</A></I>&gt;
+  To  : Essy Ren &lt;<I><A HREF="mailto:essy@plasmedia.com">essy@plasmedia.com</A></I>&gt;
+  Date: Tue, 24 Apr 2001 19:13:29 +0930
+</PRE>
+<H1>Re: gateway setting with two ethernet</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+As I suspected.  Why have you got two NICs on the same subnet?
+
+Try the following command as root
+
+ifdown eth1
+
+netstat -nr
+
+and your routing table should look something (but not necessarily the same 
+as)like
+
+&gt;Kernel IP routing table
+&gt;Destination     Gateway         Genmask         Flags   MSS Window  irtt
+&gt;Iface
+&gt;192.168.1.33    0.0.0.0         255.255.255.255 UH        0 0          0
+&gt;eth0
+&gt;192.168.1.0     0.0.0.0         255.255.255.0   U         0 0          0
+&gt;eth0
+&gt;127.0.0.0       0.0.0.0         255.0.0.0       U         0 0          0 lo
+&gt;0.0.0.0         192.168.1.1     0.0.0.0         UG        0 0
+
+
+Then try connecting to the network and see if you have more success.
+
+Cheers
+Mark Collis
+Trinity College
+
+At 15:11 24/04/01 +0700, Essy Ren wrote:
+&gt;eth0      Link encap:Ethernet  HWaddr 00:10:E0:03:B7:2D
+&gt;           inet addr:192.168.1.33  Bcast:192.168.1.255  Mask:255.255.255.0
+&gt;           UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+&gt;           RX packets:2975 errors:0 dropped:0 overruns:0 frame:0
+&gt;           TX packets:151 errors:57 dropped:0 overruns:0 carrier:57
+&gt;           collisions:0
+&gt;
+&gt;eth1      Link encap:Ethernet  HWaddr 00:10:E0:03:B7:21
+&gt;           inet addr:192.168.1.32  Bcast:192.168.1.255  Mask:255.255.255.0
+&gt;           UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+&gt;           RX packets:2379 errors:0 dropped:0 overruns:0 frame:0
+&gt;           TX packets:2224 errors:158 dropped:0 overruns:0 carrier:36
+&gt;           collisions:195
+&gt;
+&gt;lo        Link encap:Local Loopback
+&gt;           inet addr:127.0.0.1  Mask:255.0.0.0
+&gt;           UP LOOPBACK RUNNING  MTU:3924  Metric:1
+&gt;           RX packets:1159 errors:0 dropped:0 overruns:0 frame:0
+&gt;           TX packets:1159 errors:0 dropped:0 overruns:0 carrier:0
+&gt;           collisions:0
+&gt;
+&gt;Kernel IP routing table
+&gt;Destination     Gateway         Genmask         Flags   MSS Window  irtt
+&gt;Iface
+&gt;192.168.1.32    0.0.0.0         255.255.255.255 UH        0 0          0
+&gt;eth1
+&gt;192.168.1.33    0.0.0.0         255.255.255.255 UH        0 0          0
+&gt;eth0
+&gt;192.168.1.0     0.0.0.0         255.255.255.0   U         0 0          0
+&gt;eth1
+&gt;127.0.0.0       0.0.0.0         255.0.0.0       U         0 0          0 lo
+&gt;0.0.0.0         192.168.1.1     0.0.0.0         UG        0 0          0
+&gt;eth1
+&gt;0.0.0.0         192.168.1.1     0.0.0.0         UG        0 0
+&gt;
+&gt;
+&gt;----- Original Message -----
+&gt;From: Mark &lt;<A HREF="mailto:markc@trinity.sa.edu.au">markc@trinity.sa.edu.au</A>&gt;
+&gt;To: Essy Ren &lt;<A HREF="mailto:essy@plasmedia.com">essy@plasmedia.com</A>&gt;; &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+&gt;Sent: Tuesday, April 24, 2001 2:28 PM
+&gt;Subject: Re: gateway setting with two ethernet
+&gt;
+&gt;
+&gt; &gt; 192.168.1.33 and 192.168.1.32 are on the same subnet if you use the
+&gt;default
+&gt; &gt; of 255.255.255.0
+&gt; &gt; This is going to cause you no end of grief.
+&gt; &gt;
+&gt; &gt; perhaps you might like to include the results of these two commands and
+&gt;you
+&gt; &gt; will have a better chance of someone being able to help you.
+&gt; &gt;
+&gt; &gt; ifconfig -a
+&gt; &gt; netstat -nr
+&gt; &gt;
+&gt; &gt; Cheers
+&gt; &gt; Mark Collis
+&gt; &gt; Trinity College
+&gt; &gt;
+&gt; &gt; At 13:30 24/04/01 +0700, Essy Ren wrote:
+&gt; &gt; &gt;I have a server with two ethernet, which is eth0 and eth1
+&gt; &gt; &gt;the ip (primary) for eth0 is 192.168.1.33
+&gt; &gt; &gt;and the ip (secondary) for eth1 is 192.168.1.32
+&gt; &gt; &gt;I want to connect through the LAN (gateway LAN is 192.168.1.1)
+&gt; &gt; &gt;so I connect to eth1 (with gateway 192.168.1.33) to connect to eth0 (with
+&gt; &gt; &gt;gateway 192.168.1.1)
+&gt; &gt; &gt;But I still can't go through the LAN ...
+&gt; &gt; &gt;and I can't ping the 192.168.1.1
+&gt; &gt; &gt;
+&gt; &gt; &gt;when I type route it's show the route but the gateway i've setup is still
+&gt; &gt; &gt;0.0.0.0
+&gt; &gt; &gt;can you help me pls ..
+&gt; &gt; &gt;thanks
+&gt; &gt; &gt;
+&gt; &gt; &gt;--
+&gt; &gt; &gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on
+&gt;irc.linux.org.au
+&gt; &gt; &gt;To unsubscribe from the LinuxSA list:
+&gt; &gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt;
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,325 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Promise FastTrak 100 TX4 + Linux = Kernel Oops?" -->
+<!-- FromName="'Ryan Verner'" -->
+<!-- FromEmail="xfesty@computeraddictions.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 5 Jun 2003 15:25:46 +0930" -->
+<!-- Id="5A1FEFDC-971A-11D7-9F6D-000393103866@computeraddictions.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Promise FastTrak 100 TX4 + Linux = Kernel Oops?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Ryan Verner &lt;<I><A HREF="mailto:xfesty@computeraddictions.com.au">xfesty@computeraddictions.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 5 Jun 2003 15:25:46 +0930
+</PRE>
+<H1>Promise FastTrak 100 TX4 + Linux = Kernel Oops?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Hi,
+
+Having a really strange problem with a Debian stable/woody (everything 
+updated) machine, doing RAID1 over a Promise FastTrack 100 TX4 card.  
+Things are fine, until for no particular reason (can't see anything 
+that triggers it, happens randomly) we'll get a kernel oops - the 
+machine seems to be fine without the card in it.
+
+The hard drives don't appear to be corrupt, with no bad sectors 
+showing.  /var/log/syslog has absolutely nothing unusual in it before 
+the crash, so that's not giving me any clues either.
+
+I've used Promise cards with hardware raid before, and they seem fine, 
+so I'm not sure what's causing it.
+
+lspci shows the device as:
+
+- --
+01:0a.0 RAID bus controller: Promise Technology, Inc.: Unknown device 
+6268 (rev 02)
+- --
+
+Kernel oops looks like (full 80x25 screen dump):
+
+- --
+FDC 0 is a port-1991 82077
+  ataraid/d0: ataraid/d0p1 ataraid/d0p2 ataraid/d0p3 &lt;&lt;1&gt;Unable to 
+handle kernel
+NULL pointer dereference at virtual address 00000000
+  printing eip:
+00000000
+*pde = 00000000
+Oops: 0000
+CPU:    0
+EIP:    0010:[&lt;00000000&gt;]    Not tainted
+EFLAGS: 00010282
+eax: 00000000   ebx: 00000000   ecx: c0192d80   edx: 00000000
+esi: c15b0660   edi: 00087d80   ebp: 04a87c00   esp: c145fd98
+ds: 0018   es: 0018  ss: 0018
+Process swapper (pid: 1, stackpage=c145f000)
+Stack: c02ceb1c c0192d80 00000000 c15b0660 00000002 00000000 c15b0780 
+00043ec4
+        c02ceb7c 00000000 c15b0660 00000000 00000006 c021a4a8 00000000 
+c15b0660
+        c103b8fc c14c5498 00000000 c15ff6b0 00001000 00000004 00000400 
+c15b0660
+Call Trace:    [&lt;c02ceb1c&gt;] [&lt;c02ceb7c&gt;] [&lt;c021a4a8&gt;] [&lt;c02091f1&gt;] 
+[&lt;c021d5bb&gt;]
+   [&lt;c021d528&gt;] [&lt;c020b694&gt;] [&lt;c023d77a&gt;] [&lt;c021d5ac&gt;] [&lt;c023d8c8&gt;] 
+[&lt;c01f7bad&gt;]
+   [&lt;c023dd8b&gt;] [&lt;c021d94a&gt;] [&lt;c023d5c4&gt;] [&lt;c02ec244&gt;] [&lt;c02ec2c1&gt;] 
+[&lt;c023d718&gt;]
+   [&lt;c023d666&gt;] [&lt;c02eb9cc&gt;] [&lt;c01e42b9&gt;] [&lt;c01e48c4&gt;]
+
+Code:  Bad EIP value.
+  &lt;0&gt;Kernel panic: Attempted to kill init
+- --
+
+dmesg (parts snipped) of the system looks like:
+
+- --
+Linux version 2.4.20-grsec (<A HREF="mailto:root@debian">root@debian</A>) (gcc version 2.95.4 20011002 
+(Debian prerelease))
+  #1 SMP Thu Jun 5 12:35:17 CST 2003
+BIOS-provided physical RAM map:
+  BIOS-e820: 0000000000000000 - 000000000009fc00 (usable)
+  BIOS-e820: 000000000009fc00 - 00000000000a0000 (reserved)
+  BIOS-e820: 00000000000e0000 - 0000000000100000 (reserved)
+  BIOS-e820: 0000000000100000 - 0000000017ec0000 (usable)
+  BIOS-e820: 0000000017ec0000 - 0000000017ef8000 (ACPI data)
+  BIOS-e820: 0000000017ef8000 - 0000000017f00000 (ACPI NVS)
+  BIOS-e820: 00000000ffb80000 - 00000000ffc00000 (reserved)
+  BIOS-e820: 00000000fff00000 - 0000000100000000 (reserved)
+382MB LOWMEM available.
+On node 0 totalpages: 97984
+zone(0): 4096 pages.
+zone(1): 93888 pages.
+zone(2): 0 pages.
+Kernel command line: auto BOOT_IMAGE=Linux ro root=2106
+Local APIC disabled by BIOS -- reenabling.
+Found and enabled local APIC!
+Initializing CPU#0
+Detected 797.600 MHz processor.
+Console: mono EGA+ 80x25
+Calibrating delay loop... 1592.52 BogoMIPS
+Memory: 384208k/391936k available (1736k kernel code, 7340k reserved, 
+- -2292k data, 120k in
+it, 0k highmem)
+Dentry cache hash table entries: 65536 (order: 7, 524288 bytes)
+Inode cache hash table entries: 32768 (order: 6, 262144 bytes)
+Mount-cache hash table entries: 8192 (order: 4, 65536 bytes)
+Buffer-cache hash table entries: 32768 (order: 5, 131072 bytes)
+Page-cache hash table entries: 131072 (order: 7, 524288 bytes)
+CPU: L1 I cache: 16K, L1 D cache: 16K
+CPU: L2 cache: 128K
+Intel machine check architecture supported.
+Intel machine check reporting enabled on CPU#0.
+CPU:     After generic, caps: 0383fbff 00000000 00000000 00000000
+CPU:             Common caps: 0383fbff 00000000 00000000 00000000
+Enabling fast FPU save and restore... done.
+Enabling unmasked SIMD FPU exception support... done.
+Checking 'hlt' instruction... OK.
+POSIX conformance testing by UNIFIX
+mtrr: v1.40 (20010327) Richard Gooch (<A HREF="mailto:rgooch@atnf.csiro.au">rgooch@atnf.csiro.au</A>)
+mtrr: detected mtrr type: Intel
+CPU: L1 I cache: 16K, L1 D cache: 16K
+CPU: L2 cache: 128K
+Intel machine check reporting enabled on CPU#0.
+CPU:     After generic, caps: 0383fbff 00000000 00000000 00000000
+CPU:             Common caps: 0383fbff 00000000 00000000 00000000
+CPU0: Intel Celeron (Coppermine) stepping 06
+per-CPU timeslice cutoff: 365.56 usecs.
+SMP motherboard not detected.
+enabled ExtINT on CPU#0
+ESR value before enabling vector: 00000000
+ESR value after enabling vector: 00000000
+Using local APIC timer interrupts.
+calibrating APIC timer ...
+..... CPU clock speed is 797.5657 MHz.
+..... host bus clock speed is 99.6955 MHz.
+cpu: 0, clocks: 996955, slice: 498477
+CPU0&lt;T0:996944,T1:498464,D:3,S:498477,C:996955&gt;
+Waiting on wait_init_idle (map = 0x0)
+All processors have done init_idle
+PCI: PCI BIOS revision 2.10 entry at 0xfda95, last bus=1
+PCI: Using configuration type 1
+PCI: Probing PCI hardware
+Transparent bridge - Intel Corp. 82801BA/CA/DB PCI Bridge
+PCI: Using IRQ router PIIX [8086/2440] at 00:1f.0
+Linux NET4.0 for Linux 2.4
+Based upon Swansea University Computer Society NET3.039
+Initializing RT netlink socket
+Starting kswapd
+VFS: Diskquotas version dquot_6.4.0 initialized
+Journalled Block Device driver loaded
+Installing knfsd (copyright (C) 1996 <A HREF="mailto:okir@monad.swb.de">okir@monad.swb.de</A>).
+parport0: PC-style at 0x378 [PCSPP(,...)]
+Detected PS/2 Mouse Port.
+pty: 256 Unix98 ptys configured
+Serial driver version 5.05c (2001-07-08) with MANY_PORTS SHARE_IRQ 
+SERIAL_PCI enabled
+ttyS00 at 0x03f8 (irq = 4) is a 16550A
+ttyS01 at 0x02f8 (irq = 3) is a 16550A
+Uniform Multi-Platform E-IDE driver Revision: 6.31
+ide: Assuming 33MHz system bus speed for PIO modes; override with 
+idebus=xx
+ICH2: IDE controller on PCI bus 00 dev f9
+ICH2: chipset revision 2
+ICH2: not 100% native mode: will probe irqs later
+     ide1: BM-DMA at 0xffa8-0xffaf, BIOS settings: hdc:pio, hdd:DMA
+PDC20270: IDE controller on PCI bus 01 dev 50
+PCI: Found IRQ 9 for device 01:0a.0
+PDC20270: chipset revision 2
+PDC20270: not 100% native mode: will probe irqs later
+PDC20270: ROM enabled at 0xff8e0000
+PDC20270: (U)DMA Burst Bit DISABLED Primary PCI Mode Secondary PCI Mode.
+PDC20270: FORCING BURST BIT 0x50 -&gt; 0x51 INACTIVE
+     ide2: BM-DMA at 0xdf90-0xdf97, BIOS settings: hde:pio, hdf:pio
+     ide3: BM-DMA at 0xdf98-0xdf9f, BIOS settings: hdg:pio, hdh:pio
+hdd: LG CD-ROM CRD-8522B, ATAPI CD/DVD-ROM drive
+hde: WDC WD800JB-00CRA1, ATA DISK drive
+hdg: WDC WD800JB-00CRA1, ATA DISK drive
+ide1 at 0x170-0x177,0x376 on irq 15
+ide2 at 0xdff0-0xdff7,0xdfe6 on irq 9
+ide3 at 0xdfa8-0xdfaf,0xdfe2 on irq 9
+blk: queue c01a15cc, I/O limit 4095Mb (mask 0xffffffff)
+hde: 156301488 sectors (80026 MB) w/8192KiB Cache, CHS=155061/16/63, 
+UDMA(100)
+blk: queue c01a1930, I/O limit 4095Mb (mask 0xffffffff)
+hdg: 156301488 sectors (80026 MB) w/8192KiB Cache, CHS=155061/16/63, 
+UDMA(100)
+hdd: ATAPI 52X CD-ROM drive, 128kB Cache, DMA
+Uniform CD-ROM driver Revision: 3.12
+Partition check:
+  hde: hde1 hde2 hde3 &lt; hde5 hde6 hde7 &gt;
+  hdg: hdg1 hdg2 hdg3 &lt; hdg5 hdg6 hdg7 &gt;
+Floppy drive(s): fd0 is 1.44M
+FDC 0 is a post-1991 82077
+  ataraid/d0: ataraid/d0p1 ataraid/d0p2 ataraid/d0p3 &lt; ataraid/d0p5 
+ataraid/d0p6 ataraid/d0
+p7 &gt;
+Drive 0 is 76319 Mb (33 / 0)
+Drive 1 is 76319 Mb (34 / 0)
+Raid1 array consists of 2 drives.
+Promise Fasttrak(tm) Softwareraid driver for linux version 0.03beta
+Highpoint HPT370 Softwareraid driver for linux version 0.01
+No raid array found
+SCSI subsystem driver Revision: 1.00
+kmod: failed to exec /sbin/modprobe -s -k scsi_hostadapter, errno = 2
+usb.c: registered new driver hub
+Initializing USB Mass Storage driver...
+usb.c: registered new driver usb-storage
+USB Mass Storage support registered.
+md: linear personality registered as nr 1
+md: raid0 personality registered as nr 2
+md: raid1 personality registered as nr 3
+md: raid5 personality registered as nr 4
+raid5: measuring checksumming speed
+    8regs     :  1394.800 MB/sec
+    32regs    :   979.200 MB/sec
+    pIII_sse  :  1652.800 MB/sec
+    pII_mmx   :  1781.200 MB/sec
+    p5_mmx    :  1884.400 MB/sec
+raid5: using function: pIII_sse (1652.800 MB/sec)
+md: multipath personality registered as nr 7
+md: md driver 0.90.0 MAX_MD_DEVS=256, MD_SB_DISKS=27
+md: Autodetecting RAID arrays.
+md: autorun ...
+md: ... autorun DONE.
+LVM version 1.0.5+(22/07/2002)
+NET4: Linux TCP/IP 1.0 for NET4.0
+IP Protocols: ICMP, UDP, TCP, IGMP
+IP: routing cache hash table of 4096 buckets, 32Kbytes
+TCP: Hash tables configured (established 32768 bind 32768)
+NET4: Unix domain sockets 1.0/SMP for Linux NET4.0.
+kjournald starting.  Commit interval 5 seconds
+EXT3-fs: mounted filesystem with ordered data mode.
+VFS: Mounted root (ext3 filesystem) readonly.
+Freeing unused kernel memory: 120k freed
+Adding Swap: 262576k swap-space (priority -1)
+EXT3 FS 2.4-0.9.19, 19 August 2002 on ide2(33,6), internal journal
+Real Time Clock Driver v1.10e
+grsec: time set by (hwclock:16823) UID(0) EUID(0), parent (rcS:22483) 
+UID(0) EUID(0)
+eepro100.c:v1.09j-t 9/29/99 Donald Becker 
+<A HREF="http://www.scyld.com/network/eepro100.html">http://www.scyld.com/network/eepro100.html</A>
+eepro100.c: $Revision: 1.36 $ 2000/11/17 Modified by Andrey V. 
+Savochkin &lt;<A HREF="mailto:saw@saw.sw.com.s">saw@saw.sw.com.s</A>
+g&gt; and others
+PCI: Found IRQ 11 for device 01:08.0
+eth0: Intel Corp. 82801BA/BAM/CA/CAM Ethernet Controller, 
+00:03:47:16:9A:18, IRQ 11.
+   Board assembly 000000-000, Physical connectors present: RJ45
+   Primary interface chip i82555 PHY #1.
+   General self-test: passed.
+   Serial sub-system self-test: passed.
+   Internal registers self-test: passed.
+   ROM checksum self-test: passed (0x04f4518b).
+PCI: Found IRQ 11 for device 01:09.0
+eth1: Intel Corp. 82557/8/9 [Ethernet Pro 100], 00:02:B3:65:8C:E6, IRQ 
+11.
+   Board assembly 751767-004, Physical connectors present: RJ45
+   Primary interface chip i82555 PHY #1.
+     Secondary interface chip i82555.
+   General self-test: passed.
+   Serial sub-system self-test: passed.
+   Internal registers self-test: passed.
+- --
+
+R
+
+- -- -
+Ryan 'xf' Verner &lt;<A HREF="mailto:xfesty@computeraddictions.com.au">xfesty@computeraddictions.com.au</A>&gt;
+PH: +61 418 186 604   IRC: xf / irc.openrejects.net
+- -- -
+linux.conf.au 2004               14-17 January 2004
+<A HREF="http://lca2004.linux.org.au">http://lca2004.linux.org.au</A>     Adelaide, Australia
+
+"Oh no, not again."
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.0.7 (Darwin)
+
+iD8DBQE+3ttlRcxk39PM6wcRAtOEAJ9xn9Q/0ANY9gF0zXtq2dhiXmV93gCeOdxc
+iuAqbBdFAgei644iCMTRO3s=
+=iDz5
+-----END PGP SIGNATURE-----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

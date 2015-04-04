@@ -1,0 +1,112 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SSH Question" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="'Alain Satre'" -->
+<!-- ToEmail="alain@messagebay.com" -->
+<!-- Date="Sun, 11 Feb 2001 21:11:53 +1030" -->
+<!-- Id="20010211211153.A16050@dog.topology.org" -->
+<!-- Reference="3A84528D.23995BE0@messagebay.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SSH Question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : Alain Satre &lt;<I><A HREF="mailto:alain@messagebay.com">alain@messagebay.com</A></I>&gt;
+  Date: Sun, 11 Feb 2001 21:11:53 +1030
+</PRE>
+<H1>Re: SSH Question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, Feb 09, 2001 at 12:26:53PM -0800, Alain Satre wrote:
+&gt; Recently some of our RedHat6.2 servers were penetrated through a common
+&gt; exploit in rpc services.  Afterward, patching and reloadin, we have
+&gt; noticed that some of our hosts give this message when we attempt an ssh
+&gt; connection.  Im wondering what could have been done to cause this?  I
+&gt; know I can probally just re-key the whole setup, but I wanted to know
+&gt; what the intruders may have done.  The warning alone states a "man in
+&gt; the middle" attack but im not familiar with it.  Any ideas?  Should I
+&gt; just wipe out all keys and start over and be done with it?   Or is this
+&gt; worth investigating further?
+&gt; 
+&gt; [<A HREF="mailto:root@embpc14">root@embpc14</A> /tmp]# ssh 10.1.2.106
+&gt; @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+&gt; @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+&gt; @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+&gt; IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+
+Alain,
+
+Having recently converted 5 machines to openssh 2.3.0 from source,
+I've seen this a lot in the last two days.
+
+I've found two ways to deal with this.
+
+Suppose you're going from client machine X to server machine Y.
+
+1.	Delete the line for server Y in the ~/.ssh/known_hosts
+	file on X, and log in. This will just ask you to
+	verify that all is okay.
+	But before you do this, you should type something like
+	ssh-keygen -l -f /usr/local/etc/ssh_host_key.pub
+	on machine Y to find out what the fingerprint is.
+	Then verify that this is correct when you
+	log in from X.
+
+2.	Delete the line for Y in ~/.ssh/known_hosts on X,
+	and replace it with the contents of the file
+	ssh_host_key.pub
+	but precede it with the host name Y and remove
+	the trailing string.
+
+If you do (1), it's much easier, because ssh will write the
+public key of Y to the user's known-hosts file on X automatically.
+Just make sure the fingerprints match.
+
+Cheers,
+Alan Kennington.
+
+==========================================================
+PS. I've found that the ssh-agent's key is not handed on to
+a second log-in as it used to be.
+In other words, when I update to openssh 2.3.0, if
+I log in from X to Y, I don't need to give a password
+(because I ran ssh-add already on X), but when I log in
+subsequently from Y to Z, I _do_ need to give a passphrase.
+Does anyone know what's going on here?
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

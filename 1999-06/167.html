@@ -1,0 +1,172 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="FYI: X on TV." -->
+<!-- FromName="Neil Ridley" -->
+<!-- FromEmail="n.ridley@SACBH.com.au" -->
+<!-- ToName="'Linux SA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 10 Jun 1999 12:28:13 +0930" -->
+<!-- Id="064EF7E0CFE8D211B68700805FE296988104@hose007" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: FYI: X on TV.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Neil Ridley &lt;<I><A HREF="mailto:n.ridley@SACBH.com.au">n.ridley@SACBH.com.au</A></I>&gt;
+  To  : 'Linux SA' &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 10 Jun 1999 12:28:13 +0930
+</PRE>
+<H1>FYI: X on TV.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+	Just in case someone is interested. 
+
+	I haven't tried it yet myself but I intend too once I work it out!
+
+
+
+ Getting X displayed on TV
+From the Xserver's point of view a TV with a RGB SCART input is nothing but
+a fixed sync monitor with a rather low picture quality. This means that you
+can make a TV compatible signal with a plain vanilla cheapo VGA card. 
+Modelines
+For the european 625 line (575 visible lines) TV standard a modeline looks
+like this:
+Modeline "736x575i" 14.16 736 760 824 904 575 580 585 625 interlace -hsync
+-vsync
+Officially the horizontal resolution is 767 (4 / 3 * 575) pixels with a
+clock of 14.76 MHz. However, since the clock used is 14.16 MHz, I reduced
+the horizontal values proportional to 14.16 / 14.76 (and rounded them to the
+nearest multiple of 8).
+14.16 MHz / 904 yields a horizontal deflection frequency of 15.664 kHz,
+which should work on most EU (15.625 kHz) (and US, 15.75 kHz) TV's. 
+You can probably use the following modeline for the US 525 line (485 visible
+lines) standard:
+Modeline "736x485i" 14.16 736 760 824 904 485 491 496 525 interlace -hsync
+-vsync 
+If you want to make a 640x480 screen with a black border you can you use
+this line:
+Modeline "640x480i" 14.16 640 712 776 904 480 532 537 625 interlace -hsync
+-vsync
+You can centre it by altering the 2nd and 3rd horizontal and vertical values
+(this example shifts the picture to the left):
+Modeline "640x480i" 14.16 640 728 792 904 480 532 537 625 interlace -hsync
+-vsync 
+You can make a non interlaced signal with this modeline:
+Modeline "736x288" 14.16 736 760 824 904 288 290 292 312 -hsync -vsync 
+Hardware
+The VGA RGB signals are compatible with the SCART bus, the sync signals are
+not. You have to create a composite sync signal of 0.3 ... 0.5 Vpp. The
+circuit below acts both as a AND gate and a level translator. It doesn't
+need a power supply and can be mounted inside a VGA plug: 
+ -VS ------------------------+
+                             |
+                             |
+                         |  /
+       +-----+           |/
+ -HS --+ 3k3 +-----*-----|     BC 548 B
+       +-----+     |     |\
+                   |     |  \|
+                   |        -|     +-----+
+                   |         *-----+ 68  +----- -CS 0.3 Vpp
+                   |         |     +-----+
+                  +++       +++
+                  | |       | |
+                  | |       | |
+                  +++       +++
+                   |         |
+ GND --------------*---------*----------------- GND
+                  1k2       820
+You can use any general purpose low frequent low power Si NPN transistor
+instead of the BC 548 B
+The resistors are all standard 250 mW carbon film resistors;
+68 = 68 Ohm
+820 = 820 Ohm
+1k2 = 1200 Ohm
+3k3 = 3300 Ohm
+I have a page with both the VGA and SCART connectors. If you apply the
+pinout you get this; 
+ VGA                                                SCART
+
+   1 -O------------------------------------------O- 15 R
+   2 -O------------------------------------------O- 11 G
+   3 -O------------------------------------------O-  7 B
+
+   6 -O------------------------------------------O- 13 R Gnd
+   7 -O------------------------------------------O-  9 G Gnd
+   8 -O------------------------------------------O-  5 B Gnd
+
+   5 -O-+
+        |
+  11 -O-+
+
+ Connector --------------------------------------O- 21 Connector
+ shell                                                 shell
+
+  14 -O------------------------+
+ -VS                           |
+                               |
+                           |  /
+         +-----+           |/
+  13 -O--+ 3k3 +-----*-----|     BC 548 B
+ -HS     +-----+     |     |\
+                     |     |  \|
+                     |        -|     +-----+
+                     |         *-----+ 68  +-----O- 20
+                     |         |     +-----+       -CS
+                    +++       +++
+                    | |       | |
+                    | |       | |
+                    +++       +++
+                     |         |
+  10 -O--------------*---------*-----------------O- 17
+ Gnd                1k2       820                  Gnd
+You can connect all grounds with each other if you like; 
+ 5,6,7,8,Shell ------------------------------------ 5,9,13,17,21
+Notes: 
+	*	The link between 5 (Gnd) and 11 (Mid0) tells your VGA card
+that your `monitor' is colour. 
+	*	The R-, G- and B grounds are in fact shields (The R-, G- and
+B wires are in fact little coaxes). The same goes for the `-CS' wire. 
+	*	The connector shells are connected to a common shield
+screening all wires and coaxes inside the cable. 
+	*	If you use a female SCART connector, use pin 19 for -CS. 
+The usual disclamers apply. 
+
+
+NEIL RIDLEY
+SACBH-ISD-TSS
+<A HREF="mailto:n.ridley@sacbh.com.au">n.ridley@sacbh.com.au</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

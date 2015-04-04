@@ -1,0 +1,136 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Booting a Sun 3/60" -->
+<!-- FromName="Toby Corkindale" -->
+<!-- FromEmail="tjcorkin@steadycom.com.au" -->
+<!-- ToName="Alex Garner" -->
+<!-- ToEmail="linuxsa@bourbon.lynx.net.au" -->
+<!-- Date="Wed, 28 Apr 1999 02:36:28 +0000" -->
+<!-- Id="3726742C.E9A6ECA9@steadycom.com.au" -->
+<!-- Reference="4.1.19990423194131.0095b7d0@mail.lynx.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Booting a Sun 3/60</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@steadycom.com.au">tjcorkin@steadycom.com.au</A></I>&gt;
+  To  : Alex Garner &lt;<I><A HREF="mailto:linuxsa@bourbon.lynx.net.au">linuxsa@bourbon.lynx.net.au</A></I>&gt;
+  Date: Wed, 28 Apr 1999 02:36:28 +0000
+</PRE>
+<H1>Re: Booting a Sun 3/60</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Solution = kernel level module loader.
+Situations like this are why it was made.
+Read the docs in /usr/src/linux/Documentation, and the help in the
+kernel cfg, and make sure it's compiled in and enabled.
+Then, the kernel will load modules (via modprobe and /etc/conf.modules)
+whenever a call is going to be made.
+
+I use this to load everything now. configure the netcard, and the
+modules get loaded. play an mp3, and the soundcard gets loaded, etc. 
+On machines with low ram, just make almost everything (except the
+obvious things like ext2, etc.) a module, and let it load em and unload
+em itself.
+One note though - ip forwarding modules are excluded from this. You'll
+need to do insmod ip_masq_icq manually still.
+
+Toby
+
+Alex Garner wrote:
+&gt; 
+&gt; OK, an update to this...
+&gt; 
+&gt; I thought I my problem was the fact that I didn't have rarp compiled into
+&gt; my kernel. I recompiled, making sure that I had the rarp module, and then I
+&gt; realised that I already had the rarp module. (When I typed `rarp -av` it
+&gt; said 'not supported by kernel' with both the original kernel and my new
+&gt; one.) I realised that the rarp module wasn't being loaded, so I manually
+&gt; set the rarp entry with tha `rarp -s` command and behold, it worked. The
+&gt; rarp module loaded and the sun 3/60 booted, found it's IP via bootpd and
+&gt; tftpd'ed it's kernel across the network.
+&gt; 
+&gt; Question. How can I get the rarp requests to load the module? Without the
+&gt; module loaded, inetd doesn't even bother starting bootpd. It only works
+&gt; when the rarp command prods kerneld to load the module. I'd prefer not to
+&gt; kludge a solutions by getting a script calling insmod or some other hack,
+&gt; I'd just like it to work properly.
+&gt; 
+&gt; I could always compile the code into a kernel, but that's the last resort!
+&gt; 
+&gt; (A solution I've thought of that I don't like, is to call insmod from
+&gt; inetd, but I don't even know if inetd will call anything, cause it's not
+&gt; supported by the kernel. Catch 22!)
+&gt; 
+&gt; Suggestions?
+&gt; 
+&gt; At 10:12 28/04/99 , Toby Corkindale wrote:
+&gt; &gt;Alex Garner wrote:
+&gt; &gt;&gt;
+&gt; &gt;&gt; Has anyone come across some documentation for getting a Sun 3/60 to boot
+&gt; &gt;&gt; off a linux Xserver.
+&gt; &gt;Yeah, I used to have one. Or it might have been a sun 3/50, I really
+&gt; &gt;don't remember any more.
+&gt; &gt;But it worked fine, and I sold it to Nick and set up his linux machine
+&gt; &gt;to handle it.
+&gt; &gt;When I get home I'll dig out the stuff I used.
+&gt; &gt;There's a package on the web to do it, but it's extremely outdated now,
+&gt; &gt;and I don't really reccommend using most of it.
+&gt; &gt;
+&gt; &gt;&gt;
+&gt; &gt;&gt; Has anyone got it working?
+&gt; &gt;&gt;
+&gt; &gt;&gt; I can see the rarp requests from the sun, but my bootps server (running
+&gt; &gt;&gt; through inet) isn't responding. Probably buggered a config somewhere.
+&gt; &gt;&gt;
+&gt; &gt;&gt; Cheers
+&gt; &gt;&gt;
+&gt; &gt;&gt; Alex!
+&gt; &gt;&gt;
+&gt; &gt;&gt; --
+&gt; &gt;&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; &gt;&gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt;
+&gt; &gt;--
+&gt; &gt;...Failure is not an option - It comes bundled with Windows
+&gt; 
+&gt; --
+&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+...Failure is not an option - It comes bundled with Windows
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

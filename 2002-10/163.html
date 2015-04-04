@@ -1,0 +1,184 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Scanner SCSI adapter" -->
+<!-- FromName="'Brian Marr'" -->
+<!-- FromEmail="cabernet@internode.on.net" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 3 Oct 2002 08:19:46 +0930" -->
+<!-- Id="200210030819.46845.cabernet@internode.on.net" -->
+<!-- Reference="1033593711.4714.16.camel@localhost.localdomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Scanner SCSI adapter</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Brian Marr &lt;<I><A HREF="mailto:cabernet@internode.on.net">cabernet@internode.on.net</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 3 Oct 2002 08:19:46 +0930
+</PRE>
+<H1>Re: Scanner SCSI adapter</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Suse 8.0 kernel 2.4.18
+The Symbios driver has been in most kernels for some time now so I have not 
+found it necessary to download and install anything. I did have some initail 
+configuration problems in getting the card recogized. 
+Normally modprobe sym53c416 will fire up the card. You should get a log like 
+this. Dmesg is good for looking at the output.
+Brian Marr
+
+Aug  2 13:43:14 Gringo kernel: isapnp: Scanning for PnP cards...
+Aug  2 13:43:14 Gringo kernel: isapnp: Card 'SYM 53C416'
+Aug  2 13:43:14 Gringo kernel: isapnp: 1 Plug & Play card detected total
+Aug  2 13:43:14 Gringo kernel: sym53c416.c: Version 1.0.0-ac
+Aug  2 13:43:14 Gringo kernel: sym53c416: ISAPnP card found and configured at 
+0x220, IRQ 5.
+Aug  2 13:43:14 Gringo kernel: No sym53c416 found at address 0x000
+Aug  2 13:43:14 Gringo kernel: scsi1 : Symbios Logic 53c416 (rev. 151) at 
+0x220, irq 5, SCSI-ID 7, fast pio
+Aug  2 13:43:14 Gringo kernel:   Vendor: HP        Model: C5110A            
+Rev: 3701
+
+Here is the relevant part from isa-pnp from my old kernel (2.4.17 I think). If 
+you need any more info on isa-pnp please let me know. I cannot find it on 
+this system. I am not sure if they use it anymore. The scanner still works 
+though.
+==========================================snip
+# This is free software, see the sources for details.
+# This software has NO WARRANTY, use at your OWN RISK
+#
+# For details of the output file format, see isapnp.conf(5)
+#
+# For latest information and FAQ on isapnp and pnpdump see:
+# <A HREF="http://www.roestock.demon.co.uk/isapnptools/">http://www.roestock.demon.co.uk/isapnptools/</A>
+#
+# Compiler flags:  -DREALTIME -DNEEDSETSCHEDULER -DABORT_ONRESERR
+# (for   library:  -DREALTIME -DNEEDSETSCHEDULER -DABORT_ONRESERR)
+#
+# Trying port address 0273
+# Board 1 has serial identifier 62 ff ff ff ff 61 41 89 4d
+
+# (DEBUG)
+(READPORT 0x0273)
+(ISOLATE PRESERVE)
+(IDENTIFY *)
+(VERBOSITY 2)
+(CONFLICT (IO FATAL)(IRQ FATAL)(DMA FATAL)(MEM FATAL)) # or WARNING
+
+# Card 1: (serial identifier 62 ff ff ff ff 61 41 89 4d)
+# Vendor Id SLI4161, No Serial Number (-1), checksum 0x62.
+# Version 1.0, Vendor version 0.1
+# ANSI string --&gt;SYM 53C416       &lt;--
+#
+# Logical device id SLI4163
+#     Device supports I/O range check register
+#     Device supports vendor reserved register @ 0x38
+#     Device supports vendor reserved register @ 0x3a
+#     Device supports vendor reserved register @ 0x3b
+#     Device supports vendor reserved register @ 0x3d
+#
+# Edit the entries below to uncomment out the configuration required.
+# Note that only the first value of any range is given, this may be changed if 
+required
+# Don't forget to uncomment the activate (ACT Y) when happy
+
+(CONFIGURE SLI4161/-1 (LD 0
+#     Logical device decodes 16 bit IO address lines
+#         Minimum IO base address 0x0200
+#         Maximum IO base address 0xffe0
+#         IO base alignment 32 bytes
+#         Number of IO addresses required: 32
+ (IO 0 (SIZE 32) (BASE 0x0240))
+#     IRQ 4, 5, 7, 10, 11, 12 or 15.
+#         High true, edge sensitive interrupt
+ (INT 0 (IRQ 5 (MODE +E)))
+ (NAME "SLI4161/-1[0]{SYM 53C416          }")
+(ACT Y)
+))
+# End tag... Checksum 0x00 (OK)
+=====================================snip
+
+
+On Thursday 03 October 2002 06:51, Sue Robertson wrote:
+&gt; As a newbie way out of my depth, I'm looking for help in installing a
+&gt; driver for the SCSI adapter which drives my HP 5p scanner. (I've RTFM
+&gt; til I'm blue in the face, but can't tell what I'm doing wrong.)
+&gt;
+&gt; I'm using RH 7.3 (kernel 2.4.18-10). The card (sym53c416) is being
+&gt; detected on boot by isapnp OK, but is showing in my (Gnome) hardware
+&gt; devices list as type 'unknown'.  sane-find-scanner isn't detecting it,
+&gt; so I've tried using isapnptools (pnpdump etc) & insmod to get a driver
+&gt; working somehow.
+&gt;
+&gt; I've downloaded a driver - sym53c416-driver-0.75 and followed
+&gt; instructions to put it in the 'system modules' directory (hopefully
+&gt; lib/modules/2.4.18-10 is the right place?)  After running make etc. I've
+&gt; tried insmod but get various errors - as below. (I don't have a
+&gt; modules.scsi file, but my modules.isapnpmap shows the card is listed -
+&gt; along with a range of 0xffff etc etc. I know the parameters of the card
+&gt; from my Windoze config. ie I/O  0220-023F IRQ 05. Does the IRQ stay the
+&gt; same under Linux?)
+&gt;
+&gt; I've tried several variations of the following (within
+&gt; /lib/modules/2.4.18-10)
+&gt;
+&gt; insmod -p --name=modules.scsi sym53c416=0x0220,5 /lib/modules/2.4.18-10
+&gt;
+&gt; & get output of
+&gt;
+&gt; Using 
+&gt; /lib/modules/2.4.18-10/kernel/abi/cxenix/abi.cxenix.o/sym53c416=0x0220,5:
+&gt; Not a directory
+&gt;
+&gt; (I do have a file sym53c416.o in /lib/modules/2.4.18-10/kernel/drivers/scsi
+&gt; but don't know what I'm meant to do with it.
+&gt;
+&gt; My /etc/sane.d/hp.conf file reads
+&gt;
+&gt; scsi HP
+&gt; /dev/scanner
+&gt; option connect-scsi  (this last line was put in as one of my many attempts)
+&gt;
+&gt; Sorry to be so long-winded, but I've got myself totally confused.
+&gt;
+&gt; BTW  If I get this working & then upgrade to RH 8.0, will I have to do
+&gt; it all again!?
+&gt;
+&gt; Thks
+&gt;
+&gt; Sue
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

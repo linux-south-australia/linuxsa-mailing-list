@@ -1,0 +1,164 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Linux.Conf.Au 2004 FIXIT's - You can run one!" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="rsharpe@richardsharpe.com" -->
+<!-- ToName="'Dan Shearer'" -->
+<!-- ToEmail="dan@shearer.org" -->
+<!-- Date="Mon, 1 Dec 2003 22:52:52 -0800 (PST)" -->
+<!-- Id="Pine.LNX.4.44.0312012251310.6250-100000@durable" -->
+<!-- Reference="20031202011317.GM20171@erizo.shearer.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Linux.Conf.Au 2004 FIXIT's - You can run one!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:rsharpe@richardsharpe.com">rsharpe@richardsharpe.com</A></I>&gt;
+  To  : Dan Shearer &lt;<I><A HREF="mailto:dan@shearer.org">dan@shearer.org</A></I>&gt;
+  Date: Mon, 1 Dec 2003 22:52:52 -0800 (PST)
+</PRE>
+<H1>Re: Linux.Conf.Au 2004 FIXIT's - You can run one!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, 2 Dec 2003, Dan Shearer wrote:
+
+&gt; On Tue, Dec 02, 2003 at 10:32:48AM +1030, Glen Turner wrote:
+&gt; &gt; Hi Richard,
+&gt; &gt; 
+&gt; &gt; The biggest problem is building the topologies required for
+&gt; &gt; testing network-oriented programs.  Linux isn't quite at
+&gt; &gt; the stage where you can run a set of VMs interconnected
+&gt; &gt; with an arbitrary network.  So even an "automated" set
+&gt; &gt; of regression tests still requires purpose-built test
+&gt; &gt; scenarios.
+&gt; 
+&gt; The term "network effects" is a euphemism for "we have no idea what will
+&gt; happen when you connect many different things together", and this
+&gt; describes any reasonable-sized computer system today. Homogeneous
+&gt; clusters and carefully controlled groups of public-access machines *can*
+&gt; be exceptions. But even these are still at the "I wonder if it will go
+&gt; bang if I do this to it?" stage.
+
+[Deletia]
+
+&gt; There are several kinds of whole-system virtualisation:
+&gt; 
+&gt; 	1. bug-for-bug compatible hardware simulator which boots a
+&gt; 	complete OS with identical results to booting on real hardware.
+&gt; 	Nothing relies on any particular piece of underlying host
+&gt; 	hardware. Slow but very reliable, especially for low-level
+&gt; 	testing. Eg Bochs, Hercules, Simics.
+&gt; 
+&gt; 	2. Hardware virtualisation which relies on a particular piece of
+&gt; 	underlying hardware to work, but does deliver machine
+&gt; 	partitioning benefits with virtualisation as well. Generally
+&gt; 	faster but much less accurate for many reasons and limited in
+&gt; 	range of hosts it can run on. Eg VMware.
+
+I think Xen is going to be much better for this, but we are descending 
+into implementation details when we should be discussing what we want to 
+do.
+
+&gt; 	3. Kind-of hardware virtualisation sufficient to boot an OS.
+&gt; 	This often involves a small amount of modification to the OS,
+&gt; 	however for a lot of testing this doesn't matter. Eg User Mode
+&gt; 	Linux, MacOnLinux.
+&gt; 
+&gt; There are also partitioning schemes such as Linux Vserver or other
+&gt; chroot-like systems, but these blur into a multi-process model where so
+&gt; many resources are shared that the virtualisation is at the application
+&gt; level not the system level.
+&gt; 
+&gt; For testing, advantages of virtualisation include:
+&gt; 
+&gt; 	* checkpointing so that machine or network state can be
+&gt; 	  snapshotted and then used as a base from which regression
+&gt; 	  testing can start.
+&gt; 
+&gt; 	* instrumentation, meaning you have a much better measure of what is
+&gt;           going on with the system and more chance of correlating failures with other
+&gt;           events. Related to this you can set triggers -- eg "stop the simulation 
+&gt;           and snapshot it every thousand files created". If there is a failure
+&gt; 	  after fifty thousand files you can go back and examine the state of the entire 
+&gt;           machine that led up to that failure.
+&gt; 
+&gt; 	* Improve hardware/electricity/physical manpower utilisation. Most of
+&gt;           the time a modern server computer is nearly idle even when running something
+&gt;           like Mozilla tinderbox runs.  However it is easiest to dedicate all the 
+&gt; 	  hardware to one operating system and that's what usually happens.
+&gt; 
+&gt; 	* ability to run tests in parallel on identical hardware simply
+&gt; 	  by duplicating the virtualised environments. There's nothing
+&gt; 	  like having your computers in soft copy :-) Let's say I want
+&gt; 	  to run a regression suite that has 100 tests on a web
+&gt; 	  application on Apache. Each run of the suite is to take place
+&gt; 	  on a slightly different host environment: real and virtual
+&gt; 	  memory varying, system load varying from 0 to 20, network
+&gt; 	  congestion from 0 to 100%, more and fewer clients connecting
+&gt; 	  at once. So I set all this up... but then I wonder, what
+&gt; 	  happens if there are different numbers of CPUs? Easy, just
+&gt; 	  duplicate all the above and run it all on systems with 1, 2
+&gt; 	  and 4 CPUs -- mostly done in a couple of cp commands. Hang on,
+&gt; 	  what about if it was 64-bit instead of 32-bit? Again just a
+&gt; 	  few commands (if the suite involves checking out source and
+&gt; 	  building, which I recommend.)
+&gt; 
+&gt; Concerning the return on investment on test rigs built like this:
+&gt; 
+&gt; 	* an arbitarily long useable future, unlike real hardware. Even
+&gt; 	  a virtualisation technique can only run on a specific type of
+&gt; 	  hardware, that hardware itself can usually be virtualised. In
+&gt; 	  other words, this is a much better approach than test labs
+&gt; 	  with rooms full of decaying equipment. Naturally, real
+&gt; 	  hardware has to be used at some point to check the results of
+&gt; 	  virtualisation
+&gt; 
+&gt; 	* relative speed of execution in virtualised environments
+&gt; 	  increases over time as the host hardware gets better and better
+&gt; 	  (even if you have a clocked virtualisation: the speed of the
+&gt; 	  central clock just increases.) Real hardware declines in
+&gt; 	  relative speed over time. This means that a test suite that
+&gt; 	  works today with virtualisation will work better next year.
+&gt; 	  The same is not true for real hardware.
+&gt; 
+&gt; 
+
+-- 
+Regards
+-----
+Richard Sharpe, rsharpe[at]ns.aus.com, rsharpe[at]samba.org, 
+sharpe[at]ethereal.com, <A HREF="http://www.richardsharpe.com">http://www.richardsharpe.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

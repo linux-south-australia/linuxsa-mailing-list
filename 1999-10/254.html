@@ -1,0 +1,86 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: 0 byte pppd" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="mtippett@ticons.com.au" -->
+<!-- Date="Fri, 15 Oct 1999 16:17:45 +0930 (CST)" -->
+<!-- Id="Pine.BSF.3.96.991015155100.28340G-100000@augustus.tellurian.com.au" -->
+<!-- Reference="199910150509.OAA02264@laptop.ticons.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: 0 byte pppd</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : <A HREF="mailto:mtippett@ticons.com.au">mtippett@ticons.com.au</A>
+  Date: Fri, 15 Oct 1999 16:17:45 +0930 (CST)
+</PRE>
+<H1>Re: 0 byte pppd</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, 15 Oct 1999 <A HREF="mailto:mtippett@ticons.com.au">mtippett@ticons.com.au</A> wrote:
+&gt; 64 bytes from 203.38.197.10: icmp_seq=1667 ttl=238 time=1460.1 ms
+&gt; wrong data byte #8 should be 0xa4 but was 0xa3
+&gt; 	a3 b6 6 38 f4 4b 6 0 8 9 a b c d e f 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f 
+&gt; 	20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f 
+
+I think it's a cosmetic bug.  Each packet is formatted thus:
+
+-OFFSET-
+ 0 to  7  ICMP header
+ 8 to 11  packet transmit time (in seconds since epoch)
+12 to 15  packet transmit time (millisecond component)
+16 to ... values: 8, 9, 10, 11, 12, ...
+
+Packet dumps start at byte 8.  The first four bytes displayed for ICMP
+sequence 1667 indicates that you sent it at Fri Oct 15 14:37:47 1999 CST.
+
+Outgoing packets are assembled in a global buffer; incoming packets are
+compared with that buffer.  A comparison of the first 16 bytes is clearly
+nonsense unless you are certain that the return packet will be received
+before the next is sent.  You showed output for three packets, the first
+taking less than one second, the others taking more than one second.  Ping
+sends packets at one second intervals.
+
+I think your ping is comparing the timestamps, neglecting the possibility
+that the global buffer will have a later timestamp than the incoming
+packet.
+
+Do you see any pings with time &gt;= 1000.0 ms which don't have wrong data
+byte #8?
+
+David
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

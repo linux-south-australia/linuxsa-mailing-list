@@ -1,0 +1,93 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: umount problem" -->
+<!-- FromName="'Daryl Tester'" -->
+<!-- FromEmail="Daryl.Tester@iocane.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="davidac17@yahoo.com" -->
+<!-- Date="Sat, 17 May 2003 17:53:30 +0930" -->
+<!-- Id="" -->
+<!-- Reference="200305171554.45981.davidac17@yahoo.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: umount problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:davidac17@yahoo.com">davidac17@yahoo.com</A></I>&gt;
+  Date: Sat, 17 May 2003 17:53:30 +0930
+</PRE>
+<H1>Re: umount problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+David Ananian-Cooper wrote:
+
+&gt; i'm refering to the smbfs.o module. the exact problem i'm having is that i
+&gt; mount network shares onto my filesystem - then the other side cancels the
+&gt; connection, then umount refuses to let me unmount the connection - claiming
+&gt; that the device is busy.
+
+This is probably true.
+
+&gt; the output of an 'lsmod' confirms this, claiming
+&gt; that the smbfs module is in use by 1 process.
+
+This is false.  lsmod shows reference counts of instances, not processes.
+If you had two mounted shared and 4000 processes with open files, you would
+most likely see a count of 2 (or 3 - I think sometimes a reference is
+incremented by one just to keep it resident.  For example, my SCSI controller
+shows a link count of 3, but only 2 mounted filesystems off that controller).
+
+&gt; Other then a reboot, i cant
+&gt; work out how to unmount this connection.
+
+rmmod is *not* what you want to do.  You want to find out what process is
+currently residing on that file system, kill the processes, and then you
+will be able to unmount the file system.
+
+"fuser -m /mount_point_name" should show you the process ids with files
+open to that mount point.  Once that list drops to zero, then you will
+be able to unmount the file system.
+
+
+-- 
+Regards,
+  Daryl Tester,  Software Wrangler and Bit Herder, IOCANE Pty. Ltd.
+
+"The philosophy exam was a piece of cake -- which was a bit of a surprise,
+ actually, because I was expecting some questions on a sheet of paper."
+  -- Smith & Jones
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

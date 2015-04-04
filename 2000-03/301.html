@@ -1,0 +1,113 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Splitting a variable length file" -->
+<!-- FromName="mark" -->
+<!-- FromEmail="create@picknowl.com.au" -->
+<!-- ToName="Don Collins <doncol@mail.mdt.net.au>, "linuxsa@linuxsa.org.au" -->
+<!-- ToEmail="doncol@mail.mdt.net.au" -->
+<!-- Date="Wed, 15 Mar 2000 13:11:09 +1030" -->
+<!-- Id="38CEF845.2FE04770@picknowl.com.au" -->
+<!-- Reference="38CE0B4F.20D8DA8A@mail.mdt.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Splitting a variable length file</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: mark &lt;<I><A HREF="mailto:create@picknowl.com.au">create@picknowl.com.au</A></I>&gt;
+  To  : Don Collins &lt;doncol@mail.mdt.net.au&gt;, "linuxsa@linuxsa.org.au &lt;<I><A HREF="mailto:doncol@mail.mdt.net.au">doncol@mail.mdt.net.au</A></I>&gt;
+  Date: Wed, 15 Mar 2000 13:11:09 +1030
+</PRE>
+<H1>Re: Splitting a variable length file</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+You could try a perl hack like this
+
+
+
+Don Collins wrote:
+
+&gt; Hi everyone,
+&gt;     I have a situation on a site where an application is generating a
+&gt; report in two parts, but sending it to the one text file.
+&gt; The second part of the report is always the same number of lines, but
+&gt; the first part is variable.  What I want to do is to be able to process
+&gt; the two parts separately by splitting the file into two.  The easy part
+&gt; is getting the second part into a separate file. For this I can use
+&gt; `tail -43 bigfile &gt; path-to-file-of-second-part`.  What I'd like to do
+&gt; is to actually remove that second part from the original file OR copy
+&gt; everything except the second part to a separate file.  The 43 lines is
+&gt; constant thus the 43 in the tail command.  The number of lines preceding
+&gt; that last 43 lines is variable, but I can't imagine the file itself will
+&gt; ever get larger than about 200 lines.
+&gt;
+&gt; Does anyone have any suggestions as to the best way to accomplish this
+&gt; file splitting?
+&gt; regards and thanks in advance,
+&gt; Don
+&gt; --
+&gt;
+&gt; Don Collins - <A HREF="mailto:doncol">mailto:doncol</A>@mail.mdt.net.au
+&gt; <A HREF="http://www.mdt.net.au/~doncol">http://www.mdt.net.au/~doncol</A>
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+#! /usr/bin/perl
+print "No Of Lines to Trim $ARGV[0] \n";
+print "File Name $ARGV[1] \n";
+open(INFILE, $ARGV[1])|| die "$! can't open file";
+@all_file = &lt;INFILE&gt;;
+close(INFILE);
+print "total lines $#all_file \n" ;
+open(OUTFILE, "&gt;file1");
+select (OUTFILE);
+$no_to_print = $#all_file - $ARGV[0];
+print "$no_to_print /n";
+$i = 0;
+for( ;$i &lt; $no_to_print; $i ++)
+{
+	print @all_file[$i];
+}
+close(OUTFILE);
+open (OUTFILE, "&gt;file2");
+select(OUTFILE);
+for (; $i &lt; $#all_file;$i++)
+{
+	print @all_file[$i];
+}
+close (OUTFILE);
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

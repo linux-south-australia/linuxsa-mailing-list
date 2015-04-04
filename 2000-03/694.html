@@ -1,0 +1,201 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Review: Voice over IP: IETF lunchtime seminar" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="staff@tellurian.com.au, linuxsa <linuxsa@linuxsa.org.au>, aussie-isp@aussie.net, ross@rocksoft.com" -->
+<!-- Date="Tue, 28 Mar 2000 21:23:59 +0930 (CST)" -->
+<!-- Id="Pine.BSF.3.96.1000328212235.5977P-100000@augustus.tellurian.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Review: Voice over IP: IETF lunchtime seminar</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : <A HREF="mailto:staff@tellurian.com.au">staff@tellurian.com.au</A>, <A HREF="mailto:linuxsa <linuxsa@linuxsa.org.au>">linuxsa <linuxsa@linuxsa.org.au></A>, <A HREF="mailto:aussie-isp@aussie.net">aussie-isp@aussie.net</A>, <A HREF="mailto:ross@rocksoft.com">ross@rocksoft.com</A>
+  Date: Tue, 28 Mar 2000 21:23:59 +0930 (CST)
+</PRE>
+<H1>Review: Voice over IP: IETF lunchtime seminar</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+                             A review of
+
+                          Telephony over IP
+
+                 Presented by Stephen Kingham, CSIRO
+
+                 Tuesday, 28 March 2000, 12pm - 1pm
+                       Flentje lecture theatre
+                           Plaza Building
+                     The University of Adelaide
+
+                            Reviewed by
+                 David Newall &lt;<A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A>&gt;
+                          28 March, 2000
+
+......................................................................
+
+The IETF -- The Internet Engineering Task Force, who are the people who
+design the internet protocols -- are meeting here in Adelaide this week.
+This is a rare occurrence that presents an opportunity for a real treat for
+us to enjoy.  Some of the IETF members (who are experts in their fields)
+have graciously agreed to present a series of free lunchtime seminars.
+
+The seminar today was very interesting.  Too bad if you missed it.
+
+Wednesday's seminar, "Measuring Internet Performance," will be presented by
+Matt Zekauskas, from Advanced Network & Services, in Horace Lamb lecture
+theatre, between 12pm and 1pm.
+
+......................................................................
+
+The second seminar, on the topic of Telephony over IP, was presented by
+Stephen Kingham from CSIRO (apparently, although I thought I saw Don
+Robertson written on the blackboard so my humble apologies if I got it
+wrong!)
+
+The good news is it's all surprisingly easy!
+
+Normally your telephone is connected to your company PBX, which places the
+call using the public telephone network (PSTN).  With VoIP you PABX is
+connected to a "Voice over IP" gateway, which looks almost like another
+PABX or like a telephone line.  On the PABX side the gateway looks like
+ISDN; on the internet side it uses H.323 (the standard for voice over IP.)
+When you wish to make a call the PABX passes your call to the VoIP gateway
+which connects to a gateway "at the other end", which makes a (presumably)
+local call to complete the circuit ( or delivers it to a local extension.)
+Calls can also be placed to "IP telephones", for example Microsoft
+Netmeeting.
+
+If the gateway cannot place the call the PABX falls back to the usual
+(expensive) PSTN.
+
+Software called "Gatekeeper" translates a telephone number into an IP
+address.  This is analogous to the DNS which translates a domain name into
+an IP address, but unlike the DNS, which must be manually configured, you
+can connect to your local Gatekeeper and it knows that's where you are.  I
+gathered that Gatekeeper is not quite "production ready", and that static
+routes are also used.
+
+Each voice call is sampled at 64Kbps and compressed using G.some number,
+which standard describes the compression of speech.  This compresses speech
+to a bit rate of 8Kbps.  Allowing for system overheads, each call actually
+consumes 26Kbps!  I think the protocol sends 60 bytes of data per packet,
+and when you add UDP headers, and IP frames, the overheads greatly exceed
+the amount of data!  [It's ironic that the argument against IP on ATM is
+the penalty of splitting IP datagrams into lots of little ATM cells.]  On
+slow links (less than 2Mbps) further compression is used which brings the
+bandwidth down to 13Kbps.  I remember the number 5Kbps being bandied
+around, too, but I don't recall how.
+
+VoIP requires data to be delivered quickly and reliably.  If the packets
+are delivered in less than 200ms the quality is about the same as for the
+normal telephone network.  Delays up to 600ms (I wish I wrote these numbers
+down) are like talking over a satelite link; you need to talk, then pause
+to let the other person talk.  When you add up how long it takes to convert
+speech to data, and to so and so forth, until it gets to the other end, the
+total time is about 90ms plus trip time, which just about makes VoIP to USA
+workable.
+
+If the packets cannot be delivered quickly, there's no point delivering
+them at all.  VoIP uses the IP Type of Service field to identify the voice
+data so that routers can give them high priority.  Only authorised hosts
+are permitted to set the TOS and the gateways strip these bits from IP
+headers from unauthorised hosts.
+
+There are issues relating to network performance, and if the network is
+too busy to handle the call it should be rejected (and the PABX should fall
+back to the expensive PSTN line.)  This is apparently another "work in
+progress" issue, the final solution to which is still being worked out.
+
+AARNet is using this service now.  It supports voice and fax.  Fax works by
+using DSP (digital signal processors) to decode the fax signal and turn it
+back to data; the data is sent through the network and turned back into
+"fax" at the other end.  Modem calls are not support (although there is no
+reason why they couldn't be handled the same way fax is) and neither is
+ISDN video.  [Pooh!]
+
+One lovely benefit is end-to-end Q.sig, which the government has been
+unsuccessfully trying to get carriers to support for years.  Suppose you
+try to call somebody and they are on a call.  Q.sig allows you to dial a
+code and hang up, and when their call completes your telephone rings.  When
+you pick it up their telephone rings and you are thus connected to them.
+This feature is available on PABXs, but it's not available over the PSTN.
+VoIP gives you this ability end to end.
+
+Billing is really easy.  A billing system was written in Perth, and I we
+were told the URL, <A HREF="http://timtam.aarnet.edu.au.">http://timtam.aarnet.edu.au.</A>  The system currently
+handles thousands of calls per day.  Long distance calls using VoIP cost
+around 1/10th of a cent per minute; much cheaper than the PSTN.
+
+This was a very interesting seminar and you should kick yourself--very
+roughly--if you missed it!
+
+......................................................................
+
+                            comp.talk.ietf
+
+The 47th meeting of the Internet Engineering Task Force is occuring in
+Adelaide from 26 until 31 March.  The meeting collected togeth the people
+that have built the Internet.
+
+Some attendees at the meeting have graciously offered to give one hour free
+presentations to computer scientists, students and the public.
+
+The times and locations of the remaining seminars are:
+
+Wednesday 29th, 12 - 1pm
+
+   Measuring Internet performance
+   Matt Zekauskas, Advanced Network & Services
+   Horace Lamb lecture theatre, Horace Lamb Building
+
+Thursday 30th, 12 - 1pm
+
+   IP version 6
+   Bob Fink, Lawrence Berkeley National Laboratory
+   Horace Lamb lecture theatre, Horace Lamb Building
+
+Friday 31st, 12 - 1pm
+
+   To be announced
+   Horace Lamb lecture theatre, Horace Lamb Building
+
+Organised by the Department of Computer Science at The University of
+Adelaide and by the Australian Academic and Research Network.  We thank the
+presenters and the IETF.
+Enquiries to Glen Turner, email: <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>, tel: (08) 8303 3936.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

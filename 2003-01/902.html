@@ -1,0 +1,123 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Bus Error on running XMMS" -->
+<!-- FromName="'George Patterson'" -->
+<!-- FromEmail="george@visp.com.au" -->
+<!-- ToName="'Daryl Tester'" -->
+<!-- ToEmail="Daryl.Tester@iocane.com.au" -->
+<!-- Date="Tue, 21 Jan 2003 13:51:07 +1030" -->
+<!-- Id="20030121135107.2b760fcd.george@visp.com.au" -->
+<!-- Reference="20030121121344.04d621aa.george@visp.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Bus Error on running XMMS</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: George Patterson &lt;<I><A HREF="mailto:george@visp.com.au">george@visp.com.au</A></I>&gt;
+  To  : Daryl Tester &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  Date: Tue, 21 Jan 2003 13:51:07 +1030
+</PRE>
+<H1>Re: Bus Error on running XMMS</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, 21 Jan 2003 12:46:46 +1030
+"Daryl Tester" &lt;<A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A>&gt; wrote:
+
+&gt; "George Patterson" &lt;<A HREF="mailto:george@visp.com.au">george@visp.com.au</A>&gt; wrote:
+&gt; 
+&gt; &gt; I suspect that it
+&gt; &gt; could be a library problem, but I am having trouble reading the
+&gt; &gt; output of gdb... or thinking of another approach to the problem.
+&gt; 
+&gt; "bt" to generate a backtrace under gdb (although without symbols,
+&gt; the output probably isn't going to mean much).  Another method
+&gt; would be to strace the executable (e.g. - "strace /bin/ls"), capture
+&gt; the (voluminous) output, and see what it's doing when it dies.
+&gt; 
+&gt; &gt; OS: FreeBSD
+&gt; 
+&gt; Bugger.  I don't know what the FreeBSD equivalent of strace is.
+&gt; Hopefully, "strace".  :-)
+
+Under FreeBSD, strace is called strace. :-P But needed to be installed
+from the ports collection.
+
+But seriously the following is the last forteen lines of the strace run.
+
+sigprocmask(SIG_SETMASK, NULL, [])      = 0
+__sysctl([kern.clockrate], 2,
+"d\0\0\0\20\'\0\0\5\0\0\0\200\0\0\0\0\4\0\0", [20], NULL, 0) = 0
+getdtablesize()                         = 1879
+break(0x8136000)                        = 0
+break(0x813a000)                        = 0
+break(0x813b000)                        = 0
+fcntl(0, F_SETFL, O_RDWR|O_NONBLOCK)    = 0
+fcntl(1, F_SETFL, O_RDWR|O_NONBLOCK)    = 0
+fcntl(2, F_SETFL, O_RDWR|O_NONBLOCK)    = 0
+getpid()                                = 58731 (ppid 58730)
+sigaction(SIGUSR2, {0x2844f294, ~[], SA_RESTART|SA_SIGINFO}, NULL) = 0
+sigaction(SIGUSR1, {0x2844f294, ~[], SA_RESTART|SA_SIGINFO}, NULL) = 0
+--- SIGBUS (Bus error) ---
+--- SIGBUS (Bus error) ---
+
+Reading through the output...
+
+Something interesting though, Xmms is perform the following several
+times  for other share libraries...
+
+access("/usr/X11R6/lib/libintl.so.4", F_OK) = -1 ENOENT (No such file or
+directory)
+access("/usr/lib/libintl.so.4", F_OK)   = -1 ENOENT (No such file or
+directory)
+access("/usr/lib/compat/libintl.so.4", F_OK) = -1 ENOENT (No such file
+or directory)
+access("/usr/X11R6/lib/libintl.so.4", F_OK) = -1 ENOENT (No such file or
+directory)
+access("/usr/local/lib/libintl.so.4", F_OK) = 0
+
+Xmms appears to be searching for the library libintl.so.4 in different
+locations and eventually locates it.
+
+One curious line is
+readlink("/etc/malloc.conf", 0xbfbff934, 63) = -1 ENOENT (No such file or directory)
+malloc.conf doesn't exists anywhere on this machine.
+
+Regards
+
+
+George Patterson
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

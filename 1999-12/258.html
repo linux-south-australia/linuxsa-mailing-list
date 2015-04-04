@@ -1,0 +1,106 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Mail Filtering" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Mark Collis" -->
+<!-- ToEmail="markc@trinity.sa.edu.au" -->
+<!-- Date="Mon, 13 Dec 1999 11:03:30 +1030" -->
+<!-- Id="19991213110330.A38581@atdot.dotat.org" -->
+<!-- Reference="4.2.2.19991213100438.00a5c350@mail" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Mail Filtering</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Mark Collis &lt;<I><A HREF="mailto:markc@trinity.sa.edu.au">markc@trinity.sa.edu.au</A></I>&gt;
+  Date: Mon, 13 Dec 1999 11:03:30 +1030
+</PRE>
+<H1>Re: Mail Filtering</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Dec 13, 1999 at 10:05:46AM +1030, Mark Collis wrote:
+
+ &gt; Thanks for the info but what I actually meant was how do you set up to act 
+ &gt; as the role of the ISP.  I have already configured machines to get their 
+ &gt; email from an ISP.
+
+Ah, that's different :-)
+
+Get a second SMTP server for dial-on-demand mail.  Configure it so that
+it only runs its queue every 24 hours (use "sendmail -bd -q24h" at
+boot-time)
+
+For each domain served by dial-on-demand, set up its MX records like this:
+
+     domain.com.au.		IN	MX	10 mail.domain.com.au.
+				IN	MX	50 mail-dod.isp.net.au.
+
+(i.e.: the highest priority MX is the customer's own mail server, but
+if that's unreachable (because they aren't logged in) use your 
+dial-on-demand SMTP server).
+
+When customers login, they need to send "ETRN domain.com.au" to
+the SMTP port on mail-dod.isp.net.au.  That will cause its SMTP 
+server to start attempting to deliver any mail destined for
+<A HREF="mailto:username@domain.com.au">username@domain.com.au</A>, leaving any mail which doesn't match that
+description alone.
+
+Why do you need a second SMTP server?  Because DoD mail may sit in 
+the queue for many days in an undeliverable state.  It takes roughly 
+60 seconds for a mail server to work out that a DoD customer is 
+unreachable ('cos they're not logged in).
+
+Let's say you have 2000 messages in your queue waiting for DoD delivery.
+Each one takes 60 seconds to time-out when your mail server tries to send
+them, that means a queue run takes 2000 minutes...
+
+... which is a shame if you're running the queue every 30 or 60 minutes
+(which is the normal way of doing it):  You'll end up creating a situation
+where the load on the machine gradually increases, never catching up with
+the work it's supposed to be doing, until you reboot it.
+
+So, use a second machine.  Run the queue on it less often (it still needs
+to run so that old messages will bounce, but it doesn't need to run
+every 30 minutes like the way it usually does).
+
+    - mark
+
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

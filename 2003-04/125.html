@@ -1,0 +1,148 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: strange nforce2 and mandrake 9.1 problems" -->
+<!-- FromName="'Rick Harris'" -->
+<!-- FromEmail="rickharris@mightylegends.zapto.org" -->
+<!-- ToName="'Damien Uern'" -->
+<!-- ToEmail="carrigan_2606@optusnet.com.au" -->
+<!-- Date="06 Apr 2003 11:00:41 +0930" -->
+<!-- Id="1049592641.2940.38.camel@SCOOBY.localnet" -->
+<!-- Reference="200304051523.50392.carrigan_2606@optusnet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: strange nforce2 and mandrake 9.1 problems</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Rick Harris &lt;<I><A HREF="mailto:rickharris@mightylegends.zapto.org">rickharris@mightylegends.zapto.org</A></I>&gt;
+  To  : Damien Uern &lt;<I><A HREF="mailto:carrigan_2606@optusnet.com.au">carrigan_2606@optusnet.com.au</A></I>&gt;
+  Date: 06 Apr 2003 11:00:41 +0930
+</PRE>
+<H1>Re: strange nforce2 and mandrake 9.1 problems</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hmm..sounds like you've already made up your mind as to what it is, so
+why ask ?
+
+Re-assurance & agreeance from other parties perhaps ?
+
+Anyway, you could try 'renice' & 'nice' to give your burning process
+lower cpu priority & your program that is queuing a higher priority.
+The queued program will open but just stand back while those toasted
+coasters fly.
+
+Btw, having a shit hot CPU doesn't mean jack if the motherboard handles
+the data poorly. The same CPU on different motherboards will behave very
+differently.
+
+Having said that, it may also be a misconfiguration in the kernel that
+could be causing a performance hit. Note that the nForce2's IDE
+controller on linux, works in compatibility mode by default (no DMA) but
+needs a kernel patch for nearly full performance. This will give you one
+massive performance boost. Check your current HD speeds with a
+'hdparm -Tt /dev/hd(X)' - X being your hard drive letter.
+
+Then apply the nforce2 patch available here -&gt;
+<A HREF="http://home.t-online.de/home/Johannes.Deisenhofer/nforce2ide.diff">http://home.t-online.de/home/Johannes.Deisenhofer/nforce2ide.diff</A>
+
+Re-compile your kernel, boot into it & then compare the previous speeds
+with another 'hdparm -Tt /dev/hd(X)'
+
+Currently the patch will only take you up to UDMA-100. The chipset
+supports up to UDMA-133, and this is being worked on apparently.
+
+Good luck,
+Regards,
+Rick
+
+On Sat, 2003-04-05 at 23:35, Damien Uern wrote:
+&gt; On Sat, 5 Apr 2003 11:15 pm, Rick Harris wrote:
+&gt; &gt; On Sat, 2003-04-05 at 21:45, Damien Uern wrote:
+&gt; &gt; &gt; On Sat, 5 Apr 2003 08:50 pm, Brian Marr wrote:
+&gt; &gt; &gt; &gt; I moved away from the nvaudio driver on this Suse box when I got a
+&gt; &gt; &gt; &gt; kernel panic. Alsa has proved a better option.. Still using the nvnet
+&gt; &gt; &gt; &gt; module for networking though.
+&gt; &gt; &gt; &gt; Brian Marr
+&gt; &gt; &gt;
+&gt; &gt; &gt; I am using ALSA, I don't think NVIDIA supply an audio driver for the
+&gt; &gt; &gt; nforce2. This machine is running a whole bunch of binary drivers: Lucent
+&gt; &gt; &gt; Winmodem, Nvidia Network Card, and Nvidia Geforce 3 card.
+&gt; &gt; &gt;
+&gt; &gt; &gt; Btw I just tried unloading the nvnet driver and it makes no difference
+&gt; &gt; &gt; with the burning problem. Haven't gotten another kernel panic yet though.
+&gt; &gt; &gt; I can reproduce the burning problem consistently:
+&gt; &gt; &gt;
+&gt; &gt; &gt; 1) Start burning something in k3b, e.g. an iso
+&gt; &gt; &gt; 2) Attempt to start any fullscreen game, e.g. frozen-bubble
+&gt; &gt; &gt;
+&gt; &gt; &gt; At this point the game will not start, although it will be in the process
+&gt; &gt; &gt; list. If you attempt to kill said process it will not die, however the
+&gt; &gt; &gt; request to kill seems to be queued and the program ends up dying once the
+&gt; &gt; &gt; burning is finished.
+&gt; &gt; &gt;
+&gt; &gt; &gt; 3) wait til burning finishes, or cancel the burning
+&gt; &gt; &gt;
+&gt; &gt; &gt; At the very instant the burning stops, frozen-bubble will come up.
+&gt; &gt; &gt;
+&gt; &gt; &gt; This is the strangest problem I have ever seen. How on earth is burning
+&gt; &gt; &gt; and switching to fullscreen mode related?
+&gt; &gt;
+&gt; &gt; This is quite normal & is not specific to switching to fullscreen.
+&gt; &gt; Rather, the CD burning process takes precedence over all other CPU
+&gt; &gt; intense activities. Hence the queuing.
+&gt; &gt; This is needed to ensure the fifo buffer is kept topped up with data
+&gt; &gt; while the burning process is happening, & so ensure (to a certain
+&gt; &gt; extent) that you won't have a failed burn.
+&gt; &gt;
+&gt; &gt; Regards,
+&gt; &gt; Rick
+&gt; &gt;
+&gt; 
+&gt; This is an athlon XP 2100+. I could play quake 3 arena and the buffer would 
+&gt; still remain full. I do not have such problems on my home computer (1.4 
+&gt; Athlon), however I installed Mandrake 9.0 initially and upgraded to 9.1. The 
+&gt; computer with the burning problem was installed with mdk 9.1 only.
+&gt; 
+&gt; How can I disable this "feature"? I am still not convinced this is a feature. 
+&gt; As cannon-smash loaded and was playable with no problems (high frame rate 
+&gt; too). Open office loaded and was fine (surely launching that beast uses some 
+&gt; CPU). On my home computer with mdk 9.1 I can do jus
+
+A fanatic is one who can't change his mind and won't change the
+subject.
+                -- Winston Churchill
+
+
+<A HREF="125_signature.asc">signature.asc</A>
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,132 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="odd behaviour of BIND 9.1" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 8 May 2001 21:23:54 +0930" -->
+<!-- Id="20010508212354.A9403@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: odd behaviour of BIND 9.1</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 8 May 2001 21:23:54 +0930
+</PRE>
+<H1>odd behaviour of BIND 9.1</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Possible BIND 9.1. cache error problem.
+
+I'd be interested to know if anyone understands why
+the following apparent problem with BIND 9.1 happens.
+
+For a while, I was finding that anyone who tried to send me
+e-mail from an address like <A HREF="mailto:zzz@bigpond.com">zzz@bigpond.com</A> generated these sorts
+of messages in the /var/log/mail file (on a SuSE 7.1 system).
+
+=================================================================
+May  8 18:58:24 dog sendmail[8344]: f489S3s08344: ruleset=check_mail, arg1=&lt;<A HREF="mailto:zzz@bigpond.com">zzz@bigpond.com</A>&gt;, relay=[139.134.6.21], reject=451 4.1.8 &lt;<A HREF="mailto:zzz@bigpond.com">zzz@bigpond.com</A>&gt;... Domain of sender address <A HREF="mailto:zzz@bigpond.com">zzz@bigpond.com</A> does not resolve
+
+May  8 18:58:24 dog sendmail[8344]: f489S3s08344: from=&lt;<A HREF="mailto:zzz@bigpond.com">zzz@bigpond.com</A>&gt;, size=2013, class=0, nrcpts=0, proto=ESMTP, daemon=MTA, relay=[139.134.6.21] 
+=================================================================
+
+This is a little surprising, because bigpond.com is not the kind of domain
+you'd expect to disappear off the DNS. 
+So I tried nslookup, and got this sort of thing.
+
+=================================================================
+dog /etc/rc.d# nslookup bigpond.com
+Note:  nslookup is deprecated and may be removed from future releases.
+Consider using the `dig' or `host' programs instead.  Run nslookup with
+the `-sil[ent]' option to prevent this message from appearing.
+Server:         203.38.148.51
+Address:        203.38.148.51#53
+
+** server can't find bigpond.com.: SERVFAIL  
+=================================================================
+
+Well, that could be just a failure of my very own DNS server.
+Or it could be caused by "nscd" - but that's not even running.
+So I tried some other servers:
+
+=================================================================
+dingo /usr/src&gt; nslookup - ns1.telstra.net
+Default Server:  ns1.telstra.net
+Address:  203.50.0.24
+
+&gt; bigpond.com
+Server:  ns1.telstra.net
+Address:  203.50.0.24
+
+*** ns1.telstra.net can't find bigpond.com: Non-existent host/domain
+&gt; topology.org
+Server:  ns1.telstra.net
+Address:  203.50.0.24
+
+Name:    topology.org
+Address:  203.48.2.140
+=================================================================
+
+Well, even the telstra DNS server doesn't find bigpond.com.
+But several other nameservers on the net _do_ resolve bigpond.com.
+So I checked that they haven't forgotten to renew their domain
+name registration. No problem there. They're a few years ahead.
+
+So I tried giving the HUP to my "named" processes.
+No change.
+
+Finally, I killed my "named" and started it up fresh.
+And now everthing is fine.
+
+Conclusion:
+BIND 9.1 probably has a problem!!!
+
+And my guess is that Telstra's name server has the same problem.
+But I'm not going to tell them because they haven't got back to me
+to fix up problems with their secondary name service for my domain names.
+
+Does anyone know any more about this?
+I really don't want to go scouring all over the net looking
+for snippets and clues about this.
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

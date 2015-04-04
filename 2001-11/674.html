@@ -1,0 +1,114 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: awk syntax: combining 2 files with 'if' statements" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Peter Clifford'" -->
+<!-- ToEmail="peter.clifford@adelaide.edu.au" -->
+<!-- Date="Thu, 22 Nov 2001 17:04:38 +1030" -->
+<!-- Id="3BFC9C7E.A7BA3F18@aarnet.edu.au" -->
+<!-- Reference="b5b3a8d7.a8d7b5b3@adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: awk syntax: combining 2 files with 'if' statements</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Peter Clifford &lt;<I><A HREF="mailto:peter.clifford@adelaide.edu.au">peter.clifford@adelaide.edu.au</A></I>&gt;
+  Date: Thu, 22 Nov 2001 17:04:38 +1030
+</PRE>
+<H1>Re: awk syntax: combining 2 files with 'if' statements</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Peter Clifford wrote:
+&gt; 
+&gt; i want to use awk (since i am quite enjoying learning it) to do a
+&gt; statement which is something like:
+&gt; if filename (from file1) = filename (from file2) AND station name
+&gt; (file1) = station name (file2)
+&gt; then
+&gt; add $3 (file1) to file2 ($11 would do)
+
+There are two solutions, depending if you want to hold
+the files in main memory or not (which in turn depends
+upon the size of the files).  They are sketched below.
+
+1) Classic "tape merge"
+
+Sort the two files on $3 using the system sort command.
+Merge the two sorted files with $3 as the key, see Knuth
+v3 Algorithm M "two-way merge".
+
+2) Build associative array, write array at end
+
+Use $3 as the key to an associative array.
+
+example.awk contains
+&gt; BEGIN {
+&gt;   while (getline &lt;file1.txt &gt; 0) {
+&gt;     remember[$3] = $10
+&gt;   }
+&gt; 
+&gt; {
+&gt;   if ($3 in remember) {
+&gt;     print $0, remember[$3]
+&gt;   }
+&gt; }
+invoked with
+awk -f example.awk file2.txt
+
+&gt; Just went to the computer science department here at uni
+&gt; and talked to random people to see if they could help me
+&gt; out (including their IT support)....no go. (no offensive
+&gt; if the IT support for the CS department are on this list).
+
+The IT support people are system adminstration experts,
+not computer programming experts.  As far as I know
+Comp Sci don't run a formal "consulting" programme
+for uni staff where people can get access to a staff
+member for 30 minutes, although I've always found them
+happy to help.
+
+Best wishes,
+Glen
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

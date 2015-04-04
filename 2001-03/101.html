@@ -1,0 +1,128 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="etsa-caused ls process loop" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 4 Mar 2001 05:26:27 +1030" -->
+<!-- Id="200103031856.FAA10878@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: etsa-caused ls process loop</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 4 Mar 2001 05:26:27 +1030
+</PRE>
+<H1>etsa-caused ls process loop</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+This is a really nasty looking problem.
+
+It all started with multiple failures of ETSA (or whatever it's called
+now) to deliver electricity to my house - sometimes because
+they wanted to seel it at a higher price interstate, sometimes
+because a truck hit a stobie pole 100 metres from my house,
+as it did a couple of days ago.
+
+Whenever the electricity fails, a whole bunch of system log files
+go into a very funny state where the "ls" command comes up with
+question marks where there should be file permissions etc.
+
+Well, this time it's much worse than that.
+This time I run "ls -l" or "ls -rt" on a directory full of
+log files, and I find that the processes go into an
+infinite loop.
+
+Here's what it looks like in "top":
+
+=================================================================
+66 processes: 62 sleeping, 4 running, 0 zombie, 0 stopped
+CPU states:  5.0% user, 94.7% system,  0.0% nice,  0.5% idle
+Mem:   14652K av,  13284K used,   1368K free,  13540K shrd,    312K buff
+Swap:  33228K av,  10684K used,  22544K free                  3156K cached
+
+  PID USER     PRI  NI  SIZE  RSS SHARE STAT  LIB %CPU %MEM   TIME COMMAND
+10827 akenning  20   0   300  300   240 R       0 47.8  2.0   1:15 ls
+10809 akenning  20   0   244  244   184 R       0 39.6  1.6   3:24 ls      
+....
+=================================================================
+
+The two "ls" commands have completely locked.
+Even "kill -9" doesn't work on them.
+
+And the /var/log/messages file gives this:
+
+=================================================================
+Mar  4 05:12:20 dog kernel: EXT2-fs error (device 03:40): ext2_free_blocks: Freeing blocks not in datazone - block = 1109861925, count = 1
+Mar  4 05:12:20 dog kernel: EXT2-fs error (device 03:40): ext2_free_blocks: Freeing blocks not in datazone - block = 1513775231, count = 1
+Mar  4 05:12:20 dog kernel: EXT2-fs error (device 03:40): ext2_free_blocks: Freeing blocks not in datazone - block = 671089470, count = 1
+Mar  4 05:12:20 dog kernel: EXT2-fs error (device 03:40): ext2_free_blocks: Freeing blocks not in datazone - block = 671088640, count = 1
+Mar  4 05:12:20 dog kernel: EXT2-fs error (device 03:40): ext2_free_blocks: Freeing blocks not in datazone - block = 1157627904, count = 1 
+
+etc. etc. etc. etc.
+=================================================================
+
+After the previous ETSA failure (about 6 weeks earlier, on 13 Jan 2001),
+the messages were not so serious, and "ls -l" did work.
+
+Clearly this time the file system is even more badly damaged.
+
+Questions:
+1.	Can anyone tell me how to stop those "ls" processes apart
+	from re-booting?
+2.	Can anyone tell me how to repair the file system, apart
+	from just running "fsck" and using the "trial and error" method?
+
+The OS is RH 5.2 with kernel 2.0.36.
+This might be the final nail in the coffin of this old system.
+Old "dog" may have to be retired!
+
+Cheers,
+Alan Kennington.
+
+--------------------------------------------------------------------
+    name: Dr. Alan Kennington
+  e-mail: <A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>
+ website: <A HREF="http://topology.org/">http://topology.org/</A>
+    city: Adelaide, South Australia
+  coords: 34.88051 S, 138.59334 E
+timezone: UTC+1030 <A HREF="http://topology.org/timezone.html">http://topology.org/timezone.html</A>
+ pgp-key: <A HREF="http://topology.org/key_ak2.asc">http://topology.org/key_ak2.asc</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

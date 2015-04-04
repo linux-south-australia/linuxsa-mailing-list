@@ -1,0 +1,150 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: zombie shared memory segments??!" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="Mark Newton" -->
+<!-- ToEmail="newton@atdot.dotat.org" -->
+<!-- Date="Tue, 9 May 2000 15:47:03 +091800" -->
+<!-- Id="20000509154703.A31925@dog.topology.org" -->
+<!-- Reference="20000509084559.A27184@atdot.dotat.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: zombie shared memory segments??!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  Date: Tue, 9 May 2000 15:47:03 +091800
+</PRE>
+<H1>Re: zombie shared memory segments??!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, May 09, 2000 at 08:45:59AM +0930, Mark Newton wrote:
+&gt; 
+&gt; Two points:  Yes, almost every program uses shared memory in some
+&gt; way (for example, using mmap() to map shared libraries into an 
+&gt; executable's address space), but all uses of shared memory don't
+&gt; have the problem which you're alluding to.
+
+Golly. Now there are _two_ complete systems of shared memory.
+And then there's some POSIX API for shared memory which I've found
+in other people's source. That's 3 systems!
+(The Posix API is flagged by thecpp macros: 
+_POSIX_SHARED_MEMORY_OBJECTS and _POSIX_SEMAPHORES.)
+Just when I was coming to grips with the first system....
+
+&gt; The words "never" and "irretrievably" are where you're going wrong
+&gt; at the moment -- The "ipcs" command can list SysV shared memory 
+&gt; segments, "ipcrm" can delete shared memory segments which you think
+&gt; aren't in use anymore.
+
+Great. I tried that. The "ipcs" and "ipcrm" weren't referenced by the
+man-manuals that I looked at. Nor were they in the Bach Unix book.
+The "ipcs" command shows much less shared memory than the "top" command.
+And now you've explained it - there's more than one shared memory
+system going on! 
+One operating system, two or more shared memory systems.
+
+&gt; Not so -- Firstly, there are kernel limits on the amount of SysV
+&gt; shared memory segments which are smaller than the amount of physical
+&gt; RAM, and secondly shared memory is paged-in and paged-out just like
+&gt; any other memory:  You seem to be under the misconception that 
+&gt; shared memory segments are somehow wired in to physical memory, 
+&gt; but I can assure you that they are not.  Assuming your kernel is
+&gt; configured appropriately, there's nothing stopping you from allocating
+&gt; 128 Mbytes of shared memory on a 64 Mbyte system.
+
+The documentation(s) had explained that only superuser can lock down
+shared memory. This would obviously be useful for speeding up software
+a bit. I was worried, though, that a runaway process could use up
+the swap space, which obviously is also finite.
+
+&gt; And, again, bear in mind that the discussion above only covers SysV
+&gt; shared memory.  The BSD shared memory API (mmap(), mprotect(), madvise(),
+&gt; etc) works in the way you'd expect a UNIX resource to work, and benefits
+&gt; from a much better design (lower system call overhead, automatic
+&gt; deallocation, and so on).
+
+This suggests very much that I should be using mmap() etc. for an Apache
+module.
+That makes me wonder though, why did the other writers of "throttle"
+modules decide to use System V IPC.
+If you're sure that something is right on logical grounds, but 
+everybody else is doing the opposite, it's difficult to hold on
+to your own ideas. Not all Galileos get it right.
+
+&gt;  &gt; PS. On the subject of the worm/virus "iloveyou",
+&gt;  &gt; what I'd like to know is why people (e.g. reporters)
+&gt;  &gt; do not immediately point the finger at Microsoft.
+&gt; 
+&gt; Because Microsoft is so good at muddying the waters.  Bill Gates 
+&gt; contributed to this yesterday by releasing a statement calculated
+&gt; to capitalize on the irrational hysteria which has built up over
+&gt; the ILOVEYOU virus, saying that the world could expect more viruses
+&gt; if the company was broken up.
+
+This is what Hitler did. If he was going to invade Poland, he would
+accuse Poland of planning to invade Germany.
+Goebbels always said that you should never tell a _small_ lie,
+because people will look at the details.
+If you tell a big lie, your enemy won't know where to start.
+
+&gt; Non-sequiturs make me eat lampshades.
+
+I agree.
+I often have to run over the radio to change station because
+interviewees often talk such total rubbish, and the reporters
+don't have enough background to challenge the interviewee.
+And the general public just swallow it all.
+I just mumble "I _hate_ bad logic.", and write a counterblast
+on my web site.
+
+Anyway,
+many thanks for the info (to the other 2 respondents too).
+Cheers,
+Alan Kennington.
+
+PS. If anyone wants to know how the latest virus is
+being seen in the Philippine press, go to this Philippine
+web site: <A HREF="http://www.inquirer.net/">http://www.inquirer.net/</A>
+
+PPS. Another problem:
+My search of the manuals indicates no info on how to do
+safe concurrent access to the mmap() BSD style of shared memory.
+Now that I've learned up on SVR4 style memory sharing, maybe
+I'd better stick to that, because it at least I've found
+the manuals for doing semaphores for that.
+So much to learn - so few decades to learn it in!
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

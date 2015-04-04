@@ -1,0 +1,141 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IPv6 activity in Adelaide?" -->
+<!-- FromName="'David de Groot'" -->
+<!-- FromEmail="david@viking.org.au" -->
+<!-- ToName="'Evan Bourlotos'" -->
+<!-- ToEmail="evan@cs.adelaide.edu.au" -->
+<!-- Date="Sun, 2 Mar 2003 12:27:39 +1030" -->
+<!-- Id="58DB526E-4C52-11D7-AF96-003065FAEBB6@viking.org.au" -->
+<!-- Reference="3.0.1.32.20030302115346.01554150@rosemary.cs.adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IPv6 activity in Adelaide?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David de Groot &lt;<I><A HREF="mailto:david@viking.org.au">david@viking.org.au</A></I>&gt;
+  To  : Evan Bourlotos &lt;<I><A HREF="mailto:evan@cs.adelaide.edu.au">evan@cs.adelaide.edu.au</A></I>&gt;
+  Date: Sun, 2 Mar 2003 12:27:39 +1030
+</PRE>
+<H1>Re: IPv6 activity in Adelaide?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sunday, Mar 2, 2003, at 12:23 Australia/Adelaide, Evan Bourlotos 
+wrote:
+&lt;major snippage&gt;
+&gt; I'd be more than interested in any local developments people have done 
+&gt; and
+&gt; a lot of the nitty gritty stuff like distro used their war stories etc.
+&gt;
+
+Well, my encounters are as follows:
+
+I have a small network of various pieces of hardware at home. So far, 
+I've got most of it on IPv6 (but also dual-stacked on IPv4).
+
+OS/Distros are as follows:
+
+OpenBSD 3.2 i386
+Windows 2000 SP3
+SuSE Linux 7.2 and 8.1
+MacOS X 10.2.3 (and now 10.2.4)
+
+Things not on my IPv6 net just yet:
+
+Solaris 8 x86
+Cisco 2503 access router. (I suspect it doesn't have enough flash/RAM 
+to handle an IP6 aware IOS).
+Mac IIci running NetBSD 1.6
+A couple of other PCs not currently running ;)
+
+What I did:
+
+I started out just enabling IPv6 in the kernel on the SuSE 7.2 machine 
+(as I'd compiled a new kernel a while back minus IPv6 support).
+
+The Mac OS X box already supported IPv6, as did the OpenBSD machine.
+
+I downloaded the Win2k tech preview for IPv6 and installed it. (I later 
+downloaded a modified version for SP3 which works better).
+
+Initially I just played around with link addresses seeing if I could 
+ping6 another machine on the wire.
+
+Bolstered by my initial successes, I implemented Site addressing using 
+the fed0::/16 block and subnetting that into three /64 networks. (as I 
+have three distinct networks at home, routed by the central Linux box 
+with 3 interfaces in it).
+
+I configured radvd on the central linux machine to advertise the three 
+subnets I'd chosen. All the IP6 aware hosts assigned themselves 
+addresses in the relevant subnets as per the router advertisements.
+
+I configured AAAA records (and PTR records) in my DNS (a SuSE supplied 
+bind 8 that has been patched by SuSE for IPv6), for the Site addresses 
+using a separate domain.
+
+I then modified inetd.conf for a couple of services to use "tcp6" as 
+the protocol rather than "tcp". I also modified /etc/nsswitch.conf to 
+use "files dns6"  instead of "files dns" for the "hosts" and "networks" 
+fields.
+
+Tests showed I could ssh, telnet, ping6 between subnets and to my main 
+linux machine.
+ssh needed to be recompiled to support IPv6 both on the linux machine 
+and MacOS X (but not on OpenBSD).
+
+However, Site addressing is not meant to be routed on the 6bone (like 
+private addressing in IPv4).
+
+So my next step was to get me some real world addresses. I chose the 
+tunnel broker: www.freenet6.net  and got a /48 subnet routed over my 
+6to4 tunnel.
+
+Then it was just a matter of modifying radvd.conf, adding a couple of 
+zones on my name server and a "default" route on the linux machine 
+(2000::/3 -&gt; openbsd box (which is the tunnel terminator).
+
+I'm now looking at converting to Bind9 so I can have a DNS server 
+listening on my IPv6 addresses (bind8 doesn't seem to).
+
+Dave
+-- 
+David de Groot
+ICQ: 38962228 / 1315031     AIM: dadegroot
+MSN: <A HREF="mailto:beelzebub@vikings.homeip.net">beelzebub@vikings.homeip.net</A>
+Web: https://www.vikings.homeip.net/~david/
+IPv6 Web: <A HREF="http://">http://</A>[3ffe:b80:1b72:2::10]/
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

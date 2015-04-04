@@ -1,0 +1,87 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PPP and compression and 56kbps modems" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@adelaide.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 09 Aug 1999 11:46:30 +0000" -->
+<!-- Id="37AEBF96.CF01A869@adelaide.edu.au" -->
+<!-- Reference="Pine.BSF.3.96.990809130045.1894D-100000@augustus.tellurian.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PPP and compression and 56kbps modems</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@adelaide.edu.au">glen.turner@adelaide.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 09 Aug 1999 11:46:30 +0000
+</PRE>
+<H1>Re: PPP and compression and 56kbps modems</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Modem error correction latency *is* high.  The modem doesn't
+know where the packet boundary is, so it has to timeout
+before transmitting.  Result is dreadful TTY echo times
+when using modem-based error correction.  Very noticable
+on the old slower error correcting modems.  Probably
+not significant at modern data rates, as the frame
+assembly timeout would be at most (128/36000), or
+&lt;0.08S of the time to echo a single character.
+
+Conversely, most PPPs won't do error correction.  Unless
+things have improved recently, they will at best swallow
+errored packets and wait for TCP or the UDP application
+to retransmit.  The Linux code seems to swallow frames;
+see ppp_tty_receive() in drivers/net/ppp.c.
+
+So there's a trade-off here.  If you have a noisy (say,
+international) line and are doing file transfers, then
+turn on modem-based error correction.  If you are
+playing Quake, then leave it off.
+
+
+On the other Q, the compression techniques are roughly the
+same for modems and GZIP (RLE plus LZW-style Huffman coding).
+GZIP will perform better as it (1) can build a larger dictionary
+as it sees more than 128B at a time, and (2) isn't confused
+by multiple unrelated data streams, such as UDP headers
+and multiple TCP flows.
+
+-- 
+ Glen Turner                               Network Specialist
+ Tel: (08) 8303 3936          Information Technology Services
+ Fax: (08) 8303 4400         The University of Adelaide  5005
+ Email: <A HREF="mailto:glen.turner@adelaide.edu.au">glen.turner@adelaide.edu.au</A>           South Australia
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

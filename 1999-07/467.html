@@ -1,0 +1,122 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: screen and PTY ?" -->
+<!-- FromName="John" -->
+<!-- FromEmail="john@fiend.securesys.com.au" -->
+<!-- ToName="Gaelyne Gasson" -->
+<!-- ToEmail="gaelyne@videocam.net.au" -->
+<!-- Date="Sat, 17 Jul 1999 04:26:19 +0930 (CST)" -->
+<!-- Id="199907161856.EAA13183@fiend.securesys.com.au" -->
+<!-- Reference="14222.64911.645302.731842@helga.videocam.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: screen and PTY ?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: John &lt;<I><A HREF="mailto:john@fiend.securesys.com.au">john@fiend.securesys.com.au</A></I>&gt;
+  To  : Gaelyne Gasson &lt;<I><A HREF="mailto:gaelyne@videocam.net.au">gaelyne@videocam.net.au</A></I>&gt;
+  Date: Sat, 17 Jul 1999 04:26:19 +0930 (CST)
+</PRE>
+<H1>Re: screen and PTY ?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Could someone tell me the relationship between "screen" and "pty's" ?
+
+	Background info:
+
+	/dev/is filled with a bunch of files like /dev/tty?? or /dev/pty??.
+	Ptys and ttys are linked like a pipe (actually, it's a stream, but 
+	don't worry about that): for each tty there is a corresponding pty.
+	Data written in the pty end gets read out the tty end of the stream,
+	and vice-versa.
+
+	At the pty end of the stream, there is either a network connection,
+	a terminal driver (the code that talks to the video card on your
+	machine), X windows, or something like the screen command.
+
+	At the tty end of the stream sits the application program: your
+	shell, mail program, text editor, whatever.
+
+	The purpose of the stream is to process any data that passes 
+	through it. The keystrokes from your keyboard are fed into the
+	pty. The stream does a number of things: it buffers your data
+	(so it isn't fed to the application at the tty end until you 
+	hit 'enter'), it watches for backspace characters or ctrl-u
+	characters, and uses these to delete (all) characters from
+	the buffer), and it converts  some characters into unix signals	
+	(whenever the terminal stream sees a ctrl-c character, it sends
+	a SIGINT to whichever application is listening at the tty end of
+	things). It also does certain substitutions, like converting
+	the newline/carriage return pairs to plain newline characters etc.
+
+	When the application at the tty end writes output, the stream
+	does processing as well (stripping the 8th bit from characters,
+	nl-&gt;crnl conversions, and so on).
+	(Ever wondered why half the options to the stty(1) command screw
+	up your terminal so badly? Stty is used to set what processing
+	the stream does/doesn't do).
+	
+	All this spawns from the days when people connected to computers
+	using dumb terminals and serial cables.
+
+	Enter screen. The screen command opens a bunch of pty/tty streams,
+	and starts the relevant program at the tty end of each stream.
+	It then controls which pty the keyboard input/screen output is 
+	written to/read from.
+
+&gt; No more PTY's.
+&gt; Sorry could not find a PTY.
+&gt; Screen is terminating
+
+	Could be:
+
+	1) all the ptys are in use (are you running X? Are there a lot
+	of people logged into your machine?)
+	2) the version of screen you are trying to run is too old,
+	or compiled for an older version of linux.
+	As of redhat 6, linux uses the SYSV/ptmux method of allocating
+	ptys to a low-level drivers programs,whereas RH5 used the
+	try&deny method of grabbing a pty.
+
+	Run the following:
+
+	strace -o screen.trace screen pine
+
+	and post the last coupla lines to the mailing list (or to me,
+	whatever), this should hopefully make it clear what is going 
+	wrong...
+
+J.
+
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

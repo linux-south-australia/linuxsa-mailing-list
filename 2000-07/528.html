@@ -1,0 +1,156 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: emacs question: executing lisp - how?" -->
+<!-- FromName="Andrew Burrow" -->
+<!-- FromEmail="alburrow@cs.adelaide.edu.au" -->
+<!-- ToName="Mark Phillips" -->
+<!-- ToEmail="mark@ist.flinders.edu.au" -->
+<!-- Date="Thu, 13 Jul 2000 14:09:44 +0930" -->
+<!-- Id="200007130439.OAA18775@radon.cs.adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: emacs question: executing lisp - how?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Burrow &lt;<I><A HREF="mailto:alburrow@cs.adelaide.edu.au">alburrow@cs.adelaide.edu.au</A></I>&gt;
+  To  : Mark Phillips &lt;<I><A HREF="mailto:mark@ist.flinders.edu.au">mark@ist.flinders.edu.au</A></I>&gt;
+  Date: Thu, 13 Jul 2000 14:09:44 +0930
+</PRE>
+<H1>Re: emacs question: executing lisp - how?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Sorry not to reply earlier Mark.  I check the list a couple of times a
+day, but try and be careful to listen to it all the time ;-)
+
+
+&gt; If I want to execute some lisp in emacs, for example, I want to run
+&gt; 
+&gt; (setq reftex-plug-into-AUCTeX t)
+
+Firstly, I should say that you might not need to.  I prefer to
+customise emacs by actually writing stuff up in emacs lisp and leaving
+it in "~/.emacs".  But if you are only going to do a little
+customisation you might prefer to use the customisation buffers
+available under the help menu or through
+
+	M-x customize
+
+
+&gt; how do I do it?  I thought I just needed to type ESC ESC and then the
+&gt; command, but this doesn't seem to work.
+
+You can execute emacs lisp in a number of ways.
+
+
+I often just type
+
+	M-;
+
+which I think is bound to "eval-expression".  It is a quick way to
+type stuff into the minibuffer.  Of course you can yank stuff, and
+also use M-p and M-n to scroll up and down through history.  (It is
+really handy if you are in "resize-minibuffer-mode" so that the
+minibuffer can grow to accomodate large chunks of code, and you move
+up and down with C-p and C-n and insert new lines with C-q C-j.)
+
+
+If you have the lisp sitting in a buffer and you are in emacs lisp
+mode (M-x emacs-lisp-mode if the modeline says otherwise), then jump
+over the lisp expressions using M-C-f and M-C-b and when you are at the
+end of an expression use
+
+	C-x C-e
+
+which is bound to eval-last-sexp.
+
+
+
+What follows is (some of ;-) my ".emacs" code for customising AUCTeX and
+RefTeX, if any one is interested...  typically there is other stuff in
+"tex-site.el" to do
+
+
+
+;;;
+;;; LaTeX mode settings.
+;;;
+
+;; Use AUCTeX for TeX/LaTeX major modes.
+(require 'tex-site)
+
+;; Use BibTeX for bibtex major mode.
+(require 'bibtex)
+
+;; Use RefTeX for minor mode managing labels, references and citations.
+;; Currently there is a bug in "reftex.el" in that it fails to include
+;; "cl.el".
+(require 'reftex)
+(require 'cl)
+
+;; Global settings for LaTeX mode.
+(progn
+  ;; Use "kdvi" instead of "xdvi".
+  (setq TeX-view-style '(("." "kdvi %d")))
+
+  ;; Plug all 4 RefTeX functions into AUCTeX.
+  (setq reftex-plug-into-AUCTeX t)
+  )
+
+;; Automated per-buffer customizations for LaTeX mode.
+(add-hook
+ 'LaTeX-mode-hook
+ (function
+  (lambda ()
+    ;; Set the fill column for more readable text.
+    (setq fill-column 72)
+
+    ;; Start in font-lock minor mode.
+    (turn-on-font-lock)
+
+    ;; Start in auto-fill minor mode (word wrap).
+    (turn-on-auto-fill)
+
+    ;; Start in reftex minor mode.
+    (turn-on-reftex)
+
+    ;; Use the british dictionary.
+    (ispell-change-dictionary "british")
+
+    ;; Add extra reftex key bindings.
+    (define-key reftex-mode-map "\C-cg" 'reftex-grep-document)
+    (define-key reftex-mode-map "\C-cs" 'reftex-search-document)
+    ))
+ 'append)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

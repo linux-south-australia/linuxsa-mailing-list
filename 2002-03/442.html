@@ -1,0 +1,188 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: DNS server for internal and external addresses?" -->
+<!-- FromName="'Anthony Symons'" -->
+<!-- FromEmail="ant@sa.pracom.com.au" -->
+<!-- ToName="'John Davey'" -->
+<!-- ToEmail="john@davey.net.au" -->
+<!-- Date="14 Mar 2002 13:45:38 +1030" -->
+<!-- Id="1016075738.4240.168.camel@ant.internal" -->
+<!-- Reference="GOEMLNICOMCOMGGLIKHFCEKHGDAA.john@davey.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: DNS server for internal and external addresses?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  To  : John Davey &lt;<I><A HREF="mailto:john@davey.net.au">john@davey.net.au</A></I>&gt;
+  Date: 14 Mar 2002 13:45:38 +1030
+</PRE>
+<H1>RE: DNS server for internal and external addresses?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Alternatively, I did it with bind 8 with a section like this:
+
+zone "internal" {
+    type master;
+    file "named.local.internal";
+    allow-query{ localnets; 10.1.0.0/16 ; 10.2.0.0/16 };
+    allow-update{ none; };
+    allow-transfer{ 10.5.16.1; };
+};
+
+
+On Thu, 2002-03-14 at 12:16, John Davey wrote:
+&gt; Below is a working named.conf with  views
+&gt; 
+&gt; 
+&gt; view "internal" {
+&gt;         match-clients {172.30.0.0/16; 127.0.0.0/8; };
+&gt;         recursion yes;
+&gt; 
+&gt;         zone "." {
+&gt;                 type hint;
+&gt;                 file "named.ca";
+&gt;         };
+&gt; 
+&gt;         zone "0.0.127.in-addr.arpa" {
+&gt;                 type master;
+&gt;                 file "named.local";
+&gt;         };
+&gt; 
+&gt;         zone "freddy.net.au" {
+&gt;                 type master;
+&gt;                 file "primary/freddy-internal.net.au.dns";
+&gt;         };
+&gt; 
+&gt;         zone "spam.block" {
+&gt;                 type master;
+&gt;                 file "primary/spam-internal.block.dns";
+&gt;         };
+&gt; 
+&gt; 
+&gt; 
+&gt; };
+&gt; 
+&gt; 
+&gt; view "external" {
+&gt;         match-clients { any; };
+&gt; //        recursion no;
+&gt; 
+&gt;         zone "freddy.net.au" {
+&gt;                 type master;
+&gt;                 file "primary/freddy-external.net.au.dns";
+&gt;         };
+&gt; 
+&gt;         zone "spam.block" {
+&gt;                 type master;
+&gt;                 file "primary/spam-external.block.dns";
+&gt;         };
+&gt; 
+&gt; 
+&gt; };
+&gt; 
+&gt; 
+&gt; 
+&gt; 
+&gt; &gt; -----Original Message-----
+&gt; &gt; From: Ian Hogben [mailto:<A HREF="mailto:ianhogben@yahoo.com.au">ianhogben@yahoo.com.au</A>]
+&gt; &gt; Sent: Thursday, 14 March 2002 11:45 AM
+&gt; &gt; To: David Lloyd
+&gt; &gt; Cc: Andrew Reid; LinuxSA
+&gt; &gt; Subject: Re: DNS server for internal and external addresses?
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; Bind 9.2
+&gt; &gt; 
+&gt; &gt; Still looking through the views documentation. My named fails to start
+&gt; &gt; when I apply them. Must be a typo somewhere. :)
+&gt; &gt; 
+&gt; &gt; Thanks,
+&gt; &gt; 
+&gt; &gt; Ian.
+&gt; &gt; 
+&gt; &gt; On Thu, 2002-03-14 at 07:39, David Lloyd wrote:
+&gt; &gt; &gt; 
+&gt; &gt; &gt; Andrew and Ian et al:
+&gt; &gt; &gt; 
+&gt; &gt; &gt; &gt; &gt; This *is* possible, isn't it? If not, how is it done, 
+&gt; &gt; other than to have
+&gt; &gt; &gt; &gt; &gt; two DNS servers?
+&gt; &gt; &gt; &gt; 
+&gt; &gt; &gt; &gt; You can use ACLs if you want -- apply them to the zones 
+&gt; &gt; that you want to
+&gt; &gt; &gt; &gt; be internally-visible only.
+&gt; &gt; &gt; &gt; 
+&gt; &gt; &gt; &gt; I get the feeling that views is a BIND 9 feature. I'm not 
+&gt; &gt; sure though.
+&gt; &gt; &gt; &gt; ACLs will do what you want, though.
+&gt; &gt; &gt; 
+&gt; &gt; &gt; Yes, "views" is a Bind 9 feature.
+&gt; &gt; &gt; 
+&gt; &gt; &gt; Ian, what version of Bind are you running?
+&gt; &gt; &gt; 
+&gt; &gt; &gt; DSL
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; _________________________________________________________
+&gt; &gt; Do You Yahoo!?
+&gt; &gt; Get your free @yahoo.com address at <A HREF="http://mail.yahoo.com">http://mail.yahoo.com</A>
+&gt; &gt; 
+&gt; &gt; -- 
+&gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on 
+&gt; &gt; irc.linux.org.au
+&gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+-- 
+Systems Administrator       
+Pracom Ltd.             
++61 8 82029074 -=- +61 402 100 671 
+<A HREF="mailto:anthony.symons@sa.pracom.com.au">anthony.symons@sa.pracom.com.au</A>
+
+PRIVILEGED - PRIVATE AND CONFIDENTIAL
+This electronic mail is solely for the use of the addressee and may
+contain information which is confidential or privileged.
+If you receive this electronic mail in error, please delete it from
+your system immediately and notify the sender by electronic mail or
+using any of the above contact details.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,221 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="The LinuxSA Learning Channel: IO Redirection etc" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="LinuxSA@LinuxSA.org.au" -->
+<!-- Date="Tue, 25 Jan 2000 00:25:25 +1000" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: The LinuxSA Learning Channel: IO Redirection etc</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:LinuxSA@LinuxSA.org.au">LinuxSA@LinuxSA.org.au</A>
+  Date: Tue, 25 Jan 2000 00:25:25 +1000
+</PRE>
+<H1>The LinuxSA Learning Channel: IO Redirection etc</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+UNIX had the concept of IO redirection long before DOS copied and
+bastardized the concept.  The UNIX IO redirection concept if fundamental to
+many of the things that you can do with UNIX, and it is quite a
+well-developed idea, so we will explore this concept here.
+
+Why do I mention UNIX at all?  Well, Linux _is_ a UNIX operating system!
+
+Under UNIX, all programs that run are given three open files when they are
+started by a shell:
+
+   0.  Standard in, or STDIN.  This is where input comes from, and it 
+       normally points at your terminal device.
+
+       To find out what device is your terminal, use the tty(1) command.
+       Note, the (1) after command names in UNIX refers to the section
+       of the man pages that the documentation for the command exists in.
+
+       You can arrange to run any command and pass it input from a file
+       in the following way:
+
+         $ some-command &lt; /path/to/some/file
+
+       Note, the '$' is your prompt.  Note also, you can always specify
+       a complete path name for a file.
+
+       For example:
+
+         $ grep -i Fred &lt; /etc/passwd
+
+       Would search for the string 'fred' in /etc/passwd, regardless of 
+       the case of the characters.
+
+       But wait a minute, you object, I always use:
+
+         $ grep -i Fred /etc/passwd
+
+       This is true, but you can also pass the file in on STDIN, and you
+       will get different results if you do.  Can you see what the
+       difference is.
+
+    1. Standard out, or STDOUT.  This is where the normal output from
+       a program goes.  It normally points at your terminal as well, but
+       you can redirect it.
+
+       You can redirect output in the following way:
+
+          $ some-program &gt; /path/to/some/file
+
+       For example:
+
+          $ grep -i Fred /etc/passwd &gt; /tmp/results
+
+     2. Standard error, or STDERR.  This is where error output from your
+        program goes.  This normally points at your terminal as well, 
+        but you can redirect it.
+
+        Why have different output places for standard out and standard error?
+
+        Well, as you will see when you come to writing shell scripts, you
+        often do not want error messages cluttering up the normal output
+        from a program.
+
+You will forgive me for starting the above list at 0, I am sure, when you
+learn that each of these IO 'channels' are represented by small numbers,
+called file descripters (FDs), that have exactly those numbers.  That is,
+STDIN is FD 0, while STDOUT is FD 1, and STDERR is FD2.
+
+When the shell runs a program for you, it opens STDIN as FD 0, STDOUT as FD
+1, and STDERR as FD2, and then runs the program (technically, it almost
+always does a fork(2) and then an exec(3) or one of the exec?? calls).  If
+you have redirected one of STDIN, STDOUT or STDERR, your shell opens that
+file as the appropriate FD before running the program.
+
+Now, what does this all have to do with you, I hear you ask?
+
+Well, there are lots of neat things you can do, but some things to watch
+out for as well.
+
+A lot of inexperienced UNIX users assume that they can redirect a file into
+a program and use the same name for redirecting the output:
+
+    $ some-program &lt; mega-important-data-file &gt; mega-important-data-file
+
+They become very upset after doing the above, especially if that
+mega-important data file has never been backed up anywhere.  Why is this?
+
+The shell opens the mega-important-data-file for reading and associates it
+with FD 0 (or STDIN), and then opens it for writing, but truncates it to
+zero length, and assocaites it with FD 1 (or STDOUT) as well.
+
+So, if you want to do something like the above, use a different file name
+for the output file.  Oh, you should also back up files as well :-)
+
+Now, there are lots of redirection symbols that you can use, and here are
+some of them:
+
+   &lt; &lt;file&gt;   means open a file for reading and associate with STDIN.
+
+   &lt;&lt; TOKEN   Means use the current input stream as STDIN for the program
+              until TOKEN is seen.  We will ignore this one until we 
+              get to scripting.
+
+   &gt; &lt;file&gt;   means open a file for writing and truncate it and associate
+              it with STDOUT.
+
+   &gt;&gt; &lt;file&gt;  means open a file for writing and seek to the end and associate
+              it with STDOUT.  This is how you append to a file using a
+              redirect.
+
+   n&gt;&m       means redirect FD n to the same places as FD m. Eg, 2&gt;&1
+              means send STDERR to the same place that STDOUT is going to.
+
+OK, here are some tricks that you might want to use in various places.
+
+If you are gathering evidence for a bug report, you might want to redirect
+the output from a series of programs to a text file (never mind that you
+can use the script command to do the same :-).  So you might do the following:
+
+    $ some-buggy-program &gt; important-evidence.txt
+    $ echo '---------MARKER-------' &gt;&gt; important-evidence.txt
+    $ some-buggy-program &lt;some-params&gt; &gt;&gt; important-evidence.txt
+
+The second and subsequent lines append the output from the commands issues
+to the evidence file rather than overwriting them.  Try the following:
+
+    $ echo This is a line of text &gt; /tmp/file.txt
+    $ echo This is another line   &gt; /tmp/file.txt
+
+What do you get?
+
+Now try:
+
+    $ echo This is a line of text &gt; /tmp/file.txt
+    $ echo This is another line   &gt;&gt; /tmp/file.txt
+
+What do you get this time?
+
+OK, for the last few tricks here.  Sometimes you want to append STDOUT and
+STDERR to a file.  How do you do it? 
+
+    $ some-command &gt;&gt; /tmp/log.log 2&gt;&1
+
+The 2&gt;&1 says make STDERR point to the same places as STDOUT.  Since STDOUT
+is open already, and the shell has done a seek to the end, STDERR will also
+be appended to STDOUT.
+
+If you want to append a line to a file, you can echo the line you want with
+a redirect, rather than firing up an editor:
+
+   $ echo &lt;Some text&gt; &gt;&gt; /path/to/some/file
+
+It turns out that you can cause the shell to redirect to other file
+descriptors as well, and if you look in the configure scripts that come
+with many UNIX software packages, you will see examples of this.
+
+Why is redirecting so important?  Well, it is used in many shell scripts,
+it is a simple and conventient mechanism to sending output to any file
+without the programmer having to add code for handling command line
+instructions, and it is
+the UNIX way of doing things :-)
+
+It is also the same as piping, where you redirect output to, or input from,
+a pipe device.  The pipe device has a process living on the other side, but
+we will look at this later.
+
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>, Master Linux Administrator :-),
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Co-author, SAMS Teach Yourself Samba in 24 Hours
+Author: First Australian 5-day, intensive, hands-on Linux SysAdmin course
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

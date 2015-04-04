@@ -1,0 +1,144 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Security & Groups" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Mike Earnshaw" -->
+<!-- ToEmail="mearnshaw@bigpond.com" -->
+<!-- Date="Thu, 13 May 1999 19:02:31 +0930 (CST)" -->
+<!-- Id="Pine.BSF.3.96.990513183630.16077B-100000@augustus.tellurian.com.au" -->
+<!-- Reference="000301be9d1c$6c7e1540$59e8fea9@lancelot" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Security & Groups</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Mike Earnshaw &lt;<I><A HREF="mailto:mearnshaw@bigpond.com">mearnshaw@bigpond.com</A></I>&gt;
+  Date: Thu, 13 May 1999 19:02:31 +0930 (CST)
+</PRE>
+<H1>Re: Security & Groups</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, 13 May 1999, Mike Earnshaw wrote:
+&gt; I Come from a NT background.
+
+My condolences.  Unless "come from" implies "have left", in which
+case congratulations! :-)
+
+
+&gt; First is the concept of "umask", whilst I think this sets a default
+&gt; kind of security profile for something
+
+When you use the creat() system call, or the open() system call
+with the F_CREAT flag, you also specify a file creation mask.  This
+is a nine bit value comprising three groups of three bits.  The
+groups are the permissions for the creator of the file, the
+permissions for the group of the file, and the permissions for
+everyone else.  Each group is three bits, being permission to read,
+permission to write and permission to execute the file.  (Side
+note: For directories, execute permission means permission to access
+a file within that directory.)  The file creation mask which you
+specify with the creat() or open() system call is masked with the
+complement of the processes umask; that is, every bit in the umask
+is a bit which is cleared from the creation mask passed to creat().
+
+There's something of an unwritten convention that all programs
+create files with a permission mask of 0777 (that's octal), meaning
+all permissions enabled.  There's something else of an unwritten
+convention that all processes run with a umask like 022, 027; that's
+disallow write access to group and other; or disallow write access
+to group and disallow everything to other.  Obviously the umask
+you use needs to be determined by your local security policy, and
+the creation mask needs to be tempered by your specific application.
+
+
+&gt; Second, how do you assign someone to multiple groups?
+
+You list the username in the /etc/group file.  It's the last field
+of the line, and it's a comma separated field.  There is a limit
+to the number of groups a process can be in, and that limit is
+system dependent.  16 or 32 is a common limit.  (You can change
+it, but you may have to relink your kernel.)  All groups are equal
+with repsect to what files you can access.  The group id listed in
+the /etc/passwd file is the group which owns files that the user
+creates.
+
+
+&gt; Third, I briefly read something to do with suid and guid. Whilst I
+&gt; think I grasp the importance of this, how do you prevent a malicious
+&gt; attack?
+
+Don't ever set a program to be setuid or setgid unless you know
+what you are doing.  The really simple answer is that the person
+who writes the program decides if it should be setuid or setgid
+or (more commonly) neither.
+
+A setuid or setgid program is a way for you to permit other people
+to have some of your privileges.  It is up to you, when you write
+the program which runs setuid or setgid, to control what they can
+do.  It's quite easy to get that wrong, for example, you might
+write a program which, as part of it's function, sorts a data file;
+and you might do it by saying, system("sort -o data.s data").  This
+could be sufficient to give away all of your permissions.  (It need
+not be insecure, but probably is.)  Truly, the simple explanation
+is that usually you don't need to run programs set?id.
+
+
+&gt; Last, but not least, as a complete new user to Linux (all of four
+&gt; weeks), all I have done is basically installed the APC 5.2 version
+&gt; of RedHat. Whilst I probably don't know what I am doing, it all went
+&gt; well
+
+It does take a long time to learn Unix, and it is heartening to
+see you cheerfully admit that you probably don't know what you are
+doing.  (For the record, I respectfully agree with you :-) ).  Unix
+systems tend to be setup securely (which is a large part of the
+reason why newbies find it unfriendly.)  This does not mean you
+can assume your system is secure.  Unfortunately nobody can reasonably
+say what security aspects to be concerned with in this forum --
+there are tomes written on the subject, indeed you need to pay
+particular attention to "Unix Security, Volume XVII" (my little
+joke).  It's taken me decades to learn that I don't know Unix
+security; and of course the more I learn the less I know.  Read,
+read and read again.  (Going to a course is almost always a waste
+of money.  I think it's like Windows in that respect.)
+
+If you're interested, I'm hideously expensive but excellent value...
+
+Regards,
+
+David (who probably just stunned most of this list: it's not the
+question, it's the effort that went into it.)
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

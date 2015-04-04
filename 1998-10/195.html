@@ -1,0 +1,123 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: ethernet prob (fwd)" -->
+<!-- FromName="Andrae Muys" -->
+<!-- FromEmail="a.muys@mailbox.uq.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 23 Oct 1998 13:22:40 +1000 (GMT+1000)" -->
+<!-- Id="Pine.OSF.3.95.981023130608.14252R-100000@dingo.cc.uq.edu.au" -->
+<!-- Reference="Pine.LNX.3.96.981023003538.4139g-100000@Ukraine.humbug.org.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: ethernet prob (fwd)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrae Muys &lt;<I><A HREF="mailto:a.muys@mailbox.uq.edu.au">a.muys@mailbox.uq.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Fri, 23 Oct 1998 13:22:40 +1000 (GMT+1000)
+</PRE>
+<H1>Re: ethernet prob (fwd)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, 23 Oct 1998, Nikolai Andreyevich Luzan wrote:
+
+&gt; On Thu, 22 Oct 1998, Dave Lawrence wrote:
+&gt; 
+&gt; &gt; &gt; How do I load a card that ie ne.o dependent with irq=3 and io=0x300
+&gt; &gt; &gt; (actuall 300h), non pnp card from a command line interface (bash prompt)
+&gt; &gt; &gt; rather than a Xwindows interface .
+&gt; &gt; 
+&gt; &gt; edit /etc/modules.conf you install the apropriate module and alias it to
+&gt; &gt; eth0, something like this:
+&gt; &gt; 
+&gt; &gt; alias eth0 ne
+&gt; &gt; option -k ne io=0x300 irq=3
+&gt; why would you alias a kernel module which would provide support for
+&gt; multiple devices (if present) to the name of a device? all
+
+Because he isn't.  He is aliasing eth0 -&gt; ne.o not the other way round.
+This tells which module to load when someone tried to activate eth0.
+
+The answer to the guys question is modprobe.  I don't think you need the
+alias (although it is a good idea, kerneld is a great help), however once
+you have the option line for the module you can type:
+
+#modprobe ne
+
+and it will automatically pass the specified options to the module.
+
+One added benifit.  modprobe will also use the output of depmod (you are
+running depmod -a on boot right (it is default)), to ensure any
+dependencies are resolved.
+
+&gt; modules.conf is load the module at boot so you can use the card or
+&gt; multiple cards of that type, it does not bring the device up, you need
+&gt; ifconfig to do that. any card should autodetect fine, but if it
+&gt; doesn't then you can use ifconfig to configure any device you want.
+
+ifconfig is only useful once you have the module loaded, and operational.
+It has nothing to do with modules, or loading modules, or configuring the
+network card.  ifconfig is what it's name implies, the `interface
+configuration program' not the `adapter card config program'.
+
+That being said, every linux user needs to learn how to use ifconfig.  It
+makes setting up 50% of a network configuration a breeze, even on
+an unfamiliar distribution.  The other 50% is `route', you should learn
+how to use it too.
+
+&gt; #first load the module (if it wasn't auto loaded on boot or manually
+&gt; #			loaded earlier).
+&gt; insmod ne
+
+Which then promptly dumps a screen full of error messages.  Hence the
+reason you should normally use modprobe instead.
+
+ne.o is dependent on 8390.o being loaded first.  A depmod -a will work
+this out, and modprobe will then try loading 8390.o first.
+
+Also if you don't want to change your modules.conf for some reason.  You
+can also pass the options as parameters to either an insmod, or modprobe
+command:
+
+ie. modprobe ne irq=9 io=0x300 (IIRC you use = other wise try a space).
+
+Andrae Muys
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Andrae Muys              "I have no wish to recite ... stratagems, for they
+<A HREF="mailto:andrae@humbug.org.au">andrae@humbug.org.au</A>     have all the same end in view, which is, to oblige
+My stuff, Linux stuff        the enemy to make unnecessary marches in favor 
+<A HREF="http://www.uq.edu.au/~cmamuys/">http://www.uq.edu.au/~cmamuys/</A>   of our own designs." - Fredrick the Great.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,180 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Putting it all together / office multifunctionals & Linux" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="linuxcpa@netscape.net" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 08 May 2003 22:12:05 -0700" -->
+<!-- Id="3EBB38A5.7020303@netscape.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Putting it all together / office multifunctionals & Linux</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:linuxcpa@netscape.net">linuxcpa@netscape.net</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 08 May 2003 22:12:05 -0700
+</PRE>
+<H1>Putting it all together / office multifunctionals & Linux</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Our small office has recently had the need to replace our old 
+photocopier with a new one, so we traded in our old Konica photocopier 
+for a newer Konia 7035 multifuctional. In general, multifunctionals can 
+print, scan, send faxes, and print.
+
+
+So, the question that comes to mind is:
+
+
+****How well are multifunctionals supported in Unix[1]? What do I gain 
+or loose by using it in Unix vs Windows 2000?****
+
+
+*********Konica 7035 *****************
+
+On the Konica, the answer is not much.
+
+There are available generic print drivers in SuSE 8.2 and these work ok, 
+but not as well as the Windows version. Further and as per usual, the 
+unix drivers are buried on a web page found by search engine, and the IT 
+person accompanying the sales person, does not offer software or drivers 
+that are for Linux.
+
+So, in this situation,  we really did not lack anything in the way of 
+features as a result of our choice of operating system. However, it was 
+more difficult to set up. The Unix drivers were buried in the site, and 
+I had to find them via search engine, rather than going to the regular 
+support section. I also did not find the drivers functional or useful at 
+all, whereas for Windows 2000, I did.
+
+Not much to do with the Unix support provided, we weren't quite 
+satisfied with the Konica and had the Richoe/Gestetner salesman bring in 
+his machine.
+
+
+**************Gestetner 2212*****************************
+
+There is a lot lost by not using this with Windows 2000, and all of 
+these features are additional to the Konica.
+
+
+This machine has some neat features, only suppoerted under Windows.  (At 
+least as of now!):
+
+1. You can scan a document and it will be delivered to your desktop as a PDF
+2. You can send faxes out from your desk
+
+
+***************The Question********************
+
+Any way to reverse engineer the features provided by the Gestetner below 
+without making it my life's work? :-\
+
+Not having software for multifunctionals is perhaps one of the major 
+reasons why Windows 2000 servers might be favored over Unix companions 
+in some situations.  
+
+However, I am too bloody stubborn for that. :-)  
+So _Dammit_, I want to do this in Linux and not have to spend 3 days 
+figuring it out.
+
+
+*********************Clues**********************
+
+I was also told that server for fax and scan delivery would only work if 
+a Windows 2000 workstation acted as a server.  The program created its 
+own name independent of my Windows 2000 computer name, it was localhost, 
+I am James in mdkgroup.  The Windows 2000 server has to be running the 
+scan router service, and then I am supposed to set up each person on the 
+lan as a user in the program/server localhost and then go to each desk 
+and install a client. I asked the salesman to see if, by their 
+perception, cash paying Unix customers were supported..."surely you 
+support SCO or Sun Solaris" I asked. "No", they replied.
+
+Seeing as how I have a Samba server, I don't see why I wouldn't be able 
+to use my server, as a server. After all, it is a server and my 
+workstation, is a workstation.   
+And I don't even use Windows 2000 that often, and our office dual boots, 
+so it makes no sense to make a workstation a server.
+
+They say that TCP/IP is supported by the machine, along with IPX, & 
+Netbios. They throw SMB in there too.
+
+So, I got bold, and I used Ethereal to packet sniff network traffic when 
+a scan was sent from the printer to Windows.
+
+I don't know how to read the dump, but here are some highlights
+
+Ethernet II
+Source (Richoe)
+Destimation (James)
+Type IP (0x0800)
+Internet Protocol v4
+Header  Length 20 bytes
+Differentiated Services Field 0x10 (DSCP 0x04: Unknown DSCP; ECN:0x00)
+0001 00..=Differentiated Services Codepoint: Unknown (0x04)
+.... ..0. = ECN-Capable Transport (ECT): 0
+.... ...0 = ECN-CE: 0
+(more)
+Src Port 1035
+Dest Port 3670
+
+So I went to IANA to see what these ports are:
+
+mxxrlogin 1035/tcp MX-XR RPC
+mxxrlogin 1035/udp MX-XR RPC
+# Arnold E. Mauer &lt;<A HREF="mailto:amauer@vrms.com">amauer@vrms.com</A>&gt; April 2003
+
+Smile 3670/tcp SMILE TCP/UDP Interface
+smile 3670/udp SMILE TCP/UDP Interface
+# Andre Petras &lt;<A HREF="mailto:A_Petras@web.de">A_Petras@web.de</A>&gt; January 2003
+
+And then nothing made sense to me after this. :-(
+
+I thought I saw 1035 some where, but all the article talks about are 
+trojans and such.
+Port 3670 seemed to be about graphics.
+
+ Will I be able to escape the grips of the evil empire...stay tuned!
+
+
+
+James Leone
+[1]Linux is in the same boat as Unix, so I just call it Unix here.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

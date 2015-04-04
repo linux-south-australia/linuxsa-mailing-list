@@ -1,0 +1,97 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Connection refused (nfs bit)" -->
+<!-- FromName="'nik [tm]'" -->
+<!-- FromEmail="tmcruisin@sond.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="bastill@sa.apana.org.au" -->
+<!-- Date="Mon, 22 Oct 2001 12:39:23 +0930" -->
+<!-- Id="005f01c15aa6$f39eb4e0$0301a8c0@nick" -->
+<!-- Reference="01102113134800.00980@PhD_1.gihon.org.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Connection refused (nfs bit)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: nik [tm] &lt;<I><A HREF="mailto:tmcruisin@sond.com.au">tmcruisin@sond.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:bastill@sa.apana.org.au">bastill@sa.apana.org.au</A></I>&gt;
+  Date: Mon, 22 Oct 2001 12:39:23 +0930
+</PRE>
+<H1>Re: Connection refused (nfs bit)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; [<A HREF="mailto:root@Unit_1">root@Unit_1</A> /root]# mount Unit2:/home/ba /mnt/remote
+&gt; mount: RPC: Unable to receive; errno = Connection refused
+
+
+&gt; OK, so there is something I have overlooked - what is it, PLEASE!!
+
+if you have to mount an nfs share, the nfs share needs to be specified in
+/etc/exports on the machine offering the share. which will enable you to
+supply the details of the machine tying to mount the share and then it will
+allow it to connect and portmap needs to be running (RH7.1)
+
+do some reading;
+man exports
+man nfs
+man mount
+man portmap
+
+then you should be able to specify the mount at boot time in fstab and/or
+rc.local (but ensure you make it a soft mount or the system may spit and
+cause lots of hassle if it tries to mount a share that isnt there, say after
+a power failure and the mounting machine boots quicker than the sharing
+machine - I learnt the hard way!! :)
+
+snip from /etc/fstab on mount machine
+192.168.1.24:/home/nfsshare2     /home/brettsftp nfs
+rsize=1024,wsize=1024,rw,soft   0 0
+
+snip from rc.local
+mount /home/brettsftp &
+
+snip from /etc/exports on share machine
+/home/nfsshare2 192.168.1.0/255.255.255.0(rw,no_root_squash)
+
+hope this helps the mount problem.
+
+nik [tm]
+
+·´¯`·.¸¸..&gt;&lt;((((º&gt;.·´¯`·.¸¸.·´¯`·.¸
+ &gt;&lt;((((º&gt;`·.¸¸.·´¯`·.¸&gt;&lt;((((º&gt;`·.¸
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

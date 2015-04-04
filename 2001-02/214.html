@@ -1,0 +1,164 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Time Server Problems :-(" -->
+<!-- FromName="'Greg Lehey'" -->
+<!-- FromEmail="grog@lemis.com" -->
+<!-- ToName="'David Lloyd'" -->
+<!-- ToEmail="lloy0076@rebel.net.au" -->
+<!-- Date="Thu, 8 Feb 2001 10:43:50 +1100" -->
+<!-- Id="20010208104350.G38163@sydney.worldwide.lemis.com" -->
+<!-- Reference="3A80DD9E.BCD32D96@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Time Server Problems :-(</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Greg Lehey &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  Date: Thu, 8 Feb 2001 10:43:50 +1100
+</PRE>
+<H1>Re: Time Server Problems :-(</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wednesday,  7 February 2001 at 16:01:10 +1030, David Lloyd wrote:
+&gt;
+&gt; I'm experiencing a fairly "weird" error with my time server. "ntpdate -d
+&gt; my.time.server" shows:
+&gt;
+&gt; 6 Feb 14:21:46 ntpdate[12803]: step time server [ip address] offset -3543.085861 sec
+
+This is telling you that your clock was almost exactly an hour off
+(-3600 seconds).
+
+&gt; It's a local machine that synchronises to its own internal clock. I know
+&gt; this isn't the perfect setup but I'm attempting to get a proof of
+&gt; concept working. Now the time server "xntpd" baulks presumably because
+&gt; of the offset (of 64 hours). Now it's on a local network, it pings
+&gt; sensibly (between 0.unmeasurable to 0.3ms response time at the worst),
+&gt; the hardware clocks are within 1 minute of each other.
+&gt;
+&gt; * What does the offset field actually mean?
+
+It's the value by which the time was adjusted to set the correct time.
+
+&gt; * What would cause the offset to be such a ridiculously high number?
+
+Presumably the clock was set wrong.  If your CMOS clock uses local
+time, as opposed to UTC, then it could be due to DST differences.
+
+&gt; I have other machines on the same network and same subnet that display
+&gt; results such as this:
+&gt;
+&gt; 6 Feb 14:37:23 ntpdate[1650]: adjust time server [ip.address] offset 0.000029 sec
+
+That's more typical.
+
+&gt; I sent this message once already but it hasn't appeared in, like 15
+&gt; hours...so if you get it twice, sorry :-P
+
+I've noticed mail configuration problems from your site, but they
+don't seem to affect the list.  You should have received a message
+from me on the subject.
+
+On Wednesday,  7 February 2001 at 19:39:44 +1030, David Lloyd wrote:
+&gt;
+&gt; Richard et al:
+&gt;
+&gt;&gt; or you can start with just setting the date manually (or even with rdate -s)
+&gt;&gt; to get it within cooee of the real time....
+&gt;
+&gt; I had to adjust the hardware clock on the time server using hwclock. Now
+&gt; because I haven't rebooted the system, it's possible that the change
+&gt; hasn't come about in Linux's internal system clock. Which means that it
+&gt; will jump 12 hours ahead on next reboot (1)...however there are some
+&gt; salient thoughts here:
+
+I don't understand where you get the 12 hours from.  But I think
+there's still a problem with the Linux kernel that setting the date
+doesn't change the hardware clock, which is a particular nuisance if
+you're running xntpd.
+
+&gt; * ntpd is using the hardware clock
+&gt;
+&gt; If this is so, then why is my backup server (another machine using ntpd
+&gt; synchronisation) keeping the correct time? It's hardware clock and
+&gt; system time are both correct. About 12 hours ago they were 12 hours
+&gt; ahead...but system time syncs wonderfully
+
+What you've shown so far looks like a single jump of one hour.  Are
+you getting this at regular intervals without intervening reboots?
+
+&gt; * ntpd is using the system clock
+&gt;
+&gt; If this is so, I can't for the life of me work out why it thinks there
+&gt; is -3500 milli-seconds difference (way to many for ntpd to fix).
+
+Seconds, not milliseconds.
+
+&gt; Interestingly, if I use:
+&gt;
+&gt; * ntpd -b time.server
+&gt;
+&gt; The time gets set correctly but an hour behind. This silly behaviour is
+&gt; the behaviour I'm trying to fix; my main server which actually needs to
+&gt; keep the time properly loses time all the time. Even so, the server it
+&gt; syncs to:
+&gt;
+&gt; * pings at unmeasurable speeds (i.e. very very quickly)
+&gt; * has the correct time (except the hardware time might be out - see
+&gt; above)
+&gt; * manages every other machine's time service sensibly
+&gt;
+&gt; And my main server drops an hour! For no particular reason at all...
+
+Hmm.
+
+&gt; I'm beginning to think I'm losing UDP packets like mad, but everything
+&gt; else speaks nicely to the machine (mainly TCP/IP traffic and SMB over
+&gt; TCP/IP) and I'm not hearing any complaints about network speed being
+&gt; noticeably different. This, I think, may be an explanation but I can see
+&gt; the UDP packets bouncing backwards and forwards about every minute (when
+&gt; ntpd polls the time server) and they don't appear to be terribly out of
+&gt; order.
+
+This is definitely not a network problem.  How often does this happen?
+Do you have the right time zone set?
+
+Greg
+--
+Finger <A HREF="mailto:grog@lemis.com">grog@lemis.com</A> for PGP public key
+See complete headers for address and phone numbers
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

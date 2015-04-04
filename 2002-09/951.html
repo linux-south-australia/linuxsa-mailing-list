@@ -1,0 +1,101 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: pppd & wvdial" -->
+<!-- FromName="'Darryl Ross'" -->
+<!-- FromEmail="dross@syc.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="lloy0076@rebel.net.au" -->
+<!-- Date="Mon, 23 Sep 2002 15:35:35 +0930 (CST)" -->
+<!-- Id="2322.192.168.10.21.1032761135.squirrel@test.syc.net.au" -->
+<!-- Reference="200209230458.g8N4wXIN003035@ernie.tell.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: pppd & wvdial</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Darryl Ross &lt;<I><A HREF="mailto:dross@syc.net.au">dross@syc.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  Date: Mon, 23 Sep 2002 15:35:35 +0930 (CST)
+</PRE>
+<H1>Re: pppd & wvdial</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt;&gt; No. I remember seeing it somewhere, but can't quite remember where.
+&gt;&gt; Maybe it wasn't one of the options for pppd or wvdial, it may have
+&gt;&gt; been for another dialer. But, it was called something like keep-alive,
+&gt;&gt; which send and echo down the line every so often to keep the
+&gt;&gt; connection alive.
+&gt;
+&gt; This is what you're talking about:
+&gt;
+&gt; (man pppd)
+&gt;
+&gt; lcp-echo-interval n
+&gt;     If  this  option  is  given,  pppd will send an LCP
+&gt;     echo-request frame to the  peer  every  n  seconds.
+&gt;     Normally  the  peer  should  respond  to  the echo-
+&gt;     request by sending an echo-reply.  This option  can
+&gt;     be  used with the lcp-echo-failure option to detect
+&gt;     that the peer is no longer connected.
+
+Which the default is to do every 20 seconds anyway, so I'm not sure that
+is actually what you are trying to achieve. From the sound of it you don't
+want to be kicked off for 20 minutes of inactivity or whatever the timeout
+is?
+
+One way is to put into a crontab a job to ping something on the net every
+5 or 10 minutes. Something like this in /etc/crontab will do the job:
+
+-------------------------------------------------
+
+# Ping yahoo.com to keep connection alive
+*/5 * * * * root ping -c 5 www.yahoo.com &gt; /dev/null &2&gt;1
+
+-------------------------------------------------
+
+That will send 5 ping packets to Yahoo every 5 minutes and send any output
+to /dev/null. Note that you might want to implement something in
+/etc/ppp/ip-up.local so that this only happens while you are connected.
+
+Darryl
+
+-- 
+Darryl Ross
+Senior Network and Systems Administrator
+Service to Youth Council Inc
+<A HREF="mailto:dross@syc.net.au">dross@syc.net.au</A>
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

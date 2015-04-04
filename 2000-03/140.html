@@ -1,0 +1,91 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: converting a binary number to string on command line" -->
+<!-- FromName="Dieter Jansen" -->
+<!-- FromEmail="dieter@tplex.com.au" -->
+<!-- ToName="Richard Sharpe" -->
+<!-- ToEmail="sharpe@ns.aus.com" -->
+<!-- Date="Wed, 8 Mar 2000 16:55:16 +1030" -->
+<!-- Id="075201bf88c7$13249fe0$027c14cb@unicycle.com.au" -->
+<!-- Reference="Pine.BSF.3.96.1000307131536.15824A-100000@augustus.tellurian.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: converting a binary number to string on command line</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dieter Jansen &lt;<I><A HREF="mailto:dieter@tplex.com.au">dieter@tplex.com.au</A></I>&gt;
+  To  : Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  Date: Wed, 8 Mar 2000 16:55:16 +1030
+</PRE>
+<H1>Re: converting a binary number to string on command line</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Richard,
+
+&gt; &gt;Interestingly, if you generalise the code you end up with
+&gt; &gt;something rather like "od".
+&gt; 
+&gt; Yes, I think it _is_ better to use the tools that already exist.  While
+&gt; they do more, the order of magnitude cost in using them is going to be
+&gt; similar to a purpose built tool, and there is less code to maintain :-)
+
+Given that Glen has pointed out the unportability of David's C
+code, and David has pointed out the unpottability of my use of
+the od command (private email), I feel compelled to offer:
+
+  dd if=/dev/hda1 bs=1 count=2 skip=50 2&gt; /dev/null | \
+    perl -e 'read(STDIN,$x,2);printf "%x\n",unpack("S",$x);'
+
+which is reasonably direct and understandable.  I think it may
+also be portable - the unpack S assumes it is being passed data
+of the endian-ness of the platform, and that's what we're doing
+with dd.  I'd welcome correction on this if I am wrong.
+
+Of course by the time you get to this point you may just as
+well do the whole job in perl (including, perhaps, the byte
+setting that you were presumably contemplating when you first
+raised the issue):
+
+  perl -e 'open(F,"/dev/hda1"); \
+           read(F,$x,2,50); \
+           printf "%x\n",unpack("S",$x)'
+
+Cheers, Dieter.
+
+--
+Dieter Jansen                                   Tetraplex Pty Ltd
+<A HREF="mailto:dieter@tplex.com.au">dieter@tplex.com.au</A>                      <A HREF="http://www.tplex.com.au/">http://www.tplex.com.au/</A>
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

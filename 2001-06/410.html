@@ -1,0 +1,172 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: [OT] Telstra ADSL 'Unlimited' Introduces Download Limit" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 11 Jun 2001 18:06:22 +0930" -->
+<!-- Id="20010611180622.B24900@dog.topology.org" -->
+<!-- Reference="v04220805b74a26289040@[192.83.231.232]" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: [OT] Telstra ADSL 'Unlimited' Introduces Download Limit</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 11 Jun 2001 18:06:22 +0930
+</PRE>
+<H1>Re: [OT] Telstra ADSL 'Unlimited' Introduces Download Limit</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Jun 11, 2001 at 05:13:35PM +0930, Simon Hackett wrote:
+&gt; At 4:56 PM +0930 11/6/01, Dan Shearer wrote:
+&gt; &gt;
+&gt; &gt;But if you offered a service where:
+&gt; &gt;
+&gt; &gt;    a) I could choose to have a conventional charging scheme, or
+&gt; &gt;
+&gt; &gt;    b) I could choose Alan's leaky bucket, with loads of parameters tunable
+&gt; &gt;       by me, but
+&gt; &gt;
+&gt; &gt;    c) Amid all the complication there was a guarantee that I cannot
+&gt; &gt;       tune my plan to be worse than XYZ, where XYZ is some basic
+&gt; &gt;       conventional charging scheme, but
+&gt; &gt;
+&gt; &gt;    d) With the exception of (c) above the ISP could specify that the
+&gt; &gt;       charging was never any worse for them than some set of parameters
+&gt; 
+&gt; Yeah, I must say that the 'leaky bucket' approach is starting to grow on me.
+&gt; 
+&gt; One nice aspect of it is that (correct if me I'm wrong, Alan), its 
+&gt; worst case is no less permissive of extra-fee downloading that not 
+&gt; having it.
+
+Correct. The leaky bucket approach [technically referred to more
+correctly as a token bucket, but very few people care about the
+difference] gives more benefit to the user.
+Ultimately it is better to the ISP too. Here's why:
+
+1. Better for the user.
+The leaky bucket approach carries over unused bandwidth on any
+time-scale you like. I used the 1-day carry-over to make it
+easier to explain to non-technical customers. But the simplest way 
+to implement it is on a per packet basis. The algorithm is very simple
+even for per-packet accounting. I use it all the time for 155 Mbit/sec
+ATM traffic at full line rate, and it takes up less than 1% of the
+total CPU time.
+
+The 1-month accounting method where you throw away the
+unused portion every month is obviously the same thing, except that
+you throw away the unused portion. 
+
+The leaky bucket method gives the user the same amount every day
+(e.g. 100 MBytes/day)  - in actual fact you would give them
+10 kbits/sec. (In my software, I dole it out in units of milli-bits
+per microsecond. I'll leave it to you to work out why this might
+be a good idea. Something to do with 32-bit number ranges and resolution.)
+
+2. Better for the ISP.
+The ISP with a fixed bit-rate link to the core Internet must
+dimension the link according to the peak usage times in order to
+keep subscribers happy. At peak times, you ahve the most users
+active, and so you get a lot of unhappy congested users.
+
+But if you have a marginal cost of 0 dollars per MByte in the
+last day fo the month, users will tend to look at their
+limit at the end of the month and rush to make use of that
+"free" unused portion of bandwidth. That's when I do my
+linux kernel and star office downloads!
+
+Therefore it is in the interest of the ISP to keep demand
+variability within each month as low as possible.
+E.g. you might dimension according to the 90th percentile
+of hourly demand. In that case, you really don't want
+that end-of-month rush.
+
+-------------------------------------------------------
+So clearly everyone should be happier with rational pricing.
+
+Now if you compare daily leaky bucket algorithms with
+monthly leaky-bucket algorithms (i.e. just carry over
+up to some limit at the end of the month), the difference
+is more subtle. Now what you get is (probably) a slight benefit
+to the ISP (i.e. reduction in permissiveness to the subscriber)
+if you use the daily leaky-bucket, because now the user can
+go way over budget for a single day, and then send nothing for
+the rest of the month when using the monthly leaky bucket.
+
+Personally, I think that the calendar-independent algorithms
+are much better. 
+These will smooth out the traffic nicely,
+while allowing surges to any amount you like on a single day.
+
+&gt; I've been thinking about this in the context of my own notion that 
+&gt; customers dislike getting surprises, including those generated by 
+&gt; billing algorithms that they can't understand easily. However, 
+&gt; perhaps the leaky bucket algorithm could be described for the 
+&gt; 'average punter' in simple terms (i.e. never charging more than not 
+&gt; having this approach engaged, and rewarding customers for usage that 
+&gt; is allowing 'space' for others to live in, or something similar)
+
+
+I've spent a lot of time working out how to "market" 
+advanced SLAs, shaping, charging etc.
+I can give you much more info for particular technologies,
+market sectors etc. etc.
+But to put it simply, for this token bucket idea, I think it's
+simplest to explain it as just a credit thing per day.
+You say:
+
+1.	You get 100 MBytes allocation per day.
+2.	You may accumulate unused bandwidth up to a 
+	maximum of 1 GByte.
+3.	You may use all of your current bandwidth credit
+	at any time you like, but when it runs out:
+	plan A:	you will be cut off
+	plan B: you will be charged 20 cents/MByte.
+
+The numbers are whatever you like.
+That's simple enough, I think!
+
+And you should give the punters a web page where they can look
+up their current credit too.
+Easy!
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

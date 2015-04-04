@@ -1,0 +1,145 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Hardware" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Robyn Manning" -->
+<!-- ToEmail="robynman@dove.net.au" -->
+<!-- Date="Sun, 2 Jul 2000 14:20:46 +0930" -->
+<!-- Id="20000702142046.A42108@atdot.dotat.org" -->
+<!-- Reference="395EC69E.8020402@dove.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Hardware</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Robyn Manning &lt;<I><A HREF="mailto:robynman@dove.net.au">robynman@dove.net.au</A></I>&gt;
+  Date: Sun, 2 Jul 2000 14:20:46 +0930
+</PRE>
+<H1>Re: Hardware</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, Jul 02, 2000 at 02:05:42PM +0930, Robyn Manning wrote:
+
+ &gt; I'm doing a short talk at the InstallFest about Linux and Hardware.
+ &gt; I've always used ide drives (can't afford a scsi) so what are some 
+ &gt; features of scsi drives as compared to ide drives. Remember this is only 
+ &gt; for a 15 min talk.
+
+Ok, let's look at a quick subset.
+
+   - No (realistic) size limitations
+
+   - Support for bus disconnection during I/O transactions
+
+   - Very high bus bandwidth, large number of devices
+
+   - Multiple bus-masters (so, for example, your CD-ROM can initiate
+     a command to tell your computer you've just ejected a disk, instead
+     of relying on the computer to poll it every few seconds)
+
+   - A well designed and well defined spec, which permits total 
+     vendor independence and interoperability.
+
+In more detail:
+
+SCSI is basically a packet-based peer-to-peer communications protocol
+designed around mass storage devices.  Think of it as something akin
+to Ethernet:  Every device on the bus is capable of initiating a 
+"conversation", you can talk to devices while other devices are in the
+middle of a conversation, etc.  
+
+Downsides:  Again, think of it as something akin to an Ethernet:  It
+doesn't cope well with bus bandwidth saturation.  Collision domains 
+don't work well under load.
+
+A SCSI I/O is based around a device sending packets containing commands
+or data to another device.  Each device on the bus has a unique address
+(either 3 bits wide or four bits wide, depending on whether you're talking
+about SCSI or wide SCSI), and commands transmitted on the bus contain 
+the source address of the device which transmitted them, and the destination
+address of the target it's attempting to control.
+
+In the latency period between the transmission of a request and the 
+reception of the response, other devices are free to utilize the bus
+too.  For example, if you're backing up one disk onto a SCSI tape drive
+whilst doing I/O on another disk, that'll all work harmoniously:  While
+your backup disk and tape drive are busy working on high-latency
+transactions, your I/O to your data disk will speed along happily.  This
+is one of the MAJOR performance benefits SCSI exhibits, and is why single
+user machines usually don't notice the differences between IDE and SCSI:
+A single human sitting behind a single keyboard usually doesn't cause
+large amounts of parallel I/O on large numbers of mass storage devices.
+
+SCSI devices as manufactured don't give a rat's arse about PCs, so they
+don't have the stupid design warts PCs exhibit.  More specifically, the
+bizarre restriction on volume size present on PCs and virtually no other
+modern hardware in existance simply doesn't exist on SCSI devices, so 
+the only effective limit on their size is the limits of modern technology.
+SCSI drivers don't typically address sectors on the disk in terms of 
+its cylinder number, head number and sector number;  instead they address
+them in terms of linear block numbers and let the firmware on the (smart)
+disk device determine where the block is physically located.  BIOS chips
+on PC host adaptors need to do translations so a PC BIOS (which *does* 
+want to think in terms of cylinders, heads and sectors) can boot, but once
+a 32 bit OS is loaded the BIOS can be ignored and the disk can be used
+to the full extent of its capabilities.
+
+Finally, SCSI host adaptors have virtually all used DMA, which, in the
+past, has provided huge performance wins over IDE.  IDE devices which
+predate EIDE didn't support DMA at all, so all disk I/O required the
+cooperation of the CPU.  Did you ever wonder why your quake framerate
+would go down whenever it decided it wanted to load the next bit of the 
+map or a new texture?  Now you know:  Instead of running your quake game,
+the CPU was busy with the mind-numbingly boring task of byte-copying
+data from the disk's port-mapped I/O buffer into your system's physical
+memory and vice-versa.  If you'd had a SCSI system, your OS would say,
+"Oi!  Give me these disk blocks, place them in RAM starting at this
+address..." then it'd go back to running your quake game.  Meanwhile,
+in the background, the disk and SCSI card would carry out the requested
+commands, and trigger an interrupt to get the OS's attention when they'd
+finished.  The user interface experience on a SCSI system is noticibly
+"smoother" because the CPU isn't continually being ripped away from user
+tasks for basic I/O services.
+
+That'll probably fill fifteen minutes :-)
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

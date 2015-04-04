@@ -1,0 +1,120 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RPM, just like Windows' Registry only buggier" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'linux SA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 06 Mar 2003 17:17:39 +1030" -->
+<!-- Id="3E66EF0B.6080900@aarnet.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RPM, just like Windows' Registry only buggier</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : linux SA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 06 Mar 2003 17:17:39 +1030
+</PRE>
+<H1>RPM, just like Windows' Registry only buggier</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi folks,
+
+Had a few issues today with the RPM implementation that ships with
+Red Hat Linux 8.0.
+
+1)
+Before you read much further, if you use RHL 8.0 and want to retain
+your sanity then
+
+   sudo -s
+   cd /var/lib/rpm
+   db_verify Packages
+   db_dump Packages | bzip2 -c -9 &gt; Packages.20030306-1.dbdump.bz2
+
+This is the RHL equivalent of backing up the Windows Registry.
+If your machine isn't blessed with GHz of CPU then use gzip
+instead of bzip2.
+
+Repeat during each software install, saving the before and after
+copies.  eg:
+
+   sudo -s
+   cd /var/lib/rpm
+   db_verify Packages
+   rm *.dbdump.bz2
+   db_dump Packages | bzip2 -c -9 &gt; Packages.20030306-1.dbdump.bz2
+   rpm -ivh ~/my.rpm
+   db_dump Packages | bzip2 -c -9 &gt; Packages.20030306-2.dbdump.bz2
+
+This sucks, but I suggest people do it until Red Hat find the RPM
+bug which causes the database corruption.
+
+2)
+Never, ever press Ctrl+C to interrupt RPM.  Even when doing
+supposedly read-only operations such "rpm -q -a".
+
+3)
+If RPM doesn't work, as in it halts forever using 0% CPU
+and strace saying "select(0,0,0)" and only "kill -9" will
+halt the process, then in order of severity:
+
+  a) go to /var/lib/rpm and delete the __db* files.  These
+     are lock files, so don't fret.  The "kill -9" probably
+     corrupted the indexes, so continue to (b).
+
+  b) rebuild the indexes to the RPM data file with
+     "rpm -vv --rebuilddb"
+
+  c) Check the data file for errors "db_verify Packages"
+     and if this fails unload and reload the data file
+     "mv Packages Packages.ouch
+      db_dump Packages.ouch | db_load Packages
+      rpm -vv --rebuilddb"
+     Check results using "rpm -q -a".
+
+  d) Unload the database, edit the hex-text file, reload
+     the database, recreate the indexes.  Desperation
+     stuff.
+
+RPM is a wonderful tool.  When it works right :-)
+
+-- 
+  Glen Turner                (08) 8303 3936 or +61 8 8303 3936
+  Australian Academic and Research Network   www.aarnet.edu.au
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

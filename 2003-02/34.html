@@ -1,0 +1,140 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: formmail" -->
+<!-- FromName="'Andrew Braund'" -->
+<!-- FromEmail="andrew@allcnet.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 3 Feb 2003 11:43:31 +1030" -->
+<!-- Id="NDBBIFBEJKPAFOALJJAPGEEPLMAA.andrew@allcnet.com" -->
+<!-- Reference="036101c2caa2$574b71b0$1237ddcb@laptop" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: formmail</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Braund &lt;<I><A HREF="mailto:andrew@allcnet.com">andrew@allcnet.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 3 Feb 2003 11:43:31 +1030
+</PRE>
+<H1>RE: formmail</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; -----Original Message-----
+&gt; From: Troy Davis [mailto:<A HREF="mailto:tdavis@comstech.com">tdavis@comstech.com</A>]
+&gt; Sent: Sunday, 2 February 2003 20:33
+&gt; To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; Subject: formmail
+&gt;
+&gt;
+&gt; I want to be able to have web users choose a email address from a drop down
+&gt; list and type in there message and send to the chosen email address with out
+&gt; the sender finding the email address of the recipient. Older formail 1.6
+&gt; worked well for me, but with too many people searching for it now I am
+&gt; unable to use this. Does anyone have a solution for me. If you want to see
+&gt; what I am on about have a look at
+&gt; www.amca-nationals.com and choose the mail link.
+&gt;
+&gt; Thanks, Troy
+&gt;
+
+I think you would be better off ditching formmail altogether, has a rather
+poor security reputation. A simple script in PHP/Perl etc would get this done.
+I don't do Perl but in PHP the following might get you started;
+
+
+Rename <A HREF="http://www.amca-nationals.com/mail/index.html">http://www.amca-nationals.com/mail/index.html</A>
+to /mail/index.php and insert the following;
+
+&lt;?php
+$emailAddressAry = array(
+  'Andrew Ash NSW50'=&gt;'<A HREF="mailto:ashktm@yNoSpamahoo.com">ashktm@yNoSpamahoo.com</A>',
+  'Bob Dennis QLD403'=&gt;'<A HREF="mailto:redline@powNoSpamerup.com.au">redline@powNoSpamerup.com.au</A>',
+  'Dallas Czerwinski QLD96'=&gt;'<A HREF="mailto:dallaslinda496@hoNoSpamtmail.com">dallaslinda496@hoNoSpamtmail.com</A>',
+  'Dean Pomeroy SA69'=&gt;'<A HREF="mailto:dpr@mbNoSpamox.com.au">dpr@mbNoSpamox.com.au</A>',
+  'Jeff Franks NSW51'=&gt;'<A HREF="mailto:starzinteriors@biNoSpamgpond.com">starzinteriors@biNoSpamgpond.com</A>'
+  // etc (remove NoSpam)
+  );
+
+if (!isset($_POST['recipient'])) { // display the form
+
+?&gt;
+&lt;FORM METHOD=POST ACTION="&lt;?php echo $_SERVER['PHP_SELF']; ?&gt;"&gt;
+formatting etc ...&lt;br/&gt;
+  &lt;select name="recipient" size="1"&gt;
+    &lt;option&gt;Select driver&lt;/option&gt;
+&lt;?php
+  foreach( $emailAddressAry as $name=&gt;$email) {
+    echo '    &lt;option&gt;'.$name."&lt;/option&gt;\n";
+  }
+?&gt;
+  &lt;/select&gt;
+other fields ...&lt;br/&gt;
+  &lt;input type="text" name="subject" size="80"&gt;&lt;br&gt;
+  &lt;textarea name="message" cols="80" rows="15"&gt;&lt;/textarea&gt;
+  &lt;input type="submit" value="Submit" name="submit"&gt;
+  &lt;input TYPE="reset" VALUE="Reset"&gt;
+&lt;/form&gt;
+&lt;?php
+
+} else { // user clicked send
+  if (isset($emailAddressAry[$_POST['recipient']])) {
+    $formFieldsAry = array('recipient','subject','message');
+    foreach ($formFieldsAry as $field) {
+      $$field = substr($$field, 0, 200); // only allow 200 character per field,
+      //  strip all but alpha numeric ,.  and '
+      // regex gurus will improve this!
+      $$field = ereg_replace("[^[:alnum:] .,']", "", $$field);
+    }
+    ini_set("sendmail_from", 'webmaster@'.$_SERVER['SERVER_NAME']);
+    mail(
+      $emailAddressAry[$_POST['recipient']], // To:
+      $subject,
+      $message,
+      'From: webmaster@'.$_SERVER['SERVER_NAME']."\r\n"
+     .'Reply-To: webmaster@'.$_SERVER['SERVER_NAME']."\r\n"
+     .'X-Mailer: PHP/' . phpversion()
+     );
+    echo 'Your mail has been sent, thankyou for your interest...&lt;br/&gt;';
+  } else if ($_POST['recipient'] == 'Select driver') {
+    echo 'You need to select who to send the email to. Press back and try
+again.&lt;br/&gt;';
+  } else {
+    echo 'Get a life...&lt;br/&gt;'; // someone messing with our form
+  }
+}
+?&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

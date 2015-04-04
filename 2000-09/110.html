@@ -1,0 +1,219 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: my first DOS attack" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="Mark Newton" -->
+<!-- ToEmail="newton@atdot.dotat.org" -->
+<!-- Date="Tue, 5 Sep 2000 02:34:10 +0930" -->
+<!-- Id="20000905023410.B10714@dog.topology.org" -->
+<!-- Reference="20000905011637.A6523@atdot.dotat.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: my first DOS attack</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  Date: Tue, 5 Sep 2000 02:34:10 +0930
+</PRE>
+<H1>Re: my first DOS attack</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Warning -- long reply...
+
+===========================================================
+Mark,
+
+That's all good value.
+But I'm not quite certain that you have the same picture of
+the scenario that I have.
+
+Here's an example:
+
+------------------------------------------------------------------
+Scenario 1:
+I'm in Strasbourg with my laptop accessing my home web site over
+the client company's LAN and Internet access.
+I have some 4 machines which I want to access for various reasons.
+Once I'm "in" to one of my machines, I'm certain that I'm me.
+So I want to move around freely - e.g. with "rsh" and "rcp".
+
+Disadvantage of "ssh" and "scp" - I don't want other people in
+the office to see me type in my passphrase.
+If I have someone viewing a demo I've giving them, I'd rather
+just type "rsh hostname" than type the passphrase.
+
+Scenario 2:
+I'm at home in front of my main workstation, and I am copying files
+from the workstation to my webserver 30 or more times a day.
+I use makefiles with "rcp" in them.
+Typing in passphrases is very tedious indeed.
+
+------------------------------------------------------------------
+On Tue, Sep 05, 2000 at 01:16:37AM +0930, Mark Newton wrote:
+&gt; On Tue, Sep 05, 2000 at 12:54:55AM +0930, Alan Kennington wrote:
+&gt; 
+&gt;  &gt; Is that  attack of which you speak the kind of attack where
+&gt;  &gt; you fake the reverse DNS look-up to fool the server host into
+&gt;  &gt; thinking that the client is a trusted client?
+&gt;  
+&gt; No.  It is an attack which forges packets so that they appear to come
+&gt; from "trusted" IP addresses.
+
+This is fine from attacker to victim.
+But the victim traditionally replies with the destination IP
+address equal to the source address of the client's packets.
+The attacker, in order to get those reply packets, must either
+be on the same LAN as me (e.g. a shared office with disreputable
+co-workers), or else be on the same LAN as the destination host
+(or some other less credible alternatives).
+The attacker must be pretty clever to trick my computers into sending 
+IP packets to an address which is _not_ written in the client
+IP packet source-IP field.
+
+------------------------------------------------------------------
+&gt; The attack method is well known, and has been for many years.  There
+&gt; was a very long and drawn out thread on it started by Tsotumo
+&gt; Shimomura in comp.unix.security in 1996 or thereabouts;  It's also
+&gt; one of the reasons why so much effort has been invested into selecting
+&gt; difficult-to-guess seed sequence numbers in TCP implementations 
+&gt; since that time.
+
+I remember overhearing some people discussing this kind of attack
+around about that time.
+I know that TCP uses (or used to use) the time of day to choose
+the initial sequence number, apparently as a way of avoiding the
+possibility of packets from different sessions to the same port
+getting confused - in case of link failure etc.
+
+I can see that an attacker, if able to guess the precise 32-bit
+sequence number, could maintain a credible sequence of packet
+_transmissions_ to the server host to maintain the communication.
+But they still could not receive the packets from the victim
+(server) host. Thus they could.....
+hmmmm.... 
+They could then execute something nasty, e.g. a call-back, or else
+a "rm -r /" or something.
+This could be done by knowing the exact sequence of actions that will
+be taken by the server.
+So having a predictable server SEQ number makes it possible.
+And if it fails once, 5000 attempts would pretty quickly
+get it.
+
+I'm grateful to you for that. 
+I hadn't thought about how sneeky these rascals can be.
+
+------------------------------------------------------------------
+&gt;  &gt; On a related topic, the "r" commands are useful for all sorts
+&gt;  &gt; of purposed, like inclusion in scripts and makefiles.
+&gt; 
+&gt; Get ssh.  Functionally identical to the "r" commands, able to run as
+&gt; a command-line-compatible drop-in replacement, but with the benefit of
+&gt; cryptographic security.
+
+Well, I've got "ssh" all over the place.
+What I didn't know until 30 minutes ago is that there is an "scp"
+command to replace "rcp".
+This is really terrific. I've been using mail attachments for
+transfers over the net. This is going to change my life!
+The problem is that "scp" requires my passphrase, which is
+no good at all for makefile and script use.
+
+------------------------------------------------------------------
+&gt; Yes - Place public keys of authorized clients into a user's
+&gt; $HOME/.ssh/authorized_keys file (to generate the keypair, use 
+&gt; ssh-keygen(1) -- Perhaps non-obvious).
+&gt; 
+&gt;  &gt; But then would that no weaken my whole security?
+&gt;  &gt; If someone gets hold of that unencrypted signature-file
+&gt;  &gt; thing, then they can impersonate me even over the net
+&gt;  &gt; through my firewall (which lets ssh through).
+&gt; 
+&gt; There is no such thing as an unencrypted signature file.  There are
+&gt; private key files (which are supposed to be unreadable to everyone
+&gt; except their owner, and are passphrase-protected just in case) and 
+&gt; there are public key files (which are useless without the corresponding
+&gt; private key).
+
+Well, "man ssh-keygen" says:
+
+=========================================================
+     Normally this program generates the key and asks for a file in which to
+     store the private key.  The public key is stored in a file with the same
+     name but ``.pub'' appended.  The program also asks for a passphrase.  The
+     passphrase may be empty to indicate no passphrase (host keys must have
+     empty passphrase), or it may be a string of arbitrary length.
+=========================================================
+
+I.e. the passphrase is not required.
+So the "private" key _can_ be unencrypted!!
+
+Then "man scp" says:
+
+=========================================================
+     -B      Selects batch mode (prevents asking for passwords or passphras­
+             es).
+=========================================================
+
+- indicating how to avoid having the user type in anything.
+And "man ssh" says:
+
+=========================================================
+     BatchMode
+             If set to ``yes'', passphrase/password querying will be disabled.
+             This option is useful in scripts and other batch jobs where you
+             have no user to supply the password.  The argument must be
+             ``yes'' or ``no''. 
+=========================================================
+
+This is obviously the real corresponding thing to .rhosts trust.
+This is what I meant by "uncrypted signature files".
+
+So I _could_ go to the bother of setting this all up with a 
+separate key for my "rcp" scripts (or "scp" now), so that
+if someone gets my key, they will only be able to do a very 
+limited set of things.
+
+I must say that I can't see myself going to so much effort.
+I think that my recommendation to Robyn remains:
+If you have several machines which are safely behind a firewall,
+then all things considered, it's better to use .rhosts than
+to type passwords for every file copy and login.
+And if "rcp" and "rlogin" are firewalled out, the above
+sequence-number-guessing attack won't work anyway.
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

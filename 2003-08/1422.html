@@ -1,0 +1,119 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="iptables, terminal services, and port 3389?" -->
+<!-- FromName="'Luke Nuske'" -->
+<!-- FromEmail="linuxsa_newbie@hotmail.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 28 Aug 2003 12:04:01 +0930" -->
+<!-- Id="Law12-F84gSwjwoEKa000013be4@hotmail.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: iptables, terminal services, and port 3389?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Luke Nuske &lt;<I><A HREF="mailto:linuxsa_newbie@hotmail.com">linuxsa_newbie@hotmail.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 28 Aug 2003 12:04:01 +0930
+</PRE>
+<H1>iptables, terminal services, and port 3389?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hello all,
+
+Hope you are all having productive weeks, I know I'm trying to. Haven't 
+quite got my head around iptables yet, and as such here is the problem:
+
+I have a client running a W2K server on his LAN, which sits behind a Red Hat 
+7.3 box running iptables. Now, he is currently contracting a client that has 
+two live ip addresses that need to connect to his W2K server using MS 
+Terminal Services on port 3389.
+
+So, I have
+
+W2K IP Address - 192.168.xxx.xxx (private IP - internal)
+Linux eth0 Address - xxx.xxx.xxx.xxx (live IP)
+Client 1 - yyy.yyy.yyy.aaa (live IP)
+Client 2 - yyy.yyy.yyy.bbb (live IP)
+
+I believe the clients need both tcp and udp, so I have setup the following
+
+*nat
+:PREROUTING ACCEPT [319539:48423246]
+:POSTROUTING ACCEPT [174070:12208917]
+:OUTPUT ACCEPT [268924:16679867]
+[0:0] -A PREROUTING -i eth0 -s yyy.yyy.yyy.aaa -p tcp -m tcp --dport 3389 -j 
+DNAT --to-destination 192.168.xxx.xxx
+[0:0] -A PREROUTING -i eth0 -s yyy.yyy.yyy.bbb -p tcp -m tcp --dport 3389 -j 
+DNAT --to-destination 192.168.xxx.xxx
+[0:0] -A PREROUTING -i eth0 -s yyy.yyy.yyy.aaa -p udp -m udp --dport 3389 -j 
+DNAT --to-destination 192.168.xxx.xxx
+[0:0] -A PREROUTING -i eth0 -s yyy.yyy.yyy.bbb -p udp -m udp --dport 3389 -j 
+DNAT --to-destination 192.168.xxx.xxx
+[0:0] -A POSTROUTING -s 192.168.xxx.xxx -o eth0 -p tcp -m tcp --dport 3389 
+-j SNAT --to-source xxx.xxx.xxx.xxx
+[0:0] -A POSTROUTING -s 192.168.xxx.xxx -o eth0 -p udp -m udp --dport 3389 
+-j SNAT --to-source xxx.xxx.xxx.xxx
+
+*filter
+:INPUT ACCEPT [7054416:3232753774]
+:FORWARD ACCEPT [471265:87046036]
+:OUTPUT ACCEPT [7790042:4468556916]
+[0:0] -A INPUT -p tcp -m tcp -s 0/0 --dport 3389 -j ACCEPT
+[0:0] -A INPUT -p tcp -m tcp -s 0/0 --dport 3389 -j ACCEPT
+[0:0] -A INPUT -p udp -m udp -s 0/0 --dport 3389 -j ACCEPT
+[0:0] -A INPUT -p udp -m udp -s 0/0 --dport 3389 -j ACCEPT
+[0:0] -A FORWARD -d yyy.yyy.yyy.aaa -p tcp -m tcp --dport 3389 -j ACCEPT
+[0:0] -A FORWARD -d yyy.yyy.yyy.bbb -p tcp -m tcp --dport 3389 -j ACCEPT
+[0:0] -A FORWARD -d yyy.yyy.yyy.aaa -p udp -m udp --dport 3389 -j ACCEPT
+[0:0] -A FORWARD -d yyy.yyy.yyy.bbb -p udp -m udp --dport 3389 -j ACCEPT
+
+Is there anything i need to change/add/delete for this to work? I have been 
+to a few sites to get assisstance, and the current rules I have written are 
+the most accurate suggestions (i think).
+
+Also, are we allowed to post these kind of messages or is is against 
+protocol?
+
+Cheers,
+
+Luke
+
+_________________________________________________________________
+Hotmail is now available on Australian mobile phones. Go to  
+<A HREF="http://ninemsn.com.au/mobilecentral/signup.asp">http://ninemsn.com.au/mobilecentral/signup.asp</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

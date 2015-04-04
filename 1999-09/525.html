@@ -1,0 +1,115 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="sendmail problem" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 23 Sep 1999 19:17:09 +0930" -->
+<!-- Id="199909230947.TAA12361@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: sendmail problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 23 Sep 1999 19:17:09 +0930
+</PRE>
+<H1>sendmail problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Does anyone happen to know what configuration you have
+to do the /etc/mail/* files in redhat 5.2 to make
+sendmail _not_ do relays on behalf of users outside
+my domain?
+
+Strangely, my set-up denies relaying by my own hosts,
+but not by outside hosts. This is the resvers to what
+I want. It also seems to contradict the RH 5.2 documentation.
+
+Page 349 of the redhat manual, section E.10.2, says
+that it should all be fine -- relaying should be off.
+But in reality relaying _does_ happen, but only for
+the users who should _not_ be able to.
+
+My /etc/mail/relay_allow file is empty.
+So is name_allow.
+
+The sendmail.cf file from redhat 5.2 has:
+
+# file containing names of machines which can use our relay
+F{LocalNames} /etc/mail/name_allow
+
+--------------------------------------
+and it later has.....
+--------------------------------------
+Scheck_rcpt
+# first: get client address
+R$+                     $: $(dequote "" $&{client_addr} $) $| $1
+R0 $| $*                $@ ok           client_addr is 0 for sendmail -bs
+R$={LocalIP}$* $| $*    $@ ok           from here
+# next: get client name
+R$* $| $+               $: $(dequote "" $&{client_name} $) $| $2
+R $| $*                 $@ ok           no client name: directly invoked
+#R$- $| $*              $@ ok           for those without full DNS...
+R$*$=w $| $*            $@ ok           from here
+R$*$={LocalNames} $| $* $@ ok           from allowed system
+# now check other side
+R$* $| $*               $: $&gt;3 $2
+# remove local part
+R$*&lt;@$+.&gt;$*             $: $&gt;remove_local $1&lt;@$2.&gt;$3
+# still something left?
+R$*&lt;@$+&gt;$*              $#error $@ 5.7.1 $: 551 we do not relay
+-------------------------------------
+
+The /var/log/maillog file shows clearly that the
+check_rcpt rule _is_ invoked, but only on the first
+attempt. A second attempt by the outside user
+somehow just goes straight through without
+running the check_rcpt rule.
+
+This will take me days to debug if no one
+recognizes this problem and knows its solution.
+Even with the sendmail book, all of the course, the
+config files, and the redhat manual etc. etc.,
+there's still negligeable info on this.
+
+It looks like RH have devised their own special sendmail.cf
+file which is just not documented, as far as I can see.
+
+Cheers,
+Alan Kennington.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

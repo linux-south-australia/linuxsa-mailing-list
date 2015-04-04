@@ -1,0 +1,169 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Hardware RAID on Debian" -->
+<!-- FromName="'Anthony Symons'" -->
+<!-- FromEmail="ant@sa.pracom.com.au" -->
+<!-- ToName="'Richard Russell'" -->
+<!-- ToEmail="richard@yellowgoanna.com" -->
+<!-- Date="16 Oct 2001 10:45:42 +0930" -->
+<!-- Id="1003194942.3200.69.camel@ant.internal" -->
+<!-- Reference="20011015214847.G14462@yellowgoanna.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Hardware RAID on Debian</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  To  : Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  Date: 16 Oct 2001 10:45:42 +0930
+</PRE>
+<H1>Re: Hardware RAID on Debian</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, 2001-10-15 at 21:48, Richard Russell wrote:
+&gt; Hi all...
+&gt; 
+&gt; I'm looking for a hardware SCSI RAID (0/1 or 5) solution for a debian
+&gt; server...  Have been looking at Adaptec 3200s cards, but am interested
+&gt; in what else people are using, specifically if they have been using it
+&gt; with Debian, and what experiences they have had with them.
+
+I have used mylex, adaptec, and ami megaraid. I found mylex to be the
+best by far, as it "just worked" where as adaptec and megaraid both gave
+me a lot of grief. Its reported that adaptec have improved, but Im not
+prepared to risk it again. Megaraid havn't. The adaptec (at least the
+ones I used about 9 months ago) used the i2o driver in the kernel, which
+was also flakey at the time, and the first adaptec card I had got
+recalled by adaptec who replaced it with 2 brand new raid cards, which
+was at least something I guess (even though I didnt want any adaptec by
+then).
+ 
+&gt; What I really want is one that is supported by the standard kernel
+&gt; with no recompiles needed. Yeah yeah, kernel compiles are easy etc...
+&gt; I can do it, I'd just rather not, all other things being equal...
+
+I think newer distros support all 3 out of the box. There was some
+issues with mandrake 8.0 and the megaraid, because the megaraid use
+qlogic scsi chips and the qlogic driver loaded first and then didnt work
+properly since It was controlling half a raid card!
+
+&gt; Also, does anyone here have any practial experience with adding
+&gt; capacity to a RAID array? I want to be able to purchase (say) 75Gb of
+&gt; usable space now, and add up to 200Gb more as time goes on... I would
+&gt; assume this is a matter of powering down (or not, if hotswappable
+&gt; drives and enclosures are used...), doing some RAID device
+&gt; configuration (this probably requires powering down), and then using
+&gt; growfs to grow the filesystem onto the new disk(s)... Have I got this
+&gt; approximately right, or am I imagining things? 
+
+AFAIK With hardware raid you are going to need to backup all the data to
+modify the size of the raid disk (which deletes all the data) then
+recreate the file system. If newer raid cards get around this, I'd like
+to know about them as I am going to have to do this to one of my servers
+next week :/
+
+&gt; Also, would this be
+&gt; harder/slower/unreliable if one was using RAID 5 (as the striping may
+&gt; change drastically...) as against RAID 0/1 (where, I guess, the
+&gt; striping would change just as drastically, now that I think about
+&gt; it...)
+
+as above... it'll be just as hard whatever way.
+ 
+&gt; Also, would people generally recommend putting system software off the
+&gt; RAID somewhere (perhaps an IDE disk) and just data on the RAID so that
+&gt; in the case of a RAID disaster, one can still boot and function as
+&gt; expected, and can even unmount and work on the RAID while the system
+&gt; is up...?
+
+Well, your raid should be more reliable than a non raid IDE. I havnt
+seen raid disks get out of sync on hardware raid (well, execpt on the
+ami megaraid, but thats another story). 
+
+I have found mylex extreemly reliable, fast and easy to use, and if you
+loose a disk with system stuff on it thats part of a raid 5 array then
+your server will keep serving, but if its IDE then then your stuffed.
+
+Mylex also has great harware support where you can see exactly whats
+going on and can echo raid commands in to a special file in the proc
+tree to rebuild and do consistency checks etc. Or you can script a test
+that checks the status file for "OK" and emails you if its "ALERT".
+
+See below for an example of the info you can get out the proc tree.
+
+Cheers,
+Ant
+
+[<A HREF="mailto:ant@flanders">ant@flanders</A> rd]$ pwd
+/proc/rd
+[<A HREF="mailto:ant@flanders">ant@flanders</A> rd]$ ls
+c0  status
+[<A HREF="mailto:ant@flanders">ant@flanders</A> rd]$ cat status
+OK
+[<A HREF="mailto:ant@flanders">ant@flanders</A> rd]$ cd c0/
+[<A HREF="mailto:ant@flanders">ant@flanders</A> c0]$ ls
+current_status  initial_status  user_command
+[<A HREF="mailto:ant@flanders">ant@flanders</A> c0]$ cat current_status
+***** DAC960 RAID Driver Version 2.4.10 of 1 February 2001 *****
+Copyright 1998-2001 by Leonard N. Zubkoff &lt;<A HREF="mailto:lnz@dandelion.com">lnz@dandelion.com</A>&gt;
+Configuring Mylex DAC960PTL1 PCI RAID Controller
+  Firmware Version: 4.07-0-29, Channels: 1, Memory Size: 8MB
+  PCI Bus: 0, Device: 20, Function: 1, I/O Address: Unassigned
+  PCI Address: 0xFE000000 mapped at 0xD0800000, IRQ Channel: 5
+  Controller Queue Depth: 124, Maximum Blocks per Command: 128
+  Driver Queue Depth: 123, Scatter/Gather Limit: 33 of 33 Segments
+  Stripe Size: 64KB, Segment Size: 8KB, BIOS Geometry: 128/32
+  Physical Devices:
+    0:0  Vendor: IBM       Model: DPSS-318350N      Revision: S80D
+         Serial Number:         ZE0D1823
+         Disk Status: Online, 35842048 blocks
+    0:1  Vendor: IBM       Model: DPSS-318350N      Revision: S80D
+         Serial Number:         ZE0C4707
+         Disk Status: Online, 35842048 blocks
+    0:2  Vendor: FUJITSU   Model: MAH3182MP         Revision: 0114
+         Serial Number:     50012131
+         Disk Status: Online, 35700736 blocks
+    0:4  Vendor: IBM       Model: DDYS-T36950N      Revision: S93E
+         Serial Number:         TFFET251
+         Disk Status: Online, 71686144 blocks
+  Logical Drives:
+    /dev/rd/c0d0: RAID-5, Online, 71401472 blocks, Write Thru
+    /dev/rd/c0d1: RAID-7, Online, 71686144 blocks, Write Thru
+  No Rebuild or Consistency Check in Progress
+[<A HREF="mailto:ant@flanders">ant@flanders</A> c0]$
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

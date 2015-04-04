@@ -1,0 +1,131 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Tail Recursive" -->
+<!-- FromName="'Martin Sandiford'" -->
+<!-- FromEmail="ms@mcdev.com.au" -->
+<!-- ToName="'David Lloyd'" -->
+<!-- ToEmail="lloy0076@rebel.net.au" -->
+<!-- Date="Thu, 30 Aug 2001 01:49:55 +0930" -->
+<!-- Id="m3g0aaalec.fsf@plugh.mccorp.com.au" -->
+<!-- Reference="3B89C724.662FEDF0@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Tail Recursive</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Martin Sandiford &lt;<I><A HREF="mailto:ms@mcdev.com.au">ms@mcdev.com.au</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  Date: Thu, 30 Aug 2001 01:49:55 +0930
+</PRE>
+<H1>Re: Tail Recursive</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Tail recursion is recursion that can run in constant space.  Sometimes
+tail recursion is called "last call optimisation".
+
+In some languages in the functional group, of which both scheme and
+Erlang are members, tail recursion is the only way to implement
+functions that do not return.
+
+Most procedural languages do not implement tail recursion, for example
+the following C function *could* be compiled to run in constant space.
+I am not aware of any compilers that do this.
+
+    void foo(int n) {
+      if (n == 0) return;
+      printf("%d\n", n);
+      foo(n-1);
+    }
+
+To modify to run in constant space, the call to "foo(n-1)" in the last
+line could be replaced with some code to frob the value of "n", and jump
+(rather than call) to the top of the function, rather like this:
+
+    void foo(int n) {
+    loop:
+      if (n == 0) return;
+      printf("%d\n", n);
+      n = n - 1;
+      goto loop;
+    }
+
+Unfortunately, C functions can have side effects (such as modifying
+values in the callers frame via pointers) that means that these
+optimisations cannot be reliably performed in the general case.  If you
+compile this function with a main() that calls foo(1000000000), you will
+get a segfault when you run out of stack.  Definitely not constant
+space.
+
+
+
+A similar function in Erlang, will happily print all billion numbers,
+given sufficient patience.  (I'm pretty sure of this, but I haven't
+exhaustively checked :] ).
+
+    foo(0) -&gt; [];
+    foo(N) -&gt;
+        io:fwrite("~w\n", [N]),
+        foo(N-1).
+
+Likewise for (umb)scheme:
+
+    (define (foo n)
+      (if (= n 0)
+          '()
+          (begin
+            (display n)
+            (newline)
+            (foo (- n 1)))))
+
+
+Regards,
+Martin
+
+On Mon, 27 Aug 2001, <A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A> wrote:
+&gt; I can't quite get my head around what "tail recursion" (applied to
+&gt; Lisp and Scheme) means regardless of how many Scheme specifications I
+&gt; read...anyone know of any really _simple_ explanations?
+&gt; 
+&gt; DSL
+&gt; -- 
+&gt; MegaHAL: Linuxsa is not incorporated.
+&gt; User:    Can an incorporated association send out a press release?
+&gt; MegaHAL: Linuxsa is a religion.
+&gt;  - Quoting "megahal" (download: <A HREF="http://megahal.sourceforge.net/">http://megahal.sourceforge.net/</A>)
+&gt; 
+
+-- 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,119 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: smbd file/folder creation permissions" -->
+<!-- FromName="'Matthew Geddes'" -->
+<!-- FromEmail="mgeddes@tellurian.com.au" -->
+<!-- ToName="'Nik [TM]'" -->
+<!-- ToEmail="tmcruisin@sond.com.au" -->
+<!-- Date="Wed, 15 Aug 2001 13:28:40 +0930" -->
+<!-- Id="3B79F370.C6416E4F@tellurian.com.au" -->
+<!-- Reference="002b01c12522$c791a010$0301a8c0@nick" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: smbd file/folder creation permissions</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  To  : Nik [TM] &lt;<I><A HREF="mailto:tmcruisin@sond.com.au">tmcruisin@sond.com.au</A></I>&gt;
+  Date: Wed, 15 Aug 2001 13:28:40 +0930
+</PRE>
+<H1>Re: smbd file/folder creation permissions</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+"Nik [TM]" wrote:
+&gt; 
+&gt; Hi all,
+&gt; I need to get some advice with smbd.
+&gt; I have setup smbd 2.0.7 on a redhat 6.2 install to make a file server
+&gt; for our windows network.
+&gt; all is working fine with getting the shares working using swat,
+&gt; everything sweet.
+&gt; 
+&gt; what I notice is that when it creates the files/folders they are all
+&gt; given permissions for root.%user
+&gt; 
+&gt; now this hasnt been a problem until now, as its a private network, but I
+&gt; have just made another smbd share which is also mounted using nfs, to a
+&gt; folder on our firewall, so we can then sftp in and transfer files
+&gt; between home and our private network. (couldnt be bothered with VPN or
+&gt; port forwarding as I was trying to reduce external services/open ports)
+&gt; 
+&gt; what I have been trying to do is to change the default permissions smbd
+&gt; applies to new files (probably all files/folders) so as to not be
+&gt; transferring any files with root permissions.
+&gt; I have create a user and group, smbnoone.smbnogrp and then tried using
+&gt; the users map feature of samba so all users were then mapped to the one
+&gt; user. the file is very simple and is written like;
+&gt; 
+&gt; smbnoone = nick brett dave luke
+&gt; 
+&gt; I have added the user smbnoone and a suitable passwd to samba and set it
+&gt; as active, but when I then tell samba to use the smbusers.map file all
+&gt; the shares stop and smbd doesnt accept any passwords for any users
+&gt; nick brett dave luke or smbnoone
+&gt; as soon as I remove the reference to the smbusers.map file from the
+&gt; smb.conf everything back to normal.
+&gt; 
+&gt; can anyone suggest a better way of making samba create files with
+&gt; minimal permissions or spot what I may be doing wrong here
+
+Someone already mentioned the 'create mask' smb.conf option (which is a
+share-level option, rather than global). I would also have a look at
+'inherit permissions', which allows you to set the permissions on a
+directory and everything created below that directory inherits the
+permissions from it's parent. I don't know if this presents much of a
+security problem, but it's also possible to setgid a directory. Anything
+created below that directory will be owned by the group that owns the
+directory.
+
+Other smb.conf options to RTFM:
+
+[share level options]
+ directory *
+ force *
+ inherit permissions
+ map *
+ security mask
+
+DANGER! HERE BE DRAGONS! Just make sure you fully understand what you're
+doing before you actually implement these in production, as it is
+possible to give some people too much control over shares with the
+greatest of ease. Also be wary of using some of these options inside the
+[homes] share.
+
+Hope it helps,
+Matt
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

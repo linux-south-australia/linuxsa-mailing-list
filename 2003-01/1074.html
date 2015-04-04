@@ -1,0 +1,148 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: le samba, le ACL's, le meow" -->
+<!-- FromName="'Freeman, Peter (ERHS)'" -->
+<!-- FromEmail="Freeman.Peter@saugov.sa.gov.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="adam.smith@sageautomation.com" -->
+<!-- Date="Tue, 28 Jan 2003 14:54:03 +1030" -->
+<!-- Id="957F5820F786D511AEDF0002A56B67FC083346F2@sagemsg0012.sagemsmrd01.sa.gov.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: le samba, le ACL's, le meow</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Freeman, Peter (ERHS) &lt;<I><A HREF="mailto:Freeman.Peter@saugov.sa.gov.au">Freeman.Peter@saugov.sa.gov.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A></I>&gt;
+  Date: Tue, 28 Jan 2003 14:54:03 +1030
+</PRE>
+<H1>RE: le samba, le ACL's, le meow</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt;I have a FreeBSD 5.0 system here, running Samba 2.2.7a, and I want to
+&gt;enable ACL's.  I want to utilize them in such a way that I can
+&gt;manipulate ACL's from a Windows workstation and have those ACL's set on
+&gt;my samba server.
+
+Can be done, though I have zero experience with FreeBSD, but the principle
+should be the same.
+
+
+&gt;I've searched and searched and searched and searched and searched and
+&gt;searched and searched and searched and I haven't been able to find a
+&gt;great deal of information or any HOWTO's that explain what is required,
+&gt;or how exactly *to* implement ACL's.  
+
+I'm with you here, there isn't a whole lot of easy to follow info out there,
+a lot of it is dated sadly.  I won't complain though because I'd be quite
+capable of writing some docs on it myself if I had some spare time.... :P
+
+
+&gt;with it, because when I remounted it, 'mount' still reported it as UFS.
+&gt;I was directed to have a look at tunefs, and I ran 'tunefs /dev/ar0s1g
+&gt;-a enable' which told me ACL support was now enabled.
+&gt;
+&gt;Now what?  I have enabled in smb.conf:
+&gt;
+&gt;nt acl support = yes
+&gt;inherit acls = yes
+&gt;inherit permissions = yes
+
+Ok, as long as your underlying filesystem is enabling ACLs you're pretty 
+much there.  You can check this further by using the acl utilities, setfacl,
+getfacl and so on.
+
+
+&gt;From a workstation I can view permissions but not change them.  'Access
+&gt;Denied.'  As a regular user and a member of the wheel group, I can
+&gt;change permissions using my 'regular' account, right?  I even tried
+&gt;using my 'root' account directly from a workstation to see what would
+&gt;happen, but still, 'Access Denied.'
+
+There's one of two conditions which must be met in order for you to change
+ACLs from a workstation (AFAIK):
+
+1. You must be the owner of the file/dir OR
+2. You must have root level access to the share
+
+This can be a pain in the proverbial when you're manipulating ACLs on shares
+which are accessed by many users because you end up with files owned by
+those
+many different users.  You've found this out by getting access denied
+errors.
+
+What we do here is have a root level share which gives root access for IT
+staff
+only so they can manipulate ACLs anywhere on the data shares.  (All our
+samba 
+shares reside in /home/samba, so we share /home/samba as the root level
+share)
+
+Obviously you need to be careful with this as root level access means root
+level
+access, so don't give it guest+browseable access without good backups! ;)
+
+Our smb.conf entry for this share is as follows:
+
+[Storage]
+        comment = Storage Server Root
+        path = /home/samba
+        valid users = @g-itstaff
+        admin users = @g-itstaff
+        force user = root
+        read only = No
+        browseable = No
+
+Once you have this setup you should be able to manipulate ACLs from any
+workstation
+if you have logged in as a member (in this case) of the group "g-itstaff"
+
+
+&gt;This is all a humungously enormous gigantic learning curve.  I've
+&gt;mastered Samba before but only for my own small-time setup, 
+&gt;not anything
+&gt;as major as this.  But I'm-a gettin' there Martha!
+
+If it's any consolation, ours is only a small time setup too, although
+there are many of them.  The largest samba box we have only has around
+70 concurrent users...
+
+(and the learning curve is worthwhile, once you reach the top and have 
+a look at the view ;)
+
+HTH
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

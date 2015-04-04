@@ -1,0 +1,127 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: C query" -->
+<!-- FromName="'Michael T Pope'" -->
+<!-- FromEmail="michael.pope@dsto.defence.gov.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="03 Nov 2000 14:07:04 +1030" -->
+<!-- Id="s9fzojhd8v3.fsf@riesling.dsto.defence.gov.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: C query</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael T Pope &lt;<I><A HREF="mailto:michael.pope@dsto.defence.gov.au">michael.pope@dsto.defence.gov.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 03 Nov 2000 14:07:04 +1030
+</PRE>
+<H1>Re: C query</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Paul Malcolm Bailey &lt;<A HREF="mailto:pmbailey@senet.com.au">pmbailey@senet.com.au</A>&gt; writes:
+
+&gt; So how come (if they're equivalent) I can do this:
+&gt; 
+&gt; char *p1;
+&gt; p1 = "One more";
+&gt; 
+&gt; ...but this...
+&gt; 
+&gt; char *p2;
+&gt; p2 = { 'O', 'n', 'e', ' ', 'm', 'o', 'r', 'e', '\0' };
+&gt; 
+&gt; ...renders a parse error under gcc?  (I'm guessing it's illegal.)  
+
+As others have remarked, the syntax for array initialization is not valid
+for pointer assignment.
+
+&gt; I mean, an array of char is what a string constant is, right?
+
+No, and this is a different misunderstanding.  A construct like "One
+more" is not an array of char.  Its effective type is "const char*",
+which can be a problem as the following illustrates---
+
+
+  345 Riesling&gt; cat &gt; foo.c
+  char* foo = "bar";
+  int main(void) {
+    foo[1] = 'A';
+    return 0;
+  }
+  346 Riesling&gt; gcc foo.c
+  347 Riesling&gt; a.out
+  Segmentation fault (core dumped)
+
+
+We may have declared foo to point to char, but we lied, and pointed it
+to const char.  When we tried to modify what we pointed to, we
+deservedly lost.  Change the above to "char foo[]" and all is well
+again, because then the characters are effectively copied into the
+array foo.
+
+&gt; Yet I can't even do this:
+&gt; 
+&gt; int *ptr_int_2 = 45;
+
+You certainly can, especially if that was "(int*) 45".  It might even
+be meaningful on a machine where 45 is a valid address to store an
+int, which is not however the case for most linux boxes.  I doubt that
+was what you intended to say though.  If you mean, you can not do---
+
+  int* ptr = { 4, 5 };
+
+---you are quite right.  The array syntax is necessary there.
+
+&gt; (What I'm saying here is that *for only strings* I can combine a pointer
+&gt; declaration with an assignment, but not for other data types.  What
+&gt; gives?)
+
+I have tried to avoid saying `string' in this reply.  Elsewhere Glen
+correctly points out that C really does not have strings.  I would
+rather say:
+
+  char*'s are different in that you can combine declaration with
+  an initialization to a const char*. 
+
+I strongly recommend not using this form of declaration / initialization.
+
+Cheers,
+Mike Pope
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

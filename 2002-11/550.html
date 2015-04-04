@@ -1,0 +1,144 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Sendmail | MX Looping [long]" -->
+<!-- FromName="'David Lloyd'" -->
+<!-- FromEmail="lloy0076@adam.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 12 Nov 2002 08:02:33 +1030" -->
+<!-- Id="20021112080233.5f29a0c1.lloy0076@adam.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Sendmail | MX Looping [long]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@adam.com.au">lloy0076@adam.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 12 Nov 2002 08:02:33 +1030
+</PRE>
+<H1>Sendmail | MX Looping [long]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Well, here goes.
+
+I had a setup that has worked for the past two months but for a reason I
+don't understand it fell flat on its face some time last night. Here's how
+I receive my e-mail:
+
+1) someone sends it to <A HREF="mailto:lloy0076@adam.com.au">lloy0076@adam.com.au</A>
+
+2) I get my BSD box to fetchmail it, pop3 to gw.david.net.au
+ - I don't own the david.net.au domain
+ - My local name server intercepts all queries for it and resolves it to
+   10.0.0.99 = gw
+   10.0.0.100 = linux
+
+3) I then use fetchmail from linux.david.net.au with pop3
+
+4) I then take it off the pop server on my local linux box
+
+(I have this extra step because I can't get damned spamassassin to build
+on my BSD box, and yes, I know, it's in the ports collection but I've got
+other things to worry about)
+
+This has worked for thousands upon thousands of messages. Literally.
+
+Suddenly last night it gives up the ghost and goes:
+
+(the crux of the problem is...) :-
+
+  553 5.3.5 localhost.david.net.au. config error: mail loops back to me \
+  (MX problem?) 
+  554 5.3.5 &lt;<A HREF="mailto:lloy0076@localhost">lloy0076@localhost</A>&gt;... Local configuration erro
+
+Huh?
+
+After some investigation, it appeared to me that the most likely reason
+that this was occuring was because either gw (.99) or linux (.100) had
+decided that it had no idea who to send the mail to.
+
+Now, I forget to mention I have some rather black magic going with the
+name "localhost.david.net.au". gw, which is also my local authoritave name
+server for .david.net.au, happens to say that is "10.0.0.100". This is
+primarily because there are various *things* on my linux (.100) that
+insist on appending ".david.net.au" onto "localhost" but then not looking
+at /etc/hosts.
+
+I wouldn't have the faintest idea WHY, but them's the breaks.
+
+However, everything on gw (.99) happens to behave itself, so it's
+/etc/hosts points localhost.david.net.au to 127.0.0.1 whilst the name
+server points it at 10.0.0.100.
+
+Don't ask -- it works for me.
+
+Having trolled google for the particular errors (the 553 specifically) it
+seemed I needed to add a few FQDN to /etc/mail/local-host-names. I first
+tried adding:
+
+localhost
+localhost.david.net.au
+
+[ I could SWEAR I added them when I first set it up ]
+
+...to no avail. I then concluded that my BSD setup had gotten itself
+confused (for some reason). I then proceeded to add that to its
+/etc/mail/local-host-names and VOILA...it worked.
+
+I think that my mail delivery worked before simply because I fluked it and
+the sendmail on the BSD box just sorta decided "Oh, I'll deliver THAT
+locally anyway". But I'm not sure...
+
+I'm sort of like 400 messages short, which is way annoying because I have
+NO idea who has been saying what to me.
+
+BTW, I'm not really asking any particular questions--I understand (at
+least enough to have fixed the problem) what the problem was--but if
+anyone can see anything that would just suddenly trip up a perfectly
+working system and make it go and fall over seemingly by itself it would
+be useful to know...
+
+
+DSL
+
+
+-- 
+Angel of Music, why deny me?
+ Turning from true beauty!
+Angel of music, do not shun me,
+ Turn to your strange Angel!
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,90 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: ipchains & www surfing" -->
+<!-- FromName="'Michael Neuling'" -->
+<!-- FromEmail="Michael.Neuling@keyworks.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="rhett@theinbox.org" -->
+<!-- Date="Sun, 05 Aug 2001 11:56:00 +0800" -->
+<!-- Id="20010805035600.BF1DB1995C@vodka.keyworks.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: ipchains & www surfing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Neuling &lt;<I><A HREF="mailto:Michael.Neuling@keyworks.com.au">Michael.Neuling@keyworks.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:rhett@theinbox.org">rhett@theinbox.org</A></I>&gt;
+  Date: Sun, 05 Aug 2001 11:56:00 +0800
+</PRE>
+<H1>Re: ipchains & www surfing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; I had set the default input policy to deny, and was unable to browse...  
+&gt; (connections to other servers just timed out).  Just using telnet to any 
+&gt; other server on port 80 times out.
+&gt; 
+&gt; I then set the default input policy to ACCEPT, and now all is ok.  However, 
+&gt; I'm a bit concerned about doing this...
+&gt; 
+&gt; Is there a rule I can add so that the server can surf ok (it will end up 
+&gt; being a proxy), so I can still have the default input rule set to deny?
+
+Allow packets back in which are required for web surfing.  ie.  allow
+packets back in which are destined for ports &gt; 1024 and are not
+connection packets.  Something like
+
+  ipchains -A input -i $EXTIF -p tcp --dport 1024: ! -y -j ACCEPT
+
+where $EXTIF is you external interface name.  You might also want to
+add a rules to allow DNS access and ICMP packets.  
+
+  ipchains -A input -i $EXTIF -p udp --sport domain --dport 1024: -j ACCEPT
+
+  ipchains -A input -i $EXTIF -p icmp -j ACCEPT
+
+These will break other things like active ftp and real player so it's
+not perfect (infact I haven't even run these commands let alone
+verified they allow you to surf the web, let alone verified the
+security of them)
+
+Also set your default policy to REJECT, instead of DENY, while
+debuging as this will send ICMP host unreachable packet and then you
+won't have to wait for timeouts.
+
+Regards,
+Michael
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

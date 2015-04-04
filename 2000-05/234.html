@@ -1,0 +1,126 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: zombie shared memory segments??!" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Wed, 10 May 2000 01:07:54 +0930" -->
+<!-- Id="20000510010754.C30240@atdot.dotat.org" -->
+<!-- Reference="20000509154703.A31925@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: zombie shared memory segments??!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Wed, 10 May 2000 01:07:54 +0930
+</PRE>
+<H1>Re: zombie shared memory segments??!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, May 09, 2000 at 03:47:03PM +0918, Alan Kennington wrote:
+
+ &gt; Golly. Now there are _two_ complete systems of shared memory.
+ &gt; And then there's some POSIX API for shared memory which I've found
+ &gt; in other people's source. That's 3 systems!
+ &gt; (The Posix API is flagged by thecpp macros: 
+ &gt; _POSIX_SHARED_MEMORY_OBJECTS and _POSIX_SEMAPHORES.)
+ &gt; Just when I was coming to grips with the first system....
+ 
+The POSIX version is essentially the same as the BSD version.
+
+ &gt; And now you've explained it - there's more than one shared memory
+ &gt; system going on! 
+ &gt; One operating system, two or more shared memory systems.
+
+They're just different API-interfaces to the same internal implementation.
+
+ &gt; &gt; Not so -- Firstly, there are kernel limits on the amount of SysV
+ &gt; &gt; shared memory segments which are smaller than the amount of physical
+ &gt; &gt; RAM, and secondly shared memory is paged-in and paged-out just like
+ &gt; &gt; any other memory:  You seem to be under the misconception that 
+ &gt; &gt; shared memory segments are somehow wired in to physical memory, 
+ &gt; &gt; but I can assure you that they are not.  Assuming your kernel is
+ &gt; &gt; configured appropriately, there's nothing stopping you from allocating
+ &gt; &gt; 128 Mbytes of shared memory on a 64 Mbyte system.
+ &gt; 
+ &gt; The documentation(s) had explained that only superuser can lock down
+ &gt; shared memory.
+
+That discussion is independent of shared memory -- the superuser can
+lock down a certain amount of memory, period (look at the manpage for
+mprotect(2) for examples).
+
+ &gt; This would obviously be useful for speeding up software
+ &gt; a bit.
+
+In practice, though, that doesn't happen:  The pageout algorithm operates
+on an LRU basis, so any pages which are frequently accessed will never
+be sent out to backing store, so there's no point wiring them in to 
+memory.  In practice there are very, very few UNIX programs which ever
+attempt to wire-down pages.
+
+[ those who say it has useful real-time applications:  Give me a break.
+  If you want to write real-time software, don't use UNIX. ]
+
+ &gt; I was worried, though, that a runaway process could use up
+ &gt; the swap space, which obviously is also finite.
+
+That's what limits are for: "man setrlimit"
+
+ &gt; PPS. Another problem:
+ &gt; My search of the manuals indicates no info on how to do
+ &gt; safe concurrent access to the mmap() BSD style of shared memory.
+ &gt; Now that I've learned up on SVR4 style memory sharing, maybe
+ &gt; I'd better stick to that, because it at least I've found
+ &gt; the manuals for doing semaphores for that.
+
+You can use SysV semaphores independently of SysV shared memory.
+It's also common to use fcntl(2) region locks to synchronize access
+to mmap()'ed regions:  If you want exclusive access to a shared
+memory segment, obtain exclusive access to the lockfile first.  There
+are various techniques which are useful for reducing the obvious
+syscall overhead that'd imply (a syscall to acquire the lock, another
+one to free it), which Glen has outlined in another message applied
+to an ever-so-slightly different scenario.
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

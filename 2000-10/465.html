@@ -1,0 +1,355 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: RPM specs" -->
+<!-- FromName="Andrew Burrow" -->
+<!-- FromEmail="alburrow@cs.adelaide.edu.au" -->
+<!-- ToName="Matthew Geddes" -->
+<!-- ToEmail="mgeddes@xavier.sa.edu.au" -->
+<!-- Date="Fri, 13 Oct 2000 13:46:24 +0930" -->
+<!-- Id="200010130416.e9D4GPl09213@radon.cs.adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: RPM specs</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Burrow &lt;<I><A HREF="mailto:alburrow@cs.adelaide.edu.au">alburrow@cs.adelaide.edu.au</A></I>&gt;
+  To  : Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@xavier.sa.edu.au">mgeddes@xavier.sa.edu.au</A></I>&gt;
+  Date: Fri, 13 Oct 2000 13:46:24 +0930
+</PRE>
+<H1>Re: RPM specs</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Matt and others,
+
+
+I have re:cc'd this to the list since it turn out to be a longish
+example.  It might be of interest to others.
+
+
+&gt; Yeah thanks, I might just use as many of the query commands as I can to
+&gt; mostly create one. If you could send that skeleton file over, I'd be
+&gt; grateful.
+
+OK. Here I'll include two spec files I have written.  You should be
+able to follow them, especially if you start by getting the maximum
+RPM book.  It is available online from
+
+	<A HREF="http://ww.rpm.org/">http://ww.rpm.org/</A>
+
+Notes:
+
+* The most difficult thing in a spec file (without seeing a good
+example) is installing into a temp directorary so as not to disturb
+the current installation.  This requires setting the BuildRoot
+variable in the spec file, and a great deal of care in using
+build/install commands.  This is where the main wrinkles lie.  On well
+engineered source distributions using automake it is as simple as
+saying
+
+	make DESTDIR=/var/tmp/auctex-9.10p-root install
+
+Otherwise, you will neeed to set other make variables.  Another option
+is to patch the make file.
+
+* To make a patchfile install the source, rename its directory by
+appending -orig, install the source again, edit the makefiles etc,
+remove backups, and then from the parent directory run diff, e.g.,
+
+	diff -uNr auctex-9.10t-orig/ auctex-9.10t/ \
+		&gt; /usr/src/redhat/SPECS/auctex-9.10t-alb_3.patch
+
+* I try to factor out some of the details using rpm's own type of
+variables.  This is just my way of organising the spec file and not
+really a necessary part of a spec file.
+
+
+
+
+
+The first spec file is for "auctex" it is an emacs lisp package and
+the installation does not make use of autoconf, but its simplicity
+makes it relatively easy to follow.
+
+
+# 
+# auctex-alb.spec
+#   - Spec file for alb packaging of auctex.
+#   - $Id: auctex-alb.spec,v 1.9 2000/10/11 15:19:07 root Exp $
+# 
+
+
+# 
+# DEFINES
+
+%define ver		9.10t
+%define rel			alb_3
+%define prefix				/usr
+%define infodir					%{prefix}/info
+%define lispdir
+%{prefix}/share/emacs/site-lisp
+%define aucdir		%{lispdir}/auctex
+
+
+# 
+# PACKAGE DESCRIPTIONS
+
+Summary: Integrated environment for LaTeX under GNU Emacs.
+Name: auctex
+Version: %{ver}
+Release: %{rel}
+Copyright: GPL
+Group: Applications/Editors
+URL: <A HREF="http://sunsite.auc.dk/auctex/">http://sunsite.auc.dk/auctex/</A>
+Source: auctex-%{ver}.tar.gz
+Patch0: auctex-%{ver}-%{rel}.patch
+BuildRoot: /var/tmp/%{name}-%{ver}-root
+Docdir:	   %{prefix}/doc
+Requires: emacs &gt; 20
+
+%description
+AUC TeX is a comprehensive customizable integrated environment for
+writing input files for LaTeX using GNU Emacs.
+   AUC TeX lets you run TeX/LaTeX and other LaTeX-related tools, such as
+a output filters or post processor from inside Emacs, automatically
+indents your LaTeX source, and provides a large range of handy Emacs
+macros, which in several different ways can help you write your LaTeX
+documents fast and painlessly.
+   All features of AUC TeX are documented using the GNU Emacs online
+documentation system.  That is, documentation for any command is just a
+key click away!
+   AUC TeX is written entirely in Emacs-Lisp, and hence you can easily
+add new features for your own needs.  AUC TeX is distributed under the
+GNU Emacs General Public License and may therefore almost freely be
+copied and redistributed.
+
+
+# 
+# BUILD INSTRUCTIONS
+
+%prep
+%setup
+%patch -p 1
+
+%build
+make prefix=%{prefix} \
+    infodir=%{infodir} \
+    lispdir=%{lispdir} \
+    aucdir=%{aucdir} \
+    all contrib
+
+%install
+rm -r -f ${RPM_BUILD_ROOT}
+mkdir --parents --mode=0755 ${RPM_BUILD_ROOT}%{prefix}
+mkdir --parents --mode=0755 ${RPM_BUILD_ROOT}%{infodir}
+mkdir --parents --mode=0755 ${RPM_BUILD_ROOT}%{lispdir}
+mkdir --parents --mode=0755 ${RPM_BUILD_ROOT}%{aucdir}
+make prefix=${RPM_BUILD_ROOT}%{prefix} \
+    infodir=${RPM_BUILD_ROOT}%{infodir} \
+    lispdir=${RPM_BUILD_ROOT}%{lispdir} \
+    aucdir=${RPM_BUILD_ROOT}%{aucdir} \
+    install install-info install-contrib
+
+%clean
+rm -r -f ${RPM_BUILD_ROOT}
+
+
+# 
+# FILE LISTS
+
+%files
+%defattr(-, root, root)
+
+%doc CHANGES
+%doc COPYING
+%doc ChangeLog
+%doc INSTALLATION
+%doc PROBLEMS
+%doc README
+
+%doc %{infodir}/auctex.gz
+%doc %{infodir}/auctex-1.gz
+%doc %{infodir}/auctex-2.gz
+%doc %{infodir}/auctex-3.gz
+
+%attr(0644, -, -) %config %{lispdir}/tex-site.el
+
+%attr(0755, -, -) %dir %{aucdir}
+
+%attr(0644, -, -) %{aucdir}/*.el
+%attr(0644, -, -) %{aucdir}/*.elc
+%attr(0644, -, -) %{aucdir}/auto/.nosearch
+%attr(0644, -, -) %{aucdir}/style/.nosearch
+%attr(0644, -, -) %{aucdir}/style/*.el
+%attr(0644, -, -) %{aucdir}/style/*.elc
+
+
+# 
+# INSTALL-TIME SCRIPTS
+
+%post
+/sbin/install-info \
+    --section=Emacs \
+    --info-file=%{infodir}/auctex \
+    --dir-file=/etc/info-dir
+
+%postun
+/sbin/install-info \
+    --delete \
+    --info-file=%{infodir}/auctex \
+    --dir-file=/etc/info-dir
+
+
+
+
+
+The second spec file is for "gzip" it uses autoconf:
+
+# 
+# gzip-alb.spec
+#   - Spec file for alb packaging of gzip.
+#   - $Id: gzip-alb.spec,v 1.3 2000/09/21 16:55:19 root Exp $
+# 
+
+
+# 
+# DEFINES
+
+%define ver		1.3
+%define rel			alb_1
+%define prefix				/usr
+%define bindir					/bin
+%define mandir						%{prefix}/man
+%define infodir							%{prefix}/info
+
+
+# 
+# PACKAGE DESCRIPTIONS
+
+Summary: The GNU data compression program.
+Name: gzip
+Version: %{ver}
+Release: %{rel}
+Copyright: GPL
+Group: Applications/File
+URL: <A HREF="http://www.gzip.org/">http://www.gzip.org/</A>
+Source: gzip-%{version}.tar.gz
+Patch0: gzip-1.3-mktemp.patch
+BuildRoot: /var/tmp/%{name}-%{ver}-root
+Docdir:	   %{prefix}/doc
+Prereq: /sbin/install-info
+Requires: mktemp
+
+%description
+The gzip package contains the popular GNU gzip data compression
+program.  Gzipped files have a .gz extension.
+
+Gzip should be installed on your Red Hat Linux system, because it is a
+very commonly used data compression program.
+
+
+# 
+# BUILD INSTRUCTIONS
+
+%prep
+%setup
+%patch -p 1
+
+%build
+CFLAGS="${RPM_OPT_FLAGS}" ./configure \
+    --prefix=%{prefix} \
+    --bindir=%{bindir} \
+    --infodir=%{infodir} \
+    --mandir=%{mandir}
+make all
+
+%install
+rm -r -f ${RPM_BUILD_ROOT}
+
+# These explcit calls to internal make states are clumsy workarounds ---
+# unfortunately, automake does not prefix DESTDIR everywhere it is needed.
+make DESTDIR=${RPM_BUILD_ROOT} install-binPROGRAMS install-binSCRIPTS
+make bindir=${RPM_BUILD_ROOT}%{bindir} install-exec-hook
+make DESTDIR=${RPM_BUILD_ROOT} install-info-am install-man
+
+%clean
+rm -rf ${RPM_BUILD_ROOT}
+
+
+# 
+# FILE LISTS
+
+%files
+%defattr(-, root, root)
+
+%doc AUTHORS
+%doc COPYING
+%doc ChangeLog
+%doc NEWS
+%doc README
+%doc THANKS
+%doc TODO
+%doc algorithm.doc
+
+%attr(0755, -, -) %{bindir}/*
+
+%attr(0644, -, -) %doc %{prefix}/man/man1/*.1.gz
+%attr(0644, -, -) %doc %{prefix}/info/*.info*.gz
+
+
+# 
+# INSTALL-TIME SCRIPTS
+
+%post
+/sbin/install-info \
+    --info-file=%{infodir}/gzip.info.gz \
+    --dir-file=/etc/info-dir \
+    --section='New' \
+    --entry='* Gzip: (gzip).			The GNU compression utility.'
+
+
+%preun
+/sbin/install-info \
+    --delete \
+    --info-file=%{infodir}/gzip.info.gz \
+    --dir-file=/etc/info-dir
+
+
+
+
+
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

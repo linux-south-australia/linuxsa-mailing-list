@@ -1,0 +1,108 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: consolehelpter in rh7.3" -->
+<!-- FromName="'User Lloy0076'" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 21 Sep 2002 12:49:11 +0930" -->
+<!-- Id="3D8BE52F.C1511CE7@rebel.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: consolehelpter in rh7.3</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: User Lloy0076 &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 21 Sep 2002 12:49:11 +0930
+</PRE>
+<H1>Re: consolehelpter in rh7.3</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Andy,
+
+&gt; When as a user I run poweroff, halt or reboot, I immediately get back the
+
+&lt;quote who="awol"&gt;
+If you do "which poweroff" or "which halt" or "which reboot" you will
+see these commands reside in /sbin which is a system binary directory.
+In other words all system commands should be run as root NOT as a user.
+
+The consolehelper app will segfault because it's a wrapper script only
+intended to be run from within an X environment where it calls a simple
+little tk box and asks for the root passwd so it can then run those and
+other commands as root.
+&lt;/quote&gt;
+
+Whilst it is true all these commands reside in the /sbin directory, a
+directory reserved for executables that operate on the system and should
+only be accessible to the super user or administrators, RedHat have
+setup the command-line tool "consolehelper" to allow access to other
+users.
+
+Files or directories that this tool use include:
+
+/etc/security/console.perms
+/etc/security/console.apps*
+
+To enable console access to other applications (according to the RedHat
+7.1 Official RedHat Linux Guide) you do the following steps:
+
+1) Create a link from the name of your application to the
+/usr/bin/consolehelper application
+2) Create the file /etc/security/console.apps/foo
+4) Create a PAM config file for the foo service in /etc/pam.d/
+
+I suspect, but I'm not sure, that "hatl", "poweroff" and "shutdown" may
+be setuid root. RedHat aren't noted for being secure.
+
+Now, after this ramble, I conclude the following:
+
+* consolehelper is a wrapper script
+* consolehelper can be run from any environment because it's a pam
+module and configured by pam
+* consolehelper is segfaulting because it's not being called properly at
+all -- probably because it expects to find that it's been called via
+symlink, then looks for something in /etc/pam.d. Alternatively, it could
+be attempting to recursively call itself ad infinitum which would
+eventually cause a segmentation fault.
+
+
+DSL
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

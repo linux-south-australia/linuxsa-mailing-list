@@ -1,0 +1,162 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Resend: Re: Lilo" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="sirreg@dove.net.au" -->
+<!-- Date="Wed, 08 Mar 2000 13:06:40 +1000" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Resend: Re: Lilo</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:sirreg@dove.net.au">sirreg@dove.net.au</A>
+  Date: Wed, 08 Mar 2000 13:06:40 +1000
+</PRE>
+<H1>Resend: Re: Lilo</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+At 09:37 AM 3/8/00 +1030, you wrote:
+&gt;Three Drives
+&gt;
+&gt;	hda	Win95
+&gt;	hdb	RH 6.0
+&gt;	Hdc	Suse 6.3
+&gt;
+&gt;When run from RH, lilo writes to the MBR.
+&gt;Both RH and Win95 will boot ok.
+&gt;
+&gt;If I want to add Suse to the Lilo config, does lilo have to be run from
+&gt;Suse ?
+
+Well, yes, because it needs access to the correct /boot, but ummm, kind of, 
+well, you can set things up as below.
+
+&gt;Will it overwrite the current config or just add to it ?
+
+It will overwrite the current config, but you can set up things for
+multiple distributions with a little thought.
+
+The problems, IMO, that you are trying to solve are the following:
+
+  Being able to modify your LILO configuration from either/any distro and have
+  it all work correctly and seamlessly.
+
+Here is what I have done in the past:
+
+1. In each distro root file system have distro directory and link:
+
+   RH 6.x
+     /suse.xxx  A directory where you will mount the Suse root etc
+     /rh.xxx, a symbolic link to /
+   SuSE xxx
+     /suse.xxx, a symbolic link to /
+     /rh.xxx, a directory where you will mount the RH root
+
+2. In each distro's fstab, mount the other distro in the appropriate directory
+
+3. In lilo.conf in /etc for each distro have:
+
+   image=/suse.xxx/boot/vmlinuz  # or whatever it is
+      label=suse.xxx
+      root=wherever
+      etc
+   image=/rh.xxx/boot/vmlinuz    # or whatever
+      label=rh.xxx
+      etc
+
+4. Make a script called my-lilo that does two things:
+
+     copies lilo.conf to the other distro's /etc
+     runs lilo -v 
+
+Now, there are clearly problems here in that there are several distro
+specific things, but I am sure you can figure out ways to reduce the distro
+specifics
+
+&gt;The below Lilo configuration is booting Suse with the 2.2.5-15 kernel !
+&gt;:(
+&gt;
+&gt;
+&gt;
+&gt;boot=/dev/hda
+&gt;map=/boot/map
+&gt;install=/boot/boot.b
+&gt;prompt
+&gt;timeout=60
+&gt;#Boot RedHat
+&gt;image=/boot/vmlinuz-2.2.12smp
+&gt;        label=RedHat
+&gt;        root=/dev/hdb1
+&gt;
+&gt;#Boot Suse
+&gt;image=/boot/vmlinuz     
+&gt;        label=Suse
+&gt;        root=/dev/hdc2	#hdc1 is /boot
+&gt;
+&gt;                
+&gt;#Boot old kernel         
+&gt;image=/boot/vmlinuz-2.2.5-15
+&gt;        label=linuxOld
+&gt;        root=/dev/hdb1
+&gt;
+&gt;#Boot Windows 95
+&gt;other=/dev/hda1
+&gt;	label=win95
+&gt;	table=/dev/hda
+&gt;
+&gt;
+&gt;Brian Marr
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>, Master Linux Administrator :-),
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Co-author, SAMS Teach Yourself Samba in 24 Hours
+Author: First Australian 5-day, intensive, hands-on Linux SysAdmin course
+Author: First Australian 2-day, intensive, hands-on Samba course
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

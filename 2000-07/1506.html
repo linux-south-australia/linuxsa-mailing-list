@@ -1,0 +1,95 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Script Analysis help" -->
+<!-- FromName="Andrew Burrow" -->
+<!-- FromEmail="alburrow@cs.adelaide.edu.au" -->
+<!-- ToName="David Drury" -->
+<!-- ToEmail="idavid@smug.adelaide.edu.au" -->
+<!-- Date="Fri, 28 Jul 2000 10:06:09 +0930" -->
+<!-- Id="200007280036.KAA01699@radon.cs.adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Script Analysis help</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Burrow &lt;<I><A HREF="mailto:alburrow@cs.adelaide.edu.au">alburrow@cs.adelaide.edu.au</A></I>&gt;
+  To  : David Drury &lt;<I><A HREF="mailto:idavid@smug.adelaide.edu.au">idavid@smug.adelaide.edu.au</A></I>&gt;
+  Date: Fri, 28 Jul 2000 10:06:09 +0930
+</PRE>
+<H1>Re: Script Analysis help</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Regarding line counts and arithmetic in the shell:
+
+&gt; What are the commands I need to insert there. A man (-k) on count and sum
+&gt; and add produce no (helpful) result, but there must be some componentof
+&gt; some command(s) that can achieve that.
+
+You can count matches in "grep" with the "--count" option, e.g.,
+
+    grep --count -e 'some data' access_log*
+
+
+You could also use "wc" to count the number of lines, e.g.
+
+    grep -e 'some data' access_log* | wc --lines
+
+
+You can do arithmetic in bash using arithmetic expansion, e.g.,
+
+    echo $(( 3 + 4 + 2 - 6 ))
+
+See the bash info files.  Specifically, from "info bash" visit
+
+    Bash Specific Features -&gt; Shell Arithmetic
+
+So maybe the script would look something like
+
+    count=$(grep --count -e 'pattern' access_log*)
+    sum=0
+    for v in \
+         $(grep -e 'pattern' access_log* \
+            | sed -e 's/^prefix\([0-9]\+\)suffix$/\1/')
+    do
+        sum=$(( sum + v ))
+    done
+
+where "pattern", "prefix", and "suffix" are regular expressions to
+match the line, the garbage on the line preceeding the number of bytes,
+and the garbage on the line following the number of bytes.
+
+
+Andrew
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

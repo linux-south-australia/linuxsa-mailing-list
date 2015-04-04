@@ -1,0 +1,100 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: /boot/grub/stage2 file changes magically.. very weird! (LONG post!)" -->
+<!-- FromName="'Graham Smith'" -->
+<!-- FromEmail="linuxsalist@sonicresolutions.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="davidn@rebel.net.au" -->
+<!-- Date="Thu, 16 Jan 2003 14:21:07 +1030" -->
+<!-- Id="02f301c2bd12$80303860$1400a8c0@sonicresolutions.com" -->
+<!-- Reference="Pine.LNX.4.21.0301161244310.9910-100000@huachuca.tellurian.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: /boot/grub/stage2 file changes magically.. very weird! (LONG post!)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Graham Smith &lt;<I><A HREF="mailto:linuxsalist@sonicresolutions.com">linuxsalist@sonicresolutions.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  Date: Thu, 16 Jan 2003 14:21:07 +1030
+</PRE>
+<H1>Re: /boot/grub/stage2 file changes magically.. very weird! (LONG post!)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; You've got two copies of the file, one good and one bad, as well as the
+&gt; file itself.  If the differences are nothing more than that one file
+&gt; then it'd be faster to "cp good-copy /boot/grub/stage2".  However I don't
+&gt; think your problems are solved.  I think whatever you're using to mirror
+&gt; the drives is buggy, or perhaps your hardware is faulty, and so you have
+&gt; a continuing problem.  In brief: what you're using is unreliable.  Next
+&gt; time (and there will be a next time) you probably will not be so lucky.
+
+I have a feeling I only have myself to blame for this one.  Thinking back to
+early December, my boot hard drive started to fail and so I replaced the
+drive, repartitioned and let RAID do it's job.
+
+After the boot and root partitions had re-synced I had to re-install grub
+back into the MBR of the new drive.  When I attempted to re-install grub
+from the live system, it complained about md0 not having a BIOS equivalent
+and refused to install (obviously it's not too RAID friendly), it also
+didn't like the idea of installing to hda1 either (at least while RAID was
+running).
+
+Anyway I got around that by booting off a grub floppy and doing the setup
+from there which all worked fine.  Of course that fixed the MBR problem but
+it was done outside of the raid environment.  Looking back through my daily
+cron jobs, I found in the tripwire report of the day after this was done
+
+Modified:
+"/boot/grub/grub.conf"
+"/boot/grub/stage2"
+
+Looks like grub must have changed stage2 during the installation on the boot
+floppy so I think that's what has put the two drives at odds with each
+other.
+
+Hopefully its sorted now (have recopied stage2 from a good source), although
+I am still a bit suspect about the RAID code in this current kernel.  The
+"raidhotremove" command fails with:
+
+trying to remove hda1 from md1 ...
+md: bug in file md.c, line 2341
+
+That's not very re-assuring, I think it's time to update my kernel.. yet
+again!!
+
+Cheers,
+Graham
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

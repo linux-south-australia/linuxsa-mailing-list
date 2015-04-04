@@ -1,0 +1,170 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="A cure to "no DRQ after issuing WRITE"" -->
+<!-- FromName="'Fraser Farrell'" -->
+<!-- FromEmail="fraser@trilobytes.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 13 Apr 2001 07:06:43 GMT" -->
+<!-- Id="20010413.7064320@graptolite.trilobytes.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: A cure to "no DRQ after issuing WRITE"</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Fraser Farrell &lt;<I><A HREF="mailto:fraser@trilobytes.com.au">fraser@trilobytes.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 13 Apr 2001 07:06:43 GMT
+</PRE>
+<H1>A cure to "no DRQ after issuing WRITE"</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+THE PROBLEM
+A message like this one appears on all of your 
+console displays (logged in or not), X terminals, 
+console applications, etc – disrupting anything 
+that happens to be on screen:
+
+   no DRQ after issuing WRITE
+   ide0 reset: success
+
+Because That Message appears hundreds 
+of times per day; you're soon reduced to a 
+quivering wreck of frustration, desperately 
+reading HOW-TOS and manpages and DejaNews and 
+zillions of mail archives. But all you can 
+find is thousands of pleas from other poor 
+sods with the same problem, and hundreds of 
+replies saying "the hard disk is faulty".
+
+But more often than not, your IDE hard disk 
+is either brand new, or it was running that 
+other popular operating system for months 
+or years before you rescued it.
+
+
+SO WHY IS IT HAPPENING?
+The kernel hackers reading this know the 
+answer already (and can probably recite 
+the relevant source code from memory ;-) 
+
+But in simple terms, this message is Linux's 
+way of telling you that it tried to WRITE to 
+a batch of disk sectors at once; but the drive 
+controller didn't respond with the IDE 
+"standard reply" to this multi-sector write.
+
+Some newer drives – such as many Seagate 
+models – extend their capabilities by 
+providing extra info in their response to a 
+WRITE. Or they may be waiting for another 
+batch of data before actually doing the WRITE 
+and issuing the response. 
+
+An antique drive may also have trouble because 
+its controller doesn't respond in a "standard 
+IDE" way. This one probably won't affect you 
+unless you're a Linux minimalist trying to 
+run everything from a 20MB Conner... ;-)
+
+Anyway, whenever Linux accesses these drives, 
+it detects what it thinks is a hardware glitch, 
+tries to reset the drive controller, and issues 
+That Message.
+
+Your drive ISN'T broken, but it's speaking 
+in an accent. Linux needs a bit of help to 
+understand what the drive controller is saying. 
+
+
+A CURE
+You need to use "hdparm" to interrogate the 
+disk controller, and then to tell Linux how to 
+access the drive in future. To save you from 
+reading the manpage (recommended, hdparm has 
+a ton of features...) here's the procedure that 
+gets rid of That Message in most cases:
+
+ (1) log in as root
+
+ (2) hdparm -i /dev/hda
+
+This interrogates your first IDE hard disk, 
+and displays a pile of info about your disk 
+and its controller. The interesting bit is 
+the value of "MaxMultSect", which describes 
+your disk's multi-sector read/write capability.
+You can do hdparm -i /dev/hdb to find out about 
+your second IDE hard disk, and so on.
+As an example, my server's second drive 
+(a 2GB Seagate) returns a value of 32 for 
+MaxMultSect.
+
+ (3) hdparm -mX /dev/hda
+
+where X is the MaxMultSect value reported 
+in step (2). This tells Linux about your 
+disk's multi-sector read/write capability.
+Using my second drive as an example again:
+     hdparm -m32 /dev/hdb
+
+If this stops That Message from appearing, then
+
+ (4) Add the hdparm -mX... command to your startup 
+script (typically /etc/rc.local) so that this 
+cure is automatically applied if you reboot.
+
+However, if That Message continues to appear, 
+you may need to specify other hdparm settings.
+Or you may really have a faulty hard drive or 
+controller.
+
+But for most sufferers, the above procedure 
+should alleviate much wailing and gnashing 
+of teeth. It's helped me on many occasions.
+
+
+cheers,
+Fraser Farrell       <A HREF="mailto:fraser@trilobytes.com.au">fraser@trilobytes.com.au</A>
+
+- - - - - - - - - - - - - - - - - - - - - - - -
+(in deference to our idiotic new copyright laws)
+Permission is granted to forward this entire 
+message to anyone who might be interested, and 
+to store it in mailing archives, and to display 
+it on publically-accessible websites.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

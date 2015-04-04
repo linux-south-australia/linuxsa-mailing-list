@@ -1,0 +1,211 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Grep in a bash shell script....apt-get Mars-nwe...Automagic netwareclient." -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="LINUXCPA@netscape.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 29 Oct 2002 21:14:11 -0800" -->
+<!-- Id="3DBF6AA3.7060308@netscape.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Grep in a bash shell script....apt-get Mars-nwe...Automagic netwareclient.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:LINUXCPA@netscape.net">LINUXCPA@netscape.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 29 Oct 2002 21:14:11 -0800
+</PRE>
+<H1>Grep in a bash shell script....apt-get Mars-nwe...Automagic netwareclient.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Ok, I am trying to customize Novel's setup script for Lindows.   Novel 
+is a Netware client for Linux, and the project is hosted by sourceforge.net.
+
+I am also trying to earn some programming skills with elbow grease.  I 
+figure that bash shell scripting may be a good warm up before I attempt 
+to take on Perl.
+
+
+Anyway, I am just starting to get my feet wet, learning as I try to add 
+features.
+
+Comments & suggestions appreciated.
+
+
+James Leone
+
+
+
+Stuff I don't know.....
+
+Lindows is Debian based, so the following command, which is designed to 
+check to see if ncpfs is installed, fails on Debian.
+
+&gt; echo -n "Checking for ncpfs... "
+&gt; if [ "`rpm -qa | grep ncpfs | wc -l`" -gt "0" ]; then :
+&gt;     echo "installed"
+&gt;     echo "ncpfs package is installed" &gt;&gt; setup.log
+
+
+I am assuming that this command works on Red Hat systems, but I am 
+wondering how to get it to scale between Red Hat and Debian.
+
+Here is the rest of what I am trying to do:
+
+Set a string to not assume that the client will be using eth0:
+
+&gt; # User must identify his Unix Ethernet Card Number.
+&gt; echo -en "\nWhat is the Unix device number of your ethernet card? 
+&gt; (Default=eth0)[eth0/eth1/eth2/eth3]"
+&gt;     read eth
+
+
+apt-get ncpfs if not installed.
+
+&gt;
+&gt; # ncpfs package must be installed.
+&gt; echo -en "\nDo you wish to apt-get ncpfs?[y/n]: "
+&gt;     read YN
+&gt; if [ $YN = "y" -o $YN = "Y" ]
+&gt; then
+&gt;         apt-get install ncpfs
+&gt;     fi
+
+
+If I have lynx installed, it will download ncpfs  if this command is ran:
+
+lynx 
+<A HREF="ftp://speakeasy.rpmfind.net/linux/redhat/8.0/en/os/i386/RedHat/RPMS/ncpfs-2.2.0.18-11.i386.rpm">ftp://speakeasy.rpmfind.net/linux/redhat/8.0/en/os/i386/RedHat/RPMS/ncpfs-2.2.0.18-11.i386.rpm</A> 
+
+
+I could download mars-nwe and ipxutils the same way.
+
+The next line would include ---&gt; rpm -i.....
+
+
+apt-get IPX if not installed
+
+Note that I gave up on trying to use grep. I thought of using ---&gt; which 
+IPX_CONFIGURE
+
+&gt;
+&gt; # ipx needs to be installed.
+&gt;     echo -e "\nipx must be installed if you wish to mount volumes"
+&gt;     echo "on Netware 3.x and 4.x servers or do not have IP bound"
+&gt;     echo "on your Netware 5 or above servers."
+&gt;     echo -en "\nDo you wish to apt-get ipx?[y/n]: "
+&gt;     read YN
+&gt;     if [ $YN = "y" -o $YN = "Y" ]
+&gt;     then
+&gt;         apt-get install ipx
+&gt;         IPX="True"
+&gt;     fi
+
+
+I  don't seem to be able to apt-get Mars-nwe. However, I found a .deb 
+package available for download and
+I figured if I could get Lynx to magically download the mars.deb file, 
+it would be just as good. No luck  here, but lynx will automagically 
+download RPM's from <A HREF="ftp://speakeasy.rpmfind.">ftp://speakeasy.rpmfind.</A> net
+
+&gt;
+&gt; # mars-nwe needs to be installed
+&gt;     echo "You will need to download Mars-NWE"
+&gt;     echo "via Lynx which we will apt-get."
+&gt;     echo "Don't worry if Lynx is already installed,"
+&gt;     echo "apt-get can detect this and won't break anything"
+&gt;     echo "after Lynx installs, a dialogue box will come up."
+&gt;     echo "At this point you are using lynx. Of the packages"
+&gt;     echo "listed, please select mars-nwe_0.99.p120-0_i386.deb"
+&gt;     echo "when it asks you if you would like to install, say yes"
+&gt;     echo -en "\n Do you want to continue?[y/n]: "
+&gt;     read YN
+&gt;     if [ $YN = "y" -o $YN = "Y" ]
+&gt;     then
+&gt;         apt-get install lynx
+&gt;     lynx <A HREF="http://people.debian.org/~pm/pool/main/mars-nwe">http://people.debian.org/~pm/pool/main/mars-nwe</A>
+&gt;     fi
+
+A few people don't install all of the protocols available to netware, so 
+I figured I would let them use something other than 802.2.
+
+For the client to work, Mars has to start up and the ipx_interface 
+command has to be issued before the user logs in
+So I want to grab the string and incorporate it into it into the whole 
+command written in rc.local.
+
+Again, there is another scalability issue, as (I think) rc.local has to 
+be made in a Debian system, while Red Hat ships with it.
+
+&gt; if [ "$IPX" = "True" ]; then
+&gt;     echo -e "\n"
+&gt;     echo "============================================"
+&gt;     echo "   Binding IPX to your network interface"
+&gt;     echo "============================================"
+&gt;     echo
+&gt;     echo "You need to bind IPX if your servers are not setup to use 
+&gt; native IP."
+&gt;     echo "We will also have to create an /etc/init.d/rc.local file"
+&gt;     echo "The command will be something like: ipx_interface add -p 
+&gt; eth0 802.2"
+&gt;     echo "depending on which nic you want to bind and which frametype is"
+&gt;     echo "in use in your environment. See the man page for more info."
+&gt;     echo -en "\nWhich Frametype Would You Like to use? (802.2 is 
+&gt; default) [802.2/EtherII/802.3/SNAP]: "
+&gt;     read frame
+&gt;     echo -e "\nadding ipx interface, frametype $frame:" &gt;&gt; setup.log
+&gt;     ipx_interface delall 2&gt;&gt; setup.log
+&gt;     ipx_interface add -p $eth $frame 2&gt;&gt; setup.log
+&gt;       echo -en "Create the /etc/init.d/rc.local file? and add the 
+&gt; commands? [y/n]: "
+&gt;         read YN
+&gt;     if [ $YN = "y" -o $YN = "Y" ]
+&gt;         then
+&gt;         touch /etc/init.d/rc.local
+&gt;         chmod 775 /etc/init.d/rc.local
+&gt;         update-rc.d rc.local start 99 2 3 4 5 .
+&gt;              echo "ipx_interface delall" &gt;&gt; /etc/init.d/rc.local
+&gt;             echo "ipx_interface delall" &gt;&gt; setup.log
+&gt;             echo "ipx_interface add -p $eth $frame" &gt;&gt; 
+&gt; /etc/initd.d/rc.local
+&gt;             echo "ipx_interface add -p $eth $frame" &gt;&gt; setup.log
+&gt;     fi
+&gt; fi
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

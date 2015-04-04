@@ -1,0 +1,111 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Directory listings" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Paul Malcolm Bailey" -->
+<!-- ToEmail="pmbailey@senet.com.au" -->
+<!-- Date="Tue, 25 Jul 2000 14:09:44 +0930" -->
+<!-- Id="20000725140944.A78237@atdot.dotat.org" -->
+<!-- Reference="397D1355.D269FF29@senet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Directory listings</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Paul Malcolm Bailey &lt;<I><A HREF="mailto:pmbailey@senet.com.au">pmbailey@senet.com.au</A></I>&gt;
+  Date: Tue, 25 Jul 2000 14:09:44 +0930
+</PRE>
+<H1>Re: Directory listings</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, Jul 25, 2000 at 01:41:01PM +0930, Paul Malcolm Bailey wrote:
+
+ &gt; I have a query about the command "cut".  I tried out:
+ &gt; ls -al | cut -f 1
+ &gt; and:
+ &gt; ps aux | cut -f 2
+ &gt; 
+ &gt; But both of those commands were unaffected by piping their results into
+ &gt; cut.  (I.e. it was as if "cut" in these two cases has no effect.)  Why?
+ 
+Because the default delimiter character is a tab, and neither of those
+commands produce any tabs;  hence each line only contains one field.
+
+ &gt; (Yep, I looked over "man cut" but it couldn't give me any hints.)
+
+Check the notes for the -d option, which specifies the delimiter character.
+
+awk tends to be more useful in many cases, by the way:  If you specify
+a space character as the delimiter for cut, you'll get odd results if
+more than one space separates columns (cut will interpret *EACH* space
+as a delimiter, and if several spaces appear in a row it'll consider them
+to be delimiters between several empty fields).  So feeding:
+
+foo        bar
+
+into 
+
+cut -f2 -d" "
+
+will generate empty output.
+
+Awk, however, collapses multiple delimiters;  so feeding
+
+foo        bar
+
+into:
+
+awk '{print $2;}'
+
+will produce "bar" ($2 means "the second field").  If whitespace isn't
+the delimiter you want, set the IFS variable accordingly:
+
+awk '{IFS=","; print $2;}' 
+
+will use commas as delimiters.
+
+awk '{ IFS=",.: "; print $2;}'
+
+will use commas, dots, colons or spaces as delimiters.
+
+   - mark
+
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

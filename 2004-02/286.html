@@ -1,0 +1,130 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="What is mozilla doing while loading?" -->
+<!-- FromName="'Michael Martucci'" -->
+<!-- FromEmail="mkli@custombuilt.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 7 Feb 2004 23:03:27 +1030" -->
+<!-- Id="20040207230327.4b1ed8a5@localhost" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: What is mozilla doing while loading?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Martucci &lt;<I><A HREF="mailto:mkli@custombuilt.net.au">mkli@custombuilt.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 7 Feb 2004 23:03:27 +1030
+</PRE>
+<H1>What is mozilla doing while loading?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I'm trying to understand why Mozilla takes so long to start up. 
+The system I'm using is Gentoo, kernel 2.6.1(no nptl), and CFLAGS
+set to:
+  -O2 -mcpu=athlon -march=athlon -mmmx -m3dnow -pipe \
+  -fomit-frame-pointer -funroll-loops
+Oh, and the cpu here is a 900MHz Duron.
+
+The times shown are for mozilla starting up then as soon as a window
+appears, being closed manually (approximately 0.8 second reaction
+time).
+"First run" is for the first loading of Mozilla after booting up.
+"Second run" is after closing mozilla, then starting again.
+
+Loading mozilla (1.6) on startup, not prelinked, with:
+
+         export XPCOM_CHECK_THREADSAFE=0
+
+..uncommented in /usr/bin/mozilla
+
+####First run:####
+$ time mozilla
+
+real    0m13.070s
+user    0m3.761s
+sys     0m1.617s
+
+####Second run:####
+$ time mozilla
+
+real    0m5.644s
+user    0m3.663s
+sys     0m1.424s
+
+...so, this seems to be strange. 13 real seconds starting up,
+virtually no disk activity, and only 5.378s of that actually used.
+What are the remaining 7.692 seconds for?
+Second run is similar for user+sys time, but much less cpu time is
+wasted. (0.557s - probably just reaction time)
+
+Now, with prelinking of everything done (/usr/sbin/prelink -amR):
+
+####First run:####
+$ time mozilla
+
+real    0m13.653s
+user    0m3.182s
+sys     0m0.415s
+
+####Second run:####
+$ time mozilla
+
+real    0m5.661s
+user    0m3.634s
+sys     0m1.612s
+
+ ..now this is more puzzling. 13 real seconds still used - that
+puzzle was from before though - seems prelinking didn't help the
+real time much. But it did help the user and sys times - only 3.597s
+total. But then the second (and 3rd and 4th) runs of the prelinked
+mozilla were almost as bad in terms of user+sys time as the first
+run of the non-prelinked mozilla.
+
+ So now there are two questions. What is mozilla waiting for in the
+7.5 seconds of idle time on the first runs? And why has prelinking
+only decreased the user+sys time of the first run?
+
+ Michael.
+
+
+-- 
+mkli_custombuilt.net.au   o__     o__     o__     o__     o__  
+s/_/@/                    ,&gt;/'_   ,&gt;/'_   ,&gt;/'_   ,&gt;/'_   ,&gt;/'_  
+                         (*)\(*) (*)\(*) (*)\(*) (*)\(*) (*)\(*) 
+.                    .            .       .    .  . ..Ride a Bike!
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

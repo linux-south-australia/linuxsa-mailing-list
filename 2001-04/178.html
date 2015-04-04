@@ -1,0 +1,117 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: hostname and defaultroute questions" -->
+<!-- FromName="'David Lloyd'" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="'Michael Kratz'" -->
+<!-- ToEmail="michael_kratz@hotmail.com" -->
+<!-- Date="Sun, 08 Apr 2001 12:22:22 +0930" -->
+<!-- Id="3ACFD266.FE5F0A0E@rebel.net.au" -->
+<!-- Reference="F6lOAPE3EzbwJp8keTB00002fe1@hotmail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: hostname and defaultroute questions</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : Michael Kratz &lt;<I><A HREF="mailto:michael_kratz@hotmail.com">michael_kratz@hotmail.com</A></I>&gt;
+  Date: Sun, 08 Apr 2001 12:22:22 +0930
+</PRE>
+<H1>Re: hostname and defaultroute questions</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Jake + Michael!
+
+&gt; on a redhat machine, the hostname is actually determined by
+&gt; /etc/hostname
+&gt; 
+&gt; This is what the machine thinks its name is. Actually it can be
+&gt; addressesd as many different names.
+
+Actually, the hostname is set in /etc/sysconfig/network. I've checked
+with two other RedHat 6.2 distributions and /etc/hostname does not
+exist. To quote from /etc/rc.d/rc.sysinit:
+
+# Read in config data.
+if [ -f /etc/sysconfig/network ]; then
+    . /etc/sysconfig/network
+else
+    NETWORKING=no
+    HOSTNAME=localhost
+fi
+
+And further on it does:
+
+# Set the hostname.
+action "Setting hostname ${HOSTNAME}" hostname ${HOSTNAME}
+
+If you fiddled with rc.sysinit and read man hostname you could put the
+hostname in /foo/bar/nonexistent/alienhostname...
+
+&gt; &gt; machineA.domain.tld 10.0.0.1 (mail, etc. appears to come from this host)
+&gt; &gt; eth0.machineA.domain.tld 10.0.0.2
+&gt; &gt; eth1.machineA.domain.tld 10.0.0.3
+&gt; &gt;
+&gt; &gt; if so then where is the setting to set the ip address of the system? if not
+&gt; &gt; then which one should be assigned to the system??
+&gt; 
+&gt; if your machine has real-world IPs (the above example shows you dont -
+&gt; but perhaps you do) then you need to set up the DNS for your machines.
+
+Or cope with /etc/hosts files...
+
+&gt; Yes. You set the default gateway on machineA to be machineB. That way
+&gt; when machineA has a packet with destination address that doesn't match
+&gt; anything in its routing table, it passes it to the default gateway. The
+&gt; default gateway on machineB should be the default gateway on your
+&gt; upstream provider.
+
+And you do that in /etc/sysconfig/network-scripts/ifcfg-eth[number] on a
+RedHat machine. I think it's fairly much the same on Mandrake, SuSe,
+OpenLinux and so forth. I'm not sure about Debian. 
+
+Looking in the ifup script I think the setting is GATEWAY=[the ip] if
+you want to manually set it. If your gateway were to appear via ifup
+ppp0 (i.e. it's an ISP link) then it might be easier to setup your PPP
+connection to do the gateway stuff on its own.
+
+DSL
+-- 
+There's a sad face in the mirror
+  And I'm sad to say it's me
+  Like a ghost up in the attic
+Only love can set met free...
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

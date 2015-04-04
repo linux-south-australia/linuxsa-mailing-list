@@ -1,0 +1,169 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: linux from dos" -->
+<!-- FromName="'Daryl Tester'" -->
+<!-- FromEmail="Daryl.Tester@iocane.com.au" -->
+<!-- ToName="'Daniel Burke'" -->
+<!-- ToEmail="burito@airnet.com.au" -->
+<!-- Date="Tue, 25 Feb 2003 14:39:48 +1030" -->
+<!-- Id="000501c2dc83$c1812cd0$6c01a8c0@SLAVE" -->
+<!-- Reference="20030224181609.419f7122.burito@airnet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: linux from dos</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  To  : Daniel Burke &lt;<I><A HREF="mailto:burito@airnet.com.au">burito@airnet.com.au</A></I>&gt;
+  Date: Tue, 25 Feb 2003 14:39:48 +1030
+</PRE>
+<H1>Re: linux from dos</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+"Daniel Burke" &lt;<A HREF="mailto:burito@airnet.com.au">burito@airnet.com.au</A>&gt; wrote:
+
+&gt;&gt; "tr -d \\015" does this well.
+
+&gt; I'm not familiar with translate's syntax, but that should be 14 unless
+&gt; tr is totally loopy and starts counting at 1 instead of 0.
+
+Well, no, that's octal.  CR = 13 decimal = 0D hexadecimal = 15 octal.
+I used octal because a lot of non-GNU tr's don't recognise hexadecimal
+or '\n' notation.
+
+&gt; I thought the filtering was the other way around, and therefore
+&gt; more likely to be executed on DOS, where filters are not an
+&gt; option. My version will run on both platforms.
+
+Most DOS' support the concept of stdin and stdout.  I've certainly
+used it under DOS with both C and Java programs.
+
+&gt;&gt;     int  ch;
+
+&gt; Using ints to store chars is naughty.
+
+Using a char to store the result of fgetc(), which returns an int, is even
+naughtier.  I'm sure this is a C FAQ (it's certainly a C common error).
+See below.
+
+&gt;&gt;     while (ch = fgetc(stdin), ch != EOF) {
+
+&gt; Checking for successful assignment is bad, you actually mean to check
+&gt; success of fgetc()
+
+Erm, I'm not sure if I've read what you wrote correctly.  Bear in mind
+that I didn't have an issue with this, and what I've coded above is my
+own personal idiom (I always try to separate assignments from tests,
+even within looping constructs).
+
+Semantically, "(ch = fgetc(stdin), ch != EOF)" is the same as
+"((ch = fgetc(stdin)) != EOF)".  They will even typically output the
+same byte codes (I have checked this on the compilers I used to
+use when I used to care about such things).  In the second
+construct, the side effect of (ch = fgetc(stdin)) is the value
+assigned to ch.  I've just split it up into an assignment, test
+sequence.  It is certainly *not* checking for "successful
+assignment"; the value returned by fgetc() is assigned to ch
+regardless.  It *is* checking that ch hasn't been assigned EOF
+(which is -1, but that's an implementation detail we're not
+supposed to know about).  However, if we've used a signed
+character, then we most certainly will care, because 0xff will
+be downcast to a -1, and neither of the above tests will work
+correctly for character files with 0xff in the stream.  Alternatively,
+if I'd used an unsigned char, then we will never be able to test
+the -1/EOF returned by fgetc(), and the loop will never
+terminate.  Using a char of any sort to store the result of
+fgetc(), then test against, is wrong.
+
+&gt;&gt;             if (fputc(ch, stdout) == EOF) {
+&gt;&gt;                  perror("write");
+&gt;&gt;                  exit(1);
+
+&gt; exit() is bad karma..
+
+As an exception mechanism, no it isn't.  It's bad karma
+inside libraries (where the user of the library should be
+offered the chance to terminate a program, not a library
+function), and for similar reasons that applies to lower
+level functions.  As this is the topmost function, it doesn't
+apply.
+
+&gt; its unstable on at least one platform (though I forget
+&gt; which)
+
+Non-ANSI compliance isn't a reason to not use a
+standard feature of a language.  And most compilers
+actually push the exit() function onto the stack as the
+epilogue to main (i.e. when main has finished executing,
+the return code from main is passed to exit or _exit,
+I forget which).
+
+&gt; a reason and bad practice.
+
+Given that C doesn't have great exception handling
+facilities, no it isn't.  I'd use setjmp/longjmp under
+similar circumstances for anything "deeper".
+
+&gt; Commenting self explanatory programs is VERY evil. 
+
+"Self explanatory" is in the eye of the beholder.  I've
+seen self explanatory programs that have had bugs
+in them - are those bugs in there by design, or by
+accident?  With no other supporting documentation,
+I couldn't tell.
+
+&gt; int *argv[] and int argv[][] are synonyms for each other.
+
+I didn't say otherwise.  Incidently, I have seen one case where
+char * and char[] weren't interchangeable (i.e. char[] = "foo",
+then passed to function as char * which fouled up by pointing
+to the wrong segment), but that was compiler spackness from
+a major vendor.
+
+&gt; stdio.h is included by default in %95 of compilers.
+
+A lot of compilers do things that aren't in The Standard.
+"//" as a comment isn't supported in ANSI C (yet - I
+believe there's moves afoot to include it), yet that doesn't
+stop a lot of programmers using it, then wondering why
+they get compiler errors on other platforms.  I tend to
+avoid all that grief up front.
+
+
+Regards,
+  Daryl Tester
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

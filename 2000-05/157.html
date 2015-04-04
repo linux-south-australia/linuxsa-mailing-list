@@ -1,0 +1,139 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IPC for Apache module child processes (technical)" -->
+<!-- FromName="Andrew Pullin" -->
+<!-- FromEmail="andrew@hotspurbgc.com.au" -->
+<!-- ToName="<akenning@dog.topology.org>, "David Newall" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Sun, 7 May 2000 17:14:04 +0930" -->
+<!-- Id="001a01bfb7f8$06caf540$c2de26cb@asimov.hotspurbgc.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IPC for Apache module child processes (technical)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Pullin &lt;<I><A HREF="mailto:andrew@hotspurbgc.com.au">andrew@hotspurbgc.com.au</A></I>&gt;
+  To  : &lt;akenning@dog.topology.org&gt;, "David Newall &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Sun, 7 May 2000 17:14:04 +0930
+</PRE>
+<H1>Re: IPC for Apache module child processes (technical)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Alan,
+    From the look of it, what you want to do looks similar
+to what I had to do for an Operating Systems course a couple
+of years ago, and it used semaphores to do it. We actually
+used dual semaphores for the solution, and this worked quite
+well with a class of about 90 students being able to
+implement their solutions with a maximum of 10 semaphores
+being available TO THE ENTIRE COMPUTER SCIENCE NETWORK.
+(O.K. so our class were probably the only ones who needed to
+use them but that is still pretty good). What you seem to be
+doing in the second pseudo-block is implement semaphores
+over an entire code block, and doing the machines work for
+it while giving the process a license to control it's own
+destiny, whereas in the first pseudo-block, the machine will
+block the process until the critical area becomes available
+and the process cannot hog critical areas. This is a much
+safer way to do things as if a process controls it's own
+destiny, then potentially it could endless loop inside
+critical areas and no other processes would ever execute.
+The secret is to semaphore only the CRITICAL areas, and
+limit your processes into sharing some other way.
+Semaphores, I am told, are a reasonably efficient way to
+allow a user to have some control over the way his processes
+run, without giving him access to a higher machine level
+(eg. imagine if every user had root priveleges).
+
+    I am no guru on this topic, but I found Andrew
+Tannenbaum's "Modern Operating Systems" ISBN 0-13-588187-0
+helpful in explaining the problems and some solutions, and I
+also used "Operating Systems : Internals and Design
+Principles" by William Stallings ISBN0-13-917998-4 helpful
+when used with Tannenbaum. Good Luck
+    Cheers!
+        Andrew.
+
+&gt;But it looks like all that semaphore stuff
+&gt;resides in the kernel, and every time I want to
+&gt;access the shared memory, I have to do a system call,
+&gt;which has a fair amount of overhead, I assume.
+&gt;Each time I go into critical code, I have to do
+&gt;
+&gt;===========================================
+&gt;get exclusive access (system call)
+&gt;do critical stuff
+&gt;relinquish exclusive access (system call)
+&gt;===========================================
+&gt;
+&gt;This can't be the most efficient solution surely.
+&gt;I had hoped for something like:
+&gt;
+&gt;===========================================
+&gt;try to get exclusive access (user-space code)
+&gt;if busy, wait on access (system call)
+&gt;do critical stuff
+&gt;relinquish exclusive access (user-space code)
+&gt;===========================================
+&gt;
+&gt;Form my operating systems book by Deitel
+&gt;(<A HREF="http://www.topology.org/php3/e1.php3?o">http://www.topology.org/php3/e1.php3?o</A>=35950),
+&gt;I had understood that there are Dekker's and Dijkstra's
+&gt;algorithms that can be implemented without using
+&gt;kernel mode to guarantee exclusive access.
+&gt;I must confess that I did not do a compsci degree.
+&gt;(I only attended about 5 lectures, and 4 of those were
+&gt;by a long-haired Egyptian saxaphone player. I also did
+&gt;a 2-week fortran course for mathematicians in 1972.)
+&gt;Therefore I don't feel at all confident on these
+&gt;serious comp-sci things.
+&gt;(In 1972, multitasking was still regarded as a
+&gt;modern breakthrough.)
+&gt;
+&gt;So my question now is:
+&gt;Does anyone know of a set of library calls to implement
+&gt;user-space mutual exclusion primitives?
+&gt;Or where I can find a good book on this?
+&gt;
+&gt;Cheers,
+&gt;Alan Kennington.
+&gt;
+&gt;PS. The purpose of this is still to write an Apache module
+to
+&gt;do some serious bandwidth balancing/throttling.
+&gt;The existing modules for this are educational but do not
+&gt;do the right job.
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

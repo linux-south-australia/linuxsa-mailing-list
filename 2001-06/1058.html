@@ -1,0 +1,374 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="SCSI driver causing kernel crash!" -->
+<!-- FromName="'Ian McLeod'" -->
+<!-- FromEmail="drwho@firstlinux.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="aic7xxx@freebsd.org" -->
+<!-- Date="Thu, 28 Jun 2001 01:46:56 -0700 (PDT)" -->
+<!-- Id="20010628084656.95EDB36F9@sitemail.everyone.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: SCSI driver causing kernel crash!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Ian McLeod &lt;<I><A HREF="mailto:drwho@firstlinux.net">drwho@firstlinux.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:aic7xxx@freebsd.org">aic7xxx@freebsd.org</A></I>&gt;
+  Date: Thu, 28 Jun 2001 01:46:56 -0700 (PDT)
+</PRE>
+<H1>SCSI driver causing kernel crash!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi people,
+
+I am running Red Hat 7.1 (tried with both original 2.4
+and latest RH 2.4.3-12 (?) kernel) trying to use a
+Yamaha CD burner CRW8424S with a Adaptec AHA 2930 SCSI
+card.
+
+I noticed in the Red Hat release notes that the SCSI
+driver has been updated.
+
+Whenever I try to write to the drive (with cdrecrod /
+gcombust running under root as it complains of no
+privelage if otherwise) to reset or start burning -
+the kernel crashes (workstation freezes and requires
+a hard reset).
+
+It worked fine under Mandrake 8.0 with the new 2.4
+kernel - I suspect the driver is the problem.  Nothing
+else has changed on my workstation that I can tell
+(or with Red Hat 7.1 compared with Mandrake 8.0).
+
+Below is a exerpt from my system log during the crash
+as well as after reboot which contains a lot of 
+system information in case that helps.
+
+------------------------------------------------
+Jun 25 00:17:07 localhost kernel: scsi : aborting command due to timeout : pid 0, scsi0, channel 0, id 3, lun 0 Test Unit Ready 00 00 00 00 00 
+Jun 25 00:17:23 localhost kernel: sr0: CDROM not ready.  Make sure there is a disc in the drive.
+Jun 25 00:17:23 localhost kernel: sr0: CDROM not ready.  Make sure there is a disc in the drive.
+Jun 25 00:17:23 localhost kernel: Device not ready.  Make sure there is a disc in the drive.
+Jun 25 00:17:24 localhost kernel: sr0: CDROM not ready.  Make sure there is a disc in the drive.
+Jun 25 00:17:24 localhost kernel: Device not ready.  Make sure there is a disc in the drive.
+Jun 25 00:17:24 localhost last message repeated 2 times
+Jun 25 00:19:37 localhost kernel: scsi : aborting command due to timeout : pid 0, scsi0, channel 0, id 3, lun 0 Read sub-channel 02 40 01 00 00 00 00 10 00 
+Jun 25 00:19:37 localhost kernel: (scsi0:0:3:0) SCSISIGI 0x84, SEQADDR 0x156, SSTAT0 0x7, SSTAT1 0x2
+Jun 25 00:19:37 localhost kernel: (scsi0:0:3:0) SG_CACHEPTR 0x0, SSTAT2 0x0, STCNT 0x0
+Jun 25 00:19:37 localhost kernel: scsi : aborting command due to timeout : pid 0, scsi0, channel 0, id 3, lun 0 Read TOC 02 00 00 00 00 0b 00 0c 00 
+Jun 25 00:19:40 localhost kernel: SCSI host 0 abort (pid 0) timed out - resetting
+Jun 25 00:19:40 localhost kernel: SCSI bus is being reset for host 0 channel 0.
+Jun 25 00:19:40 localhost kernel: (scsi0:0:3:0) Synchronous at 10.0 Mbyte/sec, offset 15.
+Jun 25 00:19:40 localhost kernel: sr0: CDROM not ready yet.
+Jun 25 00:19:48 localhost last message repeated 9 times
+Jun 25 00:19:50 localhost kernel: sr0: CDROM (ioctl) reports ILLEGAL REQUEST.
+Jun 25 00:19:50 localhost kernel: cdrom: This disc doesn't have any tracks I recognize!
+Jun 25 00:20:14 localhost last message repeated 4 times
+Jun 25 00:20:14 localhost kernel: SCSI bus is being reset for host 0 channel 0.
+Jun 25 00:20:14 localhost kernel: Unable to handle kernel paging request at virtual address dd6b6078
+Jun 25 00:20:14 localhost kernel:  printing eip:
+Jun 25 00:20:14 localhost kernel: d083583d
+Jun 25 00:20:14 localhost kernel: pgd entry c7dc0dd4: 0000000000000000
+Jun 25 00:20:14 localhost kernel: pmd entry c7dc0dd4: 0000000000000000
+Jun 25 00:20:14 localhost kernel: ... pmd not present!
+Jun 25 00:20:14 localhost kernel: Oops: 0000
+Jun 25 00:20:14 localhost kernel: CPU:    0
+Jun 25 00:20:14 localhost kernel: EIP:    0010:[nls_iso8859-1:__insmod_nls_iso8859-1_O/lib/modules/2.4.2-2/kernel/fs/nls/+-546755/96]
+Jun 25 00:20:14 localhost kernel: EIP:    0010:[&lt;d083583d&gt;]
+Jun 25 00:20:14 localhost kernel: EFLAGS: 00010082
+Jun 25 00:20:14 localhost kernel: eax: c6fe401c   ebx: c1727878   ecx: c413fc70   edx: c1726008
+Jun 25 00:20:15 localhost kernel: esi: 00000001   edi: c413fc70   ebp: 00000000   esp: c413fc10
+Jun 25 00:20:15 localhost kernel: ds: 0018   es: 0018   ss: 0018
+Jun 25 00:20:15 localhost kernel: Process cdrecord (pid: 1968, stackpage=c413f000)
+Jun 25 00:20:15 localhost kernel: Stack: c02b6dc3 c011610e 00000086 00000093 00000000 00000000 d080733c 00000000 
+Jun 25 00:20:15 localhost kernel:        00000000 c1727800 c413fc70 d08070c8 c413fc70 00000001 00000246 c413fc70 
+Jun 25 00:20:15 localhost kernel:        00000005 00000001 d0807391 c413fc70 00000001 d0802c0d c413fc70 00000001 
+Jun 25 00:20:15 localhost kernel: Call Trace: [printk+366/384] [nls_iso8859-1:__insmod_nls_iso8859-1_O/lib/modules/2.4.2-2/kernel/fs/nls/+-736452/96] [nls_iso8859-1:__insmod_nls_iso8859-1_O/lib/modules/2.4.2-2/kernel/fs/nls/+-737080/96] [nls_iso8859-1:__insmod_nls_iso8859-1_O/lib/modules/2.4.2-2/kernel/fs/nls/+-736367/96] [nls_iso8859-1:__insmod_nls_iso8859-1_O/lib/modules/2.4.2-2/kernel/fs/nls/+-754675/96] [&lt;e25c23a5&gt;] [padzero+28/32] 
+Jun 25 00:20:15 localhost kernel: Call Trace: [&lt;c011610e&gt;] [&lt;d080733c&gt;] [&lt;d08070c8&gt;] [&lt;d0807391&gt;] [&lt;d0802c0d&gt;] [&lt;e25c23a5&gt;] [&lt;c014c38c&gt;] 
+Jun 25 00:20:15 localhost kernel:        [load_elf_binary+2236/2544] [nls_iso8859-1:__insmod_nls_iso8859-1_O/lib/modules/2.4.2-2/kernel/fs/nls/+-740032/96] [__alloc_pages+132/640] [__get_free_pages+24/48] [aic7xxx:__insmod_aic7xxx_S.bss_L256+964662/282010986] [aic7xxx:__insmod_aic7xxx_S.bss_L256+964886/282010762] [aic7xxx:__insmod_aic7xxx_S.bss_L256+959786/282015862] [nls_iso8859-1:__insmod_nls_iso8859-1_O/lib/modules/2.4.2-2/kernel/fs/nls/+-755056/96] 
+Jun 25 00:20:15 localhost kernel:        [&lt;c014d31c&gt;] [&lt;d0806540&gt;] [&lt;c012d774&gt;] [&lt;c012d988&gt;] [&lt;d0929a36&gt;] [&lt;d0929b16&gt;] [&lt;d092872a&gt;] [&lt;d0802a90&gt;] 
+Jun 25 00:20:15 localhost kernel:        [aic7xxx:__insmod_aic7xxx_S.bss_L256+956167/282019481] [__alloc_pages+132/640] [do_anonymous_page+55/256] [do_no_page+48/160] [handle_mm_fault+241/368] [aic7xxx:__insmod_aic7xxx_S.bss_L256+950872/282024776] [aic7xxx:__insmod_aic7xxx_S.bss_L256+963795/282011853] [do_page_fault+346/1104] 
+Jun 25 00:20:15 localhost kernel:        [&lt;d0927907&gt;] [&lt;c012d774&gt;] [&lt;c0123267&gt;] [&lt;c0123360&gt;] [&lt;c01234c1&gt;] [&lt;d0926458&gt;] [&lt;d09296d3&gt;] [&lt;c011308a&gt;] 
+Jun 25 00:20:15 localhost kernel:        [do_munmap+100/608] [do_brk+180/352] [sys_ioctl+487/512] [system_call+51/56] 
+Jun 25 00:20:15 localhost kernel:        [&lt;c01241b4&gt;] [&lt;c01244a4&gt;] [&lt;c0141c07&gt;] [&lt;c010901b&gt;] 
+Jun 25 00:20:15 localhost kernel: 
+Jun 25 00:20:15 localhost kernel: Code: 8b 04 82 89 44 24 08 8b 47 50 8b 57 48 c1 e0 03 09 d0 85 ed 
+Jun 25 00:24:36 localhost syslogd 1.4-0: restart.
+Jun 25 00:24:36 localhost syslog: syslogd startup succeeded
+Jun 25 00:24:36 localhost kernel: klogd 1.4-0, log source = /proc/kmsg started.
+Jun 25 00:24:36 localhost kernel: Inspecting /boot/System.map-2.4.2-2
+Jun 25 00:24:36 localhost syslog: klogd startup succeeded
+Jun 25 00:24:36 localhost portmap: portmap startup succeeded
+Jun 25 00:24:37 localhost keytable: Loading keymap: 
+Jun 25 00:24:37 localhost kernel: Loaded 14301 symbols from /boot/System.map-2.4.2-2.
+Jun 25 00:24:37 localhost kernel: Symbols match kernel version 2.4.2.
+Jun 25 00:24:37 localhost kernel: Loaded 251 symbols from 9 modules.
+Jun 25 00:24:37 localhost kernel: Linux version 2.4.2-2 (<A HREF="mailto:root@porky.devel.redhat.com">root@porky.devel.redhat.com</A>) (gcc version 2.96 20000731 (Red Hat Linux 7.1 2.96-79)) #1 Sun Apr 8 20:41:30 EDT 2001
+Jun 25 00:24:37 localhost kernel: BIOS-provided physical RAM map:
+Jun 25 00:24:37 localhost kernel:  BIOS-e820: 000000000009fc00 @ 0000000000000000 (usable)
+Jun 25 00:24:37 localhost kernel:  BIOS-e820: 0000000000000400 @ 000000000009fc00 (reserved)
+Jun 25 00:24:37 localhost kernel:  BIOS-e820: 0000000000010000 @ 00000000000f0000 (reserved)
+Jun 25 00:24:37 localhost kernel:  BIOS-e820: 0000000000010000 @ 00000000ffff0000 (reserved)
+Jun 25 00:24:37 localhost kernel:  BIOS-e820: 000000000fef0000 @ 0000000000100000 (usable)
+Jun 25 00:24:37 localhost kernel:  BIOS-e820: 000000000000d000 @ 000000000fff3000 (ACPI data)
+Jun 25 00:24:37 localhost kernel:  BIOS-e820: 0000000000003000 @ 000000000fff0000 (ACPI NVS)
+Jun 25 00:24:37 localhost kernel: On node 0 totalpages: 65520
+Jun 25 00:24:37 localhost kernel: zone(0): 4096 pages.
+Jun 25 00:24:37 localhost kernel: zone DMA has max 32 cached pages.
+Jun 25 00:24:37 localhost kernel: zone(1): 61424 pages.
+Jun 25 00:24:37 localhost kernel: zone Normal has max 479 cached pages.
+Jun 25 00:24:37 localhost kernel: zone(2): 0 pages.
+Jun 25 00:24:37 localhost kernel: zone HighMem has max 1 cached pages.
+Jun 25 00:24:37 localhost kernel: hm, page 01000000 reserved twice.
+Jun 25 00:24:37 localhost kernel: Kernel command line: auto BOOT_IMAGE=linux ro root=1609 BOOT_FILE=/boot/vmlinuz-2.4.2-2
+Jun 25 00:24:37 localhost kernel: Initializing CPU#0
+Jun 25 00:24:37 localhost kernel: Detected 451.033 MHz processor.
+Jun 25 00:24:37 localhost kernel: Console: colour VGA+ 80x25
+Jun 25 00:24:37 localhost kernel: Calibrating delay loop... 897.84 BogoMIPS
+Jun 25 00:24:37 localhost kernel: Memory: 254932k/262080k available (1365k kernel code, 6760k reserved, 92k data, 236k init, 0k highmem)
+Jun 25 00:24:37 localhost kernel: Dentry-cache hash table entries: 32768 (order: 6, 262144 bytes)
+Jun 25 00:24:37 localhost kernel: Buffer-cache hash table entries: 16384 (order: 4, 65536 bytes)
+Jun 25 00:24:37 localhost kernel: Page-cache hash table entries: 65536 (order: 7, 524288 bytes)
+Jun 25 00:24:37 localhost kernel: Inode-cache hash table entries: 16384 (order: 5, 131072 bytes)
+Jun 25 00:24:37 localhost kernel: VFS: Diskquotas version dquot_6.5.0 initialized
+Jun 25 00:24:37 localhost kernel: CPU: Before vendor init, caps: 0387f9ff 00000000 00000000, vendor = 0
+Jun 25 00:24:37 localhost kernel: CPU: L1 I cache: 16K, L1 D cache: 16K
+Jun 25 00:24:37 localhost kernel: CPU: L2 cache: 512K
+Jun 25 00:24:37 localhost kernel: Intel machine check architecture supported.
+Jun 25 00:24:37 localhost kernel: Intel machine check reporting enabled on CPU#0.
+Jun 25 00:24:37 localhost kernel: CPU: After vendor init, caps: 0387f9ff 00000000 00000000 00000000
+Jun 25 00:24:37 localhost kernel: CPU serial number disabled.
+Jun 25 00:24:37 localhost kernel: CPU: After generic, caps: 0383f9ff 00000000 00000000 00000000
+Jun 25 00:24:37 localhost kernel: CPU: Common caps: 0383f9ff 00000000 00000000 00000000
+Jun 25 00:24:37 localhost kernel: CPU: Intel Pentium III (Katmai) stepping 02
+Jun 25 00:24:37 localhost kernel: Enabling fast FPU save and restore... done.
+Jun 25 00:24:37 localhost kernel: Enabling unmasked SIMD FPU exception support... done.
+Jun 25 00:24:37 localhost kernel: Checking 'hlt' instruction... OK.
+Jun 25 00:24:37 localhost kernel: POSIX conformance testing by UNIFIX
+Jun 25 00:24:37 localhost kernel: mtrr: v1.37 (20001109) Richard Gooch (<A HREF="mailto:rgooch@atnf.csiro.au">rgooch@atnf.csiro.au</A>)
+Jun 25 00:24:37 localhost kernel: mtrr: detected mtrr type: Intel
+Jun 25 00:24:37 localhost kernel: PCI: PCI BIOS revision 2.10 entry at 0xfb450, last bus=1
+Jun 25 00:24:37 localhost kernel: PCI: Using configuration type 1
+Jun 25 00:24:37 localhost kernel: PCI: Probing PCI hardware
+Jun 25 00:24:37 localhost kernel: PCI: Using IRQ router PIIX [8086/7110] at 00:07.0
+Jun 25 00:24:37 localhost kernel: Limiting direct PCI/PCI transfers.
+Jun 25 00:24:37 localhost kernel: isapnp: Scanning for PnP cards...
+Jun 25 00:24:37 localhost kernel: isapnp: No Plug & Play device found
+Jun 25 00:24:37 localhost kernel: Linux NET4.0 for Linux 2.4
+Jun 25 00:24:37 localhost kernel: Based upon Swansea University Computer Society NET3.039
+Jun 25 00:24:37 localhost kernel: Initializing RT netlink socket
+Jun 25 00:24:37 localhost kernel: apm: BIOS version 1.2 Flags 0x07 (Driver version 1.14)
+Jun 25 00:24:37 localhost kernel: Starting kswapd v1.8
+Jun 25 00:24:37 localhost kernel: pty: 256 Unix98 ptys configured
+Jun 25 00:24:37 localhost kernel: block: queued sectors max/low 169218kB/56406kB, 512 slots per queue
+Jun 25 00:24:37 localhost kernel: RAMDISK driver initialized: 16 RAM disks of 4096K size 1024 blocksize
+Jun 25 00:24:37 localhost kernel: Uniform Multi-Platform E-IDE driver Revision: 6.31
+Jun 25 00:24:37 localhost kernel: ide: Assuming 33MHz system bus speed for PIO modes; override with idebus=xx
+Jun 25 00:24:37 localhost kernel: PIIX4: IDE controller on PCI bus 00 dev 39
+Jun 25 00:24:37 localhost kernel: PIIX4: chipset revision 1
+Jun 25 00:24:37 localhost kernel: PIIX4: not 100%% native mode: will probe irqs later
+Jun 25 00:24:37 localhost kernel:     ide0: BM-DMA at 0xf000-0xf007, BIOS settings: hda:DMA, hdb:DMA
+Jun 25 00:24:37 localhost kernel:     ide1: BM-DMA at 0xf008-0xf00f, BIOS settings: hdc:DMA, hdd:DMA
+Jun 25 00:24:37 localhost kernel: hda: WDC WD102AA, ATA DISK drive
+Jun 25 00:24:37 localhost kernel: hdb: ATAPI CD-ROM DRIVE 40X MAXIMUM, ATAPI CD/DVD-ROM drive
+Jun 25 00:24:37 localhost kernel: hdc: ST320423A, ATA DISK drive
+Jun 25 00:24:37 localhost kernel: ide0 at 0x1f0-0x1f7,0x3f6 on irq 14
+Jun 25 00:24:37 localhost kernel: ide1 at 0x170-0x177,0x376 on irq 15
+Jun 25 00:24:37 localhost kernel: hda: 20044080 sectors (10263 MB) w/2048KiB Cache, CHS=1247/255/63, UDMA(33)
+Jun 25 00:24:37 localhost kernel: hdc: 40011300 sectors (20486 MB) w/512KiB Cache, CHS=39693/16/63, UDMA(33)
+Jun 25 00:24:37 localhost kernel: Partition check:
+Jun 25 00:24:37 localhost kernel:  hda: hda1 hda2 &lt; hda5 hda6 &gt;
+Jun 25 00:24:37 localhost kernel:  hdc: hdc1 hdc2 &lt; hdc5 hdc6 hdc7 hdc8 hdc9 hdc10 &gt; hdc3
+Jun 25 00:24:37 localhost kernel: Floppy drive(s): fd0 is 1.44M
+Jun 25 00:24:37 localhost kernel: FDC 0 is a post-1991 82077
+Jun 25 00:24:37 localhost kernel: RAMDISK: Compressed image found at block 0
+Jun 25 00:24:37 localhost kernel: Freeing initrd memory: 359k freed
+Jun 25 00:24:37 localhost kernel: Serial driver version 5.02 (2000-08-09) with MANY_PORTS MULTIPORT SHARE_IRQ SERIAL_PCI ISAPNP enabled
+Jun 25 00:24:37 localhost kernel: ttyS00 at 0x03f8 (irq = 4) is a 16550A
+Jun 25 00:24:37 localhost kernel: ttyS01 at 0x02f8 (irq = 3) is a 16550A
+Jun 25 00:24:37 localhost kernel: Real Time Clock Driver v1.10d
+Jun 25 00:24:37 localhost kernel: md driver 0.90.0 MAX_MD_DEVS=256, MD_SB_DISKS=27
+Jun 25 00:24:37 localhost kernel: md.c: sizeof(mdp_super_t) = 4096
+Jun 25 00:24:37 localhost kernel: autodetecting RAID arrays
+Jun 25 00:24:37 localhost kernel: autorun ...
+Jun 25 00:24:37 localhost kernel: ... autorun DONE.
+Jun 25 00:24:37 localhost kernel: NET4: Linux TCP/IP 1.0 for NET4.0
+Jun 25 00:24:37 localhost kernel: IP Protocols: ICMP, UDP, TCP, IGMP
+Jun 25 00:24:37 localhost kernel: IP: routing cache hash table of 2048 buckets, 16Kbytes
+Jun 25 00:24:37 localhost kernel: TCP: Hash tables configured (established 16384 bind 16384)
+Jun 25 00:24:37 localhost kernel: Linux IP multicast router 0.06 plus PIM-SM
+Jun 25 00:24:37 localhost kernel: NET4: Unix domain sockets 1.0/SMP for Linux NET4.0.
+Jun 25 00:24:37 localhost kernel: VFS: Mounted root (ext2 filesystem).
+Jun 25 00:24:37 localhost kernel: SCSI subsystem driver Revision: 1.00
+Jun 25 00:24:37 localhost kernel: PCI: Found IRQ 5 for device 00:0d.0
+Jun 25 00:24:37 localhost kernel: (scsi0) &lt;Adaptec AIC-7850 SCSI host adapter&gt; found at PCI 0/13/0
+Jun 25 00:24:37 localhost kernel: (scsi0) Narrow Channel, SCSI ID=7, 3/255 SCBs
+Jun 25 00:24:37 localhost kernel: (scsi0) Cables present (Int-50 YES, Ext-50 YES)
+Jun 25 00:24:37 localhost kernel: (scsi0) Downloading sequencer code... 415 instructions downloaded
+Jun 25 00:24:37 localhost kernel: scsi0 : Adaptec AHA274x/284x/294x (EISA/VLB/PCI-Fast SCSI) 5.2.4/5.2.0
+Jun 25 00:24:37 localhost kernel:        &lt;Adaptec AIC-7850 SCSI host adapter&gt;
+Jun 25 00:24:37 localhost kernel:   Vendor: YAMAHA    Model: CRW8424S          Rev: 1.0g
+Jun 25 00:24:37 localhost kernel:   Type:   CD-ROM                             ANSI SCSI revision: 02
+Jun 25 00:24:37 localhost kernel: VFS: Mounted root (ext2 filesystem) readonly.
+Jun 25 00:24:37 localhost kernel: change_root: old root has d_count=3
+Jun 25 00:24:37 localhost kernel: Trying to unmount old root ... okay
+Jun 25 00:24:37 localhost kernel: Freeing unused kernel memory: 236k freed
+Jun 25 00:24:37 localhost kernel: Adding Swap: 233848k swap-space (priority -1)
+Jun 25 00:24:37 localhost kernel: Adding Swap: 432392k swap-space (priority -2)
+Jun 25 00:24:37 localhost kernel: usb.c: registered new driver usbdevfs
+Jun 25 00:24:37 localhost kernel: usb.c: registered new driver hub
+Jun 25 00:24:37 localhost kernel: usb-uhci.c: $Revision: 1.251 $ time 20:53:29 Apr  8 2001
+Jun 25 00:24:37 localhost kernel: usb-uhci.c: High bandwidth mode enabled
+Jun 25 00:24:37 localhost kernel: PCI: Found IRQ 10 for device 00:07.2
+Jun 25 00:24:37 localhost kernel: usb-uhci.c: USB UHCI at I/O 0xe000, IRQ 10
+Jun 25 00:24:37 localhost kernel: usb-uhci.c: Detected 2 ports
+Jun 25 00:24:37 localhost kernel: usb.c: new USB bus registered, assigned bus number 1
+Jun 25 00:24:37 localhost kernel: hub.c: USB hub found
+Jun 25 00:24:37 localhost kernel: hub.c: 2 ports detected
+Jun 25 00:24:37 localhost kernel: Winbond Super-IO detection, now testing ports 3F0,370,250,4E,2E ...
+Jun 25 00:24:37 localhost kernel: Winbond chip at EFER=0x3f0 key=0x87 devid=52 devrev=f1 oldid=ff
+Jun 25 00:24:37 localhost kernel: Winbond chip type 83977EF / SMSC 97w35x
+Jun 25 00:24:37 localhost kernel: Winbond LPT Config: cr_30=01 60,61=0378 70=07 74=03, f0=00
+Jun 25 00:24:37 localhost kernel: Winbond LPT Config: active=yes, io=0x0378 irq=7, dma=3
+Jun 25 00:24:37 localhost kernel: Winbond LPT Config: irqtype=pulsed low, high-Z, ECP fifo threshold=0
+Jun 25 00:24:37 localhost kernel: Winbond LPT Config: Port mode=Standard (SPP) and Bidirectional(PS/2)
+Jun 25 00:24:37 localhost kernel: SMSC Super-IO detection, now testing Ports 2F0, 370 ...
+Jun 25 00:24:37 localhost kernel: parport0: PC-style at 0x378 [PCSPP,TRISTATE]
+Jun 25 00:24:37 localhost kernel: parport0: irq 7 detected
+Jun 25 00:24:37 localhost keytable: 
+Jun 25 00:24:37 localhost keytable: Loading system font: 
+Jun 25 00:24:37 localhost keytable: 
+Jun 25 00:24:37 localhost rc: Starting keytable:  succeeded
+Jun 25 00:24:37 localhost random: Initializing random number generator:  succeeded
+Jun 25 00:24:37 localhost autofs: autofs startup succeeded
+Jun 25 00:24:37 localhost automount[540]: starting automounter version 3.1.7, path = /misc, maptype = file, mapname = /etc/auto.misc
+Jun 25 00:24:38 localhost atd: atd startup succeeded
+Jun 25 00:24:38 localhost automount[540]: using kernel protocol version 3
+Jun 25 00:24:38 localhost gpm: gpm startup succeeded
+Jun 25 00:24:38 localhost crond: crond startup succeeded
+Jun 25 00:22:35 localhost rc.sysinit: Mounting proc filesystem:  succeeded 
+Jun 25 00:22:35 localhost sysctl: net.ipv4.ip_forward = 0 
+Jun 25 00:22:35 localhost sysctl: net.ipv4.conf.all.rp_filter = 1 
+Jun 25 00:22:35 localhost sysctl: kernel.sysrq = 0 
+Jun 25 00:22:35 localhost rc.sysinit: Configuring kernel parameters:  succeeded 
+Jun 25 00:22:35 localhost date: Mon Jun 25 00:22:24 CST 2001 
+Jun 25 00:22:35 localhost rc.sysinit: Setting clock  (localtime): Mon Jun 25 00:22:24 CST 2001 succeeded 
+Jun 25 00:22:35 localhost rc.sysinit: Loading default keymap succeeded 
+Jun 25 00:22:35 localhost rc.sysinit: Setting default font (lat0-sun16):  succeeded 
+Jun 25 00:22:35 localhost rc.sysinit: Activating swap partitions:  succeeded 
+Jun 25 00:22:35 localhost rc.sysinit: Setting hostname localhost.localdomain:  succeeded 
+Jun 25 00:22:35 localhost rc.sysinit: Mounting USB filesystem:  succeeded 
+Jun 25 00:22:35 localhost rc.sysinit: Initializing USB controller (usb-uhci):  succeeded 
+Jun 25 00:22:35 localhost fsck: / was not cleanly unmounted, check forced. 
+Jun 25 00:22:35 localhost fsck: /:  
+Jun 25 00:22:35 localhost fsck: Inode 35794, i_blocks is 64, should be 48.  FIXED. 
+Jun 25 00:22:35 localhost fsck: /: Inode 35805, i_blocks is 64, should be 16.  FIXED. 
+Jun 25 00:22:35 localhost fsck: /: Inode 35806, i_blocks is 80, should be 24.  FIXED. 
+Jun 25 00:22:35 localhost fsck: /: Inode 35765, i_blocks is 5448, should be 5400.  FIXED. 
+Jun 25 00:22:35 localhost fsck: /: Inode 35797, i_blocks is 336, should be 320.  FIXED. 
+Jun 25 00:22:35 localhost fsck: Inode 49935, i_blocks is 64, should be 24.  FIXED. 
+Jun 25 00:22:35 localhost fsck: /: Inode 49949, i_blocks is 64, should be 8.  FIXED. 
+Jun 25 00:22:35 localhost fsck: /:  
+Jun 25 00:22:35 localhost fsck: Inode 68074, i_blocks is 64, should be 8.  FIXED. 
+Jun 25 00:22:35 localhost fsck: /: Inode 68085, i_blocks is 64, should be 8.  FIXED. 
+Jun 25 00:22:35 localhost fsck: /: 20055/131328 files (0.2% non-contiguous), 36775/262144 blocks 
+Jun 25 00:22:35 localhost rc.sysinit: Checking root filesystem succeeded 
+Jun 25 00:22:35 localhost rc.sysinit: Remounting root filesystem in read-write mode:  succeeded 
+Jun 25 00:22:35 localhost rc.sysinit: Finding module dependencies:  succeeded 
+Jun 25 00:22:35 localhost fsck: /mnt/image was not cleanly unmounted, check forced. 
+Jun 25 00:22:36 localhost fsck: /boot was not cleanly unmounted, check forced. 
+Jun 25 00:22:36 localhost fsck: /boot: 27/12880 files (0.0% non-contiguous), 5489/51376 blocks 
+Jun 25 00:22:36 localhost fsck: /dev/hdc5 was not cleanly unmounted, check forced. 
+Jun 25 00:22:36 localhost fsck: /dev/hdc5: Inode 178, i_blocks is 64, should be 8.  FIXED. 
+Jun 25 00:22:37 localhost fsck: /mnt/image: 11/92544 files (0.0% non-contiguous), 2917/184739 blocks 
+Jun 25 00:22:37 localhost fsck: /dev/hdc5:  
+Jun 25 00:22:37 localhost fsck: Inode 16311, i_blocks is 464, should be 456.  FIXED. 
+Jun 25 00:22:39 localhost fsck: Inode 145361, i_blocks is 64, should be 8.  FIXED. 
+Jun 25 00:22:54 localhost fsck: /dev/hdc5: 8716/645120 files (2.8% non-contiguous), 577997/1289854 blocks 
+Jun 25 00:22:54 localhost fsck: /dev/hdc6 was not cleanly unmounted, check forced. 
+Jun 25 00:23:13 localhost fsck: /dev/hdc6: 5373/513024 files (3.0% non-contiguous), 590684/1025884 blocks 
+Jun 25 00:23:13 localhost fsck: /mnt/workspace2 was not cleanly unmounted, check forced. 
+Jun 25 00:23:20 localhost fsck: /mnt/workspace2: 36/461216 files (44.4% non-contiguous), 342652/921682 blocks 
+Jun 25 00:23:20 localhost fsck: /usr was not cleanly unmounted, check forced. 
+Jun 25 00:24:23 localhost fsck: /usr: 126394/648960 files (0.1% non-contiguous), 544552/1296650 blocks 
+Jun 25 00:24:23 localhost rc.sysinit: Checking filesystems succeeded 
+Jun 25 00:24:25 localhost rc.sysinit: Mounting local filesystems:  succeeded 
+Jun 25 00:24:25 localhost rc.sysinit: Turning on process accounting succeeded 
+Jun 25 00:24:25 localhost rc.sysinit: Turning on user and group quotas for local filesystems:  succeeded 
+Jun 25 00:24:25 localhost rc.sysinit: Enabling swap space:  succeeded 
+Jun 25 00:24:27 localhost init: Entering runlevel: 5 
+Jun 25 00:24:27 localhost kudzu: Updating /etc/fstab succeeded 
+Jun 25 00:24:35 localhost kudzu:  succeeded 
+Jun 25 00:24:35 localhost sysctl: net.ipv4.ip_forward = 0 
+Jun 25 00:24:35 localhost sysctl: net.ipv4.conf.all.rp_filter = 1 
+Jun 25 00:24:35 localhost sysctl: kernel.sysrq = 0 
+Jun 25 00:24:35 localhost network: Setting network parameters:  succeeded 
+Jun 25 00:24:36 localhost network: Bringing up interface lo:  succeeded 
+Jun 25 00:24:41 localhost xfs: listening on port 7100 
+Jun 25 00:24:41 localhost xfs: xfs startup succeeded
+Jun 25 00:24:41 localhost anacron: anacron startup succeeded
+Jun 25 00:24:41 localhost rhnsd[651]: Red Hat Network Services Daemon starting up.
+Jun 25 00:24:41 localhost rhnsd: rhnsd startup succeeded
+Jun 25 00:24:42 localhost linuxconf: Running Linuxconf hooks:  succeeded
+Jun 25 00:24:56 localhost gdm(pam_unix)[688]: session opened for user spectrum by (uid=0)
+Jun 25 00:24:57 localhost gdm[688]: gdm_slave_session_start: spectrum on :0
+Jun 25 00:25:00 localhost kernel: Creative EMU10K1 PCI Audio Driver, version 0.7, 20:53:49 Apr  8 2001
+Jun 25 00:25:00 localhost kernel: PCI: Found IRQ 9 for device 00:0b.0
+Jun 25 00:25:00 localhost kernel: emu10k1: EMU10K1 rev 5 model 0x20 found, IO at 0xe400-0xe41f, IRQ 9
+Jun 25 00:25:00 localhost modprobe: modprobe: Can't locate module sound-service-0-0
+Jun 25 00:25:04 localhost gnome-name-server[812]: starting
+Jun 25 00:25:04 localhost gnome-name-server[812]: name server starting
+Jun 25 00:25:04 localhost kernel: hdb: Disabling (U)DMA for ATAPI CD-ROM DRIVE 40X MAXIMUM
+Jun 25 00:25:04 localhost kernel: hdb: ATAPI 40X CD-ROM drive, 128kB Cache
+Jun 25 00:25:04 localhost kernel: Uniform CD-ROM driver Revision: 3.12
+Jun 25 00:25:05 localhost kernel: Attached scsi CD-ROM sr0 at scsi0, channel 0, id 3, lun 0
+Jun 25 00:25:05 localhost kernel: (scsi0:0:3:0) Synchronous at 10.0 Mbyte/sec, offset 15.
+Jun 25 00:25:05 localhost kernel: sr0: scsi3-mmc drive: 24x/24x writer cd/rw xa/form2 cdda tray
+Jun 25 00:25:05 localhost kernel: cdrom: This disc doesn't have any tracks I recognize!
+
+
+==
+-------------------
+ICQ me @ 115319093
+-------------------
+PGP ENCRYPTED EMAIL
+AVAILABLE UPON
+REQUEST
+
+_____________________________________________________________
+Want a new web-based email account ? ---&gt; <A HREF="http://www.firstlinux.net">http://www.firstlinux.net</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

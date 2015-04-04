@@ -1,0 +1,142 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re; Database Migration" -->
+<!-- FromName="'Jake Hawkes'" -->
+<!-- FromEmail="jakehawkes2001@yahoo.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 5 Dec 2002 06:53:11 -0800 (PST)" -->
+<!-- Id="20021205145311.1233.qmail@web41207.mail.yahoo.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re; Database Migration</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jakehawkes2001@yahoo.com">jakehawkes2001@yahoo.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 5 Dec 2002 06:53:11 -0800 (PST)
+</PRE>
+<H1>Re; Database Migration</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Daryl wrote:
+&gt; Quite possibly, just for the effect of watching DSL gnash his teeth.
+&gt; But seriously, there are lots of tradeoffs to be weighed up, and
+&gt; SQL Server is quite probably worth considering.  Oracle, properly
+&gt; tuned, is a real high performance database (it gives you complete
+&gt; control over where you lay out certain tablespaces, so say you
+&gt; have an index that's getting hit heavily, you can move it to a
+&gt; separate file system / I/O channel), but that comes at a high
+&gt; performance cost - it ain't cheap.
+
+Sybase can do this - very well actually.  Can I brag a bit?
+
+ dbid  dbname         segmap dlog size      sizemb notused devname      phyname                   
+      
+ ----- -------------- ------ ---- --------- ------ ------- ------------ -----------------
+     9 event               3 data   1024000   2000    667  xisdata4     /dev/rxisdata4            
+      
+     9 event               3 data   1024000   2000    948  xisdata5     /dev/rxisdata5            
+      
+     9 event               3 data   1024000   2000   1925  xisdata5     /dev/rxisdata5            
+      
+     9 event               4 log      51200    100     98  xislog1      /dev/rxislog1             
+      
+     9 event               4 log     204800    400    400  xislog1      /dev/rxislog1             
+      
+    10 xosapp              3 data     38400     75     74  xisdata1     /dev/rxisdata1            
+      
+    10 xosapp              4 log      12800     25     25  xislog1      /dev/rxislog1             
+      
+    11 timeline            3 data     76800    150      5  xisdata3     /dev/rxisdata3            
+      
+    11 timeline            3 data    153600    300    151  xisdata3     /dev/rxisdata3        
+
+
+Out biggest DB by far: EFM  103997.0 MB
+
+Is split over many devices:
+
+ device_fragments               size          usage                free kbytes 
+ ------------------------------ ------------- -------------------- ----------- 
+ efmdata1                       7999.0 MB     data only                6912448 
+ efmdata10                      7999.0 MB     data only                7985840 
+ efmdata11                      7999.0 MB     data only                8073264 
+ efmdata12                      7999.0 MB     data only                8190976 
+ efmdata2                       7999.0 MB     data only                7365392 
+ efmdata3                       7999.0 MB     data only                7015248 
+ efmdata4                       7999.0 MB     data only                7760144 
+ efmdata5                       7999.0 MB     data only                8190976 
+ efmdata6                       7999.0 MB     data only                3337616 
+ efmdata7                       7999.0 MB     data only                8190976 
+ efmdata8                       7999.0 MB     data only                8190976 
+ efmdata9                       7999.0 MB     data only                8190976 
+ efmlog1                        7999.0 MB     log only                 8189776 
+ xislog2                        10.0 MB       log only                   10240 
+
+We are using IBM AIX (blech) and in particular fiber channel SAN disks.  The Shark as it is known
+(<A HREF="http://www.storage.ibm.com/">http://www.storage.ibm.com/</A>) is amazing.
+
+
+&gt;  SQL Server is built on Sybase, IIRC (either that or Ingres; I get the two confused),
+
+stolen is the right word there.
+
+MS had no DB and so made a partnership with sybase to port the sybase DB (known as "SQL Server"
+sound familiar?) to NT.  MS turned around and said "We have changed so much, that it is not really
+a sybase product anymore, it is ours.  Any by the way, any developer who wants to work for us will
+geat Staks-o-Kash(tm).  They even got to keep the name through a contractual loophole.
+
+&gt; so it's an OK
+&gt; database with GUI-fied front end, which probably means MCSE-like
+&gt; DBA's will be a dime a dozen.  I don't know what it would be like
+&gt; to recover/administer.
+
+good question.  in sybase, there are lots of tricks you can do to fix tables on the fly, but they
+all involve obscure SQL commands that are well documented in Sybooks.  I'd shudder to think about
+trying to do that in a GUI, over dialup, at 3am :)
+
+=====
+Jacob Hawkes, B. Eng (CSE)
+<A HREF="mailto:jakehawkes2001@yahoo.com">jakehawkes2001@yahoo.com</A>
+<A HREF="http://www.infinitylimited.net/">http://www.infinitylimited.net/</A>
+
+__________________________________________________
+Do you Yahoo!?
+Yahoo! Mail Plus - Powerful. Affordable. Sign up now.
+<A HREF="http://mailplus.yahoo.com">http://mailplus.yahoo.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

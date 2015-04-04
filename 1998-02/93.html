@@ -1,0 +1,113 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Wherefore art thou, libX11.so.6?" -->
+<!-- FromName="Mark Smith" -->
+<!-- FromEmail="marks@senet.com.au" -->
+<!-- ToName="Wayne" -->
+<!-- ToEmail="ws@senet.com.au" -->
+<!-- Date="Mon, 23 Feb 1998 11:52:32 +1030 (CST)" -->
+<!-- Id="XFMail.980223115232.marks@senet.com.au" -->
+<!-- Reference="199802222256.JAA25928@pluto.senet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Wherefore art thou, libX11.so.6?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Smith &lt;<I><A HREF="mailto:marks@senet.com.au">marks@senet.com.au</A></I>&gt;
+  To  : Wayne &lt;<I><A HREF="mailto:ws@senet.com.au">ws@senet.com.au</A></I>&gt;
+  Date: Mon, 23 Feb 1998 11:52:32 +1030 (CST)
+</PRE>
+<H1>RE: Wherefore art thou, libX11.so.6?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Although I am still getting a handle on the differences between the various
+versions of libc etc. I'll have a go at solving your problem.
+
+You have looked in all the right places to determine that whether the shared
+library exists - you are well on the way.
+
+I think your problem is that you are using libc v4 (which contains all the basic
+C library functions (such as printf etc). I think that libX11.so.6 is expecting
+at least libc v5 (I am running libc v5.4.38 - althought there is a slightly
+newer version out). Another problem may be that I think libc v4 was an "a.out"
+format library, rather than an "elf" format library. This could also be causing
+your problem.
+
+You can use the "file" command to determine whether your file is an elf or an
+aout. eg. "file libc.so.4.7.2" gives
+
+ libc.so.4.7.2: Linux/i386 demand-paged executable (QMAGIC), stripped
+
+on my box, indicating an "aout" whereas "file libc.so.5.4.38" gives
+
+libc.so.5.4.38: ELF 32-bit LSB shared object, Intel 386, version 1, not stripped
+
+indicating an elf format library.
+
+BTW : Don't think about running "strip" against libc, I have done this in
+search of disk space, and have then had to spend the next hour re-installing
+libc on a non-bootable Linux system (via rescue floppies).
+
+if you are running a complete "aout" system (try something like "file
+/bin/cp"), it is best to move to an elf system, as this is the preferred format
+for Linux executables, and the newer versions of the kernel are only designed
+to compile as an elf. See the ELF-HOWTO for instructions. An easier method of
+upgrading (if ELF-HOWTO seems to hard) is to completely upgrade your box via a
+new distributions eg. Red Hat 5.
+
+Alternatively, you may just need to install Libc 5. It is best to also install
+all the new version of the linker, GCC etc. See the GCC subdirectory under
+/pub/Linux at sunsite for all the new versions of these things. Make sure that
+you read and follow the release notes exactly, particularly the order in which
+to upgrade these components. If you are too casual about this upgrade, you may
+end up with a dead linux box, as Libc is used by all (I'm pretty sure, I
+haven't checked all 4000 binaries on my system :-) programs using shared
+libraries.
+
+BTW, it is possible to have both libc v4 and libc v5 existing on the same box,
+and is necessary if you still want to run old "aout" binaries.
+
+BTW2, there is a new libc comming, v6, which is currently "sort of" in beta
+test, ie. it is not quite a production level version, but is being used in
+distributions like Red Hat 5.
+
+HTH,
+Mark.
+
+
+----------------------------------
+E-Mail: Mark Smith &lt;<A HREF="mailto:marks@senet.com.au">marks@senet.com.au</A>&gt;
+Date: 23-Feb-98
+Time: 11:32:28
+
+He played the king as if afraid someone else would play the ace.
+                -- John Mason Brown, drama critic
+
+----------------------------------
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

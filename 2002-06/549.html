@@ -1,0 +1,182 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Use of Procmail / fetchmail putting together what everyone else taughtme" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="'Justin Hawkins'" -->
+<!-- ToEmail="justin@internode.com.au" -->
+<!-- Date="Thu, 20 Jun 2002 09:39:50 -0700" -->
+<!-- Id="" -->
+<!-- Reference="20020620101024.O52920-100000@weasel.internode.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Use of Procmail / fetchmail putting together what everyone else taughtme</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : Justin Hawkins &lt;<I><A HREF="mailto:justin@internode.com.au">justin@internode.com.au</A></I>&gt;
+  Date: Thu, 20 Jun 2002 09:39:50 -0700
+</PRE>
+<H1>Use of Procmail / fetchmail putting together what everyone else taughtme</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I have made progress sine this last email. And have figured out how to
+get my email to end up where I like it.  Right now, I am recycling some
+messages. I have to iron that out last.
+
+My setup:    My mail is retrieved by fetchmail from my isp via pop3.
+
+FYI - ($HOME = /home/james - which is my home directory)
+
+As I understand it, fetchmail follows the instrucitons outlined in
+$HOME/.fetchmailrc
+
+Here is how my $HOME/.fetchmailrc reads:
+
+set postmaster "james"
+set bouncemail
+set no spambounce
+set properties ""
+set daemon 30
+poll postoffice.pacbell.net with proto POP3
+user 'james' there with password xxxxxxx is 'james' here
+
+Since fethchmail looks for the $HOME/.forward file, I used it to start
+procmail - which will invoke spamassassin and then deliever the email
+after it is categorized into spam and non spam categories by spamassassin.
+
+My $HOME/.forward file reads:
+
+"|exec /usr/bin/procmail"
+
+I understand that this command causes the system to use procmail instead
+of sendmail.
+
+(I had to find out where procmail was by typring the following command
+at the shell prompt: which procmail.)
+
+  From what I have read, the $HOME/.procmailrc file
+(/home/james/.procmailrc) controlls procmail's behavior.
+
+It reads:
+
+PATH=$HOME/bin:/bin:/usr/bin:/usr/local/bin
+MAILDIR=$HOME/Mail  &lt;-------------------------(In this case I found out
+that $HOME meant /var/spool)
+LOGFILE=$HOME/procmail.log
+VERBOSE=on
+
+#spamassassin
+INCLUDERC=$HOME/.procmail/rc.spamassassin   &lt;------------------This file
+starts spamassassin
+
+
+I created a folder in /home/james called .procmail and put a file called
+rc.spamassassin in it.  Spamassassin is started by rc.spamassassin in
+this case because the INCLUDERC command makes rc.spamassassin a part of
+the procmail init routine, and the command itself starts the program.
+
+rc.spamassassin reads:  :0fw
+|spamassassin -P -c /usr/share/spamassassin
+
+:0:
+*^X-Spam-Status: Yes
+$HOME/SPAM/spam    &lt;---------------This command puts the spam in a
+separate spam folder in my home directory in a file called spam
+
+:0:
+*^X-Spam-Status: No
+$HOME/.mozilla/default/randomletters.slt/Mail/Incoming/inbox
+&lt;---------------This puts the legit mail in my netscape folder and
+appends it to the existing inbox.
+
+:0e
+{
+EXITCODE=$?
+}
+
+
+SO anyway...... :-)
+
+
+Any ideas as to why I am getting old messages again? This is the last
+piece of information until I deploy....
+
+
+When I check with neyscape it says "no new messages"
+
+
+Thanks!
+
+
+James Leone
+
+
+
+
+
+
+
+
+Justin Hawkins wrote:
+
+ &gt;On Wed, 19 Jun 2002, James Leone wrote:
+ &gt;
+ &gt;&gt;Justin, that was a fantastic presentation. I printed the whole thing out.
+ &gt;&gt;You were a very big help too.
+ &gt;&gt;
+ &gt;&gt;So, you definitely do not recommend redirecting email to a folder besides
+ &gt;&gt;/var/spool/mail on a stand alone workstation?
+ &gt;&gt;
+ &gt;&gt;My real problem is that I have our workers in the office using nutscrape
+ &gt;&gt;6.  I was going to set up a script embedded in a desktop icon  to
+ &gt;&gt;enable them to check their mail, and land it in folder that nutscrape 
+6 would read automaticly after it was opened.
+ &gt;&gt;Most of our accounting applications only run in windblows.
+ &gt;&gt;
+ &gt;
+ &gt;I'm not sure I understand correctly - where is the mail currently stored
+ &gt;and accessed from? Is it somehow read from /var/spool/mail from netscape
+ &gt;on windows? Or is IMAP or POP or something similar in use?
+ &gt;
+ &gt;Let me know what you currently have, and what you are trying to achieve,
+ &gt;and we'll go from there.
+ &gt;
+ &gt;	- Justin
+ &gt;
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

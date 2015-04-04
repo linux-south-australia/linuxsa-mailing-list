@@ -1,0 +1,99 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Sendmail + LDAP + RBL" -->
+<!-- FromName="" -->
+<!-- FromEmail="James.Wilson@compsm.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 17 Oct 2001 09:31:05 +0930" -->
+<!-- Id="OFEAA1E2BA.56DAFA78-ON69256AE7.0083A9CF@compsm.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Sendmail + LDAP + RBL</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: &lt;<I><A HREF="mailto:James.Wilson@compsm.com.au">James.Wilson@compsm.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 17 Oct 2001 09:31:05 +0930
+</PRE>
+<H1>Sendmail + LDAP + RBL</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi guys,
+
+Just rebuilt my sendmail.cf using the supplied .m4 files.
+
+I added the following lines to my mc:
+
+FEATURE(dnsbl, `blackholes.mail-abuse.org', `Rejected - see
+<A HREF="http://www.mail-abuse.org/rbl/">http://www.mail-abuse.org/rbl/</A>')dnl
+FEATURE(dnsbl, `dialups.mail-abuse.org', `Dialup - see
+<A HREF="http://www.mail-abuse.org/dul/">http://www.mail-abuse.org/dul/</A>')dnl
+FEATURE(dnsbl, `relays.mail-abuse.org', `Open spam relay - see
+<A HREF="http://www.mail-abuse.org/rss/">http://www.mail-abuse.org/rss/</A>')dnl
+
+The reulting sendmail.cf works fine, parse users in ldap etc...
+
+However, rbl support doesn't appear to be working.  I issued the standard
+test:
+
+[<A HREF="mailto:root@server">root@server</A> /etc]# sendmail -bt -C /etc/sendmail.cf
+ADDRESS TEST MODE (ruleset 3 NOT automatically invoked)
+Enter &lt;ruleset&gt; &lt;address&gt;
+&gt; .D{client_addr}127.0.0.1
+&gt; Basic_check_relay &lt;&gt;
+Basic_check_rela   input: &lt; &gt;
+Basic_check_rela returns: OKSOFAR
+&gt; .D{client_addr}127.0.0.2
+&gt; Basic_check_relay &lt;&gt;
+Basic_check_rela   input: &lt; &gt;
+Basic_check_rela returns: OKSOFAR
+
+ARGH!
+
+127.0.0.2 should give an error such as:
+
+&gt; .D{client_addr}127.0.0.2
+           &gt; Basic_check_relay &lt;&gt;
+           rewrite: ruleset 192   input: &lt; &gt;
+           rewrite: ruleset 192 returns: $# error $@ 5 . 7 . 1 $: "Mail
+from " 127 . 0 . 0 . 2 " refused; see
+<A HREF="http://www.mail-abuse.org/cgi-bin/lookup?127.0.0.2">http://www.mail-abuse.org/cgi-bin/lookup?127.0.0.2</A>"
+
+
+Any ideas?
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

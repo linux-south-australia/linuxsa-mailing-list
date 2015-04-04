@@ -1,0 +1,149 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Hackers from Brazil" -->
+<!-- FromName="O'Connor, Steven" -->
+<!-- FromEmail="Steven.O'Connor@boralenergy.com.au" -->
+<!-- ToName="'linuxsa@linuxsa.org.au'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 7 Apr 1999 11:11:35 +0930" -->
+<!-- Id="199904070146.LAA13525@Elizabeth.netcraft.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Hackers from Brazil</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: O'Connor, Steven &lt;<I><A HREF="mailto:Steven.O'Connor@boralenergy.com.au">Steven.O'Connor@boralenergy.com.au</A></I>&gt;
+  To  : 'linuxsa@linuxsa.org.au' &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 7 Apr 1999 11:11:35 +0930
+</PRE>
+<H1>Hackers from Brazil</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+One of my clients got hacked over the weekend from a crew in Brazil.  Here
+is the entertaining story of the tracking and patching of the problem :
+
+Here are the symptoms: (in order of discovery)
+
+- on login as root, you get a banner saying 'ACCESS GRANTED' flashing red,
+sleep 2, clear, echo 'Welcome to HXRave' ... 
+
+I thought What ?  .. next step, check to see who has logged in recently, and
+who might have changed /etc/motd or something
+
+- /etc/motd not changed
+
+- grep /etc/everything for the string 'GRANTED' ... nothing found
+
+Check log files
+
+- /var/log/messages contained entries about a login from a user called
+'rewt' uid=0
+- /var/log/[messages, security, xferlog, maillog, etc, etc] truncated as of
+the date of the hack
+
+check /etc/passwd - no entry for rewt, sure enough
+
+- /bin/login had a new timestamp
+
+vi /bin/login - found the string 'ACCESS GRANTED' along with all the other
+stuff .. Resist tempation to replace hacked /bin/login with 
+real /bin/login for now.
+
+Check networking:
+- ifconfig showed a whole pile (eth0:5 - eth0:15) of new aliased interfaces
+- netstat -a shows an IRC server running on port 6667
+
+My client definately does not use IRC ... whats all this ?
+
+- run irc, connect to local server
+- connection made OK ! - list channels - there are a whole pile of IRC
+channels all coming up in Spanish ! This is getting bizarre !
+
+Now to clean up a bit ...
+
+Check log files .. an oldish imapd is the blame ... comment out imapd from
+/etc/inetd.conf, and mv /usr/bin/imapd to /usr/bin/imapd_old .. dont need it
+anyway.
+
+Now, where do those extra aliases come from ?
+
+- /etc/rc.d/rc.local has new ifconfig and route entries - vi
+/etc/rc.d/rc.local and comment them out
+- /etc/rc.d/rc.local calls a couple of weird programs, namely
+   /dev/.chips/hx/hx &
+   /dev//.chips/bnc &
+
+Hmm...  cd /dev/.chips; ls -R ... good, source code and all buried away in
+there. Have a look in the source code ..
+nothing malignant in there, which is lucky. It is just some very slick IRC
+server that looks like it is using IP multicasting
+to broadcast music in MP3 format to whoever is attached.
+
+Various log files indicate that a number of other hacked sites are also
+hooked together into some sort of mp3-broadcast-ring
+
+Checking more log files shows lots of connections from many different
+addresses in the .com.br domain.
+
+What to do next ?  Having a certain respect for the opponent, I dont want to
+act like a PHB and just slam the door shut, these people might be
+script-kiddies for all I know, but they also are people that you can learn
+something from if you play your cards right.
+
+- download source code to /bin/login
+- Change the code around a bit so that it accepts a login from 'rewt', and
+displays the exact same banner as they got before
+- add a 'fake_shell()' routine to /bin/login that looks and smells like a
+real shell, lets you cd and ls and things, but does not run
+any real commands. Instead all commands are appended to /Rewt.log for later
+viewing
+- Replace their hacked /bin/login with my double-hacked /bin/login
+
+- Write a replacement for imapd that simply accepts connections on port 143,
+does nothing with them, and exits. This is so that when they next try to
+'fix' the system using imapd, it looks like the attempt succeeded.
+
+Take down the IRC server: killall -9 hx; killall -9 bnc
+
+tail -f /var/log/messages shows a growing stream of  identd queries on port
+6667 on this machine ...
+
+I have left the little mousetrap running for a while, will report back with
+any results that I find later on.
+
+Anyone else had any fun playing with the boys from Brazil ?
+
+SteveOC
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

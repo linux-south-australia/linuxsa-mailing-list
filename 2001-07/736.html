@@ -1,0 +1,107 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SYN states" -->
+<!-- FromName="'Daryl Tester'" -->
+<!-- FromEmail="Daryl.Tester@iocane.com.au" -->
+<!-- ToName="'Charles Williams'" -->
+<!-- ToEmail="hosting.mailing.list.account@acnshosting.com" -->
+<!-- Date="Sat, 14 Jul 2001 23:33:09 +0930" -->
+<!-- Id="3B50511D.F44D89BD@iocane.com.au" -->
+<!-- Reference="024d01c10c5c$16755f80$fe0aa8c0@chucks" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SYN states</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  To  : Charles Williams &lt;<I><A HREF="mailto:hosting.mailing.list.account@acnshosting.com">hosting.mailing.list.account@acnshosting.com</A></I>&gt;
+  Date: Sat, 14 Jul 2001 23:33:09 +0930
+</PRE>
+<H1>Re: SYN states</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Charles Williams wrote:
+
+&gt;&gt; Have you looked into SYN cookies?
+
+&gt; Syn cookies is ok but only after 3 or more connections from the same client
+&gt; is dropped.
+
+SYN cookies do not drop connections; SYN cookies, for want of a better
+explanation, maintain state without using memory during the initial
+handshake via a (crypto) hashing function.  Its reason for existence is
+to prevent resource starvation issues under SYN flood attacks, forged or
+otherwise.
+
+&gt; Thus the need to verify the SYN before a port is opened.
+
+Doesn't this just shift the problem to the machine in front of
+the firewall?  How does it stop having its SYN queue from
+being flooded, whether in kernel or user space?  More to the
+point, why isn't the firewall capable of handling this?
+
+&gt; However, you must first catch the SYN as it leaves TCP and
+&gt; before it hits the firewall.  Otherwise you will have an
+&gt; open port on a firewall until it times out.
+
+No, the "port doesn't open" until you receive the final ACK back from
+the client, at least at the application level - this is the point
+where accept() unblocks (for normal blocking listening sockets) and
+returns the new file descriptor.  What is most likely happening is
+that your firewall is maintaining data between SYN (SYN-ACK) and ACK,
+which is where the DoS is coming in.
+
+&gt; Whereas if you can catch it
+&gt; before it hits the firewall and verify that the connection is established
+&gt; you can pass the session to the firewall without losing performance as the
+&gt; time the port is open without connection and until timeout coupled with the
+&gt; magnatude of the attack is what kills the server.
+
+Is your firewall and server one and the same?
+
+&gt; Once the attack is underway and the syn proxy sees that it is recieving
+&gt; constant incomplete syns from client it is added to the bad IP DB and ALL
+&gt; connections are refused to that client for approx. 24-48 hours (when the DB
+&gt; is cleared of old IP's) thus dialin IP's are open again inside of 24 hours
+&gt; for use.
+
+Cool - so someone could start a forged SYN flood of, say, some large ISP's
+proxy cache farm, and this software would obligingly block it?  That
+smells of DoS too.
+
+Regards,
+  Daryl Tester
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

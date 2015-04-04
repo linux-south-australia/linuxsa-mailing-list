@@ -1,0 +1,121 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Mail 'from' address" -->
+<!-- FromName="Geoffrey D. Bennett" -->
+<!-- FromEmail="g@netcraft.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="doncol@george.mdt.net.au" -->
+<!-- Date="Sat, 31 Jan 1998 16:03:08 +1030 (CST)" -->
+<!-- Id="199801310533.QAA02418@Mich.netcraft.com.au" -->
+<!-- Reference="34D2A687.429F@mail.mdt.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Mail 'from' address</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Geoffrey D. Bennett &lt;<I><A HREF="mailto:g@netcraft.com.au">g@netcraft.com.au</A></I>&gt;
+  To  : <A HREF="mailto:doncol@george.mdt.net.au">doncol@george.mdt.net.au</A>
+  Date: Sat, 31 Jan 1998 16:03:08 +1030 (CST)
+</PRE>
+<H1>Re: Mail 'from' address</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; A quick one....
+&gt; Just a query as to how to send mail using 'mail' on my Linux machine at
+&gt; home, and have it go as though it were from my ISP account?  That way it
+&gt; will go as <A HREF="mailto:doncol@mail.mdt.net.au">doncol@mail.mdt.net.au</A> instead of <A HREF="mailto:don@localhost.">don@localhost.</A>  This would
+&gt; make it easier for people when they wish to reply to my quick hack
+&gt; messages.
+&gt; regards...Don.
+
+Hi Don,
+
+Two ways to do this.  One way is to tell sendmail to masquerade as
+your ISP (mail.mdt.net.au) and use an account on your machine called
+"doncol" instead of "don".  The other way is to tell sendmail that any
+outgoing mail from a particular user (such as "don") should have the
+"From" header changed to something else (such as
+"<A HREF="mailto:doncol@mail.mdt.net.au">doncol@mail.mdt.net.au</A>").
+
+The first way:
+
+Edit /etc/sendmail.cf
+Look for the line with just "DM" on it.
+Change that line to "DMmail.mdt.net.au".
+Restart sendmail: /etc/rc.d/init.d/sendmail restart
+Any mail from users on your machine will now be from
+  (user)@mail.mdt.net.au
+
+The second way:
+
+Go to the directory /usr/lib/sendmail-cf/cf
+Copy redhat.mc to another name (such as "my.mc").
+You need to add a new line to my.mc.  Here is the redhat.mc file from
+  Red Hat 5.0; whatever it looks like, just add the appropriate line
+  below the other FEATURE lines:
+
+-----8&lt;-----8&lt;-----8&lt;-----
+divert(-1)
+include(`../m4/cf.m4')
+define(`confDEF_USER_ID',``8:12'')
+OSTYPE(`linux')
+undefine(`UUCP_RELAY')
+undefine(`BITNET_RELAY')
+FEATURE(redirect)
+FEATURE(always_add_domain)
+FEATURE(use_cw_file)
+FEATURE(local_procmail)
+FEATURE(genericstable)      &lt;--- Add this line
+MAILER(procmail)
+MAILER(smtp)
+HACK(check_mail3,`hash <A HREF="mailto:-a@JUNK">-a@JUNK</A> /etc/mail/deny')
+HACK(use_ip,`/etc/mail/ip_allow')
+HACK(use_names,`/etc/mail/name_allow')
+HACK(use_relayto,`/etc/mail/relay_allow')
+HACK(check_rcpt4)
+HACK(check_relay3)
+-----8&lt;-----8&lt;-----8&lt;-----
+
+After adding the genericstable line, type "m4 &lt; my.mc &gt; my.cf".  This
+  creates the new .cf file.
+Copy my.cf to /etc/sendmail.cf (make a backup first perhaps, but there
+  should be a file redhat.cf which is the same as /etc/sendmail.cf).
+Create a file called /etc/genericstable that contains just this line:
+don	<A HREF="mailto:doncol@mail.mdt.net.au">doncol@mail.mdt.net.au</A>
+Run: makemap hash /etc/genericstable &lt; /etc/genericstable
+Restart sendmail: /etc/rc.d/init.d/sendmail restart
+Email from don will now appear to come from <A HREF="mailto:doncol@mail.mdt.net.au">doncol@mail.mdt.net.au</A>
+
+I hope this helps,
+-- 
+Geoffrey D. Bennett (<A HREF="mailto:geoffrey@netcraft.com.au">geoffrey@netcraft.com.au</A>)
+Computer Systems Manager, NetCraft Australia
+<A HREF="http://www.netcraft.com.au/geoffrey/">http://www.netcraft.com.au/geoffrey/</A>
+Red Hat Linux Resellers: <A HREF="http://www.netcraft.com.au/redhat/">http://www.netcraft.com.au/redhat/</A>
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

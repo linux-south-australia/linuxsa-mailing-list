@@ -1,0 +1,116 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: fscked partition" -->
+<!-- FromName="'Adam Smith'" -->
+<!-- FromEmail="adam.smith@sageautomation.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 6 Sep 2002 16:38:55 +0930" -->
+<!-- Id="005101c25574$436e8900$e209a8c0@bugman" -->
+<!-- Reference="20020906153708.F19799@april.netcraft.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: fscked partition</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adam Smith &lt;<I><A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 6 Sep 2002 16:38:55 +0930
+</PRE>
+<H1>RE: fscked partition</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+A certain Mister Toby Corkindale wrote:
+
+&gt; try running "lsof" or whatever the frisbee version is called, 
+&gt; and grep for stuff in /var/.
+
+Hmm.  I think this may be the killer.  I see some interesting results of
+files open in var with lsof:
+
+httpd       169   root   22w  VREG 116,131076    43663222    6501 /var
+(/dev/ad0s1e)
+
+and further down:
+
+httpd     42563    www   16w  VREG 116,131076       74505    6282 /var
+(/dev/ad0s1e)
+httpd     42563    www   22w  VREG 116,131076    43663222    6501 /var
+(/dev/ad0s1e)
+httpd     42563    www   24w  VREG 116,131076       74505    6282 /var
+(/dev/ad0s1e)
+httpd     42565    www   16w  VREG 116,131076       74505    6282 /var
+(/dev/ad0s1e)
+httpd     42565    www   22w  VREG 116,131076    43663222    6501 /var
+(/dev/ad0s1e)
+httpd     42565    www   24w  VREG 116,131076       74505    6282 /var
+(/dev/ad0s1e)
+httpd     42566    www   16w  VREG 116,131076       74505    6282 /var
+(/dev/ad0s1e)
+httpd     42566    www   22w  VREG 116,131076    43663222    6501 /var
+(/dev/ad0s1e)
+
+The partition itself is only 50Mb.  That would account for the apparent
+5.5Mb in use and the unnaccounted 40 or so Mb.
+
+I stopped Apache, and then filled the rest of my var partition to see
+what would happen:
+
+<A HREF="mailto:root@poxy">root@poxy</A> /var/tmp # cat foo &gt;&gt; foo
+
+/var: write failed, file system is full
+cat: stdout: No space left on device
+<A HREF="mailto:root@poxy">root@poxy</A> /var/tmp # dir
+total 41538
+drwxrwxrwt   2 root  wheel       512 Sep  6 13:16 .
+drwxr-xr-x  20 root  wheel       512 May 11 18:59 ..
+-rw-r--r--   1 root  wheel  42499828 Sep  6 16:32 foo
+
+42Mb! How about that.
+
+<A HREF="mailto:root@poxy">root@poxy</A> /var/tmp # df -h
+Filesystem    Size   Used  Avail Capacity  Mounted on
+/dev/ad0s1a    97M    41M    49M    45%    /
+/dev/ad0s1f   9.1G   6.0G   2.4G    72%    /usr
+/dev/ad0s1e    48M   6.2M    38M    14%    /var
+procfs        4.0K   4.0K     0B   100%    /proc
+
+The missing space appears to have been recovered.
+
+
+Thanks to Toby and all.
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

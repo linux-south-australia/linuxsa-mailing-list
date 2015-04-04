@@ -1,0 +1,88 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: clone() question  (was re: hilarious mouse question)" -->
+<!-- FromName="Mark Pulford" -->
+<!-- FromEmail="wmpulfor@cs.adelaide.edu.au" -->
+<!-- ToName="LinuxSA mailing list" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 30 Dec 1997 21:15:49 +1030 (CST)" -->
+<!-- Id="Pine.SV4.3.93.971230205453.26100A-100000@argon.teaching.cs.adelaide.edu.au" -->
+<!-- Reference="Pine.LNX.3.95.971230185104.755B-100000@superr.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: clone() question  (was re: hilarious mouse question)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Pulford &lt;<I><A HREF="mailto:wmpulfor@cs.adelaide.edu.au">wmpulfor@cs.adelaide.edu.au</A></I>&gt;
+  To  : LinuxSA mailing list &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 30 Dec 1997 21:15:49 +1030 (CST)
+</PRE>
+<H1>Re: clone() question  (was re: hilarious mouse question)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, 30 Dec 1997, Jason Nunn wrote:
+
+&gt; Don't be. It's my rather warped sense of humour i'm afraid ;), but i have
+&gt; a sensible question now. I need to do some multi-threaded programming with
+&gt; the clone() system function (which i've never used before). I'm not sure
+&gt; if this was around in 1.2.x (was it around back then?), but i only noticed
+&gt; it when 2.0.x came out. 
+
+Most people doing multi-threaded programming can ignore clone. It is much
+easier (and portable) to use one of the thread libraries for Linux. People
+who are not using glibc based systems generally use linuxthreads instead. 
+Glibc has thread support built in.
+
+&gt; - Do you know what standard clone() comes under? (ie POSIX?,BSD
+&gt; 4.4?,X/OPEN? etc), or is it just a Linux thing?
+
+Clone is Linux specific.
+
+&gt; - I have libc 5.3.12 and there's no stub for it. I'm looking through the
+&gt; libraries at sunsite (version 5.4.38)), and they are all pretty big. I was
+&gt; wondering if you knew if 5.4.38 has the clone() stub before i commit to
+&gt; downloading it?, and if it does (more importantly), do you know if there
+&gt; are any problems with this library?. Thanks. 
+
+There are quite a few system calls (including clone) which don't have
+stubs in (g)libc. If you want to use them directly you will have to
+improvise a little. The old 'sysinfo' call is also like this. To get
+around it do something like:
+
+#include &lt;linux/kernel.h&gt;	/* For the sysinfo struct */
+#include &lt;syscall.h&gt;
+
+int sysinfo(struct sysinfo *info)
+{
+	return syscall(SYS_sysinfo, info);
+}
+
+Regards,
+Mark
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

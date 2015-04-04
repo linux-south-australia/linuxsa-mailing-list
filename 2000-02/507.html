@@ -1,0 +1,110 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Transparent Proxy problems: no address for squid, please help" -->
+<!-- FromName="Daryl Tester" -->
+<!-- FromEmail="dt@picknowl.com.au" -->
+<!-- ToName="James Morgan" -->
+<!-- ToEmail="jmorgan@bigpond.net.au" -->
+<!-- Date="Thu, 24 Feb 2000 10:19:24 +1030" -->
+<!-- Id="38B47204.DA8D2213@picknowl.com.au" -->
+<!-- Reference="002501bf7dea$193e5d40$0601a8c0@vic.bigpond.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Transparent Proxy problems: no address for squid, please help</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  To  : James Morgan &lt;<I><A HREF="mailto:jmorgan@bigpond.net.au">jmorgan@bigpond.net.au</A></I>&gt;
+  Date: Thu, 24 Feb 2000 10:19:24 +1030
+</PRE>
+<H1>Re: Transparent Proxy problems: no address for squid, please help</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+James Morgan wrote:
+
+&gt; Essentially the address information (e.g. www.blah.com )  is not being
+&gt; passed to squid only the page location on the site (e.g. /blah/blah.html).
+
+That's right - this is the difference between "transparent" proxying and
+"real" proxying.  In real proxying, the browser knows that it is
+connecting to a proxy, and knows that the proxy has no way of
+determining
+the original site that the browser wanted to connect to, so it passes
+this
+information in the URL it is trying to fetch.
+
+	"GET HTTP://www.microsoft.com.au/ HTTP/1.0"
+
+All browsers (well, all that I know of) do this when they are configured
+to use a proxy.  On the other hand, if a browser is configured to direct
+connect to a web site, it has no way of knowing that you're fooling with
+the networking behind its back; it thinks it's directly connecting to
+the
+site in question, so it passes a "normal" HTTP GET method.
+
+	"GET / HTTP/1.0"
+
+What squid does is take the destination IP address of the incoming
+connection (this is what ipchains REDIRECT gives you) and the
+Site:/Host: header (I can never remember exactly what it's called)
+if available and uses that to establish the outbound connection.
+
+&gt; Squid then complains to the client that they have not typed in a correct
+&gt; address.
+
+At least squid is getting the URL requests, and correctly, from the
+looks
+of it, so I would say your ipchains configuration is correct.
+
+&gt; How do I get ipchains to pass all address info to squid. Can anyone point me
+&gt; to some obscure references to Transparent Proxies that I may not have looked
+&gt; at yet?
+
+I'll repeat this from my last email:  Have you configured squid for
+transparent proxying? Have you (from looking at the FAQ on nlanr.net,
+searching for "transparent", and finding the relevant section which
+took all of 30 seconds) done -
+
+	http_port 8080
+	httpd_accel_host virtual
+	httpd_accel_port 80
+	httpd_accel_with_proxy  on
+	httpd_accel_uses_host_header on
+
+?  Have you then restarted squid to make sure it loaded this new config?
+
+
+Regards,
+  Daryl Tester
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

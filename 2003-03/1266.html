@@ -1,0 +1,139 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: announcement- jigg R1 - Look Ahead Mezzianne with Transfer Encoding" -->
+<!-- FromName="'Jason Nunn'" -->
+<!-- FromEmail="jsno@arafura.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="30 Mar 2003 23:03:33 +0930" -->
+<!-- Id="1049031214.1777.83.camel@berkeley.arafura.net.au" -->
+<!-- Reference="1048998651.1716.21.camel@berkeley.arafura.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: announcement- jigg R1 - Look Ahead Mezzianne with Transfer Encoding</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jason Nunn &lt;<I><A HREF="mailto:jsno@arafura.net.au">jsno@arafura.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 30 Mar 2003 23:03:33 +0930
+</PRE>
+<H1>Re: announcement- jigg R1 - Look Ahead Mezzianne with Transfer Encoding</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, 2003-03-30 at 14:30, Mike Gratton wrote:
+
+&gt; Interesting... but allow me to play the devil's advocate here. ;)
+
+that's ok ;) ;)
+
+
+&gt; Does it compress the responses for storage on disk (or in memory) to 
+&gt; save space? If so, isn't that a bit redundant given the browser will 
+&gt; also cache content on that same machine?
+
+no... jigg doesn't do any cacheing of data to disk. it's basically a
+"wrapper". it wraps around squid (or any web cache program). it
+compresses the HTTP responses to a web browser (given the type of
+content it has), and any text/html responses it sees, it
+will gather up the "src img" links (objects), and then do GET <A HREF="http://...">http://...</A>
+HTTP/1.1 request on those links to force the web cache to go get them
+(before the web browser has had time to do this).
+
+
+&gt; Or does it compress responses to save bandwidth? If so, why bother 
+&gt; when you'll typically be sending the content over a 10/100Mb LAN?
+
+you're right... but it was designed for our dialup users in mind.
+our wireless clients will get no speed difference ;). if
+we only had our wireless customers (we run a multi cell wireless
+network in darwin), i wouldn't bother ;).
+
+our dialin base is quite large.
+
+besides, it was a fun project. kept me off the streets when
+i was bored at work with nothing to do ;). stopped me getting
+up to mischief ;) LOL.
+
+
+&gt; &gt; and when it sees a
+&gt; &gt; TEXT/HTML response, it will look for any IMG SRC links and tell them
+web
+&gt; &gt; cache to go get them (this is called "looking ahead")...
+&gt; 
+&gt; This sounds like a generalised version of Mozilla's pre-fetching.
+
+but when this feature is being executed on the far end of a 33-40 kbps
+dial up connection, this kind of look ahead feature will have small
+effect. the look ahead in jigg's case is done on the same machine as the
+web proxy (on a fast network). given it's location, it will always be
+doing things ahead of the slow web browser on the other end of the
+dialup connection.
+
+
+&gt; How does this interact with HTTP 1.1's keep-alive and pipelining 
+&gt; features?
+
+how does jigg interact with HTTP 1.1 keep-alive ?.
+
+the same way as squid does. jigg will hold up connections if squid 
+tells it too (if the response header doesn't have a "Connection: close"
+or "Proxy-Connection: close" directive).
+
+&gt; Eg, if a page has been partially loaded by the browser and it 
+&gt; has started to request objects embedded in the page (e.g., images), 
+&gt; using the same keep-alived'ed connection that the HTML came down, and,
+&gt; say, using pipelining to request the additional objects before the
+HTML 
+&gt; has even been completely transferred. Does jigg deal with this kind of
+&gt; situation properly?
+
+yes. each time the web browser opens up a TCP connection to jigg
+it creates a new thread to handle the request/response. and it will
+do request/responses until a response comes down telling it to
+"Connection: close" or "Proxy-Connection: close".
+
+a connection will not be closed by jigg unless the web browser
+closes the connection, or if it expects a normal termination (with
+the above directives).
+
+if the web browser "fans outs" by openning multiple connections
+to jigg, then jigg doesn't care. it just treats each connection
+as a request/response.
+
+
+:jason
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

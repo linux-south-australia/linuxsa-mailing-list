@@ -1,0 +1,153 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Bastille Firewall on Manduck 8.1 Blocking my Samba..." -->
+<!-- FromName="'James Leone Home'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="'David de Groot'" -->
+<!-- ToEmail="david@viking.org.au" -->
+<!-- Date="Thu, 28 Mar 2002 09:49:30 -0800" -->
+<!-- Id="" -->
+<!-- Reference="07DEF076A52AD311BD2500902760CEEB0696E117@adlexchange.elders.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Bastille Firewall on Manduck 8.1 Blocking my Samba...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone Home &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : David de Groot &lt;<I><A HREF="mailto:david@viking.org.au">david@viking.org.au</A></I>&gt;
+  Date: Thu, 28 Mar 2002 09:49:30 -0800
+</PRE>
+<H1>Re: Bastille Firewall on Manduck 8.1 Blocking my Samba...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Well, no luck yet. I looked up the technet article and added some entries to
+the last line of /etc/rc.d/rc.local
+
+Maybe I am going about this the wrong way. Does Bastille override the manual
+entries in /etc/rc.d/rc.local?
+
+Am I better off not running bastille? Should I enter some other command to
+/etc/rc.d/rc.local before the lines I added saying, in effect, block
+everything? Will the subsequent lines below become the exception to the
+block everything rule?
+
+Thanks everybody!!
+
+
+P.S. this is what I added to the last line of /etc/rc.d/rc.local:
+
+(I have two ethernet cards, thus eth1.)
+
+ipchains -A output -p tcp -j ALLOW --destination-port 135 -i eth1
+ipchains -A output -p udp -j ALLOW --destination-port 137 -i eth1
+
+ipchains -A output -p tcp -j ALLOW --destination-port 139 -i eth1
+
+ipchains -A output -p udp -j ALLOW --destination-port 389 -i eth1
+
+ipchains -A output -p tcp -j ALLOW --destination-port 443 -i eth1
+
+ipchains -A output -p tcp -j ALLOW --destination-port 445 -i eth1
+
+ipchains -A output -p tcp -j ALLOW --destination-port 636 -i eth1
+
+ipchains -A input -p tcp -j ALLOW --destination-port 135 -i eth1
+
+ipchains -A input -p udp -j ALLOW --destination-port 137 -i eth1
+
+ipchains -A input -p tcp -j ALLOW --destination-port 139 -i eth1
+
+ipchains -A input -p udp -j ALLOW --destination-port 389 -i eth1
+
+ipchains -A input -p tcp -j ALLOW --destination-port 443 -i eth1
+
+ipchains -A input -p tcp -j ALLOW --destination-port 445 -i eth1
+
+ipchains -A input -p tcp -j ALLOW --destination-port 636 -i eth1
+
+
+
+
+----- Original Message -----
+From: "David de Groot" &lt;<A HREF="mailto:david@viking.org.au">david@viking.org.au</A>&gt;
+To: "James Leone Home" &lt;<A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A>&gt;
+Cc: "Linux Group (E-mail)" &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Sent: Thursday, March 28, 2002 1:39 AM
+Subject: RE: Bastille Firewall on Manduck 8.1 Blocking my Samba...
+
+
+&gt;
+&gt; Thursday, March 28, 2002, 9:29:04 AM, James wrote:
+&gt;
+&gt; &gt; Can anyone help me get my samba shares and my ssl connections running? I
+&gt; &gt; have Bastile firewall running on Manduck 8.1. The kernel is new enough
+for
+&gt; &gt; IPCHAINS.
+&gt;
+&gt; &gt; I tried adding a script to /etc/rc.d/rc.local:
+&gt;
+&gt; &gt; ipchains -A input -p tcp -j ALLOW --destination-port 135:139 -i eth0
+&gt;
+&gt; Hmmm, methinks you're going to have to allow all high ports too.
+&gt; (Unless Samba is a lot nicer about networking than windows, and since
+&gt; it's designed to be compatible with windows, I doubt it).
+&gt;
+&gt; Ports you almost always need for Windows shares are:
+&gt;
+&gt; 139 - nbsession
+&gt; 137 - nbname
+&gt; 135 - msrpc-loc
+&gt; &gt;1023 - for RPC calls
+&gt; sometimes 427 - has something to do with domains, IIRC.
+&gt; sometimes 138
+&gt;
+&gt; I also can't remember which of these are UDP and which TCP off the top
+&gt; of my head.
+&gt;
+&gt; I can probably look it up if you get really stuck, although a search
+&gt; of MS TechNet will provide the ports you're after...
+&gt;
+&gt; Dave
+&gt; --
+&gt; David de Groot                          mailto:<A HREF="mailto:david@viking.org.au">david@viking.org.au</A>
+&gt; <A HREF="http://vikings.homeip.net/~david">http://vikings.homeip.net/~david</A>
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

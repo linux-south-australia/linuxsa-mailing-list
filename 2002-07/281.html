@@ -1,0 +1,160 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Calculating Netmask Values" -->
+<!-- FromName="'Luke Schapel'" -->
+<!-- FromEmail="lschapel@bigpond.com" -->
+<!-- ToName="'Andrew Pullin'" -->
+<!-- ToEmail="andrew@hotspurbgc.com.au" -->
+<!-- Date="Wed, 10 Jul 2002 01:40:28 +0930" -->
+<!-- Id="3D2B0AF4.9030501@bigpond.com" -->
+<!-- Reference="002201c2250b$d17a0ce0$c2de26cb@hotspurbgc.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Calculating Netmask Values</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Luke Schapel &lt;<I><A HREF="mailto:lschapel@bigpond.com">lschapel@bigpond.com</A></I>&gt;
+  To  : Andrew Pullin &lt;<I><A HREF="mailto:andrew@hotspurbgc.com.au">andrew@hotspurbgc.com.au</A></I>&gt;
+  Date: Wed, 10 Jul 2002 01:40:28 +0930
+</PRE>
+<H1>Re: Calculating Netmask Values</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Andrew,
+
+Uh Oh, netmasks!
+
+it is useful to understand CIDR as specified in RFC1518
+<A HREF="http://www.cis.ohio-state.edu/cgi-bin/rfc/rfc1518.html">http://www.cis.ohio-state.edu/cgi-bin/rfc/rfc1518.html</A>
+but for local stuff the following works for me
+
+Rule one - think binary
+
+Rule two - netmasks may not have embedded 0's
+ie x.x.x.193 (x.x.x.1100001) is not allowed
+
+Rule three - the number of zeroes determine the network number
+ie this must match the boundary created by the mask
+
+Rule four - you lose two addresses, first is the network number
+last is the broadcast address of the subnet
+
+Easy Huh
+
+If you want 16 (less two) hosts your netmask is 240 (11110000)
+the last four zeroes give you 16 (binary) possibilities
+x.x.x.240 is your network number
+x.x.x.241 is host 1
+--
+x.x.x.254 is host 14
+x.x.x.255 is you broadcast address of the subnet
+
+so your address in this case will be between x.x.x.241 and x.x.x.254
+with a mask of x.x.x.240
+
+but your address may start on any boundary that 256 is divisable by (in 
+this case 16)
+x.x.x.0
+x.x.x.16
+--
+x.x.x.144
+--
+x.x.x.192
+
+in other words, any number is valid as long as it has the same or 
+greater number of trailing zeroes when expressed in binary
+
+so in your case you have a netmask of x.x.x.192 giving you
+62 hosts (rule 4) and a network number of x.x.x.192 but yor network
+can have other numbers (Rule 3) ie
+
+x.x.x.0
+x.x.x.64
+x.x.x.128
+x.x.x.192
+
+CIDR is much easier to work out (x.x.x.192/26) once you get the hang of it
+
+The frightening thing is that I can do this stuff in my head :)
+HTH
+
+Cheers
+
+Luke
+
+
+
+Andrew Pullin wrote:
+&gt; Hi All,
+&gt;     I have a rather annoying problem with a dual boot
+&gt; desktop at present. It works fine with the Redmond Product,
+&gt; but when I boot Linux (Suse 7.2 Pro) I discovered I couldn't
+&gt; surf with Netscape. On further investigation (I initially
+&gt; thought it was a DNS problem), I came across the following
+&gt; error msg in the boot log:
+&gt; 
+&gt; Setting up network device eth0
+&gt; doneSetting up IPv6 network interface (no address)done
+&gt; Setting up routing (using /etc/route.conf)
+&gt; Error while excuting:
+&gt;     /sbin/route add -net 203.XX.YYY.193 netmask 255.255.0.0
+&gt; gw 203.XX.YYY.193 dev eth0
+&gt;     route: netmask doesn't match route address
+&gt; 
+&gt; Setting up routingfailed
+&gt; 
+&gt;     Now I know that the Netmask here is wrong (everything
+&gt; else uses 255.255.255.192), but it occurred to me that if it
+&gt; was something different I don't have a clue how to calculate
+&gt; a Netmask anyhow, and after a bit of a search I couldn't
+&gt; find anything on the Net about how to either. Further to
+&gt; this problem, the 255.255.255.192 works on all the M$ boxes
+&gt; and my Server, but when I tried to manually run the command
+&gt; as root on the Linux Desktop with what I thought to be the
+&gt; correct Netmask, I got the same error. Now I have had a
+&gt; routing problem before that was solved when someone kindly
+&gt; calculated the Netmask for me (ie 255.255.255.192), but to
+&gt; be honest I just took their word for it because it worked.
+&gt; Can someone help me out here and show me and everybody else
+&gt; here who might have run into this problem - How do you
+&gt; calculate a Netmask? Any suggestions as to why the route
+&gt; command doesn't work for other resons would also be
+&gt; appreciated.
+&gt;     Cheers!
+&gt;         Andrew.
+&gt; 
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

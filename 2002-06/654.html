@@ -1,0 +1,215 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Netware 4.11 Client - Final results...." -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="'James Leone'" -->
+<!-- ToEmail="jleone@pacbell.net" -->
+<!-- Date="Mon, 24 Jun 2002 20:04:23 -0700" -->
+<!-- Id="" -->
+<!-- Reference="200206252244.31694.videoproduction@internode.on.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Netware 4.11 Client - Final results....</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  Date: Mon, 24 Jun 2002 20:04:23 -0700
+</PRE>
+<H1>Netware 4.11 Client - Final results....</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&lt;snip&gt;
+
+The /etc/nwserv.conf file was the key to the denial of service taking 
+place in my Netware 4.11 server and clients that I was working on after 
+hours:
+
+Item number 4 should not read:
+
+&lt;snip&gt;
+
+      4   0x22    eth0    ethernet_ii  1
+#        4   0x0     *       AUTO         1
+
+
+Instead it should read:
+
+&lt;snip&gt;
+
+#      4   0x22    eth0    ethernet_ii  1
+        4   0x0     *       AUTO         1
+
+
+You can also specify your number instead of using auto, but only for a 
+single client on the network:
+
+&lt;snip&gt;
+
+
+4   0xC06058B0    eth0    ethernet_ii  1
+#        4   0x0     *       AUTO         1
+
+
+Now I have to post my findings on computing.net
+
+James Leone
+
+
+
+
+
+
+James Leone wrote:
+
+&gt; FANTASTIC....
+&gt;
+&gt; THANK YOU STEVE!!
+&gt;
+&gt;
+&gt; Ok, we had the Netware denial of service problem. When it would 
+&gt; happen, the error I would see was "SAP router configuration error 
+&gt; detected. Node 00107A18F4D7 claims network address C06058B0 should be 
+&gt; 00000022."
+&gt;
+&gt; The article you gave me talks about the general concept of being able 
+&gt; to configure different specs for Mars-nwe in /etc/nwserv.conf. So I 
+&gt; looked and I saw this section:
+&gt;
+&gt; &lt;snip&gt;
+&gt;
+&gt; # Automatic kernel creation of interfaces can be switched on in 
+&gt; section 5.
+&gt; # 
+&gt; -------------------------------------------------------------------------
+&gt; #
+&gt; # Examples:
+&gt; #       4   0x10    eth0    802.3   1 # setup ethernet with frame 802.3
+&gt; #       4   0xa20   arc0    802.3   1 # standard arcnet (TRXNET)
+&gt; #
+&gt; #       4   0x0     *       AUTO    1 # auto detection of all 
+&gt; ipx-interfaces.
+&gt; #       4   0x0     eth0    AUTO    1 # auto detection of eth0 frames.
+&gt; #       4   0x0     eth0    802.2   1 # auto detection of eth0 frame 
+&gt; 802.2.
+&gt; #
+&gt; # Note: If ticks &gt; 6 then the internal router handles RIP/SAP specially.
+&gt; #       (RIP/SAP filtering)
+&gt; #       4   0x0     isdn0   802.3   7 # auto isdn interface with 
+&gt; ethernet encap.
+&gt; #       4   0x0     ippp0   AUTO    7 # auto ippp0 (isdn ppp) interface.
+&gt; #       4   0x0     ppp0    AUTO    7 # auto detection of ppp0 interface.
+&gt;
+&gt;
+&gt;        4   0x22    eth0    ethernet_ii  1
+&gt; #        4   0x0     *       AUTO         1
+&gt;
+&gt; # Section 5: special device flags
+&gt; # 
+&gt; =========================================================================
+&gt; #     Flags
+&gt; #      0x1   do not remove by nwserv/nwrouted added routes and 
+&gt; ipx-devices
+&gt; #            beyond the lifetime of the server or router.
+&gt; #            If this flag is not set then all by nwserv/nwrouted added
+&gt; #            ipx-devices/routes will be deleted when
+&gt; #            nwserv/nwrouted ends and if no ipx socket is still
+&gt; #            open. (default).
+&gt; #
+&gt; #      0x2   Switch on automatic kernel creation of ipx-interfaces.
+&gt; #            The automatic kernel creating of ipx-devices sometimes
+&gt; #            make trouble (Win95). It should only be used in the
+&gt; #            beginning or for testing !!
+&gt; #
+&gt; #      0x4   do remove ALL routes and ipx-devices
+&gt; #            beyond the lifetime of the server or router.
+&gt; #            If this flag is set then all ipx-devices/routes
+&gt; #            will be deleted when nwserv/nwrouted ends,
+&gt; #            without looking for open ipx sockets.
+&gt; #            This was the default prior mars_nwe 0.99.pl6 !
+&gt; #            This also do complete ipx reinit when starting
+&gt; #            mars_nwe.
+&gt; #            This was the default prior mars_nwe 0.99.pl9 !
+&gt; #
+&gt; #
+&gt; #
+&gt; #     other flags may follow.
+&gt; #     value will be interpreted as hex value.
+&gt;
+&gt; 5       0x0
+&gt;
+&gt; I looked at line 4 and said to myself hmmmmmm, that 0X22 - that 22 
+&gt; looks familiar...
+&gt;
+&gt; My netware server says that something is claiming C06058B0 should be 
+&gt; 22....
+&gt;
+&gt; Well, maybe I should be sure that it doesn't make that claim any more...
+&gt;
+&gt; I change the line to read...
+&gt;
+&gt; 4   0xC06058B0    eth0    ethernet_ii  1
+&gt;
+&gt; AND THE MESSAGE WENT AWAY!!!!
+&gt;
+&gt;
+&gt; I am at home now, I did that work on my own machine which has 3 
+&gt; partitions on it ---&gt;Windows 2000, DOS  and Netware 4.11. I am going 
+&gt; to go to work and see if this solves my problem or if my assumption 
+&gt; that the error message and denial of service is related.
+&gt;
+&gt; Gosh I love Linux...
+&gt;
+&gt;
+&gt; James Leone
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+&gt; Steve Nicholls wrote:
+&gt;
+&gt;&gt; <A HREF="http://librenix.com/?inode">http://librenix.com/?inode</A>=197
+&gt;&gt;
+&gt;&gt;
+&gt;&gt; May be of some use??
+&gt;&gt;
+&gt;
+&gt;
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,188 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Bash help" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richardrussell@internode.on.net" -->
+<!-- ToName="'Tim Riley'" -->
+<!-- ToEmail="tr@rebel.net.au" -->
+<!-- Date="Wed, 18 Jul 2001 00:30:16 +0930" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Bash help</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richardrussell@internode.on.net">richardrussell@internode.on.net</A></I>&gt;
+  To  : Tim Riley &lt;<I><A HREF="mailto:tr@rebel.net.au">tr@rebel.net.au</A></I>&gt;
+  Date: Wed, 18 Jul 2001 00:30:16 +0930
+</PRE>
+<H1>RE: Bash help</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Yes, ports as in BSD, but for Slackware Linux :)  I will be using a
+&gt; directory tree:
+&gt;
+&gt; ie. portsroot/x11-apps/xmms/prototype-xmms-1.2.0
+&gt;
+&gt; Something like that, I may change the name of the build file though -
+&gt; prototype is odd.  The need for havinf only one file instead of three
+&gt; was for having prototype files for multiple versions of xmms in the
+&gt; directory.
+
+fair enough... I spoeak neiterh BSD nor Slackware, so I'll assume this is
+sensible :)
+
+&lt;snip&gt;
+
+&gt; &gt; ah -- so there are four files, and you are merging three into one, and
+&gt; &gt; keeping the generic script... I see...
+&gt;
+&gt; There were three files initially - protopkg, sources, and rules.  I am
+&gt; merging those three into one, which will be taken and used by the
+&gt; protopkg script itself.  I think we are on the same page here.
+
+if you call the script a file, which it is, then yeah :)
+
+&lt;snip&gt;
+
+&gt; &gt; Personally, to provide what looks to me like the same functionality, I'd
+&gt; &gt; consider replacing them with a function like (note my syntax is
+&gt; very rusty):
+&gt; &gt;
+
+corrections follow:
+
+&gt; &gt; read_lines()
+&gt; &gt; {
+&gt; &gt; 	if [$1 == "sources"]
+
+  if [ $1 = "sources" ]
+
+&gt; &gt; 	then
+&gt; &gt; 		cat &lt;&lt; EOF
+&gt; &gt; &lt;sources text&gt;
+&gt; &gt; EOF
+&gt; &gt; 	elif [$1 == "conf"]
+
+  elif [ $1 = "conf" ]
+
+&gt; &gt; 	then
+&gt; &gt; 		cat &lt;&lt; EOF
+&gt; &gt; &lt;sources text&gt;
+
+&lt;conf text&gt;
+
+&gt; &gt; EOF
+&gt; &gt; 	fi
+&gt; &gt; }
+&gt; &gt;
+&gt;
+&gt; I don't entirely understand that which this script does.  How does this
+&gt; function know what text it is catting?  Is the text piped to it from
+&gt; read_rules()?
+
+if I call `read_lines sources`, the if statement looks at the paramter
+given, and if it's "sources", it does the first thing, which is:
+
+----
+cat &lt;&lt; EOF
+&lt;sources text&gt;
+EOF
+----
+
+This is a "Here Document"
+
+man bash says:
+----
+  Here Documents
+     This type of redirection instructs the shell to  read  input
+     from  the  current  source until a line containing only word
+     (with no trailing blanks) is seen.  All of the lines read up
+     to that point are then used as the standard input for a com-
+     mand.
+:
+:
+----
+
+The input read is piped to the command given (ie cat).
+
+hence, this acts exaclty as if I had a file called "sources" containing
+&lt;sources text&gt; and I said `cat sources`. Handy, eh?
+
+&gt;
+&gt; &gt; ...and removing the definition of read_lines() from the
+&gt; original script... I
+&gt; &gt; suppose it depends quite how `read_lines()` is used in the
+&gt; script itself...
+&gt; &gt; if all it does is set an environment variable, then just set
+&gt; that variable
+&gt; &gt; in the prototype <A HREF="file:">file:</A>
+&gt; &gt;
+&gt; &gt; $SOURCES = "source1\n\
+&gt; &gt; source2\n\
+&gt; &gt; source3"
+&gt; &gt;
+&gt; &gt; etc
+&gt; &gt;
+&gt;
+&gt; Yes, I had considered that - it might just be easier to parse a
+&gt; multi-line variable, for both the sources, and the config file rules.
+&gt; The problem is, however, that for each of these, there may be two
+&gt; "words" per line, or only one...
+
+That should be ok in the solution above:
+
+$SOURCES = "source1.1 source1.2\n\
+source2\n\
+etc"
+
+&gt;
+&gt; &gt; perhaps even make `read_lines_conf()` etc...
+&gt; &gt;
+&gt; &gt; does this help? I'm now interested in solving your problem, so
+&gt; you'd better
+&gt; &gt; tell me :)
+&gt; &gt;
+&gt;
+&gt; You've lost me a little here, unfortunately - just with regard to the
+&gt; use of the read_line() function...  could you explain it a little more?
+
+hopefully I understood your misunderstanding, and my explanation explains
+sufficiently :)
+
+rr
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,95 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: glibc and staroffice" -->
+<!-- FromName="Phil Nitschke" -->
+<!-- FromEmail="phil@caemrad.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="20 Apr 1999 23:11:29 +0930" -->
+<!-- Id="wqbtgjpfxy.fsf@toby.caemrad.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: glibc and staroffice</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Phil Nitschke &lt;<I><A HREF="mailto:phil@caemrad.com.au">phil@caemrad.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: 20 Apr 1999 23:11:29 +0930
+</PRE>
+<H1>Re: glibc and staroffice</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt;&gt;&gt;&gt;&gt; "R" == romana  &lt;<A HREF="mailto:tpnet@ozemail.com.au">tpnet@ozemail.com.au</A>&gt; writes:
+
+  Romana&gt; i have an odd problem...  i wish to install glibc 2.1.1, as
+  Romana&gt; several upgrades require it (gtk etc) but when i upgrade
+  Romana&gt; using the rpm, staroffice no longer works, saying the
+  Romana&gt; ld-linux.so files are not correct. i need staroffice, but i
+  Romana&gt; wish the new glibc libraries..any ideas?
+
+Hi Romana,
+
+Your problem is not so odd... Check out the debian-user mailing list
+archives at <A HREF="http://www.au.debian.org/Lists-Archives/">http://www.au.debian.org/Lists-Archives/</A> for Mar and Apr 1999.
+Look for "Subject: Star Office 5 & Potato/Glibc2.1??"
+
+Here is a summary of what worked for one user (I'm sure you can
+convert it to Red Hat equivalent commands):
+
+========================================================================
+1) I got the libc deb from slink. [slink == Debian 2.1, which uses glibc 2.0]
+2) I manually unpacked the archive (ar -x libc???.deb; tar xvfz data.tar.gz)
+3) I edited the soffice wrapper:
+   a) In the section where it sets the LD_LIBRARY_PATH (I believe it is the
+      *) option in the block that starts with "case $sd_platform in"), I
+      added the path where my glibc2.0 is located to the BEGINNING of the
+      LD_LIBRARY_PATH.
+	 LD_LIBRARY_PATH=/home/myuser/glibc2.0/lib:$sd_inst/lib:$LD_LIBRARY_PATH
+
+   b) The last line of the soffice script, I changed as follows:
+	exec /home/myuser/glibc2.0/lib/ld-linux.so.2 $sd_inst/bin/$sd_binary "$1" "$2" "$3" "$4" "$5" "$6" "$7" "$8" "$9"
+
+It took a *WHILE* (8-15 seconds) for it to load the first time (I run a
+P200 w/128M RAM), but it did load, and seems to function properly.  When the
+program first loads, it gives me a message box that says, "Error opening
+document /home/myuser/Office50/bin/soffice.bin: Nonexistent object.  Filter
+not found."  I click the OK button, and it works.
+========================================================================
+
+HTH,
+
+-- 
+Phil
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

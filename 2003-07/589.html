@@ -1,0 +1,121 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="rsh problem [was RE: ]" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'Trevor Tregoweth','Linux SA'" -->
+<!-- ToEmail="trevor@txc.net.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 16 Jul 2003 01:49:57 +0930" -->
+<!-- Id="003401c34aed$01165050$020120ac@skink" -->
+<!-- Reference="002301c34ac4$cf95eae0$1401010a@thetoads" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: rsh problem [was RE: ]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : Trevor Tregoweth &lt;<I><A HREF="mailto:trevor@txc.net.au">trevor@txc.net.au</A></I>&gt;<BR>        Linux SA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 16 Jul 2003 01:49:57 +0930
+</PRE>
+<H1>rsh problem [was RE: ]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Trevor,
+
+Yes, a few tips (the two machines will be called A and B, and you are trying
+to connect from A to B):
+
+1) use ssh instead -- it's more secure, and more functional.
+
+2) check that rsh/ssh is actually listening on B -- run `netstat -anp --inet
+| grep LISTEN` and look for something listening on either the ssh or rsh
+port -- it may be that inetd or xinetd are doing the listening, which is ok.
+Bear in mind that something listening on localhost (or 127.0.0.1) is not
+going to be visible to anything else. You'll need it listening on either
+0.0.0.0 or the specific IP you're trying to connect to.
+
+3) if nothing is listening, check /etc/inetd.conf or /etc/xinetd.d/rsh to
+get rsh running, or run `/etc/init.d/ssh start` to get ssh running (all this
+is on B). You may need to install ssh (on both machines), and it's quite
+possible that the files are in different locations to what I listed.
+
+4) once netstat shows something listening on B, try connecting locally -- do
+the same as if you were connecting from A, but on B. Make sure you specify
+the external IP address and not localhost though.
+
+5) if that doesn't work, check your iptables/ipchains config on B, and
+perhaps your tcp_wrappers (/etc/hosts.allow and /etc/hosts.deny), also on B.
+
+6) if it does work, try from A. If that doesn't work, you may find that A's
+iptables/ipchains config is blocking outgoing connections. You may also find
+that there is some other network issue. Try pinging from A to B, and then
+back the other way.
+
+7) If none of those works, check /var/log/messages and friends on B, and
+experiment using verbose options to rsh/ssh on A.
+
+8) If still no joy, send another email with more detail, using plaintext,
+not HTML, and with a subject line! :)
+
+HTH
+
+rr
+
+--
+Richard Russell
+Yellow Goanna P/L
+m: +61 412 827 805
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+w: <A HREF="http://www.yellowgoanna.com">http://www.yellowgoanna.com</A> 
+
+-----Original Message-----
+From: Trevor Tregoweth [mailto:<A HREF="mailto:trevor@txc.net.au">trevor@txc.net.au</A>] 
+Sent: Tuesday, 15 July 2003 9:03 PM
+To: Linux SA
+Subject: 
+
+
+Hi All
+
+trying to creat a rsh session between 2 machines, on the same network, and
+keep getting connection refused, had anyone any useful tips on what i might
+of missed
+
+
+Cheers
+
+Trevor
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

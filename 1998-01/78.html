@@ -1,0 +1,133 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="ppp dialin not working under RH 5" -->
+<!-- FromName="Bruce Moffatt" -->
+<!-- FromEmail="brucem@melb.cpr.itg.telstra.com.au" -->
+<!-- ToName="Linux SA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 21 Jan 1998 09:59:04 +1100 (EST)" -->
+<!-- Id="199801202259.JAA00782@melb137.melb.cpr.itg.telecom.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: ppp dialin not working under RH 5</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Bruce Moffatt &lt;<I><A HREF="mailto:brucem@melb.cpr.itg.telstra.com.au">brucem@melb.cpr.itg.telstra.com.au</A></I>&gt;
+  To  : Linux SA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 21 Jan 1998 09:59:04 +1100 (EST)
+</PRE>
+<H1>ppp dialin not working under RH 5</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+I have installed Redhat 5 on my recently upgraded machine,
+having bought Applixware in an attempt to lure the family
+away from the evil M$ empire. BTW Applix looks wonderful.
+
+This system replaces my slackware system, which was pretty
+mature, and had all needed components running sweetly. I am
+having a little trouble getting back on the net with the
+new system, and if anyone can shed some light I would be
+grateful.
+
+The system is now a 2.0.33 kernel with pppd 2.2.0
+The ISP allows a shell login.
+My dial-in script dials in, logs on and then fails to 
+maintain a connection.
+
+Here is the relevant part of the dial-in:
+exec /usr/sbin/pppd /dev/cua1 38400 $LOCAL_IP:$REMOTE_IP \
+     crtscts modem asyncmap 20A0000 netmask $NETMASK defaultroute \
+     connect $DIALER_SCRIPT
+
+Here is the relevant part of the dialer-script:
+exec /usr/sbin/chat -v					\
+	TIMEOUT		3				\
+	ABORT		'\nBUSY\r'			\
+	ABORT		'\nNO ANSWER\r'			\
+	ABORT		'\nRINGING\r\n\r\nRINGING\r'	\
+	''		\rAT				\
+	'OK-+++\c-OK'	ATH0				\
+	TIMEOUT		30				\
+	OK		ATDT$TELEPHONE			\
+	CONNECT		''				\
+	38400		''				\
+	ogin:--sername:	$ACCOUNT			\
+	assword:	$PASSWORD			\
+	'&gt;'		"$PPPSTARTUP"
+
+And here is the result in /var/log/messages:
+
+Jan 21 10:15:47 localhost chat[1043]: ^M 
+Jan 21 10:15:47 localhost chat[1043]: Start your PPP session now - only use a login script if your system does^M 
+Jan 21 10:15:47 localhost chat[1043]: not support PAP authentication (nb: Windows 95 supports PAP authentication).^M 
+Jan 21 10:15:47 localhost chat[1043]: ^M 
+Jan 21 10:15:47 localhost chat[1043]: User Access Verification^M 
+Jan 21 10:15:47 localhost chat[1043]: ^M 
+Jan 21 10:15:47 localhost chat[1043]: Username: -- got it 
+Jan 21 10:15:47 localhost chat[1043]: send (bmoffatt^M) 
+Jan 21 10:15:47 localhost chat[1043]: expect (assword:) 
+Jan 21 10:15:47 localhost chat[1043]:  bmoffatt^M 
+Jan 21 10:15:47 localhost chat[1043]: Password: -- got it 
+Jan 21 10:15:47 localhost chat[1043]: send (*********^M) 
+       nb the above line has been modified to protect the innocent :)
+Jan 21 10:15:47 localhost chat[1043]: expect (&gt;) 
+Jan 21 10:15:47 localhost chat[1043]:  ^M 
+Jan 21 10:15:47 localhost chat[1043]: access4&gt; -- got it 
+Jan 21 10:15:47 localhost chat[1043]: send (ppp nego^M) 
+Jan 21 10:15:48 localhost pppd[1040]: Serial connection established.
+Jan 21 10:15:49 localhost pppd[1040]: ioctl(PPPIOCGUNIT): Operation not permitted
+Jan 21 10:15:49 localhost pppd[1040]: ioctl(PPPIOCGDEBUG): Operation not permitted
+Jan 21 10:15:49 localhost pppd[1040]: Exit.
+
+
+These are essentially the same scripts I used on my old slackware system.
+I assume I may have forgotten to set something up somewhere...
+Any comments would be helpful
+
+Bruce
+
+
+                |
+   =============_=============
+      \        /_\ ~      /
+     =========[ O ]=========
+             ~ \_/\ 
+             /     \                                   
+           ()       ()                                 
+
+
+
+IRL Bruce Moffatt
+IRC skua
+email <A HREF="mailto:bmoffatt@picknowl.com.au">bmoffatt@picknowl.com.au</A>
+email (Telstra business only) <A HREF="mailto:brucem@melb.cpr.itg.telstra.com.au">brucem@melb.cpr.itg.telstra.com.au</A>
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

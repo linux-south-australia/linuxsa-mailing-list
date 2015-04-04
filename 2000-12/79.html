@@ -1,0 +1,173 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Backup Options" -->
+<!-- FromName="'David Newall'" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="'Damien Wilson'" -->
+<!-- ToEmail="wilbs@bigfoot.com,LinuxSA@linuxsa.org.au" -->
+<!-- Date="Mon, 4 Dec 2000 01:00:36 +1030" -->
+<!-- Id="005301c05d35$9c3a9a30$4f4514cb@SMARTPANEL" -->
+<!-- Reference="001601c05cc3$f17a8310$0200a8c0@damienwilson.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Backup Options</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Damien Wilson &lt;<I><A HREF="mailto:wilbs@bigfoot.com">wilbs@bigfoot.com</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:LinuxSA@linuxsa.org.au">LinuxSA@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 4 Dec 2000 01:00:36 +1030
+</PRE>
+<H1>Re: Backup Options</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Damien! [Ho ho]
+
+You did not say what size filesystems need to be backed up, what type of
+backup device you have available, nor what sort of network connectivity is
+supplied.  I'm going to assume that you are still choosing backup device,
+and that the system is a stand-alone unit which must be backed up locally,
+rather than via a network.  In these circumstances you need to make sure
+that you choose a backup device that can store more data than fits on a
+filesystem.  The reason I say that is because it's too much to hope that
+staff can change media mid-backup, so each backup must fit on a single unit.
+Theoretically you could design your backup strategy around specific
+sub-directory trees, for example maybe /home/project fits on one (say) tape,
+and /home/everything-else fits on another tape, leaving all of the rest of
+the filesystem for the third tape; but it's easier if you can just backup
+/dev/sd01 to one tape, /dev/sd02 to a second and /dev/sd03 to the third.  I
+say again: it's easier if each filesystem fits on a single backup media.
+It's even better if all filesystems fit on one unit, because then you can
+backup everything in one go.
+
+I believe tapes still provide the greatest capacity, although with DVD-R
+coming along (87GB?), maybe that might be an interesting option.  But no,
+don't even think about it.  All reports that I've heard suggest that DVD-R
+is not yet prime-time.  Stick to tapes.  I suggest DAT is a good choice.
+You can backup oodles of GB on one DAT, and it seems quite reliable.
+
+How often you backup depends on your particular needs, but daily (I mean
+nightly) probably isn't unreasonable.  Do make sure that you have plenty of
+copies.  It's common to have a regime where every so often, say quarterly, a
+complete backup is taken onto new media, and then stord off-site forever.
+Never overwritten!  It's common, in addition, to have a number of sets of
+media which are used in rotation on a daily or weekly basis.  I don't think
+ten sets is too many.  Data is so hard to recover without backups.
+
+So either daily or weekly, depending on your needs: if all filesystems
+combined will fit on one tape then do that; otherwise split the backup over
+a few nights putting complete filesystems onto separate tapes.
+
+What program should you use?  I suppose the standard choices would be dump
+or tar.  I rather like cpio.  It's simple and portable.  Use find to
+generate a list of names on the filesystem you are copying, and pipe that
+into cpio.  The output of cpio goes to your tape device:
+
+  cd /
+  find . -xdev -print | cpio -o | dd bs=64k &gt; /dev/rmt0
+
+One tip: It's a great idea to put, at the start of each tape, a "tape file"
+that describes what is on the tape.  Do that using echo and/or date, writing
+to the non-rewinding tape device:
+
+  cd /
+  date +"backup of / taken on %c" | dd bs=64k of=/dev/nrmt0
+  find . -xdev -print | cpio -o | dd bs=64k of=/dev/rmt0
+
+The advantage of that is that you can know what is on a tape by catting it:
+
+  $ cat /dev/rmt0
+  backup of /home & /devel taken on Sat Nov 04 12:02:33 EST 1989
+
+Remember that you are running the backup on a live-filesystem, which means
+changes can take place as you backup.  If you change a file while you are
+copying it to tape the backup of that file will be valueless.  At best you
+will get some sort of message (on stdout), at worst no warning at all.  Do
+try to schedule these backups when nothing else is being done on the
+filesystem.  Sometimes that cannot be achieved, but then sometimes it
+doesn't matter if a file is properly backed up or not.
+
+Schedule your backups using cron.  Make sure you check for a tape in the
+tape drive before you start, and send an error message if it's not there.
+Something like the following is good:
+
+  #! /bin/sh
+  # backup home and devel filesystems
+  # run at cron at 3am every monday by the following crontab entry:
+  # 0 3 * * 1 /usr/local/sbin/monday-backups
+
+  # retension the tape... generally a good idea, and it gives us some idea
+if no tape is inserted
+  mt -f /dev/rmt0 retension || {
+    echo "Unable to retension tape.  Perhaps there is no media in the
+drive?" |
+      mail -s "Backup of /home & /devel failed" admin damien
+    exit 1
+  }
+
+  # write a tape header
+  date +"Backup of /home & /devel taken on %c" | dd bs=64k of=/dev/nrmt0
+
+  # write the backups
+  cd /
+  (find home devel -xdev -print | cpio -o | dd bs=64k of=/dev/nrmt0) 2&gt;
+/tmp/errors$$
+
+  # mail errors to important people
+  [ -s /tmp/errors$$ ] &&
+    mail -s "Errors backing up /home & /devel" admin damien &lt; /tmp/errors$$
+  rm -f /tmp/errors$$
+
+  # rewind and eject the tape
+  mt -f /dev/rmt0 rewoffl
+
+
+None of the above discussion applies to files which are maintained by an
+application that maintains online/offline state in those files.  Informix is
+an example of such an applicaiton.  The problem is that you simply cannot
+take a copy of an Informix data store and expect the data engine to use that
+file.  Informix will notice that the file was not properly closed, and will
+want to perform some sort of error recovery.  Last time I used Informix, it
+had a "fast recovery" mode that seemed to take only about two days to
+recover our system.  Not pretty.  If you have such an application either use
+it's backup facility, or else shut that application down before backing up.
+
+Have fun.
+
+David
+
+P.S. Ignore DL when he suggests Amanda.  That is probably not the answer for
+you.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

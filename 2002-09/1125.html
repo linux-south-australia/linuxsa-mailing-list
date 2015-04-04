@@ -1,0 +1,136 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IMAP and Windows clients" -->
+<!-- FromName="'Dan Shearer'" -->
+<!-- FromEmail="dan@tellurian.com.au" -->
+<!-- ToName="'Glen Turner'" -->
+<!-- ToEmail="glen.turner@aarnet.edu.au" -->
+<!-- Date="Thu, 26 Sep 2002 10:45:17 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0209261003530.25131-100000@calulu.shearer.org" -->
+<!-- Reference="3D925534.6030207@aarnet.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IMAP and Windows clients</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A></I>&gt;
+  To  : Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  Date: Thu, 26 Sep 2002 10:45:17 +0930 (CST)
+</PRE>
+<H1>Re: IMAP and Windows clients</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, 26 Sep 2002, Glen Turner wrote:
+
+&gt; Most databases use raw partitions, so in many important ways
+&gt; are filesystems themselves.
+
+True (but not in the special case of Cyrus, as mentioned earlier I don't
+think there is any version of DB that uses raw partitions or devices.)
+
+&gt; There are three major distinctions: Firstly filesystems support one
+&gt; access path -- filename -- whereas databases can have multiple
+&gt; access paths -- that is, you can have multiple keys.  You pay a
+&gt; price for each additional access path.
+
+This is true (until Reiser4 comes out)
+
+&gt; Secondly, database indexes are tree-structured whereas filesystem
+&gt; diretories are list-structured. 
+
+Reiser3 is tree-structured. Reiser3 doesn't scale to large sizes (some
+simple limits are still in there) but it is most definitely designed to be
+viewed as a database if you choose. It does well with large numbers of
+small files.
+
+&gt; Write 100,000 files to a directory and 100,000 records to a database
+&gt; and you'll see that the filesystem performance better with small
+&gt; numbers of files but considerably worse with large numbers of files.
+
+In the case of traditional filesystems (either list or log-structured)
+this is true, including XFS. But I'm not sure that the IMAP problem is
+always like this. Some kinds of company can have nearly all of their
+emails with attachments. I know it sounds strange, but it is true. BASE64
+encoding of M$ attachments frequently runs to multi-megabytes, which takes
+the problem out of the "many small files" category.
+
+A seeming advantage of a database of storing the different components in
+separate tables and exploiting common properties to deliver better
+performance or functionality is just not possible. Digital signatures and
+shortcomings in MIME specifications mean that the entire message has to be
+stored as one blob. This could really tip the scales in favour of
+databases but an IMAP server designed to break many digital signatures
+would not be regarded as a good thing.
+
+&gt; Thirdly, databases are designed for transaction support.  That is,
+&gt; to have a consistent user response time.  You can see this by
+&gt; deleting those 100,000 files/records.  The filesystem will delay
+&gt; other transactions, the database will deliver other transactions
+&gt; with only a small performance hit.
+
+This is a definite advantage of a database in the case of small files,
+which is afterall true in many cases with IMAP.
+
+&gt; Maildir++ has one other significant advantage over databases
+&gt; for enterprise applications -- writing each message into a
+&gt; distinct file allows heirarchical storage management (HSM)
+&gt; systems to archive old unaccessed messages to near-line storage.
+&gt; Filesystems like XFS are significantly more HSM-friendly than
+&gt; databases.  Using a HSM gives a neat solution to disk space
+&gt; implications of the use of e-mail folders as a corporate archive.
+
+Not forgetting the storage expansion, synchronisation and non-IMAP 
+access arguments, which all favour filesystems. The last one is slightly
+circular though :-)
+
+I think in summary its a bit like this:
+
+  - with modern hardware and moderate load/size, any decent IMAP store is
+    going to work. If you're thinking of a small workgroup load even the
+    most inefficent common IMAP system around is probably going to work
+    well enough to keep people happy
+
+  - with high load/size, the specific characteristics of the problem will
+    dictate which kind of underlying access mechanism makes the most sense
+
+--
+Dan Shearer
+Open Source Manager
+Mob: +61 411 49 1800
+Tel: +61 8 8130 3104
+<A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A>
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,100 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PPP server What to use? mgetty? or is there better" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Geoffrey D. Bennett" -->
+<!-- ToEmail="g@netcraft.com.au" -->
+<!-- Date="Tue, 4 Aug 1998 17:08:40 +0930 (CST)" -->
+<!-- Id="199808040738.RAA03189@rebel.net.au" -->
+<!-- Reference="199807080520.OAA01374@Kara.netcraft.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PPP server What to use? mgetty? or is there better</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Geoffrey D. Bennett &lt;<I><A HREF="mailto:g@netcraft.com.au">g@netcraft.com.au</A></I>&gt;
+  Date: Tue, 4 Aug 1998 17:08:40 +0930 (CST)
+</PRE>
+<H1>Re: PPP server What to use? mgetty? or is there better</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt;&gt; Its all pretty much in the title, for a PPP server what does everybody
+&gt;&gt; else run to handle the Dial-in access part? I have currently got mgetty
+&gt;&gt; handling a modem [it has problems].
+&gt;
+&gt; Yes.  Check out the AutoPPP option to mgetty.  It presents the login
+
+I run uugetty, not mgetty, and it doesn't (didn't) support auto ppp
+detection, so I grafted some bits from mgetty into uugetty.  Now it
+seems to work like a champ.  I have a patch for getty_ps-2.0.7h, which
+makes it recognise PPP the same way that mgetty does.  It also permits
+you to add a new option to the uugetty.conf file, PPP=path, which is
+how you tell it what program to execute when it detects a PPP session.
+(It's analogous to a FIDO session.)  If you would like it, the patch is
+at <A HREF="http://www.rebel.net.au/~davidn/getty_ps-2.0.7h-rebel.patch.">http://www.rebel.net.au/~davidn/getty_ps-2.0.7h-rebel.patch.</A>
+
+Apart from installing the patched version of uugetty, you must also
+modify your uugetty.conf file(s): Add PPP=path, where path points to
+your ppp daemon which must be configured to login using PAP + /etc/passwd
+(so put the login option into your /etc/ppp/options file); or else point
+path to a shell script which invokes pppd with the login option.  My users
+all used to login to a shell prompt and then exec pppd, and they no doubt
+will expect that to continue to work; so I have PPP=/etc/ppp/autoppp in
+my uugetty.conf files, where /etc/ppp/autoppp is an executable shell
+script containing:
+
+   #!/bin/bash
+   exec /usr/sbin/pppd +pap login
+
+Probably +pap is not needed; but it doesn't hurt.
+
+I found that I also had to modify pppd because it wasn't compiled for
+shadow passwords, nor for Microsoft's extension which permits the client
+to querey for DNS addresses.  In addition, when you specify the login
+option to pppd, and if the secrets file exists, and if the client doesn't
+have a secret in the secrets file, pppd would refuse access to the client.
+I want to be able to have a secrets file for some clients, while also
+allowing my users to authenticate themself with their password, so I also
+modified pppd so that it permits a client to have no secret if the login
+option is given.  For those who are interested, the patch is available at
+<A HREF="http://www.rebel.net.au/~davidn/ppp-2.2.0f-rebel.patch.">http://www.rebel.net.au/~davidn/ppp-2.2.0f-rebel.patch.</A>
+
+As this is a new facility I have only told a small number of people about
+it: staff plus three reliable subscribers.  It was installed August 2, has
+been used successfully 10 times and has failed to permit a login three
+times: once when I was testing; once for an unknown user; and once when
+the password had expired.  It seems okay to me.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

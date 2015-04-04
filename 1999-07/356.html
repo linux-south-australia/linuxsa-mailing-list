@@ -1,0 +1,248 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Another Netware + Linux question" -->
+<!-- FromName="O'Connor, Steven" -->
+<!-- FromEmail="Steven.O'Connor@boral.com.au" -->
+<!-- ToName="'linuxsa@linuxsa.org.au'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 14 Jul 1999 12:21:21 +0930" -->
+<!-- Id="BDF1E8B3E7CBD2118C160060974FC7CF167B81@enewaymd01.ene.boral.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Another Netware + Linux question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: O'Connor, Steven &lt;<I><A HREF="mailto:Steven.O'Connor@boral.com.au">Steven.O'Connor@boral.com.au</A></I>&gt;
+  To  : 'linuxsa@linuxsa.org.au' &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 14 Jul 1999 12:21:21 +0930
+</PRE>
+<H1>Another Netware + Linux question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Situation :
+
+- Have a Linux Server (not running Caldera) with all the 'latest' netware
+client tools
+- Have a Novell Server on the same network, running 4.1 or greater. The
+netware server has both IPX and IP bindings on the same network as the Linux
+server
+
+Mission:
+
+- Ultimately, want to get the Linux Server to 'see' some of the drives on
+the Netware server, and then re-export them as Samba shares, so that other
+users in remote locations can read and write to the Novell drives.  For one
+reason or another, the remote users cannot do this at present, mainly
+because some of the routers in the middle do not support IPX traffic.
+Ugrading the routers will cost in the order of $9,000, so I am told.
+
+Diagnosis:
+
+- Running slist from the Linux server fails to find the Novell server at
+all. I think that slist will work fine on older Novell servers, but
+something radical happened beyond Netware 4.0
+
+What to do ?
+
+- Could someone either point me to some software that I can download and try
+out, that they are pretty sure will work ?
+
+- Alternately, if someone who claims to be able to do this can make
+themselves available for a few hours during the week, I will be happy to pay
+good rates to get them to do the job on-site. If need be, I can provide
+dial-up access into the network out of normal hours - if you reckon that you
+can do all of this over a modem.
+
+The client is Britax in case you are interested.
+
+------------------------------------------------------------------
+
+Reference doco - the AUTOEXEC.NCF file from the Novell server  (This is all
+Chinese to me)
+
+set Time Zone = CST-9:30CSuT
+set Daylight Savings Time Offset = 1:00:00
+set Start Of Daylight Savings Time = (OCTOBER SUNDAY LAST  2:00:00 AM)
+set End Of Daylight Savings Time = (MARCH SUNDAY LAST  2:00:00 AM)
+set Default Time Server Type = SINGLE
+SET Reply To Get Nearest Server = Off 
+
+# Note: The Time zone information mentioned above 
+# should always precede the SERVER name.
+
+set Bindery Context = OU=LONSDALE.O=B-R
+file server name BRITAX_ADELAIDE
+ipx internal net 000FEED1
+
+load conlog  maximum=500
+ 
+SET Maximum Concurrent Disk Cache Writes=100
+SET Maximum Directory Cache Buffers=600
+SET Minimum Directory Cache Buffers=300
+SET Concurrent Remirror Requests=16
+SET Remirror Block Size=8
+SET Maximum Service Processes=60
+
+# $NMSBASE$ DO NOT DELETE THIS LINE
+# Setup has created the following NMSBASE.NCF file.
+# Review the load sequence of NLM files in NMSBASE.NCF.
+# Make sure that the NLM files loaded by NMSBASE.NCF
+# do not conflict with your existing setup.
+NMSBASE.NCF
+
+LOAD MEMMGR
+LOAD SNMP verbose Control= Trap=
+LOAD TCPIP FORWARD=YES
+LOAD IPXRTR routing=NLSP 
+
+REM Managewise requested
+REM PP:100699 LOAD IPXRTRNM
+
+;########################  Ethernet PCI NIC in Slot 1  ###########
+LOAD CPQNF3.LAN SLOT=10008 NAME=Board1 FRAME=Ethernet_802.3
+BIND IPX TO Board1 NET=2
+LOAD CPQNF3.LAN SLOT=10008 NAME=Board2 FRAME=Ethernet_802.2
+BIND IPX TO Board2 NET=3
+LOAD CPQNF3.LAN SLOT=10008 NAME=Board3 FRAME=Ethernet_II
+BIND IP TO Board3 ADDR=192.9.200.101 MASK=FF.FF.FF.0
+;BIND IP TO Board3 ADDR=192.168.167.1 MASK=FF.FF.FF.0
+;#################################################################
+
+;########################  TOKEN RING NIC in Slot 2  ###########
+;LOAD c:CPQTRPCI.LAN SLOT=2 NAME=Board4 FRAME=Token-Ring
+;BIND IPX TO Board4 NET=1
+;LOAD c:CPQTRPCI.LAN SLOT=2 NAME=Board5 Frame=TOKEN-RING_SNAP
+;BIND IP TO Board5 ADDR=192.168.168.1 MASK=FF.FF.FF.0
+
+LOAD CPQTRODI SLOT=2 PORT=2800 FRAME=TOKEN-RING MSB  NAME=CPQTRODI_1_TOK
+BIND IPX CPQTRODI_1_TOK NET=1
+LOAD CPQTRODI SLOT=2 PORT=2800 FRAME=TOKEN-RING_SNAP NAME=CPQTRODI_1_TSP
+BIND IP ADDR=192.168.168.1 mask=ff.ff.ff.0
+;#################################################################
+
+;###################  Old NICS   #################################
+rem LOAD IBMFE SLOT=1 FRAME=Ethernet_802.3  NAME=IBMFE_802.3
+rem BIND IPX IBMFE_802.3 NET=2
+rem LOAD IBMFE SLOT=1 FRAME=Ethernet_802.2  NAME=IBMFE_802.2
+rem BIND IPX IBMFE_802.2 NET=3
+rem LOAD IBMFE SLOT=1 FRAME=Ethernet_II NAME=IBMFE_II
+rem BIND IP IBMFE_II ADDR=192.168.167.1 MASK=FF.FF.FF.0
+rem LOAD IBMTRPO FRAME=TOKEN-RING NAME=IBMTRPO_TR
+rem BIND IPX IBMTRPO_TR NET=1
+rem LOAD IBMTRPO FRAME=TOKEN-RING_SNAP NAME=IBMTRPO_IP
+rem BIND IP IBMTRPO_IP ADDR=192.168.168.1 MASK=FF.FF.FF.0
+;#################################################################
+
+;## pp:07/01/98 comment out in order to test MWise LOAD CPQHLTH.NLM
+;## pp:07/01/98                                    CPQSNMP
+
+LOAD REMOTE FIL
+LOAD RSPX
+
+LOAD AFTER311
+LOAD CDROM.NLM
+
+; #################  LOAD FAX SERVER  ############################
+faxaio.ncf
+load faxserve
+;fstart5
+; ################################################################
+
+; #########    Load Netware Management Agent #####################
+REM PP:100699 temp rem NMA2.NCF
+; ################################################################
+
+;load sys:\system\LPROTECT.NLM
+; ################################################################
+
+; #########    Load print server remote printers  ################
+load pserver pserv
+; ################################################################
+
+; ##################  Load APC UPS  ##############################
+LOAD APCSMUPS
+; ################################################################
+
+; ################  Mount tape drive & Arcserve  #################
+load NWASPI.CDM
+load tsands
+load tsa410
+astart6
+; ################################################################
+
+; ####################  Load spclight  ###########################
+load nsrvni
+; ################################################################
+
+
+# $LANZ$ DO NOT DELETE THIS LINE
+# NetWare LANalyzer Agent installation has created
+# the following to load NetWare LANalyzer Agent.
+# Uncomment the following two lines to enable NetWare
+# LANalyzer Agent on this server.  Only one NetWare
+# LANalyzer Agent needs to monitor any particular
+# segment, so if you have another server running
+# NetWare LANalyzer Agent on the segments this server
+# is connected to, you may leave these lines commented.
+REM pp:100699 temp rem SEARCH ADD SYS:LANZ
+REM pp:100699 temp rem LANZ.NCF
+
+REM *** BEGIN ManageWise Desktop Management Section ***
+REM PP:100699 temp rem  MW_AUTO.NCF 
+REM *** END ManageWise Desktop Management Section ***
+
+REM **** BEGIN ManageWise INOCULAN Virus Protect Section
+# rem rem (pp - stay with VPROTECT instead)  ISTART4.NCF 
+REM **** END ManageWise INOCULAN Virus Protect Section
+
+REM --- The Following line is required to load the Solid
+REM     Server for use with Australian Health's
+REM     'Chem Alert' software. Added 16/06/98 by SB. 
+load solid -c caii
+REM --- End of Solid Server start-up.
+
+; ####################  Load monitor  ############################
+load monitor
+; ################################################################
+
+;###### LANDESK VIRUS PROTECT 5.0 SECTION START #######
+;# Do not modify this section
+vpstart
+;######  LANDESK VIRUS PROTECT 5.0 SECTION END  ####### 
+
+; ################## load AutoCad licensing System ##############
+load adskelmd -e \adlm\key -l \adlm\log\adlm.log
+; ###############################################################
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

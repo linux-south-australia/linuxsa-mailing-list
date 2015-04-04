@@ -1,0 +1,100 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: internet sharing" -->
+<!-- FromName="'Damien Uern'" -->
+<!-- FromEmail="carrigan_2606@optusnet.com.au" -->
+<!-- ToName="'Jasper Leonidas'," -->
+<!-- ToEmail="justlink21@hotpop.com,linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 25 Mar 2003 20:46:23 +1030" -->
+<!-- Id="200303252046.23137.carrigan_2606@optusnet.com.au" -->
+<!-- Reference="1048506879.1555.4.camel@LinuxServ" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: internet sharing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Damien Uern &lt;<I><A HREF="mailto:carrigan_2606@optusnet.com.au">carrigan_2606@optusnet.com.au</A></I>&gt;
+  To  : Jasper Leonidas &lt;<I><A HREF="mailto:justlink21@hotpop.com">justlink21@hotpop.com</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 25 Mar 2003 20:46:23 +1030
+</PRE>
+<H1>Re: internet sharing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Monday 24 March 2003 10:24 pm, Jasper Leonidas wrote:
+&gt; i want to share internet with linux and windows client. i've done
+&gt; setting the iptable/firewall. the client can ping host from the internet
+&gt; but with the use of ip address number only. using the hostname will not
+&gt; work. how will i resolve this? how will i know the DNS server of my ISP?
+&gt; i had statically configure my client.(no DHCP service)
+
+On my small network I made my gateway a forwarding nameserver. That means it 
+just passes on requests from my internal computer's to my ISP's DNS servers 
+and hence my internal machines never need re-configuring. Of course you need 
+to know what DNS servers to forward to and this should be logged in 
+/var/log/messages (assuming you have the usepeerdns option set in pppd).
+
+Damien
+
+This is my /etc/named.conf file
+
+options {
+        directory "/var/named";
+        /*
+         * If there is a firewall between you and nameservers you want
+         * to talk to, you might need to uncomment the query-source
+         * directive below.  Previous versions of BIND always asked
+         * questions using port 53, but BIND 8.1 uses an unprivileged
+         * port by default.
+         */
+        // query-source address * port 53;
+
+        forward first;
+           forwarders {
+             203.2.75.132; //replace these with your DNS servers
+             198.142.0.51;
+            };
+};
+
+zone "." {
+        type hint;
+        file "named.ca";
+};
+
+zone "0.0.127.in-addr.arpa" {
+        type master;
+        file "named.local";
+};
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

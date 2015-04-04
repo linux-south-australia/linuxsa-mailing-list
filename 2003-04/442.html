@@ -1,0 +1,107 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: smbfstab" -->
+<!-- FromName="'Mark O'Loughlin'" -->
+<!-- FromEmail="marko@woogie.nu" -->
+<!-- ToName="" -->
+<!-- ToEmail="rbrandt@tumourbiology.com,linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 15 Apr 2003 15:58:44 +0100" -->
+<!-- Id="NHBBJPDMAEHBKNKHAHIGMEMHCDAA.marko@woogie.nu" -->
+<!-- Reference="20030415050234.8E0BF80C1@voodoo.strato-webmail.de" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: smbfstab</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark O &lt;<I><A HREF="mailto:marko@woogie.nu">marko@woogie.nu</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:rbrandt@tumourbiology.com">rbrandt@tumourbiology.com</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 15 Apr 2003 15:58:44 +0100
+</PRE>
+<H1>RE: smbfstab</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+This is because of how SuSE starts.  During boot the mount commands is
+called the /etc/init.d/boot script.  This script is called before the
+network interface is up so it can't mount any network file systems.  What I
+suggest is the following.
+
+edit /etc/init.d/boot and change the line "boot -av -t
+nonfs,noproc,nodevpts" to: "boot -av -t nonfs,noproc,nodevpts,nosmbfs" so it
+wont even attempt to mount a samba file system.
+
+Next edit /etc/init.d/smbfs and change the start section:
+From:
+    start|reload)
+        ;;
+
+To:
+    start|reload)
+        echo -n "Starting SMB File System"
+        mount -a -t smbfs &
+        ;;
+
+Of course if you didn't install samba from the SuSE rpm then you will have
+to create the smbfs script and ensure it is started and stopped in the
+correct run levels.
+
+Cheers
+Mark
+
+
+-----Original Message-----
+From: <A HREF="mailto:rbrandt@tumourbiology.com">rbrandt@tumourbiology.com</A> [mailto:<A HREF="mailto:rbrandt@tumourbiology.com">rbrandt@tumourbiology.com</A>]
+Sent: 15 April 2003 06:03
+To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+Subject: smbfstab
+
+
+I'd like to mount a windows share to my Suse box. I can do it using the
+smbmount command successfully. However, I'd like to mount during start-up.
+I've added the following line to the fstab <A HREF="file:">file:</A>
+//server/user$
+/smb/user	credentials=/home/.smbpw,uid=ralfb,gid=ralfb,fmask=664,dmask=775.
+This doesn't work.
+Anybody has an idea?
+
+Ralf
+
+--
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

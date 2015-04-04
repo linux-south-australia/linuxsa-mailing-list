@@ -1,0 +1,154 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="A comparison of ENBD and DRBD, updated" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="LinuxSA@linuxsa.org.au" -->
+<!-- Date="Sat, 21 Oct 2000 10:47:39 +0900" -->
+<!-- Id="3.0.6.32.20001021104739.00b8ee90@203.16.214.248" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: A comparison of ENBD and DRBD, updated</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:LinuxSA@linuxsa.org.au">LinuxSA@linuxsa.org.au</A>
+  Date: Sat, 21 Oct 2000 10:47:39 +0900
+</PRE>
+<H1>A comparison of ENBD and DRBD, updated</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+This is a resend of a message I sent out a little while ago, with some
+additional information.
+
+I am working on a project to replace an RSYNC run between two machines
+every 20 minutes with something that mirrors the data at a lower layer, say
+at the driver level.
+
+I had identified two possible ways to do this. One was Philipp Reisner's
+DRBD. The other (pointed out by David Lloyd) was ENBD. DRBD can be found by
+searching the web. ENBD can be found on Freshmeat.
+
+Over the weekend I tested ENBD, and yesterday, I purchased two new 15GB
+drives and started testing DRBD. Because the data we are rsyncing is about
+7 to 8 GB, I wanted to test with a 7GB partition, so I created a 7GB
+partition to mirror between two machines.
+
+My setup is a Dual-celeron 533 as the source and an AMD K6-2/400 as the
+sink, with a 100Mb/s ethernet between the machines (crossover cable).
+
+I expect that the customer writes between 100 and 400MB per day, and
+clearly this type of mirroring is 100% write bound. To allow for adequate
+safety margins, I need to achieve about 400MB/hour with acceptible CPU
+utulizations (less than 40%) and reasonable load averages, however, if
+there is free CPU, a high load average is not a big issue.
+
+ENBD and DRBD take different approaches to doing their job. ENBD gives you
+a device in /dev, /dev/nd?, that writes over the network to a remote file
+or partition. This means that you need to use software mirroring on the
+primary machine to mirror across the net.
+
+DRBD provides a device in /dev, /dev/nb*, that writes to the two halves of
+your mirror, one on the local machine, which must be a partition, and the
+other over the network, which must also be a partition.
+
+DRBD looked like it would be easier to use, because my partitions are on
+RAID controllers, and I didn't like the idea of adding too many extra
+driver layers into the picture. It also offers the ability to resync the
+two halves of the mirrors, including bringing the mirror up after replacing
+one of the mirrors. This allows you to initialize the mirror quickly.
+
+My first problem was getting ENBD to run at all on the SMP machine. It
+required a small hack on the Makefile to pass -DSMP or -D__SMP__ to all
+compiles. I used Version 2.2.7 of ENBD.
+
+Once I got it going, I found that I could I could write small files to the
+network device, /dev/nda, but if I tried to write a large file, like 100MB,
+it hung. I hope to give it another try soon.
+
+Next, I moved on to DRBD. I used version 0.5.7 of DRBD, and this version
+compiled cleanly under RH 6.2.
+
+I used drbdsetup to set up my mirror on both machines using the B protocol,
+nominated the primary and built a file system on /dev/nb0 with mke2fs. This
+all worked fine, but was slower than I was used to, and the disks rattled
+on bith machines.
+
+Then, because it was late, I left the machines running all night copying
+2GB or data from a file system on the the mirrored file system, and
+deleting the data and copying it again.
+
+When I got up this morning, I thought it had crashed, but a closer
+examination revealed it was copying a file of several hundred megabytes.
+This looked good, so I then set about figuring out how fast it could copy
+data.
+
+I timed a copy of the pinstripe ISO image to the mirror, and it a little
+over 19 minutes. This came out at 860kB/s. During the copy, the source had
+plenty of free CPU, like 60%, although the load average was over 3, but
+under 4. This meant that I should be able to achieve close to 2GB/hour
+which was way over my need.
+
+However, I have recently found what I think is an operational problem with
+DRBD, one that will cause lots of pain when you need less pain! If one of
+your two mirrors are down (perhaps because it took a hardware fault), and
+your new primary is rebooted, you cannot mount any of the /dev/nb? devices!
+You have to mount the underlying local device.
+
+That is, you cannot operate DRBD in an unconnected state when you bring one
+node up by itself. Should the operational staff have a problem when a
+switchover occurs between the two machines, and should they decide to
+reboot the new primary machine (when the other is off the air), they will
+have even more problems bringing up the system.
+
+What I can't understand is why DRBD not being able to contact its partner
+is any different from DRBD that just lost connection with its partner ...
+Perhaps I just do not understand how to run DRBD.
+
+Now its back to testing ENBD again, to see if it also has that problem, and
+whether or not the latest releases have eliminated the problems I saw
+earlier.
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Contributing author, SAMS Teach Yourself Samba in 24 Hours
+Author, Special Edition, Using Samba
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

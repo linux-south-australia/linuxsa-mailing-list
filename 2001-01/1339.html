@@ -1,0 +1,141 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: uh oh! -- BIND's no good again - warning, warning" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="'Glen Turner'" -->
+<!-- ToEmail="glen.turner@aarnet.edu.au" -->
+<!-- Date="Wed, 31 Jan 2001 13:00:56 +1030" -->
+<!-- Id="20010131130056.A26794@dog.topology.org" -->
+<!-- Reference="3A777241.82FC6A4D@aarnet.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: uh oh! -- BIND's no good again - warning, warning</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  Date: Wed, 31 Jan 2001 13:00:56 +1030
+</PRE>
+<H1>Re: uh oh! -- BIND's no good again - warning, warning</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Jan 31, 2001 at 12:32:41PM +1030, Glen Turner wrote:
+&gt; Mark Newton wrote:
+&gt; &gt; 
+&gt; &gt;  &gt; Large is no great problem in general.
+&gt; &gt;  &gt; But if the old named runs in one process of 2 MBytes at start-up,
+&gt; &gt;  &gt; and the new one runs in 5 processes of 2 MBytes, then I don't count
+&gt; &gt;  &gt; this as an improvement. If the software had been written by MS,
+&gt; &gt;  &gt; people would call this bloatware.
+&gt; &gt;  &gt; But since linux is without sin....
+&gt; &gt; 
+&gt; &gt; Are you sure you're counting correctly?
+&gt; &gt; 
+&gt; &gt; named v9 is multithreaded.  Are you sure you're not seeing 5 threads
+&gt; &gt; sharing the same 2 Mbytes?  I don't think the situation is anywhere
+&gt; &gt; near as bad as you're making it sound (indeed, it's probably about 20%
+&gt; &gt; as bad :-)
+&gt; 
+&gt; I have Mark Crispin, one of the ten BIND authors, looking
+&gt; over my shoulder as I write.  He says that the processes
+&gt; all share memory.  He also says that BIND9 is like BIND8
+&gt; in that the database is held in a red-black tree in memory.
+
+Glen,
+
+I'm very sceptical about this.
+I saw my free swap space go down by the same amount as the
+BIND memory went up.
+I checked the three relevant columns - SIZE, RSS and SHARE in top.
+The documentation was clear about the threading and lighweight process
+aspects etc. So I was expecting to see less real memory usage.
+
+However, I suspect that with my 2.0.36 kernel on RedHat 5.2,
+the memory sharing was probably just not happening.
+In fact, clearly it was not.
+As soon as I wiped 9.1 and installed 8.2.3, the virtual memory
+usage went down by 8 MBytes.
+I.e. those 5 processes at 2 MBytes each were real processes, not just
+threads, and the shared memory was rather small.
+My principal reason for dumping 9.1 was the RAM usage.
+I just simply don't know what type and amount of RAM to put into
+my old Digital Venturis 466.
+I'll go out and buy more RAM if someone can tell me what
+kind I need.
+
+Just for a little moment, I've just re-run the old 9.1 version.
+"Top" gave me this:
+
+---------------------------------------------------------------------
+ 12:52pm  up 18 days,  1:58, 14 users,  load average: 0.48, 0.14, 0.04
+98 processes: 97 sleeping, 1 running, 0 zombie, 0 stopped
+CPU states:  9.0% user, 10.6% system,  0.0% nice, 80.5% idle
+Mem:   14652K av,  14192K used,    460K free,   6308K shrd,    256K buff
+Swap:  33228K av,  23776K used,   9452K free                  3076K cached 
+
+  PID USER     PRI  NI  SIZE  RSS SHARE STAT  LIB %CPU %MEM   TIME COMMAND  
+// This is version 9.1.0.
+26821 root       0   0  2596 2060  1060 S       0  0.0 14.0   0:00 named
+26820 root       0   0  2596 2060  1060 S       0  0.0 14.0   0:00 named
+26822 root       1   0  2596 2060  1060 S       0  2.2 14.0   0:02 named
+26823 root       0   0  2596 2060  1060 S       0  0.0 14.0   0:00 named
+26824 root       0   0  2596 2060  1060 S       0  0.0 14.0   0:00 named
+
+// This is version 8.2.3.
+25566 root       0   0  1452  712   204 S       0  0.0  4.8   0:34 named 
+---------------------------------------------------------------------
+[The 18-day up time is due to electricity failure.
+The machine only crashes when the elctricity is stopped - or
+sold interstate at a higher price.]
+
+The amount of memory in the SHARE column is much greater than I
+remember seeing when it was really running.
+Obviously there's a little port re-use clash when 9.1.0 runs on
+top of 8.2.3:
+
+---------------------------------------------------------------
+Jan 31 12:52:32 dog ./named[26822]: listening on IPv4 interface lo, 127.0.0.1#53
+Jan 31 12:52:32 dog ./named[26822]: binding TCP socket: address in use
+Jan 31 12:52:32 dog ./named[26822]: listening on IPv4 interface eth0, 203.38.148.51#53
+Jan 31 12:52:32 dog ./named[26822]: binding TCP socket: address in use
+Jan 31 12:52:32 dog ./named[26822]: listening on IPv4 interface ppp0, 139.130.140.14#53
+Jan 31 12:52:32 dog ./named[26822]: binding TCP socket: address in use          
+---------------------------------------------------------------
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

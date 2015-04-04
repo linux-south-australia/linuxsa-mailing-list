@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="[help] USB mass storage device problems" -->
+<!-- FromName="'James Hercus'" -->
+<!-- FromEmail="james@recalldesign.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 05 Feb 2003 11:29:02 +1030" -->
+<!-- Id="3E4061D6.1040501@recalldesign.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: [help] USB mass storage device problems</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Hercus &lt;<I><A HREF="mailto:james@recalldesign.com">james@recalldesign.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 05 Feb 2003 11:29:02 +1030
+</PRE>
+<H1>[help] USB mass storage device problems</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+I'm trying to get my linux box to talk to a digital camera and a USB 
+memory stick. For the memory stick the kernel seems to load the drivers 
+OK but no /dev entries are created. I am using devfs. Is there something 
+I have to do to have the /dev entries created?
+
+I have successfully used the memory stick on another system without 
+devfs; I just had to load the modules and mount /dev/sda1. However, the 
+camera didn't work on that system; in fact it usually hangs the kernel.
+
+Can anyone help?
+
+James
+
+--------------------------------------------------------------------------------
+$ uname -a
+Linux neuromancer 2.4.19 #4 Thu Nov 7 16:25:58 CST 2002 i686 AMD 
+Athlon(TM) XP 1700+ AuthenticAMD GNU/Linux
+
+
+Plugged in USB memory stick (Kingmax):
+
+var/log/syslog:
+Feb  5 11:08:01 neuromancer /USR/SBIN/CRON[3985]: (mail) CMD (  if [ -x 
+/usr/sbin/exim -a -f /etc/exim/exim.conf ]; then /usr/sbin/exim -q ; fi)
+Feb  5 11:08:01 neuromancer kernel: hub.c: USB new device connect on 
+bus1/1, assigned device number 12
+Feb  5 11:08:01 neuromancer kernel: usb.c: USB device 12 (vend/prod 
+0xea0/0x6803) is not claimed by any active driver.
+Feb  5 11:08:02 neuromancer usbmgr[321]: vendor:0xea0 product:0x6803
+Feb  5 11:08:02 neuromancer usbmgr[321]: class:0x8 subclass:0x6 
+protocol:0x50
+Feb  5 11:08:02 neuromancer usbmgr[321]: USB device is matched the 
+configuration
+Feb  5 11:08:02 neuromancer kernel: SCSI subsystem driver Revision: 1.00
+Feb  5 11:08:02 neuromancer kernel: Initializing USB Mass Storage driver...
+Feb  5 11:08:02 neuromancer kernel: usb.c: registered new driver usb-storage
+Feb  5 11:08:02 neuromancer kernel: scsi0 : SCSI emulation for USB Mass 
+Storage devices
+Feb  5 11:08:02 neuromancer kernel:   Vendor:           
+Model:                   Rev: 1.11
+Feb  5 11:08:02 neuromancer kernel:   Type:   
+Direct-Access                      ANSI SCSI revision: 02
+Feb  5 11:08:02 neuromancer kernel: WARNING: USB Mass Storage data 
+integrity not assured
+Feb  5 11:08:02 neuromancer kernel: USB Mass Storage device found at 12
+Feb  5 11:08:02 neuromancer kernel: USB Mass Storage support registered.
+Feb  5 11:08:02 neuromancer usbmgr[321]: "scsi_mod" was loaded
+Feb  5 11:08:02 neuromancer usbmgr[321]: "sd_mod" was loaded
+Feb  5 11:08:02 neuromancer usbmgr[321]: "usb-storage" was loaded
+
+# a few directories appear in /dev:
+ $diff dev_before dev_after
+ 822a823,827
+ &gt; /dev/scsi
+ &gt; /dev/scsi/host0
+ &gt; /dev/scsi/host0/bus0
+ &gt; /dev/scsi/host0/bus0/target0
+ &gt; /dev/scsi/host0/bus0/target0/lun0
+
+--------------------------------------------------------------------------------
+
+
+plugged in Digital Camera (Olympus C-220Z):
+
+/var/log/syslog:
+Feb  5 10:56:30 neuromancer kernel: hub.c: USB new device connect on 
+bus1/1, assigned device number 9
+Feb  5 10:56:30 neuromancer kernel: usb.c: USB device 9 (vend/prod 
+0x7b4/0x102) is not claimed by any active driver.
+Feb  5 10:56:30 neuromancer usbmgr[321]: vendor:0x7b4 product:0x102
+Feb  5 10:56:30 neuromancer usbmgr[321]: class:0x8 subclass:0x6 
+protocol:0x50
+Feb  5 10:56:31 neuromancer usbmgr[321]: USB device is matched the 
+configuration
+Feb  5 10:56:31 neuromancer kernel: SCSI subsystem driver Revision: 1.00
+Feb  5 10:56:31 neuromancer kernel: Initializing USB Mass Storage driver...
+Feb  5 10:56:31 neuromancer kernel: usb.c: registered new driver usb-storage
+Feb  5 10:56:31 neuromancer kernel: scsi0 : SCSI emulation for USB Mass 
+Storage devices
+
+Feb  5 10:57:00 neuromancer kernel: scsi: device set offline - not ready 
+or command retry failed after bus reset: host 0 channel 0 id 0 lun 0
+Feb  5 10:57:00 neuromancer kernel: WARNING: USB Mass Storage data 
+integrity not assured
+Feb  5 10:57:00 neuromancer kernel: USB Mass Storage device found at 9
+Feb  5 10:57:00 neuromancer kernel: USB Mass Storage support registered.
+Feb  5 10:57:00 neuromancer usbmgr[321]: "scsi_mod" was loaded
+Feb  5 10:57:00 neuromancer usbmgr[321]: "sd_mod" was loaded
+Feb  5 10:57:00 neuromancer usbmgr[321]: "usb-storage" was loaded
+
+----------------
+
+$ uname -a
+Linux neuromancer 2.4.19 #4 Thu Nov 7 16:25:58 CST 2002 i686 AMD 
+Athlon(TM) XP 1700+ AuthenticAMD GNU/Linux
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

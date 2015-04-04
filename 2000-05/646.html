@@ -1,0 +1,205 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Backuping a Linux Box" -->
+<!-- FromName="behoffski" -->
+<!-- FromEmail="behoffski@grouse.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 24 May 2000 12:02:08 +0930" -->
+<!-- Id="392B3F28.F78F8C04@grouse.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Backuping a Linux Box</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: behoffski &lt;<I><A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Wed, 24 May 2000 12:02:08 +0930
+</PRE>
+<H1>Re: Backuping a Linux Box</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Having maintained backups in the past through a haphazard copy to a spare
+&gt; machine technique (hey! at least they where backups).  I have recently
+&gt; acquired a DAT tape (as the email goes to press I am having the first
+&gt; complete system backup that I have had in *MANY* years.
+&gt; 
+&gt; Now for those of you who use Linux in a more formal environment, I am
+&gt; interested in canvassing opinions as to what is a good backup configuration
+&gt; for Linux.
+&gt; 
+&gt; For the interim I will probably just do a rolling 4 week with the 1st week
+&gt; rotation rotation (those who have done backup configs before will understand
+&gt; that :).
+&gt; 
+&gt; But I am very interested in knowing what is considered best practice using
+&gt; Open Source software?
+&gt; 
+&gt; Looking forwards to all sorts of interesting replies.
+&gt; 
+&gt; Regards,
+&gt; 
+&gt; Matthew
+&gt; 
+&gt; PS for a MUA, I have recently changed from elm to mutt.  It is well worth
+&gt; the move!!
+
+[Sorry if this post lags the rest of the discussion a little...
+I read LinuxSA via the digest.]  
+
+Basically, backups is a risk/expense trade-off: How much expense 
+are you willing to incur doing backups, versus what cost or 
+risk is there if you lose data?  
+
+My very, very first job was "Assistant System Administrator" at 
+Austek Microsystems, with someone named Richard Sharpe as my 
+boss.  One of my main jobs was to manage the backups for the 
+company.  Austek was designing custom VLSI chips and developing 
+VLSI software tools in-house, so protecting the work of the 
+large engineering team was very important.  
+
+At Austek, we took a snapshot monthly of all the disks to tape, 
+and those snapshots were performed with the system shut down to 
+a single-user state, so that the tape image was capable of 
+recreating a working, bootable disk if the data had to be 
+restored to a new drive.  The snapshots were held for at 
+least a year before being reused, and occasionally 
+(quarterly?) a snapshot was put aside and never reused.  
+
+We then had weekly incremental backups, which captured all the 
+changes since the previous weekly backup (or the previous 
+monthly snapshot).  These tapes were stored off-site, and 
+rotated in a fairly long cycle (9 weeks or thereabouts, I 
+think).  
+
+And finally (in the backup regime) we had daily incremental 
+backups, which were stored on-site.  Again, a  fairly longish 
+rotation cycle was used -- the dailys covered around 4 weeks 
+of data before being reused.  
+
+A listing of each file backed up incrementally was held 
+on-line in a disk file, including modification times, so that 
+if we had to retrieve a file, we could search for the file 
+in the listings instead of having to reread each tape.  
+
+So if someone had finger trouble and deleted something, we could 
+probably get it back off the incrementals or the previous full 
+snapshot.  Up to a day's work might be lost in some 
+circumstances, but that was a reasonable risk to take.  
+
+If a disk died, we would restore a monthly shapshot, then restore 
+the weeklys up to the current week (maximum of 4 weeks), then 
+restore the dailys up to the current day (maximum of 4 weekdays).  
+This seemed the best trade-off between effort to perform the 
+backup and the hassle of reloading if there was an error.  
+
+In addition to backups, we also had an archive facility, using 
+a different set of tapes (which were duplicated).  Archiving 
+data made a huge difference to the amount of stuff that was 
+written to the monthly snapshots, and helped ease the pressure 
+on disk space.  
+
+Okay... so much for past practice.  Now for a bit of a look at 
+the present:
+
+You need to backup to defend against:
+
+        1. Finger trouble.  An installation screws something up, 
+                or you broke or deleted an important file.  
+                You need to restore the file off of a backup.  
+
+        2. Media dying, or suffering an accident.  I've had a 
+                disk head crash only last month, so believe me, 
+                it happens.  Or perhaps there might be a fire 
+                which char-grills your disk drive.  
+
+        3. Damage from outsiders, including viruses.  
+
+Your backups should be onto removable media, either a tape, a 
+CD, or perhaps a pluggable IDE drive.  At least some of your 
+backups should be well away from the rest of your system, 
+in case of big events like fire.  Tape is good, as it's 
+fairly cheap and compact.  Burning the occasional CD is 
+okay, but perhaps best left for archiving rather than 
+for backups, since you can't reuse CDs (?? are the 
+rewritable CDs much cop, yet?)  
+
+For tapes, turn off data compression NOW: otherwise, if your 
+backup is written as one big file to the tape, and an early 
+block of the tape is unreadable, the rest of the tape is useless.  
+(use mt(1) to control the data compression setting).  
+
+You could get away with incrementals from one machine to 
+another, or perhaps even one disk drive to another, but 
+this carries some risk that an incident might take out 
+the backups as well as the original.  There's a lot to be 
+said for having the backups completely away and off-line 
+from the originals.  
+
+As part of setting up a new disk myself in the aftermath 
+of the failure, I've set aside a partition as an "archive" 
+partition.  RPMs and other sources downloaded from the 
+net get stored in this partition, so that I can easily 
+exclude these from the incremental backups if desired.  
+
+Incidentally, I asked Glen Turner on this list a year or so 
+ago how the big boys do backup.  His answer was to use 
+dual-ported SCSI drives in a RAID configuration, then 
+add your backup drive as a shadow of your working drive, 
+let the system make the backup drive become a complete 
+shadow of the original, then take the backup drive offline 
+and store it in a safe place.  
+
+Finally, Ross Williams of Rocksoft has much to say on this 
+subject, including the question of guarding against 
+creeping corruption that otherwise might slowly infitrate 
+your backup copies until undamaged originals are lost.  See 
+the Rocksoft site, "The Tao of Backup":
+
+        <A HREF="http://www.rocksoft.com/taobackup/">http://www.rocksoft.com/taobackup/</A>
+
+which includes discussing basic and advanced backup issues.  
+For example, the web points out that you should encrypt your 
+backup tapes so that your intellectual property remains 
+secure even if a tape gets stolen.  
+
+cheers,
+
+Brenton
+
+-- 
+behoffski (Brenton Hoff) | Software Engineer, Grouse Software
+<A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A>  | <A HREF="http://www.grouse.com.au/">http://www.grouse.com.au/</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

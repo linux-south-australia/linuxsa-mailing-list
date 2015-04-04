@@ -1,0 +1,117 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="IPC for Apache module child processes (technical)" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 6 May 2000 06:19:13 +091800" -->
+<!-- Id="20000506061913.A17376@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: IPC for Apache module child processes (technical)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 6 May 2000 06:19:13 +091800
+</PRE>
+<H1>IPC for Apache module child processes (technical)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Questions about locking shared memory for multiple
+child processes.
+
+-----------------------------------------------------
+Is there anyone out there who knows how to do
+shared memory access correctly for multiple child processes?
+
+As I said in an earlier mail, I want to have an Apache module
+to do fair bandwidth allocation (to put it diplomatically).
+
+The Apache module "throttle" turned out to not only be in
+need of updating (because the Apache API has changed in the
+3 years since it was written). It also does not do what I want.
+It balances/limits/throttles bandwidth according to the user ID
+of the file which is being accessed. In my case, that would
+be the same user ID for all files, pretty much.
+
+I'm going to balance bandwidth according to remote IP address,
+which means that I will probably hash the 32 bits down to
+about 12, and jump from a hash table into a heap of fixed-length
+records, and then do gargabe collection on this in the usual manner.
+
+The problem comes from the fact that Apache spawns a separate
+child process for each file request. I'm planning to use
+shared memory (shmget(), shmat() etc.) to be able to share
+the common data structure between child processes.
+(Clearly there are other solutions, e.g. a common database
+process which provides services to all child processes, but
+I'll try to do the most efficient solution first.)
+
+The problem arises when two child processes want to access
+the data structure at the same time. I need to be able to lock
+the structure or some part of the structure for the duration of
+access, and make the other process wait.
+
+I'm familiar with all of this in kernel modules - you just whip
+up the interrupt mask until you're out of the critical section.
+But I can't see how to do this with multiple processes which
+share a single chunk of memory.
+
+I have a feeling this has something to do with mutexes and
+semaphores, but the documentation seems to indicate that this is
+for threads only.
+
+Questions:
+1. If there are standard Unix functions to do this, what are they?
+
+2. If there aren't, where would I find the algorithms in a
+computing book?
+(Didn't I once read that this has something to do with Dijkstra??)
+
+By the way, I do know how to do this in assembly language on
+a 68k. You just use an atomic test-and-set.
+But C doesn't seem to have this sort of thing.
+
+Cheers,
+Alan Kennington.
+
+PS.  I haven't been getting any dodgy attachments in the
+last 2 days. Obviously I'm not in the address lists of anyone
+with "Outlook". Yet anohter nail in the coffin for MS.
+This should be rubbed in to all those who continue to
+support MS software.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

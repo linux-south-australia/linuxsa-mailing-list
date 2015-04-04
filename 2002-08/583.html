@@ -1,0 +1,130 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Round 1 to Apache (was: Tomcat4 - Apache )" -->
+<!-- FromName="'nik [tm]'" -->
+<!-- FromEmail="tmcruisin@sond.com.au" -->
+<!-- ToName="'Matthew Williams'" -->
+<!-- ToEmail="mattheww@empower.com.au" -->
+<!-- Date="Thu, 22 Aug 2002 15:06:17 +0930" -->
+<!-- Id="3D647851.5010405@sond.com.au" -->
+<!-- Reference="62D5F72B69A7BB4DA9D72477134ADE090738F2@einstein" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Round 1 to Apache (was: Tomcat4 - Apache )</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: nik [tm] &lt;<I><A HREF="mailto:tmcruisin@sond.com.au">tmcruisin@sond.com.au</A></I>&gt;
+  To  : Matthew Williams &lt;<I><A HREF="mailto:mattheww@empower.com.au">mattheww@empower.com.au</A></I>&gt;
+  Date: Thu, 22 Aug 2002 15:06:17 +0930
+</PRE>
+<H1>Round 1 to Apache (was: Tomcat4 - Apache )</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+hmmm..
+
+just had a go at setting this one up (the webapp module for apache to 
+work with tomcat) and run into a problem.
+I have currently two seperate machines (one apache server, the other tomcat)
+thought I would see how they go working like that.
+
+now the problem I have is that apache seems to want a local DocumentRoot 
+location, but the jsp's are all on the other machine.
+
+httpd.conf;
+
+#tomcat config
+  &lt;VirtualHost 150.101.236.172&gt;
+   ServerName tomcat.sond.com.au
+   DocumentRoot /var/tomcat4/webapps
+   WebAppConnection conn warp 150.101.236.173:8180
+   WebAppDeploy recharge warpConnection /recharge
+  &lt;/VirtualHost&gt;
+
+when I run the 'apachectl configtest' it complains that DocumentRoot 
+doesnt exist locally.
+
+Warning: DocumentRoot [/var/tomcat4/webapps] does not exist
+
+now I wish the files to be run form the other server..is it possible to 
+do that?
+
+and then to match the apache config, is this correct as the tomcat config?
+
+   &lt;!-- Define an Apache-Connector Service --&gt;
+   &lt;Service name="Tomcat-Apache"&gt;
+
+     &lt;Connector className="org.apache.catalina.connector.warp.WarpConnector"
+      port="8180" minProcessors="5" maxProcessors="75"
+      enableLookups="false" appBase="webapps"
+      acceptCount="10" debug="0"/&gt;
+
+     &lt;!-- Replace "localhost" with what your Apache "ServerName" is set 
+to --&gt;
+     &lt;Engine className="org.apache.catalina.connector.warp.WarpEngine"
+      name="tomcat.sond.com.au" debug="0"&gt;
+
+       &lt;!-- Global logger unless overridden at lower levels --&gt;
+       &lt;Logger className="org.apache.catalina.logger.FileLogger"
+               prefix="apache_log." suffix=".txt"
+               timestamp="true"/&gt;
+
+       &lt;!-- Because this Realm is here, an instance will be shared 
+globally --&gt;
+       &lt;Realm className="org.apache.catalina.realm.MemoryRealm" /&gt;
+
+     &lt;/Engine&gt;
+
+   &lt;/Service&gt;
+
+as the 'apachectl configtest' also complains of;
+
+Syntax error on line 1146 of /usr/local/apache/conf/httpd.conf:
+Specified connection not configured
+
+line 1146 is the WebAppDeploy line of the Virtualhost directive, but 
+this is probably due to not finding DocumentRoot, therefore cannot find 
+the recharge folder in DocumentRoot right??
+
+anyone have any suggestion?
+do the jsp's need to be on the apache machine? then get compiled into 
+servlets across the internet? (doesnt sound right to me, and I dont 
+think i like the idea of doing that)
+
+
+tia
+nik [tm]
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,169 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SYN states" -->
+<!-- FromName="'Daryl Tester'" -->
+<!-- FromEmail="Daryl.Tester@iocane.com.au" -->
+<!-- ToName="'Charles Williams'," -->
+<!-- ToEmail="hosting.mailing.list.account@acnshosting.com,linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 15 Jul 2001 13:43:52 +0930" -->
+<!-- Id="3B511880.AC74D0BA@iocane.com.au" -->
+<!-- Reference="024d01c10c5c$16755f80$fe0aa8c0@chucks" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SYN states</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  To  : Charles Williams &lt;<I><A HREF="mailto:hosting.mailing.list.account@acnshosting.com">hosting.mailing.list.account@acnshosting.com</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 15 Jul 2001 13:43:52 +0930
+</PRE>
+<H1>Re: SYN states</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Charles Williams wrote:
+
+&gt;&gt;&gt; Syn cookies is ok but only after 3 or more connections from the same
+&gt;&gt;&gt; client is dropped.
+
+&gt;&gt; SYN cookies do not drop connections;
+
+&gt; Who said anything about syncookies dropping a connection?
+
+OK, maybe I read more intent into your statement than was intended -
+would you mind clarifying that statement?  What exactly is being
+"dropped", or who is doing the dropping?
+
+&gt;&gt; More to the point, why isn't the firewall capable of handling this?
+
+&gt; NO. Read it again. this is not the firewalls responsibility.  This is a TCP
+&gt; issue only.
+
+The firewall runs TCP, so it does fall within the baliwick of the
+firewall.  Any modern, decent (read: "corporate class") firewall
+should be able to cope robustly under such conditions.  If it doesn't,
+then I would like the name of it to add to my "Products to avoid at
+all costs" list.
+
+&gt;&gt;&gt; However, you must first catch the SYN as it leaves TCP and
+&gt;&gt;&gt; before it hits the firewall.  Otherwise you will have an
+&gt;&gt;&gt; open port on a firewall until it times out.
+
+&gt;&gt; No, the "port doesn't open" until you receive the final ACK back from
+&gt;&gt; the client, at least at the application level - this is the point
+&gt;&gt; where accept() unblocks (for normal blocking listening sockets) and
+&gt;&gt; returns the new file descriptor.  What is most likely happening is
+&gt;&gt; that your firewall is maintaining data between SYN (SYN-ACK) and ACK,
+&gt;&gt; which is where the DoS is coming in.
+
+&gt; wrong.
+
+Which part is wrong, or is the entire paragraph wrong?  I said the
+"port doesn't open at the application level".  I said that your
+firewall is maintaining state, which it must be in order to have
+"have an open port on a firewall".  Ports don't open until the
+three way handshake is complete.  What you have here is the
+"half-open" situation.
+
+&gt; read the rfc.
+
+Any in particular, or will 793 do?  And if you are referring to 793,
+don't confuse specification with implementation - it merely suggests
+how TCP may be implemented, not mandates it.  TCP stacks, in real life,
+can and are implemented differently without violating 793 (one of
+the funkiest I can remember is Douglas Comer's implementation for
+Xinu, which used multiple cooperating user space processes ).
+
+&gt; the port that the connection comes in on is the one
+&gt; that is open and awaiting info.
+
+Correct - a _single_ TCB.  One socket in a listening state, one "network
+structure".  That in and of itself can not cause a DoS under a SYN flood.
+Under "traditional" TCP implementations, when a SYN is received for a
+socket that is passively open, another TCB structure is allocated (to
+record sequence numbers, connection details etc.) and SYN-ACK is then
+sent back.  This allocation of a TCB structure is the resource that gets
+consumed in a DoS situation.  SYN cookies circumvents this by doing away
+with the need to allocate the TCB to record the details in and encoding
+it in the SYN-ACK packet that gets sent back in acknowledgement to the
+SYN, thus removing the resource that gets starved in a SYN flood attack.
+This does not violate 793 either (well, slightly - because it can't
+encode all the attributes, from memory[1] things like certain TCP
+options can't be used).
+
+&gt;&gt; Is your firewall and server one and the same?
+
+&gt; could be.  depends on how it's set up.
+
+You stated that you were servicing a "100 MBp connection" - I would
+hope that they were separate machines, otherwise you are going to
+suffer performance problems when under attack.
+
+&gt;&gt; Cool - so someone could start a forged SYN flood of, say, some large ISP's
+&gt;&gt; proxy cache farm, and this software would obligingly block it?  That
+&gt;&gt; smells of DoS too.
+
+&gt; How?  DoS is external to internal and unwanted.
+
+I'm talking about _forged_ external DoS.
+
+&gt; Also, the packets from the
+&gt; cache farm would be out of sync anyway and not work.  All that would happen
+&gt; is a bunch of resets are generated and the IP is eventually blocked as a Bad
+&gt; IP.
+
+OK, maybe I didn't spell it out in enough detail.  The large ISP's proxy
+cache is external to the resource you're protecting, and the attack
+launched from a third IP address (using a forged source IP address,
+coincidently matching the cache's IP address) has just successfully
+caused the software protecting that resource to block that IP address.
+Now no-one from the large ISP is able to connect to the protected
+resource, despite being purely incidental to the attack scenario.
+Validating the IP source address relies (roughly) on getting ACK back
+with the correct details (eg, ACK = SEQ + 1), which can be easy when
+used against a TCP stack with predicitable sequence numbers (something
+nmap reports on, btw), but as you've already stated that you're blocking
+half-open connections, the above attack could work without modification
+(with one caveat - if you process RSTs back from the legitimate source
+forged IP host, saying WTF to the SYN-ACK's you've been sending it).
+
+
+Regards,
+  Daryl Tester
+
+[1]  I use the expression "from memory" a lot - people who read this
+     in my posts can append "and likely to be incorrect" without
+     affecting the statement in any way.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

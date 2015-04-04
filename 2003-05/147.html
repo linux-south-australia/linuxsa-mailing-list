@@ -1,0 +1,144 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: DNAT with ipchains -- or http reverse proxy listening on two ports..." -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 04 May 2003 22:27:33 +0930" -->
+<!-- Id="courier.3EB50E3D.00000C70@pogona.yellowgoanna.com" -->
+<!-- Reference="courier.3EB509D5.00000BFB@pogona.yellowgoanna.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: DNAT with ipchains -- or http reverse proxy listening on two ports...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 04 May 2003 22:27:33 +0930
+</PRE>
+<H1>Re: DNAT with ipchains -- or http reverse proxy listening on two ports...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+phear not! 
+
+I have found the solution -- as so often happens immediately after making a 
+public request (surely there's something in that?) 
+
+Anyway, I just needed to add the following lines (obvious once I checked the 
+doco :) 
+
+ ---
+Listen 80
+Listen 8080
+ ---
+(I was trying to do it on the one line) 
+
+and 
+
+ ---
+&lt;VirtualHost &lt;hostname&gt;:8080&gt;
+    DocumentRoot /home/httpd/html
+    ServerName  &lt;hostname&gt;
+    ProxyPass / <A HREF="http://&lt">http://&lt</A>;internalhost&gt;:8080/
+    ProxyPassReverse / <A HREF="http://&lt">http://&lt</A>;internalhost&gt;:8080/
+    CustomLog /var/log/httpd/access_log common
+&lt;/VirtualHost&gt;
+ --- 
+
+And that all worked fine... :) 
+
+rr 
+
+Richard Russell writes: 
+
+&gt; Hi all  
+&gt; 
+&gt; My ipchains is a little rusty, and I know how to do what I want to do in 
+&gt; iptables...  
+&gt; 
+&gt; I have an Internet, connected to a Linux box, which has a bunch of Windows 
+&gt; servers behind it on a private IP range. I want port 8080 on the Linux box 
+&gt; to be forwarded to port 8080 on one of the windows boxes (yes, a 
+&gt; *specific* one :)  
+&gt; 
+&gt; In iptables, I would do this:  
+&gt; 
+&gt; iptables -t nat -A PREROUTING -p tcp -d $EXT -m tcp --dport 8080 -j DNAT 
+&gt; --to-dest 192.168.x.y:&lt;port&gt;
+&gt; iptables -t nat -A POSTROUTING -p tcp -d 192.168.x.y -m tcp --dport 8080 
+&gt; -j SNAT --to-source 192.168.1.1  
+&gt; 
+&gt; .. or something like that. (first DNAT destination to where I want it to 
+&gt; go, secondly SNAT source to an IP that the windows boxes have a route for.  
+&gt; 
+&gt; Can I do that in ipchains?  
+&gt; 
+&gt; (actually, just thinking about this, this might not even work, as I'd have 
+&gt; to re-SNAT/DNAT the response packets, wouldn't I? hmmm)...  
+&gt; 
+&gt; So, second idea is to have httpd, which is already listening on port 80, 
+&gt; and mostly acting as a reverse proxy there, listen to port 8080, and do 
+&gt; the same kind of reverse proxy there too.  
+&gt; 
+&gt; Anyone able to help me?  
+&gt; 
+&gt; Cheers  
+&gt; 
+&gt; rr  
+&gt; 
+&gt; -- 
+&gt; Richard Russell
+&gt; Yellow Goanna P/L
+&gt; m: +61 412 827 805
+&gt; e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+&gt; w: <A HREF="http://www.yellowgoanna.com/">http://www.yellowgoanna.com/</A> 
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+&gt; To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject 
+&gt; 
+ 
+
+
+-- 
+Richard Russell
+Yellow Goanna P/L
+m: +61 412 827 805
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+w: <A HREF="http://www.yellowgoanna.com/">http://www.yellowgoanna.com/</A> 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

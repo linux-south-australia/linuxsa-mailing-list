@@ -1,0 +1,193 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: NOT impressed" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Jake Hawkes" -->
+<!-- ToEmail="jake@infinitylimited.net" -->
+<!-- Date="Mon, 14 Aug 2000 22:33:53 +0930" -->
+<!-- Id="20000814223353.A5730@atdot.dotat.org" -->
+<!-- Reference="39937D5B.86D45FFA@infinitylimited.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: NOT impressed</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  Date: Mon, 14 Aug 2000 22:33:53 +0930
+</PRE>
+<H1>Re: NOT impressed</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, Aug 10, 2000 at 10:13:15PM -0600, Jake Hawkes wrote:
+
+ &gt; Mark Newton wrote:
+ &gt; &gt; On Thu, Aug 10, 2000 at 11:04:21PM +0930, MWP wrote:
+ &gt; &gt; Ok, now for extra value marks, try to get two clients on the same NAT'ted
+ &gt; &gt; LAN talking to the same games server at the same time.
+ &gt; &gt; Beginning to see the point now?
+ &gt; 
+ &gt; ok, so my understanding of NAT just flew out the window. I thought NAT
+ &gt; was the process of "wrapping" the internal packet with another that had
+ &gt; a real world IP.
+ 
+No, it doesn't do that at all.  
+
+Think of NAT as being a bit like a cross between a proxy and IP-forwarding
+(routing).  An explanation is below, followed by a discussion of implications
+for gaming.
+
+Consider TCP.  A TCP session from 192.168.1.1's web browser to 150.101.89.3's
+web server begins like this:
+
+    Client 192.168.1.1                           Server 150.101.89.3
+
+    TCP flags: SYN
+    ip_src = 192.168.1.1       |
+    ip_dst = 150.101.89.3      |-----------------------&gt;
+    tcp_sport = 21436 (random) |
+    tcp_dport = 80
+
+                                                 TCP flags: SYN ACK
+                                               | ip_src = 150.101.89.3
+                        &lt;----------------------| ip_dst = 192.168.1.1
+                                               | tcp_sport = 80
+                                                 tcp_dport = 21436
+
+     TCP flags: ACK
+     ip_src = 192.168.1.1      |
+     ip_dst = 150.101.89.3     |-----------------------&gt;
+     tcp_sport = 21436         |
+     tcp_dport = 80
+
+After that 3-way handshake, actual data transfer can begin.
+
+The packets concerned probably travel through all kinds of routers
+to get from 192.168.1.1 to 150.101.89.3.  There are two major assumptions
+which color the interpretation of the packets under discussion:
+
+   1.  Each router passes through the packets with the headers intact;  and
+
+   2.  The destination addresses are always routable (i.e.: both conversants
+       are using "real" IP addresses).
+
+According to RFC 1597 and RFC 1918, 192.168.0.0/16 addresses aren't actually
+routable, so my example above wouldn't really work:  Routers on the Internet
+don't know how to reach any IP address which starts with 192.168.x.y.  So,
+let's think about what a NAT gateway could do to address that issue.
+
+A NAT gateway will receive an "inside" packet described by the tuple
+(ip_src, tcp_sport) and remap the IP address so that it's routable (usually,
+but not always, by substituting its own IP address).  So, if a NAT gateway
+has an external IP address of 203.56.192.40, it'll take an input packet
+which looks like (ip_src, tcp_sport) = (192.168.1.1, x) and emit 
+(203.56.192.40, x) to the Internet.
+
+It can't stop there, though.  Remember that the 192.168.x.y hosts don't
+know that they're talking through a NAT gateway, so there is the potential
+(and, indeed, the likelihood) that more than one host will attempt to use
+the same source port number;  As a result, the NAT gateway also needs
+to make-up a new value for "tcp_sport" to replace "x" in the tuple above.
+So we might end up with (192.168.1.1, 21436) being mapped to 
+(203.56.192.40, 16765).
+
+The NAT gateway needs to remember this mapping, because the server in
+the outside world will be sending packets back to whatever host is mentioned
+in a packet's ip_src field, which will be 203.56.192.40 in this case.  So,
+after making a mapping like the one described above, the NAT gateway also
+needs to know that any packets received from the Internet addressed to
+203.56.192.40 port 16765 should be forwarded on to 192.168.1.1 port 21436.
+The NAT gateway also needs to monitor the state of the connection;  When it
+sees TCP FIN packets being exchanged (signifying the tear-down of a
+connection), or TCP RST packets, or various ICMP packets, or whatever, it
+needs to know that it's safe to "forget" the mapping it has built up for
+that connection.  Each mapping takes up a finite amount of memory, so 
+we can't keep hoarding them forever (and there's no point keeping them 
+after a connection has died anyway).
+
+It's also possible to set up "static mappings".  So, if your web server
+is running on the "inside" host 192.168.1.62, you might tell your NAT
+gateway that any packets with a destination of 203.56.192.40 port 80 should
+be remapped to 192.168.1.62 port 80.  The same usually holds true for UDP.
+Often you can use IP aliases on a single NAT gateway if more than one IP
+address is routed to it, so that your NAT gateway can "pretend" to be 
+multiple "inside" machines.
+
+Now let's address this to games in an ADSL environment.  You have *one*
+IP address, so there can be no IP aliasing.  You have a game which expects
+to see a games server out on the Internet somewhere on, say, port 7777.
+However, furthermore, you often also find that the game server will
+communicate with the client on port 7777 as well.  
+
+That means you can't have more than one "inside" host playing the game
+at once.  Why?  Because the game server will be transmitting UDP packets to
+(external_ip_address, 7777), and your NAT gateway will be making a decision
+to forward those packets to exactly *one* internal host.  You can only 
+map port 7777 to one internal IP address;  as such, the game could be said
+to be NAT-hostile.
+
+If you want to play Unreal Tournament, or Tribes, or Counterstrike, or 
+any of countless other games through a NAT gateway, you first need to
+make sure that the game server won't be "insisting" on a particular port
+number for the client.  And, in many (most?) cases you'll find that that
+isn't the case.
+
+So, that doesn't mean you can't play games through a NAT gateway;  It
+just means that there isn't a whole lot of point in inviting your friends
+over to share the LPB experience, because only one of you will be able
+to play at a time.
+
+ &gt; Are you saying that NAT simply marks the packet with a single bit
+ &gt; change?
+
+No, it remaps the IP source address and TCP/UDP source port for outbound
+packets, and the IP destination address and TCP/UDP destination port for
+inbound packets.
+
+What you described in your paragraph above is called "tunnelling", and
+it has nothing to do with NAT.
+
+ &gt; If you're suggesting that only one NAT client can play at a
+ &gt; time, I'm I right?
+
+Bingo.
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

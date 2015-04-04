@@ -1,0 +1,127 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Hacking past Apache user authentication" -->
+<!-- FromName="Daniel Callan" -->
+<!-- FromEmail="dcallan@dataline.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 24 Jun 1999 20:07:58 +1000" -->
+<!-- Id="3.0.32.19990624200755.009f5d30@hub.dataline.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Hacking past Apache user authentication</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Callan &lt;<I><A HREF="mailto:dcallan@dataline.net.au">dcallan@dataline.net.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Thu, 24 Jun 1999 20:07:58 +1000
+</PRE>
+<H1>RE: Hacking past Apache user authentication</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Steve,
+
+At 16:06 24/06/99 +0930, you wrote:
+&gt;&lt;snip&gt;
+&gt;That much I knew.
+&gt;Can anybody give me some idea of the level of risk, or the amount of effort
+&gt;required to gain entry to a protected directory on a well administered
+&gt;server?
+&gt;
+
+There is only one major security risk I can think to make noise about and
+that is keeping the ".htpasswd" and ".htgroup" files WITHIN the DocumentRoot
+of the webserver makes them potentially readable (yep they're ASCII ;-)
+to the world. This gives them a nice list of correct usernames and a
+corresponding list of crypted passwords (which will take no time to crack
+as they can be compared against each other's encoding/crypting).
+Simple answer is to keep them at the same level as cgi-bin
+eg:	/usr/local/apache/htdocs/
+	/usr/local/apache/cgi-bin/
+	/usr/local/apache/secure/.htpasswd  
+
+The .htaccess files need absolute paths anyway so it is no biggie
+if the files be outside of the whole Apache dir structure.
+I've never tried to break them before but I've been using .htaccess auth
+methods for 2~3 years and some of the points I've noted are:
+
+- Any auth method other than "Basic" will give you firewall headaches 
+(eg 'Digest' or 'MD5')
+
+- MS Browser suck because they can save the passwords that are used for
+later (when someone else might be on the machine)
+
+- As mentioned earlier, they only request auth once per realm, per browser
+session (ie: must close browser to forget)
+
+*GOOD THING
+- You can alternatively create your .htpasswd file as a DBM file (eg: "users")
+and utilise the .htaccess tag "DBMAuthFile" instead of "AuthFile".
+This will require two things
+1) DBM support compiled into the httpd daemon (check your Apache
+"Configure" script)
+2) Using the "dbmmanage" script (instead of "htpasswd") to create and change
+the "users" dbm file.
+The main advantage of this method is that it is somewhat harder for some user
+to utilise the dbmmanage script, (particularly if you perm it to root
+and/or hide
+it in a root-only path), than it is for them to hack the .htpasswd or .htgroup
+files with any old ASCII util/editor. There are other advantage is combining 
+this with some management CGIs that can add/remove accounts from the users
+file 
+(via Perl's DBM access functions) saves on clunky commandline htpasswd inputs.
+
+Caveats:
+I have yet had no joy whatsoever with getting this DBMAuthFile support to
+work under Linux (I did have once upon a time on someone else's Solaris box,
+so I do know it works). I just can't get Apache to use the same DBM libs as
+Perl and "dbmmanage" are using. However, if I was able to set this task
+as a priority project, I would be pretty confident of getting it going.
+I am also running entirely Slackware systems here too, so that might
+have been dogging me a bit in the libs dept.
+
+Hope all this helps,
+Regards
+-Daniel
+
+
+         Daniel Callan
+        System Engineer/
+       Senior Programmer
+
+     <A HREF="mailto:hostmaster@dataline.net.au">hostmaster@dataline.net.au</A>
+      -- DataLine.net.au --
+     <A HREF="http://dataline.net.au">http://dataline.net.au</A> 
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,115 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="wacky PC hardware - IRQs and UARTs and PPP" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="ak.linuxsa@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 11 May 2003 07:57:16 +0930" -->
+<!-- Id="20030511075716.A6205@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: wacky PC hardware - IRQs and UARTs and PPP</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 11 May 2003 07:57:16 +0930
+</PRE>
+<H1>wacky PC hardware - IRQs and UARTs and PPP</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Topic: Really wierd hardware and PPP/serial RX packet loss.
+
+While playing around with PPP over a null modem today,
+in a more or less scientific manner, like by inserting lots of trace
+commands in the kernel modules, I found something rather surprising.
+Considering that millions of people use PPP/serial worldwide,
+I'm surprised that I've not heard of this problem in my last
+6 years of linux/PC usage.
+
+My PPP/serial link loses about 1 out of 20 to 50 packets over a
+lighltly loaded link at 19200 bits/sec between two computers on the
+same desk. The cause turned out to be UART overrun - I traced it right
+down to the serial driver's flag bytes; so I'm sure of the _nature_ of
+the problem. But the cause is still a little uncertain.
+
+While searching in the Google encyclopedia, I found this little gem:
+<A HREF="http://cae.best.vwh.net/irqtune/">http://cae.best.vwh.net/irqtune/</A>
+The document is dated 1997 but happens to describe the problem I've got.
+I wouldn't have thought that such a glaring error - a rather large
+packet loss rate - would persist into 2003.
+
+This guy seems to have some software (which no doubt doesn't work in
+the modern kernel as we know it) to fix up the hardware priorities
+in software by loading up a kernel module to modify the priorities.
+It seems like the wacky PC hardware organises all those priorities
+in the /proc/interrupts file as follows:
+0, 1, 2, 8, 9, 10, 11, 12, 13, 14, 15, 3, 4, 5, 7, 8
+from highest to lowest priority.
+Now that's what I call wacky hardware. Coming from a 68k background,
+I find this a little bizarre - like most of the PC hardware, including
+the fact that all the bytes are backwards, and they've got this
+wierd way of making address registers by shifting 16-bit integers
+4 bits to the left and adding - truly wacky!
+
+But now what I'd like to know is:
+-	How come no one ever mentions this amazingly high PPP/serial
+	packet loss rate? It seems to be caused by the lateness
+	of servicing hardware interrupts, although I can't fathom this,
+	given the way bottom-half hand-offs are supposed to avoid this.
+
+-	Is there a simple fix for the problem?
+
+-	Or is it already fixed and I've really got something else.
+
+-	If this guy in 1997 knew how to arbitrarily rearrange the
+	IRQ priorities, then how come this fix isn't in the kernel already? 
+
+My RX host is always getting the overrun when opening an ohphone
+voice call, which means it's probably starting up the audio card
+kernel modules into action. My provisional explanation of the problem
+is that the sound modules are just not letting the serial
+module get a look-in for up to 10 mSec or so. This would match
+my experiments. This is despite the fact that I have audio on IRQ 7 and
+serial on IRQ 4.
+
+Cheers,
+Alan Kennington.
+
+Today's motto: There's more than one way to be free.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

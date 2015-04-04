@@ -1,0 +1,101 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="cdrom automounting" -->
+<!-- FromName="Jake Hawkes" -->
+<!-- FromEmail="jake@eclectic.com.au" -->
+<!-- ToName="LinuxSA Mailing List" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 20 May 1999 15:14:10 +0930" -->
+<!-- Id="3743A12A.EB2C7817@eclectic.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: cdrom automounting</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A></I>&gt;
+  To  : LinuxSA Mailing List &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 20 May 1999 15:14:10 +0930
+</PRE>
+<H1>cdrom automounting</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+well not quite.
+
+i dont want to mount the cdrom, but call a program to do
+.....things.....
+
+i've looked at the autofs package, and it looks good. But... it is only
+activated when a user tries to access a path. The autofs deamon receives
+the request, and then mounts the resource in question.
+
+autofs also has the ability to run a program (e.g, instead of "mount",
+like a script that pings machine to find the fastest etc.), which is
+what i want, but it still initiated by a user.
+
+I have noticed that when the cdrom tray is closed, the drive light comes
+on. I realise this may be drive-type specific, but it may indicate that
+at this point in time the drive is talking to the IDE controller, and
+therefore possibly the kernel. I have also noticed the message "hdc:
+media changed" come up, but again only during a mount or ioctl() call.
+
+What I'm wondering is what does the kernel know about cdrom drives? Does
+it know when the drive is opened and therefore closed?
+
+I've looked through the kernel source, which has been helpfull, but i
+dont know enough about how the kernel operates in repect to devices to
+know whereto start looking.
+
+I did manage to learn how to make a nifty (albeit kludgy and some will
+say ugly) bit of c-code to open the cd ...
+#include &lt;fcntl.h&gt;
+#include &lt;sys/stat.h&gt;
+#include &lt;sys/ioctl.h&gt;
+#include &lt;linux/cdrom.h&gt;
+int main(void) { /* yes!! int!! :) */
+  int cdrom;
+  if((cdrom = open("/dev/hdc", O_RDONLY))==-1)
+    perror("error opening");
+  if(ioctl(cdrom, CDROMEJECT)==-1)
+    perror("error ejecting");
+  return(0);
+}
+
+
+-- 
+
+Jake Hawkes, B. Eng (CSE)
+
+e-mail: <A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,105 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IPC for Apache module child processes (technical)" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="David Newall" -->
+<!-- ToEmail="davidn@rebel.net.au" -->
+<!-- Date="Sun, 7 May 2000 15:25:24 +091800" -->
+<!-- Id="20000507152523.A24366@dog.topology.org" -->
+<!-- Reference="Pine.BSF.4.21.0005061814200.3539-100000@augustus.tellurian.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IPC for Apache module child processes (technical)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  Date: Sun, 7 May 2000 15:25:24 +091800
+</PRE>
+<H1>Re: IPC for Apache module child processes (technical)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Yup.
+I looked at the "man 5 ipc" and the other
+stuff on semaphores.
+But it looks like all that semaphore stuff
+resides in the kernel, and every time I want to
+access the shared memory, I have to do a system call,
+which has a fair amount of overhead, I assume.
+Each time I go into critical code, I have to do
+
+===========================================
+get exclusive access (system call)
+do critical stuff
+relinquish exclusive access (system call)
+===========================================
+
+This can't be the most efficient solution surely.
+I had hoped for something like:
+
+===========================================
+try to get exclusive access (user-space code)
+if busy, wait on access (system call)
+do critical stuff
+relinquish exclusive access (user-space code)
+===========================================
+
+Form my operating systems book by Deitel
+(<A HREF="http://www.topology.org/php3/e1.php3?o">http://www.topology.org/php3/e1.php3?o</A>=35950),
+I had understood that there are Dekker's and Dijkstra's
+algorithms that can be implemented without using
+kernel mode to guarantee exclusive access.
+I must confess that I did not do a compsci degree.
+(I only attended about 5 lectures, and 4 of those were
+by a long-haired Egyptian saxaphone player. I also did
+a 2-week fortran course for mathematicians in 1972.)
+Therefore I don't feel at all confident on these
+serious comp-sci things.
+(In 1972, multitasking was still regarded as a
+modern breakthrough.)
+
+So my question now is:
+Does anyone know of a set of library calls to implement
+user-space mutual exclusion primitives?
+Or where I can find a good book on this?
+
+Cheers,
+Alan Kennington.
+
+PS. The purpose of this is still to write an Apache module to
+do some serious bandwidth balancing/throttling.
+The existing modules for this are educational but do not
+do the right job.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,257 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Static Routes RH8.0" -->
+<!-- FromName="'Steve Sloan'" -->
+<!-- FromEmail="steve@lansol.com.au" -->
+<!-- ToName="'Sean Burford'" -->
+<!-- ToEmail="sean.burford@adelaide.edu.au" -->
+<!-- Date="Wed, 15 Jan 2003 19:50:33 +1030" -->
+<!-- Id="3E2527E1.2010207@lansol.com.au" -->
+<!-- Reference="3E229DCB.40309@lansol.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Static Routes RH8.0</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Steve Sloan &lt;<I><A HREF="mailto:steve@lansol.com.au">steve@lansol.com.au</A></I>&gt;
+  To  : Sean Burford &lt;<I><A HREF="mailto:sean.burford@adelaide.edu.au">sean.burford@adelaide.edu.au</A></I>&gt;
+  Date: Wed, 15 Jan 2003 19:50:33 +1030
+</PRE>
+<H1>Re: Static Routes RH8.0</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+--------------030400070404050908070207
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
+
+Thanks Sean,
+
+After a lot of reading I did eventually get it to work.
+What I had to do was add a file call 
+/etc/sysconfig/networking/devices/eth0.route
+for routes on eth0
+
+which has the following format
+
+GATEWAY0=x.x.x.x
+NETMASK0=x.x.x.x
+ADDRESS0=x.x.x.x
+GATEWAY1=x.x.x.x
+NETMASK1=x.x.x.x
+ADDRESS1=x.x.x.x
+etc.
+
+Now when I restart the network service the static routes come up 
+automatically
+
+Still not sure why I can get it to read the old static-routes files but 
+any it's working.
+
+Steve
+
+
+
+Sean Burford wrote:
+
+&gt;Hi,
+&gt;
+&gt;On Mon, 2003-01-13 at 21:36, Steve Sloan wrote:
+&gt;  
+&gt;
+&gt;&gt;Just been trying to add some static routes to two RH8.0 boxes.
+&gt;&gt;In the past I have always added the routes to the 
+&gt;&gt;/etc/sysconfig/static-routes file and never had a problem.
+&gt;&gt;Now for some reason the network service seems to ignore everything in 
+&gt;&gt;that file.
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;Redhat 8.0 initialises static routes in the same was as Redhat 7.2. 
+&gt;I've had a quick look through the scripts and here's what I came up
+&gt;with.  Don't expect any real insights.
+&gt;
+&gt;A valid /etc/sysconfig/static-routes file looks like this:
+&gt;any net 10.0.0.0 netmask 255.0.0.0 reject
+&gt;eth0 host 10.0.0.1
+&gt;
+&gt;If you are setting a static route without a specific interface (like the
+&gt;first line above):
+&gt;- Make sure that the line begins with the lowercase word 'any'
+&gt;- Try running the command: /sbin/route add -&lt;args&gt;
+&gt;    where args is everything from the line except 'any'
+&gt;Non interface specific static routes have to begin with the word "any",
+&gt;in lower case.  They are initialised from `/etc/init.d/network start`.
+&gt;
+&gt;If you are setting a static route on a specific interface (like the
+&gt;second line above), make sure that:
+&gt;- The device (eg eth0) is not an alias (eg eth0:1)
+&gt;- Make sure that NO_ALIASROUTING is set to no in /etc/sysconfig/network
+&gt;- cp ifcfg0-eth0 to ifcfg-eth0:0, and set ONBOOT to no
+&gt;- Try running the command: /sbin/route add -&lt;args&gt; &lt;device&gt;
+&gt;    where args is everything from the line except device.
+&gt;Interface specific routes have to begin with the name of the device, eg
+&gt;"eth0".  They are initialised from
+&gt;/etc/sysconfig/network-scripts/ifup-aliases in function new_interface()
+&gt;if $NO_ALIASROUTING is not set to "yes".  ifup-aliases is only invoked
+&gt;by ifup-post if the device is not an alias (does not contain a colon
+&gt;(:)).  ifup-post is called by ifup.
+&gt;
+&gt;Send me your /etc/sysconfig/static-routes, /etc/sysconfig/network and
+&gt;/etc/sysconfig/network-scripts/ifcfg-* files if you still have problems.
+&gt;
+&gt;  
+&gt;
+
+-- 
+
+_____________________________________________
+ 
+LanSol Computers
+283 Sir Donald Bradman Drv.
+Brooklyn Park SA 5032
+Ph 618 8238 3406   Fax 618 83538479
+Mobile    0414 398166
+Email   <A HREF="mailto:steve@lansol.com.au">steve@lansol.com.au</A>
+URL  www.lansol.com.au
+ _____________________________________________
+
+
+
+--------------030400070404050908070207
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+Thanks Sean,&lt;br&gt;
+&lt;br&gt;
+After a lot of reading I did eventually get it to work.&lt;br&gt;
+What I had to do was add a file call /etc/sysconfig/networking/devices/eth0.route&lt;br&gt;
+for routes on eth0&lt;br&gt;
+&lt;br&gt;
+which has the following format&lt;br&gt;
+&lt;br&gt;
+GATEWAY0=x.x.x.x&lt;br&gt;
+NETMASK0=x.x.x.x&lt;br&gt;
+ADDRESS0=x.x.x.x&lt;br&gt;
+GATEWAY1=x.x.x.x&lt;br&gt;
+NETMASK1=x.x.x.x&lt;br&gt;
+ADDRESS1=x.x.x.x&lt;br&gt;
+etc.&lt;br&gt;
+&lt;br&gt;
+Now when I restart the network service the static routes come up automatically&lt;br&gt;
+&lt;br&gt;
+Still not sure why I can get it to read the old static-routes files but any
+it's working.&lt;br&gt;
+&lt;br&gt;
+Steve&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+Sean Burford wrote:&lt;br&gt;
+&lt;blockquote type="cite"
+ cite="<A HREF="mailto:mid1042585821.31389.98.camel@explo.its.adelaide.edu.au">mid1042585821.31389.98.camel@explo.its.adelaide.edu.au</A>"&gt;
+  &lt;pre wrap=""&gt;Hi,
+
+On Mon, 2003-01-13 at 21:36, Steve Sloan wrote:
+  &lt;/pre&gt;
+  &lt;blockquote type="cite"&gt;
+    &lt;pre wrap=""&gt;Just been trying to add some static routes to two RH8.0 boxes.
+In the past I have always added the routes to the 
+/etc/sysconfig/static-routes file and never had a problem.
+Now for some reason the network service seems to ignore everything in 
+that file.
+    &lt;/pre&gt;
+  &lt;/blockquote&gt;
+  &lt;pre wrap=""&gt;&lt;!----&gt;
+Redhat 8.0 initialises static routes in the same was as Redhat 7.2. 
+I've had a quick look through the scripts and here's what I came up
+with.  Don't expect any real insights.
+
+A valid /etc/sysconfig/static-routes file looks like this:
+any net 10.0.0.0 netmask 255.0.0.0 reject
+eth0 host 10.0.0.1
+
+If you are setting a static route without a specific interface (like the
+first line above):
+- Make sure that the line begins with the lowercase word 'any'
+- Try running the command: /sbin/route add -&lt;args&gt;
+    where args is everything from the line except 'any'
+Non interface specific static routes have to begin with the word "any",
+in lower case.  They are initialised from `/etc/init.d/network start`.
+
+If you are setting a static route on a specific interface (like the
+second line above), make sure that:
+- The device (eg eth0) is not an alias (eg eth0:1)
+- Make sure that NO_ALIASROUTING is set to no in /etc/sysconfig/network
+- cp ifcfg0-eth0 to ifcfg-eth0:0, and set ONBOOT to no
+- Try running the command: /sbin/route add -&lt;args&gt; &lt;device&gt;
+    where args is everything from the line except device.
+Interface specific routes have to begin with the name of the device, eg
+"eth0".  They are initialised from
+/etc/sysconfig/network-scripts/ifup-aliases in function new_interface()
+if $NO_ALIASROUTING is not set to "yes".  ifup-aliases is only invoked
+by ifup-post if the device is not an alias (does not contain a colon
+(:)).  ifup-post is called by ifup.
+
+Send me your /etc/sysconfig/static-routes, /etc/sysconfig/network and
+/etc/sysconfig/network-scripts/ifcfg-* files if you still have problems.
+
+  &lt;/pre&gt;
+&lt;/blockquote&gt;
+&lt;br&gt;
+&lt;pre class="moz-signature" cols="$mailwrapcol"&gt;-- 
+
+_____________________________________________
+ 
+LanSol Computers
+283 Sir Donald Bradman Drv.
+Brooklyn Park SA 5032
+Ph 618 8238 3406   Fax 618 83538479
+Mobile    0414 398166
+Email   &lt;a class="moz-txt-link-abbreviated" href="mailto:<A HREF="mailto:steve@lansol.com.au">steve@lansol.com.au</A>"&gt;<A HREF="mailto:steve@lansol.com.au">steve@lansol.com.au</A>&lt;/a&gt;
+URL  &lt;a class="moz-txt-link-abbreviated" href="<A HREF="http://www.lansol.com.au">http://www.lansol.com.au</A>"&gt;www.lansol.com.au&lt;/a&gt;
+ _____________________________________________&lt;/pre&gt;
+&lt;br&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+--------------030400070404050908070207--
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,132 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: GTK Problems" -->
+<!-- FromName="Jason Tan" -->
+<!-- FromEmail="jason@rebel.rebel.net.au" -->
+<!-- ToName="Robert Crockart" -->
+<!-- ToEmail="bobcrock@onaustralia.com.au" -->
+<!-- Date="Mon, 28 Aug 2000 13:25:19 +0930 (CST)" -->
+<!-- Id="Pine.LNX.3.95.1000828131259.15222A-100000@rebel.rebel.net.au" -->
+<!-- Reference="39A65ECA.C2370BD@onaustralia.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: GTK Problems</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jason Tan &lt;<I><A HREF="mailto:jason@rebel.rebel.net.au">jason@rebel.rebel.net.au</A></I>&gt;
+  To  : Robert Crockart &lt;<I><A HREF="mailto:bobcrock@onaustralia.com.au">bobcrock@onaustralia.com.au</A></I>&gt;
+  Date: Mon, 28 Aug 2000 13:25:19 +0930 (CST)
+</PRE>
+<H1>Re: GTK Problems</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, 25 Aug 2000, Robert Crockart wrote:
+
+&gt; Thanks Ben for the reply .
+&gt; Well the only bit I left out of the original error message was that
+&gt; glib-config was 1.2.8 but only glib-1.2.5 could be found.
+&gt; I confimed it by looking at the version as you suggest .
+&gt; Re-running  gtk+-1.2.8 /configure produces the same error as before .
+&gt; Not certain how I might set the "environment variable" to point to the
+&gt; correct copy of glib-config .
+&gt; thanks anyway
+&gt; Bob Crockart
+&gt; 
+
+To set the einviroment variable just go 
+export GLIB_CONFIG='&lt;path/to/glib-config'
+
+In the shell you will be compilign from.
+
+But I am not sure that will help you.
+
+It sounds to nme like you need to add a line that points to your home
+directory (which is a I think where you said you glib .so file was) or
+where ever the newwert glin .so file lives into
+you /etc/ld.so./conf file.
+
+Then move the old glib .so, which is probably in /usr/lib or /lib to some
+directory that is not mentioned in the /etc/ld.so.conf file.
+( or you could just uninsatll it if it was isntalled from an rpm.
+rpm -e &lt;package_name&gt;
+rpm -qa|grep glib shoudl tell you the package name to use I think
+But if you uinstall amke sure you have the original rpm if there is any
+chance you will need to restore it
+).
+
+Then run
+ldconfig -v
+
+You should get a whole lot of stuff that looks like this:
+/usr/lib:
+        libzgcj.so.0 =&gt; libzgcj.so.0.0.0
+        libgcjgc.so.0 =&gt; libgcjgc.so.0.0.0
+        libgcj.so.0 =&gt; libgcj.so.0.0.0
+        libgtkmm-1.0.so.6 =&gt; libgtkmm-1.0.so.6.0.0
+        libgnomemm.so.6 =&gt; libgnomemm.so.6.0.0
+        libgdkmm-1.0.so.0 =&gt; libgdkmm-1.0.so.0.1.0
+        libquicktime.so.0 =&gt; libquicktime.so.0.6.0
+        libz.so.1 =&gt; libz.so.1.1.3
+        libsnmp.so.0 =&gt; libsnmp.so.0.3.6.1
+        libtk8.0.so =&gt; libtk8.0.so
+        libtixsam4.1.8.0.so =&gt; libtixsam4.1.8.0.so
+        libtix4.1.8.0.so =&gt; libtix4.1.8.0.so
+
+What this will do is tke your old versionof the glib .so fiel out of the
+library path and add your new version.
+
+In short the  /etc/ld.so.conf file tells the system where to look for
+shared libraries and the ldconfig command forces the system to re-read
+its config file then creates the necessary lnks and does some other
+stuff I dont know about ot let the sytem knwo about any changes.
+
+The -v just makes it verbose, which lets you see what libraries are being
+used and whhere they live - it also lets you kow that somethgn is actually
+happening.
+
+I think all of the above should help, form what i have seen in your and 
+ Ben's emails.
+
+Hope this helps.
+
+I am a bit curious though as to why you are installing the glib stuff in
+your home dir instaead of in the ususal places (eg /lib /usr/lib).
+
+It seems to me liek you problem is all to do with the fact that the .so is
+nto isntalled int eh right place and ld.so.conf has not been configured to
+know about where it is installed.
+
+Regards
+jason
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

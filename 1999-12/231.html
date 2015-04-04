@@ -1,0 +1,146 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Mail Filtering" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Adam Hawes" -->
+<!-- ToEmail="adam@overfiend.ace.net.au" -->
+<!-- Date="Sun, 12 Dec 1999 16:33:33 +1030" -->
+<!-- Id="19991212163333.C30468@atdot.dotat.org" -->
+<!-- Reference="385482E9.1E9A23ED@overfiend.ace.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Mail Filtering</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Adam Hawes &lt;<I><A HREF="mailto:adam@overfiend.ace.net.au">adam@overfiend.ace.net.au</A></I>&gt;
+  Date: Sun, 12 Dec 1999 16:33:33 +1030
+</PRE>
+<H1>Re: Mail Filtering</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Dec 13, 1999 at 03:53:53PM +1030, Adam Hawes wrote:
+
+ &gt; When I download the mail, the mail system decides (based on the
+ &gt; To: field in the email) where to route the mail locally.  The
+ &gt; problem with this is that any mail to a list address (such as
+ &gt; LinuxSA) or any BCC'd mail does not have a valid To: field that
+ &gt; maps to a user on my system.
+ 
+Generally speaking, this is a truly horrible way of doing mail.  There's
+essentially no way of getting mail delivery right if you're using 
+info in the headers to work out how to deliver it.
+
+Consider what happens when you send mail through Australia Post.  The
+letters you send usually have two destination addresses on them:  One
+of them is at the top of the letter itself, where it's traditional to
+write the name and address of the recipient;  the other one is on the 
+front of the envelope.  There's no actual requirement that these addresses
+bear any relationship to each other whatsoever:  The only address 
+Australia Post uses when it's working out how to deliver the message is
+the envelope address.
+
+Internet email is the same:  The addresses you see in the mail headers
+are there for your information only... They need not bear any relationship
+at all to the addresses which are used for the actual delivery of the 
+mail.  Bcc: lists and mailing lists are two mechanisms which cause the
+headers to "lie" about the mail's destination, but there are other reasons
+for it as well ("masquerading" firewalls, anonymous remailers, etc).
+
+SMTP and ESMTP (the protocols used for delivering mail to an Internet
+user) both have a method for specifying an "envelope address".  Also,
+the protocols don't actually recognise headers at all;  when they send
+mail, they transmit a sender envelope address, a recipient envelope
+address, then a block of data which one *assumes* is a set of headers
+followed by message text, but there's no strict requirement that that
+assumption is an accurate one (just like Australia Post never assumes
+that the letters contained within envelopes begin with the sender's
+address, the recipient's address, and "Dear Sir/Madam").
+
+When you channel all mail for a certain domain into a single mailbox
+and then attempt to use the info in that mailbox to funnel the mail
+to its end recipients, you lose the envelope information.  That's a
+pity, because the envelope information is the only reliable method in
+existance for determining who the mail should really be delivered to!
+
+ &gt; I have asked this question before, but did not receive the
+ &gt; answer that I was looking for.  Is thers any way of configuring
+ &gt; the mail system to use the envelope headers to deduce where the
+ &gt; mail was originally intended to end up, rather than simply
+ &gt; looking at the to field?
+
+Yup -- Ask your ISP about SMTP delivery:  You should be able to obtain
+a service whereby the ISP queues the mail for you until you dial-in,
+then attempts SMTP delivery.  SMTP preserves the envelope addresses
+(it absolutely depends on them!), so you'll end up with reliable mail
+delivery.
+
+If you can't get that, try another ISP.  Fiddling around with software
+on your own system to "solve" this problem will not work -- there will
+always be failures.
+ 
+Your situation is slightly better than some, actually:  At work we
+have a couple of customers who have misconfigured MDaemon, such that
+unrecognised destination addresses (like the ones you're complaining
+about) get treated as mail which is supposed to be delivered externally,
+so they punt it back up to our mail server.  Consider the problems you're
+likely to get if, say, someone at those companies subscribes to a mailing
+list without modifying the configuration of their mail software:  Mail
+comes in saying "To: <A HREF="mailto:mailinglist@mailserver.somewhere.com">mailinglist@mailserver.somewhere.com</A>", their 
+MDaemon says, "Hmm - That doesn't look like <A HREF="mailto:someuser@companyname.com.au">someuser@companyname.com.au</A>,
+it must be one of our users trying to send outbound mail, so I'll 
+send it upstream...", and, as a result, "<A HREF="mailto:mailinglist@mailserver.somewhere.c">mailinglist@mailserver.somewhere.c</A>om"
+ends up recieving a copy of the message... which will then be redistributed
+to all the mailing list recipients, which will cause the cycle to 
+begin anew.  Any Internode customers on this list who wonder why they
+sometimes receive multiple copies of our user bulletins now know the
+answer (but we think we've fixed it for good now :-)
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-----BEGIN PGP SIGNATURE-----
+Version: PGPfreeware 5.0i for non-commercial use
+MessageID: jTkHPLfCb+ust6YAJmrzPKz0GgWGOeTZ
+
+iQA/AwUBOFM6tDVY9oBk/GJ4EQJ+uACgi3TeuSIWjRGcitSWYTiVjB7ehwUAoJ+T
+NW5Ot8nWW/f3S+/kAs/1ZEyB
+=W/pp
+-----END PGP SIGNATURE-----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

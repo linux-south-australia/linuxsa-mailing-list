@@ -1,0 +1,136 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Diskless boot problem with Freebsd 4.1R (fwd)" -->
+<!-- FromName="Peter Clifford" -->
+<!-- FromEmail="pcliffor@geology.adelaide.edu.au" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 27 Sep 2000 16:59:43 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.10.10009271652470.31615-100000@tellus.geology.adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Diskless boot problem with Freebsd 4.1R (fwd)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Peter Clifford &lt;<I><A HREF="mailto:pcliffor@geology.adelaide.edu.au">pcliffor@geology.adelaide.edu.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 27 Sep 2000 16:59:43 +0930 (CST)
+</PRE>
+<H1>Diskless boot problem with Freebsd 4.1R (fwd)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Howdy All, 
+
+A friend and I are having problems with diskless booting.  I'm using
+the freebsd etherboot port.  Here's our
+/usr/local/etc/dhcpd.conf file for the ISC v2 DHCP
+server:
+
+# dhcpd.conf
+
+# option definitions common to all supported
+networks...
+option domain-name "jansen.org";
+option domain-name-servers 202.167.41.130;
+option subnet-mask 255.255.255.0;
+default-lease-time 600;
+max-lease-time 7200;
+
+subnet 192.168.0.0 netmask 255.255.255.0 {
+  range dynamic-bootp 192.168.0.10 192.168.0.20;
+  option routers 192.168.0.8;
+  option broadcast-address 192.168.0.255;
+  filename "/tftpboot/kernel.XWORKSTATION";
+  option root-path
+"192.168.0.1:/usr/diskless/rootfs/xworkstation";
+  option option-128 "192.168.0.1:/usr/diskless/swap";
+  option option-176 5;
+  option option-160 "timeout=8:default=193:";
+  option option-192 "IJ2:::/tftpboot/kernel.ij2:";
+  option option-193
+"XWORKSTATION:::/tftpboot/kernel.XWORKSTATION:"; 
+}
+
+
+my /etc/exports file has this line in it:
+
+/usr -alldirs -maproot=0:0
+edessa pico host10 host11 host12 host13
+
+The last few messages that pop up on the diskless
+systems screen are:
+
+Mounting root from NFS:
+NFS ROOT:
+192.168.0.1:/usr/diskless/rootfs/xworkstation
+NFS SWAP: 192.168.0.1:/usr/diskless/swap
+
+
+The system sits here like this.  We have tried this on
+two different diskless boxes with the same result.  We have left them for
+up to 20 minutes but nothing happens.  I'm not sure what's meant to happen
+next.  I don't know if my filesystem exported for the diskless machine is
+set up right either.
+
+Can someone help me with what is meant to happen next
+and what I'm not doing right?  I'm using 4.1R and a
+kernel for the diskless machine compiled with the
+following options:
+
+# Kernel BOOTP support  
+  options         BOOTP           # Use BOOTP to
+obtain IP address/hostname
+  options         BOOTP_NFSROOT   # NFS mount root
+filesystem using BOOTP info
+  options         BOOTP_NFSV3     # Use NFS v3 to NFS
+mount root
+  options         BOOTP_COMPAT    # Workaround for
+broken bootp daemons.
+
+I've also added the
+
+option option-132 00:00:08:00;
+
+line in my dhcpd.conf file to get more verbose output
+from the boot process.
+At the end of the booting process I get one extra
+message now.  It reads:
+
+start_init: trying /sbin/init 
+
+thanks in advance for any help
+
+Peter
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

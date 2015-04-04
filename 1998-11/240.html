@@ -1,0 +1,163 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SCSI Controllers for a Hard Drive" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Adrian Butterworth" -->
+<!-- ToEmail="adrian@econ-outlook.com.au" -->
+<!-- Date="Thu, 12 Nov 1998 08:32:58 +1030 (CST)" -->
+<!-- Id="199811112202.IAA05165@atdot.dotat.org" -->
+<!-- Reference="36499CF7.B5198E9@econ-outlook.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SCSI Controllers for a Hard Drive</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Adrian Butterworth &lt;<I><A HREF="mailto:adrian@econ-outlook.com.au">adrian@econ-outlook.com.au</A></I>&gt;
+  Date: Thu, 12 Nov 1998 08:32:58 +1030 (CST)
+</PRE>
+<H1>Re: SCSI Controllers for a Hard Drive</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Adrian Butterworth wrote:
+
+  [ advansys SCSI host adaptors ]
+ &gt; Unlike the adaptecs they boot quickly, recognise
+ &gt; every device I've put to them including drives,
+ &gt; magneto-opticals, burners and dats, have never
+ &gt; given an error (vs many errors a day on every Adaptec
+ &gt; I've used) and are cheap, you can pick them up around $130.
+ &gt; I've even managed to use one to salvage data from disks
+ &gt; the others had given up as dead.
+
+The traits you mention there sound like they have very little to 
+do with the quality of the host adaptor and lots to do with the
+quality of your cabling.
+
+It is not a SCSI controller's job to "recognise devices" any more
+than it is a LAN card's job to "recognise computers" on the network.
+That's the software's job.  Similarly, salvaging data from disks other
+controllers have given up as dead suggests that the Advansys is more
+forgiving of cabling errors than the Adaptec, and that if you'd fixed
+up your cabling the Adaptec would have "salvaged" the data as well
+(i.e.: the disks weren't really dead, they were just having trouble
+communicating).
+
+As suggested above, the best way to visualize SCSI is as a LAN:  A
+SCSI bus consists of a number of wholly independent autonomous devices
+which communicate with each other via a standardized protocol -- Your
+computer's SCSI host adaptor is but one of those devices, and just happens
+to be the one that originates most of the commands utilized by the
+protocol, but is otherwise nothing special.  Like 10Base-2 LANs, SCSI
+specifies "termination" criteria and limits on bus cable length, and
+will fail if those specifications are not met.  Like LAN cards, some
+SCSI host adaptors are more forgiving than others if those standards
+are not met, but if an adaptor fails to communicate you can hardly 
+blame the card if the cabling is bodgy.
+
+In general, follow these guidelines when setting up your SCSI bus so
+that it'll work with any host adaptor:
+
+    - Total bus length should be no more than 3m (including all the
+      cable coiled up inside your computer's case and any external
+      enclosures).  Different SCSI standards actually have different
+      cable length limits, but 3m is a fairly good rule of thumb.  Check
+      IEEE's web site for the official specs if you want more info.
+
+    - No more than two devices on the bus should be supplying terminator
+      power.  Your SCSI card is usually one of those devices;  You may
+      have to change the jumper configurations on other devices to switch
+      of terminator power to make things work.
+
+    - At least one device must supply terminator power.  Duh. :-)
+
+    - Termination must be enabled on the devices at each end of the bus,
+      and ONLY those devices.  If you don't have any external devices, that
+      means your SCSI controller is at one end of the bus, so you'll need
+      to enable your host adaptor's termination.  Conversely, if you plug-in
+      external devices, be sure to disable the host adaptor's termination.
+      Although most host adaptors have auto-termination these days, in my 
+      experience it hardly ever works.  If the devices at the ends of your
+      SCSI bus don't have in-built (switchable) termination, use external
+      terminators.
+
+    - Only use shielded external cables (usually thicker and stiffer than
+      unshielded cable).  If you have unshielded external cable, expect your
+      SCSI bus to act like an antenna and pick up RF noise from everywhere,
+      making it fail for no apparent reason ("Why does my computer only work
+      when the radio is switched off?").  Most people ignore this rule
+      because shielded cable is more expensive than unshielded, and usually
+      harder to get too.
+
+    - If you have parity enabled on one device on your bus, enable it for
+      all the others too.
+
+If you get these right, your SCSI bus should work with any host adaptor.
+If you get them wrong, it'll probably still work, but may fail randomly
+for otherwise unrelated reasons.  I've had a customer with a SCSI bus
+that worked perfectly for three years then suddenly failed -- Turned out
+that it stopped working because he put another computer on the same desk,
+and started working when we moved that computer to the other side of the
+room:  Because the cabling was marginal, electromagnetic emissions from
+the new computer were sufficient to make it stop working.  After I eliminated
+about a metre of cable from the marginal SCSI bus, he was able to put his
+new computer back on his desk where it belonged without further problems.
+I've heard of other SCSI busses which only work when the lights in the
+room are turned off (a fluro starter probably radiated too much :-) or
+when someone is standing behind the computer (EM fields from the person's
+body affecting the signals on the cable).
+
+ &gt; I'm beginning to believe, like NIC's, Operating systems
+ &gt; and even whole PC's the brandnames aren't really ahead on
+ &gt; anything but marketing, hype and price. So don't feel you
+ &gt; have to buy an adaptec any more than you have to buy NT.
+ &gt; There are good alternatives like advansys.
+
+Some host adaptors are *definitely* better than others.  I'm using an
+Adaptec 7880UW and it absolutely rocks - Fastest SCSI controller I've
+seen (and unfortunately hard to get these days, 'cos Adaptec superceded
+them with an inferior model).  The Adaptec 7890s are fantastic too.
+
+As a rule, however, Adaptec controllers are more anal about cabling.
+You should have no trouble if you follow the rules of thumb I've presented
+above.
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1958-3414 ------------- Fax: +61-8-83034403 -----
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

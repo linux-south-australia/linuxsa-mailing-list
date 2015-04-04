@@ -1,0 +1,122 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="[long] Linkers, binutils and different versions of libraries" -->
+<!-- FromName="'Matthew Geddes'" -->
+<!-- FromEmail="mgeddes@tellurian.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="07 Aug 2003 11:34:28 +0930" -->
+<!-- Id="1060221868.4297.178.camel@hilarious" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: [long] Linkers, binutils and different versions of libraries</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 07 Aug 2003 11:34:28 +0930
+</PRE>
+<H1>[long] Linkers, binutils and different versions of libraries</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+How does ld decide which library to hardcode the path to when linking an
+ELF executable? I have two complete sets of libraries built and
+installed on my box:
+
+  - The standard RedHat 8.0 or Slackware 9.0 libs (depending on the box
+I'm using at the time), including glibc, libao, libogg and libvorbis.
+
+  - A complete set of libao, libogg and libvorbis, which I'm attempting
+to link against uClibc (ie, not glibc). These libs are stored in a file
+system hierarchy under /tmp somewhere, so that they don't overwrite the
+libs that my nasty music is currently using to offend the others in my
+office.
+
+Building and linking libao and libogg are easy - they only require stuff
+provided by the standard c library, so the uclibc-gcc wrapper links them
+against the correct libraries.
+
+When trying to build libvorbis (and subsequently vorbis-tools), it links
+against part of glibc (as well as parts of uclibc).
+
+To get stuff to link against uClibc, I do the following:
+
+  PATH=/usr/i386-linux-uclibc/bin:/usr/i386-linux-uclibc/usr/bin:$PATH
+  ./configure
+  make all install
+
+Or similar.
+
+To link against uclibc and a bunch of other libraries, I need to tell ld
+where to find those libraries. Now, because ld has a nasty habit of
+putting absolute path names in ELF executables, I can't just
+-L/tmp/somewhere_where_the_libraries_live/lib, so I do something like:
+
+  find /tmp/... -name '*.so*' -exec ln -s '{}' . \;
+  find /tmp/... -name '*.h*' -exec ln -s '{}' . \;
+  PATH=/usr/i386-linux-uclibc/bin:/usr/i386-linux-uclibc/usr/bin:$PATH
+  LDFLAGS="-L. -nostdlib"
+  CPPFLAGS="-I. -nostdinc"
+  LD_LIBRARY_PATH="."   # ./configure tries to execute a few test progs
+  ./configure
+  make all install
+
+Or similar. Incidentally, with -L., ld appears to *not* put a path name
+in front of the library name in the ELF executable, thus relying on
+/etc/ld.so.cache.
+
+Despite the LDFLAGS env var, a 'strings -' of the built file (in this
+case, say ogg123), libm.so.6 and therefore libc.so.6 have been linked to
+the binary.
+
+My question is, how can I force ld to either:
+
+ * not use any libs other than those listed by the -L option on the
+command line or
+ * ignore library versions (ie, put libc.so in the ELF binary instead of
+libc.so.6), if possbile / wise.
+ * use a specific version of a library
+
+I haven't had much to do with the GNU linker and binutils in the past
+('cause they just work :-)) and the man/info pages didn't appear to have
+anything that was related.
+
+thx,
+Matt
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,173 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Problems mounting drive as slave" -->
+<!-- FromName="'Andrew Lord'" -->
+<!-- FromEmail="andrewlord@internode.on.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 14 Jun 2002 01:36:50 +1030" -->
+<!-- Id="B92EF931.7D%andrewlord@internode.on.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Problems mounting drive as slave</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Lord &lt;<I><A HREF="mailto:andrewlord@internode.on.net">andrewlord@internode.on.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 14 Jun 2002 01:36:50 +1030
+</PRE>
+<H1>Problems mounting drive as slave</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hello all,
+
+I'd be most grateful for some help on the following problem.
+
+Just wondering if somebody can advise me about how to mount the partitions
+of a slave drive on my operational linux system.  ie what specific changes,
+need to be made to which particular files (MTAB & FSTAB are shown below)?
+
+&lt;BACKGROUND&gt;
+
+Drive A (Master) 0.8 GB has LILO boot-loader and WindoZe.
+Drive B (Slave in a Master-slave pairing), 30 GB hosts linux Mandrake 8.2.
+Drive B has both Linux-Native and FAT32 partitions.
+
+Problem:
+
+I can now no longer boot into Linux (on Drive B) nor re-install Linux on
+drive B (drive just cycles at either attempt).  However, I can boot into
+WinDoze on Drive A, and still see the FAT 32 partitions on drive B.  Linux
+partitions are invisible under Windoze but I need to rescue my linux data
+from the linux partitions (/, /home, /backup).  So I thought that if I could
+somehow boot into linux on another drive and mount the linux partitions on
+the Drive B from Drive A, then I'd be able to transfer my linux data to the
+good drive.  
+
+
+Attempt:
+
+I have now purchased another hard drive and have installed this in place of
+Drive A (Master-only with slave disconnected and jumper-pins repositioned).
+
+Install of Mandrake on Drive A  went according to expectations.  Disk
+partitioning is 
+/
+swap
+/home
+/backup
+/Fat32 partition
+/BeOS partition
+
+Drive B partitioning is
+
+ext2
+linux-swap
+ext2
+ext2
+ext2
+FAT32
+FAT32
+FAT32
+FAT32
+FAT32
+
+Ithen reconnected Drive B (and adjusted jumper-pins) to make it slave and
+Drive A'd jumper pins to make it Master-with-slave) and booted up.
+
+&lt;/BACKGROUND&gt;
+
+Because Drive B has been connected after the installation of Linux on Drive
+A as a Master-only setup, none of the partitions present on drive B have
+been mounted.  
+
+So which files need to be changed and what are the specific changes that
+need to be made ?
+
+I am guessing that two files which require changes are "mtab" and "ftab"
+(are there more ?).  Then content of mine is:
+
+/etc/mtab
+
+/dev/hda1 / ext2 rw 0 0
+none /proc proc rw 0 0
+none /dev devfs rw 0 0
+/dev/hda7 /backup ext2 rw 0 0
+none /dev/pts devpts rw,mode=0620 0 0
+none /dev/shm tmpfs rw 0 0
+/dev/hda6 /home ext2 rw 0 0
+/mnt/cdrom /mnt/cdrom supermount
+ro,dev=/dev/hdc,fs=iso9660,--,iocharset=iso8859-1 0 0
+/mnt/cdrom2 /mnt/cdrom2 supermount
+ro,dev=/dev/scd0,fs=iso9660,--,iocharset=iso8859-1 0 0
+/mnt/floppy /mnt/floppy supermount
+rw,sync,dev=/dev/fd0,fs=vfat,--,iocharset=iso8859-1,umask=0,codepage=850 0 0
+/dev/hda8 /mnt/windows vfat rw,iocharset=iso8859-1,umask=0,codepage=850 0 0
+none /proc/bus/usb usbdevfs rw,devmode=0664,devgid=43 0 0
+
+/etc/fstab
+
+/dev/hda1 / ext2 defaults 1 1
+/dev/hda7 /backup ext2 defaults 1 2
+none /dev/pts devpts mode=0620 0 0
+none /dev/shm tmpfs defaults 0 0
+/dev/hda6 /home ext2 defaults 1 2
+/mnt/cdrom /mnt/cdrom supermount
+dev=/dev/hdc,fs=iso9660,ro,--,iocharset=iso8859-1 0 0
+/mnt/cdrom2 /mnt/cdrom2 supermount
+dev=/dev/scd0,fs=iso9660,ro,--,iocharset=iso8859-1 0 0
+/mnt/floppy /mnt/floppy supermount
+dev=/dev/fd0,fs=vfat,--,iocharset=iso8859-1,umask=0,sync,codepage=850 0 0
+/dev/hda8 /mnt/windows vfat iocharset=iso8859-1,umask=0,codepage=850 0 0
+none /proc proc defaults 0 0
+/dev/hda5 swap swap defaults 0 0
+
+
+TIA
+
+Andrew Lord
+
+
+PS.  I have also attempted to install Linux on Drive A, with Drive B in
+place (ie Master-slave configuration).  As usual I got to the partitioning
+stage of Mandrake 8.2 install, and was able to designate and name all
+partitions on both drive A & drive B.  Then after partitioning, drive B did
+its usual cycling thing [(ch ch, ch, ch ...pause.....) x 10] even though I
+designated the 'offending' partition as "empty". The install then crashed
+out as it has done previously.
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

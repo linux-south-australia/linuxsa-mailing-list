@@ -1,0 +1,172 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: CVS, SSH, secure, chroot etc" -->
+<!-- FromName="'jonathan soong'" -->
+<!-- FromEmail="jon.soong@imvs.sa.gov.au" -->
+<!-- ToName="'Andrew Reid'" -->
+<!-- ToEmail="andrew.reid@plug.cx" -->
+<!-- Date="Fri, 23 May 2003 12:21:12 +0930" -->
+<!-- Id="3ECD8CA0.90405@imvs.sa.gov.au" -->
+<!-- Reference="1053688727.22072.7.camel@keetoo.alfred.cx" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: CVS, SSH, secure, chroot etc</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: jonathan soong &lt;<I><A HREF="mailto:jon.soong@imvs.sa.gov.au">jon.soong@imvs.sa.gov.au</A></I>&gt;
+  To  : Andrew Reid &lt;<I><A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A></I>&gt;
+  Date: Fri, 23 May 2003 12:21:12 +0930
+</PRE>
+<H1>Re: CVS, SSH, secure, chroot etc</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+thanks for the suggestion Andrew, i did have a look there.
+
+In the end i've done it another way.
+
+SECURE CVS without multiple unix accounts
+
+1. make user 'cvsd'  who has r/w access to the CVS repository
+2. set 'cvsd's shell to /bin/bash (or some proper shell) in /etc/passwd
+3. set 'cvsd's password to * in /etc/shadow
+4. have all developers who are using the CVS generate an ssh key 
+('ssh-keygen -t dsa') and send you the public key
+5. put an entry in 'cvsd's /home/cvsd/.ssh/authorized_keys2 file that 
+looks like:
+    command="/usr/bin/sleep 3h" ssh-dss ASDFASDFAKdjkjidf8+... == 
+<A HREF="mailto:jon@here.com">jon@here.com</A>
+    // this forces the 'command' to be executed as soon as the person 
+logs in
+
+Now only those developers who have sent you keys will be able to login 
+(passwordless) to the CVS machine and will be automatically be dumped to 
+sleep for 3 hours - this will keep the ssh port forward open.
+
+Now i can securely use CVS's pserver user management, without multiple 
+unix users.
+
+Anyone have any thoughts on the security implications of forcing the 
+users to execute 'sleep 3h'
+e.g. can this be broken by sending weird signals?
+
+Cheers,
+
+Jon
+
+
+Andrew Reid wrote:
+
+&gt;On Thu, 2003-05-22 at 12:54, jonathan soong wrote:
+&gt;
+&gt;  
+&gt;
+&gt;&gt; &gt;&gt;The Problem:
+&gt;&gt;CVS on a public server, that we want external developers to be able to 
+&gt;&gt;access - securely.
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;You know about SourceForge, right? They run one of the biggest public
+&gt;CVS servers going around, and they give secure access to developers
+&gt;through SSH.
+&gt;
+&gt;  
+&gt;
+&gt;&gt; &gt;&gt;Conditions:
+&gt;&gt;_Cannot_ have multiple shell accounts on the machine.
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;Is this a security thing? You can tie the account down such that it can
+&gt;only execute CVS and SSH.
+&gt;
+&gt;  
+&gt;
+&gt;&gt;Must have read/write access on the machine
+&gt;&gt;
+&gt;&gt; &gt;&gt;Current Thinking:
+&gt;&gt;1. Chroot CVS. - (done)
+&gt;&gt;2. Use pserver, but somehow secure it - (working on..)
+&gt;&gt;    I have setup pserver, and will use pserver's user management to 
+&gt;&gt;avoid lots of shell accounts.
+&gt;&gt;    I want to use an ssh tunnel to protect pserver's passwords.
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;But there's the thing -- you'll need local accounts (or something PAM
+&gt;compatible) for users to be able to SSH in.
+&gt;
+&gt;I'd be having a look at the way SourceForge have done it and seeing if
+&gt;you can apply similar principles to your setup.
+&gt;
+&gt;  
+&gt;
+&gt;&gt;    Hence, i want users to be able to create an ssh tunnel into my 
+&gt;&gt;machine with a public password.
+&gt;&gt;    (i.e. a generic account, which can't do anything - once on the 
+&gt;&gt;machine, i want the users to be
+&gt;&gt;    forced to login via pserver's authentication and be restricted to 
+&gt;&gt;cvs commands).
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;See, this is where I don't see why you'd bother. All this achieves is
+&gt;secure transmission of the CVS data. Why not just take the extra step
+&gt;and use SSH alone for doing CVS? It's not that hard to setup -- I'd
+&gt;argue that it's easier to setup than pserver.
+&gt;
+&gt;You're already going to be going to some lengths to secure the account
+&gt;and limit it to SSH/CVS. It'd be just as easy (if not easier) to
+&gt;continue along that line.
+&gt;
+&gt;[ ... ]
+&gt;
+&gt;  
+&gt;
+&gt;&gt;    Anyone have any  thoughts about this? Am i missing something glaring 
+&gt;&gt;obvious.
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;I feel you're making the situation harder than it needs to be. Have a
+&gt;look at the way SourceForge provide developer access and see if that's
+&gt;got any merit for your situation.
+&gt;
+&gt;   - andrew
+&gt;
+&gt;  
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,199 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Cisco vs Linux" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'linuxsa'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 11 Jul 2001 11:59:47 +0930" -->
+<!-- Id="3B4BBA1B.D001759@aarnet.edu.au" -->
+<!-- Reference="HKEMJGGDNENEDGGDCJBBAEENCJAA.richardrussell@internode.on.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Cisco vs Linux</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : linuxsa &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 11 Jul 2001 11:59:47 +0930
+</PRE>
+<H1>Re: Cisco vs Linux</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+John Edwards wrote:
+&gt; &gt;
+&gt; 1) uptime (I assume cisco are better here, but that's mainly due to the
+&gt; nature of PC hardware)
+
+They are roughly similar for the same engineering.  A PC
+with a flash memory disk will have about the same uptime
+as a 2500.  The Cisco 7200 router uses PCMCIA disk and
+you need to run mirroring if the contents of the disk matter
+to you.
+
+The Cisco image is statically-linked, so it will keep running
+if the filesystems underneath come and go.  Linux spits the
+dummy badly if root or swap go AWOL.
+
+&gt; 2) support
+
+Depends.  You can't change the Cisco code yourself, so
+if the bug doesn't matter to Cisco you can be waiting
+a long time.
+
+Having said that, Cisco's support is the best in the
+industry and puts other large suppliers to shame.
+Some smaller suppliers have better support (eg Juniper,
+Barr Systems) but this is most probably a benefit
+from their smaller size.
+
+&gt; 3) speed (which wouldn't be an issue in this case)
+
+Speeds are roughly the same for the same hardware.
+
+The trick to watch here is the use of static RAM for
+packet buffering on some Cisco routers.  This makes
+them significantly faster than a PC with a much
+higher clocked CPU.  If it matters to you, you can get
+static RAM for PCs that can be accessed down the
+AGP bus -- Linux supports this as part of the NUMA
+memory support.
+
+The 7500 series can have cards that run routing
+code on the card.  These communiticate down a PCI bus,
+so performance is roughly equivalent to using
+network interface cards that contain network processors.
+Support is an issue here, as the network processor
+code is new and generally written by hardware suppliers
+like Intel.
+
+The Cisco GSR uses a cross-bar switch rather than a
+bus.  There is no equivalent PC technology.
+
+&gt; 4) security perhaps (I have seen more Linux compromises
+&gt; than Cisco, but that could be because I spend more time
+&gt; with Linux)
+
+About the same.  Both are written in C and both are
+plagued by buffer overruns.  Being statically-linked
+the Cisco code is more difficult to wrap.
+
+&gt; Availability of more obscure interfaces, like high-speed serial and E1.
+
+Synchronous serial interfaces such as E1 are well supported
+by Linux.  Channelised E1 isn't, a hardware availability
+issue.
+
+Some interfaces you might think of as obscure, such
+as 1.2Gbps Packet over SONET/SDH actually have excellent
+Linux support.
+
+The obscure interfaces argument runs both ways.  Generally
+the Cisco routers support more long-haul obscure interfaces
+and Linux support more short-haul obscure interfaces.
+
+WHat Cisco does have all over Linux is excellent
+obscure software features.  You don't know how much
+you need these until you do.  The Linux solution is
+usually to patch the kernel and recompile.  This
+makes kernel upgrades a nightmare.  My PC runs
+
+  linux
+  MPLS patches
+  VLAN patches
+  IP/USB patches
+  NetFlow patches
+  WCCP patches
+
+Arrgh!
+
+&gt; Consistent interface across versions and platforms.
+
+Linux is consistent.  The Cisco advantage is really having
+all of the configuration in one file.  It *is* a big advantage,
+as you can see by Juniper using FreeBSD but altering the
+user interface to present the router config as a single file.
+
+&gt; Packet switching software (faster, packets don't need to be checked
+&gt; against the routing table).
+
+All forwarded packets need to be checked against a forwarding
+table.  Except in the GSR and some combined switch/routers
+Cisco has no specialised hardware to do a forwarding table
+lookup.
+
+Only in the Cisco 7500 with VIP2 or VIP4 interface cards
+running Distributed Cisco Express Forwarding is the forwarding
+decision made by the interface CPU rather than the main CPU.
+dCEF isn't exactly stable code yet.
+
+&gt; Traffic accounting, ie: netflow. (I think Netramet does something
+&gt; similar on linux, but havn't tried it)
+
+Linux uses BSD traffic accounting.  This isn't as good as NetFlow.
+NetFlow also does some nifty routing table lookups to grab the
+Autonomous System number.  This can save a lot of post-processing.
+NetFlow will also do some pre-defined aggregations which are fine
+for ISPs but no pre-defined aggregation matches customer bill
+reconciliation requirements.  NetFlow will also sample traffic,
+but the statistical model for this is broken in the current
+implementation.
+
+Cisco are reworking NetFlow into a more generic format, so a
+lack of support by Linux at the moment isn't a great loss
+
+&gt; WCCP - a cheap way (relative to layer 4 switches) to do transparent
+&gt; proxying with a failover mechanism.
+
+Linux with Squid does WCCPv1, v2 with patches, v3 not yet.  WCCP v2
+is the most widely deployed version.
+
+Really, it's horses for courses.  For exmaple, the PNG
+academic network is planning to run a Cisco 7500-series
+router at the core and Linux PCs at the other ends of
+those links.  The links are synchronous PPP.
+
+Footnote: you can run Linux on a c2500 is you want to be
+at the cutting edge.  Looks good for cheap, high-uptime
+DHCP servers in campus networks.
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

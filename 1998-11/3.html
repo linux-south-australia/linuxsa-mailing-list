@@ -1,0 +1,112 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: larger drive needed" -->
+<!-- FromName="Mark Pulford" -->
+<!-- FromEmail="mark@kyne.com.au" -->
+<!-- ToName="LinuxSA mailing list" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 1 Nov 1998 13:45:50 +1030 (CST)" -->
+<!-- Id="Pine.LNX.3.96.981101130534.4407A-100000@hamster.kyne.com.au" -->
+<!-- Reference="199810311416.AAA21862@Elizabeth.netcraft.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: larger drive needed</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Pulford &lt;<I><A HREF="mailto:mark@kyne.com.au">mark@kyne.com.au</A></I>&gt;
+  To  : LinuxSA mailing list &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 1 Nov 1998 13:45:50 +1030 (CST)
+</PRE>
+<H1>Re: larger drive needed</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, 1 Nov 1998, Tony White wrote:
+
+&gt;   I have jsut checked (df) the drive and I have less that 4% left.
+&gt; Is there any way of upgrading the drive WITHOUT a full reinstall
+&gt; on Linux?
+
+Instead of trying to copy everything over to another drive you could try
+resizing the reserve space. "tune2fs" will do this. The reserve space
+defaults to about 5% of the drive when the partition is formatted to
+ext2. The space is reserved so that only a specific user as well as users
+belonging to a certain group can take advantage of it. Normally it is set
+to root/root. You can change this setting with tune2fs as well. This
+reserve space doesn't show up with "df". The main use for reserve space
+is ensuring that root (and daemons) still have space to write to if some
+user chews up all the disk space (although many ppl would recommend
+separate partition for /home, /tmp, etc...). For home users this isn't as
+critical.
+
+Unmount the partition. If it is your root partition you can mount it read
+only instead. If you boot into emergency or single mode through lilo it
+will probably be much easier to do this. It is very important that you
+don't make any changes to a mounted partition with "tune2fs". 
+
+"tune2fs -l /dev/hda4" will list the current settings for the partition
+hda4.
+
+Use "tune2fs -r 5000 /dev/hda4" to resize the reserve space to 5000 blocks
+(1k each).
+
+If you can't free up enough space with tune2fs you can just add another
+disk and copy other an entire directory structure to it (/usr for
+example). Then edit /etc/fstab to reflect the changes. When you copy the
+files across make sure the ownership and permissions are kept, use "-a"
+with cp or "-p" with tar.
+
+The only information which isn't transfered through utilities like "cp" 
+and "tar" is the boot information. If your kernel image has changed it
+location on a disk you will have to rerun "lilo" to set up the boot
+loader. To set up the boot loader on a partition which isn't the root
+partition "lilo -r /mnt/newdisk" is very useful. This will get lilo to
+chroot to the specified directory (treat the directory as its root
+directory). If you have to fix lilo from a boot disk, that is the easiest
+way to do it.
+
+Another way would be to back up everything you want to keep (ignoring the
+distribution files). This isn't as hard as it sounds since almost
+everything would be under a few directories like /etc, /home, /var/named,
+/root, etc.. If you take this path be very careful you backup every
+directory which contains something useful. Most of these directories
+(/var/spool/mail for example) can be extracted (use -p with tar to keep
+perms) into their place without any hassle. For /etc you would probably
+want to merge it by hand. I have done this many times (and across
+different distributions) and it works well (for me anyway :)).
+
+Whatever you do, have some good backups just in case.
+
+Regards,
+Mark
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

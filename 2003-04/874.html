@@ -1,0 +1,124 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="ssh-agent parenting for KDE virtual terminals" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="ak.linuxsa@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 30 Apr 2003 05:07:25 +0930" -->
+<!-- Id="20030430050725.A22551@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: ssh-agent parenting for KDE virtual terminals</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 30 Apr 2003 05:07:25 +0930
+</PRE>
+<H1>ssh-agent parenting for KDE virtual terminals</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Although I asked about this on this list some months ago, I still haven't
+figured out the answer.
+
+Question:
+How do you make an ssh-agent process the parent of all virtual terminal
+and konsole processes running under KDE.
+Obviously I want to be able to fund KDE and just enter in the
+SSH passphrase once instead of once for each terminal, which is about
+40 terminals to log in to various other machines.
+
+Here's my little bit of (frustrating) progress today.
+I modified the file 
+
+/etc/opt/kde3/share/config/kdm/Xserver
+
+on my SuSE 8.1 workstation as follows:
+
+---------------------------------
+# :0 local /usr/X11R6/bin/X vt7
+:0 local /usr/bin/ssh-agent /usr/X11R6/bin/X vt7
+---------------------------------
+
+I.e. I parented the X process to ssh-agent.
+The result is this:
+
+---------------------------------
+<A HREF="mailto:akenning@shark">akenning@shark</A>&gt; ps fax |grep ssh
+  589 ?        S      0:00 /usr/sbin/sshd
+  881 ?        S      0:00  |   \_ /usr/bin/ssh-agent /usr/X11R6/bin/X vt7 -auth /var/lib/xdm/authdir/authfiles/blahblah
+---------------------------------
+
+(The "blahblah" is some random rubbish.)
+
+So I expected to be able to type "ssh-add" in any old window in the
+session and get something sensible, but I get this:
+
+---------------------------------
+<A HREF="mailto:akenning@shark">akenning@shark</A>&gt; ssh-add
+Could not open a connection to your authentication agent.
+---------------------------------
+
+So clearly the X process is not the parent of all the xterm and konsole processes.
+In fact, I get this n "ps fax":
+
+---------------------------------
+  969 ?        S      0:00 kdeinit: Running...      
+  997 ?        S      0:01  \_ kdeinit: kwin -session blahblahblah
+  998 ?        S      0:00  |   \_ /bin/tcsh -c xterm 
+ 1042 ?        S      0:00  |   |   \_ xterm
+ 1282 pts/0    S      0:00  |   |       \_ -csh
+---------------------------------
+
+Okay, so I look at <A HREF="http://docs.kde.org/">http://docs.kde.org/</A> for kdeinit and kwin and find not much.
+Obviously I need to make ssh-agent the parent of "kwin".
+
+Does anyone just happen to know how to do this?
+I don't want to read every configuration file on the computer that starts
+with k to try to guess what makes this happen.
+I'm tired of spending hours every week chasing non-existent documentation
+with Google and "man -k" and "locate" etc. etc.
+(Actually right now, the big nuisance I've got is trying to get
+two sound cards going one two different PCs.
+None of the documentation I've read has solutions that actually work.
+But that's another story....)
+
+Thanks in advance for any assistance.
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

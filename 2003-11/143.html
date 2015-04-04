@@ -1,0 +1,147 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="xmms, gnome, and global keyboard shortcuts" -->
+<!-- FromName="'Ben Williams'" -->
+<!-- FromEmail="benw@webmedia.com.au" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 09 Nov 2003 20:58:53 +1030" -->
+<!-- Id="3FAE16E5.7060305@webmedia.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: xmms, gnome, and global keyboard shortcuts</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Ben Williams &lt;<I><A HREF="mailto:benw@webmedia.com.au">benw@webmedia.com.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 09 Nov 2003 20:58:53 +1030
+</PRE>
+<H1>xmms, gnome, and global keyboard shortcuts</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I just had a bit of a win with gnome and xmms, and in the style of James 
+Leone (hi james ;-) ) I thought I'd post my experience here.
+
+The Itch:
+---------
+On my windows machine, I have a program called FlexTouch[1]. It allows 
+you to assign arbitrary shortcuts to (somewhat) arbitrary actions (such 
+as programs - "Win+q = c:\windows\calc.exe" and winamp commands - 
+"win+space = play or pause". Using this has become such an ingrained 
+thing in me that I find myself reaching for win+space every time I want 
+to pause music on every computer I ever sit at. So of course, I wanted 
+to be able to do it on my redhat 8.0 (gnome 2.0) machine.
+
+The Scratch:
+------------
+as often is the case in linux, a solution in several parts.
+
+1. xmmsPipe[2,3].
+ From the webpage, "XMMSPipe is a plugin for XMMS that enables it to be 
+controlled by sending strings to a named pipe (FIFO). When enabled, XMMS 
+can be commanded by sending strings to $HOME/.xmms/inpipe, for example, 
+`echo play_pause &gt; ~/.xmms/inpipe`".
+
+Installation was pretty easy - I just had to download the tarball, 
+untar, make && make install. restart xmms, and it's all there. I can 
+manually do commands like that example and have xmms play or pause. 
+fantastic, good start.
+
+2. my friend vi[4].
+I created some tiny scripts called "xmms-playpause", "xmms-prev", 
+"xmms-volup" and the like under /usr/local/bin. They all contain just 2 
+lines (from the play-or-pause example):
+
+	#!/bin/bash
+	echo "play_pause" &gt; ~/.xmms/inpipe
+
+A `chmod a+x /usr/local/bin/xmms-playpause` later, and I could (as a 
+normal user) do `xmms-playpause` from the command line and have xmms 
+play or pause. Cool, getting closer.
+
+3. gconf-editor[5].
+On my redhat 8.0 system, it's under gnome menu -&gt; extras -&gt; system tools 
+-&gt; configuration editor, or `gconf-editor` from a prompt.
+
+  a. In the GUI, I navigated to /apps/metacity/keybinding_commands[6], 
+under which are a number of keys labeled command_N. I edited some of 
+these key values to run the scripts i created in step 2, simply by 
+setting the value for (say) command_1 to (say) 
+"/usr/local/bin/xmms-playpause".
+
+  b. Under /apps/metacity/global_keybindings[6] there are a number of 
+keys called "run_command_N". As you might imagine, these run the 
+command_N key values from /apps/metacity/keybinding_commands (that I 
+modified in 3a). I set the shortcuts I wanted by setting the value for 
+(say) run_command_1 to (say) "&lt;mod4&gt;Space"[7], which binds it to Win+Space.
+
+4. I celebrated the geeky achievement by win+spacing to my heart's content.
+
+
+So yeah, I made it work, and learned how to bind arbitrary global 
+shortcuts under gnome at the same time (actually, I believe it's a 
+metacity thing, but I don't think there's many people who run metacity 
+our of gnome). Yay for linux on the desktop, yay for gnome, yay for xmms :)
+
+  - Ben
+
+
+1. &lt;<A HREF="http://www.softadvance.com/flextouch/&gt">http://www.softadvance.com/flextouch/&gt</A>;. the winamp-plugin-only 
+version is at 
+&lt;<A HREF="http://classic.winamp.com/plugins/detail.jhtml?componentId">http://classic.winamp.com/plugins/detail.jhtml?componentId</A>=3611&gt;.
+
+2. &lt;<A HREF="http://rooster.stanford.edu/~ben/xmmspipe/&gt">http://rooster.stanford.edu/~ben/xmmspipe/&gt</A>;
+
+3. I looked at a couple of other xmms remote control type apps - at the 
+time I was looking though, sourceforge.net was not accessible, so that 
+excluded most of them from my evaluation. xmmsPipe did what i wanted, at 
+any rate. and pipes are cool.
+
+4. mmmmm, creamy vi goodness. I'm sure emacs would have worked too. 
+Also, if you're really stuck, pico or ed. Well, maybe not pico.
+
+5. What was that? A windows registry editor, for gnome? Good idea.
+
+6. I didn't magically know these values - a google search for "gnome 
+arbitrary keyboard shortcuts" found me a couple of mailing list 
+references that pointed me in the right direction. The rest was 
+(educated) guessing.
+
+7. I didn't magically know that "&lt;mod4&gt;" was the name for the windows 
+key either. I found this out when i was binding win+M to "hide all 
+windows and focus desktop" under gnome preferences -&gt; keyboard shortcuts.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,96 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: DNS Caching" -->
+<!-- FromName="'David Newall'" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="'Mick Collins'" -->
+<!-- ToEmail="mickwell@bigpond.com" -->
+<!-- Date="Thu, 19 Jul 2001 00:13:53 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0107182357200.10014-100000@smart-panel.tellurian.com.au" -->
+<!-- Reference="000501c10f94$651d9ae0$0201a8c0@home.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: DNS Caching</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Mick Collins &lt;<I><A HREF="mailto:mickwell@bigpond.com">mickwell@bigpond.com</A></I>&gt;
+  Date: Thu, 19 Jul 2001 00:13:53 +0930 (CST)
+</PRE>
+<H1>Re: DNS Caching</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Does anyone know what Im talking about.
+
+Do you? :-)
+
+When you want to find the IP address for a given hostname you use a DNS
+resolver.  Often these resolvers have a list of recursive nameservers
+to query.  The first recursive nameserver should be able to resolve
+any name, but if it fails, or fails to answer within a certain time,
+the resolver queries the next, and so, until it's exhausted it's list
+of nameservers.  Often nameservers have a built-in cache, which they
+use to satisfy recently obtained addresses without having to go to the
+wire again.  There's no reason why resolvers can't also have a cache,
+just as there's no reason why resolvers can't also do recursive queries,
+but for simplicity, at least on unix, the resolver does the least work,
+and leaves the most work for the nameserver.
+
+Nameservers don't have to do recursive queries, nor do they have to
+cache results.  If they do neither of these then their only use is
+to answer queries about domains they control.  I suppose a nameserver
+might have so many records to manage that it needs some sort of on-
+disk database, in which case it might also cache (in memory) commonly
+requested names.  That would be an awful lot of names.  I don't know
+of any that do that.
+
+Bind, which is probably still the most commonly used nameserver, performs
+caching, and recursive lookups, and primary or secondary zone resolution.
+That is, when you query bind it looks in its cache for the result, and
+returns it quickly, if it has it.  If it hasn't got the result in cache,
+and if it's configured for recursive queries, it does all of that and
+caches the result.  If the query happens to be for a zone for which it
+is a primary or secondary server, it returns the result from it's in-
+memory table.
+
+Djbdns, another popular unix nameserver, comes with separate caching
+servers and (what DB calls) external servers.  The caching server does
+recursive lookups, and is generally configured to only accept queries
+from the local network; and the external server is used for domains
+for which it is the primary or secondary server.  If you don't "own"
+any domains you don't run the external server; but you do always run
+the caching server.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

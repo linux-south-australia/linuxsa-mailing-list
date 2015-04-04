@@ -1,0 +1,125 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Messages file" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Linuxsa'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 17 Jan 2001 15:06:47 +1030" -->
+<!-- Id="3A65215F.1905EF3@aarnet.edu.au" -->
+<!-- Reference="FGEFIJAGPBKMLNKMFKJPEECDCDAA.martin@safcol.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Messages file</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Linuxsa &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 17 Jan 2001 15:06:47 +1030
+</PRE>
+<H1>Re: Messages file</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; this domain is delegated correctly but ns1.foo.com failed to update zone
+&gt; (as usually it happens - different SOA :) then you will get
+&gt; "non-authoritative" from ns.foo.com , ns1.foo.com and from all root servers
+&gt; (because they say truth all the time).
+
+The server is going non-authoritative due to a configuration error.
+This allows the cached result to be supplanted should the error
+be fixed and an authoritative result seen by the cache.
+
+To stop *your* servers being lame, the steps are:
+ 1) retrieve what the delegating server things your
+    Name Servers (NS) are
+     a) find your delegating name server (we have example.edu.au,
+        so we look for AU then EDU.AU)
+          dig @a.root-servers.net ns au
+            au NS NS2.BERKELEY.EDU   &lt;-- Pick any of the returned NS
+records
+          dig @ns2.berkeley.net ns edu.au
+            edu.au. NS ns.telstra.net.
+     b) List what the delegating name server things your
+       Name Serevers are
+          dig @ns.telstra.net ns example.edu.au
+            example.edu.au NS ns.example.edu.au
+            example.edu.au NS ns.aarnet.edu.au
+  2) Check that all these NS are actually configured
+      a) On the master
+           i) The NS lists all the Name Servers and
+              these exactly match those on the delegating
+              server
+           ii) The IP addresses of the NS also exactly match.
+           iii) All the other Name Servers are slaves to this
+                master
+      b) On the slaves
+           i) Check that the zone transfer is defined.
+           ii) Check that the zone transfer works.
+      c) On both
+           i) Check that the records returned are authoritative
+              If they are not, this is probably a syntax
+              error in the zone file.
+                 dig @ns.example.edu.au soa example.edu.au
+                 flags: aa
+           ii) Check that the ACL for this zone allows anyone
+               query access
+           iii) Check that the ACL for this zone allows
+                only the master and slaves to do zone transfers.
+
+To reduce the level of reported errors about problems in
+other zones, say in /etc/named.conf:
+
+options {
+        multiple-cnames yes;
+};
+logging {
+        category statistics { null; };
+        category lame-servers { null; };
+        category cname { null; };
+};
+
+Finally, if you have any sort of decent bandwidth then you
+shouldn't do DNS forwarding on the same box you use for the
+DNS master or slave.  This gives a good launching pad for
+a trivial but effective DNS-based denial of service attack.
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

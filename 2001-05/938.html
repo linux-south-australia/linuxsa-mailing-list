@@ -1,0 +1,120 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Printing through CUPS" -->
+<!-- FromName="'Matthew Geddes'" -->
+<!-- FromEmail="mgeddes@xavier.sa.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 29 May 2001 12:56:21 +0930" -->
+<!-- Id="3B1316DD.4CCFF165@xavier.sa.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Printing through CUPS</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@xavier.sa.edu.au">mgeddes@xavier.sa.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 29 May 2001 12:56:21 +0930
+</PRE>
+<H1>Printing through CUPS</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+I've been playing with CUPS a fair bit over the last week, trying to get
+it to spool print jobs for all of our networked printers. I've
+uninstalled LPRng from our RedHat 6.2 server and compiled and installed
+the source using the rpm.spec file (and then re-installed using the same
+paths using configure and make because the .spec file left a few files
+out). I can print fine from my various Linux machines, but I am having
+problems printing from the Windows machines through Samba. I have
+configured Samba to print using cups (as opposed to the likes of lpr)
+and I have set up the magic [printers] share. I can install the printer
+on the Windows machines and configure it (I am using the HP LaserJet
+5P/5MP (Postscript) driver on Windows and the HP LaserJet driver on the
+server). I can print from Windows and the CUPS logs tell me that the
+spooler received the job and that it was completed, but nothing happens
+on the printer (or the JetDirect box). I turned up debugging in CUPS and
+found nothing that looked out of the ordinary. Here's part of the
+error_log:
+
+D [29/May/2001:12:17:56 +09-30] print_job: request file type is
+application/vnd.cups-raw.
+D [29/May/2001:12:17:56 +09-30] check_quotas: requesting-user-name =
+'nobody'
+D [29/May/2001:12:17:56 +09-30] print_job: requesting-user-name =
+'nobody'
+D [29/May/2001:12:17:56 +09-30] copy_banner(0x402b1008, 12, "none")
+D [29/May/2001:12:17:56 +09-30] copy_banner(0x402b1008, 12, "none")
+I [29/May/2001:12:17:56 +09-30] Job 12 queued on 'Library' by 'nobody'.
+D [29/May/2001:12:17:56 +09-30] Job 12 hold_until = 0
+D [29/May/2001:12:17:56 +09-30] StartJob(12, 080b8538)
+D [29/May/2001:12:17:56 +09-30] StartJob() id = 12, file = 0/1
+D [29/May/2001:12:17:56 +09-30] job-sheets=none,none
+D [29/May/2001:12:17:56 +09-30] banner_page = 0
+D [29/May/2001:12:17:56 +09-30] StartJob: argv =
+"Library","12","nobody","MicrosoftWord-Document1","1","","/var/spool/cups/d00012-001"
+D [29/May/2001:12:17:56 +09-30] StartJob: envp =
+"PATH=/usr/lib/cups/filter:/bin:/usr/bin","SOFTWARE=CUPS/1.1","USER=root","CHARSET=iso-8859-1","LANG=en-us","TZ=GMT","PPD=/etc/cups/ppd/Library.ppd","CUPS_SERVERROOT=/etc/cups","RIP_MAX_CACHE=8m","TMPDIR=/var/spool/cups/tmp","CONTENT_TYPE=application/vnd.cups-raw","DEVICE_URI=socket://jet1.xavier.sa.edu.au","PRINTER=Library","CUPS_DATADIR=/usr/share/cups","CUPS_FONTPATH=/usr/share/cups/fonts","",""
+D [29/May/2001:12:17:56 +09-30] StartJob: statusfds = 5, 6
+D [29/May/2001:12:17:56 +09-30] StartJob: filterfds[1] = 7, -1
+D [29/May/2001:12:17:56 +09-30] StartJob: backend =
+"/usr/lib/cups/backend/socket"
+D [29/May/2001:12:17:56 +09-30] StartJob: filterfds[0] = -1, 8
+D [29/May/2001:12:17:56 +09-30]
+start_process("/usr/lib/cups/backend/socket", bfff794c, bfff2dfc, 7, 8,
+6)
+I [29/May/2001:12:17:56 +09-30] Started backend
+/usr/lib/cups/backend/socket (PID 32664) for job 12.
+D [29/May/2001:12:17:56 +09-30] NFO: Attempting to connect to host
+jet1.xavier.sa.edu.au on port 9100
+D [29/May/2001:12:17:56 +09-30] CloseClient() 3
+D [29/May/2001:12:17:56 +09-30] D [29/May/2001:12:17:56 +09-30]
+UpdateJob: job 12, file 0 is complete.
+D [29/May/2001:12:17:56 +09-30] CancelJob: id = 12
+D [29/May/2001:12:17:56 +09-30] StopJob: id = 12
+D [29/May/2001:12:17:56 +09-30] StopJob: printer state is 3
+
+
+I believe this chunk contains two jobs. The test page I printed from the
+web interface and the job from the Windows machine.
+
+Does anyone have any ideas as to what the problem might be?
+
+Thanks,
+Matt
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

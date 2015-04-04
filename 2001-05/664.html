@@ -1,0 +1,159 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Firewalling & cbq/sfq" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'Toby Corkindale'" -->
+<!-- ToEmail="tjcorkin@sa.pracom.com.au" -->
+<!-- Date="Fri, 18 May 2001 16:08:53 +0930" -->
+<!-- Id="20010518160853.B31976@dog.topology.org" -->
+<!-- Reference="Pine.LNX.4.21.0105181017170.24092-100000@localhost.localdomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Firewalling & cbq/sfq</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@sa.pracom.com.au">tjcorkin@sa.pracom.com.au</A></I>&gt;
+  Date: Fri, 18 May 2001 16:08:53 +0930
+</PRE>
+<H1>Re: Firewalling & cbq/sfq</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, May 18, 2001 at 10:52:38AM +0930, Toby Corkindale wrote:
+&gt; 
+&gt; I've been attempting to setup stochastic fairness queues (SFQ) as a
+&gt; sub-discipline of the class-based queueing scheduler (CBQ) to limit
+&gt; bandwidth used by internal masqueraded users (housemates) downloading thru
+&gt; an external link.
+
+Toby,
+
+I don't recall there ever having been discussion of the linux traffic control
+in the linuxSA mailing list.
+For that topic, I subscribe to <A HREF="mailto:diffserv-general@lists.sourceforge.net">diffserv-general@lists.sourceforge.net</A>,
+which is theoretically limited to diffserv questions, but which seems
+to range fairly widely over tc questions.
+
+&gt; using "iptables -t mangle -L -v" i can see that packets are not matching the
+&gt; rules I setup. Can anyone suggest what rules are appropriate to match
+&gt; packets coming in on a ppp interface, and leaving thru the eth interface,
+&gt; after being de-masqueraded..
+
+Without seeing your -L -v outputs, it's not easy to interpret what's
+going wrong. Although I am often criticised for the garrulity of my posts,
+that's better than having to eke out the details via a dialogue
+of many posts on-list. Better to post one hundred-line explanation of
+a problem than a dialogue of 5 posts elucidating the problem!
+
+&gt; The rules I have tried are using the mangle table (present in OUTPUT and
+&gt; PREROUTING):
+&gt; eg:
+&gt; -t mangle -I PREROUTING -d users_ip -i ppp0 -j MARK --set-mark 1
+&gt; 
+&gt; and
+&gt; 
+&gt; -t mangle -I OUTPUT -d users_ip -s ! gateways_internal_ip -j MARK --set-mark
+&gt; 1
+
+This is just a hunch, but are you escaping the ! character?
+It seems too obvious to mention. So no one else will mention it!
+Are you running this in a csh or sh shell script?
+
+&gt; (users ip is of form 192.168.x.x, dialup IP is something like 203.x.x.x,
+&gt; gateways_internal_ip would be 192.168.1.4 in this case..)
+
+Do you have any NAT that might change destination IP address?
+Can you run tcpdump to see whether there are packets coming out
+in the right subnet etc.?
+
+&gt; if i setup a rule on output and remove the -s ! gateways_int_ip, then it
+&gt; matches all packets to the destination, but putting that rule back in stops
+&gt; matching again..
+
+The shell special-character ! could possibly explain this.
+
+&gt; A second question, for Alan Kennington.. (I hope this hasn't already been
+&gt; discussed, i haven't checked any archives)
+&gt; Whereabouts did you get the statistics for the statement that any online
+&gt; server is potentially cracked five times every hour?
+
+My own 3 IP subnets are my primary source of evidence.
+And other people have confirmed that they get probed that often too.
+Of course, you have to set up your firewall to at least log all
+probes. Otherwise you won't see them.
+The rates change according to the time of week, time of day,
+and special events, such as 4 May for chinese hackers.
+Some people seem to be in regions of IP number space which
+don't get so many hack attempts though.
+And I think that masny people just don't have sensitive logging set-ups
+for all the probes. So they just see very little of what's
+going on out there.
+
+I'll just summarise 2001 May 4 (things got hotter in the couple days after
+May 4 actually).
+
+00:27 probe of all UDP ports 53 on locnet 1 by 202.101.165.37
+00:33 probe of all UDP ports 53 on locnet 1 by 202.159.26.162
+01:12 probe of TCP port 111 on PPP subnet by 200.206.135.67
+01:32 probe of all UDP port 53 on locnet 1 by 213.59.244.101
+01:40 ICMP probe on PPP subnet by 212.118.133.134 
+02:15 attempt to access port 25 on non-existent host by 64.4.14.168
+02:17 probe of port 515 on PPP subnet by 210.236.92.77
+02:16 two more port 25 attempts by 64.4.14.168
+02:22 attempt to access port 443 on non-exist IP host by 195.92.95.23
+Further attempts to access port 25 on non-existent host by 64.4.14.168
+    every 10 minutes or so ad nauseam.
+04:47 probe of locnet 2 port 53 by 202.99.170.34
+05:59 probe of UDP port 1680 on PPP subnet by 139.130.87.241
+06:05 probe of UDP port 31337 on PPP subnet by 145.236.193.45
+07:11 probe of TCP port 515 on subnet 1 by 24.168.102.21
+
+Plus various pings attempts to non-existent virtual hosts,
+and untracked packets which are dropped by the NAT module.
+
+Well, that's a tiny sample.
+It's tiring to write this all out.
+The above amounts to only about 2 probes per hour.
+But it's highly variable.
+So some hours it is 5 or more probes in one hour,
+and sometimes you go a whole hour without a (visible) probe.
+I would say it averages 2/hour on an average day.
+It all depends on whether the students are on holiday or not.
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

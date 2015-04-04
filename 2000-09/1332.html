@@ -1,0 +1,122 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: ZENWorks Features" -->
+<!-- FromName="Dan Shearer" -->
+<!-- FromEmail="dan@tellurian.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 28 Sep 2000 23:38:07 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0009282327460.23726-100000@calulu.shearer.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: ZENWorks Features</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Thu, 28 Sep 2000 23:38:07 +0930 (CST)
+</PRE>
+<H1>Re: ZENWorks Features</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+G'day Andrew,
+
+&gt; I was wondering if anyone knows of any product for Linux that emulates
+&gt; the features of the part of ZEN Works or GHOST dumps a fresh image of a
+&gt; particular machine onto the client PC every time it reboots.
+
+There are a few tools that help do this specific task. 
+
+However I find that usually what is required is a more comprehensive
+solution, because there's always some site-specific administrative work
+that needs to be done at each end. I do find though that having remoteboot
+in the solution helps a lot. Linux does remoteboot, both in freeware and
+payware PROMs. Many motherboards come with PXE now anyway (refer to Mark
+Newton's post of some time ago regarding PXE'd FreeBSD installations
+taking over the network :-)
+
+When I was a private consultant there was a project which did pretty much
+this (only with a lot of complicating factors) for the arrivals/departure
+screens in Amsterdam, Sydney and other airports. The brief there was to
+make an NT application work extremely reliably and be completely remotely
+administerable. No blue screens allowed because someone might have to
+climb a ladder 2000 times and press ctrl-alt-delete etc.
+
+We ended up using boot PROMs, some scripting logic before any OS was
+booted, a Linux partition and an NT partition that first checked the
+hardware for sanity, then the Linux partition for sanity and rebuilt it if
+insane, checked for updates and applied them, then booted Linux which
+checked the NT partition for sanity and rebuilt it if insane, updates (eg
+the video card had been changed so Linux installed a new NT driver) and
+then booted having initialised a hardware watchdog card in case NT
+crashed. 
+
+Would you believe, the company that helped me with the work on this
+project with me was Tellurian, and the employees are still with us. We did
+a considerable amount of work on this project that we have rights to, and
+also quite a bit of documentation.
+
+Tell us some more about the problem you have. We have been wondering about
+doing something useful with some of the generic bits of this work. Maybe
+this would be an opportunity.
+
+&gt; It would be good to see a product that might even use an rsync type of
+&gt; thinking and only update the parts of the hard disk that have changed..
+
+rsync isn't really a solution unless you have very few workstations
+because of the server-side CPU hit. If you think about it rsync is
+extremely wasteful in this special case: all the destination files are
+identical but you are calculating the same differences time and again!  
+Finally, if the source files are compressed (and often they should be
+because you are talking about 1Gb or more files, and you might have many
+of them in a big remoteboot network) you can't use rsync anyway, because
+you change one byte in the file and the compression algorithm might well
+splatter changes all over the compressed output. However, transferring Gb
+of data to every workstation isn't a solution either! There are various
+ways around this from multicast file transfer to an rsync replacement
+tuned for the case where the differences can be calculated at the server
+side in advance.
+
+Incidentally Ghost does some clever things with NT images, including
+editing the NT SID. The SID has to be unique on a network, so just imaging
+an NT machine doesn't help. I don't know of a free tool that does
+SID mangling in NT images.
+
+--
+Dan Shearer
+Open Source Manager
+<A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A>
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,182 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Routing query" -->
+<!-- FromName="Tarek Heiland" -->
+<!-- FromEmail="tarek@bakas.com.au" -->
+<!-- ToName="'Matthew Geddes'" <mgeddes@xavier.sa.edu.au>, linuxsa" -->
+<!-- ToEmail="mgeddes@xavier.sa.edu.au" -->
+<!-- Date="Wed, 28 Jun 2000 19:07:09 +0930" -->
+<!-- Id="55FC8B9A5F40D3119B460090278A30310EF200@ADELAIDENEW1" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Routing query</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Tarek Heiland &lt;<I><A HREF="mailto:tarek@bakas.com.au">tarek@bakas.com.au</A></I>&gt;
+  To  : 'Matthew Geddes'" &lt;mgeddes@xavier.sa.edu.au&gt;, linuxsa &lt;<I><A HREF="mailto:mgeddes@xavier.sa.edu.au">mgeddes@xavier.sa.edu.au</A></I>&gt;
+  Date: Wed, 28 Jun 2000 19:07:09 +0930
+</PRE>
+<H1>RE: Routing query</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Having just looked at this email and not the whole thread I would leave
+lines 5 and 6 in as they specify the netmask entry for the IP'S on eth1 and
+eth0. What happens if you are not using a standard class C. e.g.
+255.255.255.192 for example.
+
+eg for a slightly more complex example (ip's changed) which  also runs dual
+interfaces on the same eth0 NIC (10.0.0.0/24 + 203.30.88.128/26)
+
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use
+Iface
+203.30.88.250   *               255.255.255.255 UH    0      0        0 ppp4
+139.130.137.65  *               255.255.255.255 UH    0      0        0 ppp0
+203.30.88.249   *               255.255.255.255 UH    0      0        0 ppp3
+203.30.88.252   *               255.255.255.255 UH    0      0        0 ppp2
+203.30.88.253   *               255.255.255.255 UH    0      0        0 ppp5
+165.12.128.1    203.30.88.164   255.255.255.255 UGH   0      0        0 eth0
+203.30.88.129   *               255.255.255.255 UH    0      0        0 eth0
+203.30.88.65    *               255.255.255.255 UH    0      0        0 ppp1
+203.30.88.128   *               255.255.255.192 U     0      0        0 eth0
+203.30.88.0     203.30.88.65    255.255.255.192 UG    0      0        0 ppp1
+10.0.0.0        *               255.255.255.0   U     0      0        0 eth0
+127.0.0.0       *               255.0.0.0       U     0      0        0 lo
+default         139.130.137.65  0.0.0.0         UG    0      0        0 ppp0
+
+
+
+
+What version of Linux are you using. 
+
+Normaly you set default with
+
+route add default gw  203.30.236.95 dev ppp0
+
+for routing table shown.
+
+In Redhat 6.x it then shows up as default not 0.0.0.0 although this should
+theoretically still work the same.
+
+You do realise that by using the 192.168.X.X range and the 172.16-31.X.X
+ranges (Class C and Class B private subnet ranges) you will need to
+masquerade to use the web for anything, as the IP packets source address
+from any host bar the server itself will be invalid internet addresses by
+the RFC definition (private subnet allocations).
+
+IP forwarding must be enabled for this to work, and IP masquerading must be
+set.
+
+eg a crude accept everything rule (not really secure but ok for
+testing)would be
+
+/sbin/ipchains -P forward ACCEPT
+/sbin/ipchains -A forward -s 10.0.0.0/24 -j MASQ
+
+Obviously substitute your own IP range as appropriate instead of the
+10.0.0.0/24
+
+I guess I should read the thread before I assume too much.
+
+Regards
+
+Tarek
+
+
+
+
+&gt; -----Original Message-----
+&gt; From: Matthew Geddes [<A HREF="mailto:mgeddes">mailto:mgeddes</A>@xavier.sa.edu.au]
+&gt; Sent: Wednesday, 28 June 2000 1:00 PM
+&gt; To: linuxsa
+&gt; Subject: Re: Routing query
+&gt; 
+&gt; 
+&gt; Tom Dunstan wrote:
+&gt; 
+&gt; &gt; &gt; Kernel IP routing table
+&gt; &gt; &gt; Destination   Gateway      Genmask         Flags MSS 
+&gt; Window  irtt Iface
+&gt; &gt; &gt; 192.168.0.1   0.0.0.0      255.255.255.255 UH    0 0      
+&gt;     0   eth1
+&gt; &gt; &gt; 172.16.1.1    0.0.0.0      255.255.255.255 UH    0 0      
+&gt;     0   eth0
+&gt; &gt; &gt; 203.30.236.95 0.0.0.0      255.255.255.255 UH    0 0      
+&gt;     0   ppp0
+&gt; &gt; &gt; 203.30.236.95 0.0.0.0      255.255.255.255 UH    0 0      
+&gt;     0   ipsec0
+&gt; &gt; &gt; 192.168.0.0   192.168.0.1  255.255.255.0   UG    0 0      
+&gt;     0   eth1
+&gt; &gt; &gt; 172.16.1.0    172.16.1.1   255.255.255.0   UG    0 0      
+&gt;     0   eth0
+&gt; &gt; &gt; 127.0.0.0     0.0.0.0      255.0.0.0       U     0 0      
+&gt;     0   lo
+&gt; &gt; &gt; 0.0.0.0       203.30.236.95 0.0.0.0        UG    0 0      
+&gt;     0   ppp0
+&gt; &gt; &gt; eric:~ #
+&gt; &gt; &gt;
+&gt; &gt; &gt; So, what have I miffed up?
+&gt; &gt; 
+&gt; &gt; What are you trying to do, and what happens? It looks like the third
+&gt; &gt; route in the table means the fourth one will never get 
+&gt; reached, so no
+&gt; &gt; ipsec. As a general rule, I wouldn't have the gateways set for the
+&gt; &gt; general eth0 and eth1 routes (routes 5 and 6 in the table), 
+&gt; I'd leave
+&gt; &gt; those blank. Other than that, what's happening that shouldn't?
+&gt; 
+&gt; the ipsec0 interface is set up when you try to configure FreeS/WAN to
+&gt; make a tunnel over the ppp interface. The fact that they are both the
+&gt; same is normal (although, I'm not sure if normal means working ;-)).
+&gt; 
+&gt; I too agree that you shouldn't need lines 5 & 6.
+&gt; 
+&gt; Matt
+&gt; 
+&gt; -- 
+&gt; 
+&gt; Matthew Geddes
+&gt; Network Manager
+&gt; Xavier College
+&gt; Gawler, SA
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on 
+&gt; irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as 
+&gt; the subject
+&gt; 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,172 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="(Clarification) Re: Some Proposals for a Linux of The Future (tm) :)" -->
+<!-- FromName="'Damien Uern'" -->
+<!-- FromEmail="carrigan_2606@optusnet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 30 Jun 2003 23:18:13 +0930" -->
+<!-- Id="200306302318.13830.carrigan_2606@optusnet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: (Clarification) Re: Some Proposals for a Linux of The Future (tm) :)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Damien Uern &lt;<I><A HREF="mailto:carrigan_2606@optusnet.com.au">carrigan_2606@optusnet.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 30 Jun 2003 23:18:13 +0930
+</PRE>
+<H1>(Clarification) Re: Some Proposals for a Linux of The Future (tm) :)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hello,
+
+Okay I 've read a lot of discussion about this and now it's time to clear the 
+air as to what my original proposal was (as it was in my head).
+
+The most important objective is a structured and logical /etc directory with a 
+single unified configuration file format. I have decided that being able to 
+display said configuration files in a GUI is secondary and in fact I want to 
+have a separate "layout" file so as to offer the GUI more flexibility and 
+power without destroying the readability of the config file format. I think 
+having a unified config file format and logical directory structure greatly 
+simplifies writing a GUI program for configuring the system anyway, so we get 
+that added benefit for free.
+
+Simple configuration files and scripts need not be altered in this new system, 
+e.g. "hosts, hosts.allow, etc" should be able to keep their current format 
+because it is so simple (and maybe we should leave "termcap" the hell alone 
+:). A program parsing the /etc tree will ignore such special files (and any 
+other files that don't appear to be of the correct format).
+
+I don't believe having a consistent and easy to understand configuration 
+layout is "training wheels" or going to create "inferior" System 
+Administrators. I think what it could do is make an unecessarily complex and 
+illogical system easier to learn and remember. It's about making a system 
+more accessible, not "dumbing it down" or making it any less powerful.
+
+The separation of Administrator-modified configuration files and the default 
+files installed by the system makes sense to me. But having it in two totally 
+different locations doesn't, e.g. "/etc and /usr/local/etc". Forgetting about 
+Unix history for a moment and stepping outside of the box, if you were to 
+design the filestructure from scratch, where would you place these two 
+directories?
+
+I'll put my 2 cents in:
+
+/system/conf - contains all configuration data (could call it config I guess)
+/system/defaults/conf - contains default settings 
+
+But anyway, I didn't want to redesign the whole Unix filesystem (other people 
+are trying to do that). I just want some structure to the /etc tree to make 
+configuration easier :)
+
+So here are my revised goals:
+
+1. Design a logical directory structure within the /etc directory.
+   - it must be fairly simple for somebody to look through that directory to 
+find something without resorting to "locate" or "find".
+2. Design a unified configuration file format.
+  - This format must be simple enough to be easily understood by somebody 
+without them having to refer to a manual (by referring to a manual, I mean a 
+manual describing the syntax, not the configuration options presented 
+within).
+  - All configuration files will have a common extension so they can easily be 
+seen as such (e.g: .conf).
+3. Design a simple (probably xml-based) layout file that allows an application 
+to display (graphically) the configuration options for a program.
+  - The file format should be fairly easy to understand, but referring to a 
+manual in order to write one will be necessary (and possibly to read one and 
+understand it fully).
+  - It should allow some interpretation by the GUI program so that all 
+configuration dialogs look consistent. The layout file shouldn't specify 
+things like "rectangle,200,200", but should just group configuration 
+variables and specify the type of value they take (like in a programming 
+language), amongst other things (such as a "display name", visibility, etc 
+etc). 
+    - The reason for these layout files is so that packages can describe 
+enough about their configuration options to allow it to be displayed 
+graphically without the graphical application having to specifically know 
+about said software package.
+
+
+I believe something like this could be done if it is managed in stages:
+
+1) Discourage hard-coding paths to configuration files so that configuration 
+files can be placed wherever the user pleases. Application accesses these 
+files through a library "say libetc, or libconfig".
+  - Devise a fast-lookup method for finding the configuration files fast by 
+using a cache and/or a pre-defined filepath and/or some other means (similar 
+to how the linker looks up library files).
+  - At this stage applications can keep their own configuration file formats 
+and must parse the file themselves. However, the naming of these files and 
+their location can now be controlled without breaking the application.
+
+2) Devise configuration file format and create a parser and API for this 
+format for applications to use. This functionality becomes part of the 
+existing library as created in step 1.
+ - Encourage people to use the library if they can and to file feature 
+requests if they cant.
+
+3) Create layout file format and sample application that can parse the etc 
+tree and provide a GUI for config files that have an accompanying layout 
+file.
+- Enourage people to package layout files as part of their software 
+distribution so as to ease administration.
+
+4) ???
+
+5) Profit!! :)
+
+Somewhere in those stages the layout of the /etc directory and the format of 
+the configuration/layout files should be attempted to be made a standard 
+(LSB) so as to encourage people to follow it.
+
+For all those that say "the current system is fine once you know it", I say 
+how does that make the current system the best possible? How can we make 
+progress if we stay stationary? (and if you say "if it aint broke don't fix 
+it", I'm going to scream :) It *IS* broke :)
+
+Cheers,
+
+Damien
+
+--
+Computer Systems Engineer
+Postgraduate Student
+The Flinders University of South Australia
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

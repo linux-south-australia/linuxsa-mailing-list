@@ -1,0 +1,141 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: webmin and networking" -->
+<!-- FromName="Darryl Ross" -->
+<!-- FromEmail="dross@syc.asn.au" -->
+<!-- ToName="Matthew Mills" -->
+<!-- ToEmail="Matthew.Mills@santos.com.au" -->
+<!-- Date="Tue, 18 Jul 2000 10:47:58 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0007181045330.11402-100000@boss.syc.asn.au" -->
+<!-- Reference="69256920.00056016.00@sanmiguel.notes.santos.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: webmin and networking</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Darryl Ross &lt;<I><A HREF="mailto:dross@syc.asn.au">dross@syc.asn.au</A></I>&gt;
+  To  : Matthew Mills &lt;<I><A HREF="mailto:Matthew.Mills@santos.com.au">Matthew.Mills@santos.com.au</A></I>&gt;
+  Date: Tue, 18 Jul 2000 10:47:58 +0930 (CST)
+</PRE>
+<H1>Re: webmin and networking</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, 18 Jul 2000, Matthew Mills wrote:
+&gt; Hi people, I wonder if anyone can help with this problem, I have installed
+&gt; Webmin 0.80 (what a great tool!!) and it worked wonderfully by just typing
+&gt; <A HREF="http://localhost:10000">http://localhost:10000</A> into my web browser under Mandrake 7.1 (thanks
+&gt; Installfest!).  Then I decided to read the networking How-to and started setting
+&gt; up my machine for a home network.  Since then when I try to use Webmin, instead
+&gt; of asking for my password to get into webmin, it trys to find localhost or my
+&gt; machine name (ive tried the IP addresses by going to keyword.netscape.com.  The
+&gt; steps I took when setting up my home-network were:.......
+&gt; 
+&gt; 1. Edit the /etc/sysconfig/network and change
+&gt; NETWORKING=yes (was "false")
+&gt; FORWARD_IPV4=yes (was no)
+&gt; 
+&gt; 2. Edit the /etc/sysctl.conf and change
+&gt; net.ipv4.ip_forward = 1
+&gt; net.ipv4.ip_always_defrag = 1
+&gt; 
+&gt; 3. Set my Eth0 adapter to a fixed class C Ipaddress
+&gt; eg. 199.3.7.1
+&gt; 
+&gt; 4. Activated the network again
+&gt; /etc/rc.d/init.d/network restart
+&gt; 
+&gt; 5. Set up DHCP
+&gt; created /etc/dhcpd.conf
+&gt; added
+&gt; subnet 199.3.7.0 netmask 255.255.255.0 {
+&gt;       range 199.3.7.2 199.3.7.60;
+&gt;       default-lease-time 86400;
+&gt;       max-lease-time 86400;
+&gt;       option routers 199.3.7.1;
+&gt;       option ip-forwarding off;
+&gt;       option broadcast-address 199.3.7.255;
+&gt;       option subnet-mask 255.255.255.0;
+&gt;      option domain-name-servers 199.3.7.1
+&gt; }
+&gt; 
+&gt; 6. edited the /etc/rc.d/init.d/dhcpd file
+&gt; put a # in front of the line beginning with /sbin/route add
+&gt; created a new line /sbin/route add -host 255.255.255.255 dev eth0
+&gt; 
+&gt; put a # in front of the line daemon /usr/bin/dhcpd and replaced it with
+&gt; daemon /usr/sbin/dhcpd eth0
+&gt; 
+&gt; 7. Started dhcp with /etc/rc.d/init.d/dhcpd start
+&gt; 
+&gt; 8. created a  /etc/named.conf
+&gt;   added
+&gt; forwarders { my isp ns1; and ns2;  };
+&gt; allow-query { 199.3.7/24; 127.0.0.1/32; };
+&gt; 
+&gt; 9. edit the /etc/rc.d/init.d/named file
+&gt; change line daemon named to
+&gt; daemon named -u nobody -g nobody
+&gt; 
+&gt; 10. restarted the named service
+&gt; 
+&gt; 11.  added to hosts.deny
+&gt; ALL: ALL
+&gt; 
+&gt; 12. added to hosts.allow
+&gt; ALL: 127.0.0.1
+&gt; ALL: 199.3.7.
+&gt; 
+&gt; Since these steps, I havent been able to use webmin as it tries to go to the
+&gt; internet to find localhost or &lt;myhostname&gt;
+&gt; I have tried to see what the problem could be by stopping the named service and
+&gt; the dhcpd service but this didnt help.
+
+You need to put all your local IP addresses with your local h0ostname in
+the /etc/hosts file, eg:
+
+127.0.0.1	localhost.localdomain	localhost
+199.3.7.1	myhost.whereeveriam	myhost
+
+Darryl
+
+-- 
+
+Darryl Ross
+Network and Systems Administrator
+Service to Youth Council, Inc
+Website: <A HREF="http://www.syc.asn.au/">http://www.syc.asn.au/</A>
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

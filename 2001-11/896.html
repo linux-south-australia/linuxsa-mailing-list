@@ -1,0 +1,132 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="nmap RTTVAR oddness" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 29 Nov 2001 14:56:06 +1030" -->
+<!-- Id="20011129145606.A17918@yellowgoanna.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: nmap RTTVAR oddness</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 29 Nov 2001 14:56:06 +1030
+</PRE>
+<H1>nmap RTTVAR oddness</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I have a client whom I've just set up with iptables. The rules are as
+follows (basically, accept all existing and related connections, and
+new icmp, anything on the internal (eth0), and ssh and smtp on
+external (ppp0), and reject everything else). Pretty simply really:
+
+(note that the question may not have anything to do with the actual
+rules, but I include them for completeness.)
+
+
+--------
+[<A HREF="mailto:root@blah">root@blah</A> root]# iptables -L -v
+Chain INPUT (policy DROP 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination
+10637 3103K state_chk  all  --  any    any     anywhere             anywhere
+
+Chain FORWARD (policy DROP 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination
+ 1103  252K state_chk  all  --  any    any     anywhere             anywhere
+
+Chain OUTPUT (policy ACCEPT 9378 packets, 2975K bytes)
+ pkts bytes target     prot opt in     out     source               destination
+
+Chain state_chk (2 references)
+ pkts bytes target     prot opt in     out     source               destination
+ 8692 3175K ACCEPT     all  --  any    any     anywhere             anywhere           state RELATED,ESTABLISHED
+    0     0 ACCEPT     icmp --  any    any     anywhere             anywhere           state NEW
+  353 21322 ACCEPT     all  --  eth0   any     anywhere             anywhere           state NEW
+    1    48 ACCEPT     tcp  --  ppp0   any     anywhere             anywhere           state NEW tcp dpt:ssh
+    2   104 ACCEPT     tcp  --  ppp0   any     anywhere             anywhere           state NEW tcp dpt:smtp
+ 2692  158K REJECT     all  --  any    any     anywhere             anywhere           reject-with icmp-port-unreachable
+[<A HREF="mailto:root@blah">root@blah</A> root]#
+--------
+
+now when I try to nmap this machine from my server, this is what I
+get:
+
+--------
+<A HREF="mailto:me@myserver">me@myserver</A>:~$ nmap blah.domain.com
+
+Starting nmap V. 2.12 by Fyodor (<A HREF="mailto:fyodor@dhp.com">fyodor@dhp.com</A>, www.insecure.org/nmap/)
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+&lt;.... and so on, each line taking ten seconds or more&gt;
+&lt;until eventually, I get the expected outputm which is correct&gt;
+--------
+
+Sometimes, nmap works almost instantly, but usually it does this. Is
+this due to the connection being over a modem, and the link being
+flooded at the time (which I beleive it is)? or is it something else?
+
+TIA
+
+rr
+
+-- 
+Richard Russell
+Yellow Goanna Pty Ltd
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+m: +61 412 827 805
+f: +61 8 8462 2362
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

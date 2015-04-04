@@ -1,0 +1,188 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: DDD (Debugger)" -->
+<!-- FromName="'Andrew Catford'" -->
+<!-- FromEmail="acatford@trinity.sa.edu.au" -->
+<!-- ToName="'Richard Sharpe'" -->
+<!-- ToEmail="sharpe@ns.aus.com" -->
+<!-- Date="Wed, 08 Aug 2001 20:05:27 +1000 (CST)" -->
+<!-- Id="997266927.3b7115efd41bd@imp.trinity.sa.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: DDD (Debugger)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Catford &lt;<I><A HREF="mailto:acatford@trinity.sa.edu.au">acatford@trinity.sa.edu.au</A></I>&gt;
+  To  : Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  Date: Wed, 08 Aug 2001 20:05:27 +1000 (CST)
+</PRE>
+<H1>Re: DDD (Debugger)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Richard Sharpe wrote:
+&gt;Alan Kennington wrote:
+&gt;&gt; The plain old char-array overflow should be history now
+&gt;&gt; if you use C++ or the n-functions such as strncpy.
+&gt;
+&gt;Ummm, strncpy (et al) are no panacea. You can still make mistakes in the 
+&gt;limit value passed into the call, and strncpy will leave the string 
+&gt;unterminated if you pass a string that is exactly the length specified, 
+&gt;or something like that.
+
+It is also possible to exploit poorly written C++ code that has been compiled
+with the GNU C++ compiler.  MS Visual C++ generated code doesn't suffer from the
+particular problem I will describe shortly.
+
+Consider:
+
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+class crap
+{
+        private:
+                char buffer[1024];
+                                            
+        public:
+                void fill_buffer(char *string)
+                {
+                        strcpy(buffer, string); // Obviously bad.
+                }
+
+                virtual void output_buffer()
+                {
+                        printf("%s\n", buffer);
+                }
+};
+
+class foo:public crap
+{
+        public:
+                void output_buffer()
+                {
+                        printf("foo: ");
+                        crap::output_buffer();
+                }
+};
+
+class bar:public crap
+{
+        public:
+                void output_buffer()
+                {
+                        printf("bar: ");
+                        crap::output_buffer();
+                }
+};
+
+void main()
+{
+        crap *object[2];
+
+        object[0] = new foo;
+        object[1] = new bar; 
+
+        object[0]-&gt;fill_buffer("string1");
+        object[1]-&gt;fill_buffer("string2");
+        object[0]-&gt;output_buffer();
+        object[1]-&gt;output_buffer();
+}
+
+Notice the same calling primitives to output_buffer() for two different classes.
+This is the result of using virtual methods.  If the method were not declared
+virtual, the compiler would do the call resolution at compile time (known as
+static binding).  As the method is declared virtual, the compiler uses dynamic
+binding, calculating the address for the call at runtime.
+
+The compiler would reserve 1024 bytes for the definition of buffer.  Then it
+would read the declaration of the fill_buffer() method (which is not virtual)
+and directly assigns the corresponding address in the code.  At this point, the
+compiler reads the declaration of the output_buffer() method (which is virtual).
+Instead of doing static binding, the compiler does dynamic binding, and reserves
+4 bytes in the class (which will contain a pointer).
+
+Thus we would have a structure like:
+
+BBBBBBBB...[1024 of these]...BBBBVVVV
+
+B representing a byte of the buffer, and V the pointer.
+
+This pointer is called the virtual pointer, VPTR.  This pointer points to an
+entry in an array of function pointers.  These in turn point to methods,
+relative to the class.  There is one VTABLE for a class, that contains pointers
+to all class methods.
+
+It all looks something like this:
+
+object[0]: BBBBBBBB...[1024 of these]....VVVV
+                                          |
++-----------------------------------------+
+|
++--- VTABLE_foo: IIIIIIIIIIIIIIIIPPPP
+
+object[1]: BBBBBBBB...[1024 of these]....WWWW
+                                          |
++-----------------------------------------+
+|
++--- VTABLE_bar: IIIIIIIIIIIIIIIIQQQQ
+
+
+B represents a byte of the buffer
+V represents a byte of the VPTR to VTABLE_foo
+W represents a byte of the VPTR to VTABLE_bar
+I represents various information bytes
+P represents a byte of the pointer to the output_buffer() method of foo
+Q represents a byte of the pointer to the output_buffer() method of bar
+
+The astute reader will not that the VPTR is located after the buffer in the
+processes memory space.  Thus inadequate bounds checking will allow the VPTR to
+be clobbered.
+
+I stated that MS Visual C++ compiled code is not vulnerable to this problem. 
+This is because the MS compiler puts the VPTR at the beginning of the object.
+
+It is possible to exploit this type of problem by creating a VTABLE inside the
+buffer being overflowed.  If the the VTABLE is created so that its addresses
+point to the code we want to run (also located in the buffer being overflowed,
+after the new VTABLE), and overwrite the VPTR so that it points to the new
+VTABLE, it is possible to get arbitrary code run.
+
+This problem has been known about for some time now.  Having said that, I don't
+think I have seen a real-world example of this.
+
+Andrew.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

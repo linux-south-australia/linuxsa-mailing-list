@@ -1,0 +1,162 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="SUMMARY: Sendmail and firewalls etc" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="LinuxSA@linuxsa.org.au" -->
+<!-- Date="Thu, 13 Jul 2000 19:57:16 +0900" -->
+<!-- Id="3.0.6.32.20000713195716.009d2c00@203.16.214.248" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: SUMMARY: Sendmail and firewalls etc</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:LinuxSA@linuxsa.org.au">LinuxSA@linuxsa.org.au</A>
+  Date: Thu, 13 Jul 2000 19:57:16 +0900
+</PRE>
+<H1>SUMMARY: Sendmail and firewalls etc</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+I though that I might summarize the information about sendmail and
+firewalls for everyone's edification.
+
+My questions and searching was based on a desire to simplify the sendmail
+setup at a customer site.  The environment at this site goes along the lines:
+
+
+[Big Bad Internet]-----[Firewall]-----[Internal Mail Hub]
+
+There is an MX record pointing to the firewall for the domain behind it,
+some.com.au.  The firewall accepts all mail and forwards most of it to the
+internal mail hub machine, pop.some.com.au, which has a private IP address.
+
+The internal mail hub, pop.some.com.au, receives all mail sent by internal
+clients and sends it to the firewall for sending to the BBI.
+
+The configuration that needs to be done can be restricted to the redhat.mc
+file that will be found in /usr/lib/sendmail-cf/cf if you have installed
+the sendmail-cf RPM for a RedHat or Mandrake distro, and possibly for other
+distros.
+
+You should copy the redhat.mc to your own name, like local.mc and then
+modify it.
+
+FIREWALL
+
+On the firewall, you may not need to modify the redhat.mc file that comes
+with the machine, in which case you can run with the sendmail.cf file
+installed by default.
+
+You will need to set up the following files:
+
+/etc/mail/access   -  Controls which machines can relay through you.
+                      You would put your internal mail hub's address in 
+                      here.
+
+/etc/sendmail.cw   - Controls the names that you accept mail for. You would
+                     put your domain name in here, some.com.au, as well
+                     as any other names your system is known by. This will
+                     prevent the infamous MX record points back to me
+                     problems.
+
+/etc/mail/mailertable - Here you would put a single rule to route mail
+                        for your domain to the internal mail hub. Eg,
+
+ 		   	      some.com.au	   esmtp:[pop.some.com.au]
+
+                	    You need to run makemap on this file for sendmail
+			    to use it:
+
+				makemap hash mailertable &lt; mailertable
+
+/etc/hosts		- Put the name pop.some.com.au in here along with
+			  its internal IP address, eg 192.168.1.2.
+
+
+INTERNAL MAIL HUB
+
+On the internal mail hub, you will probably need to add the nocanonify
+feature to your mc file, as well as specify a smart host. Simply add the
+following somewhere near the bottom of the mc file you are creating:
+
+  FEATURE(`nocanonify')
+
+run m4 to create your sendmail.cf:
+
+  m4 local.mc &gt; local.cf
+
+Copy it to /etc and add the smart host entry. To add the smart host entry,
+look for the DS entry early on in your sendmail.cf file. Simply add the
+name of your smart host, ie:
+
+  DSexternal.some.com.au
+
+and make sure that your hosts file has the name of this system in it.
+
+You will also have to add the name of the systems that relay through you if
+you are using PCs to send mail to /etc/mail/access and rebuild the access
+db file. For example:
+
+   192.168.1 relay
+
+and then run makemap on it
+
+   makemap hash access &lt; access
+
+DISCLAIMER
+
+I trust all these things are correct, and if not, I will be quickly corrected.
+
+ACKNOWLEDGMENTS
+
+Alex (not just a petty face) Garner
+Andrew (who may or may not know how to spell) Speer
+
+RESOURCES
+
+<A HREF="http://www.redhat.com/support/docs/howto/RH-sendmail-HOWTO/book1.html">http://www.redhat.com/support/docs/howto/RH-sendmail-HOWTO/book1.html</A>
+
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+ 
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,98 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SuSE-6.2 & IPFWADM+IPCHAINS+KPPP" -->
+<!-- FromName="Darryl Ross" -->
+<!-- FromEmail="rosdr001@lux.levels.unisa.edu.au" -->
+<!-- ToName="Phil Pittard" -->
+<!-- ToEmail="vk5ham@seol.net.au" -->
+<!-- Date="Fri, 17 Sep 1999 07:57:00 +0930 (GMT+9:30)" -->
+<!-- Id="Pine.SOL.4.05.9909170748150.3694-100000@lux.levels.unisa.edu.au" -->
+<!-- Reference="37DF819E.9F7EF109@seol.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SuSE-6.2 & IPFWADM+IPCHAINS+KPPP</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Darryl Ross &lt;<I><A HREF="mailto:rosdr001@lux.levels.unisa.edu.au">rosdr001@lux.levels.unisa.edu.au</A></I>&gt;
+  To  : Phil Pittard &lt;<I><A HREF="mailto:vk5ham@seol.net.au">vk5ham@seol.net.au</A></I>&gt;
+  Date: Fri, 17 Sep 1999 07:57:00 +0930 (GMT+9:30)
+</PRE>
+<H1>Re: SuSE-6.2 & IPFWADM+IPCHAINS+KPPP</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 15 Sep 1999, Phil Pittard wrote:
+
+&gt; Hi all... have found a few "funnies" in SuSE_6.2 & wondered whether
+&gt; anyone else had seen them as well (& if so, whether they found a
+&gt; fix/indentified the problem)
+&gt; 
+&gt; 1. kppp is glitchy - would not work at all initially, so I renamed
+&gt; /etc/ppp/options & just did a 'touch options' to get a blank file & I
+&gt; was then able to get a working ppp connection abt every 3rd time.  Even
+&gt; allowing for removing all the conf stuff out of /etc/ppp/options kppp
+&gt; was still unreliable so I settled on wvdial & just added some stuff to
+&gt; use my permanent ip etc etc, in the wvdial.conf
+
+Mine worked straight out of the box. I just had to set the accuonts up and
+it worked.
+
+&gt; 2. I added firewall & masquerading in YAST & rebooted.... couldnt get
+&gt; "out" on any other box on my LAN, tried manually (at the console)
+&gt; entering ipfwadm params
+&gt; eg/ ipfwadm -F -p deny    and    ipfwadm -m -F -a accept -S192.168.1.3
+&gt; -D0.0.0.0 (and various other variations when that didnt work!) and kept
+&gt; getting this error
+&gt; ipfwadm: setsockopt failed: No such file or directory. I cannot find
+&gt; what it is that doesnt exist :)!
+
+Don't use ipfwadm with 2.2 kernels, use ipchains. I tried the Yast option
+for ip masquerading, and I couldn't get it to work, so i disabled it
+again and added the following to my /etc/rc.d/boot.local <A HREF="file:">file:</A>
+
+ipchains -A forward -j MASQ -s 192.168.1.0/24 -d any/0
+
+and that sets it up at boot time.
+
+&gt; 3. In desperation I ran up KFirewall ....  that worked , although I see
+&gt; lots of "ipchains died" errors  ... but it does work, with 1 downside...
+&gt; I have to boot kfirewall and set it all up again IF I shutdown that box,
+&gt; (which wont happen often as its a permanent dialup BUTi it;s still
+&gt; annoying!) I have rtfm'd but cannot find a .conf file for kfirewall and
+&gt; cannot figure out why ipfwadm wont accept parameters that USED to work!!
+
+Because ipfwadm isn't really supported in v2.2 kernels. Try what I said
+above.
+
+Dazz
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

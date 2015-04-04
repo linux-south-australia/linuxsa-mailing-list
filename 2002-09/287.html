@@ -1,0 +1,258 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Modem install HELP! :)" -->
+<!-- FromName="'Anthony Stapells'" -->
+<!-- FromEmail="stapells@ionsys.com" -->
+<!-- ToName="'Ben Kramer'" -->
+<!-- ToEmail="ben@webmedia.com.au" -->
+<!-- Date="Sat, 7 Sep 2002 20:42:32 -0400" -->
+<!-- Id="00ac01c256d1$1fd98d60$759afed8@ionsys.com" -->
+<!-- Reference="003401c2569b$2c7b6880$1596fed8@ionsys.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Modem install HELP! :)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Anthony Stapells &lt;<I><A HREF="mailto:stapells@ionsys.com">stapells@ionsys.com</A></I>&gt;
+  To  : Ben Kramer &lt;<I><A HREF="mailto:ben@webmedia.com.au">ben@webmedia.com.au</A></I>&gt;
+  Date: Sat, 7 Sep 2002 20:42:32 -0400
+</PRE>
+<H1>Re: Modem install HELP! :)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Wow!
+
+First off, thanks for the deluge of help!
+
+Second off, I've tried the things mentioned by all.  I did exist during the
+Dark Ages of Win3.1, (actually somewhat before that...I blush to admit that
+I have coded in 8-bit 6502 code) so I was worried that the spectre of IRQ
+conflicts was raising its ugly head once more.  And you lot seem to think
+that is the case as well.
+
+What I did was:
+
+1)  Pulled the bloody serial mouse out of the computer, just to simply
+matters.  Don't know why I didn't beforehand ;P  I figure if I can make the
+modem work, I can probably find a PS/2 mouse.  Budget be damned!  :)
+
+2)  Turned on PNP.  Turned off PNP.  Shouted obscenities.  Tried once PNP
+more.
+
+3)  Disabled the second serial port in BIOS.
+
+4)  Looked at "/sbin/lspci -v -b" (and cat /proc/pci).  Output seemed
+identical and sadly "microelectronics" was not present.
+
+5)  Did I mention the obscenities?
+
+6)  Tried pnpdump.  Interestingly enough information about the modem does
+indeed appear.  I am instructed to edit and uncomment the entries below to
+achieve the correct configuration.  As I am unaware which of the three
+different (?) configurations might be appropriate, this isn't too helpful.
+I may as well admit that I am even unaware of how to edit out said comments.
+
+7)  "/usr/bin/wvdialconf create" once again.  Say...it seems to be pinging
+the modem at ttyS1, which is comforting as the jumpers are set at COM2 and I
+disabled ttyS1 through BIOS earlier.  However, it is time for obscenities as
+three tries of ATQ0 V1 E1 yield nothing.  However, it does mention setserial
+again, so I try "/bin/setserial /dev/ttyS1 uart 16550A port 0x02f8 irq 3".
+I used IRQ 3 since that is where the jumpers on the modem are set, and 02f8
+since the boot messages seemed to indicate that was where it found the
+16550A at ttyS01.  But running "/usr/bin/wvdialconf create" after trying
+that setserial string still got no modem response to the query string.
+
+Odds and Sods Answered:
+
+Yes, it is an internal PCI modem.  I heartily agree with Romana's "internal
+modems can be the devil in Linux:)".
+
+I have the usual two serial ports on the board and now have only the one
+serial device (the modem) present.  It is a standalone linux system, but the
+PNP enabled or disabled does not seem to make much of a difference.
+
+Oh - not once did kudzu admit that anything new was in the box.
+
+Random (and Probably Wrong) Thoughts:
+
+Would a more modern MB help?  It's actually 1997, not '99 as I originally
+mentioned.  I thought modems had been pretty stable as hayes compatible for
+awhile now, so should an older BIOS matter?
+
+Maybe I've worn off the gold on the contact constantly pulling it out and
+fiddling with jumpers...
+
+Still appearing foolish, but am REALLY appreciating the kind time people are
+sparing to hold my hand,
+Tony
+
+:)
+
+PS - I did not try all the different COM jumper settings, as there should no
+longer be a conflict since there is only ONE serial device present (and port
+for the that matter...and PCI card actually).  Right?  Theoretically?
+
+
+
+&gt;
+&gt; Hi Tony,
+&gt;
+&gt; you have having the clasic IRQ conflicts. You said you have a serial
+mouse, which I take is on COM1 (/dev/ttyS0). Here is what you should do:
+&gt;
+&gt; Disable COM2 in the bios of your MB.
+&gt; Change the modem jumpers to COM2.
+&gt;
+&gt; That should fix your problem, and you should see the modem on /dev/ttyS1.
+&gt; If you dont see the modem, but the serial port does appear, then I would
+sugest that that scrounged part is no good !
+&gt;
+&gt; Cheers,
+&gt;
+&gt; Ben.
+&gt;
+&gt; On Sat, 7 Sep 2002 14:08:05 -0400
+&gt; "Anthony Stapells" &lt;<A HREF="mailto:stapells@ionsys.com">stapells@ionsys.com</A>&gt; wrote:
+&gt; &gt; Hello all!  I am both new to the list and to linux in general, so please
+&gt; &gt; forgive me any particularly ignorant questions.  :)
+&gt; &gt;
+&gt; &gt; Both for the fun of it and because I'm a freelance web developer (who's
+&gt; &gt; obviously been working in Windows lo these last few years), but since
+most
+&gt; &gt; sites are deployed to linux servers I thought I'd build a linux box with
+all
+&gt; &gt; the odds and sods of computers parts I've scrounged over the years.
+&gt; &gt;
+&gt; &gt; Anyway, everything (RH 7.2) seems to be running smoothly...except for
+the
+&gt; &gt; bloody modem.  I cannot get a response from it.
+&gt; &gt;
+&gt; &gt; The facts:
+&gt; &gt;
+&gt; &gt; 1.  It is indeed a hardware modem, specifically Multi-Tech Systems
+Inc. -
+&gt; &gt; MT5634ZPX-PCI.  According to the RedHat site
+&gt; &gt; (<A HREF="http://hardware.redhat.com/hcl/genpage2.cgi?pagename">http://hardware.redhat.com/hcl/genpage2.cgi?pagename</A>=details&hid=422)
+it is
+&gt; &gt; dead easy to install.  Which is somewhat humbling...and perhaps why I
+like
+&gt; &gt; the software end of things. :)
+&gt; &gt;
+&gt; &gt; 2.  Linux seems to recognize that it is installed, but just doesn't
+quite
+&gt; &gt; admit that it is a modem and sticks it under "unknown" when I do a
+hardware
+&gt; &gt; probe through KDE.
+&gt; &gt;
+&gt; &gt; 3.  As per RH's instructions I tried "/sbin/lspci -v -b" to little
+comfort
+&gt; &gt; as nothing resembling Microelectronics appeared.
+&gt; &gt;
+&gt; &gt; 4.  Continuing onward into the fog, I then tried "/bin/setserial device
+uart
+&gt; &gt; 16550A port 0x02e8 irq 3" (I got the port and irq values from examining
+the
+&gt; &gt; boot sequence messages) and promptly got an error.  To wit:  "device: No
+&gt; &gt; such file or directory".  I then dropped out the word "device" from the
+&gt; &gt; line, tried adding /dev/ttyS3 (again, as the boot messages seemed to
+&gt; &gt; indicate that a device 16550A existed at ttyS3) and things seems to
+work.
+&gt; &gt; At least I got no error messages at any rate.
+&gt; &gt;
+&gt; &gt; 5.  Sadly, despite the seeming progress, I still cannot get a modem
+&gt; &gt; response.  Using KPPP I cannot get a response from /dev/ttyS3, nor
+&gt; &gt; /dev/modem for that matter.  From the CLI, "/usr/bin/wvdialconf create"
+&gt; &gt; merrily searches but cannot find a modem.   Yet, and this may actually
+be a
+&gt; &gt; clue to those less clue-less than I, it ignores ttyS3 as it claims that
+&gt; &gt; /dev/mouse/ points to that port.
+&gt; &gt;
+&gt; &gt; Other interesting bits:
+&gt; &gt;
+&gt; &gt; I've got a serial mouse hooked up too, and in fact originally had some
+&gt; &gt; trouble having a mouse and the modem in the computer at the same time.
+I
+&gt; &gt; played with my BIOS (ancient BTW...1999, Pentium 200 board...told you I
+made
+&gt; &gt; this thing from leftovers), and made serial2 02e8 rather than auto, and
+set
+&gt; &gt; PNP OS to "no".  That seemed to allow both modem and mouse.
+&gt; &gt;
+&gt; &gt; The modem jumpers are configured for IRQ3 and COM4.
+&gt; &gt;
+&gt; &gt; Discussion:
+&gt; &gt;
+&gt; &gt; Am I wrong in assuming that a 16650A device is a modem?  I admit that I
+am
+&gt; &gt; blindly guessing that from the instructions on the Redhat site.  I am
+dimly
+&gt; &gt; starting to suspect that it might actually just be a serial device...ie
+my
+&gt; &gt; mouse.
+&gt; &gt;
+&gt; &gt; I have read through the HOW-TOs at
+&gt; &gt; <A HREF="http://www.tldp.org/HOWTO/Modem-HOWTO.html.">http://www.tldp.org/HOWTO/Modem-HOWTO.html.</A>  Sadly to little avail it
+would
+&gt; &gt; seem.  Although the answer is probably buried in there, I am too
+ignorant to
+&gt; &gt; spot it.
+&gt; &gt;
+&gt; &gt; Any help that anyone can give this linux fledgling would be gratefully
+&gt; &gt; received!
+&gt; &gt;
+&gt; &gt; Thanks in advance,
+&gt; &gt; Tony
+&gt; &gt;
+&gt; &gt;
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on
+irc.linux.org.au
+&gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt;
+&gt; &gt;
+&gt; &gt;
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

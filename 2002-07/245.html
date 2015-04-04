@@ -1,0 +1,135 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Postgres Postmaster Carks It..." -->
+<!-- FromName="'David Lloyd'" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 09 Jul 2002 08:45:13 +0930" -->
+<!-- Id="3D2A1D01.FE83B41E@rebel.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Postgres Postmaster Carks It...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 09 Jul 2002 08:45:13 +0930
+</PRE>
+<H1>Postgres Postmaster Carks It...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+
+Hmmmm...
+
+I have attached a small part of the output of my2pg.pl.
+
+Essentially, I have:
+
+1) extracted all the fields from /var/log/squid/access.log
+2) put them all into MySQL
+3) used my2pg.pl to translate a mysqldump to postgresql
+
+Now, you'll note that the second field -- supposedly a timestamp -- has
+been converted to 65536. This is because my2pg.pl (appeared on freshmeat
+a few days ago) made the timestamp -- an int(5) in MySQL -- into an int2
+which couldn't cope with the range of values.
+
+I therefore changed that field to an int8, probably way too much
+storage.
+
+When I run:
+
+createdb squid
+psql squid &lt; the_dump_file.psl
+
+...postmaster carks it. I'm not entirely certain why, but it may be
+because of an overflow error in one of the integer fields. Symptoms
+include:
+
+1) general system slowness
+2) postmaster refuses connections
+3) eventually I run out of memory and the kernel finally decides to kill
+the postmaster process
+
+Killing the postmaster process or service mysqld stop don't fix the
+problem. I essentially have to wait until postmaster/postgresql actually
+die to fix the problem.
+
+I have run the mysql dump itself back into mysql and my system behaves
+itself...
+
+Any ideas of what other information I might gather to diagnose this
+problem? I am a little bit lost with postgres...
+
+DSL
+-- 
+Do you have leprosy?
+ Consult Leviticus 13
+ See your priest!
+
+--
+-- Table structure for table 'access_log'
+--
+
+CREATE TABLE access_log (
+  id INT4 DEFAULT nextval('access_log_id_seq'),
+  timestamp INT8  DEFAULT NULL,
+  duration INT2  DEFAULT NULL,
+  clientaddress varchar(127) DEFAULT NULL,
+  result varchar(63) DEFAULT NULL,
+  bytes INT2  DEFAULT NULL,
+  method varchar(63) DEFAULT NULL,
+  url varchar(253) DEFAULT NULL,
+  username varchar(72) DEFAULT NULL,
+  sibling varchar(63) DEFAULT NULL,
+  code INT2  DEFAULT NULL,
+  mime varchar(63) DEFAULT NULL,
+  PRIMARY KEY  (id)
+);
+
+/*!40000 ALTER TABLE access_log DISABLE KEYS */;
+
+--
+-- Dumping data for table 'access_log'
+--
+
+
+INSERT INTO access_log VALUES (1,65535,370,'127.0.0.1','NONE',1104,'NONE','error:unsupported-request-method','-','NONE',0,'-');
+INSERT INTO access_log VALUES (2,65535,317,'127.0.0.1','NONE',1096,'NONE','error:unsupported-request-method','-','NONE',0,'-');
+INSERT INTO access_log VALUES (3,65535,4480,'127.0.0.1','TCP_MISS',3331,'GET','<A HREF="http://www.rebel.net.au/cgi-bin/download.sh?">http://www.rebel.net.au/cgi-bin/download.sh?</A>','-','DIRECT',0,'image/gif');
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

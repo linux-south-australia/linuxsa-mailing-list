@@ -1,0 +1,160 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Use of Procmail / fetchmail putting together what everyone else taught me" -->
+<!-- FromName="'Darryl Ross'" -->
+<!-- FromEmail="dross@syc.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="jleone@pacbell.net" -->
+<!-- Date="Fri, 21 Jun 2002 09:59:47 +0930 (CST)" -->
+<!-- Id="1070.192.168.10.80.1024619387.squirrel@test.syc.net.au" -->
+<!-- Reference="20020620101024.O52920-100000@weasel.internode.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Use of Procmail / fetchmail putting together what everyone else taught me</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Darryl Ross &lt;<I><A HREF="mailto:dross@syc.net.au">dross@syc.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  Date: Fri, 21 Jun 2002 09:59:47 +0930 (CST)
+</PRE>
+<H1>Re: Use of Procmail / fetchmail putting together what everyone else taught me</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hey James,
+
+Fetchmail does not 'take over' the role of sendmail on your system. What
+it does is collect the mail from your ISP mailbox and then hand it over to
+sendmail to handle it locally. It is then up to sendmail to call procmail
+to do any fancy delivery things that you want.
+
+In your situation, you probably won't need a .forward file to call
+procmail (as sendmail uses procmail to do it's delivery stuff anyway), and
+you can probably streamline your .procmailrc file to make it easier to
+read and also to make it a bit faster to process at the same time. I was
+running  the following for quite a while whilst I was testing
+spamassassin, before making it run system wide:
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+# .procmailrc file
+
+# Set up some environment variables
+PATH=$HOME/bin:/bin:/usr/bin:/usr/local/bin
+LOGFILE=$HOME/procmail.log
+VERBOSE=on
+
+# Run SpamAssassin
+:0
+|/usr/bin/spamassassin -P -c /usr/share/spamassassin
+
+# Filter out spam
+:0:
+* ^X-Spam-Status: Yes
+$HOME/mail/CaughtSpam
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+Note that you don't need to specify delivery for the 'default' mail, ie,
+mail that doesn't match the filter spam rule, it will be delivered to your
+system default mailbox, which is exactly where most programs on your
+system will be expecting new mail to be. Don't change it unless you know
+what you're doing, as it's going to break things (as you've noticed).
+
+&gt; When I check with neyscape it says "no new messages"
+
+Netscape is checking for new mail in /var/spool/mail/james, but you've
+changed that, hence why it can't find any new messages. Try the above
+(once you are sure you understand what is going on, don't just try it
+because I said so!).
+
+Darryl
+
+-- 
+Darryl Ross
+Senior Network and Systems Administrator
+Service to Youth Council Inc
+<A HREF="mailto:dross@syc.net.au">dross@syc.net.au</A>
+
+&gt;
+&gt;
+&gt; Thanks!
+&gt;
+&gt;
+&gt; James Leone
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+&gt; Justin Hawkins wrote:
+&gt;
+&gt; &gt;On Wed, 19 Jun 2002, James Leone wrote:
+&gt; &gt;
+&gt; &gt;&gt;Justin, that was a fantastic presentation. I printed the whole thing
+&gt; &gt;&gt;out. You were a very big help too.
+&gt; &gt;&gt;
+&gt; &gt;&gt;So, you definitely do not recommend redirecting email to a folder
+&gt; &gt;&gt;besides /var/spool/mail on a stand alone workstation?
+&gt; &gt;&gt;
+&gt; &gt;&gt;My real problem is that I have our workers in the office using
+&gt; &gt;&gt;nutscrape 6.  I was going to set up a script embedded in a desktop
+&gt; &gt;&gt;icon  to enable them to check their mail, and land it in folder that
+&gt; &gt;&gt;nutscrape
+&gt; 6 would read automaticly after it was opened.
+&gt; &gt;&gt;Most of our accounting applications only run in windblows.
+&gt; &gt;&gt;
+&gt; &gt;
+&gt; &gt;I'm not sure I understand correctly - where is the mail currently
+&gt; &gt;stored and accessed from? Is it somehow read from /var/spool/mail from
+&gt; &gt;netscape on windows? Or is IMAP or POP or something similar in use?
+&gt; &gt;
+&gt; &gt;Let me know what you currently have, and what you are trying to
+&gt; &gt;achieve, and we'll go from there.
+&gt; &gt;
+&gt; &gt;	- Justin
+&gt; &gt;
+&gt;
+&gt;
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on
+&gt; irc.linux.org.au To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

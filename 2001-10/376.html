@@ -1,0 +1,106 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: changing a Mb value to Kb value" -->
+<!-- FromName="'Geoffrey D. Bennett'" -->
+<!-- FromEmail="g@netcraft.com.au" -->
+<!-- ToName="'nik [tm]'" -->
+<!-- ToEmail="tmcruisin@sond.com.au" -->
+<!-- Date="Fri, 12 Oct 2001 00:48:49 +0930" -->
+<!-- Id="20011012004849.Q12927@april.netcraft.com.au" -->
+<!-- Reference="00f901c15220$db11ea20$0301a8c0@nick" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: changing a Mb value to Kb value</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Geoffrey D. Bennett &lt;<I><A HREF="mailto:g@netcraft.com.au">g@netcraft.com.au</A></I>&gt;
+  To  : nik [tm] &lt;<I><A HREF="mailto:tmcruisin@sond.com.au">tmcruisin@sond.com.au</A></I>&gt;
+  Date: Fri, 12 Oct 2001 00:48:49 +0930
+</PRE>
+<H1>Re: changing a Mb value to Kb value</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, Oct 11, 2001 at 04:19:20PM +0930, nik [tm] wrote:
+[...]
+&gt; My goal is to write a script(s) that gets the incoming data packet totals
+&gt; from iptables (from the table we have setup here) then check the value it is
+&gt; given to see if its written in M or Kb and then turn it into kilobytes so
+&gt; from there I can take the data and plot it on a graph on a webpage.
+&gt; the current problem being I cant just take the number and plot it in the
+&gt; graph because if ones a Mb value and the other is a KB value it doesnt give
+&gt; correct plots. (obviously 1200 is larger than 120 as a number, but not as
+&gt; data 1200Kb against 120Mb)
+
+Rather than trying to convert '134M' to '134000K', you probably want
+to use the '-x' flag instead (it's listed in 'man iptables').
+
+Eg.:
+
+# iptables -L INPUT -vn
+Chain INPUT (policy ACCEPT 1070 packets, 90039 bytes)
+ pkts bytes target     prot opt in     out     source          destination
+ 1268  106K ACCEPT     all  --  *      *       0.0.0.0/0       0.0.0.0/0
+
+# iptables -L INPUT -vnx
+Chain INPUT (policy ACCEPT 1070 packets, 90039 bytes)
+    pkts      bytes target     prot opt in     out     source     destination
+    1534   128614 ACCEPT     all  --  *      *       0.0.0.0/0  0.0.0.0/0
+
+&gt; I run a script grepping an iptables command which will return something
+&gt; similar to this (1st is incoming, 2nd is outgoing data) ;
+&gt; 145M
+&gt; 22M
+[...]
+&gt; I have looked at apac and mrtg ip accounting packages but want to do it
+&gt; myself for a better understanding of it all. I already have php graphing
+&gt; working ok on the web and getting the data I need from iptables, so its only
+&gt; the Mb --&gt; Kb conversion left to work out but I am lost as to where to
+&gt; start.
+&gt; are there any packages for this kind of check/conversion? or do I just need
+&gt; to know more about shell scripts (case statements etc)
+
+You should be using Perl :-).  Try:
+
+# iptables -L -vn|perl '-pes/\b(\d+)([KMG])\b/$1*10**($2eq K?3:$2eq M?6:9)/eg'
+
+The above Perl will also work on your demo file (and shouldn't be much
+less readable than trying to do the same in sh :-).
+
+-- 
+Geoffrey D. Bennett, RHCE, RHCX               <A HREF="mailto:geoffrey@netcraft.com.au">geoffrey@netcraft.com.au</A>
+Senior Systems Engineer           <A HREF="http://www.netcraft.com.au/geoffrey/">http://www.netcraft.com.au/geoffrey/</A>
+NetCraft Australia Pty Ltd           <A HREF="http://www.netcraft.com.au/linux/">http://www.netcraft.com.au/linux/</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,150 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="PAM authentication" -->
+<!-- FromName="" -->
+<!-- FromEmail="nickm@bhwb.nsw.gov.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 19 Dec 2000 12:28:38 +1030 (CST)" -->
+<!-- Id="200012190158.eBJ1wdK29142@medusa.aiew" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: PAM authentication</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: &lt;<I><A HREF="mailto:nickm@bhwb.nsw.gov.au">nickm@bhwb.nsw.gov.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 19 Dec 2000 12:28:38 +1030 (CST)
+</PRE>
+<H1>PAM authentication</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hey y'all,
+
+I'm working on a project at the moment.  It's written, so far, purely in
+PHP3.  It accesses a PostgreSQL database, an LDAP server and verious other
+things.
+
+I want a user authentication mechanism.
+
+I could use HTTP authentication, with the $PHP_AUTH_USER variable[1].
+However, I think I can see issues with this method.  I want most of the
+site to be accessable without login.  Certain areas will require users to
+be logged in, certain areas will be different depending on whether you're
+logged in or not.  Users need to be able to log on and log off randomly.
+I'm using a custom-written session management system, tailored to the needs
+of the project, which uses cookies to store a session ID..
+
+Basically, I don't think that basic HTTP authentication is going to be
+suitable for my needs.
+
+I could be totally wrong, of course - let me know if you think I'm wrong!
+
+So, instead of HTTP WWW-authenticate type authentication, I've so far
+decided to implement my own.
+
+What I would really like to do is use PAM to validate username/password
+pairs.  Then I can use the pam_ldap module and not have to worry about
+doing any extra programming.
+
+I've checked the PHP manuals - there don't seem to be any functions for
+PAM.
+
+This is either because nobody has written them - I doubt that's the reason
+- or because it's not PHP's place to worry about authentication.
+
+I want the following:
+
+A form is drawn on the screen with a username box, password box, and submit
+button.  It's stored on a secure (https) server, so the session traffic
+(specifically, the password) is encrypted.  The user enters a
+username/password, the PHP script takes the pair and passes it to PAM, who
+validates it through all the proper channels.
+
+Thoughts, anyone?  Am I totally wrong?  Is the WWW-authenticate method
+bug-free and nice and easy to use and dynamic and stuff?  I keep reading
+things on the PHP web site like:
+
+"Both Netscape and Internet Explorer will clear the local browser window's
+authentication cache for the realm upon receiving a server response of 401.
+This can effectively "log out" a user, forcing them to re-enter their
+username and password. Some people use this to "time out" logins, or
+provide a "log-out" button."
+
+...
+
+"This behavior is not required by the HTTP Basic authentication standard,
+so you should never depend on this. Testing with Lynx has shown that Lynx
+does not clear the authentication credentials with a 401 server response,
+so pressing back and then forward again will open the resource (as long as
+the credential requirements haven't changed)."
+
+<A HREF="http://www.php.net/manual/features.http-auth.php">http://www.php.net/manual/features.http-auth.php</A>
+
+*shudder* stuff that - I want something that I know will work, without
+stuffing around for IE and Netscape and Lynx and argh!
+
+Happy to accept criticism :)
+
+
+Cheers..
+
+Nick :)
+
+
+
+[1] (mostly stolen from www.php.net/manual)
+&lt;?
+        cfunction authenticate() {
+                Header("WWW-authenticate: basic realm=\"REALM\");
+	        Header("HTTP/1.0 401 Unauthorized");
+		$title="Invalid Login";
+		?&gt;
+			In order to proceed you will need a valid username/password.
+		&lt;?
+		exit;
+	}
+
+	if(!isset($PHP_AUTH_USER)) {
+		authenticate();
+	} else {
+		if (!($PHP_AUTH_USER == $a_valid_username) && ($PHP_AUTH_PW == $that_usernames_password)) {
+			die("Invalid username and/or password.");
+		}
+	}
+?&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

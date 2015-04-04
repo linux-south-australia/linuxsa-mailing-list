@@ -1,0 +1,148 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="tcsh does not work as root shell in SuSE 7.1??" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 25 Jun 2001 23:31:18 +0930" -->
+<!-- Id="20010625233118.A20662@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: tcsh does not work as root shell in SuSE 7.1??</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 25 Jun 2001 23:31:18 +0930
+</PRE>
+<H1>tcsh does not work as root shell in SuSE 7.1??</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Maybe this is a problem with other distributions too,
+because it should be distribution independent.
+
+Here's the problem:
+
+I log in as root and type "chsh", and
+type in "tcsh". Then I can't get back in as
+root because I should have typed "/bin/tcsh".
+Okay, luckily I had a remote login from another
+terminal (using triple-DES to get from the 
+sitting room to the kitchen - after all, there
+may be a "device" attached to my ethernet cable!).
+So I change that shell to /bin/tcsh.
+But now I get the same sort of thing:
+
+--------------------------------------------
+ferret /home/akenning&gt; su -l
+Password:
+su: cannot run tcsh: No such file or directory
+--------------------------------------------
+
+But....
+
+--------------------------------------------
+ferret /root# file /bin/tcsh
+/bin/tcsh: ELF 32-bit LSB executable, Intel 80386, version 1, dynamically linked (uses shared libs), not stripped 
+ferret /root# ls -l /bin/tcsh
+-rwxr-xr-x    1 root     root       794214 Jan 19 19:03 /bin/tcsh 
+--------------------------------------------
+
+Yes, the file is there.
+Is it in /etc/shells?
+
+--------------------------------------------
+ferret /root# cat &lt; /etc/shells
+/bin/ash
+/bin/bash
+/bin/bash1
+/bin/csh
+/bin/false
+/bin/ksh
+/bin/sh
+/bin/tcsh
+/bin/true
+/usr/bin/csh
+/usr/bin/ksh
+/usr/bin/passwd
+/usr/bin/bash
+/usr/bin/rbash
+/usr/bin/tcsh
+/usr/bin/zsh   
+-------------------------------------------
+
+Looks okay to me.
+Not only that - I already use tcsh for my user logins.
+And they all work fine.
+
+So maybe there's some global tcsh initialisation file
+that has a bad command?
+
+The file /etc/csh.cshrc contains these lines:
+
+------------------------------------------
+if ( "$uid" == "0" ) then
+    setenv LS_OPTIONS '-a -N --color=tty -T 0';
+else
+    setenv LS_OPTIONS '-N --color=tty -T 0';
+endif 
+------------------------------------------
+
+I don't think that this should make any difference.
+
+So it looks like there is no reason why root should
+have a problem running the "tcsh" shell.
+
+=================================================
+I should also mention that I tried this:
+
+su --shell=/bin/bash
+
+but this kept giving me the message about "tcsh"
+not being defined.
+So it looks like if you get a wrong shell with
+"chsh" as root, then you can never get back in - without
+rebooting into single-user mode.
+This seems like a pretty serious problem to me.
+
+Can anyone throw any light on these issues?
+Is there a similar problem with RH 7.1?
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,189 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SAMBA + LDAP + Win98SE" -->
+<!-- FromName="'Toby Corkindale'" -->
+<!-- FromEmail="tjcorkin@sa.pracom.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="James.Wilson@compsm.com.au" -->
+<!-- Date="Mon, 15 Oct 2001 16:34:54 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0110151629490.9386-100000@localhost.localdomain" -->
+<!-- Reference="OF09070FD7.759923D6-ON69256AE6.0000137B@compsm.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SAMBA + LDAP + Win98SE</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@sa.pracom.com.au">tjcorkin@sa.pracom.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:James.Wilson@compsm.com.au">James.Wilson@compsm.com.au</A></I>&gt;
+  Date: Mon, 15 Oct 2001 16:34:54 +0930 (CST)
+</PRE>
+<H1>Re: SAMBA + LDAP + Win98SE</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+You have increased
+a) the number of global file descriptors
+   (/proc/sys/fs/file-max)
+b) the number of files per shell and children
+   (ulimit -n)
+
+..right?
+
+It looks like the problem is, as you say, running out of global file
+descriptors.
+
+You can investigate who has these by looking in
+/proc/$PID/fd/
+
+(where $PID is a process ID on the system)
+loop thru every one, and you will probably find one PID which is hogging ALL
+the file descriptors. Once you've done this, you can set about fixing it.
+
+Ignore the suggestions to use lsof logging to disk repetitively, thats a
+huge waste of processor power and disk!
+
+A small perl script will be able to iterate thru the processes in /proc/ and
+report on the count of number of files in each's fd directory.. Set it so
+that when the count gets over, say, 1000, it logs the process's PID and
+command line to something..
+
+Once you have info on the offending process, get back to us, and someone
+will probably know of an available fix.
+
+Hope this helps!
+
+-Toby
+
+On Mon, 15 Oct 2001 <A HREF="mailto:James.Wilson@compsm.com.au">James.Wilson@compsm.com.au</A> wrote:
+
+&gt;
+&gt; The kernel by the looks...
+&gt;
+&gt; [<A HREF="mailto:root@server">root@server</A> log]# cat messages* | grep "Too many" | more
+&gt; Oct  9 08:13:12 server xinetd[2274]: warning: cannot open /etc/hosts.allow:
+&gt; Too many open files in system
+&gt; Oct  9 08:13:12 server xinetd[2274]: warning: cannot open /etc/hosts.deny:
+&gt; Too many open files in system
+&gt; Oct  9 08:13:12 server xinetd[2275]: warning: cannot open /etc/hosts.allow:
+&gt; Too many open files in system
+&gt; Oct  9 08:13:12 server xinetd[2275]: warning: cannot open /etc/hosts.deny:
+&gt; Too many open files in system
+&gt; Oct  9 08:13:12 server xinetd[2276]: warning: cannot open /etc/hosts.allow:
+&gt; Too many open files in system
+&gt; Oct  9 08:13:12 server xinetd[2276]: warning: cannot open /etc/hosts.deny:
+&gt; Too many open files in system
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;                     Andrew Reid
+&gt;                     &lt;andrew.reid@        To:     <A HREF="mailto:James.Wilson@compsm.com.au">James.Wilson@compsm.com.au</A>
+&gt;                     plug.cx&gt;             cc:     <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt;                                          Subject:     Re: SAMBA + LDAP + Win98SE
+&gt;                     15/10/2001
+&gt;                     09:50 am
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+&gt; On Sun, Oct 14, 2001 at 02:22:58PM +0930, <A HREF="mailto:James.Wilson@compsm.com.au">James.Wilson@compsm.com.au</A> wrote:
+&gt;
+&gt; &gt; At some of the smaller sites, this problem is not so much an issue,
+&gt; however
+&gt; &gt; on the larger sites it can take workstations at least 2mins to kick off
+&gt; the
+&gt; &gt; login.bat.  There is no utilization on the network (1% on the fiber
+&gt; switch)
+&gt; &gt; and the server is ticking at 3% on each cpu (slapd).
+&gt;
+&gt; Do you have any working name resolution? Does each address in the DHCP
+&gt; pool have a corresponding DHCP entry?
+&gt;
+&gt; &gt; Another issue, is that at one particularly large site, we have an issue
+&gt; &gt; where the server complains ti has too many open files and bombs.  We
+&gt; upped
+&gt; &gt; the servers memory to 1gb and the open file limit to 20000.  This was
+&gt; also
+&gt; &gt; hit!!
+&gt;
+&gt; Which component is complaining about this? SAMBA, the kernel? You
+&gt; shouldn't need that much memory in a fileserver.
+&gt;
+&gt;    - andrew
+&gt;
+&gt; --
+&gt; void signature () {
+&gt;            cout &lt;&lt; "Andrew Reid -- <A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A>" &lt;&lt; endl;
+&gt;            cout &lt;&lt; "Cell: +61 401 946 813" &lt;&lt; endl;
+&gt;            cout &lt;&lt; "Quidquid latine dictum sit, altum viditur" &lt;&lt; endl;
+&gt; }
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+
+-- 
+ Toby Corkindale
+ UNIX Developer, Core Tech R&D
+ Technology SA, Pracom Ltd
+ 288 Glen Osmond Road
+ Fullarton,	5063
+ South Australia
+ Tel: +61 8 8202 9075
+ Fax: +61 8 8202 9001
+ mailto:<A HREF="mailto:Toby.Corkindale@sa.pracom.com.au">Toby.Corkindale@sa.pracom.com.au</A>
+ <A HREF="http://www.sa.pracom.com.au/">http://www.sa.pracom.com.au/</A>
+
+                  PRIVILEGED - PRIVATE AND CONFIDENTIAL
+
+   Privileged/Confidential Information may be contained in this message.
+   If you are not the addressee indicated in this message, you may not
+   copy or deliver this message to anyone.  In such case, you should
+   destroy this message and notify the sender by reply email. Opinions,
+   conclusions and other information in this message that do not relate
+   to the official business of this organisation shall be understood as
+   neither given nor endorsed by it.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

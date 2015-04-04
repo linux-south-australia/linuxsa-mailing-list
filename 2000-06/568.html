@@ -1,0 +1,110 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="SSH Gotcha" -->
+<!-- FromName="David Lloyd" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 19 Jun 2000 16:01:52 +0930" -->
+<!-- Id="394DBE58.E0B833CB@rebel.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: SSH Gotcha</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 19 Jun 2000 16:01:52 +0930
+</PRE>
+<H1>SSH Gotcha</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi!
+
+Just in case someone else manages to fall over this little "gotcha", I
+thought I'd share a bit.
+
+In the configuration file, /etc/ssh/sshd_config [you can call it what
+you want but that's the default], you have a setting AllowUser.
+According to the man/info pages:
+
+             This keyword can be followed by a number of user names,
+separated
+             by spaces.  If specified, login is allowed only for users
+names
+             that match one of the patterns.  `*' and `?' can be used as
+wild­
+             cards in the patterns.  Only user names are valid, a
+numerical
+             user id isn't recognized.  By default login is allowed
+regardless
+             of the user name.
+
+This is blatantly misleading. What this MEANS is that sshd will only
+accept connection (or maybe it's one of its PAM modules) if the
+connection comes from a login account that PURPORTS to be the user name.
+So for example, I had...
+
+(config file)
+AllowUser lloy0076
+...
+(/config file)
+
+When relogged as another user on my local system, it refused the
+connection. The command I was using was:
+
+% ssh -l lloy0076 localhost
+
+Everything else was set correctly. After a significant amount of manual
+reading, I decided (as a last resort) to remove the AllowUser statement
+from sshd's config file. Once I had done this, my ssh logins worked.
+
+Therefore....the manual page for OpenSSH 1.2 is wrong. It should read:
+
+  This keyword can be followed by a number of user names, separated by
+spaces. If specified
+  login is allowed only from accounts that purport to be one of the user
+names...
+
+It's a small irritation. I think I'm going to write a mini-howto to set
+it up.
+
+DL
+-- 
+To the thirsty I will give water without price
+From the fountain of the water of life
+He who conquers shall have this heritage
+And I will be his God and he shall be my son
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

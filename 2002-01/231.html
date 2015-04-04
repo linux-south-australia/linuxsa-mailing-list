@@ -1,0 +1,200 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Recording radio at set schedules - mpeg compression on the fly" -->
+<!-- FromName="'Aristotle'" -->
+<!-- FromEmail="aristotle@ihug.com.au" -->
+<!-- ToName="'Toby Corkindale'" -->
+<!-- ToEmail="tjcorkin@sa.pracom.com.au" -->
+<!-- Date="Tue, 15 Jan 2002 01:17:30 +1030" -->
+<!-- Id="3C42EF82.4050503@ihug.com.au" -->
+<!-- Reference="Pine.LNX.4.33.0201150054560.14737-100000@localhost.localdomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Recording radio at set schedules - mpeg compression on the fly</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Aristotle &lt;<I><A HREF="mailto:aristotle@ihug.com.au">aristotle@ihug.com.au</A></I>&gt;
+  To  : Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@sa.pracom.com.au">tjcorkin@sa.pracom.com.au</A></I>&gt;
+  Date: Tue, 15 Jan 2002 01:17:30 +1030
+</PRE>
+<H1>Re: Recording radio at set schedules - mpeg compression on the fly</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I seem to be able to record a mpeg file although I can't play it - no 
+sound comes out - it could be my workstation rather than a fault of the 
+file itself as I don't have any other mp3s to test it on at the moment.
+
+But the file length is about right - a Mb or two for a few minutes of 
+recording.  Getting there!
+
+Toby Corkindale wrote:
+
+&gt; On Tue, 15 Jan 2002, Aristotle wrote:
+&gt; 
+&gt; 
+&gt;&gt;I tried this at the command line and received an error from sox that it
+&gt;&gt;can't write to output file ''
+&gt;&gt;
+&gt; 
+&gt; hmm, you should be writing to output file called (without the quotes)
+&gt; "-"
+&gt; 
+&gt; ie. just a dash. That actually means "write to stdout" for programs.
+&gt; I thought.. if you were doing that and it wasn't working, i don't know whats
+&gt; going on.
+&gt; 
+&gt; 
+&gt;&gt;I will keep plugging at it - there must be some way to instruct it to
+&gt;&gt;direct output to stdout?
+&gt;&gt;
+&gt; 
+&gt; see about.
+&gt; 
+&gt; 
+&gt;&gt;Failing that - can I take raw data from the soundcard device itself?  I
+&gt;&gt;am not sure that I can.
+&gt;&gt;
+&gt; 
+&gt; it needs a few ioctls to set the speed, etc. default is 8bit 8000 hz or
+&gt; something icky like that.
+&gt; 
+&gt; 
+&gt;&gt;Toby Corkindale wrote:
+&gt;&gt;
+&gt;&gt;
+&gt;&gt;&gt;Hmm,
+&gt;&gt;&gt;
+&gt;&gt;&gt;You could us "at" to set the time when it records easily enough.
+&gt;&gt;&gt;at 5 am
+&gt;&gt;&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;recordradio.pl
+&gt;&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;
+&gt;&gt;&gt;^D
+&gt;&gt;&gt;
+&gt;&gt;&gt;at 6 am
+&gt;&gt;&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;stoprecording
+&gt;&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;
+&gt;&gt;&gt;^D
+&gt;&gt;&gt;
+&gt;&gt;&gt;etc
+&gt;&gt;&gt;
+&gt;&gt;&gt;you'd then make the recordradio.pl script do something like
+&gt;&gt;&gt;
+&gt;&gt;&gt;#!/usr/bin/perl
+&gt;&gt;&gt;
+&gt;&gt;&gt;# record your PID so you can stop it later..
+&gt;&gt;&gt;open(FOO, "/var/run/radio.pid");
+&gt;&gt;&gt;print FOO "$$\n";
+&gt;&gt;&gt;close(FOO);
+&gt;&gt;&gt;
+&gt;&gt;&gt;# Record from line in to mpeg
+&gt;&gt;&gt;print "Recording to output.mp3..\n";
+&gt;&gt;&gt;# i'm guessing at the rec stuff, i haven't actualy tried it myself
+&gt;&gt;&gt;# the lame options are for the fm radio preset, plus VBR mode enable.
+&gt;&gt;&gt;system("rec --rate=44100 -t wav --size=w - | lame --preset fm --quiet
+&gt;&gt;&gt;-v - output.mp3");
+&gt;&gt;&gt;print "Recording has aborted for some reason.\n";
+&gt;&gt;&gt;# remove the pid file
+&gt;&gt;&gt;unlink("/var/run/radio.pid");
+&gt;&gt;&gt;exit;
+&gt;&gt;&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt;The stoprecording script would just need to be a bash script that does:
+&gt;&gt;&gt;kill `cat /var/run/radio.pid`
+&gt;&gt;&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt;i haven't tried this, but give it a go and see if it works.. I was thinking
+&gt;&gt;&gt;about this exact situation last week, because some ppl i know do a show on
+&gt;&gt;&gt;sunday mornings that i'd like to record, but am not in the mood at 9am!
+&gt;&gt;&gt;Unfortunately my radio reception when its next to the computer prevented me
+&gt;&gt;&gt;from actually trying out the stuff..
+&gt;&gt;&gt;
+&gt;&gt;&gt;Hope this helps, and if you debug it and get it working, please post back to
+&gt;&gt;&gt;the list..
+&gt;&gt;&gt;
+&gt;&gt;&gt;-Toby
+&gt;&gt;&gt;
+&gt;&gt;&gt;On Sun, 13 Jan 2002, Aristotle wrote:
+&gt;&gt;&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;Hi people,
+&gt;&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;I would like to set up my Mandrake 8.1 box to record the radio and mpeg
+&gt;&gt;&gt;&gt;compress it to set directories / dynamically updated filenames (by date)
+&gt;&gt;&gt;&gt;at set times - so for example I can record a show of Radio National at
+&gt;&gt;&gt;&gt;5am or whatever.
+&gt;&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;I figure I can plug a radio in the line in port on the soundcard and
+&gt;&gt;&gt;&gt;then pipe that to a mpeg compression application somehow although I have
+&gt;&gt;&gt;&gt;no idea how.
+&gt;&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;If anyone is aware of a project already started up for this I would be
+&gt;&gt;&gt;&gt;appreciative to be pointed in the right direction - or if anyone is able
+&gt;&gt;&gt;&gt;to help me I would be happy.  Even if someone would like to come around
+&gt;&gt;&gt;&gt;one day and I will shout some pizza / beer / etc to sit down and nut
+&gt;&gt;&gt;&gt;this and some other Linux things out I would be very appreciative.
+&gt;&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;It would be handy to extend this to a radio / tv card to record set
+&gt;&gt;&gt;&gt;programs - and just set up a monthly schedule.
+&gt;&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;Would it be one day possible to route this through voice recognition
+&gt;&gt;&gt;&gt;software to keep an eye out for interesting topics - say listening for
+&gt;&gt;&gt;&gt;'Afghanistan' on talk back radio or something - I jnow this is
+&gt;&gt;&gt;&gt;far-fetched but I thought I would ask anyhow.
+&gt;&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;I am about to re-commence studies at Flinders University in politics
+&gt;&gt;&gt;&gt;(international relations) and a tool like this would be immensely
+&gt;&gt;&gt;&gt;helpful.  Perhaps later we can develop it to a point where other
+&gt;&gt;&gt;&gt;students / universities would find such a tool to be useful also -
+&gt;&gt;&gt;&gt;another way to get Linux on the map.
+&gt;&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;Thanks in advance!!!
+&gt;&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;
+&gt;&gt;
+&gt; 
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

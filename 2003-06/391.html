@@ -1,0 +1,118 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: uptime = 1 day, Grrrrr...." -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="ak1.linuxsa@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 11 Jun 2003 13:47:58 +0930" -->
+<!-- Id="20030611134758.A25725@dog.topology.org" -->
+<!-- Reference="3EE671CE.9070907@bsal.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: uptime = 1 day, Grrrrr....</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak1.linuxsa@topology.org">ak1.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 11 Jun 2003 13:47:58 +0930
+</PRE>
+<H1>Re: uptime = 1 day, Grrrrr....</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Jun 11, 2003 at 09:33:26AM +0930, David Creed wrote:
+&gt; Alan, hope you don't mind me asking a dumb question, but you mentioned 
+&gt; in this post
+&gt; <A HREF="http://www.linuxsa.org.au/mailing-list/2003-04/598.html">http://www.linuxsa.org.au/mailing-list/2003-04/598.html</A>
+&gt; that the problem with limited uptime reporting periods related to 
+&gt; "jiffies" (whatever they are) and also to the fact that
+&gt;   2^32 / (100*60*60*24) = 497.1026962962
+&gt; 
+&gt; My dumb question is, "is this a product of using a 32 bit operating 
+&gt; system, and will this uptime reporting limit change if I'm using a 64 
+&gt; bit operating system, specifically linux on Alpha ?"
+
+
+David,
+
+In the 2.4.20 kernel file kernel/timer.c, there's this:
+
+unsigned long volatile jiffies;
+
+So it's architecture-dependent.
+("jiffies" is, of course, the count of system timer interrupts since boot time.
+So the max uptime is 2^N/(HZ*60*60*24) days, where N is sizeof(unsigned long)*8
+and HZ is the number of system interrupts per second.)
+
+If you do this:
+
+    egrep "long.* u64" include/*/types.h 
+
+in the top kernel directory, you get lines such as this:
+
+include/asm-alpha/types.h:typedef unsigned long u64;
+include/asm-arm/types.h:typedef unsigned long long u64;
+include/asm-i386/types.h:typedef unsigned long long u64;
+include/asm-m68k/types.h:typedef unsigned long long u64;
+include/asm-ppc/types.h:typedef unsigned long long u64;
+include/asm-ppc64/types.h:typedef unsigned long u64;
+include/asm-sparc/types.h:typedef unsigned long long u64;
+include/asm-sparc64/types.h:typedef unsigned long u64;
+
+So it looks like the alpha, ppc64 and sparc64 use 64-bit jiffies,
+whereas the others in the above list have 32-bit jiffies.
+
+Using "jiffies" for uptime calculations is obviously wrong, and really shows
+a lack of faith in the ability of linux to stay up for 500 days.
+On the other hand, 32-bit time has to become extinct between now and 2038
+so as to avoid the Y2k38 bug. So we just have to put up with this jiffies
+constraint until our current PCs go down to the museum.
+
+Actually, on that subject, I've been thinking about pyramids lately, and
+the fact that archaeologists of the future will be looking around for evidence
+of civilisation in the 20th/21st centuries. So maybe we should lobby the
+state govt to build a huge pyramid out at Monarto and fill it completely
+with old computer gear inside. This would be something to put us on the
+map like the Sydney Opera House, and would be gratefully received by
+archaeologists of the future. Too bad that all the data will be gone!
+
+Anyway, in principle the 64-bit architectures should give correct uptime
+reports if the "uptime" program is written properly.
+Maybe someone with a 64-bit linux machine could tell you...
+
+CHeers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

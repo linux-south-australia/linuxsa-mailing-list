@@ -1,0 +1,163 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Masquerading / FTP Server" -->
+<!-- FromName="'Michael T. Cheshire'" -->
+<!-- FromEmail="michael.cheshire@microarts.com.au" -->
+<!-- ToName="'Richard Russell','Steve Lawrence'" -->
+<!-- ToEmail="richard@yellowgoanna.com,sjl79@netspace.net.au" -->
+<!-- Date="Mon, 15 Jul 2002 12:42:03 +0930" -->
+<!-- Id="1678A60022973E4E936ABA52D4D86A61023CDD@exchange.microarts.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Masquerading / FTP Server</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael T. Cheshire &lt;<I><A HREF="mailto:michael.cheshire@microarts.com.au">michael.cheshire@microarts.com.au</A></I>&gt;
+  To  : Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;<BR>        Steve Lawrence &lt;<I><A HREF="mailto:sjl79@netspace.net.au">sjl79@netspace.net.au</A></I>&gt;
+  Date: Mon, 15 Jul 2002 12:42:03 +0930
+</PRE>
+<H1>RE: Masquerading / FTP Server</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I thought that ip_nat_ftp was primarily for (S)NAT not DNAT :)
+
+For what you are suggesting to work Steve, you must have NAT setup so your windows box can access the net :
+
+ie (assuming your network is 192.168.0.0/24 and you use ppp for your external link)
+
+echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+iptables -t nat -A POSTROUTING -s 192.168.0.0/24 -o ppp+ -j MASQUERADE
+
+(check that you can ping an address on the net from your windows box to confirm this)
+
+then you would do a
+
+iptables -A PREROUTING -t nat -p tcp -d &lt;external ip&gt; --dport 21 -j DNAT --to &lt;your machine's ip&gt;:21
+iptables -A PREROUTING -t nat -p tcp -d &lt;external ip&gt; --dport 20 -j DNAT --to &lt;your machine's ip&gt;:20
+iptables -A PREROUTING -t nat -p udp -d &lt;external ip&gt; --dport 21 -j DNAT --to &lt;your machine's ip&gt;:21
+iptables -A PREROUTING -t nat -p udp -d &lt;external ip&gt; --dport 20 -j DNAT --to &lt;your machine's ip&gt;:20
+
+which forwards ports 20 & 21, TCP & UDP to your internal machine :)
+
+also, make sure you are not firewalling those ports (20,21) with iptables or anything else as this will kinda stop the above working =)
+
+Hope this helps.
+
+M.
+
+-----Original Message-----
+From: Richard Russell [mailto:<A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>]
+Sent: Monday, 15 July 2002 9:55 AM
+To: Steve Lawrence
+Cc: LinuxSA
+Subject: Re: Masquerading / FTP Server
+
+
+try
+
+modprobe ip_nat_ftp
+
+rr
+
+
+On Mon, Jul 15, 2002 at 12:40:31AM +0930, Steve Lawrence wrote:
+&gt; Hi guys,
+&gt; 
+&gt; I've been trying to sort out my firewall script so that my Linux box will
+&gt; forward the incoming connections on the FTP port for the server on my
+&gt; windows box to my windows box.
+&gt; 
+&gt; I've presently got what i believe to be a partial success in that connection
+&gt; attempts are no longer being snuffed out by the firewall however they seem
+&gt; not to be being picked up by the FTP. I have verified that the connection
+&gt; attempt at least seems to be being forwarded (through the use of ethereal)
+&gt; 
+&gt; <A HREF="http://www.ethereal.com">http://www.ethereal.com</A>
+&gt; 
+&gt; TCP Source Port: 4560, DST Port XXXX (XXXX), SEQ:2059763647, ACK:0, LEN:0.
+&gt; 
+&gt; This is pretty much the result of listening to the packets which are being
+&gt; received on the windows box NIC, noting that there is no acknowledgement of
+&gt; the packet and yes this is definitely as a result of the FTP connection
+&gt; attempt, as was determined by the source and dest addresses for the
+&gt; proceedure (not shown).
+&gt; 
+&gt; So basically what i'm asking after all of that is, can anyone help me out
+&gt; with the actual IPTABLES chains i need to enable this to work ?
+&gt; 
+&gt; this is as close i've managed to get :
+&gt; 
+&gt; $IPTABLES -A PREROUTING -t nat -p tcp -d $EXTIP --dport XXXX:XXXX -j
+&gt; DNAT --to $HTTPIP
+&gt; 
+&gt; Noting that the port range includes the data ports for the ftp server as
+&gt; well as the port and port -1 for the actual connections, so as to allow
+&gt; passive mode connections.
+&gt; 
+&gt; Also where $EXTIP = dynamically assigned ip from the ISP and $HTTPIP = the
+&gt; local machine which contains the FTP server
+&gt; 
+&gt; Any and all help will be more than gratefully accepted at this stage :)
+&gt; 
+&gt; thanks folks
+&gt; 
+&gt; Steve Lawrence
+&gt; 
+&gt; PS : noting i'm still a very green user of linux, though this may be
+&gt; blatantly obvious by the question alone. :)
+&gt; 
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+&gt; 
+
+-- 
+-- 
+Richard Russell
+Yellow Goanna P/L
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+m: +61 412 827 805
+f: +61 8 8462 2362
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

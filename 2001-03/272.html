@@ -1,0 +1,100 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Perl Formats" -->
+<!-- FromName="'Mark Newton'" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="'Andrew Hill'" -->
+<!-- ToEmail="list@fornax.net" -->
+<!-- Date="Wed, 7 Mar 2001 15:55:38 +1030" -->
+<!-- Id="20010307155538.A59792@atdot.dotat.org" -->
+<!-- Reference="3AA5C02D.8050700@fornax.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Perl Formats</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Andrew Hill &lt;<I><A HREF="mailto:list@fornax.net">list@fornax.net</A></I>&gt;
+  Date: Wed, 7 Mar 2001 15:55:38 +1030
+</PRE>
+<H1>Re: Perl Formats</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Mar 07, 2001 at 03:29:25PM +1030, Andrew Hill wrote:
+
+ &gt; I guess a write to file would look cleaner, but this seems nicer
+ &gt; to me - I hate temporary file :-)
+ &gt; If anyone can think of a cleaner solution....?
+
+I assume you're sending $mail into a pipe, something like this:
+
+    open MAIL, "|/usr/bin/mail -s 'Some subject line' <A HREF="mailto:someone@somewhere.com">someone@somewhere.com</A>"
+	or die "Can't send mail: $!";
+
+    print MAIL $mail;
+    close MAIL;
+
+If so, why don't you just apply the format to the MAIL filehandle and
+forget writing to the variable?
+
+    format FORMAT_NAME = 
+    @&lt;&lt;&lt;&lt;&lt;&lt;&lt; @&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt; ^&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+    $name,   $id,      $comment
+		       ^&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+		       $comment
+		       ^&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;...
+		       $comment
+    .
+
+    open MAIL, "|/usr/bin/mail -s 'Some subject line' <A HREF="mailto:someone@somewhere.com">someone@somewhere.com</A>"
+	or die "Can't send mail: $!";
+
+    select(MAIL);       # make MAIL the default file handle
+    $~ = "FORMAT_NAME"; # Apply FORMAT_NAME to it 
+    write;              # send output
+    select(STDOUT);     # return the world to normal
+    close MAIL;
+    
+Is that a bit more like what you had in mind?  It appears simpler to me, 
+but it might be a simple solution to a problem you don't have :-)
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,127 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Sendmail features and firewalls" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="Alex Garner" -->
+<!-- ToEmail="alex@netcraft.com.au" -->
+<!-- Date="Thu, 13 Jul 2000 19:30:13 +0900" -->
+<!-- Id="3.0.6.32.20000713193013.009b8630@203.16.214.248" -->
+<!-- Reference="3.0.6.32.20000713043816.00af11b0@203.16.214.248" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Sendmail features and firewalls</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : Alex Garner &lt;<I><A HREF="mailto:alex@netcraft.com.au">alex@netcraft.com.au</A></I>&gt;
+  Date: Thu, 13 Jul 2000 19:30:13 +0900
+</PRE>
+<H1>Re: Sendmail features and firewalls</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 01:06 PM 7/13/00 +0930, Alex Garner wrote:
+&gt;&gt; I have been reviewing the sendmail config at one customer site recently to
+&gt;&gt; make it simpler and more maintainable ...
+&gt;&gt; 
+&gt;&gt; We have what is a standard config in this situation:
+&gt;&gt; 
+&gt;&gt;   [Big Bad Internet]----[Firewall]-----[Internal Mail Server]
+&gt;&gt; 
+&gt;&gt; All mail is received on the firewall and relayed to the Internal Mail
+Server.
+&gt;&gt; 
+&gt;&gt; All internal addresses are from one of the Private IP domains. 
+&gt;&gt; 
+&gt;&gt; When I set this up four years ago, I had to hack the sendmail config file
+&gt;&gt; to defeat DNS name lookups on the internal mail server name so the IP
+&gt;&gt; address could be looked up in the hosts file. 
+&gt;&gt; 
+&gt;&gt; The ways to handle this these days is to use the LOCAL_RULES stuff in your
+&gt;&gt; sendmail.mc file, or to use split DNS.  
+&gt;&gt; 
+&gt;&gt; However, both of these are quite complicated, and it seemed to me that
+&gt;&gt; there is a need for a FEATURE, perhaps called internal_mail_hub that allows
+&gt;&gt; people who are trying to set this sort of system up to do so easily.
+
+Boy, if only I knew this stuff four years ago ... :-(
+
+&gt;It's actually already pretty simple with existing sendmail-cf
+&gt;FEATUREs. This is all straight from www.sendmail.org BTW.
+
+Well, you do have to do some digging to get to it :-)
+
+&gt;Use the standard /usr/lib/sendmail-cf/cf/redhat.mc file and comment
+&gt;out the recomended line. Compile and use.
+&gt;
+&gt;Allow RELAY access to the necessary machines in /etc/mail/access
+&gt;
+&gt;	localhost.localdomain           RELAY
+&gt;	localhost                       RELAY
+&gt;	127.0.0.1                       RELAY
+&gt;	192.168.0.1                     RELAY
+&gt;	example.com                     RELAY
+&gt;
+&gt;Where 192.168.0.1 is the IP address of your internal mail server, and
+&gt;example.com is the domain name to receive mail for.
+&gt;
+&gt;Now do the forwarding bit in /etc/mail/mailertable
+&gt;
+&gt;	example.com                    smtp:[192.168.0.1]
+
+Now, the important thing here are the square brackets as they stop sendmail
+from using DNS and MX records for looking up the address.
+
+However, I think that this is more complex than it need be (the admin has
+to set up a mailertable etc).
+
+But, having had a look at the sendmail.cf file (which I can read, damn, I
+think I need a career change :-), it does do all I would want, in that the
+rules to handle delivery to names defined in sendmail.cw are handled before
+the mailertable lookup is done, so one can set things up to allow mail to a
+small number of accounts on the firewall, like root, while handling all
+other addresses via the internal mail gateway.
+
+[Rest deleted]
+
+Well, Alex, you are not just a pretty face :-) I guess I get to find out on
+Saturday if you are even a pretty face?
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+ 
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

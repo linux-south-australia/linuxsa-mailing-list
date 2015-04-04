@@ -1,0 +1,143 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Boosting NFS performance (bottlenecks?)" -->
+<!-- FromName="'Schenk, Jarrad'" -->
+<!-- FromEmail="Jarrad.Schenk@dsto.defence.gov.au" -->
+<!-- ToName="'Linuxsa (E-mail)'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 12 Feb 2004 08:36:54 +1030" -->
+<!-- Id="8D98BD395C94D7119DF800306E01596665C403@ednex506.dsto.defence.gov.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Boosting NFS performance (bottlenecks?)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Schenk, Jarrad &lt;<I><A HREF="mailto:Jarrad.Schenk@dsto.defence.gov.au">Jarrad.Schenk@dsto.defence.gov.au</A></I>&gt;
+  To  : Linuxsa (E-mail) &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 12 Feb 2004 08:36:54 +1030
+</PRE>
+<H1>RE: Boosting NFS performance (bottlenecks?)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I've also heard that with point to point tcp transfers across gigabit, that you will vary rarely get full 1000mbit throughput (more like 200mbit). In point to multipoint you can but not point to point.
+
+Is this still a problem or has it been fixed? (or was I told porkies?)
+
+
+Jarrad
+
+&gt; -----Original Message-----
+&gt; From: Richard Sharpe [mailto:<A HREF="mailto:rsharpe@richardsharpe.com">rsharpe@richardsharpe.com</A>]
+&gt; Sent: Thursday, 12 February 2004 5:32 AM
+&gt; To: Ryan Verner
+&gt; Cc: Linux SA; Glen Turner
+&gt; Subject: Re: Boosting NFS performance (bottlenecks?)
+&gt; 
+&gt; 
+&gt; On Thu, 12 Feb 2004, Ryan Verner wrote:
+&gt; 
+&gt; &gt; 
+&gt; &gt; On 12/02/2004, at 1:47 AM, Ryan Verner wrote:
+&gt; &gt; 
+&gt; &gt; &gt; On 12/02/2004, at 1:35 AM, Ryan Verner wrote:
+&gt; &gt; &gt;&gt; 100baseTX full-duplex, I'm only getting ~10MB/sec transfers.  I 
+&gt; &gt; &gt;&gt; actually need much
+&gt; &gt; &gt;
+&gt; &gt; &gt; Erm, 1000baseTX full-duplex, even.  10MB/sec would be 
+&gt; good @ the lower 
+&gt; &gt; &gt; speed, but unfortunately for this, it isn't *quite* enough juice.
+&gt; &gt; 
+&gt; &gt; And just to follow up myself again, that 10MB/sec was a once off, I 
+&gt; &gt; think - I'm getting averages of around 5MB/sec, which is 
+&gt; what I would 
+&gt; &gt; expect for 100baseTX.  Cards are definitely running at 1000baseTX 
+&gt; &gt; full-duplex, though.
+&gt; &gt; 
+&gt; &gt; What kind of speeds should I expect?
+&gt; &gt; 
+&gt; &gt; I know that the G5 isn't a bottleneck as it's also connected to an 
+&gt; &gt; XServe RAID via fibre channel, and it transfers to/from this at 
+&gt; &gt; absolute insane speeds.
+&gt; &gt; 
+&gt; &gt; I just converted one filesystem to XFS, and as I suspected, it made 
+&gt; &gt; absolutely no difference to transfer speeds.
+&gt; &gt; 
+&gt; &gt; Argh.  Anybody want to suggest anything?  :-(
+&gt; 
+&gt; We came across an interesting bug in the FreeBSD NFS server 
+&gt; code in 4.6.2 
+&gt; which was still in the code all the way to 5.x. This bug only 
+&gt; affected 
+&gt; server code, so I don't know if it is what you are seeing.
+&gt; 
+&gt; The server code only allocated socket buffer space (this was 
+&gt; TCP, BTW), of 
+&gt; 32kB plus a bit for the RPC overhead. The client was doing 
+&gt; 64kB reads. 
+&gt; The first 32kB went out, but the second 32kB was not sent 
+&gt; until the Linux 
+&gt; client acked the very last segment of the first 32kB. This 
+&gt; caused long 
+&gt; pauses in the middle (something like 32ms) and reduced throughput to 
+&gt; something like 6MB/s. Today we can get 70+MB/s. The problem 
+&gt; was that the 
+&gt; in-kernel NFS server was using kernel routines that would not 
+&gt; put any data 
+&gt; in the socket buffer until all the space needed was there. 
+&gt; Since the last 
+&gt; segment of the last 32kB was still in the socket buffer, 
+&gt; there was not 
+&gt; room for another 32kB + header space.
+&gt; 
+&gt; You can check for these problems by grabbing a capture and 
+&gt; looking at it 
+&gt; with the Analyse--&gt;Tcp Stream Analysis--&gt;tcptrace type and look for a 
+&gt; marked staircase effect in the graph.
+&gt; 
+&gt; Regards
+&gt; -----
+&gt; Richard Sharpe, rsharpe[at]richardsharpe.com, rsharpe[at]samba.org, 
+&gt; sharpe[at]ethereal.com, <A HREF="http://www.richardsharpe.com">http://www.richardsharpe.com</A>
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on 
+&gt; irc.freenode.net
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as 
+&gt; the subject
+&gt; 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

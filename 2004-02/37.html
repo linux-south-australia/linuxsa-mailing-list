@@ -1,0 +1,162 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: LCA 2004 - secure computer kiosks" -->
+<!-- FromName="'SteveOC'" -->
+<!-- FromEmail="steve@smartfab.com.au" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="02 Feb 2004 14:40:15 +1030" -->
+<!-- Id="1075695018.4128.272.camel@tk" -->
+<!-- Reference="VA.000002fc.0725bda9@netexpress.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: LCA 2004 - secure computer kiosks</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: SteveOC &lt;<I><A HREF="mailto:steve@smartfab.com.au">steve@smartfab.com.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 02 Feb 2004 14:40:15 +1030
+</PRE>
+<H1>Re: LCA 2004 - secure computer kiosks</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Kiosks are Kool. 
+
+Im doing exactly that with point of sale systems - boot machine,
+straight to graphical LILO prompt, then straight into X without any
+login. Presents a fullscreen graphical menu of different applications
+(configured via a text ini file), and from there straight into
+full-screen POS system. 
+
+The simple solution is just to call startx from rc.local, however this
+is full of difficulties  .. just try running X as non-root user from
+rc.local and see how far you get ... It can be made to work, but it
+requires true shell scripting horror. 
+
+So, to get around this, Im using runlevel 2, and firing up X as a
+non-root user from /etc/rc.d/rc2.d/S99startPOS. 
+
+/home/pos_user/.profile contains - 
+------------------------- 
+#!/bin/bash 
+while [ 1 ] ; do 
+  /usr/X11R6/bin/startx 
+done 
+exit 
+------------------------- 
+Just run X in a loop 
+
+/etc/rc.d/rc2.d/S99startPOS contains - 
+------------------------- 
+#!/bin/bash 
+
+# Ensure the environment is up to scratch 
+PATH=$PATH: + extra stuff 
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH: + extra stuff 
+su pos_user -c "initialisation commands ..." 
+su - pos_user 
+------------------------- 
+The last su changes the UID to the non-root user, and logs in as them.
+(ie - runs their .profile script) This ensures that all the paths and
+permissions and everything are spot on by the time that X is laucnhed. 
+
+If you use runlevel 5, and try to configure KDM or GDM for autologin,
+that works fine, and is maybe the easiest way to create a kiosk from a
+RedHat style disto. Problem is, if you start either of these login
+managers, then it creates a dependency for the kiosk to have all the
+latest and greatest Qt and/or Gnome libs installed and available. For
+those of us looking to build a minimalist high performance system for a
+single dedicated task, this is total overkill, and you want to avoid as
+many dependencies as possible. 
+
+X and everything else runs as a non-root user, and the POS application
+and SQL database runs in a chrooted jail. 
+
+Runs great on a PII with 64MB RAM, since there is no overhead for window
+managers, Gnome / CORBA / KDE, etc. At runtime, X is cruising on about
+11MB, the application uses around 8MB, and postgreSQL daemons chew
+another 8MB, so on a good day you might be able to get away with a 32MB
+kiosk machine before swapping. (I have not dared go below 64MB yet, but
+it should work fine) 
+
+The only non-graphical portion lies between LILO boot and the start of
+X. Im researching ways at the moment to completely hide all of the
+generous bootup diagnostics, and just display some sort of full screen
+spinner whilst the OS is bootstrapping itself.  If any bootup script
+fails, I want to drop out of the graphical mode, and display the boot
+log in text mode. 
+
+Ive based all this on slackware/vector, since it is a lot closer to the
+kiosk setup than a big distro, but there is still an awful lot of
+scripts and hacks that are changed from the basic slackware to lock
+everything down. 
+
+Now I want to be able to build these things on demand, and I dont want
+to waste an entire weekend working until 4am for 2 days straight just to
+re-configure everything from a stock distro each time a new application
+comes up - 20 minutes per machine sounds better, and gives me time to
+add a funky coat of paint to the PC that its going into. So Ive created
+a distro (POSLinux) with minimal installation options instead. A system
+installed with this POSLinux distro includes the tools needed to
+re-generate a new variant distro. 
+
+Huh ? How does that work ? 
+
+You install POSLinux, change the menus and graphics around around to
+suit your application, setup your application, database, networking
+configuration, login accounts and passwords, custom kernel for wierd-ass
+hardware, etc, etc. Thats a lot of changes, but you dont need to note
+them all down so as to reproduce them on the next machine - When you are
+100% happy with the efforts of your labour, run 'makedistro', and it
+will create a fresh new slackware linux distribution CD which installs a
+clone of exactly how your machine is setup & working now. 
+
+Currently, the base .iso file is growing - its out to 250MB now, since
+Ive decided that I cannot live without the Gimp available on a
+production machine. Im sure there is plenty of stuff in there that I can
+still remove without killing everything, like Japanese docs and all the
+locale data in X ??? 
+
+I still cant be hassled hosting this and paying for bandwidth charges,
+so I might instead burn a bunch of CD's and give them away at a LUG
+meeting, primarily for people who want to build secure kiosk / or
+dedicated GUI application systems, it gives them a starting point that
+at least saves them the first weekend of messing around, and provides a
+framework for building their own custom kiosk distros. 
+
+my 2c 
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,107 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: [OT] FreeBSD Nebie eLog V" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="'Daryl Tester'" -->
+<!-- ToEmail="Daryl.Tester@iocane.com.au" -->
+<!-- Date="Thu, 11 Sep 2003 09:56:12 -0700" -->
+<!-- Id="3F60A92C.2040407@pacbell.net" -->
+<!-- Reference="3F6080B5.9F158C02@iocane.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: [OT] FreeBSD Nebie eLog V</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : Daryl Tester &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  Date: Thu, 11 Sep 2003 09:56:12 -0700
+</PRE>
+<H1>Re: [OT] FreeBSD Nebie eLog V</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Daryl Tester wrote:
+
+&gt;James Leone wrote:
+&gt;
+&gt;  
+&gt;
+&gt;&gt;* The contents of scanner.sh reads:
+&gt;&gt;
+&gt;&gt;chown james /home/Anonymous/*.*
+&gt;&gt;chgrp wheel /home/Anonymous/*.*
+&gt;&gt;cp /home/Anonymous/*.* /home/james/
+&gt;&gt;rm /home/Anonymous *.*
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;Urk - sorry to be a bear, James, but I see a couple of problems
+&gt;with that script.
+&gt;
+&gt;1)  There's going to be unnecessary noise coming off of all
+&gt;those commands when the directory is empty.
+&gt;2)  Worse, there's two race conditions that may occasionally
+&gt;bite you.  One is where FTP starts after the cp, but before
+&gt;the rm, in which case the file will go completely missing.
+&gt;The other is where the FTP starts just before the cp, and
+&gt;hasn't completed yet, in which case the cp will only copy
+&gt;a partial file (which rm will obligingly remove).
+&gt;
+&gt;The following relies on several gnuisms.  Try something like:
+&gt;  
+&gt;
+Right away! Thank you!
+
+James Leone
+
+&gt;#!/bin/sh
+&gt;
+&gt;for f in $(find /home/Anonymous -type f -maxdepth 1 -print); do
+&gt;    # Check if file in use.
+&gt;    if ! /sbin/fuser $f &gt; /dev/null; then
+&gt;        # It's clear - chocks away.
+&gt;        chown james:wheel $f
+&gt;        mv $f /home/james/
+&gt;    fi
+&gt;done
+&gt;
+&gt;
+&gt;Cheers,
+&gt;  --dt
+&gt;
+&gt;  
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

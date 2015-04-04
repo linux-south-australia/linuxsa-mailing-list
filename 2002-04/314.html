@@ -1,0 +1,136 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Duplex setting on an ethernet card" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'SUMNER, Peter'" -->
+<!-- ToEmail="peter.sumner@baesystems.com" -->
+<!-- Date="Wed, 10 Apr 2002 16:51:57 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.44.0204101608250.6104-100000@bush.aarnet.adelaide.edu.au" -->
+<!-- Reference="DD3847CE45D2D41185E200508BB35A26055CEB@SBNTEX2" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Duplex setting on an ethernet card</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : SUMNER, Peter &lt;<I><A HREF="mailto:peter.sumner@baesystems.com">peter.sumner@baesystems.com</A></I>&gt;
+  Date: Wed, 10 Apr 2002 16:51:57 +0930 (CST)
+</PRE>
+<H1>Re: Duplex setting on an ethernet card</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Peter,
+
+The reason you can't see the duplex setting is that system administrators
+shouldn't fiddle with it, as 9 times out of 10 they don't understand what
+it does.
+
+The summary is: set both the switch and the PC to autonegotiate OR set
+both the switch and the PC to 100BaseTX FDX.
+
+Setting a speed and duplex sets the speed and duplex of the local NIC
+*and* turns off the negotiation protocol.  Without the negotiation
+protocol an autonegotiating port defaults to 10BaseTX HDX (the original
+ethernet speed and duplex for twisted pair).
+
+Thus a system administrator setting the duplex to "full" actually
+ends up with a configuration
+
+          Speed  Duplex  Autoneg
+  Host:    100    FDX      Off
+  Switch:   10    HDX       On
+
+When the host comes up the switch sees a 100MHz carrier, resulting in the
+configuration
+
+          Speed  Duplex  Autoneg
+  Host:    100    FDX      Off
+  Switch:  100    HDX       On
+
+The mismatched duplex will cause packet loss and low throughput. 
+
+This is slightly complicated by the fact that some NIC cards and some
+switches have faulty negotiation protocols.  The early DEC Tulip cards and
+the early Cisco and HP switches are in this category -- I'd be thinking
+that the VMS machine might well have a card with the DEC Tulip 21140 chip
+(eg: a DE500-AA card rather than the DE500-BA card which uses the
+bug-fixed 21143 chip).  The switches can usually be fixed by a software
+upgrade.
+
+The way you set the duplex is as a kernel parameter.  See
+
+  <A HREF="http://www.scyld.com/network/tulip.html">http://www.scyld.com/network/tulip.html</A>
+
+for the DEC cards.  For example /etc/modules.conf could contain
+  alias eth0 tulip
+  options eth0 options=8
+  # options=8 is 100BaseTX, FDX, RJ45
+
+The DEC chip has more complex parameters than most cards, normally you
+would say
+  alias eth0 eepro100
+  options eth0 full_duplex=1
+
+To see the link negotiation set "debug", bigger numbers produce more
+output.
+
+  alias eth0 tulip
+  options eth0 options=8 debug=1
+  # options=8 is 100BaseTX, FDX, RJ45
+  # debug=1 prints negotiation, debug=6 prints the most
+
+To summarise, for modern PCs leave the duplex and speed settings well
+alone.  Perhaps set "debug" to ensure that the negotiation works
+correctly.  If it doesn't then suspect that the switch port is not set for
+autonegotiate.  If the NIC card doesn't do autonegotiation correctly throw
+it away and get a new one, new cards cost so little that anything else is
+a waste.
+
+For old, more expensive machinery with faulty NIC cards then nail down the
+speed and duplex parameters *at both the host and the switch*.  
+Fortunately this machinery is unlikely to move switch ports, unlike PCs.
+
+Regards,
+Glen
+
+-- 
+Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,133 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: pppd" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Robyn Manning" -->
+<!-- ToEmail="robynman@ozemail.com.au" -->
+<!-- Date="Mon, 29 Nov 1999 14:03:14 +1030 (CST)" -->
+<!-- Id="Pine.BSF.3.96.991129133010.20617H-100000@augustus.tellurian.com.au" -->
+<!-- Reference="99112901283400.01227@localhost.localdomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: pppd</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Robyn Manning &lt;<I><A HREF="mailto:robynman@ozemail.com.au">robynman@ozemail.com.au</A></I>&gt;
+  Date: Mon, 29 Nov 1999 14:03:14 +1030 (CST)
+</PRE>
+<H1>Re: pppd</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; The pppd binary must be installed with the SUID bit set.
+
+I strongly urge you find a FreeBSD archive and download the complete manual
+set.  Linux has appalling documentation; BSD unix has always had good
+documenation.  Linux is sufficiently close to unix that the BSD manual will
+hold more lessons than surprises.  When you have obtained the BSD manuals,
+read them.  They explain security in lucid detail.
+
+SUID means "set user id".  This is part of Unix security, and I hasten to
+add that it's something which is frequently misused.
+
+Unix has three security domains.  There is the user who owns a file; there
+is the group that has group ownership of a file; and there is everyone
+else.
+
+   -rw-r--r-x  1 user  group  64 Nov 19 15:39 some-file
+
+Files are opened for some particular type of access, such as read only,
+write only or read and write.  When the file is opened the desired type of
+access is stated, and the kernel checks to see if that is permitted.  The
+kernel first checks to see what domain to use: if the process that opens
+the file was started by the same user that owns the file, then only the
+user permissions are inspected.  If the process was started by some other
+user, but that user is a member of the group that owns the file, then only
+the group permissions are considered.  If the process that opens the file
+was started by some other user, and if that user is not a member of the
+group that owns the file, then the third security domain determines whether
+the access is permitted.
+
+In the case of "some-file", above, "user" can read and/or write the file,
+but cannot execute it.  Anyone in group "group" (other than user) can only
+read the file; neither write nor execute it.  All other users can read and
+execute the file.
+
+The Unix security model permits an executable file to be started with the
+same permissions as the user or group that owns the file.
+
+   -rwsr-xr-x  1 user  group  1998 Nov  1 15:00 some-program
+
+All of what I said above, concerning verifying access to the file, holds
+true.  In addition, because the desired access is to execute the file two
+other elements in the file permission bits have meaning.  (I should say
+that execute access can only be requested using the fork system call, and
+this does not require read permission.)  Those two bits are the SUID (set
+user id) and SGID (set group id) bits.  When a file that has the SUID bit
+set is executed, the user who executed it is remembered (the real uid), and
+the new process runs effectively (effective uid) as the user that owns the
+program file.  The SGID bit is analagous to the SUID bit.
+
+When "some-program" (above) is executed, it runs with an effective user id
+of user.  Anybody can run it, and no matter who does so, it always runs
+with user's permissions.
+
+To refine the security model that I described above: When a file is opened
+for some particular type of access, the kernel first checks to see if the
+process is running with the same effective user id as the owner of the
+file; and so on.
+
+The intended purpose of SUID and SGID is to permit you to create secure
+access to protected data.  For example, you might have a file containing
+secrets that your friends tell you, and you might want your friends to be
+able to add their own secrets to that file.  You don't want anybody to be
+able to change a secret, just to add one, and so you would write a program
+that adds a secret to the file.  You would set the SUID bit on the program
+file, and deny any access to the file to the group and everyone else, so
+that only you could do anything to the file.  When anybody runs your SUID
+program, that program accesses the file with the same privileges as you.
+Naturally you would take very great care to ensure that the program could
+do nothing that you didn't specifically want.  For reasons that are way
+to time consuming to go into right now, use of the system() library
+routine would almost certainly be a security flaw.
+
+Postscript: pppd probably needs to be run as root, perhaps because it
+needs to read and write from the modem, which you might well not permit
+"ordinary" users, and perhaps because it manipulates routing tables.
+
+Another fine lesson brought to you by,
+
+David
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

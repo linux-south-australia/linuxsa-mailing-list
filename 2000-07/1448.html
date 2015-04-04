@@ -1,0 +1,165 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: serial port clashes" -->
+<!-- FromName="Robyn Manning" -->
+<!-- FromEmail="robynman@dove.net.au" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 27 Jul 2000 02:07:14 +0930" -->
+<!-- Id="00072702071401.00737@kanga.roo" -->
+<!-- Reference="20000726213436.A6747@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: serial port clashes</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Robyn Manning &lt;<I><A HREF="mailto:robynman@dove.net.au">robynman@dove.net.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 27 Jul 2000 02:07:14 +0930
+</PRE>
+<H1>Re: serial port clashes</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Alan,
+
+Definitely sounds like a irq problem and yes some misbehaving programs or 
+hardware take ownership of a certain com port and irq.
+
+Robyn
+
+On Wed, 26 Jul 2000, Alan Kennington wrote:
+&gt; Here's a curious problem which I can't solve (after several
+&gt; hours of trying).
+&gt;
+&gt; I wanted to be able to log in to a linux box through
+&gt; Com2 (ttyS1). So I added the line
+&gt;
+&gt; S1:23:respawn:/sbin/agetty -L ttyS1 9600 vt320
+&gt;
+&gt; to my /etc/inittab file.
+&gt; On ttyS0 (Com1) I have a mouse.
+&gt; On ttyS3, I have an internal modem!
+&gt; (There's no spare port for an external modem, in case
+&gt; that's what you're going to suggest.)
+&gt;
+&gt; But whenever I have the getty program running, I can't
+&gt; get the "wvdial" program to do anything with the ppp connection.
+&gt; I can't set up the connection.
+&gt;
+&gt; In fact, from a virtual terminal (xterm) I get
+&gt;
+&gt; ===================================================
+&gt; hamster /root# wvdial
+&gt; --&gt; WvDial: Internet dialer version 1.41
+&gt; --&gt; Initializing modem.
+&gt; --&gt; Sending: ATZ
+&gt; --&gt; Sending: ATQ0
+&gt; --&gt; Re-Sending: ATZ
+&gt; --&gt; Modem not responding.
+&gt; hamster /root#
+&gt; ===================================================
+&gt;
+&gt; On the other hand, if I use the VT320 connected to Com2
+&gt; to log in as root and run "wvdial", it actually finds a modem,
+&gt; and dials, and then fails after a minute or so, saying that it's
+&gt; getting no response from the PPP server.
+&gt;
+&gt; But If I remove the ttyS1 line from /etc/inittab and run
+&gt; "kill -HUP 1", everything is fine again.
+&gt; Except that now I can't log in on Com2 to do my kernel debugging work.
+&gt;
+&gt; The IRQ table shows:
+&gt;
+&gt; ==================================================
+&gt;            CPU0
+&gt;   0:     110078          XT-PIC  timer
+&gt;   1:       3507          XT-PIC  keyboard
+&gt;   2:          0          XT-PIC  cascade
+&gt;   3:      16581          XT-PIC  serial
+&gt;   4:       8044          XT-PIC  serial
+&gt;   8:          2          XT-PIC  rtc
+&gt; [...]
+&gt; ==================================================
+&gt;
+&gt; The "dmesg" contains:
+&gt;
+&gt; ==================================================
+&gt; Serial driver version 5.01 (2000-05-29) with MANY_PORTS SHARE_IRQ
+&gt; SERIAL_PCI ISAPNP enabled ttyS00 at 0x03f8 (irq = 4) is a 16550A
+&gt; ttyS01 at 0x02f8 (irq = 3) is a 16550A
+&gt; ttyS03 at 0x02e8 (irq = 3) is a 16550A
+&gt; ==================================================
+&gt;
+&gt; I thought the IRQ sharing should be fine.
+&gt; Maybe that isn't the problem. I don't know.
+&gt;
+&gt; By the way, the successful "wvdial" run (which permitted me to send
+&gt; this e-mail!) was:
+&gt;
+&gt; =================================================
+&gt; hamster /etc# wvdial
+&gt; --&gt; WvDial: Internet dialer version 1.41
+&gt; --&gt; Initializing modem.
+&gt; --&gt; Sending: ATZ
+&gt; ATZ
+&gt; OK
+&gt; --&gt; Sending: ATQ0 V1 E1 S0=0 &C1 &D2
+&gt; ATQ0 V1 E1 S0=0 &C1 &D2
+&gt; OK
+&gt; --&gt; Modem initialized.
+&gt; [...]
+&gt; =================================================
+&gt;
+&gt; My best guess is that "agetty" is somehow typing up the IRQ 3
+&gt; in some way.
+&gt;
+&gt; Any clues much appreciated.
+&gt;
+&gt; Cheers,
+&gt; Alan Kennington.
+&gt;
+&gt; PS. Considering all the excitement over the Yopy, I think
+&gt; people should be even more excited over the iPAQ H3600.
+&gt;
+&gt; <A HREF="http://www.handhelds.org/Compaq/iPAQH3600/Pictures/index.html">http://www.handhelds.org/Compaq/iPAQH3600/Pictures/index.html</A>
+&gt;
+&gt; especially this sort of picture:
+&gt;
+&gt; <A HREF="http://www.handhelds.org/Compaq/iPAQH3600/Pictures/JGHand7.jpg">http://www.handhelds.org/Compaq/iPAQH3600/Pictures/JGHand7.jpg</A>
+&gt;
+&gt; But I read somewhere that the H3600 is not for export out of
+&gt; the USA.
+&gt;
+&gt; Why is this so?
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

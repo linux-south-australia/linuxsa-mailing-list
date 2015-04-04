@@ -1,0 +1,138 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SMTP callouts for email really work" -->
+<!-- FromName="'Michael Firkins'" -->
+<!-- FromEmail="michael@home.lyppard.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 28 Sep 2003 00:47:39 +0930" -->
+<!-- Id="20030927151739.GB28212@home.lyppard.com.au" -->
+<!-- Reference="20030927144713.GZ12846@erizo.shearer.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SMTP callouts for email really work</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Firkins &lt;<I><A HREF="mailto:michael@home.lyppard.com.au">michael@home.lyppard.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 28 Sep 2003 00:47:39 +0930
+</PRE>
+<H1>Re: SMTP callouts for email really work</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Dan,
+
+* Dan Shearer &lt;<A HREF="mailto:dan@shearer.org">dan@shearer.org</A>&gt; [2003-09-28 00:16]:
+&gt; I just had reason to check my reject logs, because people have been
+&gt; telling me that this latest Microsoft worm is generating lots of
+&gt; messages. My conclusion is that rcpt-time block _really_ works. I
+&gt; haven't even bothered to look at my anti-spam checks for months, but I 
+&gt; am not vulnerable to the latest auto-spam doing the rounds. And my CPU
+&gt; has been bumbling along near zero :-)
+&gt; 
+&gt; According to the logs I have rejected 400 messages containing the string
+&gt; "microsoft.com" in the headers, out of 7000 rejected messages in total.
+&gt; And not one of these messages cost me significant data, because I
+&gt; dropped the message as soon as the sender was identified as bogus
+&gt; (before the SMTP "DATA" command.)
+&gt; 
+&gt; RCPT-time checking is implemented in Exim in an ACL structure, ie you
+&gt; put together a simple ACL statement along the lines of what you might do
+&gt; in a Squid or Apache config file. There is also a milter for Sendmail
+&gt; that will do something similar.
+&gt; 
+&gt; The two checks I do which stop huge amounts of spam are:
+&gt; 
+&gt; 	1. Does "<A HREF="mailto:sender@senderdomain">sender@senderdomain</A>" positively not exist? Spammers
+&gt; 	still usually post from spoofed or otherwise unrepliable places.
+&gt; 	A callout starts an SMTP delivery but stops before the DATA
+&gt; 	statement, unless there was previously an error message (if
+&gt; 	there is an MTA at all, or an MX at all, etc.)
+&gt; 
+&gt; 		==&gt; one line in a config file.
+&gt; 
+&gt; 	2. Does "<A HREF="mailto:postmaster@senderdomain">postmaster@senderdomain</A>" positively not exist? Would
+&gt; 	you believe, neither spammers nor automated virus-generated
+&gt; 	addresses tend to survive this test because they don't tend
+&gt; 	to have properly-run domains :-)
+&gt; 
+&gt; 		==&gt; one line in a config file.
+&gt; 
+&gt; This saves bandwidth and CPU. I simply don't have to process any of that
+&gt; junk because it never crossed the border into my network.
+&gt; 
+&gt; After that, I push the surviving mail through Spam Assassin at DATA
+&gt; time, before I accept the message into a queue. So if SA doesn't like it
+&gt; I have paid for the bandwidth and the CPU, but at least it hasn't
+&gt; clogged my spool areas (and in a site that runs Windows I would then
+&gt; need to virusscan the messages, so SA saves that step at least.)
+&gt; 
+&gt; Exim is so far the only main MTA that has got this facility neatly
+&gt; packaged by default. Postfix/qmail require source hacking as far as I
+&gt; know and there is an addon for Sendmail that can do something similar,
+&gt; but it isn't handled in any kind of integrated way. Interestingly there
+&gt; has been a lot of discussion about covering this sort of checking
+&gt; behaviour in the RFCs.
+&gt; 
+
+That's pretty good. I have managed to get some of what you have (but in postfix)
+by using a regex list on header_checks, and keep a largish list of known spam
+senders in the sender_access list, and using amavisd-new to pump the email through
+SA and AV. I can add whatever to the header_checks list, but I have to admit I
+don't plug in every new threat. Generally, consistant spammers usually land up in
+there with a custom and personalised reject notice :)
+
+&gt; Wietse lead a discussion on the Postfix development list a while ago
+&gt; exploring the cases in which callouts can cause problems, but I think
+&gt; practical experience shows that it is a very effective tool with no
+&gt; serious side-effects.
+&gt; 
+&gt; If Exim is out of your experience and you don't have time to investigate
+&gt; it, consider putting it in as a skinny application proxy in front of
+&gt; your existing mail gateway. It really isn't that hard and your users
+&gt; will thank you for it!
+
+Mine don't even realise the gateway is doing this stuff. It just works. They can
+get peeved if someone sends a .exe through the system, cause they aren't going to
+get it easily :)
+
+Michael
+
+&gt; 
+&gt; -- 
+&gt; Dan Shearer
+&gt; <A HREF="mailto:dan@shearer.org">dan@shearer.org</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

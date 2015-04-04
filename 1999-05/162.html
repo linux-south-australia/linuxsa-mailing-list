@@ -1,0 +1,84 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: redirecting output to a file (was thi has me stumped)" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Jake Hawkes" -->
+<!-- ToEmail="jake@eclectic.com.au" -->
+<!-- Date="Mon, 10 May 1999 20:29:32 +0930 (CST)" -->
+<!-- Id="199905101059.UAA18278@atdot.dotat.org" -->
+<!-- Reference="3736B4BA.D510536@eclectic.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: redirecting output to a file (was thi has me stumped)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Jake Hawkes &lt;<I><A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A></I>&gt;
+  Date: Mon, 10 May 1999 20:29:32 +0930 (CST)
+</PRE>
+<H1>Re: redirecting output to a file (was thi has me stumped)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Jake Hawkes wrote:
+
+ &gt; My question therefore has morphed into this:
+ &gt; "Do I need to have an fflush() after every printf(), regardless of
+ &gt; whether the printf() has a \n in it or not?"
+ &gt; If so, I think this is un-funky. In my opinion, the coder should not
+ &gt; have to care what the stdout stream is going. It seems however that a
+ &gt; coder does, or at best put fflush() calls everywhere.
+
+You don't have to care -- if your program ever exits, all the buffers
+will be flushed and you'll get your output.  If you're running in a
+continuous loop, you'll get your output every time you fill a buffer
+(probably 8k or so; a multiple of your disk block size at least).
+It's only if you play tricks (like expecting that the only way you'll
+ever close a stream is by getting killed) that you run into problems.
+
+When stdout and/or stderr correspond to a tty, the stdio subsystem 
+realizes that they're supposed to be interactive (via isatty()) and
+unbuffers them (i.e.: gives you an implied fflush() after every newline).
+
+If you put an fflush() after every printf() you'll slow your program
+down terribly when you're redirecting to a file, and won't help at all
+when you're running interactively.
+
+     - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

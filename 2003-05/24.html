@@ -1,0 +1,186 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SuSE 8.1 blank monitor config problem" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="ak.linuxsa@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 2 May 2003 05:24:05 +0930" -->
+<!-- Id="20030502052405.A8376@dog.topology.org" -->
+<!-- Reference="3EB15DE0.2010409@netscape.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SuSE 8.1 blank monitor config problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 2 May 2003 05:24:05 +0930
+</PRE>
+<H1>Re: SuSE 8.1 blank monitor config problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, May 01, 2003 at 10:48:16AM -0700, James Leone wrote:
+&gt; <A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A> wrote:
+&gt; 
+&gt; When you get to the log in screen, does the command sax2 work? That 
+&gt; should get you directly to the monitor setup.
+&gt; 
+
+James,
+
+Definitely not. At each point where SaX2 is invoked, that's when the screen
+locks. But when I run YaST2 remotely, a control-C gets me out of it.
+This is what I just found in the file /var/log/SaX.log:
+(The file is 931 lines long. So I'll edit it a bit.)
+
+================================================================
+[...]
+
+02-May 02:18:38 &lt;I&gt; got run... 1 -&gt; Intro Page
+02-May 02:25:36 &lt;I&gt; Initializing...
+02-May 02:25:39 &lt;I&gt; [ Detection already done
+        To perform a fresh detection use the --reinit option
+]
+xmset: could not open display
+02-May 02:26:01 &lt;X&gt; Startup...
+02-May 02:26:01 &lt;X&gt; [ Startup on already running Server:
+        :0.0 -&gt; grant
+]
+02-May 02:26:25 &lt;I&gt; got run... 1 -&gt; Intro Page
+02-May 04:09:49 &lt;I&gt; Initializing...
+02-May 04:09:53 &lt;I&gt; [ Detection already done
+        To perform a fresh detection use the --reinit option
+]
+xmset: could not open display
+02-May 04:10:19 &lt;X&gt; Startup...
+02-May 04:10:19 &lt;X&gt; [ Startup on already running Server:
+        :0.0 -&gt; grant
+]
+================================================================
+
+I gather now that the "got run" means that X thinks it's running, whereas
+in fact the monitor is very unhappy with the signal it's getting.
+The later "could not open" things must come from me trying to
+run the X server from a remote monitor.
+
+&gt; &gt;The installation seems to go normally until X is run -- and then the
+&gt; &gt;screen goes blank and the lights flash on the monitor.
+&gt; &gt;
+&gt; 
+&gt; Does a GUI come up during the installation?  If not, then it is not 
+&gt; being detected. You need to find out what the specs on your monitor are 
+&gt; and then enter them in sax manually.
+
+The config software correctly saw that I had a Hyundai monitor,
+although maybe its parameters were wrong.
+"max sax2" doesn't mention any config files for SaX2.
+I guess it just generates the XF86Config file.
+So I suppose I'll have to edit that a bit.
+
+The broader problem is apparently that SuSE have decided as a marketing
+decision to remove heaps of config options from the installation process
+so that they can claim that it's really quick.
+Yes it is - if you install only the 10% of stuff that they offer by default -
+but then it doesn't work after the installation.
+(Even things like "locate" aren't installed if you ask for the maximum
+installation packages!)
+I'd rather spend 1 hour longer on installation and 20 hours less on
+fixing problems caused by incorrect/incomplete installation.
+
+&gt; &gt;I still have 3 sound cards which are resisting all attempts at configuration.
+&gt; &gt;
+&gt; I am just curious,  what kernel are you using? Is sound enabled? If so, 
+&gt; have you gone to alsa.org and downloaded the driver, installed it and 
+&gt; ran the utility I mentioned in a recent post?
+
+These are mostly linux kernel 2.4.20 - the one with the local vulnerability.
+Very definitely the sound modules are there, because I can load them
+with modprobe etc.
+But they don't work excpet for making a squeaky little noise, and they
+don't link up to the ALSA software. And so forth....
+It's so woeful, I hate to even think about it.
+I was hoping that by setting up this new machine with all new software
+straight out of the box, it might work better. But now I can't even
+get it to run X.
+
+ALSA is the default software that SuSE installs for music.
+Sometimes it even works. It worked on one of my machines for
+a while and I can't it to work again.
+The trouble is that I don't understand the "concept of operations"
+of ALSA - even though I read all the docs I could find on ALSA about
+3 years ago (when it failed miserably to make contact over optical
+fibre with my then-new Roland VS880-EXHD 8-track digital recorder, which cost
+me A$2500 and has collected dust for the last 3 years because the ALSA
+drivers couldn't do optical SPDIF - I try not to complain, but
+virtually nothing works properly with linux for me...).
+I'm hoping that this newly set-up machine with non-working X will
+at least work for optical SPDIF and OpenH.323 and ALSA.
+If not, I'll have to set up a couple of machines and stick WindXYZ on them!!
+I'll be eating at the soup kitchen by July if I dont' get this
+sound stuff going soon...
+
+Anyway, I'll just hack yet another night away and forget about productive
+work for a while.... (My last 3 days have been a write-off due to
+linux config problems. If I added up the financial cost of my time,
+then linux would be a very costly OS indeed. I only use linux because I
+hate monopolists and I have an almost religious zeal for seeing the source.)
+One moment I'm writing 300 lines a day of linux kernel code
+to create the world's best implementation of a new RFC, next moment
+I'm spending several days on trivial config tasks.
+
+===========================================================
+Now having a look at it a bit more, I've found that if I kill
+a program "xapi", the screen lock is removed and I get back
+to where I was before.
+So now I don't have to re-boot every time I try to config the X server.
+
+(That is a constant problem with SaX2, which stupidly uses X to
+configure X - so if it doesn't work, you can't fix it!!
+The old SaX used to have a text-only mode. But I guess the
+marketing people didn't like its looks so much.
+This is the problem with the rush to imitate the MS pointy-clicky
+approach to everything. The advantage of unixes is that you can always
+get out of every problem - if you're prepared to give up such
+luxuries as sleep and social life. The big distros have turned their
+backs on the greatest strength of unixes - the text command line.)
+
+
+So.... nose to the grind stone, shoulder to the wheel, elbow grease ready...
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

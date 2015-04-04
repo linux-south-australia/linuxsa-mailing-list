@@ -1,0 +1,174 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="SYN states" -->
+<!-- FromName="'Charles Williams'" -->
+<!-- FromEmail="hosting.mailing.list.account@acnshosting.com" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 14 Jul 2001 13:55:38 +0200" -->
+<!-- Id="024d01c10c5c$16755f80$fe0aa8c0@chucks" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: SYN states</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Charles Williams &lt;<I><A HREF="mailto:hosting.mailing.list.account@acnshosting.com">hosting.mailing.list.account@acnshosting.com</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 14 Jul 2001 13:55:38 +0200
+</PRE>
+<H1>SYN states</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hello,
+
+I recently asked a question about capturing a SYN packet.
+
+That was actually an incorrect dirscription (almost) of what I want to do.
+
+According to RFC-793: After a SYN-SENT state from client to server the
+server responds with a SYN-RECEIVED event that includes (SEQ, ACK, and CTL)
+and then awaits ESTABLISHMENT from client containing (SEQ, ACK, and CTL).
+
+The thing is I want to be able to Enter wait state and accept ALL
+SYN-SENT(s) to a server from client.  Then I need to do the following:
+
+1) grab and log origin IP to cache upon SYN-SENT reception.
+2) Hold SYN packet.
+3) Transmit SYN-RECEIVED.
+4) Close connection and Enter wait state.
+5) If SYN-RECEIVED/ESTABLISHED received from client then match to IP and
+held SYN Packet
+6) If all is good then pass session to FIREWALL and close connection.
+        else
+                add IP to bad IP DB (to refuse future connections) drop and
+flush all packet info and close connection.
+
+This would probably all need to be done prior to TCP connection (thus more
+difficult to implement) and could be accomplised in a proxy fashion in that
+once the SYN is complete the proxy could do a SYN to TCP using the original
+packets from client (the only problem here is the sequence numbers need to
+be matched in some way).
+
+In this fashion TCP would be buffered from un-acknowledged SYN(s) (used
+mostly in DOS attacks) and thus speed the function of TCP while reducing
+uncompleted connection attempts.
+
+The easier method would be for TCP to handle ALL initial SYN requests and
+then have all passed to syn proxy.  Once all is good then have the session
+passed to firewall.  This way TCP would not need to be circumvented.  I
+believe this would work better as the initial SYN would be handled by TCP
+thus taking a load off the proxy.
+
+Below is a diagram of what I am looking to do compared to present situation.
+
+Present:
+
+      client
+server/deamon
+
+  1.  CLOSED                                               LISTEN/httpd
+
+  2.  SYN-SENT    --&gt; &lt;SEQ=100&gt;&lt;CTL=SYN&gt;               --&gt;
+SYN-RECEIVED/httpd
+
+  3.  ESTABLISHED &lt;-- &lt;SEQ=300&gt;&lt;ACK=101&gt;&lt;CTL=SYN,ACK&gt;  &lt;--
+SYN-RECEIVED/httpd(open and waiting)
+
+  4.  ESTABLISHED --&gt; &lt;SEQ=101&gt;&lt;ACK=301&gt;&lt;CTL=ACK&gt;       --&gt;
+ESTABLISHED/httpd(open port)
+
+  5.  ESTABLISHED --&gt; &lt;SEQ=101&gt;&lt;ACK=301&gt;&lt;CTL=ACK&gt;&lt;DATA&gt; --&gt;
+ESTABLISHED/httpd(open port)
+
+
+with proxy
+
+
+       client
+server/deamon
+
+  1.  CLOSED                                               LISTEN/proxy
+
+  2.  SYN-SENT    --&gt; &lt;SEQ=100&gt;&lt;CTL=SYN&gt;               --&gt;
+SYN-RECEIVED/proxy
+
+  3.  ESTABLISHED &lt;-- &lt;SEQ=300&gt;&lt;ACK=101&gt;&lt;CTL=SYN,ACK&gt;  &lt;--
+SYN-RECEIVED/proxy (no open port)
+
+  4.  ESTABLISHED --&gt; &lt;SEQ=101&gt;&lt;ACK=301&gt;&lt;CTL=ACK&gt;       --&gt;
+ESTABLISHED/proxy-&gt;firewall(open port)
+
+  5.  ESTABLISHED --&gt; &lt;SEQ=101&gt;&lt;ACK=301&gt;&lt;CTL=ACK&gt;&lt;DATA&gt; --&gt;
+ESTABLISHED/firewall(open port)
+
+If you notice in the first diagram the port is open as soon as the SYN-ACK
+(step 3) is sent by the server (start of DOS attack).  If no recieve is sent
+back from client that port is open until it times out.  Multiply this by all
+the infected systems used to attack a server and that is a lot of open ports
+that will swamp a server.
+
+In the second diagram the ports remain free due to the use of the proxy.
+There are NO open ports until the SYN is completed (step 4) and then all
+session info is passed to the firewall using the original session info.
+Thus any ports opened through the firewall a KNOWN good sessions (unless the
+client issues a SYN-RST) and all DOS attempts have the IP logged and the
+session drop and purged.
+
+SO, I have the initial proxy done.  I just need to get it to accept the SYN
+packets and then log or throw away as necessary and then pass the connection
+upon completion of SYN.
+
+Any help would be greatly appreciated.
+
+chuck
+
+Chuck's Top 10 Things to Remember and Think about!
+=======================================================
+10. Please return stewardess to original upright position.
+9. Fighting for peace is like fucking for virginity.
+8. Never date someone because you're too lazy to commit suicide.
+7. It is not the fall that kills you.  it's the sudden stop at the end.
+6. You can't have everything.  Where would you put it all?
+5. " Real Windows Performance", on the next "In Search Of".
+4. 2 rules to success in life. 1. Don't tell people everything you know.
+3. 24 hours in a day, 24 beers in a case.  Coincidence?
+2. 9 out of 10 men who try Camels prefer women.
+1. Always borrow money from a pesimist.  They never expect it back anyway.
+
+That's it!  NO MORE! JEEZ! GET BACK TO WORK!
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

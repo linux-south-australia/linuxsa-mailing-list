@@ -1,0 +1,90 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: ipfwadm accounting" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="ben@webmedia.com.au" -->
+<!-- Date="Fri, 14 Aug 1998 13:32:50 +0930 (CST)" -->
+<!-- Id="199808140402.NAA24760@rebel.net.au" -->
+<!-- Reference="35D3B0ED.C8E9A77F@webmedia.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: ipfwadm accounting</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : <A HREF="mailto:ben@webmedia.com.au">ben@webmedia.com.au</A>
+  Date: Fri, 14 Aug 1998 13:32:50 +0930 (CST)
+</PRE>
+<H1>Re: ipfwadm accounting</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; how/where do we find out the account balance !?
+
+The accounting chains count packets.  You specify the rules, much the
+same as for forward and deny rules, and packets which match are counted
+by the kernel.  At a later date you can print (and optionally zero) the
+totals.
+
+Suppose you give unique IP addresses to each person using your network.
+Let's say you give the number 192.168.43.1 through 192.168.43.100 to
+each of those 100 people.  Let's also say you want to be able to charge
+them 25 cents per megabyte that they download through your firewall or
+router.  Add the following to your firewall or router, using ipfwadm:
+
+  ipfwadm -A -a -W eth0 -D 192.168.43.1
+  ipfwadm -A -a -W eth0 -D 192.168.43.2
+  ...
+  ipfwadm -A -a -W eth0 -D 192.168.43.100
+
+Later, say each month, you print and zero your firewall accounts:
+
+  ipfwadm -A -l -x -z
+
+This produces output similar to:
+
+  IP accounting rules
+      pkts      bytes dir prot source               destination          ports
+   3970435  346292853 i/o all  anywhere             192.168.43.1         n/a
+   4732107 1712589536 i/o all  anywhere             192.168.43.2         n/a
+   ...
+     28427   15296441 i/o all  anywhere             192.168.43.100       n/a
+
+
+Ipfwadm is of marginal use if you want to account for packets per user where
+users get given a dynamic IP address.  It can be done, but it's a lot more
+work.  If your users dial in with PPP, I'm sure you will pppstat (run during
+ip-down script) much more useful.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

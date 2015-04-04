@@ -1,0 +1,106 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: controlling which modules load at boot" -->
+<!-- FromName="Andrew Burrow" -->
+<!-- FromEmail="alburrow@cs.adelaide.edu.au" -->
+<!-- ToName="Jayson Hay" -->
+<!-- ToEmail="bike291@ihug.com.au" -->
+<!-- Date="Fri, 08 Sep 2000 14:22:39 +0930" -->
+<!-- Id="200009080452.OAA22649@krypton.cs.adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: controlling which modules load at boot</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Burrow &lt;<I><A HREF="mailto:alburrow@cs.adelaide.edu.au">alburrow@cs.adelaide.edu.au</A></I>&gt;
+  To  : Jayson Hay &lt;<I><A HREF="mailto:bike291@ihug.com.au">bike291@ihug.com.au</A></I>&gt;
+  Date: Fri, 08 Sep 2000 14:22:39 +0930
+</PRE>
+<H1>Re: controlling which modules load at boot</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Further to what Benjamin Close &lt;<A HREF="mailto:linux@senet.com.au">linux@senet.com.au</A>&gt; said:
+
+&gt; You can load any module you want in /etc/rc.d/rc.local or the more eligant
+&gt; way is to get the kernel to load the modules for you. When accessing the
+
+As Benjamin points out it is generally possible, and always better to
+let the kernel handle the loading of modules.  However, there are
+occasions when a module must be explicitly loaded, and loaded early.
+
+One example: if you have an IDE cdrom as well as an IDE cdwriter.  You
+can tell the ide-cd module to ignore the cdwriter, but you cannot tell
+the ide-scsi module to ignore the cdrom.  So it is vitally important
+that the ide-cd module be loaded first.
+
+"rc.local" is one option.  However, I am not sure that it is used in
+recent RedHat distributions!  Specifically, any mention of it is missing
+from "/etc/inittab", "/etc/rc.d/rc.sysinit", or "/etc/rc.d/rc" and I
+have had no luck putting commands in there.  Instead, the file
+"/etc/rc.d/rc.modules" is earmarked for starting modules.  Well
+actually, you won't find a whisper about it in the RedHat documentation,
+but you can see for yourself that it is run from "rc.sysinit".  So if
+you were running RedHat you might write something like
+
+
+#! /bin/sh
+# 
+# /etc/rc.d/rc.modules
+#
+#   - Load modules.  Called from /etc/rc.sysinit.
+# 
+
+# The two modules ide-cd, and ide-scsi will both attempt to claim IDE cdroms
+# for themselves.  ide-cd is well behaved, in that it can be told to ignore
+# devices.  ide-scsi is not!
+
+/sbin/modprobe ide-cd
+
+
+into "/etc/rc.d/modules" (make sure it is executable.)
+
+
+Recently I have started playing with debian (thanks to Michael and
+Richard!).  Guess what?  You just put the name of the module to start
+at boot time into "/etc/modules".  It says so in the comments to
+"/etc/modules" and also in `man modules`.  Spot the difference.
+
+
+
+Cheers,
+
+
+ Andrew
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,182 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="procmailrc re-send recipes (which fallback to a mailbox fileif user unknown)" -->
+<!-- FromName="" -->
+<!-- FromEmail="dcallan@wias.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 13 Aug 2001 15:46:02 +1000" -->
+<!-- Id="4.3.1.20010813145916.00bfd660@mail.wias.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: procmailrc re-send recipes (which fallback to a mailbox fileif user unknown)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: &lt;<I><A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 13 Aug 2001 15:46:02 +1000
+</PRE>
+<H1>procmailrc re-send recipes (which fallback to a mailbox fileif user unknown)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+I have a major headache on my hands with a procmailrc setup.
+For anyone who just stopped reading and is already typing "RTFM", please 
+feel free
+to include some _useful_ FM's because I have looked but as yet cannot find 
+a single recipe
+that is trying to do what I need ;-)
+
+The Scenario:
+I have a client who loves his NT mailserver (which lives on their LAN, 
+running off a PPP link) and
+has up till now maintained all their addresses there. The system had with 
+his old ISP was that
+they received all of his domains mail on a sigle mailbox (via an 
+@domain.com "virtusertable" referrence).
+Once POP3ed to the NT machine, the mailserver software (FTgate I think) 
+would sift it based on the
+"To:" addresses and shuffle it off to local Exchange mailboxes. Nice and 
+simple, I know ;-)
+However, there are other offices for this company, and they all had to have 
+mailboxes with their
+local ISP's so that the FTgate could bounce mail for their aliases off to 
+these external addresses.
+This meant that all this mail (not bound for the Exchange accounts) was 
+transfered down their PPP
+link, played with by the NT machine and then sent back out the link to 
+various other ISP's.
+
+Now, they have come to my company requesting a Linux server (that we farm 
+for them) which can run
+their WWW and MAIL services. The web stuff was a no-brainer, but the mail 
+is a messy situation.
+
+The scenario I have suggested to the client was to create POP3 boxes for 
+all of these external offices'
+staff on the Linux mailserver (which is the official MX pref for their 
+domain) and all other mail should go
+into a single POP3 box for the FTgate to check and disect. Basic idea was 
+to minimise all the needless
+mail traffic their dialup was suffering from.
+
+The client promised me that all the external sites addresses (previously 
+redirected by FTgate) were
+running off aliases that always had an identifying prefix. EG: 
+<A HREF="mailto:NSW.joe@domain.com">NSW.joe@domain.com</A>, <A HREF="mailto:NSW.mary@domain.com">NSW.mary@domain.com</A>,
+<A HREF="mailto:VIC.sales@domain.com.">VIC.sales@domain.com.</A> So I did plan it assuming that there would some way 
+of filtering them.
+
+ANYWAY, the solution I used was to setup the exact same "virtusertable" 
+entry they used to have
+(pointing to a single mailbox, let's call it "master") and a .procmailrc 
+(in /home/master) that would catch
+any mail with a "To:" field that started with the relevant prefixes and 
+re-send them locally to "<A HREF="mailto:USER@localhost">USER@localhost</A>"
+(which bypassed the "virtusertable" and was picked up by the entries in 
+/etc/aliases for each real user).
+
+The Problem:
+It worked great for a while but now he is adding all kinds of addresses to 
+the Linux server and not all of
+them have prefixes that I am filtering (so they end up on his FTgate 
+wondering were to go next).
+Worse, not all of the existingly known "<A HREF="mailto:NSW.foo@domain.com">NSW.foo@domain.com</A>" addresses have 
+been re-created on
+the Linux server (so they do get filtered but come up as "user unknown" and 
+there is an ever-growing
+"dead-letter" file as a result).
+
+&lt;quick thankyou to anyone still reading&gt;
+
+My existing config/recipe is:
+
+/etc/mail/virtusertable:
+-----------------------------------------------
+@foo.com.au        master+%1
+-----------------------------------------------
+
+AND
+
+/home/master/.procmailrc:
+----------------------------------------------------------
+DOMAIN=foo.com.au
+ENV_TO=$1
+
+:0f
+* ENV_TO ?? .
+| formail -i "X-Envelope-To: "$ENV_TO@$DOMAIN
+:0fE
+| formail -i "X-Envelope-To: UNKNOWN"
+
+:1:
+* ^To:.*VIC
+! $<A HREF="mailto:ENV_TO@localhost">ENV_TO@localhost</A>
+
+:2:
+* ^To:.*NSW
+! $<A HREF="mailto:ENV_TO@localhost">ENV_TO@localhost</A>
+------------------------------------------------------------
+
+
+I realise that I obviously have a lot to learn about Procmail recipes but 
+the clock is ticking and
+so far all I can find in the manpages/websites is vagues bits that allude 
+to seperate elements
+of what I want to accomplish.
+
+I have tried adding the following (in the hope of catching the "user 
+unknown" jobs)
+but so far it keeps going to dead.letter:
+----------------------------------
+:2E:
+/var/spool/mail/master
+----------------------------------
+
+Help.....please.
+
+Cheers,
+-Daniel
+
+
+Daniel Callan
+<A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A>
+Systems Admin.
+WIAS Aust.
+www.wias.net.au
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

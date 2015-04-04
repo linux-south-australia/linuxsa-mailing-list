@@ -1,0 +1,235 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Compiling NKFS into the Kernel" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 23 Jun 2002 21:38:52 -0700" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Compiling NKFS into the Kernel</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 23 Jun 2002 21:38:52 -0700
+</PRE>
+<H1>Compiling NKFS into the Kernel</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I edited the nwserver.conf file on the machines at work and was able to 
+get rid of the rip router error. I had to leave before I was finished 
+with the machines. I still don't know if that solves the problem.
+
+
+So I am here at home and I tried to comiple the Netware Kernel File 
+System into my Kernel but this is the message I received is below.
+
+
+I am clueless as to what to do. Do I modify the c files? Do I change the 
+sytax of the make command. How the heck do you copy a file to a line 
+that looks like a command?
+
+"Now copy /boot/vmlinuz.version.h to /lib/modules/`uname 
+-r`/build/include/linux/version.h"
+
+Help!   :-(
+
+
+James Leone
+
+
+
+/usr/include/linux/version.h:23: #error "   /lib/modules/`uname 
+-r`/build/include/linux/version.h"
+/usr/include/linux/version.h:24: #error ""
+/usr/include/linux/version.h:25: #error " o When compiling, make sure to 
+use the following"
+/usr/include/linux/version.h:26: #error "   compiler option to use the 
+correct include files:"
+/usr/include/linux/version.h:27: #error ""
+/usr/include/linux/version.h:28: #error "   -I/lib/modules/`uname 
+-r`/build/include"
+/usr/include/linux/version.h:29: #error ""
+/usr/include/linux/version.h:30: #error "   instead of"
+/usr/include/linux/version.h:31: #error ""
+/usr/include/linux/version.h:32: #error "   -I/usr/include/linux"
+/usr/include/linux/version.h:33: #error ""
+/usr/include/linux/version.h:34: #error "   Please adjust the Makefile 
+accordingly."
+/usr/include/linux/version.h:35: #error 
+"======================================================="
+In file included from nkfs_driver.c:31:
+/usr/include/linux/malloc.h:4: warning: #warning linux/malloc.h is 
+deprecated, use linux/slab.h instead.
+make: *** [nkfs_driver.o] Error 1
+<A HREF="mailto:james@James">james@James</A>:~/nkfs-4.2.1/src &gt;
+
+
+So I hacked the .c files and changed the word malloc.h to slab.h in each 
+instance and then I received the following message:
+
+<A HREF="mailto:james@James">james@James</A>:~&gt; cd nkfs-4.2.1/
+<A HREF="mailto:james@James">james@James</A>:~/nkfs-4.2.1 &gt; make
+make[1]: Entering directory `/home/james/nkfs-4.2.1/src'
+gcc -D__KERNEL__ -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer 
+-DMODULE -DMODVERSIONS -I/usr/include -I. -I../include -DLINUX1_3_x    
+-c -o nkfs_driver.o nkfs_driver.c
+nkfs_driver.c:27: linux/modversions.h: No such file or directory
+In file included from /usr/include/linux/module.h:296,from nkfs_driver.c:28:
+/usr/include/linux/version.h:2: #error 
+"======================================================="
+/usr/include/linux/version.h:3: #error "You should not include 
+/usr/include/{linux,asm}/ header"
+/usr/include/linux/version.h:4: #error "files directly for the 
+compilation of kernel modules."
+/usr/include/linux/version.h:5: #error ""
+/usr/include/linux/version.h:6: #error "glibc now uses kernel header 
+files from a well-defined"
+/usr/include/linux/version.h:7: #error "working kernel version (as 
+recommended by Linus Torvalds)"
+/usr/include/linux/version.h:8: #error "These files are glibc internal 
+and may not match the"
+/usr/include/linux/version.h:9: #error "currently running kernel. They 
+should only be"
+/usr/include/linux/version.h:10: #error "included via other system 
+header files - user space"
+/usr/include/linux/version.h:11: #error "programs should not directly 
+include &lt;linux/*.h&gt; or"
+/usr/include/linux/version.h:12: #error "&lt;asm/*.h&gt; as well."
+/usr/include/linux/version.h:13: #error ""
+/usr/include/linux/version.h:14: #error "To build kernel modules please 
+do the following:"
+/usr/include/linux/version.h:15: #error ""
+/usr/include/linux/version.h:16: #error " o Have the kernel sources 
+installed"
+/usr/include/linux/version.h:17: #error ""
+/usr/include/linux/version.h:18: #error " o Make sure that the symbolic 
+link"
+/usr/include/linux/version.h:19: #error "   /lib/modules/`uname 
+-r`/build exists and points to"
+/usr/include/linux/version.h:20: #error "   the matching kernel source 
+directory"
+/usr/include/linux/version.h:21: #error ""
+/usr/include/linux/version.h:22: #error " o Now copy 
+/boot/vmlinuz.version.h to"
+/usr/include/linux/version.h:23: #error "   /lib/modules/`uname 
+-r`/build/include/linux/version.h"
+/usr/include/linux/version.h:24: #error ""
+/usr/include/linux/version.h:25: #error " o When compiling, make sure to 
+use the following"
+/usr/include/linux/version.h:26: #error "   compiler option to use the 
+correct include files:"
+/usr/include/linux/version.h:27: #error ""
+/usr/include/linux/version.h:28: #error "   -I/lib/modules/`uname 
+-r`/build/include"
+/usr/include/linux/version.h:29: #error ""
+/usr/include/linux/version.h:30: #error "   instead of"
+/usr/include/linux/version.h:31: #error ""
+/usr/include/linux/version.h:32: #error "   -I/usr/include/linux"
+/usr/include/linux/version.h:33: #error ""
+/usr/include/linux/version.h:34: #error "   Please adjust the Makefile 
+accordingly."
+/usr/include/linux/version.h:35: #error 
+"======================================================="
+In file included from nkfs_driver.c:29:
+/usr/include/linux/version.h:2: #error 
+"======================================================="
+/usr/include/linux/version.h:3: #error "You should not include 
+/usr/include/{linux,asm}/ header"
+/usr/include/linux/version.h:4: #error "files directly for the 
+compilation of kernel modules."
+/usr/include/linux/version.h:5: #error ""
+/usr/include/linux/version.h:6: #error "glibc now uses kernel header 
+files from a well-defined"
+/usr/include/linux/version.h:7: #error "working kernel version (as 
+recommended by Linus Torvalds)"
+/usr/include/linux/version.h:8: #error "These files are glibc internal 
+and may not match the"
+/usr/include/linux/version.h:9: #error "currently running kernel. They 
+should only be"
+/usr/include/linux/version.h:10: #error "included via other system 
+header files - user space"
+/usr/include/linux/version.h:11: #error "programs should not directly 
+include &lt;linux/*.h&gt; or"
+/usr/include/linux/version.h:12: #error "&lt;asm/*.h&gt; as well."
+/usr/include/linux/version.h:13: #error ""
+/usr/include/linux/version.h:14: #error "To build kernel modules please 
+do the following:"
+/usr/include/linux/version.h:15: #error ""
+/usr/include/linux/version.h:16: #error " o Have the kernel sources 
+installed"
+/usr/include/linux/version.h:17: #error ""
+/usr/include/linux/version.h:18: #error " o Make sure that the symbolic 
+link"
+/usr/include/linux/version.h:19: #error "   /lib/modules/`uname 
+-r`/build exists and points to"
+/usr/include/linux/version.h:20: #error "   the matching kernel source 
+directory"
+/usr/include/linux/version.h:21: #error ""
+/usr/include/linux/version.h:22: #error " o Now copy 
+/boot/vmlinuz.version.h to"
+/usr/include/linux/version.h:23: #error "   /lib/modules/`uname 
+-r`/build/include/linux/version.h"
+/usr/include/linux/version.h:24: #error ""
+/usr/include/linux/version.h:25: #error " o When compiling, make sure to 
+use the following"
+/usr/include/linux/version.h:26: #error "   compiler option to use the 
+correct include files:"
+/usr/include/linux/version.h:27: #error ""
+/usr/include/linux/version.h:28: #error "   -I/lib/modules/`uname 
+-r`/build/include"
+/usr/include/linux/version.h:29: #error ""
+/usr/include/linux/version.h:30: #error "   instead of"
+/usr/include/linux/version.h:31: #error ""
+/usr/include/linux/version.h:32: #error "   -I/usr/include/linux"
+/usr/include/linux/version.h:33: #error ""
+/usr/include/linux/version.h:34: #error "   Please adjust the Makefile 
+accordingly."
+/usr/include/linux/version.h:35: #error 
+"======================================================="
+make[1]: *** [nkfs_driver.o] Error 1
+make[1]: Leaving directory `/home/james/nkfs-4.2.1/src'
+make: *** [all] Error 2
+<A HREF="mailto:james@James">james@James</A>:~/nkfs-4.2.1 &gt;
+
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,190 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: diskless firewall?" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'Mcleod, Ian'" -->
+<!-- ToEmail="ian.mcleod@eds.com" -->
+<!-- Date="Mon, 14 Oct 2002 12:22:07 +0930" -->
+<!-- Id="20021014122207.A13502@yellowgoanna.com" -->
+<!-- Reference="EBD5241959BE8E42B6846134DF0EAE2302602CCD@AUADM201" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: diskless firewall?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : Mcleod, Ian &lt;<I><A HREF="mailto:ian.mcleod@eds.com">ian.mcleod@eds.com</A></I>&gt;
+  Date: Mon, 14 Oct 2002 12:22:07 +0930
+</PRE>
+<H1>Re: diskless firewall?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Oct 14, 2002 at 12:39:09PM +1000, Mcleod, Ian wrote:
+&gt; But I would like to keep logs, run squid, etc.
+&gt; 
+&gt; Maybe squid will have to reside on another machine - and the pentium just be
+&gt; firewall *only* and boot off a disk like you say - or CD...
+&gt; 
+&gt; Could this work?
+
+This is normal recommended practice -- dedicate a machine to
+routing/filtering, and use it to protect the rest of your network
+services. Often, you'd have at least two network services machines --
+one which is a "bastian" host, which is somewhat visible to the
+outside world, and does incoming mail, web serving, external DNS, and
+anything else that's needed on the outside, and then you have your
+internal server, which does internal mail (so the external one just
+transfers mail direct to the internal mail server), and squid,
+intranet, file storage, internal DNS, and so on. This way, your
+firewall box has no services, and hence is pretty secure, your box
+with services visible is protected by the firewall, and is in turn,
+firewalled off from the internal network (you use three networks on
+your firewall -- internal, external, and DMZ, or De-Militarized Zone),
+and your internal network is completely protected from the outside.
+
+&gt; 
+&gt; Another machine could then do the logging, analysis, etc..
+
+Some people also have an administrative network, or at least, a
+specific machine that has special access to the key machines, which
+does the logging, runs analysis, and is the only one allowed to do
+certain admin tasks.
+
+diagram:
+
+        external
+        internet
+            |
+            |
+        Firewall----DMZ or Bastian
+          Box         Host
+            |
+            |
+         Proxy etc
+           server
+            |
+           LAN
+
+The Firewall box is effectively a router with packet filtering -- you
+can use Linux or whatever. It's connected directly to the Internet,
+through some sort of modem or access device. From the internet, only
+certain ports on the Bastian are visible. It doesn't really matter if
+your proxy is dual homed as drawn above or not -- but it's generally
+important to be sure that it and the LAN aren't visible from outside.
+
+The general principle here is to ensure that there are no single
+points of failure -- an attacker needs to break at least two things to
+get in to the LAN...
+
+rr
+
+&gt; 
+&gt; &gt; -----Original Message-----
+&gt; &gt; From: Matthew Moyle-Croft [mailto:<A HREF="mailto:mmc@mmc.com.au">mmc@mmc.com.au</A>]
+&gt; &gt; Sent: Monday, October 14, 2002 11:57 AM
+&gt; &gt; To: Mcleod, Ian
+&gt; &gt; Cc: Linuxsa (E-mail)
+&gt; &gt; Subject: Re: diskless firewall?
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; &gt; Is it possible to have an old Pentium 133 with no hard 
+&gt; &gt; drive boot off
+&gt; &gt; &gt; another machine to be used a firewall?  Then a small 
+&gt; &gt; partition could be set
+&gt; &gt; &gt; aside - say a GB or two for smoothwall (or whatever) on the 
+&gt; &gt; host machine.
+&gt; &gt; &gt; Unless someone has some old hard drives lying around.
+&gt; &gt; 
+&gt; &gt; Why not just have it boot off a floppy or cdrom?  It'll dump 
+&gt; &gt; everything into 
+&gt; &gt; ram and then not access anything anymore.  
+&gt; &gt; 
+&gt; &gt; Diskless fw's are bad news -&gt; if your other machine is 
+&gt; &gt; compromised then you 
+&gt; &gt; lose it.
+&gt; &gt; 
+&gt; &gt; &gt; But this would save space and noise if it is diskless - I 
+&gt; &gt; could probably
+&gt; &gt; &gt; cram it in somewhere unobtrusive..
+&gt; &gt; &gt; 
+&gt; &gt; &gt; Is it possible to 'flatten' a motherboard so cards are not 
+&gt; &gt; at right angles
+&gt; &gt; &gt; so one can fit it in a small box?  I don't know if PCI cables exist?
+&gt; &gt; 
+&gt; &gt; YOu can get little risers to put them at right angles but 
+&gt; &gt; they can get 
+&gt; &gt; cranky.
+&gt; &gt; 
+&gt; &gt; MMC
+&gt; &gt; &gt; 
+&gt; &gt; &gt; Ian McLeod
+&gt; &gt; &gt; Customer Service Office (CSO)
+&gt; &gt; &gt; EDS (Australia) Pty Ltd
+&gt; &gt; &gt; Level 9, 108 North Tce, Adelaide, SA, 5000
+&gt; &gt; &gt; Phone: 		(08) 8464 1304
+&gt; &gt; &gt; Fax:		(08) 8464 1508
+&gt; &gt; &gt; email:  		<A HREF="mailto:ian.mcleod@eds.com">ian.mcleod@eds.com</A> / <A HREF="mailto:SAGJustice@eds.com">SAGJustice@eds.com</A>
+&gt; &gt; &gt; 
+&gt; &gt; &gt; e ...The recognised global leader in ensuring clients 
+&gt; &gt; achieve superior value
+&gt; &gt; &gt; in the Digital Economy 
+&gt; &gt; &gt; 
+&gt; &gt; &gt; 
+&gt; &gt; &gt; 
+&gt; &gt; 
+&gt; &gt; -- 
+&gt; &gt; Matthew
+&gt; &gt; --
+&gt; &gt; <A HREF="mailto:Matthew@Moyle-Croft.com">Matthew@Moyle-Croft.com</A>    | <A HREF="mailto:mmc@mmc.com.au">mmc@mmc.com.au</A>        |    <A HREF="mailto:mmc@206gti.net">mmc@206gti.net</A>
+&gt; &gt; <A HREF="http://www.Moyle-Croft.com">http://www.Moyle-Croft.com</A> | <A HREF="http://www.mmc.com.au">http://www.mmc.com.au</A> | <A HREF="http://206gti.net">http://206gti.net</A>
+&gt; &gt; 
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+&gt; 
+
+-- 
+-- 
+Richard Russell
+Yellow Goanna P/L
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+m: +61 412 827 805
+f: +61 8 8462 2362
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

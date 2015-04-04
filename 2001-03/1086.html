@@ -1,0 +1,169 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba Socket Errors" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="'Andrew Halliday'," -->
+<!-- ToEmail="andrew@recalldesign.com,linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 27 Mar 2001 20:26:24 +0900" -->
+<!-- Id="3.0.6.32.20010327202624.00e25da0@10.0.2.1" -->
+<!-- Reference="02b701c0b694$8c2b31f0$df5d0fcb@handy" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba Socket Errors</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : Andrew Halliday &lt;<I><A HREF="mailto:andrew@recalldesign.com">andrew@recalldesign.com</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 27 Mar 2001 20:26:24 +0900
+</PRE>
+<H1>Re: Samba Socket Errors</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 05:34 PM 3/27/01 +0930, Andrew Halliday wrote:
+&gt;Recently I found that i couldnt connect to my samba share.
+&gt;I am positive that I have performed no major upgrades / installs or
+&gt;anything, and neither have my users.
+&gt;Upon inspection of syslog, the following errors are returned, almost once
+&gt;per connection attempt:
+
+The error message simply means that the TCP connection went away for some
+reason, and the smbd, which was trying to write to the connection, got an
+error.
+
+We need to find out why the connection went a way.
+
+A packet trace would help in this situation.
+
+&gt;Mar 27 16:38:42 bounty smbd[25214]: [2001/03/27 16:38:42, 0]
+&gt;lib/util_sock.c:wri
+&gt;te_socket_data(540)
+&gt;Mar 27 16:38:42 bounty smbd[25214]:   write_socket_data: write failure.
+&gt;Error =
+&gt;Broken pipe
+&gt;Mar 27 16:38:42 bounty smbd[25214]: [2001/03/27 16:38:42, 0]
+&gt;lib/util_sock.c:wri
+&gt;te_socket(566)
+&gt;Mar 27 16:38:42 bounty smbd[25214]:   write_socket: Error writing 4 bytes to
+&gt;soc
+&gt;ket 6: ERRNO = Broken pipe
+&gt;
+&gt;I have searched through copious amounts of mailing list archives and found
+&gt;only people asking questions such as myself.
+&gt;
+&gt;I am running linux kernel 2.2.18pre21 with samba Version 2.0.7.
+&gt;On the client side, after a considerable waiting period, the error reported
+&gt;is "The semaphore timeout period has expired.".
+&gt;
+&gt;Can anyone help?  This is most annoying :(
+&gt;
+&gt;AndrewH
+&gt;
+&gt;PS: The offending code in util_sock.c appears to be :
+&gt;
+&gt;/***************************************************************************
+&gt;*
+&gt; Write data to a socket - use send rather than write.
+&gt;****************************************************************************
+&gt;/
+&gt;
+&gt;ssize_t write_socket_data(int fd,char *buffer,size_t N)
+&gt;{
+&gt;  size_t total=0;
+&gt;  ssize_t ret;
+&gt;
+&gt;  while (total &lt; N)
+&gt;  {
+&gt;#ifdef WITH_SSL
+&gt;    if(fd == sslFd){
+&gt;      ret = SSL_write(ssl,buffer + total,N - total);
+&gt;    }else{
+&gt;      ret = send(fd,buffer + total,N - total, 0);
+&gt;    }
+&gt;#else /* WITH_SSL */
+&gt;    ret = send(fd,buffer + total,N - total,0);
+&gt;#endif /* WITH_SSL */
+&gt;
+&gt;    if (ret == -1) {
+&gt;      DEBUG(0,("write_socket_data: write failure. Error = %s\n",
+&gt;strerror(errno) ));
+&gt;      return -1;
+&gt;    }
+&gt;    if (ret == 0) return total;
+&gt;
+&gt;    total += ret;
+&gt;  }
+&gt;  return (ssize_t)total;
+&gt;}
+&gt;
+&gt;/***************************************************************************
+&gt;*
+&gt;write to a socket
+&gt;****************************************************************************
+&gt;/
+&gt;
+&gt;ssize_t write_socket(int fd,char *buf,size_t len)
+&gt;{
+&gt;  ssize_t ret=0;
+&gt;
+&gt;  DEBUG(6,("write_socket(%d,%d)\n",fd,(int)len));
+&gt;  ret = write_socket_data(fd,buf,len);
+&gt;
+&gt;  DEBUG(6,("write_socket(%d,%d) wrote %d\n",fd,(int)len,(int)ret));
+&gt;  if(ret &lt;= 0)
+&gt;    DEBUG(0,("write_socket: Error writing %d bytes to socket %d: ERRNO =
+&gt;%s\n",
+&gt;       (int)len, fd, strerror(errno) ));
+&gt;
+&gt;  return(ret);
+&gt;}
+&gt;
+&gt;
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.ethereal.com)
+Contributing author, SAMS Teach Yourself Samba in 24 Hours
+Author, Special Edition, Using Samba
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,224 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Interrupts not cooperating" -->
+<!-- FromName="'Brian Marr'" -->
+<!-- FromEmail="cabernet@internode.on.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 17 Sep 2001 13:19:09 +0930" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Interrupts not cooperating</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Brian Marr &lt;<I><A HREF="mailto:cabernet@internode.on.net">cabernet@internode.on.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 17 Sep 2001 13:19:09 +0930
+</PRE>
+<H1>Interrupts not cooperating</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Suse 7.1 kernel 2.4.4
+
+
+Sorry about the large amount of info below. When my Soundcard is in place, my 
+ethernet card plays up.
+Sep  9 07:48:45 gringo kernel: NETDEV WATCHDOG: eth0: transmit timed out
+Sep  9 07:48:45 gringo kernel: eth0: Tx queue start entry 265  dirty entry
+The Sound Card is ISA PnP, and works well for recording etc. I would like to 
+keep it if possible. Isapnp.conf does not offer any choices of interrupt and 
+it promptly takes over interrupt 5 when inserted (see below). This kicks the 
+Network card off 5 to 9. Both of the Network cards that I have tried do not 
+like sharing interrupt 9 with other hardware. Can anyone give me a few 
+pointers on how I might get the Network card to share something else ?
+What would be a good location for it ?
+
+Soundcard
+Crystal Audio -Turtle Beach
+Network cars - D-Link (via-rhine) and Realtek (8139)
+
+Brian Marr
+
+
+
+No Sound Card
+
+===========================================================
+gringo:/home/gringo # cat /proc/pci
+PCI devices found:
+  Bus  0, device   0, function  0:
+    Host bridge: Intel Corporation 440BX/ZX - 82443BX/ZX Host bridge (rev 3).
+      Master Capable.  Latency=64.
+      Prefetchable 32 bit memory at 0xe0000000 [0xe3ffffff].
+  Bus  0, device   1, function  0:
+    PCI bridge: Intel Corporation 440BX/ZX - 82443BX/ZX AGP bridge (rev 3).
+      Master Capable.  Latency=64.  Min Gnt=136.
+  Bus  0, device   7, function  0:
+    ISA bridge: Intel Corporation 82371AB PIIX4 ISA (rev 2).
+  Bus  0, device   7, function  1:
+    IDE interface: Intel Corporation 82371AB PIIX4 IDE (rev 1).
+      Master Capable.  Latency=64.
+      I/O at 0xf000 [0xf00f].
+  Bus  0, device   7, function  2:
+    USB Controller: Intel Corporation 82371AB PIIX4 USB (rev 1).
+      IRQ 12.
+      Master Capable.  Latency=64.
+      I/O at 0xd000 [0xd01f].
+  Bus  0, device   7, function  3:
+    Bridge: Intel Corporation 82371AB PIIX4 ACPI (rev 2).
+      IRQ 9.
+  Bus  0, device   8, function  0:
+    Network controller: Tiger Jet Network Inc. Model 300 128k (rev 0).
+      IRQ 11.
+      Master Capable.  Latency=110.
+      I/O at 0xd400 [0xd4ff].
+      Non-prefetchable 32 bit memory at 0xe9000000 [0xe9000fff].
+  Bus  0, device   9, function  0:
+    Ethernet controller: VIA Technologies, Inc. VT86C100A [Rhine 10/100] (rev 
+6).
+      IRQ 5.
+      Master Capable.  Latency=64.  Min Gnt=118.Max Lat=152.
+      I/O at 0xd800 [0xd87f].
+      Non-prefetchable 32 bit memory at 0xe9001000 [0xe900107f].
+  Bus  0, device  11, function  0:
+    RAID bus controller: CMD Technology Inc PCI0648 (rev 1).
+      IRQ 12.
+      Master Capable.  Latency=64.  Min Gnt=2.Max Lat=4.
+      I/O at 0xdc00 [0xdc07].
+      I/O at 0xe000 [0xe003].
+      I/O at 0xe400 [0xe407].
+      I/O at 0xe800 [0xe803].
+      I/O at 0xec00 [0xec0f].
+  Bus  1, device   0, function  0:
+    VGA compatible controller: nVidia Corporation Riva TnT 128 [NV04] (rev 4).
+      IRQ 11.
+      Master Capable.  Latency=64.  Min Gnt=5.Max Lat=1.
+      Non-prefetchable 32 bit memory at 0xe4000000 [0xe4ffffff].
+      Prefetchable 32 bit memory at 0xe6000000 [0xe6ffffff].
+gringo:/home/gringo # cat /proc/interrupts
+           CPU0       CPU1
+  0:    7099246    7105653    IO-APIC-edge  timer
+  1:      17566      17701    IO-APIC-edge  keyboard
+  2:          0          0          XT-PIC  cascade
+  3:          1          1    IO-APIC-edge  serial
+  4:        130        119    IO-APIC-edge  serial
+  5:     144256     143821   IO-APIC-level  eth0
+  6:          6          3    IO-APIC-edge  floppy
+  8:   10327506   10308865    IO-APIC-edge  rtc
+ 10:         12          4    IO-APIC-edge  sym53c416
+ 11:   39816740   39818075   IO-APIC-level  HiSax
+ 12:     876314     871261   IO-APIC-level  ide2, ide3, usb-uhci
+ 14:       3000       3048    IO-APIC-edge  ide0
+ 15:          3          3    IO-APIC-edge  ide1
+NMI:          0          0
+LOC:   14203306   14203304
+ERR:          0
+gringo:/home/gringo #
+
+==========================================================\
+
+With Sound Card
+
+<A HREF="mailto:gringo@gringo">gringo@gringo</A>:~ $cat /proc/pci
+PCI devices found:
+  Bus  0, device   0, function  0:
+    Host bridge: Intel Corporation 440BX/ZX - 82443BX/ZX Host bridge (rev 3).
+      Master Capable.  Latency=64.
+      Prefetchable 32 bit memory at 0xe0000000 [0xe3ffffff].
+  Bus  0, device   1, function  0:
+    PCI bridge: Intel Corporation 440BX/ZX - 82443BX/ZX AGP bridge (rev 3).
+      Master Capable.  Latency=64.  Min Gnt=136.
+  Bus  0, device   7, function  0:
+    ISA bridge: Intel Corporation 82371AB PIIX4 ISA (rev 2).
+  Bus  0, device   7, function  1:
+    IDE interface: Intel Corporation 82371AB PIIX4 IDE (rev 1).
+      Master Capable.  Latency=64.
+      I/O at 0xf000 [0xf00f].
+  Bus  0, device   7, function  2:
+    USB Controller: Intel Corporation 82371AB PIIX4 USB (rev 1).
+      IRQ 9.
+      Master Capable.  Latency=64.
+      I/O at 0xd000 [0xd01f].
+  Bus  0, device   7, function  3:
+    Bridge: Intel Corporation 82371AB PIIX4 ACPI (rev 2).
+      IRQ 9.
+  Bus  0, device   8, function  0:
+    Network controller: Tiger Jet Network Inc. Model 300 128k (rev 0).
+      IRQ 12.
+      Master Capable.  Latency=8.
+      I/O at 0xd400 [0xd4ff].
+      Non-prefetchable 32 bit memory at 0xe9000000 [0xe9000fff].
+  Bus  0, device   9, function  0:
+    Ethernet controller: VIA Technologies, Inc. VT86C100A [Rhine 10/100] (rev 
+6).
+      IRQ 9.
+      Master Capable.  Latency=64.  Min Gnt=118.Max Lat=152.
+      I/O at 0xd800 [0xd87f].
+      Non-prefetchable 32 bit memory at 0xe9001000 [0xe900107f].
+  Bus  0, device  11, function  0:
+    RAID bus controller: CMD Technology Inc PCI0648 (rev 1).
+      IRQ 9.
+      Master Capable.  Latency=64.  Min Gnt=2.Max Lat=4.
+      I/O at 0xdc00 [0xdc07].
+      I/O at 0xe000 [0xe003].
+      I/O at 0xe400 [0xe407].
+      I/O at 0xe800 [0xe803].
+      I/O at 0xec00 [0xec0f].
+  Bus  1, device   0, function  0:
+    VGA compatible controller: nVidia Corporation Riva TnT 128 [NV04] (rev 4).
+      IRQ 12.
+      Master Capable.  Latency=64.  Min Gnt=5.Max Lat=1.
+      Non-prefetchable 32 bit memory at 0xe4000000 [0xe4ffffff].
+      Prefetchable 32 bit memory at 0xe6000000 [0xe6ffffff].
+<A HREF="mailto:gringo@gringo">gringo@gringo</A>:~ $cat /proc/interrupts
+           CPU0       CPU1
+  0:       8187       8520    IO-APIC-edge  timer
+  1:        103        115    IO-APIC-edge  keyboard
+  2:          0          0          XT-PIC  cascade
+  4:         34         49    IO-APIC-edge  serial
+  5:         47         45    IO-APIC-edge  Crystal audio controller
+  8:          0          2    IO-APIC-edge  rtc
+  9:      21257      21178   IO-APIC-level  ide2, ide3, eth0, usb-uhci
+ 10:          7          9    IO-APIC-edge  sym53c416
+ 14:          3          9    IO-APIC-edge  ide0
+ 15:          3          3    IO-APIC-edge  ide1
+NMI:          0          0
+LOC:      16612      16612
+ERR:          0
+<A HREF="mailto:gringo@gringo">gringo@gringo</A>:~ $
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,117 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="ReiserFS problems (long with details)" -->
+<!-- FromName="'David de Groot'" -->
+<!-- FromEmail="david@viking.org.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 21 Jan 2002 22:29:10 +1030" -->
+<!-- Id="901292798.20020121222910@viking.org.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: ReiserFS problems (long with details)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David de Groot &lt;<I><A HREF="mailto:david@viking.org.au">david@viking.org.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 21 Jan 2002 22:29:10 +1030
+</PRE>
+<H1>ReiserFS problems (long with details)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+  Hi Guys,
+
+  Our wonderful power suppliers, ETSA, decided to have an outage out
+  our way today (and it was amazing almost exactly an hour
+  long...hmmm...but I digress). So I come home to my little collection
+  of machines and find the main server is in a bad way.
+
+  It's a K6-2 400 on a flaky motherboard (due to be replaced soon),
+  with 128Mb RAM and an IBM 60Gb drive (ATA).
+
+  The drive is partitioned thusly:
+
+Disk /dev/hda: 16 heads, 63 sectors, 119150 cylinders
+Units = cylinders of 1008 * 512 bytes
+
+   Device Boot    Start       End    Blocks   Id  System
+/dev/hda1             1       102     51376+  83  Linux
+/dev/hda2           103    119150  60000192    f  Win95 Ext'd (LBA)
+/dev/hda5           103      2183   1048792+  83  Linux
+/dev/hda6          2184      8279   3072352+  83  Linux
+/dev/hda7          8280     20763   6291904+  83  Linux
+/dev/hda8         20764     21779    512032+  82  Linux swap
+/dev/hda9         21780     28021   3145936+  83  Linux
+/dev/hda10        28022     30102   1048792+  83  Linux
+/dev/hda11        30103    119150  44880160+  83  Linux
+
+Mount table is:
+
+Filesystem           1k-blocks      Used Available Use% Mounted on
+/dev/hda5              1032056     74076    905544   8% /
+/dev/hda1                49743      2360     44815   6% /boot
+/dev/hda9              3145832   1233160   1912672  40% /home
+/dev/hda11            44878784  17296376  27582408  39% /share
+/dev/hda6              3072252    954924   2117328  32% /usr
+/dev/hda7              6291704    575140   5716564  10% /var
+shmfs                   568044         0    568044   0% /dev/shm
+
+And, /dev/hda10 is meant to be mounted as /www
+
+/ and /boot are ext2 filesystems and the rest are ReiserFS.
+
+I'm running SuSE 7.2
+
+Problem is, /dev/hda10 is foobarred, seriously. I tried fsck.reiserfs
+on it's own, with -x and -o as options and in desparation I even did a
+--rebuild-sb followed by a --rebuild-tree on /dev/hda10
+
+However, whenever I try to mount the filesystem, mount coredumps and
+susbsequent mounts hang (thus if /dev/hda10 is in /etc/fstab, the
+system hangs on boot trying to mount /dev/shm).
+
+So the question is, Is there a way to fix the partition and hopefully
+get the data back?  (yes the critical data is backed up, but it's
+annoying to have to rebuild the stuff that isn't).
+
+Thanks in Advance.
+
+Dave
+-- 
+David de Groot                          mailto:<A HREF="mailto:david@viking.org.au">david@viking.org.au</A>
+<A HREF="http://vikings.homeip.net/~david">http://vikings.homeip.net/~david</A>  &lt;-- not working due to above problem
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,206 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Linuxtax.com forms - close but no cigar!" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="'Peter Gossner','Jay Scherrer','Henry Owuzo'," -->
+<!-- ToEmail="gossner@arcom.com.au,jay@scherrer.com,owuzo1@linuxmail.org,Mark@linuxtax.com,linuxsa@linuxsa.org.au,Tenforty Developers <Tenforty-developers@lists.sourceforge.net>" -->
+<!-- Date="Sat, 17 Aug 2002 19:24:48 -0700" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Linuxtax.com forms - close but no cigar!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : Peter Gossner &lt;<I><A HREF="mailto:gossner@arcom.com.au">gossner@arcom.com.au</A></I>&gt;<BR>        Jay Scherrer &lt;<I><A HREF="mailto:jay@scherrer.com">jay@scherrer.com</A></I>&gt;<BR>        Henry Owuzo &lt;<I><A HREF="mailto:owuzo1@linuxmail.org">owuzo1@linuxmail.org</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:Mark@linuxtax.com">Mark@linuxtax.com</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:Tenforty Developers <Tenforty-developers@lists.sourceforge.net>">Tenforty Developers <Tenforty-developers@lists.sourceforge.net></A></I>&gt;
+  Date: Sat, 17 Aug 2002 19:24:48 -0700
+</PRE>
+<H1>Linuxtax.com forms - close but no cigar!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hello all - Help!  :-[
+
+I have been trying to figure out how we can use the existing IRS forms
+for Practical Tax instead of redesigning them and waiting for IRS
+approval before people can use the open source program.
+
+My conclusion is that It looks pretty bleak. (That's why I am also
+asking for help, if anybody can....)
+
+I am pissed. I am thinking to myself - Hell, why not just have them put
+the preprinted IRS forms into their printer and they just print the
+numbers on form. By the time we get these forms made, I will be an old
+man! Unless we can get hundreds of people working on the forms. (Well
+actually I don't know how long it would take the programmers, I am just
+guessing.)
+
+(I need to vent a bit....) What annoys me is that I am sure that the IRS
+used LaTeX to design the forms and then exported them to Adobe. Jay, if
+the IRS lady in DC can get you LaTeX files, things are looking better.
+In fact that is my biggest hope right now, whereas before it was a "I
+won't hold my breath item." I do have a friend that works in a
+congressman's office in DC, maybe she can ask the helpful people at IRS
+to give us the latex files, if they have them.
+
+Last if Adobe has a product that is more functional than Acrobat Reader
+(I have this) than maybe I can find a used version of it down at the
+used book store for under $200. Heck, I'll just pay for it.
+
+We gotta do what we gotta do, ya know what I mean?
+
+****note the frankenstein file, which I will refer to below, is a
+concept - if we can make our own frankenstein - then it prooves possible
+that we can print two jobs onto one document. One print job will be the
+tax form, the other will be everything that the tax payer would fill in.
+Maybe I should have asked if I was just dreaming...*****
+
+So far no luck - I think I need the advice of Debian users to help let
+me know what I did wrong. Debian users are kind of like Jedi Knights I
+suppose... :-)
+
+Ok, I feel better...
+
+My basic strategy for form printing was:
+
+1. Download the IRS' own PDF forms (Hell, they ought to approve their
+own forms...)
+
+2. Find out which *nix commands could be used to cause the IRS form
+print job and the print job from Practical Tax to land on one page - so
+we wouldn't have to design forms or learn the PostScript language.
+
+******************What I did while I was being a
+Bozo...**********************************************
+
+The first thing I did was look at my CUPS print spooler while I printed
+a job. It was clear to me that an encapsulated postscript (eps) file was
+copied to /var/spool/Cups directory for a short time. Once a print job
+was complete, the file would slightly change in name, tyhe contents of
+the file would radically change and the file would no longer be a eps
+type of file.
+
+I tried to simply copy an eps file into /var/spool/CUPS and then do a
+print job - hoping that the second print job would merge with the first
+causing a **frankenstein** form to appear, but it just deleted the
+target file and printed whatever I saw on screen.  I monkied with some
+lpr shell commands, but 'man lpr' wasn't too elaborate. I finally gave
+up on the spool file approach.
+
+
+3. Try to use the cat command to merge the files before printing
+
+The command - 'cat /home/james/f1040.pdf | lpr' - will create a print
+out the PDF file named f1040.pdf that is stored in my home directory, if
+the PDF file was there before I issued the command. I have seen this
+miracle before!
+
+However supposedly:
+
+The command - 'cat /home/james/f1040.pdf /home/james/f990.pdf &gt;
+/home/james/frankenstein.pdf' - would create a new file called
+frankenstein.pdf containing graphics form both the 990 and 1040.
+
+If the above actually worked - logic would follow that:
+
+The command - 'cat /home/james/frankenstien.pdf | lpr' would print the
+desired frankenstein file.
+
+Then I looked up merge commands and got 'psmerge' from a Linux Cookbook
+site.
+
+It claimed that the command: - 'psmerge -ofrankenstein.ps f990.ps
+f1040.ps' (if both ps files were made from 'pdftops') would create the
+frankenstein.ps file I described above.
+
+STRIKE ONE! :-)  (We'll not reall, I probably just made a mistake...)
+
+I read a post somewhere slightly implying that 'psmerge' would only work
+on eps files. So I tried using 'ps2epsi.'
+
+STRIKE - TWO!
+
+Ok I thought maybe some type of Adobe Magic is screwing up what would
+normally work.
+
+I know, just to test this out, I will use the enscript command then
+merge the files...
+
+YOUR OUT!
+
+Merger still does not work.
+
+Then I found this web page:
+
+( I thought I was out...?)
+
+www.physionet.org/physiotools/plt/html/node43.html
+
+Which interestingly has a section on the -no option for the program "plt"
+The no option suppposedly will 'spool the output, but don't eject the
+page (use this option if you wish to overlay the output with additional
+material produced by another program"
+
+Well, that didn't work because I couldn't copmpile it, even though I
+read the 'fine manual'.
+
+Yes, there are XMLtoPDF utilities, but they eliminate the stuff we need
+the most and give us what we don't need much help with - The graphics
+are deleted and the text is left. The graphics are so tedious to make
+and have to be literally the exact style of the IRS Forms, that their is
+almost no point in using that utility.
+
+**********************************************************************************
+Items of some hope..
+
+A perl script that may do the overlay we're looking for:
+
+<A HREF="http://www.linuxprinting.org/directomatic">http://www.linuxprinting.org/directomatic</A> &
+<A HREF="http://www.linuxprinting.org/direct-doc.html">http://www.linuxprinting.org/direct-doc.html</A>
+
+A perl script that can change Practicaltax's xml output into ps for
+merging (if merging will ever work...)
+
+<A HREF="http://aspn.activestate.com/ASPN/CodeDoc/Kite/Kite/XML2PS.html">http://aspn.activestate.com/ASPN/CodeDoc/Kite/Kite/XML2PS.html</A>
+
+Cavescript is supposed to be similar:
+
+www.speleonics.com.au/cavescript/docs.html
+
+James Leone
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,118 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Sound modules...the mystery is..." -->
+<!-- FromName="Benjamin Close" -->
+<!-- FromEmail="Benjsc@senet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 24 Sep 1998 16:27:49 +0930" -->
+<!-- Id="3609ED6D.71137A00@senet.com.au" -->
+<!-- Reference="3609B0D7.AA77F5DA@smug.adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Sound modules...the mystery is...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Benjamin Close &lt;<I><A HREF="mailto:Benjsc@senet.com.au">Benjsc@senet.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Thu, 24 Sep 1998 16:27:49 +0930
+</PRE>
+<H1>Re: Sound modules...the mystery is...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Tyson LT wrote:
+&gt; 
+&gt; the mystery about my sound problem is that it worked fine when I
+&gt; installed RH5.1 at the install fest...I went home and ran sndconfig and
+&gt; set it up in about 1 minute. (It played that poor-quality sound sample
+&gt; and everything!)
+&gt; 
+&gt; But this time it just won't work...is it safe to assume that modprobe
+&gt; fails because it can't find the sound module? (I wish it would give a
+&gt; more complete message than 'an error occured running the modprobe
+&gt; program'....it's like, thanks for the MS-style  general, unknown error
+&gt; message!)
+&gt; 
+
+Congratulations I never managed to get sndcnfg to play any sound to me
+but playing sound works fine for me.
+
+&gt; The only reaason I can think that it would find it in one install and
+&gt; not in another is that the version of rh5.1 I installed at the
+&gt; installfest is different than the one I installed from the rh5.1
+&gt; boxed-set...
+
+
+To all with sound problems. If you upgrade your kernel (not sure which
+version) soundcnf will fail! The modules will not load it will give an
+error like device unable to initialize.
+
+The problem lies in what sndcfg puts in /etc/conf.modules 
+The older modules used dma=1,5 to specify the required dma's. The
+problem is this is redhat (and works for older kernels) specific. The
+correct setup should be dma=1 dma16=5 this will let the module load
+correctly. I had great problems with 2.0.34 I ended up compiling the
+sound in to the kernel and specifying the dma/irq's until I found out
+this bug. 
+
+
+If you are still having problems with modules, you should be loading
+sb.o for a soundblaster.
+In /etc/conf.modules there should be a setup like:
+
+alias sound sb
+options sb io=0x220 irq=5 dma=1 dma16=5   &lt;- note the new changes
+
+Sound.o is just something which keeps tabs on what is happeneing with
+the soundcard. (replaced with soundcore.o in the development kernels)
+
+At the command line try:
+
+modprobe sb
+
+this should install the soundcard modules - it automatically loads
+sound.o
+If you have errors when you then send me an email.
+
+Then as a simple test do: cat somewavfile /dev/dsp 
+You should hear the sound - it will be slower than normal but you should
+hear it.
+
+Cheers,
+-- 
+                      ___   __
+                     |___) |__ |\ |
+                     |___) |__ | \|
+                   <A HREF="mailto:Benjsc@senet.com.au">Benjsc@senet.com.au</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

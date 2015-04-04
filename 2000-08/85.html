@@ -1,0 +1,169 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Directory listing bash script" -->
+<!-- FromName="Paul Malcolm Bailey" -->
+<!-- FromEmail="pmbailey@senet.com.au" -->
+<!-- ToName="Richard Sharpe" -->
+<!-- ToEmail="sharpe@ns.aus.com" -->
+<!-- Date="Wed, 02 Aug 2000 21:17:48 +0930" -->
+<!-- Id="39880A64.E8B800DA@senet.com.au" -->
+<!-- Reference="3.0.6.32.20000726140000.00a1c440@203.16.214.248" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Directory listing bash script</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Paul Malcolm Bailey &lt;<I><A HREF="mailto:pmbailey@senet.com.au">pmbailey@senet.com.au</A></I>&gt;
+  To  : Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  Date: Wed, 02 Aug 2000 21:17:48 +0930
+</PRE>
+<H1>Re: Directory listing bash script</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Richard Sharpe wrote:
+&gt; 
+&gt; At 11:30 AM 7/26/00 +0930, Paul Malcolm Bailey wrote:
+&gt; &gt;Hi.
+&gt; &gt;
+&gt; &gt;Linux newbie here.
+&gt; &gt;
+&gt; &gt;Yep, it's more directory stuff with bash.
+&gt; &gt;
+&gt; &gt;However, this time I'm reporting success.  I wanted to have a script
+&gt; &gt;that listed out hidden directories and counted them (also including the
+&gt; &gt;non-hidden directories too).
+&gt; &gt;
+&gt; &gt;It wasn't that easy, and for that reason alone I'm posting the code to
+&gt; &gt;the list so other newbies maybe don't have to spend hours and hours
+&gt; &gt;struggling with commands and switches to list hidden directories.
+&gt; &gt;
+&gt; &gt;Here it is:
+&gt; &gt;
+&gt; &gt;
+&gt; &gt;#!/bin/sh
+&gt; &gt;echo
+&gt; &gt;num=0
+&gt; &gt;hid=0
+&gt; &gt;for somevar in $(ls); do
+&gt; 
+&gt;                 ^^^^^   This is not portable. It is a bashism. Use `ls` ...
+&gt;                         unless you need nesting.
+
+So what you're saying here is always put command substitutions in single
+quotes as standard practice?  (For example, $(ls -al) should instead be
+$('ls -al') for portability reasons.  Is that right?)
+
+You've made it clear that portability is an important consideration in
+shell scripting, but it wasn't something I was really taking into
+account when trying to code this script (obviously a Linux and Unix
+newbie :) ).  Should portability be given top priority when writing
+shell scripts?  And if so, is a programmer kind of constrained into a
+lowest-common-denominator subset of commands when writing for
+portability across various types of shells?
+
+I guess I'm really asking here if programming for one shell (say, bash)
+is greatly different to programming for other shells (say, the Korn
+shell).
+
+&gt; &gt;  if [ -d $somevar ]
+&gt; &gt;    then
+&gt; &gt;      echo "$somevar/"
+&gt; &gt;      num=$[num+1]
+&gt; &gt;  fi
+&gt; &gt;done
+&gt; &gt;if let $[$num &gt; 0]; then
+&gt; &gt;  echo;
+&gt; &gt;fi
+&gt; &gt;for anothervar in $(ls -ad .[a-zA-Z0-9]*); do
+&gt; 
+&gt; Ummm, what was wrong with:
+&gt; 
+&gt;   shopt -s dotglob
+&gt;   for f in *; do
+&gt; 
+&gt; Which will pick up all files, including hidden files. However, 'shopt' may
+&gt; be nonportable as well :-)
+
+As superuser, I searched the man pages for both 'shopt' and 'dotglob'
+using man -K but couldn't find any.  I then tried 'locate shopt' and
+'locate dotglob' but got nothing.  I then checked the Camel book, 2nd
+edition, looking for either shopt or dotglob but there were no entries
+in the index.
+
+What's 'shopt' and what's 'dotglob'?  Where do I get them?
+
+&gt; Also, using $(...), like `...`, will not correctly handle files with spaces
+&gt; in their names.
+&gt; 
+&gt; &gt;  if [ -d $anothervar ]
+&gt; &gt;    then
+&gt; &gt;      echo -e "$anothervar/\t[hidden]"
+&gt; &gt;      num=$[num+1]
+&gt; &gt;      hid=$[hid+1]
+&gt; &gt;  fi
+&gt; &gt;done
+&gt; &gt;if let $[$hid &gt; 0]; then
+&gt; &gt;  echo;
+&gt; &gt;fi
+&gt; &gt;echo -e "($num directories, $hid hidden)\n"
+&gt; &gt;exit 0
+&gt; &gt;
+&gt; &gt;
+&gt; &gt;The other reason for posting this to the list is to confirm one thing:
+&gt; &gt;is it true that to make a hidden file or directory, all you have to do
+&gt; &gt;is prefix the file name or directory name with a full-stop?  I mean, I
+&gt; &gt;guessed that was the way things worked and so I've coded based on that
+&gt; &gt;guess ... but I just wanted to check, y'know?
+&gt; 
+&gt; Yes, that is true ...
+&gt; 
+&gt; &gt;R,
+&gt; &gt;
+&gt; &gt;Paul.
+&gt; &gt;
+&gt; &gt;--
+&gt; &gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; &gt;To unsubscribe from the LinuxSA list:
+&gt; &gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt;
+&gt; &gt;
+&gt; 
+&gt; Regards
+&gt; -------
+&gt; Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+&gt; Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+&gt; Contributing author, SAMS Teach Yourself Samba in 24 Hours
+&gt; Author, Special Edition, Using Samba
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

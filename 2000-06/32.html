@@ -1,0 +1,108 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: System Time" -->
+<!-- FromName="Daryl Tester" -->
+<!-- FromEmail="dt@picknowl.com.au" -->
+<!-- ToName="Weidner, Paula" -->
+<!-- ToEmail="pmweidne@subcorp.com.au" -->
+<!-- Date="Thu, 01 Jun 2000 17:21:21 +0930" -->
+<!-- Id="393615F9.A0D0AFFD@picknowl.com.au" -->
+<!-- Reference="F1DCD9B55F1DD311AB8C00508B0AB45EEFD392@snowball.asc.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: System Time</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  To  : Weidner, Paula &lt;<I><A HREF="mailto:pmweidne@subcorp.com.au">pmweidne@subcorp.com.au</A></I>&gt;
+  Date: Thu, 01 Jun 2000 17:21:21 +0930
+</PRE>
+<H1>Re: System Time</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+"Weidner, Paula" wrote:
+
+&gt; Wouldn't this make the RTC wrong not just the System Time in Linux?
+
+[Danger - it's been a while since I've wielded a soldering iron ...
+ The following story may be based purely on fiction]
+
+(Peers into dim dark recesses of brain; finding nothing but cobwebs,
+he proceeds ...)  It depends on which crystal - the RTC is usually
+driven by a 32kHz crystal.  Divide that by 32768 (2^15) gives you
+your "seconds" resolution.  The clock that drives the system time
+comes off of the counter/time chip (8253?), and is driven by a
+different rock.
+
+Another thing that can cause clock drift on a "slowish" machine is
+some process can lock out the interrupts for longer than a system
+tick (ie, spans two ticks).  From memory, the interrupts for
+each level aren't queued more than once, and as each tick occurs
+every 10 or 100 Hz (gad, I need a brain upgrade), that can cause
+drift as the IRQ tick routine is called once for x ticks.  Actually,
+I can test this ...
+
+[<A HREF="mailto:dt@nipnyep">dt@nipnyep</A> /proc]$ grep timer /proc/interrupts; sleep 1; grep timer /proc/interrupts 
+  0:    6976721          XT-PIC  timer
+  0:    6976822          XT-PIC  timer
+
+Just over 100 ticks for a second.  Cool.  I do need a new brain.
+
+Anyhoo, this may or may not be your problem.  I remember it occuring
+on a machine I had years ago, and was eventually put down to a
+combination of a flaky hard disk and device driver locking the IRQ
+out for extended periods.
+
+
+Regards,
+  Daryl Tester
+&gt; 
+&gt;         -----Original Message-----
+&gt;         From:   MWP [SMTP:<A HREF="mailto:hirm@chariot.net.au">hirm@chariot.net.au</A>]
+&gt;         Sent:   Thursday, 1 June 2000 12:46
+&gt;         To:     Weidner, Paula
+&gt;         Cc:     linuxsa
+&gt;         Subject:        Re: System Time
+&gt; 
+&gt;         Youll prolly find its the mothboards fault.
+&gt;         Ive come across quite a few motherboards now that have had faulty
+&gt; clock gen
+&gt;         crystals/ic's.
+&gt;         Unfortunatly theres not much you can do about it either besides
+&gt; replacing
+&gt;         the motherboard.
+&gt; 
+&gt;         MWP
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

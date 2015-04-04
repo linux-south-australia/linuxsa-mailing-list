@@ -1,0 +1,206 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Help? linux can't see out all of a sudden pt 1" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="apdl@bigpond.com,linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 9 Dec 2001 23:57:32 +1030" -->
+<!-- Id="000201c180b5$451c8f20$0200a8c0@albert" -->
+<!-- Reference="200112091259.XAA13072@jessica.netcraft.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Help? linux can't see out all of a sudden pt 1</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:apdl@bigpond.com">apdl@bigpond.com</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 9 Dec 2001 23:57:32 +1030
+</PRE>
+<H1>RE: Help? linux can't see out all of a sudden pt 1</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&lt;snip&gt;
+&gt; 
+&gt; In shell, I typed ifconfig -a and got the following 
+&gt; [<A HREF="mailto:root@localhost">root@localhost</A> root]# ifconfig -a
+&gt; eth0    Link encap:Ethernet HWaddr 00:07:95:08:80:5C
+&gt;         inet adr:127.0.0.0  Bcast:127.0.0.255   Mask:255.255.255.0
+
+I don't think you're supposed to set eth0 to 127.0.0.0 ... I'm pretty
+sure that 127.*.*.* are reserved for loopback etc. Try setting it to
+192.168.0.x instead...
+
+&gt;         UP BROADCAST MULTICAST MTU:1500 Metric:1
+&gt;         RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+&gt;         TX packets:3 errors:0 dropped:0 overruns:0 carrier:0
+&gt;         collisions:0 txqueuelen:100
+&gt;         RX bytes:0 (0.0 b) TX bytes:126 (126.0 b)
+&gt;         Interrupt:5 Base address:0xcc00
+&gt; 
+&gt; lo      Link encap:Locl Loopback
+&gt;         inet addr:127.0.0.1 Mask:255.0.0.0
+
+This is loopback -- 127.0.0.1 ...
+
+&gt;         UP LOOPBACK RUNNING MTU:16436   Metric:1
+&gt;         RX packets:625 errors:0 dropped:0 overruns:0 frame:0
+&gt;         TX packets:625 errors:0 dropped:0 overruns:0 carrier:0
+&gt;         collissions:0 txqueuelen:0
+&gt;         RX bytes:62144 (60.5 Kb) TX bytes:62144 (60.6 Kb)
+&gt; 
+&gt; ppp0    Link encap:Point-to-Point Protocol
+&gt;         inet addr:144.134.80.53 P-t-P:144.130.44.230    
+&gt; Mask:255.255.255.255
+
+Ok, so your ppp0 is 144.134.80.53, and the other end is 144.130.44.230
+...
+
+&gt;         UP POINTOPOINT RUNNING NOARP MULTICAST MTU:1524 Metric:1
+&gt;         RX packets:3 errors:0 dropped:0 overruns:0 frame:0
+&gt;         TX packets:34 errors:0 dropped:0 overruns:0 carrier:0
+&gt;         collissions:0 txqueuelen:3
+&gt;         RX bytes:66 (66.0 b) TX bytes:2607 (2.5 Kb)
+&gt; 
+&gt; 
+&gt; In shell I typed   netstat -rn and got the following
+&gt; [<A HREF="mailto:root@localhost">root@localhost</A> root]# netstat -rn
+&gt; Kernel IP routing table
+&gt; Destination     Gateway     Genmask         Flags   Mss 
+&gt; Window  irtt    Iface
+&gt; 144.130.44.230  0.0.0.0     255.255.255.255 UH      40  0     
+&gt;   0       ppp0
+
+This routes anything sent to 144.130.44.230 through ppp0 -- correct.
+
+&gt; 127.0.0.0       0.0.0.0     255.255.255.0   U       40  0     
+&gt;   0       eth0
+
+This routes anything sent to 127.0.0.* through eth0 -- incorrect, as
+this stops lo from working, and it's a bad choice of IP address.
+
+&gt; 127.0.0.0       0.0.0.0     255.0.0.0       U       40  0     
+&gt;   0       lo
+
+This routes anything sent to 127.*.*.* through lo (loopback/local) --
+I'm not entirely sure if this is correct, but I suspect it is...
+
+&gt; 0.0.0.0         127.0.0.1   0.0.0.0         UG      40  0     
+&gt;   0       lo
+
+This routes anything else (0.0.0.0 is default) through lo -- incorrect.
+The gateway here should be the other end of your ppp link. Your PC knows
+how to get there, and it knows how to get to the rest of the world
+(presumably).
+
+
+
+&gt; 
+&gt; In shell I typed route and got the following
+&gt; [<A HREF="mailto:root@localhost">root@localhost</A> root]# route
+&gt; Kernel IP routing table
+&gt; Destination     Gateway     Genmask         Flags Metric Ref  
+&gt; Use    Iface
+&gt; 144.130.44.230  0.0.0.0     255.255.255.255 UH      0  0      
+&gt;  0       ppp0
+&gt; 127.0.0.0       0.0.0.0     *               U       0  0      
+&gt;  0       eth0
+&gt; 127.0.0.0       0.0.0.0     *               U       0  0      
+&gt;  0       lo
+&gt; 0.0.0.0        127.0.0.1    localhost.local UG      0  0      
+&gt;  0       lo
+
+route ~= netstat -rn
+
+&gt; 
+&gt; 
+&gt; Following finding the above and discussing with a friend, I checked 
+&gt; K&gt;Configuration&gt;Networking&gt;Netconf and found what I believe were
+&gt; inconsistencies between Netconf settings and those of KPPP.
+&gt; 
+&gt; PPP/SLIP/PLIP
+&gt;     ppp0:Hardware: line connection speed was different to 
+&gt; that I'd set in 
+&gt; KPPP, so I reset the Netconf speed to be the same
+&gt;     Modem port was set to /dev/modem in netconf, whereas KPPP 
+&gt; was set to 
+&gt; /dev/ttySO so again I reset the Netconf to be same as KPPP
+
+/dev/modem is probably a symlink (ls -l /dev/modem, and you may see what
+I mean)...
+
+Other stuff shouldn't matter -- it may be slowing you down, but if your
+modems are connecting, then you should be ok.
+
+&gt; 
+&gt; ROUTING & GATEWAYS
+&gt;    Defaults:  Routing was not enabled, so I enabled it.
+
+Shouldn't need routing enabled -- your machine isn't routing for other
+machines, is it?
+
+&gt; 
+&gt; HOST NAME & IP DEVICES
+&gt;     Host name: was listed as 'localhost', whereas the 
+&gt; computer's server is 
+&gt; supposed to be called 'localhost.localdomain' so I reset it 
+&gt; to the later
+
+Try giving your machine a proper name ("localhost" is used to mean
+"myself", at 127.0.0.1). Normally you make up a name and give it to your
+PC.
+
+&gt;     Adaptor 1 contained primary name + domain of 'localhost' 
+&gt; instead of 
+&gt; localhost.localdomain so I reset it to the later
+&gt;     Adaptor 1 contained net device of 'eth0' & I reset it to 'ppp0'
+&gt;     Adaptor 1 contained IP address (my computer) of 127.0.0.0 
+&gt; and I reset it 
+&gt; to 127.0.0.1
+
+What's "Adaptor 1"? I'm not familiar with Netconf... Show us what
+ifconfig -a and netstat -rn say now...
+
+&gt; 
+&gt; After making these changes and rebooting the system, and 
+&gt; dialing up, the 
+&gt; computer can again see the outside world.  Somehow 
+
+Hmm... Netconf probably inserted some routes in there...
+
+rr
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,352 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="request help with MonMotha iptable configuration script for use o n Mandrake 9.0" -->
+<!-- FromName="'Mcleod, Ian'" -->
+<!-- FromEmail="ian.mcleod@eds.com" -->
+<!-- ToName="'Linuxsa (E-mail)'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 14 Oct 2002 14:51:56 +1000" -->
+<!-- Id="EBD5241959BE8E42B6846134DF0EAE2302602CD6@AUADM201" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: request help with MonMotha iptable configuration script for use o n Mandrake 9.0</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mcleod, Ian &lt;<I><A HREF="mailto:ian.mcleod@eds.com">ian.mcleod@eds.com</A></I>&gt;
+  To  : Linuxsa (E-mail) &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 14 Oct 2002 14:51:56 +1000
+</PRE>
+<H1>request help with MonMotha iptable configuration script for use o n Mandrake 9.0</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I need to set up a box to function as a straight forward no fuss firewall /
+router / transparent proxy for 1 (maybe very rarely more) users.  These are
+the options from the Mon Motha script - I have sugggested a few configs
+below for comment.  I am using 2.4.7 (stable version of the script).
+
+
+MonMotha's IPTables Firewall Configuration Reference Guide
+
+Version 2.3.8-pre7
+Last Edited: June 23, 2002 
+
+
+This is a detailed guide of the configuration options within httpMonMotha's
+IPTables script &lt;<A HREF="http://monmotha.mplug.org/&gt">http://monmotha.mplug.org/&gt</A>;, a mature and easy to configure
+Linux 2.4 kernel Netfilter script that will do firewalling, routing, NAT, IP
+masquerading, and "Cable/DSL router"ing as CompUSA sales people call it.
+
+
+This is a wiki page. Please feel free to comment where you think additional
+information might be useful to people configuring the script. 
+
+  _____  
+
+
+Main Configuration Section 
+
+
+*	IPTABLES="/usr/local/sbin/iptables" 
+
+*	TCP_ALLOW="" I will use IRC, web (ssl and normal), FTP, all the
+usual dekstop user stuff - so I just add the ports as required?  Find the
+ports that IRC uses, etc..
+
+*	TCP ports to allow on incoming connections to the firewall itself
+(localhost) from the Internet. Add only the ports that you need for services
+like SSHD, Web Servers, FTP servers, etc. Seperate port numbers with spaces
+like "22 80 443" Keep this as short as possible for security. These also
+apply to any computers behind the firewall that have public IPs. 
+
+*	UDP_ALLOW="6112 6119 4000" - I will probably use quake3 or other
+games - is this a security risk if left open?  What port/s does Quake3 use?
+
+*	UDP ports to allow on incoming connections to the firewall itself
+(localhost). The defaults are what you need to play all battle.net games
+(including Starcraft
+&lt;<A HREF="http://www.mplug.org/phpwiki/index.php/NetfilterStarcraft&gt">http://www.mplug.org/phpwiki/index.php/NetfilterStarcraft&gt</A>; and Diablo ][).
+These also apply to any computers behind the firewall that have public IPs. 
+
+*	INET_IFACE="eth0" 
+
+*	Interface device to the Internet. (probably eth1 or eth0 for cable,
+leased line, and non PPPoE DSL; ppp0 for dialup or PPPoE DSL) 
+
+*	LAN_IFACE="eth1" 
+
+*	Interface device(s) to your internal LAN. This is probably eth0 or
+eth1. In theory you can now have more than one of these. 
+
+*	INTERNAL_LAN="192.168.0.0/24" -- I use a 192.168.0 LAN
+
+*	The ENTIRE internal LAN. (If you have multiple subnet's, separate
+with spaces). This should also set up all you need to use the firewall box
+as a router between subnets (assuming your routing table is peoperly
+configured). 
+	*	/24 means subnet 255.255.255.0, /8 is 255.0.0.0 (for
+10.x.x.x) 
+
+*	MASQ_LAN="192.168.0.0/24"  -- will I have to worry about any
+existing services on the host machine conflicting with masqueraded IPs of
+ports also in use on that machine?  Say for identd or something.
+
+*	The internal network(s) to be masqueraded. These IP addresses should
+be within the three ranges specified by httpRFC 1918
+&lt;<A HREF="http://www.faqs.org/rfcs/rfc1918.html&gt">http://www.faqs.org/rfcs/rfc1918.html&gt</A>; reserved for internal networks. 
+
+*	SNAT_LAN="" --- I will use dial-up and soon dynamic ADSL - I doubt I
+need worry about this??
+
+*	Internal networks/hosts to use static NAT (format is &lt;internal ip or
+network&gt;:&lt;external ip&gt;). This is for network address translation of real IP
+addresses on the Internet side to certain httpRFC 1918
+&lt;<A HREF="http://www.faqs.org/rfcs/rfc1918.html&gt">http://www.faqs.org/rfcs/rfc1918.html&gt</A>; addresses on the internal LAN. This
+can replace masquerading if you have a static IP and will also allow you to
+keep connections going if the interface drops momentarily. 
+
+*	DROP="LTREJECT" --- I like logging and lots of flashing lights..
+
+*	What to do with packets we don't want: 
+
+*	DROP: Basically ignore the packet, no further action will be taken 
+*	REJECT: Respond with an error, then DROP the packet 
+*	TREJECT: Respond with tcp-reset for TCP or normal REJECT for other
+protocols, then DROP the packet 
+*	LDROP: log the packet then DROP it 
+*	LREJECT: log the packet then REJECT it 
+*	LTREJECT: log the packet then TREJECT it 
+
+*	You probably want TREJECT as this will make your firewalled ports
+show up as if they were not open at all. Use LTREJECT if you want to log it
+too. 
+
+*	DENY_ALL="" 
+
+*	Internet hosts to explicitly deny from accessing your system at all.
+This is an incoming only block (you can still connect to them), and will
+take the system wide drop policy. 
+
+*	BLACKHOLE="" 
+
+*	Hosts you don't want to have anything to do with (this is a
+bidirectional deny), this can have it's own policy (like DROP) to make your
+box ignore flooders and other abusers after you've identified them and added
+them to this. 
+
+*	BLACKHOLE_DROP="DROP" 
+
+*	What to do with stuff from blackholed hosts. Takes the same options
+as DROP= above. 
+
+*	TCP_FW="" -- do I just enter the same ports as above for TCP_ALLOW
+for normal desktop applications?  I will also need streaming media, etc..
+
+*	Port forwards on TCP. This allows you to forward one (or a range of
+ports, use a - between the start and stop ports) port from the external
+interface on the NAT box to the same or a different port on an internal
+HOST. This can also be used between public IPs. The format is: port(range)
+on external iface:port on internal iface&gt;destination IP. If a range is
+specified, all the ports on the external interface will be forwarded
+incrementally to the portrange specified on the internal interface. (I.E.
+specify the rule "1-5:2-6&gt;10.0.0.1", port 1 will be forwarded to port 2 on
+10.0.0.1, 2 forwards to 3, etc). As of 2.3.8-pre3 you will also need to
+allow them in TCP_ALLOW or similar. 
+
+*	UDP_FW=""  -- put the quake3 ports here?
+
+*	Same as above but using UDP (some games may need this, such as older
+versions of starcraft). 
+
+*	MANGLE_TOS_OPTIMIZE="TRUE" 
+
+*	This changes the TOS of various packets (mostly generated by games)
+to ask for special treatment by routers along the way. Most routers simply
+ignore this, but some can provide different routes for high-bandwidth vs.
+low-latency (think gigabit satellite link vs. T1). Often this has no
+noticable effect. Disable if you have problems or just don't like it. 
+
+*	DHCP_SERVER="TRUE"  --- I have a dhcp server runing on it - seems
+pointless for one machine but oh well..  It works and that's all that
+matters - set this to 'true'?  I only want the DHCP server visible
+internally..
+
+*	Set to TRUE if the firewall is also a DHCP server. DHCP clients do
+not need this. This allows broadcasts to the server from potential clients
+on the LAN to succeede. 
+
+*	BAD_ICMP="5 9 10 15 16 17 18" --- anyone know what this does?
+
+*	This is a list of ICMP messages to deny from the internet. Numeric
+or english form is acceptable. 
+
+*	ENABLE="N" 
+
+*	You will need to set this to "Y" or it won't run. This is a saftey
+measure to make sure people don't blindly run it without configuring it. 
+
+
+Flood Parameters Configuration --- I presume I can leave all this as is for
+a desktop machine with very few services (if any externally excepting identd
+for IRC maybe some others)
+
+
+*	LOG_FLOOD="2/s" 
+
+*	How often to log to the log file if something's happening that has
+logging on it (the L-policies for DROP, synfloods, ping floods). This is to
+prevent log DoSing. Probably should be decreased unless you are
+investigating things. 
+
+*	SYN_FLOOD="20/s" 
+
+*	Rate at which to allow SYN packets. SYN packets are used in
+establishing a TCP connection. If you have no services running, you can take
+this down to 1-5/s and let the burst take care of the occasional FTP, DCC,
+ICQ, etc connections. Servers will probably need this MUCH higher. If you
+have problems with connections to your computer failing, increase this
+number. 
+
+*	PING_FLOOD="1/s" 
+
+*	How many pings to respond to per second. For most people 1 per
+second or even less is sufficient (just enough to check to see if you're
+up). www.yahoo.com might want more though :) 
+
+
+Outbound filters
+
+
+
+*	ALLOW_OUT_TCP="" -- do I need to worry about this??  I thought I had
+already defined ports, etc - or is this for 'hosts' in the proper sense that
+run a web server, etc?
+
+*	Internal hosts allowed to be forwarded out on TCP (do not put
+this/these host/s in INTERNAL_LAN, but do define their method of access
+(snat or masq) if not a public ip). Use the source luke. 
+
+*	PROXY="" --- I run squid on the same box - 127.0.0.1:3128??  I think
+I have set squid to transparent mode too in the config file - I don't know
+how that changes the operation of squid.
+
+*	Redirect for Squid or other transparent proxy. Syntax to specify the
+proxy is "host:port". 
+
+
+Experimental Options (please report your successes/failures) 
+
+
+*	MAC_MASQ="" --- can I use this to lock my wireless ADSL connection
+to my laptop wireless NIC?
+
+*	MAC addresses permitted to use masquerading, leave blank to not use 
+
+*	MAC_SNAT="" 
+
+*	MAC addresses permitted to use static NAT, leave blank to not use
+(format is &lt;MAC Address&gt;:&lt;external ip&gt;) 
+
+*	TTL_SAFE="" 
+
+*	How many hops packets need to make once they get on your LAN (null
+disables the mangling) (requires patch from patch-o-matic). Probably for
+extremely paranoid people only, it's only in for fun. 
+
+*	USE_SYNCOOKIES="TRUE" --- will this break anything if I set it to
+true?
+
+*	TCP
+&lt;<A HREF="http://www.mplug.org/phpwiki/index.php/SynCookies?action">http://www.mplug.org/phpwiki/index.php/SynCookies?action</A>=edit&gt;Syn Cookies
+on or off (TRUE/FALSE toggle). Recommended to TRUE, because this will
+protect you from SYN floods by posing a cryptographic challenge per every
+TCP connection to make illegitimate connections computationally expensive,
+thus rendering SYN floods mostly ineffective. Requires more CPU power on
+your firewall machine, though not noticably so unless you have an active
+server or you are synflooded. 
+
+*	SUPER_EXEMPT="" 
+
+*	A list of hosts that get to completely bypass the packet filter.
+Separate with spaces. Use these with extreme caution (you might as well add
+them to /etc/hosts.equiv while you're at it if you trust these hosts this
+much). 
+
+*	BRAINDEAD_ISP="FALSE" -- I presume Internode is not 'braindead' lol
+
+*	This option forces no fragments on TCP. Useful if you have an ISP
+with a braindead firewall that blocks ICMP fragment needed messages or if
+you are on a tunneled connection (such as PPPoE DSL) with an MTU lower than
+that of your LAN. 
+
+*	ALLOW_HOSTWISE_PROTO="" -- need I worry??
+
+*	This option allows you to allow IP protocols (other than UDP and
+TCP). Note that this has nothing to do with TCP or UDP port numbers.
+Standard notation is acceptable for a host, so if you want to allow from
+everyone it is acceptable to use 0/0 for the host to allow from. 
+
+
+Pre-Alpha and non-functional stuff - Don't bother unless you're working on
+it. 
+
+
+*	DMZ_IFACE="" 
+
+*	Interface your DMZ is on (leave blank if you don't have one). 
+
+
+Additional information 
+
+
+LOCIP options for configuration directives 
+
+
+Many configuration directives allow a LOCIP option to be specified. This
+allows you to filter based on the destination IP. This is useful if the
+system running the firewall has multiple public IPs or you are running
+publicly routable IPs on your internal LAN and want to open ports to a
+single host only. 
+
+
+Outbound filtering --- should this concern me or us?
+
+
+The script has very little support for outbound filters. This will be
+addressed in the later 2.5.x development series (not begun as of 23 June
+2002). 
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

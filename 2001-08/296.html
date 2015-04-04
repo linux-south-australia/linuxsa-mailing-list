@@ -1,0 +1,161 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: DDD (Debugger)" -->
+<!-- FromName="" -->
+<!-- FromEmail="michaeld@senet.com.au" -->
+<!-- ToName="'Alan Kennington','LinuxSA','Alan Kennington'" -->
+<!-- ToEmail="akenning@topology.org,linuxsa@linuxsa.org.au,akenning@topology.org" -->
+<!-- Date="Tue, 7 Aug 2001 23:54:02 GMT" -->
+<!-- Id="200108072353.f77NrFI90010@pluto.senet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: DDD (Debugger)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: &lt;<I><A HREF="mailto:michaeld@senet.com.au">michaeld@senet.com.au</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;<BR>        LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;<BR>        Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  Date: Tue, 7 Aug 2001 23:54:02 GMT
+</PRE>
+<H1>Re: DDD (Debugger)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Alan Kennington wrote:
+&gt; On Wed, Aug 08, 2001 at 12:20:13AM +0930, Glen Turner wrote:
+&gt; &gt; Daryl Tester wrote:
+&gt; &gt; &gt; 
+&gt; &gt; &gt; That's the rub.  A well placed printf() speaks volumes about your
+&gt; &gt; &gt; understanding of the program that's being debugged.
+&gt; &gt; 
+&gt; &gt; Oh come on.  A breakpoint shows exactly the same understanding
+&gt; &gt; and avoids a stack of source code control issues.
+&gt; 
+&gt; It all depends on what kind of software you're writing.
+&gt; I'd divide software into 3 categories for this purpose:
+&gt; 
+&gt; 1.	Realtime, such as device drivers and comms
+&gt; 	protocol software.
+&gt; 	Here I don't mean realtime as in fast.
+&gt; 	I mean that the time at which things get executed
+&gt; 	is critical to correct performance.
+&gt; 	I.e. there are deadlines.
+&gt; 2.	Event-driven interactive.
+&gt; 3.	Batch jobs.
+&gt; 
+&gt; Using a debugging tool which slows down execution in
+&gt; category 1 is going to alter things totally.
+&gt; Generally it just isn't possible to find bugs
+&gt; with a debugging tool in the case of device drivers
+&gt; and user-space protocol software.
+
+Waffle.  Sure debuggers are useless if you are intending to step through line 
+by line, but if you're going to do that you might as well try typing with your 
+nose.  
+
+A few strategic breakpoints can help you debug just about anything.  Break 
+around where the bug is suspected, evaluate some locals and *think* about the 
+problem.  I've seen far too many attempts at debugging where print(f|k)'s have 
+been added ad nauseum and the problem either goes away, or is hidden so deep in 
+the pile of outputted crap.  And what really amazes me is people will keep 
+going down this path for days and not start thinking about the problem.  
+Sheesh.
+ 
+&gt; In case 2, you probably can use a debugger, but sometimes
+&gt; things inside GUI libraries could be altered if you
+&gt; change the timing. E.g. buffer overflows might not happen
+&gt; if you go step by step - or they might happen when they
+&gt; wouldn't normally.
+
+I wouldn't have thought that buffer overflows are all that common.  Most bugs 
+IMHO are much simplier.  But you are right, don't use a debugger for debugging 
+stack overflows or memory leaks etc.
+ 
+&gt; Case 3 is where a debugger should always be fine.
+&gt; 
+&gt; Since I've done a fair heap of software in category 1,
+&gt; I just can't use a debugger, and I have to get in the habit
+&gt; of using things like PRINTK as a #define macro for
+&gt; printk which is turned on by a DEBUG macro, or else I
+&gt; use the #if 1 ... #endif technique that you mentioned.
+
+Or something like:
+
+#ifdef DEBUG
+
+  void _Assert(char *, unsigned);  /* Your func */
+
+  #define ASSERT(f) \
+     if (f)         \
+        NULL;       \
+     else           \
+        _Assert(__FILE__, __LINE__)
+
+#else
+
+  #define ASSERT(f) NULL
+
+#endif
+
+which is low overhead and rather than just dumping stuff, you are asserting 
+what should be the case (so it makes you think about what is [in]valid at this 
+point of time)
+
+&gt; My conclusion is that I nearly always prefer to
+&gt; use the printf trace-line method of debugging.
+&gt; By accumulating such trace lines over time,
+&gt; it I get in trouble, I can always turn them all on
+&gt; and see what's happening.
+
+All well and good, but if the problem isn't due to thread interaction, memory 
+leaks or buffer overflows, a quick session in a source-level debugger can be 
+very quick in finding a problem.
+
+&gt; I regard insertion of trace lines as being almost as 
+&gt; important as checking the sanity of all function parameters
+&gt; and return values.
+
+Good habit to get into.
+
+Michael...
+-- 
+<A HREF="mailto:michaeld@senet.com.au">michaeld@senet.com.au</A>
+
+
+-------------------------------------------
+This message was sent using SE Net Webmail.
+<A HREF="http://webmail.senet.com.au/">http://webmail.senet.com.au/</A>
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

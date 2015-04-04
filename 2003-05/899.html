@@ -1,0 +1,202 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="IMAP configuration / Squirrel Mail/SuSE Linux 8.2 Professional" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 24 May 2003 20:41:33 -0700" -->
+<!-- Id="3ED03B6D.8080200@pacbell.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: IMAP configuration / Squirrel Mail/SuSE Linux 8.2 Professional</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 24 May 2003 20:41:33 -0700
+</PRE>
+<H1>IMAP configuration / Squirrel Mail/SuSE Linux 8.2 Professional</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Ok, I am a bit annoyed. :-(  I need to know how to get IMAP to run in 
+SSL so I can use Squirrelmail.
+
+With the goal of learning today, I decided that I would like to try to
+set up Squirrelmail, a nice looking web based mail client, on the 
+server.  So I load up the RPM during the install, and do a quick check 
+to see if it will pull up on a web based interface, and yes it did, so 
+it looked promising.
+
+But when I tried to log in, I get the following message on the web page:
+
+"Warning: fsockopen()[function.fsockopen]:php_hostconnect: connect
+failed in /srv/www/htdocs/squirrelmail/functions/imap_general.php on
+line 172."
+
+Luckily I was able to glean that I had to install UW Imap server from
+this, so after I installed the RPM for that, I tried to log in, and I
+got this message:
+
+"ERROR
+
+Unknown user or password incorrect
+
+Go to the login page"
+
+WTF? I already had a James set up on the server.
+
+Ok, so I ran nmap from the console to see if the imap service was running:
+
+nmap 192.168.5.66
+
+Starting nmap V. 3.00 ( www.insecure.org/nmap/ )
+
+Interesting ports on (192.168.5.66):
+
+(The 1592 ports scanned but not shown below are in
+state: closed)
+
+Port State Service
+
+143/tcp open imap2
+
+Nmap run completed -- 1 IP address (1 host up) scanned
+in 6 seconds
+
+Nmap was recently showing the default port reading for services and not
+the actual ports open.  This wasted hours of my time when I was reverse
+engineering the Gestetner Multifunctional scan server. So I have this in
+mind.
+
+Then I did a search of the Linuxsa archives and this message came up:
+
+<A HREF="http://www.linuxsa.org.au/mailing-list/2000-05/465.html">http://www.linuxsa.org.au/mailing-list/2000-05/465.html</A>
+
+I tried to telnet over to the IMAP server and I saw this behavior, which
+is different than described on the above post:
+
+telnet 192.168.5.66 143
+
+Trying 192.168.5.66...
+
+Connected to 192.168.5.66.
+
+Escape character is '^]'.
+
+* OK [CAPABILITY IMAP4REV1 LOGIN-REFERRALS STARTTLS
+LOGINDISABLED] myserversfakename.local IMAP4rev1 2002.332 at Sat, 24
+May 2003 02:18:38 -0700 (PDT)
+
+login james FAKEPASSWORD
+
+login BAD Command unrecognized/login please: JAMES
+
+WTF???
+
+Login Disabled...who the heck did that? I didn't!
+
+And the FAQ's for IMAP are 55 pages big, and section 7.4 is supposed
+
+
+So I search then I find this:
+
+<A HREF="http://www.wu-wien.ac.at:8082/rfc/rfc2595.hyx/3.2._bIMAP_bLOGINDISABLED_bcapability">http://www.wu-wien.ac.at:8082/rfc/rfc2595.hyx/3.2._bIMAP_bLOGINDISABLED_bcapability</A>
+
+An exerpt:
+
+&gt;    The current IMAP protocol specification (RFC 2060) requires the
+&gt;    implementation of the LOGIN command which uses clear-text passwords.
+&gt;    Many sites may choose to disable this command unless encryption is
+&gt;    active for security reasons.  An IMAP server MAY advertise that the
+&gt;    LOGIN command is disabled by including the LOGINDISABLED capability
+&gt;    in the capability response.  Such a server will respond with a tagged
+&gt;    "NO" response to any attempt to use the LOGIN command.
+
+
+My comment is: Oh hell!
+
+I try to telnet to port 993, no response. I try the web browser on 
+https:, no response.
+
+And where is the bloddy /etc/imap.conf file that allows me to specify this?
+
+I have piles of print outs two inches thick from google searches, etc.
+
+************************************************************
+
+Computing should not be this difficult.
+
+First of all, no where in the documentation do I find anything of this 
+nature at Squirrelmail to warn me.
+
+Secondly, I am _lucky_ that I guessed that it was IMAP and not 
+Squirrelmail. What's there to differentiate to the average user, that 
+its not a squirrel mail problem?
+
+Thirdly, the Squirrelmail mail group has so many messsages for help on 
+the mail list, that it takes a significant amount of time to find an 
+appropriate message, and when I find it, I can see that one guy has been 
+asking the list for 4 days the same question I have.
+
+<A HREF="http://sourceforge.net/mailarchive/forum.php?thread_id">http://sourceforge.net/mailarchive/forum.php?thread_id</A>=2408599&forum_id=2995
+
+<A HREF="http://sourceforge.net/mailarchive/forum.php?thread_id">http://sourceforge.net/mailarchive/forum.php?thread_id</A>=2358399&forum_id=2995
+
+Further the University of Washington mail list simply didn't answer 
+someone's question about this from January 2002:
+
+<A HREF="http://www.washington.edu/imap/listarch/2002/msg00024.html">http://www.washington.edu/imap/listarch/2002/msg00024.html</A>
+
+Ughhhhhh!
+
+James Leone
+
+
+P.S.
+
+I had recently set up the server again to change to SuSE 8.2 on the
+server instead of Mandrake.  In the process I figured out why the server
+would be powered off at random times.  The power supply program nut
+wasn't working well with my small APCC boxes.  But I digress.
+
+
+
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

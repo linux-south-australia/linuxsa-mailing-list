@@ -1,0 +1,95 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Cross Server Domains" -->
+<!-- FromName="'Darryl Ross'" -->
+<!-- FromEmail="dross@syc.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="cobalt@auzit.com" -->
+<!-- Date="Mon, 28 Oct 2002 09:51:49 +1030 (CST)" -->
+<!-- Id="1422.192.168.10.21.1035760909.squirrel@test.syc.net.au" -->
+<!-- Reference="200210270949.g9R9n0F19211@www.ehostingshop.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Cross Server Domains</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Darryl Ross &lt;<I><A HREF="mailto:dross@syc.net.au">dross@syc.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:cobalt@auzit.com">cobalt@auzit.com</A></I>&gt;
+  Date: Mon, 28 Oct 2002 09:51:49 +1030 (CST)
+</PRE>
+<H1>Re: Cross Server Domains</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+James,
+
+&gt; usr1.domain.com   =&gt; server1 :: /var/sites/usr1
+&gt; usr2.domain.com   =&gt; server1 :: /var/sites/usr2
+&gt; usr3.domain.com   =&gt; server2 :: /var/sites/usr3
+
+Copy the apache configuration from server1 to server2 so they are
+basically set up the same in terms of hosting. Then you need to tell the
+DNS server that the subdomains on the second server are on the second
+server. If you run your own dns, then you'd need something like the
+following in your zone <A HREF="file:">file:</A>
+
+==============================================
+$ORIGIN domain.com
+@     IN A     192.168.0.1
+*     IN A     192.168.0.1
+usr3  IN A     192.168.0.2
+usr4  IN A     192.168.0.2
+usr5  IN A     192.168.0.2
+usr6  IN A     192.168.0.2
+usr7  IN A     192.168.0.2
+usr8  IN A     192.168.0.2
+==============================================
+
+That will tell the DNS server to respond with 192.168.0.2 for usr3 through
+usr8, but anything else it will respond with 192.168.0.1. If you're
+putting in a bigger second server you might want to consider replacing the
+current with the new so you don't have to worry about it, or if that is
+not an option then make the wildcard point to the new one and then
+explicitly set the A records for the ones on the first server. Note that
+the wildcard will match things like mail.domain.com and www.domain.com so
+you'll need to make sure you take those into account too.
+
+Also, obviously, you'd need to change the IP addresses with your correct
+addresses for your 2 servers.
+
+Regards
+Darryl
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

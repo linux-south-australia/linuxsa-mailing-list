@@ -1,0 +1,137 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Slow machine.." -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'Andrew Galdes'" -->
+<!-- ToEmail="AGaldes@elders.com.au" -->
+<!-- Date="Sat, 11 Jan 2003 14:12:17 +1030" -->
+<!-- Id="20030111141217.E22292@yellowgoanna.com" -->
+<!-- Reference="20021220141513.B9322@yellowgoanna.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Slow machine..</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : Andrew Galdes &lt;<I><A HREF="mailto:AGaldes@elders.com.au">AGaldes@elders.com.au</A></I>&gt;
+  Date: Sat, 11 Jan 2003 14:12:17 +1030
+</PRE>
+<H1>Re: Slow machine..</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all, back online after a few weeks -- this is a continuation of an
+earlier thread from before Christmas. Hope y'all had a good break etc.
+
+On Fri, Dec 20, 2002 at 02:15:13PM +1030, Richard Russell wrote:
+
+&lt;snip&gt;
+
+&gt; &gt; -You could try hdparm to test hard disk speed. 
+&gt; 
+&gt; Hmmm... never used hdparm before... any tips?
+
+OK, I used hdparm, and I have some advice for people...
+
+Don't.
+
+Just kidding -- it did increase the reported speed of my HDD, and
+worked ok, but then I pushed it too far, with "sub-optimal" results
+(in the sense that wholesale disk corruption might be considered
+sub-optimal).
+
+Yes, I know, there are warnings, but hey -- I had a fairly recent
+backup, and the machine is not yet in production, so it was a risk I
+could afford to take.
+
+My IDE interfaces look like this:
+
+hda: Seagate Barracuda IV 20G
+hdb: CDROM
+hdc: Seagate Barracuda IV 20G
+hdd: CDRW
+
+The HDDs are identical, being the same model (ST320011A), with the same
+partitioning. They are also running under software RAID 1 (Mirror) on
+each of the partitions (except swap). The CDROM and CDRW drives are
+running as SCSI devices (scd0 and scd1 respectively) using the
+ide-scsi module.
+
+Anyway, after messing about a bit, I found out that the drives should
+support Mode 5, according to the specs. I (cleverly) didn't check what
+the motherboard supported, but assumed that it would be ok. Turns out
+it only supports up to UDMA66, which I believe is Mode 4. I used
+hdparm -i to see what it said, and was slightly puzzled by the "DMA
+modes:" line...
+
+hda said:
+DMA modes: mdma0 mdma1 mdma2 udma0 udma1 udma2
+
+and hdc said:
+DMA modes: mdma0 mdma1 mdma2 udma0 udma1 udma2 udma3 udma4 udma5
+
+That was the only difference between the two, and seeing as they are
+identical models, I can't see why there should be any difference.
+Anyway, I initially went conservative, and put them both on udma2.
+This worked fine, but didn't really give me the kind of speed I was
+expecting (according to the -tT option, at least). So, I tried udma3.
+I had a recent backup, so thought it couldn't be that bad... Seemed
+OK, so I got confident. Fiddling about a bit, I did udma4 and udma5,
+and started seeing huge quantities of error messages rolling up my
+screen. I turned it all back, but it was too late.
+
+Strangely, the machine still seems to work, but there are numerous
+files that appear to be dying, and every time I boot up, it's an
+adventure in fscking.
+
+Aaaaanyway, I think the moral of this story is to take note of the
+warnings in hdparm (which, incidentally, is why I've avoided it
+entirely in the past), make sure you have good backups -- test them
+first (which I later discovered is causing me problems, as my backups
+appear to be corrupt), and don't do it on a machine you can't afford
+to lose (which I could, so this disaster is more of an inconvenience,
+and gives me opportunity to redo my machine from scratch, documenting
+it properly this time... :)
+
+rr
+
+-- 
+Richard Russell
+Yellow Goanna P/L
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+m: +61 412 827 805
+f: +61 8 8462 2362
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

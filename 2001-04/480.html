@@ -1,0 +1,196 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: LVM and Software RAID (was: Re: New hdd installation)" -->
+<!-- FromName="'Greg Lehey'" -->
+<!-- FromEmail="grog@lemis.com" -->
+<!-- ToName="'Richard Watkins'" -->
+<!-- ToEmail="rcwatkins@bigpond.com.au" -->
+<!-- Date="Tue, 17 Apr 2001 13:27:13 +0930" -->
+<!-- Id="20010417132713.N66943@wantadilla.lemis.com" -->
+<!-- Reference="PAECJPBAEHBHIKLODGPNKEAACGAA.rcwatkins@bigpond.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: LVM and Software RAID (was: Re: New hdd installation)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Greg Lehey &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  To  : Richard Watkins &lt;<I><A HREF="mailto:rcwatkins@bigpond.com.au">rcwatkins@bigpond.com.au</A></I>&gt;
+  Date: Tue, 17 Apr 2001 13:27:13 +0930
+</PRE>
+<H1>Re: LVM and Software RAID (was: Re: New hdd installation)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tuesday, 17 April 2001 at 13:07:39 +0930, Richard Watkins wrote:
+&gt; Hi Greg,
+&gt; 
+&gt;&gt; No, this is not correct.  RAID-1 is usually faster than RAID-5, and
+&gt;&gt; never slower.
+&gt; 
+&gt; I'm sorry but the above statement is wrong...
+&gt; 
+&gt; "Striping with Parity wastes less disk space then does mirroring, and
+&gt; it also often results in faster disk performance because the operating
+&gt; system can request data from all the striped drives at the same time."
+&gt; (SYBEX-MSCE: Networking Essentials Study Guide-Page 353)
+&gt; 
+&gt; I can check other references if you think this is an error made by
+&gt; M$.
+
+I don't know if this error was made by Microsoft, but it's definitely
+wrong.  It can only be possible for a single transfer, and then only
+if you have ridiculously large data transfers.  By requesting data
+from all drives at the same time, you're tying each of them up for
+about 5 to 8 ms, during which they're not available for other
+transfers.  The result is a steep drop in performance.  It also
+ignores the fact that you can perform multiple reads in parallel from
+mirrors.
+
+Take a look at <A HREF="http://www.vinumvm.org/vinum/Performance-issues.html">http://www.vinumvm.org/vinum/Performance-issues.html</A> ,
+or read the following extract from vinum(8):
+
+   Performance considerations
+     A number of misconceptions exist about how to set up a RAID array for
+     best performance.  In particular, most systems use far too small a stripe
+     size.  The following discussion applies to all RAID systems, not just to
+     vinum.
+
+     The FreeBSD block I/O system issues requests of between .5kB and 60 kB; a
+     typical mix is somewhere round 8 kB.  You can't stop any striping system
+     from breaking a request into two physical requests, and if you do it
+     wrong it can be broken into several.  This will result in a significant
+     drop in performance: the decrease in transfer time per disk is offset by
+     the order of magnitude greater increase in latency.
+
+     With modern disk sizes and the FreeBSD I/O system, you can expect to have
+     a reasonably small number of fragmented requests with a stripe size be-
+     tween 256 kB and 512 kB; with correct RAID implementations there is no
+     obvious reason not to increase the size to 2 or 4 MB on a large disk.
+
+     When choosing a stripe size, consider that most current ufs file systems
+     have cylinder groups 32 MB in size.
+
+     The easiest way to consider the impact of any transfer in a multi-access
+     system is to look at it from the point of view of the potential bottle-
+     neck, the disk subsystem: how much total disk time does the transfer use?
+     Since just about everything is cached, the time relationship between the
+     request and its completion is not so important: the important parameter
+     is the total time that the request keeps the disks active, the time when
+     the disks are not available to perform other transfers.  As a result, it
+     doesn't really matter if the transfers are happening at the same time or
+     different times.  In practical terms, the time we're looking at is the
+     sum of the total latency (positioning time and rotational latency, or the
+     time it takes for the data to arrive under the disk heads) and the total
+     transfer time.  For a given transfer to disks of the same speed, the
+     transfer time depends only on the total size of the transfer.
+
+     Consider a typical news article or web page of 24 kB, which will probably
+     be read in a single I/O.  Take disks with a transfer rate of 6 MB/s and
+     an average positioning time of 8 ms, and a file system with 4 kB blocks.
+     Since it's 24 kB, we don't have to worry about fragments, so the file
+     will start on a 4 kB boundary.  The number of transfers required depends
+     on where the block starts: it's (S + F - 1) / S, where S is the stripe
+     size in file system blocks, and F is the file size in file system blocks.
+
+     1.   Stripe size of 4 kB.  You'll have 6 transfers.  Total subsystem
+          load: 48 ms latency, 2 ms transfer, 50 ms total.
+
+     2.   Stripe size of 8 kB.  On average, you'll have 3.5 transfers.  Total
+          subsystem load: 28 ms latency, 2 ms transfer, 30 ms total.
+
+     3.   Stripe size of 16 kB.  On average, you'll have 2.25 transfers.  To-
+          tal subsystem load: 18 ms latency, 2 ms transfer, 20 ms total.
+
+     4.   Stripe size of 256 kB.  On average, you'll have 1.08 transfers.  To-
+          tal subsystem load: 8.6 ms latency, 2 ms transfer, 10.6 ms total.
+
+     5.   Stripe size of 4 MB.  On average, you'll have 1.0009 transfers.  To-
+          tal subsystem load: 8.01 ms latency, 2 ms transfer, 10.01 ms total.
+
+     It appears that some hardware RAID systems have problems with large
+     stripes: they appear to always transfer a complete stripe to or from
+     disk, so that a large stripe size will have an adverse effect on perfor-
+     mance.  vinum does not suffer from this problem: it optimizes all disk
+     transfers and does not transfer unneeded data.
+
+     Note that no well-known benchmark program tests true multi-access condi-
+     tions (more than 100 concurrent users), so it is difficult to demonstrate
+     the validity of these statements.
+
+     Given these considerations, the following factors affect the performance
+     of a vinum volume:
+
+     o   Striping improves performance for multiple access only, since it in-
+         creases the chance of individual requests being on different drives.
+
+     o   Concatenating UFS file systems across multiple drives can also im-
+         prove performance for multiple file access, since UFS divides a file
+         system into cylinder groups and attempts to keep files in a single
+         cylinder group.  In general, it is not as effective as striping.
+
+     o   Mirroring can improve multi-access performance for reads, since by
+         default vinum issues consecutive reads to consecutive plexes.
+
+     o   Mirroring decreases performance for all writes, whether multi-access
+         or single access, since the data must be written to both plexes.
+         This explains the subdisk layout in the example of a mirroring con-
+         figuration above: if the corresponding subdisk in each plex is on a
+         different physical disk, the write commands can be issued in paral-
+         lel, whereas if they are on the same physical disk, they will be per-
+         formed sequentially.
+
+     o   RAID-5 reads have essentially the same considerations as striped
+         reads, unless the striped plex is part of a mirrored volume, in which
+         case the performance of the mirrored volume will be better.
+
+     o   RAID-5 writes are approximately 25% of the speed of striped writes:
+         to perform the write, vinum must first read the data block and the
+         corresponding parity block, perform some calculations and write back
+         the parity block and the data block, four times as many transfers as
+         for writing a striped plex.  On the other hand, this is offset by the
+         cost of mirroring, so writes to a volume with a single RAID-5 plex
+         are approximately half the speed of writes to a correctly configured
+         volume with two striped plexes.
+
+     o   When the vinum configuration changes (for example, adding or removing
+         objects, or the change of state of one of the objects), vinum writes
+         up to 128 kB of updated configuration to each drive.  The larger the
+         number of drives, the longer this takes.
+
+Greg
+--
+Finger <A HREF="mailto:grog@lemis.com">grog@lemis.com</A> for PGP public key
+See complete headers for address and phone numbers
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

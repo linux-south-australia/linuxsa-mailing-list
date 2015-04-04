@@ -1,0 +1,95 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: procmailrc re-send recipes (which fallback)" -->
+<!-- FromName="'Daniel Callan'" -->
+<!-- FromEmail="dcallan@wias.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 13 Aug 2001 17:04:28 +1000" -->
+<!-- Id="4.3.1.20010813165845.00c05d90@mail.wias.net.au" -->
+<!-- Reference="4.3.1.20010813145916.00bfd660@mail.wias.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: procmailrc re-send recipes (which fallback)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Callan &lt;<I><A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 13 Aug 2001 17:04:28 +1000
+</PRE>
+<H1>Re: procmailrc re-send recipes (which fallback)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+Alrighty! I've at least managed to come up with a dodgey comprimise for the
+fallback if I get "user unknown" for the prefix users getting filtered.
+
+The following recipe, will send a copy of the message back to master's 
+spool file
+(although it does still end up in dead.letter too...which sucks a bit).
+
+/home/master/procmailrc:
+----------------------------------------------------------------------------
+DOMAIN=foo.com.au
+ENV_TO=$1
+
+:0f
+* ENV_TO ?? .
+| formail -i "X-Envelope-To: "$ENV_TO@$DOMAIN
+:0fE
+| formail -i "X-Envelope-To: UNKNOWN"
+
+:1:
+* ^To:.*(NSW|VIC)
+! $<A HREF="mailto:ENV_TO@localhost">ENV_TO@localhost</A>
+
+:1e:
+/var/spool/mail/master
+-----------------------------------------------------------------------------
+
+Any ideas how to can the extra copy going to dead-letter ?
+
+Cheers,
+-Daniel
+
+
+Daniel Callan
+<A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A>
+Systems Admin.
+WIAS Aust.
+www.wias.net.au
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,245 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Problems mounting drive as slave" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'Andrew Lord'" -->
+<!-- ToEmail="andrewlord@internode.on.net,linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 14 Jun 2002 03:20:18 +0930" -->
+<!-- Id="021b01c21302$c7c5b340$1000a8c0@skink" -->
+<!-- Reference="B92EF931.7D%andrewlord@internode.on.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Problems mounting drive as slave</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : Andrew Lord &lt;<I><A HREF="mailto:andrewlord@internode.on.net">andrewlord@internode.on.net</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 14 Jun 2002 03:20:18 +0930
+</PRE>
+<H1>RE: Problems mounting drive as slave</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+hi andrew...
+
+briefly:
+
+/etc/fstab is the file that tells linux about your filesystems. you can
+edit it to add new filesystems, so you don't have to type a full mount
+command to mount them -- they can be mounted automatically, or you could
+type "mount &lt;mountpoint&gt;" to mount them without adding extra options.
+
+/etc/mtab is a kernel-created file that describes all the mounted
+filesystems. don't touch it... 
+
+the mount program, when run by itself, will read the contents of
+/etc/mtab, format them nicely, and show you mounted filesytems. if you
+give it other options, it will mount a filesystem...
+
+eg:
+
+mount &lt;device&gt; &lt;mountpoint&gt;
+
+as an experiment, you can run mount by itself, edit /etc/mtab, adding
+another line similar but differnt to one of the lines already there, and
+then run mount again... here's an eg from my system:
+
+<A HREF="mailto:richard@gecko">richard@gecko</A>:~$ mount
+/dev/hda3 on / type ext2 (rw,errors=remount-ro,errors=remount-ro)
+proc on /proc type proc (rw)
+/dev/hda1 on /boot type ext2 (rw)
+<A HREF="mailto:richard@gecko">richard@gecko</A>:~$ sudo vi /etc/mtab
+<A HREF="mailto:richard@gecko">richard@gecko</A>:~$ mount
+/dev/hda3 on / type ext2 (rw,errors=remount-ro,errors=remount-ro)
+proc on /proc type proc (rw)
+/dev/hda1 on /boot type ext2 (rw)
+/dev/nosuchdevice on /nosuchmountpoint type ext5 (rw)
+
+
+Lovely.
+
+
+rr
+
+-- 
+Richard Russell
+Yellow Goanna Pty Ltd
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+m: +61 412 827 805
+f: +61 8 8462 2362
+ 
+
+&gt; -----Original Message-----
+&gt; From: Andrew Lord [mailto:<A HREF="mailto:andrewlord@internode.on.net">andrewlord@internode.on.net</A>] 
+&gt; Sent: Friday, 14 June 2002 12:37 AM
+&gt; To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; Subject: Problems mounting drive as slave
+&gt; 
+&gt; 
+&gt; Hello all,
+&gt; 
+&gt; I'd be most grateful for some help on the following problem.
+&gt; 
+&gt; Just wondering if somebody can advise me about how to mount 
+&gt; the partitions of a slave drive on my operational linux 
+&gt; system.  ie what specific changes, need to be made to which 
+&gt; particular files (MTAB & FSTAB are shown below)?
+&gt; 
+&gt; &lt;BACKGROUND&gt;
+&gt; 
+&gt; Drive A (Master) 0.8 GB has LILO boot-loader and WindoZe.
+&gt; Drive B (Slave in a Master-slave pairing), 30 GB hosts linux 
+&gt; Mandrake 8.2. Drive B has both Linux-Native and FAT32 partitions.
+&gt; 
+&gt; Problem:
+&gt; 
+&gt; I can now no longer boot into Linux (on Drive B) nor 
+&gt; re-install Linux on drive B (drive just cycles at either 
+&gt; attempt).  However, I can boot into WinDoze on Drive A, and 
+&gt; still see the FAT 32 partitions on drive B.  Linux partitions 
+&gt; are invisible under Windoze but I need to rescue my linux 
+&gt; data from the linux partitions (/, /home, /backup).  So I 
+&gt; thought that if I could somehow boot into linux on another 
+&gt; drive and mount the linux partitions on the Drive B from 
+&gt; Drive A, then I'd be able to transfer my linux data to the 
+&gt; good drive.  
+&gt; 
+&gt; 
+&gt; Attempt:
+&gt; 
+&gt; I have now purchased another hard drive and have installed 
+&gt; this in place of Drive A (Master-only with slave disconnected 
+&gt; and jumper-pins repositioned).
+&gt; 
+&gt; Install of Mandrake on Drive A  went according to 
+&gt; expectations.  Disk partitioning is 
+&gt; /
+&gt; swap
+&gt; /home
+&gt; /backup
+&gt; /Fat32 partition
+&gt; /BeOS partition
+&gt; 
+&gt; Drive B partitioning is
+&gt; 
+&gt; ext2
+&gt; linux-swap
+&gt; ext2
+&gt; ext2
+&gt; ext2
+&gt; FAT32
+&gt; FAT32
+&gt; FAT32
+&gt; FAT32
+&gt; FAT32
+&gt; 
+&gt; Ithen reconnected Drive B (and adjusted jumper-pins) to make 
+&gt; it slave and Drive A'd jumper pins to make it 
+&gt; Master-with-slave) and booted up.
+&gt; 
+&gt; &lt;/BACKGROUND&gt;
+&gt; 
+&gt; Because Drive B has been connected after the installation of 
+&gt; Linux on Drive A as a Master-only setup, none of the 
+&gt; partitions present on drive B have been mounted.  
+&gt; 
+&gt; So which files need to be changed and what are the specific 
+&gt; changes that need to be made ?
+&gt; 
+&gt; I am guessing that two files which require changes are "mtab" 
+&gt; and "ftab" (are there more ?).  Then content of mine is:
+&gt; 
+&gt; /etc/mtab
+&gt; 
+&gt; /dev/hda1 / ext2 rw 0 0
+&gt; none /proc proc rw 0 0
+&gt; none /dev devfs rw 0 0
+&gt; /dev/hda7 /backup ext2 rw 0 0
+&gt; none /dev/pts devpts rw,mode=0620 0 0
+&gt; none /dev/shm tmpfs rw 0 0
+&gt; /dev/hda6 /home ext2 rw 0 0
+&gt; /mnt/cdrom /mnt/cdrom supermount 
+&gt; ro,dev=/dev/hdc,fs=iso9660,--,iocharset=iso8859-1 0 0 
+&gt; /mnt/cdrom2 /mnt/cdrom2 supermount 
+&gt; ro,dev=/dev/scd0,fs=iso9660,--,iocharset=iso8859-1 0 0 
+&gt; /mnt/floppy /mnt/floppy supermount 
+&gt; rw,sync,dev=/dev/fd0,fs=vfat,--,iocharset=iso8859-1,umask=0,co
+&gt; depage=850 0 0 /dev/hda8 /mnt/windows vfat 
+&gt; rw,iocharset=iso8859-1,umask=0,codepage=850 0 0 none 
+&gt; /proc/bus/usb usbdevfs rw,devmode=0664,devgid=43 0 0
+&gt; 
+&gt; /etc/fstab
+&gt; 
+&gt; /dev/hda1 / ext2 defaults 1 1
+&gt; /dev/hda7 /backup ext2 defaults 1 2
+&gt; none /dev/pts devpts mode=0620 0 0
+&gt; none /dev/shm tmpfs defaults 0 0
+&gt; /dev/hda6 /home ext2 defaults 1 2
+&gt; /mnt/cdrom /mnt/cdrom supermount 
+&gt; dev=/dev/hdc,fs=iso9660,ro,--,iocharset=iso8859-1 0 0 
+&gt; /mnt/cdrom2 /mnt/cdrom2 supermount 
+&gt; dev=/dev/scd0,fs=iso9660,ro,--,iocharset=iso8859-1 0 0 
+&gt; /mnt/floppy /mnt/floppy supermount 
+&gt; dev=/dev/fd0,fs=vfat,--,iocharset=iso8859-1,umask=0,sync,codep
+&gt; age=850 0 0 /dev/hda8 /mnt/windows vfat 
+&gt; iocharset=iso8859-1,umask=0,codepage=850 0 0 none /proc proc 
+&gt; defaults 0 0 /dev/hda5 swap swap defaults 0 0
+&gt; 
+&gt; 
+&gt; TIA
+&gt; 
+&gt; Andrew Lord
+&gt; 
+&gt; 
+&gt; PS.  I have also attempted to install Linux on Drive A, with 
+&gt; Drive B in place (ie Master-slave configuration).  As usual I 
+&gt; got to the partitioning stage of Mandrake 8.2 install, and 
+&gt; was able to designate and name all partitions on both drive A 
+&gt; & drive B.  Then after partitioning, drive B did its usual 
+&gt; cycling thing [(ch ch, ch, ch ...pause.....) x 10] even 
+&gt; though I designated the 'offending' partition as "empty". The 
+&gt; install then crashed out as it has done previously.
+&gt; 
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on 
+&gt; irc.linux.org.au To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as 
+&gt; the subject
+&gt; 
+&gt; 
+&gt; 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

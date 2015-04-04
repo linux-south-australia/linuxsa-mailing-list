@@ -1,0 +1,150 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IP identifier field for linux UDP/IP equals zero??!" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="ak.linuxsa@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 16 May 2003 11:04:30 +0930" -->
+<!-- Id="20030516110430.A12503@dog.topology.org" -->
+<!-- Reference="3EC43506.3040806@dsto.defence.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IP identifier field for linux UDP/IP equals zero??!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 16 May 2003 11:04:30 +0930
+</PRE>
+<H1>Re: IP identifier field for linux UDP/IP equals zero??!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, May 16, 2003 at 10:17:02AM +0930, Barney Wrightson wrote:
+&gt; 
+&gt; The suggestion here is that the easy implementation be an id incremented 
+&gt; for each datagram regardless of destination, which I think would 
+&gt; invalidate the compression that assumes incrementing ids immediately, if 
+&gt; it is related to a particular source-destination pair.
+&gt; 
+&gt; eg	src-&gt;dest1  id=1
+&gt; 	src-&gt;dest2  id=2
+&gt; 	src-&gt;dest3  id=3
+&gt; 	src-&gt;dest3  id=4
+&gt; 	src-&gt;dest1  id=5
+&gt; 	etc...
+&gt; 
+&gt; Or as has been mentioned before there are other reasonable ways to get 
+&gt; unique ids that are not just an incremented counter. So regardless of 
+&gt; whether the linux implementation is correct or not the same problems 
+&gt; could well exist with implementations definately do conform.
+
+
+Barney,
+
+At the risk of driving some innocent bystanders up the pole...
+
+Actually RFC 3095 does cope very nicely with your scenario.
+It efficiently encodes the _non-negative_ deviation of the the IP ID
+from the increment-by-one rule. It even copes nicely if the bytes
+or the 16-bit field are in little-endian order. 
+I didn't want to go into details. RFC 3095 is _very_ complex. 
+
+The frustrating thing is that the inventors did not sample the
+traffic from a linux box before setting their design parameters in stone.
+Just one single number in the spec needs to be changed from 0 to -1
+to fix the problem. This is just an example of how linux does not
+have the market share yet to force protocol designers to take it into account.
+
+This, incidentally, is the last reply on the ROHC (RFC 3095) mailing list:
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+b) Constant IP-ID (as mentioned by Alan and Fredrik).
+
+Since it does not follow RFC 791, I see that as an "irregular" case.
+IMHO, it's not worth the protocol change on RFC 3095 in order to
+optimize just for this special case. It would be much easier to change
+the IP stack implementation to be compliant with RFC 791 and have
+the benefit of optimal performance of ROHC.
+
+Actually, it seems to me the change is necessary for interoperability of
+IP itself, i.e., what if the receiving IP node, by following RFC 791,
+does not check DF bit? What will it do with two IP datagrams with
+same IP-ID? Or did I miss any RFC that updates RFC 791 in this regard?
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+In retrospect, I made a mistake to present this as a standards compliance
+issue, since a good lawyer can prove that the Sun rises in the west
+if you pay them enough. Written English is just ambiguous.
+It's a strategic issue. Perceptions are important.
+
+Let me put it this way:
+
+-	The mobile phone industry is going to say that linux is
+	in non-compliance with RFC 791.
+-	MS is going to agree, and they'll pay an "independent"
+	consultancy to prove that linux has an "issue".
+-	It's trivial to change the linux kernel to do the
+	increment-by-one rule which it already does for TCP.
+
+The question is not: "Is linux kosher/halal/dinkum?"
+The question is: "Do you want linux to gain wide acceptance?" and
+"Do you want to avoid a PR coup for the anti-linux camp?"
+
+The general public knows even less about RFC legal interpretation
+than the least knowledgeable among us.
+There will be maybe 500 million 3G handsets out there with
+RFC 3095 in 5 to 10 years.
+So I say linux should be wise, not clever, and just put back
+the increment-by-one rule for IP ID fields.
+As MS has taught us, it's usually better to win than to be right.
+And I'm only suggesting that one dubious linux feature be replaced
+with an unambiguously correct implementation choice.
+(If linux can't be secure without hiding a tiny percentage of IP ID fields, 
+then linux security must be horribly slack, which we know it isn't.)
+
+Another point I should make is that I think that if MS had done the same
+thing with the IP ID, then linux advocates would be pointing the finger
+at them and talking about "embrace and extend".
+
+Right now, RFC 3095 exists only in the lab. But when it hits the fan,
+it would be good if linux was "3G-ready" already.
+
+Anyway.... Time to purchase the weekly munga.
+
+Cheers again,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,238 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="fwtk2.1 compiling error." -->
+<!-- FromName="emyeu" -->
+<!-- FromEmail="saigon_ca@yahoo.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 21 Feb 2000 13:16:48 -0800 (PST)" -->
+<!-- Id="20000221211648.8244.qmail@web1703.mail.yahoo.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: fwtk2.1 compiling error.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: emyeu &lt;<I><A HREF="mailto:saigon_ca@yahoo.com">saigon_ca@yahoo.com</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 21 Feb 2000 13:16:48 -0800 (PST)
+</PRE>
+<H1>fwtk2.1 compiling error.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hello all.
+
+I need your help of compiling the source code of fwtk2.1
+I have following the instructions and make changes to
+Makefile.config. When I run make, it seem OK util it get
+to
+x-gw . Part of The error message as followed:
+----------------------------------------
+all: /tmp/fwtk/http-gw
+make[1]: Entering directory `/tmp/fwtk/http-gw'
+cc -I.. -O2 -DLINUX   -c hmain.c -o hmain.o
+cc -I.. -O2 -DLINUX   -c http-gw.c -o http-gw.o
+cc -I.. -O2 -DLINUX   -c ftp.c -o ftp.o
+cc -I.. -O2 -DLINUX   -c gof2html.c -o gof2html.o
+cc -I.. -O2 -DLINUX   -c auth.c -o auth.o
+cc -I.. -O2 -DLINUX   -c gio.c -o gio.o
+cc -I.. -O2 -DLINUX   -c noproxy.c -o noproxy.o
+cc -I.. -O2 -DLINUX   -c error.c -o error.o
+cc -I.. -O2 -DLINUX   -c icons.c -o icons.o
+cc -I.. -O2 -DLINUX   -c ver.c -o ver.o
+cc -I.. -O2 -DLINUX -s -static -o http-gw hmain.o
+http-gw.o ftp.o gof2html.o \
+        auth.o error.o icons.o gio.o ver.o noproxy.o \
+        ../libfwall.a ../libauth.a -lcrypt
+make[1]: Leaving directory `/tmp/fwtk/http-gw'
+all: /tmp/fwtk/x-gw
+make[1]: Entering directory `/tmp/fwtk/x-gw'
+cc -I.. -O2 -DLINUX -I/usr/X11R6/include   -c child.c -o
+child.o
+In file included from child.c:14:
+ulib.h:26: X11/Intrinsic.h: No such file or directory
+make[1]: *** [child.o] Error 1
+make[1]: Leaving directory `/tmp/fwtk/x-gw'
+make: *** [all] Error 2
+[<A HREF="mailto:root@ftp_server2">root@ftp_server2</A> fwtk]# 
+---------------------------
+Here is My Makefile.config
+
+#
+#  Copyright (c) 1993, Trusted Information Systems,
+Incorporated
+#  All rights reserved.
+# 
+#  Redistribution and use are governed by the terms
+detailed in the
+#  license document ("LICENSE") included with the toolkit.
+#
+
+#
+#	Author: Marcus J. Ranum, Trusted Information Systems,
+Inc.
+#
+# RcsId: "$Header:
+/home/rmurphy/fwtk/fwtk/RCS/Makefile.config.linux,v 1.2
+1998/01/13 23:50:46 rmurphy Exp $"
+
+
+# Your C compiler (eg, "cc" or "gcc")
+CC=	cc
+
+
+# program to use for installation -- this may or may not
+preserve
+# old versions (or whatever). assumes that it takes
+parameters:
+# copy source dest
+CP=	cp
+
+
+# Defines for your operating system
+#
+DEFINES=-DLINUX
+#DEFINES=-DSYSV -DSOLARIS
+
+# Options for your compiler (eg, "-g" for debugging, "-O"
+for
+# optimizing, or "-g -O" for both under GCC)
+#COPT=	-g -traditional $(DEFINES)
+#COPT=	-g $(DEFINES)
+COPT=	-O2 $(DEFINES)
+
+# Version of "make" you want to use
+#MAKE=	gnumake
+MAKE=	make
+
+
+# Your ranlib utility (use "touch" if you don't have
+ranlib)
+RANLIB=	ranlib
+#RANLIB=	touch
+
+
+# Destination directory for installation of binaries
+DEST=	/usr/local/etc
+
+
+# Destination directory for installation of man pages
+#DESTMAN=	$(DEST)/../man
+
+
+# Names of any auxiliary libraries your system may require
+(e.g., -lsocket)
+# If you want to link against a resolver library, specify
+it here.
+#AUXLIB= 
+#AUXLIB= -lsocket
+# Some versions of Linux have broken the crypt() function
+out into a
+# separate library - uncomment the following line if
+authsrv fails to build.
+AUXLIB= -lcrypt
+
+# For Solaris:
+#AUXLIB= -lresolv -lsocket -lnsl
+
+
+# DBM library should be specified if it is an external
+library or
+# you with to use a different one than what is included in
+libc
+#DBMLIB=	-lndbm
+# for Linux:
+DBMLIB=-lgdbm
+# "Linux" is such a ephemeral concept. Unfortunately, one
+of the
+# significant incompatibilities between distributions and
+versions
+# is where the DBM libraries end up. "-ldbm", "-ldb", or
+"-lgdbm" could
+# work for you.  "-lgdbm" works for me (Slackware Linux
+2.3).
+# for BSD:
+#DBMLIB=
+
+# Flags to pass to the linker (eg, -static for static
+binaries under GCC,
+# or -Bstatic for static binaries under SunOS 4.1.x)
+#LDFL=	-Bstatic
+#LDFL=
+LDFL= -s -static
+# Flags for X gateway link - usually the same as LDFL
+XLDFL=-s
+
+
+# Location of the fwtk sources [For #include by any
+external tools needing it]
+FWTKSRCDIR=/u/b/mjr/firewall/fwtk
+#FWTKSRCDIR=/usr/local/src/fwtk
+
+
+# Location of X libraries for X-gw
+XLIBDIR=/usr/X11R6/lib
+#XLIBDIR=/usr/local/X11R6/lib
+
+# X Libraries
+# For BSD:
+#XLIBS= -L$(XLIBDIR) -lXaw -lXmu -lXt -lXext -lX11R6 -lSM
+-lICE -lipc
+#XLIBS =  -L$(XLIBDIR) -lXaw -lXmu -lXt -lXext -lX11R6
+# for Linux:
+XLIBS =  -L$(XLIBDIR) -lXaw -lXmu -lXt -lXext -lX11R6 -lc
+# for BSD/OS 2.0:
+#XLIBS = -L$(XLIBDIR) -lXaw -lXmu -lXt -lXext -lX11R6 -lSM
+-lICE -lXext
+# For SunOS:
+#XLIBS = -L$(XLIBDIR) -lXaw -lXmu -lXt -lXext -lX11R6
+
+# Location of X include files
+XINCLUDE=/usr/X11R6/include
+#XINCLUDE=/usr/local/X11R6/include
+
+# Objects to include in libfwall for SYSV
+SYSVOBJ= signal.o
+----------------------------
+What 's wrong with the error in Makefile.config.?
+How do I overcome this problems.
+
+Thanks.
+emieu.
+
+__________________________________________________
+Do You Yahoo!?
+Talk to your friends online with Yahoo! Messenger.
+<A HREF="http://im.yahoo.com">http://im.yahoo.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

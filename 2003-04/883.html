@@ -1,0 +1,115 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Apache reverse proxy -- why does this even work?" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 30 Apr 2003 11:20:22 +0930" -->
+<!-- Id="courier.3EAF2BDE.000044CB@pogona.yellowgoanna.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Apache reverse proxy -- why does this even work?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 30 Apr 2003 11:20:22 +0930
+</PRE>
+<H1>Apache reverse proxy -- why does this even work?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all, 
+
+I have a Linux box running Apache, with NameVirtualHosts which are set up to 
+be reverse proxies to a bunch of Windows boxes running Apache on a private 
+network. The Linux box has two interfaces. 
+
+An eg directive is: 
+
+&lt;VirtualHost domain.com&gt;
+    DocumentRoot /home/httpd/html
+    ServerName domain.com
+    ProxyPass / <A HREF="http://internal.int/">http://internal.int/</A>
+    ProxyPassReverse / <A HREF="http://internal.int/">http://internal.int/</A>
+    CustomLog /var/log/httpd/access_log common
+&lt;/VirtualHost&gt; 
+
+The strange this is, that despite the fact that internal.int doesn't resolve 
+on the linux box at all, it still works. I have checked nsswitch.conf, 
+resolv.conf, yp (not running), nisplus (not running) and /etc/hosts, and 
+can't find any mention of internal.int anywhere. 
+
+Eventually, I did find it in a local copy of named. It's a master for .int, 
+and has a zone file, with the correct information for internal.int in it. 
+It's only listening on the internal (192.168) interface (not even 
+localhost). If I run `dig internal.int @192.168.x.y`, I get the correct 
+response. However, /etc/resolv.conf looks like this: 
+
+[<A HREF="mailto:root@fw">root@fw</A> /root]#  cat /etc/resolv.conf
+search int
+#nameserver 192.168.x.y       &lt;-- internal address, commented out
+nameserver &lt;provider's DNS&gt; 
+
+nscd isn't running. 
+
+I can't see any NS related directives in httpd.conf. 
+
+If i try to resolve internal.int from the command line, it doesn't resovle 
+(unless I specify the DNS explicitly using dig or nslookup). 
+
+No interfaces are configured to be dhcp. 
+
+
+It shouldn't work!!! 
+
+(one thing I haven't tested is stopping the named, or restarting httpd -- 
+perhaps something has cached an old copy of /etc/resolv.conf... but what 
+does this? I don't want to break it, as it's a production server) 
+
+
+Cheers 
+
+rr 
+
+-- 
+Richard Russell
+Yellow Goanna P/L
+m: +61 412 827 805
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+w: <A HREF="http://www.yellowgoanna.com/">http://www.yellowgoanna.com/</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

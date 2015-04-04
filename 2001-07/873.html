@@ -1,0 +1,213 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Bash help" -->
+<!-- FromName="'Tim Riley'" -->
+<!-- FromEmail="tr@rebel.net.au" -->
+<!-- ToName="'Richard Russell'" -->
+<!-- ToEmail="richardrussell@internode.on.net" -->
+<!-- Date="Tue, 17 Jul 2001 22:37:57 +0930" -->
+<!-- Id="20010717223757.A913@rebel.net.au" -->
+<!-- Reference="HKEMJGGDNENEDGGDCJBBKELJCJAA.richardrussell@internode.on.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Bash help</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Tim Riley &lt;<I><A HREF="mailto:tr@rebel.net.au">tr@rebel.net.au</A></I>&gt;
+  To  : Richard Russell &lt;<I><A HREF="mailto:richardrussell@internode.on.net">richardrussell@internode.on.net</A></I>&gt;
+  Date: Tue, 17 Jul 2001 22:37:57 +0930
+</PRE>
+<H1>Re: Bash help</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, Jul 17, 2001 at 06:38:50PM +0930, Richard Russell wrote:
+&gt; 
+&gt; &gt; I've been making some modifications to a tool called protopkg, which
+&gt; &gt; takes source code and makes a slackware package from it.  My first job
+&gt; &gt; has been to make it read from one build file, instead of three.
+&gt; 
+&gt; first question: why? I would have thought that there may be a reason why
+&gt; it's in three files (perhaps because putting it in one simply won't work...
+&gt; but more likely because you want to share some of these files around, but
+&gt; not all of them -- three files may be the most logical way to arrange the
+&gt; code.)
+
+I am extending protopkg to make it into a tool which will be used in the
+situation of a ports system.  The reason I want one file instead of
+three is becuase that way it is very easy to have multiple versions (ie.
+multuple files) of a port in its directory - better to have three files
+for three versions instead of nine.
+
+&gt; 
+&gt; &gt; Previously, it had a 'prototype' file, in which there was certain
+&gt; &gt; variables, as well as package specific compile() and install()
+&gt; &gt; functions.  The other files it could use were 'sources' and 'rules.'  In
+&gt; &gt; each of these files, there were various lines of text in between two
+&gt; &gt; flags, in the following format:
+&gt; &gt;
+&gt; &gt; flag:
+&gt; &gt; text
+&gt; &gt; text
+&gt; &gt; text
+&gt; &gt; :flag
+&gt; 
+&gt; what type of text? Is this bash commands, environment variable settings, or
+&gt; some other config settings?
+
+In the case of the files which were separate from the prototype file
+originally, there was just text - for one, a URI and an MD5 checksum per
+line, and for the other, a keyword and a path to a file.  The text
+between the flags is handled by other functions in the protopkg script.
+
+&gt; 
+&gt; &gt; There is a read_rules() function that extracts the information between
+&gt; &gt; the flag name passed to it as an argument.  This is it below:
+&gt; 
+&gt; where? in the prototype file?
+
+No.  The read_rules() function is in the protopkg script/program.  The
+prototype file itself is never run, its functions are called by
+protopkg.
+
+&gt; 
+&gt; &gt;
+&gt; &gt; read_rules() {
+&gt; &gt;    sed -e '/^#/d' -e '/^$/d' | sed -n "/^${1}:/,/^:${1}$/p" |
+&gt; &gt;    grep -Fv "${1}:" | grep -Fv ":${1}" | sed -e "s/^[ \t]*//"
+&gt; &gt; }
+&gt; 
+&gt; ok, in playing around with this, I think that the read_rules() function just
+&gt; reads the stuff between the flags, and prints it to stdout, right?
+&gt; 
+
+That's the one.
+
+&gt; &gt; So, in order to combine all three files into one, I made another set of
+&gt; &gt; flags to encapsulate that which was originally alone in the 'protopkg'
+&gt; &gt; file (flag name is 'package') and then appended the other two files to
+&gt; &gt; it.
+&gt; 
+&gt; ok, so it (the (new, modified) prototype file?) looks like:
+&gt; 
+&gt; ---------------
+&gt; #!/bin/bash
+&gt; 
+&gt; &lt;bash program with read_rules function defined&gt;
+&gt; 
+&gt; ...
+&gt; 
+&gt; package:
+&gt; flag:
+&gt; text
+&gt; text
+&gt; :flag
+&gt; 
+&gt; anotherflag:
+&gt; text
+&gt; text
+&gt; :anotherflag
+&gt; :package
+&gt; 
+&gt; -------------
+&gt; 
+&gt; right?
+
+No - read_rules() and the other functions are contained withing the
+`protopkg` script.  Essentially, the prototype file contains information
+on how to build the source code tarball in question, along with some
+other things.
+
+An example would look like this:
+
+------
+
+package:
+VERSION=2.0
+PROGNAME=xmms-$VERSION-$ARCH-$BUILD
+BUILD=1
+ARCH=`/bin/arch`
+
+DESC="\
+Info about \n \
+the package"
+
+STRIPBIN=y
+STIRPLIB=y
+SETATTR=y
+
+compile() {
+ tar zxvf $CWD/xmms-$VERSION
+ ./configure --prefix=/usr
+ make
+}
+
+install() {
+ make install
+}
+
+:package
+
+sources:
+ <A HREF="http://www.xmms.org/xmms-2.0.tar.gz">http://www.xmms.org/xmms-2.0.tar.gz</A>
+:sources
+
+conf:
+ /etc/xmms.conf
+:conf
+
+---------
+
+The text between the 'package' flags is the stuff called by protopkg to
+compile and install the package. 100% bash.  The rest is not bash code,
+just lines of data that the protpkg scrip interprets.
+
+
+&gt; 
+&gt; &gt; The problem starts here.  Originally, the entire prototype file was
+&gt; &gt; sourced, which was OK since it contained only Bash stuff.  However, now
+&gt; &gt; it doesn't, so I want to use the read_rules() function to just source
+&gt; &gt; the stuff in between the 'package' flags.  My failed attempt is below.
+&gt; 
+&gt; This code (below) is from the new prototype file, right? or are you running
+&gt; it in your interactive shell (afaik, there's no reason to source something
+&gt; in a script...)?
+&gt; 
+&gt; &gt;
+&gt; &gt;      # This dumps it to a file called source.  So close!  But I want it
+&gt; &gt;      # read *internally*
+&gt; &gt;
+&gt; &gt;      read_r
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

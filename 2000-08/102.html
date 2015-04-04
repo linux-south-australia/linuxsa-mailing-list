@@ -1,0 +1,317 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: samba woes" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="kevin@oceania.net, Linux user group" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 03 Aug 2000 20:14:07 +0900" -->
+<!-- Id="3.0.6.32.20000803201407.00a0c5b0@203.16.214.248" -->
+<!-- Reference="200008020442.OAA14246@bhwb.nsw.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: samba woes</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : kevin@oceania.net, Linux user group &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 03 Aug 2000 20:14:07 +0900
+</PRE>
+<H1>Re: samba woes</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 08:51 AM 8/3/00 +1000, <A HREF="mailto:kevin@oceania.net">kevin@oceania.net</A> wrote:
+&gt;I am trying to set up a little print server
+&gt;with samba without success.
+&gt;The server has an IP 192.168.0.71 and the
+&gt;machine I wish to print from 192.168.0.70(this one)
+&gt;
+&gt;I can telnet into the printserver and echo "blah blah" &gt; /dev/lp0
+&gt;and it prints fine, I have set up the printer with RedHat printtool
+&gt;on this machine but cannot get it to print. below is my smb.conf
+&gt;I am sure something is amiss here but I cannot see it.
+&gt;Sorry about the length of the post
+
+This has almost nothing to do with Samba.  Get lpd printing to a remote
+printer from 192.168.0.70 to 192.168.0.71 first. Then, if you have a
+printers section in your smb.conf file, it will see the remote printer and
+print to it.
+
+&gt;Kind regards
+&gt;Kevin
+&gt;
+&gt;
+&gt;
+&gt;; The global setting for a RedHat default install
+&gt;; smbd re-reads this file regularly, but if in doubt stop and restart
+&gt;it:
+&gt;; /etc/rc.d/init.d/smb stop
+&gt;; /etc/rc.d/init.d/smb start
+&gt;;======================= Global Settings
+&gt;=====================================
+&gt;[global]
+&gt;
+&gt;; workgroup = NT-Domain-Name or Workgroup-Name, eg: REDHAT4
+&gt;   workgroup = OCEANIA 
+&gt;
+&gt;; comment is the equivalent of the NT Description field
+&gt;   comment = RedHat Samba Server
+&gt;
+&gt;; volume = used to emulate a CDRom label (can be set on a per share
+&gt;basis)
+&gt;   volume = RedHat4
+&gt;
+&gt;; printing = BSD or SYSV or AIX, etc.
+&gt;   printing = bsd
+&gt;   printcap name = /etc/printcap
+&gt;   load printers = yes
+&gt;
+&gt;; Uncomment this if you want a guest account
+&gt;;  guest account = pcguest
+&gt;   log file = /var/log/samba-log.%m
+&gt;; Put a capping on the size of the log files (in Kb)
+&gt;   max log size = 50
+&gt;
+&gt;; Options for handling file name case sensitivity and / or preservation
+&gt;; Case Sensitivity breaks many WfW and Win95 apps
+&gt;;   case sensitive = yes
+&gt;    short preserve case = yes
+&gt;    preserve case = yes
+&gt;
+&gt;; Security and file integrity related options
+&gt;   lock directory = /var/lock/samba
+&gt;   locking = yes
+&gt;   strict locking = yes
+&gt;;   fake oplocks = yes
+&gt;   share modes = yes
+&gt;; Security modes: USER uses Unix username/passwd, SHARE uses WfW type
+&gt;passwords
+&gt;;        SERVER uses a Windows NT Server to provide authentication
+&gt;services
+&gt;   security = user
+&gt;; Use password server option only with security = server
+&gt;;   password server = &lt;NT-Server-Name&gt;
+&gt;
+&gt;; Configuration Options ***** Watch location in smb.conf for
+&gt;side-effects *****
+&gt;; Where %m is any SMBName (machine name, or computer name) for which a
+&gt;custom
+&gt;; configuration is desired
+&gt;;   include = /etc/smb.conf.%m
+&gt;
+&gt;; Performance Related Options
+&gt;; Before setting socket options read the smb.conf man page!!
+&gt;   socket options = TCP_NODELAY 
+&gt;; Socket Address is used to specify which socket Samba
+&gt;; will listen on (good for aliased systems)
+&gt;;   socket address = aaa.bbb.ccc.ddd
+&gt;; Use keep alive only if really needed!!!!
+&gt;;   keep alive = 60
+&gt;
+&gt;; Domain Control Options
+&gt;; OS Level gives Samba the power to rule the roost. Windows NT = 32
+&gt;;       Any value &lt; 32 means NT wins as Master Browser, &gt; 32 Samba gets
+&gt;it
+&gt;;   os level = 33
+&gt;; specifies Samba to be the Domain Master Browser
+&gt;;   domain master = yes 
+&gt;; Use with care only if you have an NT server on your network that has
+&gt;been
+&gt;; configured at install time to be a primary domain controller.
+&gt;;   domain controller = &lt;NT-Domain-Controller-SMBName&gt;
+&gt;; Domain logon control can be a good thing! See [netlogon] share section
+&gt;below!
+&gt;;   domain logons = yes
+&gt;; run a specific logon batch file per workstation (machine)
+&gt;;   logon script = %m.bat
+&gt;; run a specific logon batch file per username
+&gt;;   logon script = %u.bat
+&gt;; Windows Internet Name Serving Support Section
+&gt;; WINS Support - Tells the NMBD component of Samba to enable it's WINS
+&gt;Server
+&gt;;       the default is NO.
+&gt;;   wins support = yes
+&gt;; WINS Server - Tells the NMBD components of Samba to be a WINS Client
+&gt;;       Note: Samba can be either a WINS Server, or a WINS Client, but
+&gt;NOT both
+&gt;;   wins server = w.x.y.z
+&gt;; WINS Proxy - Tells Samba to answer name resolution queries on behalf
+&gt;of a non
+&gt;;       WINS Client capable client, for this to work there must be at
+&gt;least one
+&gt;;       WINS Server on the network. The default is NO.
+&gt;;   wins proxy = yes
+&gt;
+&gt;;============================ Share Declarations
+&gt;==============================
+&gt;[homes]
+&gt;   comment = Home Directories
+&gt;   browseable = no
+&gt;   read only = no
+&gt;   preserve case = yes
+&gt;   short preserve case = yes
+&gt;   create mode = 0750
+&gt;
+&gt;; Un-comment the following and create the netlogon directory for Domain
+&gt;Logons
+&gt;; [netlogon]
+&gt;;   comment = Samba Network Logon Service
+&gt;;   path = /home/netlogon
+&gt;; Case sensitivity breaks logon script processing!!!
+&gt;;   case sensitive = no
+&gt;;   guest ok = yes
+&gt;;   locking = no
+&gt;;   read only = yes
+&gt;;   browseable = yes  ; say NO if you want to hide the NETLOGON share
+&gt;;   admin users = @wheel
+&gt;
+&gt;; NOTE: There is NO need to specifically define each individual printer
+&gt;;[printers]
+&gt;;   comment = All Printers
+&gt;;   path = /var/spool/samba
+&gt;;    path = /home/kenny
+&gt;;   browseable = yes 
+&gt;;   printable = yes
+&gt;; Set public = yes to allow user 'guest account' to print
+&gt;;   public = yes 
+&gt;;   writable = yes 
+&gt;;   create mode = 0700
+&gt;;   valid users = venom kenny anthem
+&gt;
+&gt;;[tmp]
+&gt;;   comment = Temporary file space
+&gt;;   path = /tmp
+&gt;;   read only = no
+&gt;;   public = yes
+&gt;
+&gt;; A publicly accessible directory, but read only, except for people in
+&gt;; the staff group
+&gt;;[public]
+&gt;;   comment = Public Stuff
+&gt;;   path = /home/samba
+&gt;;   public = yes
+&gt;;   writable = yes
+&gt;;   printable = no
+&gt;;   write list = @users
+&gt;
+&gt;; Other examples. 
+&gt;;
+&gt;; A private printer, usable only by fred. Spool data will be placed in
+&gt;fred's
+&gt;; home directory. Note that fred must have write access to the spool
+&gt;directory,
+&gt;; wherever it is.
+&gt;;[fredsprn]
+&gt;;   comment = Fred's Printer
+&gt;;   valid users = fred
+&gt;;   path = /homes/fred
+&gt;;   printer = freds_printer
+&gt;;   public = no
+&gt;;   writable = no
+&gt;;   printable = yes
+&gt;;
+&gt;; A private directory, usable only by fred. Note that fred requires
+&gt;write
+&gt;; access to the directory.
+&gt;;[fredsdir]
+&gt;;   comment = Fred's Service
+&gt;;   path = /usr/somewhere/private
+&gt;;   valid users = fred
+&gt;;   public = no
+&gt;;   writable = yes
+&gt;;   printable = no
+&gt;;
+&gt;; a service which has a different directory for each machine that
+&gt;connects
+&gt;; this allows you to tailor configurations to incoming machines. You
+&gt;could
+&gt;; also use the %u option to tailor it by user name.
+&gt;; The %m gets replaced with the machine name that is connecting.
+&gt;;[pchome]
+&gt;;  comment = PC Directories
+&gt;;  path = /usr/pc/%m
+&gt;;  public = no
+&gt;;  writeable = yes
+&gt;;
+&gt;;
+&gt;; A publicly accessible directory, read/write to all users. Note that
+&gt;all files
+&gt;; created in the directory by users will be owned by the default user,
+&gt;so
+&gt;; any user with access can delete any other user's files. Obviously this
+&gt;; directory must be writable by the default user. Another user could of
+&gt;course
+&gt;; be specified, in which case all files would be owned by that user
+&gt;instead.
+&gt;;[public]
+&gt;;   path = /usr/somewhere/else/public
+&gt;;   public = yes
+&gt;;   only guest = yes
+&gt;;   writable = yes
+&gt;;   printable = no
+&gt;;
+&gt;;
+&gt;; The following two entries demonstrate how to share a directory so that
+&gt;two
+&gt;; users can place files there that will be owned by the specific users.
+&gt;In this
+&gt;; setup, the directory should be writable by both users and should have
+&gt;the
+&gt;; sticky bit set on it to prevent abuse. Obviously this could be
+&gt;extended to
+&gt;; as many users as required.
+&gt;;[myshare]
+&gt; comment = Hp Desjet 670C (Anthem) 
+&gt; path = /var/spool/samba
+&gt; valid users = venom kenny anthem kevin
+&gt; public = no 
+&gt; writable = yes
+&gt; printable = yes 
+&gt; create mask = 0765
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Contributing author, SAMS Teach Yourself Samba in 24 Hours
+Author, Special Edition, Using Samba
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,97 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SCSI Confusion" -->
+<!-- FromName="Daryl Tester" -->
+<!-- FromEmail="Daryl.Tester@steadycom.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="idavid@smug.adelaide.edu.au" -->
+<!-- Date="Thu, 20 May 1999 16:23:56 +0930 (CST)" -->
+<!-- Id="199905200653.QAA13984@dt.steadycom.com.au" -->
+<!-- Reference="199905200633.QAA08605@mulder.smug.adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SCSI Confusion</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:Daryl.Tester@steadycom.com.au">Daryl.Tester@steadycom.com.au</A></I>&gt;
+  To  : <A HREF="mailto:idavid@smug.adelaide.edu.au">idavid@smug.adelaide.edu.au</A>
+  Date: Thu, 20 May 1999 16:23:56 +0930 (CST)
+</PRE>
+<H1>Re: SCSI Confusion</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+David Drury wrote:
+
+&gt; /dev has sd[a-g][1-15] and sg[a-h], but there is confusion as to how it
+&gt; resolves to Partition and SCSI ID. Some indicate it the letters, and some
+&gt; the numbers.
+
+/dev/sd* usually denotes the SCSI disk driver, while /dev/sg* is the
+"generic" SCSI driver (can be used to access devices like scanners,
+etc ...).  However, it's not so much the name that indicates the drive
+and its partition, but the major and minor device numbers.  To wit:
+
+[<A HREF="mailto:dt@dt">dt@dt</A> dt]$ ls -l /dev/sda*
+brw-rw----   1 root     disk       8,   0 Sep 13  1994 /dev/sda
+brw-rw----   1 root     disk       8,   1 Sep 13  1994 /dev/sda1
+brw-rw----   1 root     disk       8,   2 Sep 13  1994 /dev/sda2
+brw-rw----   1 root     disk       8,   3 Sep 13  1994 /dev/sda3
+brw-rw----   1 root     disk       8,   4 Sep 13  1994 /dev/sda4
+brw-rw----   1 root     disk       8,   5 Sep 13  1994 /dev/sda5
+brw-rw----   1 root     disk       8,   6 Sep 13  1994 /dev/sda6
+brw-rw----   1 root     disk       8,   7 Sep 13  1994 /dev/sda7
+brw-rw----   1 root     disk       8,   8 Sep 13  1994 /dev/sda8
+brw-rw----   1 root     disk       8,   9 Sep 13  1994 /dev/sda9
+[...]
+
+See the "8, 0" part?  These are special files that map onto the
+kernel's device drivers; the "8" is the major number and the
+following number is the minor number (caveat:  I'm running a
+RedHat 4.2 box here; these numbers may change between kernel
+revisions).  A "man 4 sd" (under 4.2) shows how the minor device
+number maps onto a SCSI drive and partition.
+
+Note that the drive number is usually determined by detection at
+boot up time, so if you have an external drive switched off when
+your kernel probes for SCSI devices, not only will the drive not
+exist if you power it up later, but if its ID occurs "lower down"
+than the other drives you will find your drives suddenly mysteriously
+shifting.
+
+
+Cheers,
+  Daryl Tester.        (<A HREF="http://www.steadycom.com.au/">http://www.steadycom.com.au/</A>)
+  Steadycom Pty. Ltd.  (Phone: +618 8202 9000  Fax: +618 8202 9001)
+                    "Better dead than Redmond."
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

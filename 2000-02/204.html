@@ -1,0 +1,627 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Announcing Grouse Grep V2.00 for GNU/Linux" -->
+<!-- FromName="behoffski" -->
+<!-- FromEmail="behoffski@grouse.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 14 Feb 2000 12:30:03 +1030" -->
+<!-- Id="38A761A3.986CA0B5@grouse.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Announcing Grouse Grep V2.00 for GNU/Linux</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: behoffski &lt;<I><A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 14 Feb 2000 12:30:03 +1030
+</PRE>
+<H1>Announcing Grouse Grep V2.00 for GNU/Linux</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+This is a very long message, but I hope you won't mind -- 
+there are some interesting things here.  Grab yourself a 
+drink, sit down, and have a bit of a read.  GNU Grep's 
+claim to be "The fastest grep in the West" is in for a bit 
+of a shake.  
+
+Back in the November 1997 issue of Dr. Dobb's Journal, I 
+published an article entitled "High-Speed Finite-State 
+Machines".  In that article, I presented some cute coding 
+trickery combining threaded assembly with table-driven 
+finite state machines to produce a stunningly fast 
+architecture for handling byte-oriented applications.  The 
+article included a word count utility, a grep program and a 
+Huffman decoder program.  
+
+In each case, the speed of the programs was (and is) 
+amazing: the Huffman decoder decompresses a bitstream 
+(bit-aligned, not byte-aligned) for just 14 cycles per 
+output byte.  The word count program is faster than any 
+comparable line/word counting program (although I note that 
+if you don't try to count lines and use a 64k lookup table, 
+you can create faster word counting code).  The grep 
+program (Grouse Grep, a.k.a. ggrep) easily outstrips most 
+comparable programs, regardless of whether they implement 
+simple string searches or regular expression searches.  
+[See later for some limitations of this grep program, 
+however.]  
+
+Well, I thought that such fast code, and the potential of 
+this general-purpose architecture to provide stunning 
+improvements in dozens of other applications, would cause 
+quite a splash when the article was published.  While the 
+reaction was quite pleasing, the interest was nowhere near 
+as great as I'd hoped... partially because my expectations 
+were very, very high.  
+
+So why didn't the code go as far as I'd hoped?  There's 
+quite a few reasons, once you start looking:
+
+    1.  The programs ran on DOS, at a time when Windows 95 
+        had mostly (arguably?) shed its DOS inheritance;
+
+    2.  It was produced using TopSpeed C, instead of a 
+        more mainstream C compiler such as Microsoft's 
+        or Borland's; 
+
+    3.  The DDJ article title and text somewhat underplayed 
+        the benefits of the architecture.  This was 
+        partially due to my originally writing TWO articles, 
+        4000 words each, which ended up being distilled 
+        into one 3000-word article.  Many of the things I 
+        originally hoped to say got left out along the way.  
+        (That's also why the article is very klunky in one 
+        or two places); 
+
+    4.  I shied away from directly comparing my code to 
+        other packages -- as I didn't have time to properly 
+        compare speed, features or correctness, and so 
+        didn't want to publish inadequately-researched 
+        comparisons.  Remember that everything I published 
+        was achieved as an after-hours project, taking 
+        from May 1995 to October 1997 to create.  
+
+    5.  The key to the high speed operation was some 
+        hand-crafted Intel assembly.  The code was of 
+        limited interest to non-Intel platforms.  
+
+    6.  Grep is a utility closely associated with the UNIX 
+        community; publishing a DOS program misses much of 
+        the likely audience.  
+
+So, I decided in early 1998 to correct these deficiencies 
+by porting the code to GCC running on GNU/Linux, and by 
+trying to take on GNU Grep head-to-head.  Linux provided 
+the Intel PC platform I had originally designed for, so I 
+was confident that the threaded assembly trickery I had 
+(re)invented would be applicable.  
+
+When I first started playing with the original idea for 
+these applications (the lodsb/xlat/jmp ax sequence), it was 
+first tried in the context of writing a word count utility.  
+So it was natural when contemplating the GCC/Linux version 
+to port the word count utility first.  
+
+(Incidentally, the word count utility was the driving force 
+the first time round, in early May 1995: I tried more 
+conventional coding techniques to implement a wc utility, 
+but these didn't produce the speed I wanted.  I had 
+previously dreamt up the "lodsb/xlat/jmp ax" state table 
+idea and had noted it as an interesting idea, but had never 
+tried to use it anywhere.  I threw it into the wc app only 
+when other approaches proved to be too slow.)  
+
+A key question was how to port the lodsb/xlat/jmp ax 
+sequence.  Several issues came up:
+    - Should I write a pure ANSI-compatible version, or 
+        a GCC-extended version, or a GCC-extended version 
+        plus assembly optimisation, or should I write 
+        the match engine purely in assembly?  
+    - Would GCC's flat memory model be unsuitable for the 
+        page-aligned aspects of the assembly code?
+    - Some feedback from the FORTH community suggested that 
+        the 386 instruction sequence:
+            movb (%ecx),%al
+            incl %ecx
+            jmp *(%ebx,%eax,4)
+        would run faster because its load/store style 
+        better exploits the newer processors' pipelined 
+        architecture.  
+
+In the end, I decided to base my code on a GCC-extended 
+version, with GCC's computed goto extension being the 
+nearest to a direct translation of the original assembly.  
+Some of the limitations of the original assembly -- notably 
+the restriction that all code entry points fit into a 
+256-byte code page -- no longer applied in the GCC version, 
+so the freedom to experiment in C was more important than 
+squeezing the last iota of performance out of the 
+assembly version.  
+
+A highly condensed version of the C code for the inner loop 
+of my word counting utility follows.  As noted in the DDJ 
+article, we add the byte 0xee to the end of the buffer, so 
+that we only test for buffer end when we see this byte -- 
+which will hopefully be very rare for typical text files.  
+
+entryEE_NOP:    if (pText == pEnd) goto Finished;
+                /*FALLTHROUGH*/
+entryNOP:       NextCh = *pText++;
+                pAction = pTab[NextCh];
+                goto *pAction;
+
+entryEE_WORD:   if (pText == pEnd) goto Finished;
+                /*FALLTHROUGH*/
+entryWORD:          Words++;
+                pTab = WordTable;
+                NextCh = *pText++;
+                pAction = pTab[NextCh];
+                goto *pAction;
+
+entryWHITE:     pTab = WhiteTable;
+                NextCh = *pText++;
+                pAction = pTab[NextCh];
+                goto *pAction;
+
+entryLF_WHITE:  pTab = WhiteTable;
+                /*FALLTHROUGH*/
+entryLF_NOP:    Lines++;
+                NextCh = *pText++;
+                pAction = pTab[NextCh];
+                goto *pAction;
+
+Finished:       /*End of buffer found: remember in-word context and exit*/
+                pCurrentTable = pTab;
+                return;
+
+The state tables need to be treated a little differently to 
+the DOS version.  Each table contains absolute memory 
+addresses instead of code page byte offsets, so the action 
+type is a void * pointer.  Any code assuming that each 
+entry was a byte (mainly fill operations like memset) 
+has been changed to be more independent of the entry type.  
+Mostly, this meant that memset calls were rewritten as 
+loops.  
+
+The actual entry addresses for each action (e.g. 
+entryLF_WHITE) need to be advertised to the code 
+constructing the state tables.  I implemented this by 
+adding a pointer parameter to a structure which receives 
+the entry points if it isn't NULL, so we can get the entry 
+points during initialisation and then run the engine during 
+processing:
+
+        /*Does the client want to receive the action entry points?*/
+        if (pActionCodes != NULL) {
+                /*Yes, write them now and then return*/
+                pActionCodes-&gt;pEE_NOP   = &&entryEE_NOP;
+                pActionCodes-&gt;pNOP      = &&entryNOP;
+                pActionCodes-&gt;pEE_WORD  = &&entryEE_WORD;
+                pActionCodes-&gt;pWORD     = &&entryWORD;
+                pActionCodes-&gt;pWHITE    = &&entryWHITE;
+                pActionCodes-&gt;pLF_WHITE = &&entryLF_WHITE;
+                pActionCodes-&gt;pLF_NOP   = &&entryLF_NOP;
+                return;
+        }
+
+This version compared extremely favourably to the GNU wc 
+utility: it runs almost 30% faster.  While it was possible 
+that some of this was due to different implementation 
+choices such as file buffering size, a few experiments 
+quickly demonstrated that almost all the performance gain 
+was due to the speed of the table-driven threaded assembly 
+of the search engine.  
+
+Next, I took a look at the assembly generated by GCC, to 
+see how it compared to the lodsb/xlat/jmp ax sequence I'd 
+started from.  I found that while most of the generated 
+code was optimal, GCC hadn't spotted one of the features 
+of the original: it kept clearing EAH to zero, not 
+realising that it could be cleared upon startup and assumed 
+to be clear thereafter.  I edited the assembly intermediate 
+version by hand to reinstate this optimisation, reducing 
+the number of instructions per action from (on average) 5 
+to 4. and the optimised program sped up by nearly 9% to be
+nearly 35% faster than GNU wc.  
+
+So this experiment, plus a quick look at the GNU grep 
+sources, convinced me that it was worth while porting the 
+grep program to GNU/Linux, and taking on the very 
+formidable GNU grep head-to-head.  In particular, this 
+meant that (a) bugs in Grouse Grep (ggrep), especially the 
+mishandling of NULs, had to be fixed, (b) Many, if not all, 
+cases where ggrep was slower than grep had to be addressed, 
+and (c) Many of the additional features in grep needed to 
+be added to ggrep.  In addition, I wanted to clean up 
+various things that weren't well-written, but which were 
+too risky to tackle as the DDJ publication date loomed.  
+
+Here, then, is the results for a highly unscientific list 
+of expressions that I used while developing the code.  
+It compares the performance of grep (v 2.3) versus ggrep, 
+when searching an 8Mb text file containing a catalog of 
+files available for download from a BBS.  I don't pretend 
+that this comparison is unbiased; it just happens to be 
+the reference set I used.  I'll try to be more objective 
+and rigorous elsewhere.  
+
+  ./ggrep      ./ggrep-c    grep23       
+
+  4.20(  95%)   4.22(  95%)   4.42   -c e
+  4.52(  86%)   4.52(  86%)   5.21   -c ee
+  3.20(  91%)   3.21(  91%)   3.49   -c eee
+  2.79(  94%)   2.78(  93%)   2.96   -c eeee
+  2.62( 100%)   2.63( 101%)   2.60   -c J
+  3.55(  88%)   3.55(  88%)   3.99   -c JJ
+  2.85(  91%)   2.86(  91%)   3.13   -c JJJ
+  2.51(  93%)   2.51(  93%)   2.69   -c JJJJ
+  4.17(  44%)   4.29(  45%)   9.33   -c a.e
+  4.27(  43%)   4.41(  44%)   9.87   -c a..e
+  4.29(  43%)   4.49(  45%)   9.81   -c a...e
+  6.25(  58%)   6.76(  63%)  10.72   -c th\\?d
+  3.17(  51%)   3.31(  53%)   6.14   -c x.*y.*z
+  4.13(  65%)   4.15(  65%)   6.33   -c [a]
+  4.98(  72%)   5.61(  81%)   6.87   -c [qj].*[qj].*[qj]
+  2.33(  95%)   2.32(  94%)   2.45   -c Kermit
+  3.43(  50%)   3.60(  52%)   6.85   -c [abc][def][ghi]
+  1.71(  98%)   1.75( 101%)   1.73   -c thisisaverylongstring
+  4.49(  38%)   4.62(  39%)  11.70   -c e$
+  2.79(  46%)   2.81(  47%)   5.96   -c ^W
+  4.45(  71%)   4.58(  73%)   6.23   -ci e
+  4.98(  70%)   4.90(  69%)   7.10   -ci ee
+  3.43(  73%)   3.40(  72%)   4.67   -ci eee
+  2.96(  73%)   3.00(  74%)   4.02   -ci eeee
+  4.22(  52%)   4.80(  59%)   8.01   -ci J
+  3.61(  76%)   3.61(  76%)   4.71   -ci JJ
+  2.90(  79%)   2.95(  80%)   3.66   -ci JJJ
+  2.51(  74%)   2.52(  75%)   3.36   -ci JJJJ
+  5.16(  39%)   5.86(  45%)  12.92   -ci a.e
+  5.26(  43%)   5.91(  49%)  11.97   -ci a..e
+  5.12(  42%)   5.52(  45%)  12.19   -ci a...e
+  7.24(  55%)   8.06(  61%)  13.04   -ci th\\?d
+  8.23(  69%)   9.65(  81%)  11.81   -ci x.*y.*z
+  4.44(  80%)   4.83(  87%)   5.51   -ci [a]
+  5.56(  75%)   6.43(  87%)   7.38   -ci [qj].*[qj].*[qj]
+  2.54(  83%)   2.57(  84%)   3.03   -ci Kermit
+  3.64(  53%)   3.80(  55%)   6.80   -ci [abc][def][ghi]
+  1.75(  87%)   1.82(  91%)   1.99   -ci thisisaverylongstring
+  4.57(  32%)   5.07(  35%)  14.16   -ci e$
+  2.78(  21%)   2.82(  21%)  12.90   -ci ^W
+
+(The numbers are times in seconds to perform the search 
+10 times.  "grep23" is GNU grep version 2.3, "ggrep-c" 
+is Grouse Grep with the match engine using merely 
+GCC-generated code; "ggrep" is the version where the 
+EAH-is-zero optimisation has been applied to GCC's output.  
+Percentages compare the Grouse times to the GNU times; 
+less than 100% is faster.  Timing is a little crude, and 
+variations of up to 0.2 second or so aren't significant.  
+The file in question was in RAM, so the times ignore disk 
+I/O overhead and focus on the CPU required to perform the 
+search.)  
+
+As you can see, Grouse Grep is faster than GNU grep in 
+almost every case above, sometimes over twice as fast.  
+
+This message is already way too long, so very briefly, a 
+few highlights of ggrep:
+
+- I've written a Perl script to edit GCC's assembly output 
+  and add the EAH optimisation.  This script (called 
+  trimasm) assumes various things based on how matchgcc.c 
+  is written.  The script is run as part of the program 
+  compilation/linking commands in the Makefile.  
+
+- ggrep includes a minor refinement to the Tuned Boyer-Moore 
+  simple string search algorithm that I've invented, called 
+  the Self-Tuning Boyer-Moore algorithm.  In addition, I've 
+  found that GNU Grep bails out of using BM-style searches 
+  for case-insensitive strings, despite the fact that this 
+  is quite easy and efficient to implement.  This is why the 
+  case-sensitive string searches (3 chars or longer) are 
+  faster than grep.  
+
+- Parts of the code has been rewritten to make the code 
+  more flexible and reuseable.  Most modules (with one or 
+  two glaring exceptions) are now completely reentrant; 
+  previously, module-wide configuration flags limited the 
+  module's use.  This effort included substantial work to 
+  represent options within the compiled format.  I've also 
+  tried to prepare for Unicode support, as the table-driven 
+  nature of the search engine should make things like UTF-8 
+  handling a breeze.  
+
+- Buffered file handling has been rewritten to (mostly) 
+  match the memory-mapped file buffering interface of GNU 
+  grep, but has been split out into a reusable module 
+  called FastFile.  
+
+Paradoxically, the software in this release that I'm most 
+excited about has relatively little to do with performance.  
+It's a trace facility called Tracery.  This module captures 
+so much of the features I'd always wanted in a trace 
+facility.  Its real importance comes from the fact that it 
+is primarily designed to improve the reusability of 
+software modules: the designer and implementor can capture 
+and share their effort in tracing and debugging the code, 
+with little or no impact on the speed of the program.  Even 
+if nothing else in my software interests you, I urge you to 
+start using Tracery on your C and C++ code NOW (and port the 
+module to other languages!).  
+
+However, just when it looks like ggrep can lay claim to 
+being the "fastest grep in the West", some objections come 
+up:
+
+- It doesn't support all the options that grep does, either 
+  on the command line or in the code; 
+
+- It doesn't run on multiple machines; 
+
+- It is limited to GCC, being based on non-ANSI C code; 
+
+- It doesn't support extended regular expression syntax 
+  (grouping, alternation, backreferences, {n,m} iteration); 
+
+- It has a user base of only 1; grep has millions of 
+  users.  The bug level is substantially higher.  
+
+- It uses a NFA architecture rather than a DFA.  
+
+The last point is very important, and deserves expansion.  
+Compare the performance of the following search:
+
+277.20(3904%) 336.10(4734%)   7.10   -c \w.*[a-j].*[A-Z].*\w
+
+As soon as the amount of backtracking involved in 
+completing the search becomes significant, the NFA engine 
+becomes hopelessly inefficient.  The DFA engine throws more 
+memory at the search (and can run out of memory more easily 
+in a few cases), but the result is much more reliable and 
+predictable execution times.  
+
+The reason the earlier comparisons did not show this defect 
+is that ggrep is aware of its deficiencies, and tries to 
+minimise the impact.  For example, when searching for 
+"x.*y.*z", ggrep first looks for the z, and only attempts 
+a full match on lines where a z is found.  Even better, 
+the full match uses the CPU byte search to look for the x.  
+This approach is very much hit-and-miss: it means the 
+code makes guesses about the input data, and can be 
+severely punished if its guess is wrong, or if its 
+best guess simply isn't good enough.  
+
+Some comments from Henry Spencer given by private email at 
+the time of the DDJ publication are relevant:
+
+      The one real flaw I see in your code is that it uses 
+      the backtracking approach, when there are superior 
+      methods known -- at the cost of some extra setup time, 
+      one can convert the regular expression into a form
+      that permits matching with no backtracking, and this 
+      is almost always faster in the match phase.
+
+      [...] You do a very good job of keeping the 
+      backtracking method's flaws under control.  Some of it 
+      wouldn't generalize as well as one might like [...].  
+
+      [...] The MatchDual business, with the RE split into 
+      two pieces matched separately, is cute, although it 
+      wouldn't generalize to RE syntaxes in which you can 
+      apply operators to parenthesized subexpressions 
+      (which means that concatenation isn't necessarily the 
+      top-level operator and you can't necessarily split 
+      the RE into two concatenated parts).  Some of the 
+      other optimizations had similarly limited 
+      applicability.
+
+      [...] Assigning scores to strings to decide which one 
+      is less likely doesn't work well if the application 
+      is doing something non-standard -- foreign-language 
+      text or non-text data.  (Searching DNA sequences is 
+      the classic weird case; in fact, there are special 
+      algorithms just for that problem.)  I don't know 
+      whether it matters enough to bother having a way to 
+      suppress this.
+
+[MatchDual has been absorbed into ScanFile_SearchBuffer 
+in this release.  The functionality is mostly the same; the 
+new implementation is a little more straightforward.]  
+
+So where to from here?  There's lots of issues, but here we 
+go (in no particular order):
+
+- GNU Grep is still the "Fastest Grep in the West"... but 
+  it's position is under serious threat, and the next 
+  generation heralded by Grouse Grep is poised to 
+  overrun it.  The only objection to Grouse Grep claiming 
+  the crown for simple string searches (particularly where 
+  case insensitivity is involved) is that Grouse cannot 
+  compete on bug level, features or portability... but 
+  it's only a matter of time before these appear.  More 
+  widely, GNU Grep deserves the title because its DFA 
+  engine is far more predictable... but it's only a matter 
+  of time (perhaps 6-12 months) before the Grouse FSA can 
+  be used to create a DFA engine that eclipses this as well.  
+
+- ggrep is CERTAINLY buggy, much as I would wish it 
+  otherwise.  Use it at your own risk.  E-mail me at 
+  <A HREF="mailto:behoffski">mailto:behoffski</A>@grouse.com.au with bug reports (and 
+  preferably patches), and I'll coordinate further 
+  releases.  
+
+- Using computed gotos in an undisciplined fashion is 
+  frowned on, and I agree with that opinion.  However, 
+  the discipline imposed by the state tables is very 
+  substantial, and raises this technique to one that 
+  should become mainstream in programming languages.  
+  Table-driven finite-state machines have been around 
+  for decades, anyway.  For example, the VAX has a 
+  dedicated instruction for byte-indexed table-driven 
+  jumps: CASEB.  
+
+- The assembly optimisation implemented by my Perl script 
+  could be incorporated into GCC's optimisation phases.  
+  This would improve the portability of the C code, and 
+  would make the optimisation more reliable.  
+
+- Some people have advised me to add grep's DFA engine 
+  to my code, so that (a) ggrep supports the full RE 
+  syntax and (b) some of the performance problems can 
+  be sidestepped.  I've resisted this, mainly because I 
+  want the focus to remain on the table-driven 
+  finite-state architecture I've presented here.  In 
+  particular, a DFA enthusiast could compose a set of 
+  DFA-oriented actions that can be added to the existing 
+  framework.  In the long run, this will provide 
+  substantially better performance than the existing DFAs 
+  can produce.  I ran out of time to try this myself, sigh.  
+
+- It's possible a handcrafted-assembly match engine would 
+  outperform the C-generated one.  It's not an issue now, 
+  as the flexibility of the C version is much more 
+  valuable, but may be worth investigating once the dust 
+  has settled a bit.  
+
+- The remaining features of grep (e.g. leading and trailing 
+  context) should be added to ggrep.  
+
+- Virtually every module has been designed and implemented 
+  to be a reusable library.  While the original 
+  license/warranty statements on the 1997 sources published 
+  along with the DDJ article are not explicit, they map most 
+  closely to the GNU Lesser General Public Library License.  
+  Therefore, each and all source files included in ggrep are 
+  published under this licence.  However, while the intent 
+  has been to reuse, little of this code has in fact been 
+  applied in other projects, so your mileage may vary.  
+
+- The table-driven nature of the search engine should lend 
+  itself to superb support for foreign-language processing, 
+  including Unicode.  There's no support at present, 
+  although some bits have been designed with Unicode in 
+  mind.  For example, the compact RE specification provides 
+  16 bits to store literals (glyphs).  On a much more 
+  mundane level, I've tried to match grep's support of 
+  locale in the implementation of things like case folding 
+  and character classifications (untested, sorry).  
+
+- Byte-oriented interpreters such as Perl and Java might 
+  benefit from this technique (although it's quite 
+  possible that they implement it already).  
+
+- There are many, many other areas where this architecture 
+  could provide dramatic performance improvements.  For 
+  example, notice the 14-cycle Huffman decoder published 
+  along with the DDJ article.  
+
+- If you can frame an application so that (a) you can 
+  conveniently work using byte-sized pieces of information, 
+  (b) you can compose a set of actions that describe how to 
+  act on those bytes and (c) those actions can be organised 
+  into a smallish set of state tables, then this 
+  architecture will reward you with stunning performance.  
+  1k bytes per state table gets costly if you have a 
+  lot of tables, however.  (The original lodsb/xlat/jmp ax 
+  code consumed only 256 bytes per table, but there were 
+  substantial restrictions on the actions as a result.)  
+
+- One possible application is analysing chess positions: 
+  recognising and acting on the contents of a square can be 
+  done very, very cheaply.  The tables themselves could be 
+  created from text specification files, making 
+  experimentation easier.  Also, there might be ways of 
+  speeding up move generation.  Who knows?  
+
+At this point, I must pay tribute to the authors of GNU 
+grep, and the other Open Source supporters: it would have 
+been utterly impossible for me to write ggrep without the 
+presence of superb tools like GCC, Perl, XFree86 and 
+GNU/Linux.  Also, my grep code would have been much 
+poorer if I hadn't had the luxury of reading the sources 
+of the existing implementations.  I "doffs my titfer" in 
+respect to you all, and pray that my contribution will in 
+some way add to the resources available for all.  These 
+improvements would be virtually impossible to achieve in 
+anything other than an Open Source model.  
+
+And now, an advert: I have other projects I would like to 
+work on, that centre on trying to substantially improve 
+code reuse -- things like Tracery just scratch the 
+surface.  I'm trying to fund time to work on these projects 
+though my contracting business (Grouse Software).  If you 
+like my ideas and inventions, or maybe my emphasis on reuse, 
+or even the automated test rig included in this release 
+(over 2000 tests!), and you would like me to work on your 
+projects for a while, contact Grouse!  
+
+I've created a web describing Grouse Grep in more detail, 
+including links to the FTP archive where you can download 
+the source.  The web is available via Grouse's home page:
+
+    <A HREF="http://www.grouse.com.au/">http://www.grouse.com.au/</A>
+
+Finally, a small exercise in reuse, although we are moving 
+from arguably the sublime to almost certainly the 
+ridiculous: Recall that we created a reusable module in 
+ggrep called FastFile to present the file using mmap.  
+The word count utility would benefit from this module, and 
+FastFile can be configured very easily to provide what wc 
+requires...
+
+Here are the results when searching for an 8Mb text file 
+which has been paged into RAM (disk I/O overheads would 
+add a constant time to each program if the file was on disk 
+instead of in RAM, but that's not what's being measured).  
+Speeds are given as a ratio comparing the time to GNU wc's 
+time:
+
+Time    Speedup    Program
+
+20.8    1.0        GNU wc
+15.1    1.3        Grouse FSA, Read interface, no EAH opt
+14.0    1.4        Grouse FSA, Read interface, EAH opt
+ 9.8    2.1        Grouse FSA, FastFile i/f, no EAH opt
+ 8.7    2.3        Grouse FSA, FastFile i/f, EAH opt
+
+cheers,
+
+behoffski
+
+-- 
+behoffski (Brenton Hoff) | Software Engineer, Grouse Software
+<A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A>  | <A HREF="http://www.grouse.com.au/">http://www.grouse.com.au/</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

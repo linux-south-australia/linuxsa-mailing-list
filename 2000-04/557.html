@@ -1,0 +1,126 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Protecting files against power failure" -->
+<!-- FromName="Daryl Tester" -->
+<!-- FromEmail="dt@picknowl.com.au" -->
+<!-- ToName="David Newall" -->
+<!-- ToEmail="davidn@rebel.net.au" -->
+<!-- Date="Sat, 29 Apr 2000 20:34:28 +0930" -->
+<!-- Id="390AC1BC.DC6C4613@picknowl.com.au" -->
+<!-- Reference="Pine.BSF.3.96.1000428165310.340A-100000@augustus.tellurian.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Protecting files against power failure</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  To  : David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  Date: Sat, 29 Apr 2000 20:34:28 +0930
+</PRE>
+<H1>Re: Protecting files against power failure</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+David Newall wrote:
+
+[I originally wrote:]
+&gt;&gt; (although, of course, this shouldn't affect the shell's file
+&gt;&gt; descriptor - care to hazard a guess why?).
+[But later retracted after being enlightened with a hammer.]
+
+&gt; File descriptors can be shared amongst different processes.  Consider these
+&gt; two command sequences:
+&gt; 
+&gt;   bash$ some-process &lt; some-file & some-process &lt; some-file
+&gt;   bash$ (some-process & some-process) &lt; some-file
+
+File descriptors can be _inherited_ by child processes, as both your
+above examples show.  They can't be passed to any arbitrary process.
+To perform something like "cat &lt; file", your atypical shell might
+(very rudimentarily) perform:
+
+1) fd = open("file", O_RDONLY);   /* open file for reading (? fd = #3 ?) */
+2) fork();                        /* create child from parent process */
+
+   /* In the child process */
+
+3) dup2(fd, 0);                   /* Map file descriptor #3 onto #0 */
+4) exec("cat");                   /* Execute the cat process. */
+
+   /* In the parent process */
+
+5) wait(&status);                 /* Wait for termination of child. */
+
+In the real world, it's more complex than this, as we have to take
+into account close-on-exec flags on file descriptors, signals,
+possibly closing off fd's descriptor in the parent process, plus
+the various permutations you described above with "(cmd & cmd) &lt; foo"
+et. al.  But the fact remains that a process can only inherit file
+descriptors passed in from the parent.
+
+&gt;   bash$ exec 5&gt; /dev/null
+&gt;   bash$ ./print &lt;&5 &
+&gt;   [1] 1234
+&gt;   bash$ ./set 100 &lt;&5
+&gt;   100
+&gt;   bash$ ./set -10 &lt;&5
+&gt;   90
+&gt;   bash$ ./set 12345 &lt;&5
+&gt;   12435
+&gt; 
+&gt; The numbers are printed by print, but as a result of something which set
+&gt; does.  This is a clear example of how one process CAN impact another (even
+&gt; though the implicit promise of Unix is that all processes are isolated from
+&gt; all others.)
+
+But they aren't isolated.  They share a common parent, who passed in
+a duplicated (but shared) file descriptor to the child process in each
+case.
+
+&gt; When you need access to a file you signal that process and have it
+&gt; pass a file descriptor (using send()) to you.
+
+This wouldn't work, because there would be no difference between a
+process receiving (via recv()) a file descriptor ID, an arbitrary
+integer, or just plain making up a number on the spot and read()'ing
+and write()'ing to its heart's content.  Unless the FD's been open
+for the process before it was exec'd, or it does the opening itself,
+it won't be able to do jack.
+
+&gt; Well that's what you could do if you were evil.
+
+Well, it's lucky I'm not, then.  :-|
+
+Regards,
+  Daryl Tester
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

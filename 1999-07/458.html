@@ -1,0 +1,314 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Port Forwarding..." -->
+<!-- FromName="Tim Ansell" -->
+<!-- FromEmail="ansell@chariot.net.au" -->
+<!-- ToName="Linux User Group" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 17 Jul 1999 15:17:23 +0930" -->
+<!-- Id="379018EB.FCE124FC@chariot.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Port Forwarding...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Tim Ansell &lt;<I><A HREF="mailto:ansell@chariot.net.au">ansell@chariot.net.au</A></I>&gt;
+  To  : Linux User Group &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 17 Jul 1999 15:17:23 +0930
+</PRE>
+<H1>Port Forwarding...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+--------------D4BEF396FCDE2483C3FD1F93
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+I'm trying to setup up port forwarding on my current firewall...
+
+My current network configuration is..
+
+        Internet
+            |
+            | 210.9.63.147
+            | 210.9.63.146
+        ____|________
+       |  Firewall   | 192.168.1.1
+       |             |--------- DMZ    192.168.1.2
+       |_____________|                 192.168.1.3
+           |
+           |
+        Network
+
+    10.1.1.1
+
+I would like to forward port www (80) from 210.9.63.147 to 192.168.1.2
+and forward.
+As well i would like to forward Imap (143) and SMTP (25) from
+210.9.63.147 to 192.168.1.3
+
+I can telnet to 192.168.1.2 on port 80
+
+[<A HREF="mailto:root@gihs">root@gihs</A> linux]# telnet 192.168.1.2 80
+Trying 192.168.1.2...
+Connected to 192.168.1.2.
+Escape character is '^]'.
+
+So i use this command which should forward from 210.9.63.147 80 to
+192.168.1.2 80
+
+[<A HREF="mailto:root@gihs">root@gihs</A> linux]# /usr/sbin/ipmasqadm portfw -a -P tcp -L 210.9.63.147
+80 -R 192.168.1.2 80
+
+Yet when i try and telnet to 210.9.63.147 80 i get the following
+
+[<A HREF="mailto:root@gihs">root@gihs</A> linux]# telnet 210.9.63.147 80
+Trying 210.9.63.147...
+<A HREF="telnet:">telnet:</A> Unable to connect to remote host: Connection refused
+[<A HREF="mailto:root@gihs">root@gihs</A> linux]#
+
+Meaning that the port forwarding isn't working yet when i start up httpd
+on 210.9.63.147 i can connect to the machine... This seems to mean that
+port forwarding isn't at all!
+
+ipchains -L gives the following...
+Chain input (policy ACCEPT):
+Chain forward (policy ACCEPT):
+Chain output (policy ACCEPT):
+
+ipmasqadm portfw -l gives the following....
+prot localaddr            rediraddr               lport    rport  pcnt
+pref
+TCP  mail.gihs.sa.edu.au  192.168.1.2               www      www
+10    10
+
+more /proc/sys/net/ipv4/ip_forwarding gives
+1
+
+Can anyone help? I have got port forwarding working before but can't
+seem to get it working again.
+
+Masqurading out works perfectly.
+
+The 2 kernels i'm trying to use are 2.2.5-15 (the one that comes with
+redhat 6.0) and the 2.3.10 kernel.
+
+In the kernel i have
+
+                         &lt;*&gt; Packet socket
+                         [*] Kernel/User netlink socket
+                         [*] Routing messages
+                         &lt;*&gt; Netlink device emulation
+                         [*] Network firewalls
+                         [*] Socket Filtering
+                         &lt;*&gt; Unix domain sockets
+                         [*] TCP/IP networking
+                         [ ] IP: multicasting
+                         [*] IP: advanced router
+                         [ ] IP: policy routing
+                         [ ] IP: equal cost multipath
+                         [ ] IP: use TOS value as routing key
+                         [ ] IP: verbose route monitoring
+                         [ ] IP: large routing tables
+                         [ ] IP: kernel level autoconfiguration
+                         [*] IP: firewalling
+                         [*] IP: firewall packet netlink device
+                         [*] IP: always defragment (required for
+masquerading)
+                         [ ] IP: transparent proxy support
+                         [*] IP: masquerading
+                       --- Protocol-specific masquerading support will
+be built as modules.
+                         [*] IP: ICMP masquerading
+                       --- Protocol-specific masquerading support will
+be built as modules.
+                         [*] IP: masquerading special modules support
+                         &lt;M&gt; IP: ipautofw masq support (EXPERIMENTAL)
+                         &lt;*&gt; IP: ipportfw masq support (EXPERIMENTAL)
+                         &lt;*&gt; IP: ip fwmark masq-forwarding support
+(EXPERIMENTAL)
+                         [*] IP: optimize as router not host
+                         &lt; &gt; IP: tunneling
+                         &lt; &gt; IP: GRE tunnels over IP
+                         [*] IP: aliasing support
+                         [ ] IP: ARP daemon support (EXPERIMENTAL)
+                         [ ] IP: TCP syncookie support (not enabled per
+default)
+                       --- (it is safe to leave these untouched)
+
+I have tried everything can you please help...
+
+Tim
+
+--------------D4BEF396FCDE2483C3FD1F93
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+&lt;!doctype html public "-//w3c//dtd html 4.0 transitional//en"&gt;
+&lt;html&gt;
+&lt;tt&gt;I'm trying to setup up port forwarding on my current firewall...&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;My current network configuration is..&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Internet&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+| 210.9.63.147&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+| 210.9.63.146&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ____|________&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; Firewall&nbsp;&nbsp;
+| 192.168.1.1&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|--------- DMZ&nbsp;&nbsp;&nbsp; 192.168.1.2&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |_____________|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+192.168.1.3&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Network&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp; 10.1.1.1&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;I would like to forward port www (80) from 210.9.63.147 to 192.168.1.2
+and forward.&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;As well i would like to forward Imap (143) and SMTP (25) from 210.9.63.147
+to 192.168.1.3&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;I can telnet to 192.168.1.2 on port 80&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;[<A HREF="mailto:root@gihs">root@gihs</A> linux]# telnet 192.168.1.2 80&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;Trying 192.168.1.2...&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;Connected to 192.168.1.2.&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;Escape character is '^]'.&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;So i use this command which should forward from 210.9.63.147 80
+to 192.168.1.2 80&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;[<A HREF="mailto:root@gihs">root@gihs</A> linux]# /usr/sbin/ipmasqadm portfw -a -P tcp -L 210.9.63.147
+80 -R 192.168.1.2 80&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;Yet when i try and telnet to 210.9.63.147 80 i get the following&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;[<A HREF="mailto:root@gihs">root@gihs</A> linux]# telnet 210.9.63.147 80&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;Trying 210.9.63.147...&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;<A HREF="telnet:">telnet:</A> Unable to connect to remote host: Connection refused&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;[<A HREF="mailto:root@gihs">root@gihs</A> linux]#&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;Meaning that the port forwarding isn't working yet when i start
+up httpd on 210.9.63.147 i can connect to the machine... This seems to
+mean that port forwarding isn't at all!&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;ipchains -L gives the following...&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;Chain input (policy ACCEPT):&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;Chain forward (policy ACCEPT):&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;Chain output (policy ACCEPT):&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;ipmasqadm portfw -l gives the following....&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;prot localaddr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+rediraddr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+lport&nbsp;&nbsp;&nbsp; rport&nbsp; pcnt&nbsp; pref&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;TCP&nbsp; mail.gihs.sa.edu.au&nbsp; 192.168.1.2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+www&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; www&nbsp;&nbsp;&nbsp; 10&nbsp;&nbsp;&nbsp;
+10&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;more /proc/sys/net/ipv4/ip_forwarding gives&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;1&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;Can anyone help? I have got port forwarding working before but can't
+seem to get it working again.&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;Masqurading out works perfectly.&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;The 2 kernels i'm trying to use are 2.2.5-15 (the one that comes
+with redhat 6.0) and the 2.3.10 kernel.&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;In the kernel i have&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;*&gt; Packet socket&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[*] Kernel/User netlink socket&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[*] Routing messages&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;*&gt; Netlink device emulation&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[*] Network firewalls&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[*] Socket Filtering&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;*&gt; Unix domain sockets&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[*] TCP/IP networking&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[ ] IP: multicasting&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[*] IP: advanced router&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[ ] IP: policy routing&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[ ] IP: equal cost multipath&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[ ] IP: use TOS value as routing key&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[ ] IP: verbose route monitoring&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[ ] IP: large routing tables&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[ ] IP: kernel level autoconfiguration&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[*] IP: firewalling&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[*] IP: firewall packet netlink device&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[*] IP: always defragment (required for masquerading)&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[ ] IP: transparent proxy support&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[*] IP: masquerading&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+--- Protocol-specific masquerading support will be built as modules.&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[*] IP: ICMP masquerading&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+--- Protocol-specific masquerading support will be built as modules.&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[*] IP: masquerading special modules support&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;M&gt; IP: ipautofw masq support (EXPERIMENTAL)&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;*&gt; IP: ipportfw masq support (EXPERIMENTAL)&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;*&gt; IP: ip fwmark masq-forwarding support (EXPERIMENTAL)&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[*] IP: optimize as router not host&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt; &gt; IP: tunneling&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt; &gt; IP: GRE tunnels over IP&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[*] IP: aliasing support&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[ ] IP: ARP daemon support (EXPERIMENTAL)&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[ ] IP: TCP syncookie support (not enabled per default)&lt;/tt&gt;
+&lt;br&gt;&lt;tt&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+--- (it is safe to leave these untouched)&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;I have tried everything can you please help...&lt;/tt&gt;
+&lt;p&gt;&lt;tt&gt;Tim&lt;/tt&gt;&lt;/html&gt;
+
+--------------D4BEF396FCDE2483C3FD1F93--
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

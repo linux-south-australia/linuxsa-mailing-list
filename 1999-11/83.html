@@ -1,0 +1,215 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: small GCC probs" -->
+<!-- FromName="MWP" -->
+<!-- FromEmail="hirm@chariot.net.au" -->
+<!-- ToName="mike andrew" -->
+<!-- ToEmail="mikero@norfolk.nf" -->
+<!-- Date="Fri, 5 Nov 1999 00:14:27 +1030" -->
+<!-- Id="000e01bf26ca$b7704220$0201a8c0@comp" -->
+<!-- Reference="38220C42.6B9611F8@grouse.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: small GCC probs</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: MWP &lt;<I><A HREF="mailto:hirm@chariot.net.au">hirm@chariot.net.au</A></I>&gt;
+  To  : mike andrew &lt;<I><A HREF="mailto:mikero@norfolk.nf">mikero@norfolk.nf</A></I>&gt;
+  Date: Fri, 5 Nov 1999 00:14:27 +1030
+</PRE>
+<H1>Re: small GCC probs</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hmmm....
+
+I have found some rather good debugging utils for the HC11... some of which
+are quite new and are still being developed.
+
+Yeh... at TAFE they teach HC11 programming using the hitech C compiler and
+the old DOS IDE (they dont have the money to upgrade to the windows ver).
+Its funny, after playing with the ported GCC a bit, ive found that Hitech's
+C compiler is an absolute load of bollocks, even though it is considered to
+be one of the best compilers around.
+The GCC port for the HC11 by Stephane Carrez
+(<A HREF="http://home.worldnet.fr/stcarrez/m68hc11_port.html">http://home.worldnet.fr/stcarrez/m68hc11_port.html</A>) is sooo much better
+than Hitech's compiler. Its optimisation is a lot better, and all the code
+is PROPPER ANSI C.
+
+MWP
+
+
+
+&gt; On Fri, 05 Nov 1999, behoffski wrote:
+&gt; Excuse the length of replied section of this post, but your comments are
+&gt; pertinent, and I would like to back up what you say.  I have 30+ years
+&gt; experience of writing C only for embedded systems.
+&gt;
+&gt; One of the salient features of many embedded projects is an almost total
+lack
+&gt; of debugging ability. You simply cannot breakpoint anywhere, and most
+embedded
+&gt; applications have no stdio of any kind. The concept of stdout is a little
+&gt; strange when you're switching traffic lights &lt;grin&gt;.
+&gt;
+&gt; To get round this, a viable method is to use a standard compiler (such as
+GNU)
+&gt; on a standard OS (such as linux) to test the embedded code. Typically,
+this
+&gt; involves wrapping the entire project inside (let's say) embedded_main()
+and
+&gt; calling it from main(). Everything inside main is #defined out on the
+embedded
+&gt; compile except for a single call to embedded_main(). You can then use
+stderr
+&gt; and other facilites to debug code.
+&gt;
+&gt; What is immutable in this picture, is that source code *must* be generic
+and
+&gt; standard. Very typically, a manufacturer of chip 'X' supplies a reasonable
+C
+&gt; compiler for it. You can be certain, it cannot have, and will never have,
+the
+&gt; advanced "lint" type features of GNU. It simply won't and can't find the
+really
+&gt; strange gotchas (missing include include include files, wrongly phrased
+int's
+&gt; when you meant shorts, etc ad infinitum. Australian Hitech compilers are
+&gt; perhaps the best crafted embedded compilers in the world. They are badge
+&gt; engineered in the US so the yanks think they're home grown, they don't
+lint
+&gt; very well at all).
+&gt;
+&gt; In my world, it is imperative to test my embedded C source with a
+real -world
+&gt; compiler such as gnu. I WANT the compiler to scream at me, I welcome it
+&gt; complaining very loudly about void main(void). The original author of this
+&gt; post, is, i think, missing the whole point of using good syntax to begin
+with.
+&gt; The last thing I would want to do, no matter how innocuous it would
+appear, is
+&gt; cripple a warning message when my embededd eprom is going to end up on a
+flight
+&gt; control system somewhere. They are awfully difficult to fix after the
+event.
+&gt;
+&gt; You are also quite correct about void functions being handled differently.
+In
+&gt; Hitech's case for HC11's and 68340's it is optimised to jumps, not call
+subs.
+&gt; This makes bugger all difference to all functions except main() and
+exit().
+&gt; The startup asm code makes wrong assumptions (it sets the stack
+incorrectly),
+&gt; and exit() pops the stack to oblivion.
+&gt;
+&gt; It's a case of shooting the messenger rather than fixing the fault! Fix
+the
+&gt; cause of the warning, don't cripple a warning message coz you dont like
+it.
+&gt;
+&gt;
+&gt;  &gt; MWP wrote:
+&gt; &gt; &gt; Im currently developing microcontroller progs using a X assembler
+version of
+&gt; &gt; &gt; GCC.
+&gt; &gt; &gt; In this application, the program NEVER stops running (has a while(1)
+loop
+&gt; &gt; &gt; inside) so i setup main to be "void main(void)".
+&gt; &gt; &gt; But of course, GCC doesnt like that and gives a warning saying main
+should
+&gt; &gt; &gt; return an int value.
+&gt; &gt; &gt;
+&gt; &gt; &gt; Is there a way of disabling this 1 warning message?? It just gets
+annoying
+&gt; &gt; &gt; after a while, as im a "make a small change, recompile" type guy :P
+&gt; &gt;
+&gt; &gt; We've discussed this before on this list.  Here's a brief summary:
+&gt; &gt;
+&gt; &gt; - The ANSI standard says that main() must return an int to
+&gt; &gt;   be a conforming program.
+&gt; &gt;
+&gt; &gt; - On some compilers+architectures, a function returning void is
+&gt; &gt;   implemented differently to a function returning int, to the point
+&gt; &gt;   where the wrong declaration may produce a program that crashes.
+&gt; &gt;   main() is no exception.
+&gt; &gt;
+&gt; &gt; - GCC on Intel is more forgiving of this case, but that's not the
+&gt; &gt;   point.  Do not use the compiler's behaviour in any given situation
+&gt; &gt;   as a reference when trying to understand what's permitted.
+&gt; &gt;
+&gt; &gt; - The ANSI Standard is very much your friend.  Do everything you
+&gt; &gt;   can to stay within its bounds.  Once you stray into using bizarre
+&gt; &gt;   compilers on bizarre architectures (e.g. when developing embedded
+&gt; &gt;   code), non-standard code tends to produce really, really obscure
+&gt; &gt;   and costly bugs.
+&gt; &gt;
+&gt; &gt; - The whole Open Source movement is based on code sharing.  Code sharing
+&gt; &gt;   is based on conformance to the standard.  (Although, to be fair, GCC
+&gt; &gt;   is in many ways a de-facto standard in its own right.)
+&gt; &gt;
+&gt; &gt; - Stray from the standard only when you have tried extremely hard to
+&gt; &gt;   conform, have checked your design and implementation with other
+&gt; &gt;   experienced programmers, and am confident that the cost of
+&gt; &gt;   writing and maintaining nonstandard code is outweighed by the
+&gt; &gt;   benefits of doing so.  In the end, it's an engineering decision.
+&gt; &gt;
+&gt; &gt; - In this case, there's no cost in declaring the function as returning
+&gt; &gt;   int, and adding an (unreached) return 0; statement, and so that is how
+&gt; &gt;   you should address this issue.
+&gt; &gt;
+&gt; &gt; cheers,
+&gt; &gt;
+&gt; &gt; Brenton
+&gt; &gt;
+&gt; &gt; ps. If you wanted to suppress a particular warning, you could pipe the
+&gt; &gt;     compiler output through a filter like awk, sed or perl, and have the
+&gt; &gt;     filter delete the messages that you don't want to see.  But that's
+&gt; &gt;     really an action of last resort.
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; behoffski (Brenton Hoff) | Software Engineer, Grouse Software
+&gt; &gt; <A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A>  | <A HREF="http://www.grouse.com.au/">http://www.grouse.com.au/</A>
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; --
+&gt;
+&gt; --
+&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,124 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Partitioning disks" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 22 Jun 2000 23:44:59 +0900" -->
+<!-- Id="3.0.6.32.20000622234459.009e6610@203.16.214.248" -->
+<!-- Reference="006901bfdc60$5aa86620$86881acb@ngapartji.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Partitioning disks</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Thu, 22 Jun 2000 23:44:59 +0900
+</PRE>
+<H1>Partitioning disks</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+A while back Alex Garner proffered us with the following advice on disk
+partitioning: <A HREF="http://linux.nf/partrec.htm">http://linux.nf/partrec.htm</A>
+
+I would like to take a somewhat contrary possition.
+
+Firstly, I agree with Alex's opening comments about the best partition
+layout; that is, it depends.
+
+However, having been involved in partitioning disks for perhaps 10 or more
+years, I prefer a simpler approach, and then choose to complicate it
+depending on my requirements. I have seen the root partition on one
+particular vendor's UNIX OSes grow from 16MB to 128MB over time, and have
+seen all sorts of complicated partitioning schemes.
+
+For a simple home install, or even a workstation install, I go for placing
+everything in one partition. It is just simpler, as you don't have to mess
+around with a number of partitions and manage space for a number of
+partitions. I am always finding a reason to load those extra files, and
+don't want to have to manage space. 
+
+These days, Linux will even swap to a file, so you do not need to create a
+swap partiton. Simply create a swap file (if the installation script will
+let you get away without a swap partition):
+
+   dd if=/dev/zero of=/swapfile bs=2048 count=65536
+   mkswap -v1 /swapfile
+   swapon /swapfile   # and add it to fstab
+
+However, if you have a disk that is larger than 8.4GB, then you may need to
+create a small /boot partition. 20MB should be enough. Then put everything
+in the remaining space.  The need to create the small boot partition is
+because of the 1024 cylinder problem.  OTOH, if you have a modern BIOS that
+supports EDD (since some time in 1998), you can use LILO-21.4.4.  It can
+boot from anywhere on a disk larger than 8.4GB.
+
+If you are planning to upgrade to the next version of some distro, then you
+might want a more complex setup, mainly so you can ensure that a new
+version does not blow away important files.  However, RedHat does a good
+job of upgrading from what I have seen, so this is not necessarily a reason
+to complicate your life. And in anycase, you will have to save all your
+config files if you are doing a reinstall.
+
+Next good reason for complicating things is if you are running a server.
+Then you will probably want a clean separation of system files from other
+files.
+
+Here you will probably want a separate partition for /home, so user's data
+is separate from everything else.
+
+You might also want a separate partition for /var so that /var/spool and
+/var/log under contol. This helps to prevent you from being DoS'd via mail
+and causing lots of logging messages.
+
+If you are ultra cautious, you might also want /tmp and /usr/tmp on a
+separate partition (you could symbolically link them to directories in the
+same partition as /home), and then you will want to mount everything except
+/ and /usr with the nosuid option.  This helps eliminate a whole class of
+security problems.
+
+I would still be tempted to put / and /usr in the same partition. After
+all, disks are so damn big these days, that it is silly to live by rules
+created when 80MB removable RM03s or whatever were big.
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Co-author, SAMS Teach Yourself Samba in 24 Hours
+Author: First Australian 5-day, intensive, hands-on Linux SysAdmin course
+Author: First Australian 2-day, intensive, hands-on Samba course
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

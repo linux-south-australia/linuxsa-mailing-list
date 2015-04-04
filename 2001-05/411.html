@@ -1,0 +1,125 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PXE Environement and network boot images" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="'David Newall','Davis, Harvey'" -->
+<!-- ToEmail="davidn@rebel.net.au,Harvey.Davis@dsto.defence.gov.au" -->
+<!-- Date="Fri, 11 May 2001 11:14:28 +0900" -->
+<!-- Id="3.0.6.32.20010511111428.00da6160@10.0.2.1" -->
+<!-- Reference=" <DB0C881A51F5D311999F0090274DD43702E56E08@salex003.dsto.defence.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PXE Environement and network boot images</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;<BR>        Davis, Harvey &lt;<I><A HREF="mailto:Harvey.Davis@dsto.defence.gov.au">Harvey.Davis@dsto.defence.gov.au</A></I>&gt;
+  Date: Fri, 11 May 2001 11:14:28 +0900
+</PRE>
+<H1>Re: PXE Environement and network boot images</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 11:12 AM 5/11/01 +0930, David Newall wrote:
+&gt;&gt; Error messages indicate that both dhcp and tftp work fine, however the
+&gt;&gt; remote node complains about the image being to large (thats the bootnet.img
+&gt;&gt; file ~1.4MB).
+
+Was this all for PXE or Etherboot?
+
+&gt;Thinking a bit more, an alternative to mknbi, or a required additional
+step, is
+&gt;imggen, which I found by guessing a URL from the bootrom's copyright notice.
+&gt;
+&gt;Here are my notes from when I built a network bootable diskless client:
+&gt;
+&gt;1. Make network bootable image
+&gt; 
+&gt;Configure kernel as the follows:
+&gt; General setup: Networking Support: On
+&gt; Networking options: Unix Domain Sockets:  Module or On
+&gt; Networking options: IP: kernel level configuration: On
+&gt; Networking options: IP: BOOTP support: On
+&gt; Networking device support: Network device support: On
+&gt; Networking device support: *appropriate interface*: On
+&gt; File systems: Network File Systems: NFS file syste support: On
+&gt; File systems: Network File Systems: Root file system on NFS: On
+&gt; File systems: Partition Types: Advanced partition selection: On    (to
+turn off PC BIOS partition type)
+&gt; File systems: Partition Types: PC BIOS (MSDOS partition tables) support: Off
+&gt; 
+&gt;Generate image as follows:
+&gt; make bzImage
+&gt; mkdev /dev/dev255 c 0 255   (for rdev command)
+&gt; rdev arch/i386/boot/bzImage /dev/dev255  (magic: nfs, i think)
+&gt; /usr/local/bin/imggen -a arch/i386/boot/bzImage vmlinux.netbootable
+&gt; 
+&gt;2. Configure DHCP and TFTP & install network bootable image
+&gt; 
+&gt;Sample /etc/dhcpd.conf putting client's rootfs in /export:
+&gt; 
+&gt;  subnet 203.20.69.128 netmask 255.255.255.128 {
+&gt;    option domain-name "tellurian.com.au";
+&gt;    option domain-name-servers 203.20.69.2;
+&gt;    option routers 203.20.69.130;
+&gt; 
+&gt;    host diskless {
+&gt;      hardware ethernet 00:e0:18:8e:5b:0b;
+&gt;      fixed-address 203.20.69.222;
+&gt;      option root-path "/export/client1";
+&gt;      filename "/export/client1/vmlinux.bootable";
+&gt;    }
+&gt;  }
+&gt; 
+&gt;3. Create install filesystem
+&gt; 
+&gt;  gunzip initrd.img from bootnet.img?
+&gt;  add /lib/*?
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.ethereal.com)
+Contributing author, SAMS Teach Yourself Samba in 24 Hours
+Author, Special Edition, Using Samba
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

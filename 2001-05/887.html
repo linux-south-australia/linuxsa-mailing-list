@@ -1,0 +1,129 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Dual boot - Win 2000 and Linux" -->
+<!-- FromName="'romana'" -->
+<!-- FromEmail="romana@timelady.com" -->
+<!-- ToName="'Stephen Ward','LinuxSA'" -->
+<!-- ToEmail="sward@trinity.sa.edu.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 27 May 2001 14:00:47 +0930" -->
+<!-- Id="3B1082F7.8060909@timelady.com" -->
+<!-- Reference="3B1079CB.F2A10F99@trinity.sa.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Dual boot - Win 2000 and Linux</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: romana &lt;<I><A HREF="mailto:romana@timelady.com">romana@timelady.com</A></I>&gt;
+  To  : Stephen Ward &lt;<I><A HREF="mailto:sward@trinity.sa.edu.au">sward@trinity.sa.edu.au</A></I>&gt;<BR>        LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 27 May 2001 14:00:47 +0930
+</PRE>
+<H1>Re: Dual boot - Win 2000 and Linux</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Stephen,
+
+I am a dual win2000/linux(RH7.1) booter. Bit more fiddly than previous 
+dual boot setups, but works well:)
+
+Ok, what you will need is two floppies - one in DOS format (to load a 
+boot image), and one startup disk (created during linux install)
+Unfortunately, win2k needs to be installed first, as it likes to hog the 
+MBR.
+So,
+
+1) Install win2k. (Preferably first partition)
+2) In Explorer, have a look at C:\. You will find a file called 
+boot.ini. We will be playing with that later.(If you cant see it, go to 
+Tools, Folder Options, View, Show Hidden Files & Folders.)
+This file KIND of works like lilo.conf. (Same principle, anyway)
+3) Choose your favourite Linux distro, and start installing.
+MOST IMPORTANT!!!!! DO NOT INSTALL LILO TO MBR!!!!!
+Create a boot partition, and ensure LILO is located there. Remember the 
+/dev/hd** location (mine is /dev/hda6, for example)
+4) Create that startup disk when prompted. Will definitely be needing that!
+5) Using startup disk, boot into Linux. Mount your floppy drive, with 
+the blank formatted DOS disk I mentioned earlier.
+6) Now we want to copy the LILO boot sector to a file that is 512 bytes 
+big, right onto the DOS floppy. We will be calling it 'linux.bin'. The 
+command below uses my boot partition, /dev/hda6, as the example. Simply 
+substitute your own boot partition.
+dd if=/dev/hda6 bs=512 count=1 of=/mnt/floppy/linux.bin
+7) Back to win2k. Remove the disks, and boot into windows. Open Explorer 
+and copy the file linux.bin off the floppy to the root of your win2k 
+drive (ie c:\).
+8) Open c:\boot.ini file in "Notepad" and add the line 
+c:\linux.bin="&lt;insert distro name&gt;" to the end of the file, and save it. 
+Mine is an example:
+[boot loader]
+timeout=30
+default=multi(0)disk(0)rdisk(0)partition(1)\WINNT
+[operating systems]
+multi(0)disk(0)rdisk(0)partition(1)\WINNT="Microsoft Windows 2000 
+Professional" /fastdetect
+c:\linux.bin="RedHat"
+
+Now, reboot, and you should get a choice! Test both options:)
+
+For more info, I found this page with more details, and piccies for 
+those who like such things
+
+<A HREF="http://www.littlewhitedog.com/reviews_other_00011.asp">http://www.littlewhitedog.com/reviews_other_00011.asp</A>
+Romana:)
+
+Stephen Ward wrote:
+
+&gt; I suspect that this question has been asked before, but anyway.......
+&gt; 
+&gt; I used to have an ideal (for me) laptop setup with Lilo booting to
+&gt; either Win 98 (yes, apologies etc.) and Redhat 7. I have now moved to
+&gt; Win 2000 (yes, apologies again etc.) but understand that a dual boot
+&gt; configuration is not possible as Win 2000 want to hog the MBR.
+&gt; 
+&gt; Can anyone suggest a dual boot scenario (as opposed to a VMware-type
+&gt; solution).
+&gt; 
+&gt; Thank you.......
+&gt; 
+
+-- 
+??????????????????????????????????????????
+<A HREF="mailto:romana@timelady.com">romana@timelady.com</A>	icq no:393293
+
+'between the idea & the reality, 
+between the motion & the act, 
+falls the shadow'
+??????????????????????????????????????????
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

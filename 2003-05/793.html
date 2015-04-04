@@ -1,0 +1,168 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="How to build a user-driven restore interface for Amanda..." -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au, amanda-users@amanda.org" -->
+<!-- Date="Thu, 22 May 2003 20:00:10 +0930" -->
+<!-- Id="006001c3204d$20b417f0$020120ac@skink" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: How to build a user-driven restore interface for Amanda...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto: amanda-users@amanda.org"> amanda-users@amanda.org</A></I>&gt;
+  Date: Thu, 22 May 2003 20:00:10 +0930
+</PRE>
+<H1>How to build a user-driven restore interface for Amanda...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all (and sorry for the cross-posting, but I think it's relevant to
+both lists),
+
+I'm not a developer, I'm a sysadmin. However, I have a problem that I
+desire a solution for, and apparently none exists. Hence, I am
+considering trying my hand at building it. If anyone wants to
+participate, or would even like to take this idea and do it themselves,
+please let me know. I've written some partially organised thoughts down
+here, but I'm thinking as I write, so they may be a little more muddled
+than they could be.
+
+
+
+The Problem: amrecover is a text-driven interface that requires
+systems-type skills to select which files to restore. However, the
+process of selecting which files to restore, at least in the context of
+user home directories should be one that the user controls. There is
+nothing intrinsic about this process that should require sysadmin
+intervention, apart from manual tape changing, where that is neccessary.
+
+The Solution: A tool that allows people to select the files to be
+restored, while requiring them to know nothing but the location of the
+relevant files within their home directory, and the date to restore from
+(both of which should be browseable).
+
+How to do it: The two interfaces that jump out at me are a web-based
+interface and a filesystem-based interface.
+
+Filesystem Interface 
+pros: * familiarity
+	* user OS independant
+      * no need to waste time designing a User Interface
+      * could use copy and paste to restore files wherever user wants --
+though the delays would be too long
+cons: * familiarity (restoring takes hours sometimes, and this would be
+unexpected behaviour)
+      * would need to stop users from trying to open files in place, and
+force them to copy before openning
+      * sounds like lots of low-level work to me...
+
+Web Interface
+pros: * Interface could be more similar to actual process of restoring
+(select files then start restore)
+      * user OS independant
+      * time delay could be made clear in the interface
+      * no filesystem implementation "stuff", so could do it at a
+"higher level"
+cons: * another new interface for users
+      * sounds like lots of interface design work to me...
+
+One could use an FTP interface also, but I think that would be pretty
+much equal to the filesystem interface, but with a slight familiarity
+advantage (users are used to waiting for FTP file transfers, though the
+fact that the wait would be a long delay followed by high bandwidth
+transfer could be problematic for client programs).
+
+I personally think the web interface is the go. If I could have someone
+authenticate with their normal username and password, to a web page that
+restricts them to the correct host and disk (using sethost and setdisk)
+and subdirectory, and gives them a list of files and directories with
+checkboxes next to them, allows them to browse the directories, change
+dates, and then begin an extract, I think that would be simple enough.
+Basically, the URL would look like this:
+
+http[s]://&lt;host&gt;/&lt;basename&gt;?date=&lt;date&gt;&path=&lt;path&gt;
+
+eg:
+
+https://server.domain.com/filerestore?date=2003-05-01&path=/documents/Le
+tters
+
+Which would give them a list of the files in ~/documents/Letters
+(obviously, on their correct host and disk), on the 1st of May, 2003.
+Directories would be browsable, and all directories and files would have
+a checkbox next to them. There would be a button at the bottom called
+"select", which would select the files, and return to the same screen,
+with selected files highlighted and with checkboxes pre-ticked. There
+would also be a button at the bottom that said "restore", which would
+take you to a screen listing which files from which dates were selected,
+and wait for confirmation or correction. Correction would take you back
+to the last screen, and correction would either start the download,
+swapping tapes as needed with amtape, or email the sysadmin, asking them
+to swap tapes as needed. There would then be a significant wait, and the
+web session would have to be considered closed. Once the file restore
+was complete, or if there was an error, the user could be automatically
+emailed.
+
+Of course, there would have to be some security checking -- you don't
+want people restoring out of their home directory, for example. ".."
+would be disallowed in the path, and as symlinks are not followed in
+amrecover, they wouldn't matter here.
+
+My initial thought is to make a webpage that integrates with amrecover
+through stdin/stdout, but I'm sure there would be some sort of library
+that could be used instead. Which would be better is not real clear to
+me. I suspect that stdin/stdout would have some advantages, though I can
+see an obvious disadvantage -- what if the UI changes? An advantage I
+can see is that doing it in Perl or some similar language may well be
+easier on this level.
+
+Anyway, what do people think of this idea? Any volunteers? Anyone spot
+any glaring problems? Is there anything else I should attempt to think
+through?
+
+rr
+
+-- 
+Richard Russell
+Yellow Goanna P/L
+m: +61 412 827 805
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+w: <A HREF="http://www.yellowgoanna.com">http://www.yellowgoanna.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

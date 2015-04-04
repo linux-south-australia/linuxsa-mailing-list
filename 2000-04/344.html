@@ -1,0 +1,102 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: BIND" -->
+<!-- FromName="Daryl Tester" -->
+<!-- FromEmail="dt@picknowl.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 17 Apr 2000 09:08:36 +0930" -->
+<!-- Id="38FA4EFC.88AA9F32@picknowl.com.au" -->
+<!-- Reference="38FA459C.6A5BDFDB@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: BIND</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 17 Apr 2000 09:08:36 +0930
+</PRE>
+<H1>Re: BIND</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Richard Sharpe wrote:
+
+&gt; At 10:21 PM 4/16/00 +0930, Don Collins wrote:
+&gt;&gt; I think you are supposed to replace 0.0.0.0 with 127.0.0.1 for it
+&gt;&gt; to do local nameserver caching correctly.
+
+&gt; The address 0.0.0.0 sometimes means 'this computer'.
+
+In an odd kind of way.  While I'm not 100% au fait with the semantics,
+I've always understood that '0.0.0.0' binds to the first interface on
+a Unix host (where "first" can sometimes be "arbitrary").
+
+For example (under Python):
+
+&gt;&gt;&gt; from socket import socket, AF_INET, SOCK_STREAM
+&gt;&gt;&gt; s = socket(AF_INET, SOCK_STREAM)
+&gt;&gt;&gt; s.bind('0.0.0.0', 5001)
+&gt;&gt;&gt; s.getsockname()
+('0.0.0.0', 5001)
+&gt;&gt;&gt; s.getpeername()
+Traceback (innermost last):
+  File "&lt;stdin&gt;", line 1, in ?
+socket.error: (107, 'Transport endpoint is not connected')
+
+(The exception occurs because we're obviously not connected, so there can't
+be a remote connection, as you would expect)
+
+&gt;&gt;&gt; s.connect('0.0.0.0', 23)
+&gt;&gt;&gt; s.getsockname()
+('127.0.0.1', 5001)
+&gt;&gt;&gt; s.getpeername()
+('127.0.0.1', 23)
+&gt;&gt;&gt; s.close()
+
+Magically, we're now on the local loopback interface.  Python's socket
+library is just a thin OO wrapping around the traditional C socket
+library, so there's no trickery that Python is doing.  You could telnet
+to 0.0.0.0 and then netstat -tn for the same results.
+
+I've always specified the IP address explicitly, because I've come
+across some Unices where it doesn't always use the loopback interface,
+but instead binds to some random IP address on a multihomed machine,
+and then you start getting really obscure errors from nslookup (pedantic
+program that it is).
+
+
+Regards,
+  Daryl Tester
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

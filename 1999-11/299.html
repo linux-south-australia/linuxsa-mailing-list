@@ -1,0 +1,158 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: more spooky stuff on the net!" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Tue, 16 Nov 1999 17:51:52 +1030 (CST)" -->
+<!-- Id="199911160721.RAA77923@atdot.dotat.org" -->
+<!-- Reference="199911160424.OAA18225@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: more spooky stuff on the net!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Tue, 16 Nov 1999 17:51:52 +1030 (CST)
+</PRE>
+<H1>Re: more spooky stuff on the net!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Alan Kennington wrote:
+
+ &gt; This is where the idea comes from:
+   [ stuff ]
+
+Ok, here's where I think it's something on your system, or (as MT
+intimated) something to do with load-balanced DNS:
+
+<A HREF="mailto:newton@gizmo">newton@gizmo</A>&gt; telnet geekboys.org
+Trying 212.78.193.215...
+^C
+<A HREF="mailto:newton@gizmo">newton@gizmo</A>&gt; telnet www.geekboys.org
+Trying 212.78.193.215...
+^C
+<A HREF="mailto:newton@gizmo">newton@gizmo</A>&gt;
+<A HREF="mailto:newton@gizmo">newton@gizmo</A>&gt; nslookup -q=any 215.193.78.212.in-addr.arpa.
+Server:  ns2.on.net
+Address:  192.231.203.2
+215.193.78.212.in-addr.arpa     name = theo.spray.se
+193.78.212.IN-ADDR.ARPA nameserver = noc.spray.se
+193.78.212.IN-ADDR.ARPA nameserver = spraydns.norweb.se
+193.78.212.IN-ADDR.ARPA nameserver = ns1.razorfish.com
+193.78.212.IN-ADDR.ARPA nameserver = ns2.razorfish.com
+noc.spray.se    internet address = 212.78.194.254
+spraydns.norweb.se      internet address = 194.218.252.9
+ns1.razorfish.com       internet address = 206.64.109.2
+ns2.razorfish.com       internet address = 206.64.109.59
+
+
+We can also try it from my server at home:
+
+<A HREF="mailto:newton@atdot">newton@atdot</A>&gt; telnet geekboys.org
+Trying 212.78.193.215...
+^C
+<A HREF="mailto:newton@atdot">newton@atdot</A>&gt; telnet www.geekboys.org
+Trying 212.78.193.215...
+^C
+
+
+Perhaps what you need to do is to get in touch with the people who
+look after the domain, and ask them whether they're doing anything
+freaky with load-balancing.
+
+<A HREF="mailto:newton@gizmo">newton@gizmo</A>&gt; nslookup -q=soa geekboys.org.
+Server:  ns2.on.net
+Address:  192.231.203.2
+geekboys.org
+        origin = noc.spray.se
+        mail addr = hostmaster.spray.se
+        serial = 1999110501
+        refresh = 3600 (1H)
+        retry   = 3600 (1H)
+        expire  = 604800 (1W)
+        minimum ttl = 3600 (1H)
+geekboys.org    nameserver = noc.spray.se
+geekboys.org    nameserver = spraydns.norweb.se
+noc.spray.se    internet address = 212.78.194.254
+spraydns.norweb.se      internet address = 194.218.252.9
+
+... which means you should talk to <A HREF="mailto:hostmaster@spray.se">hostmaster@spray.se</A>
+
+Cheers,
+
+ &gt; The trouble is that this has been happening in a sort of
+ &gt; peripherally noticeable way ever since I installed SuSE 6.2.
+
+Are you sure that SuSE's default preferences don't include a
+bias towards requesting documents in Germanic tongues, arising 
+from its European roots?
+
+Try this for me:
+
+    <A HREF="mailto:root@dog">root@dog</A># named.restart
+    
+    <A HREF="mailto:root@badger">root@badger</A># named.restart
+
+    <A HREF="mailto:root@rat">root@rat</A># named.restart
+
+Restarting the nameserver will wipe all evidence that geekboys.org
+ever existed from your in-core cache;  The next request you send to
+your nameservers will then grab brand-new information direct from the
+source.
+
+Another thing worth doing is to send DNS requests directly to the
+source;  They have more than one server servicing that domain, it's
+possible that they're inconsistent (i.e: noc.spray.se might have one
+set of info in it, spraydns.norweb.se might have a different set).
+
+    dog&gt; dig any www.geekboys.org. @spraydns.norweb.se.
+
+    dog&gt; dig any www.geekboys.org. @noc.spray.se.
+
+ &gt; My hunch is that maybe telnet is just going to a different
+ &gt; name server or something.
+
+Probably cache pollution;  The records look like they were modified
+on the 5th of Nov.  How long have you been using that website for?
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

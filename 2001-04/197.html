@@ -1,0 +1,196 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Modem on ttyS3 problem." -->
+<!-- FromName="'Andrew Pullin'" -->
+<!-- FromEmail="andrew@hotspurbgc.com.au" -->
+<!-- ToName="'Andrew Reid'" -->
+<!-- ToEmail="andrew.reid@plug.cx" -->
+<!-- Date="Sun, 8 Apr 2001 18:19:50 +1000" -->
+<!-- Id="00b001c0c004$b0051860$c2de26cb@hotspurbgc.com.au" -->
+<!-- Reference="009701c0bff3$a19aaa80$c2de26cb@hotspurbgc.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Modem on ttyS3 problem.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Pullin &lt;<I><A HREF="mailto:andrew@hotspurbgc.com.au">andrew@hotspurbgc.com.au</A></I>&gt;
+  To  : Andrew Reid &lt;<I><A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A></I>&gt;
+  Date: Sun, 8 Apr 2001 18:19:50 +1000
+</PRE>
+<H1>Re: Modem on ttyS3 problem.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi All,
+    To answer a few questions. If you set minicom in the
+options to look at ttyS3, exit and restart minicom it will
+look for a modem on ttyS3 (supposedly). While minicom
+usually looks for the device on /dev/modem, these options
+override it. Minicom doesn't "see" a modem on ttyS3. wvdial
+apparently searches for modems on all serial ports (there
+are about 100 in /dev/, but the system only "looks for
+modems on the first 4 (ttyS0, ttyS1, ttyS2, and ttyS3)
+unless you tell it to look somewhere else.
+
+    As I understand the dialin sequence -
+
+    the modem recognises an incoming call and passes a RING
+signal to the serial port.
+    mgetty "listens" to the serial port and hears the RING
+and sends an autoanswer signal ATA to the modem.
+    the modem then answers the incoming call and sends the
+initial authenticating to the serial port.
+    mgetty then authenticates with this data and initiates
+pppd.
+    pppd starts up and talks to the dialin machine and
+initiates a ppp connection.
+    The connection remains open until broken (ie. hang up
+etc)
+    pppd dies.
+    modem resets
+    mgetty continues to listen.
+
+    As for inittab, I have just set up dialin 1 and got it
+to work. Dialin 2 is virtually identical except for the
+serial port ttyS3. As far as I can tell the server is doing
+what it is supposed to except that it can't "see" the modem
+and so is ignoring it.
+
+    I haven't yet tried a serial mouse on this port, so I
+will give it a go, however ttyS2 (dos com 3) works fine as
+dialin 1 is working on it. setserial reports that the port
+is there and set to the correct speeds etc. There is no
+bizarre hardware, just a stock standard setup with 4 serial
+ports. 2 ports are on board (/dev/ttyS0 and ttyS1).
+/dev/ttyS0 is not being used (yet). 2 ports are on an
+expansion board (/dev/ttyS2 and ttyS3). setserial detects
+all these ports and the interrupts etc are all correct. Hope
+this helps with the diagnosis.
+    Cheers!
+        Andrew.
+
+
+----- Original Message -----
+From: Andrew Reid &lt;<A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A>&gt;
+To: Andrew Pullin &lt;<A HREF="mailto:andrew@hotspurbgc.com.au">andrew@hotspurbgc.com.au</A>&gt;
+Cc: &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Sent: Sunday, April 08, 2001 5:52 PM
+Subject: Re: Modem on ttyS3 problem.
+
+
+&gt; On 08 Apr 2001 16:17:33 +1000, Andrew Pullin wrote:
+&gt;
+&gt; &gt; The problem is that
+&gt; &gt; even though setserial advises that the ttyS* ports are
+there
+&gt; &gt; and configured correctly, and the Linux side of things
+are
+&gt; &gt; set up (ie mgetty etc. it was almost identical setup to
+the
+&gt; &gt; dialin 1 config), I cannot 'find' the third modem when I
+use
+&gt; &gt; any terminal programs like minicom or wvdial.
+&gt;
+&gt; Minicom generally uses /dev/modem as the modem to try and
+talk to. If
+&gt; /dev/modem doesn't exist or links to the wrong device, you
+may have a
+&gt; problem talking to it.
+&gt;
+&gt; &gt; Also the modem doesn't pick up the incoming call and
+pass
+&gt; &gt; it on to mgetty.
+&gt;
+&gt; Well, the sequence is somewhat different to that. If
+you've got an
+&gt; external modem, you'll notice that when you call the phone
+number that
+&gt; modem is connected to, a little light flashes. Mgetty
+waits for one of
+&gt; these flashes, or signals as mgetty reads them, and does
+something like
+&gt; answer the call with them.
+&gt;
+&gt; &gt;     I think that the not seeing the 3rd modem is the
+problem
+&gt; &gt; here, but I don't know what to do to fix it. The modem
+&gt; &gt; detects the incoming call (the Ring Indicator light
+comes
+&gt; &gt; on). I think that because the system cannot see the
+modem
+&gt; &gt; connected to the port it also isn't picking up the Ring
+&gt; &gt; signal from the modem and so isn't firing up mgetty and
+&gt; &gt; subsequently pppd.
+&gt;
+&gt; Is there anything in inittab for mgetty on /dev/ttyS3?
+There should be
+&gt; if you want it to answer the call. Just a clarification --
+mgetty is
+&gt; _always_ running in these circumstances. In inittab, the
+respawn option
+&gt; is generally specified. This means that as soon as one
+instance of the
+&gt; process (mgetty) dies, another starts.
+&gt;
+&gt; &gt;     The usual method of checking for a modem is to send
+an
+&gt; &gt; init string to the port and if it receives an OK signal
+&gt; &gt; back, then there is a modem connected to that line. Is
+there
+&gt; &gt; anything people can suggest to help here? Are there any
+&gt; &gt; other methods of checking serial ports for modems? Are
+there
+&gt; &gt; any other ways to initialise (or send any data) to a
+modem?
+&gt;
+&gt; Can you use other devices on this port? For example, a
+serial mouse or
+&gt; something similar. One thing I'd ask is, how many physical
+serial ports
+&gt; does this beast have? /dev/ttyS0-3 means 4 ports. Do you
+have any bizare
+&gt; hardware inside this machine to give you the phyical
+plugs?
+&gt;
+&gt;    -Andrew
+&gt;
+&gt; --
+&gt; Andrew Reid                   email: <A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A>
+&gt;                               www:   <A HREF="http://www.plug.cx">http://www.plug.cx</A>
+&gt; "No one gets too old to       phone: +61 401 946 813
+&gt;  learn a new way of being
+&gt;  stupid."
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,133 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Anyone going to meeting with laptop with GbE?" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'John Edwards'" -->
+<!-- ToEmail="isplist@adam.com.au" -->
+<!-- Date="Mon, 14 Jul 2003 14:07:59 +0930" -->
+<!-- Id="3F1233A7.9020102@aarnet.edu.au" -->
+<!-- Reference="3F12267C.4070806@adam.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Anyone going to meeting with laptop with GbE?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : John Edwards &lt;<I><A HREF="mailto:isplist@adam.com.au">isplist@adam.com.au</A></I>&gt;
+  Date: Mon, 14 Jul 2003 14:07:59 +0930
+</PRE>
+<H1>Re: Anyone going to meeting with laptop with GbE?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+John Edwards wrote:
+
+&gt; Sounds interesting, is there a web site somewhere detailing the project 
+&gt; and the problems it needs to solve?
+
+Not yet, it's on the todo list.
+
+Basically the problem it is that the current
+ethernet MTU is too small.  It really should be 64KB,
+but IEEE won't do this as they want interop from GbE
+to thick coax.
+
+The second problem is that IPv4 path MTU discovery is
+broken.  On fat pipe with big frame sizes your can't
+have a range of MTUs and have good TCP performance.
+I've got models for this, but rather than inflict the
+math just consider that:
+
+  - if a GbE host uses a MTU 10% lower than the real MTU
+    then it is blowing a fast ethernet's worth of bandwidth.
+    That's what machines do today if they implment IPv4's
+    "plateau" path MTU algorithm.
+
+  - if a GbE host uses the more obvious "binary search"
+    algorithm to discover the MTU then finding the last
+    5% of the bandwidth leads to a 50% packet loss.  TCP
+    hates that, so the TCP performance hit can be worse
+    than the correct MTU performance gain.
+
+So a sneaky, complex algorithm tuned to TCP is needed
+to discover the Path MTU.  I've got one of these, but
+getting it deployed probably won't happen without a lot
+of work, as vendors need a high degree of assurance than
+the algorithm won't fail in some obscure way.
+
+A lot of switch and router vendors support "jumbo frames",
+these are 9000 bytes.  With that installed base, an
+alternative approach is for ISPs to decide that 9000
+will be the new gigabit MTU and deploy it where possible.
+The ISP having a bigger MTU on their backbone doesn't hurt
+existing normal-MTU ethernet users.
+
+Then the 9000 value can be added as a new plateau to the
+"plateau" path MTU discovery algorithm used in Win, BSD,
+Linux.
+
+Then as user networks move to the bigger MTU, at least
+for machines doing serious file transfer, then the
+infrastructure for bigger end-to-end MTU will be in place.
+
+I'd expect big MTU to be a differentiation point for gigabit
+ISP networks.  A host running a file tranbsfer on 1500-byte
+MTU GbE will get about 690Mbps, a host running 9000-byte MTU
+ethernet will get 1Gbps.  So for users with file transfer
+applications there's a significant performance difference.
+
+I'm also working on making DHCP do the right thing for
+plug-and-play operation of GbE networks with large MTUs:
+
+   - allow the DHCP response to set the MTU
+
+   - hosts which are asked to set a big MTU and can't
+     (eg, NIC won't support it) return the DHCP allocation
+     and don't bring up the interface.
+
+   - ping tests use small packets or full-MTU packets
+     as appropriate (the current spec allows any packet
+     size in ping tests, which won't do the desired thing
+     with some exotic misconfigurations).
+
+-- 
+  Glen Turner         Tel: (08) 8303 3936 or +61 8 8303 3936
+  Network Engineer          Email: <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>
+  Australian Academic & Research Network   www.aarnet.edu.au
+-- 
+  linux.conf.au 2004, Adelaide          lca2004.linux.org.au
+  Main conference 14-17 January 2004   Miniconfs from 12 Jan
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,210 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: [OT]  Internode DSL + Smoothwall + PADT" -->
+<!-- FromName="'Michael Selge'" -->
+<!-- FromEmail="mselge@hansenyuncken.com.au" -->
+<!-- ToName="'Matthew Moyle-Croft'" -->
+<!-- ToEmail="mmc@mmc.com.au" -->
+<!-- Date="Thu, 11 Apr 2002 13:12:13 +0930" -->
+<!-- Id="001b01c1e10a$de663f90$bf5391a2@HYSA" -->
+<!-- Reference="Pine.LNX.4.33.0204101218570.19751-100000@tsunami.mmc.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: [OT]  Internode DSL + Smoothwall + PADT</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Selge &lt;<I><A HREF="mailto:mselge@hansenyuncken.com.au">mselge@hansenyuncken.com.au</A></I>&gt;
+  To  : Matthew Moyle-Croft &lt;<I><A HREF="mailto:mmc@mmc.com.au">mmc@mmc.com.au</A></I>&gt;
+  Date: Thu, 11 Apr 2002 13:12:13 +0930
+</PRE>
+<H1>RE: [OT]  Internode DSL + Smoothwall + PADT</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+OK...I'm getting further, although now someone that knows about PADT
+commands might need some input. It looks to me like it's exiting too quickly
+without receiving a PADT ( whatever that is !! )
+
+I changed config of Smoothwall from a persistent connection to an idle
+timeout of 30 minutes. Using Idle timeout Smoothwall exits normally and then
+I can reconnect. If I force a logoff then it fails to disconnect properly.
+See below
+
+When exiting due to idle timeout
+
+Apr  9 23:41:33 smoothy pppd[292]: Terminating connection due to lack of
+activity.
+Apr  9 23:41:33 smoothy pppoe[293]: Session terminated -- received PADT from
+peer
+Apr  9 23:41:33 smoothy pppd[292]: Connection terminated.
+Apr  9 23:41:33 smoothy pppd[292]: Connect time 55.9 minutes.
+Apr  9 23:41:33 smoothy pppd[292]: Sent 1018148 bytes, received 5493103
+bytes.
+Apr  9 23:41:33 smoothy pppd[292]: tcflush failed: Input/output error
+Apr  9 23:41:33 smoothy snort: pcap_loop: read: Network is down
+Apr  9 23:41:34 smoothy snort: Snort received signal 3, exiting
+Apr  9 23:41:35 smoothy smoothwall: PPP has gone down on ppp0
+Apr  9 23:41:37 smoothy ipsec_setup: (/etc/ipsec.conf, line 1) cannot open
+configuration file "/etc/ipsec.conf" -- `stop
+' aborted
+Apr  9 23:41:39 smoothy pppd[292]: Exit.
+
+
+Exiting due to forced shutdown
+
+Apr 10 18:28:41 smoothy pppd[1192]: Terminating on signal 15.
+Apr 10 18:28:41 smoothy pppoe[1193]: Sent PADT
+Apr 10 18:28:41 smoothy pppd[1192]: Modem hangup
+Apr 10 18:28:41 smoothy pppd[1192]: Connection terminated.
+Apr 10 18:28:41 smoothy pppd[1192]: Connect time 42.6 minutes.
+Apr 10 18:28:41 smoothy pppd[1192]: Sent 606147 bytes, received 4747324
+bytes.
+
+When the Shutdown is forced the session is stopped but cannot be restarted.
+Below are the processes running
+
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 Apr09 ?        00:00:04 init [3]
+root         2     1  0 Apr09 ?        00:00:00 [kflushd]
+root         3     1  0 Apr09 ?        00:00:00 [kupdate]
+root         4     1  0 Apr09 ?        00:00:00 [kswapd]
+root         5     1  0 Apr09 ?        00:00:00 [keventd]
+root        45     1  0 Apr09 ?        00:00:00 /sbin/syslogd -m 0
+root        47     1  0 Apr09 ?        00:00:02 /sbin/klogd
+root       260     1  0 Apr09 ?        00:00:00 /usr/sbin/crond
+root       262     1  0 Apr09 ?        00:00:00 /usr/sbin/httpd -DSSL
+nobody     265   262  0 Apr09 ?        00:00:01 /usr/sbin/httpd -DSSL
+nobody     266   262  0 Apr09 ?        00:00:01 /usr/sbin/httpd -DSSL
+nobody     267   262  0 Apr09 ?        00:00:00 /usr/sbin/httpd -DSSL
+nobody     268   262  0 Apr09 ?        00:00:01 /usr/sbin/httpd -DSSL
+root       269     1  0 Apr09 ?        00:00:00 /usr/sbin/dhcpd eth0
+root       272     1  0 Apr09 ?        00:00:04 /usr/local/sbin/sshd
+root       283     1  0 Apr09 tty1     00:00:00 /sbin/mingetty tty1
+root       284     1  0 Apr09 tty2     00:00:00 /sbin/mingetty tty2
+root       285     1  0 Apr09 tty3     00:00:00 /sbin/mingetty tty3
+root       286     1  0 Apr09 tty4     00:00:00 /sbin/mingetty tty4
+root       287     1  0 Apr09 tty5     00:00:00 /sbin/mingetty tty5
+root       288     1  0 Apr09 tty6     00:00:00 /sbin/mingetty tty6
+root      1192     1  0 17:46 ?        00:00:00 /usr/sbin/pppd pty
+/usr/sbin/ppp
+root      1195  1192  0 17:46 ?        00:00:01 perl /etc/ppp/ip-up ppp0
+38400
+root      1232  1195  0 17:46 ?        00:00:03 perl
+/usr/local/bin/updatelists.
+nobody    1269     1  0 18:28 ?        00:00:00 /usr/local/bin/dnrd
+root      1273   272  1 18:29 ?        00:00:01 /usr/local/sbin/sshd
+root      1274  1273  0 18:29 ttyp0    00:00:00 -bash
+root      1289   260  0 18:29 ?        00:00:00 /USR/SBIN/CROND
+root      1291  1289  0 18:29 ?        00:00:00 /bin/bash -c
+/usr/local/bin/make
+root      1293  1291  0 18:29 ?        00:00:00 sh /usr/local/bin/makegraphs
+root      1294  1293 68 18:29 ?        00:00:10 perl
+/usr/local/bin/ipacsum --gi
+root      1299  1274 46 18:30 ttyp0    00:00:00 ps -ef
+
+
+&gt; -----Original Message-----
+&gt; From: Matthew Moyle-Croft [mailto:<A HREF="mailto:mmc@mmc.com.au">mmc@mmc.com.au</A>]
+&gt; Sent: Wednesday, 10 April 2002 12:28
+&gt; To: Michael Selge
+&gt; Cc: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; Subject: RE: [OT] Telstra DSl to Internode DSL + Smoothwall ( Update )
+&gt;
+&gt;
+&gt; Hmm,
+&gt; Strange.
+&gt;
+&gt; Two things to try:
+&gt;
+&gt; - if you do "ps -ef | grep ppp" whilst the connection is
+&gt; running what shows?
+&gt; - will it die if you do a "kill -9 &lt;pid&gt;"?
+&gt; - what other processes are running at the time?
+&gt;
+&gt; MMC
+&gt;
+&gt;
+&gt;
+&gt; On Wed, 10 Apr 2002, Michael Selge wrote:
+&gt;
+&gt; &gt; I did some more testing last night and here are the results.
+&gt; &gt; When I Disconnect I have this in /var/log/messages
+&gt; &gt;
+&gt; &gt; Apr  9 18:05:10 smoothy pppd[354]: Terminating on signal 15.
+&gt; &gt; Apr  9 18:05:10 smoothy pppoe[355]: Sent PADT
+&gt; &gt; Apr  9 18:05:10 smoothy pppd[354]: Modem hangup
+&gt; &gt; Apr  9 18:05:10 smoothy pppd[354]: Connection terminated.
+&gt; &gt; Apr  9 18:05:10 smoothy pppd[354]: Connect time 1.1 minutes.
+&gt; &gt; Apr  9 18:05:10 smoothy pppd[354]: Sent 1656 bytes,
+&gt; received 6310 bytes.
+&gt; &gt;
+&gt; &gt; BUT after this happens if I do a : ps -ef|grep pppd
+&gt; &gt; the output is
+&gt; &gt; root       263     1  0 Apr09 ?        00:00:05 /usr/sbin/pppd pty
+&gt; &gt;
+&gt; &gt; so it looks like its dropping connection but not killing the process
+&gt; &gt;
+&gt; &gt; I tried to kill the Process with
+&gt; &gt; kill 263
+&gt; &gt; and it doesn't want to die.
+&gt; &gt;
+&gt; &gt; Where do I go from here ?
+&gt; &gt;
+&gt; &gt; P.S. If I take out the space on the profile name from
+&gt; "Internode ADSL" to
+&gt; &gt; "Internode" it doent make any difference.
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; &gt; -----Original Message-----
+&gt; &gt; &gt; From: Matthew Moyle-Croft [mailto:<A HREF="mailto:mmc@mmc.com.au">mmc@mmc.com.au</A>]
+&gt; &gt; &gt; Sent: Tuesday, 9 April 2002 15:33
+&gt; &gt; &gt; To: Michael Selge
+&gt; &gt; &gt; Cc: 'David Lloyd'; 'Evan Bourlotos'; <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; &gt; &gt; Subject: RE: [OT] Telstra DSl to Internode DSL + Smoothwall
+&gt; &gt; &gt;
+&gt; &gt; &gt;
+&gt; &gt; &gt; Michael,
+&gt; &gt; &gt; WRT to your problem, I assume the when you ask it to drop the
+&gt; &gt; &gt; connection
+&gt; &gt; &gt; that the pppd actually dies?
+&gt; &gt; &gt;
+&gt; &gt; &gt; (ie. "ps -ef | grep pppd" shows nothing?)
+&gt; &gt; &gt;
+&gt; &gt; &gt; Given that Internode effectively use the same Telstra
+&gt; &gt; &gt; infrastructure to
+&gt; &gt; &gt; provide PPPoE connections for residential, I don't quite see
+&gt; &gt; &gt; how it could
+&gt; &gt; &gt; be an Internode problem.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

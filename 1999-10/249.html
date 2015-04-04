@@ -1,0 +1,104 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: protecting dialup lines" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Justin Cannan" -->
+<!-- ToEmail="jcla@pasteur.dialix.com.au" -->
+<!-- Date="Fri, 15 Oct 1999 13:23:58 +0930 (CST)" -->
+<!-- Id="Pine.BSF.3.96.991015125741.28340B-100000@augustus.tellurian.com.au" -->
+<!-- Reference="3805D0C9.7FF84AFB@pasteur.dialix.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: protecting dialup lines</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Justin Cannan &lt;<I><A HREF="mailto:jcla@pasteur.dialix.com.au">jcla@pasteur.dialix.com.au</A></I>&gt;
+  Date: Fri, 15 Oct 1999 13:23:58 +0930 (CST)
+</PRE>
+<H1>Re: protecting dialup lines</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, 14 Oct 1999, Justin Cannan wrote:
+&gt; I have a machine providing dialin access for remote email.
+&gt; This modem is being called by someone other than the authorised people.
+
+Others have suggested caller-id, which can only hurt by as much as Telstra
+hose you for that feature (it's not free.)  There is no guarantee that CID
+will be presented, and you only need to dial a prefix to the number you
+want to ensure that no CID is displayed; never the less it's not expensive
+and you might just as well pay for that service.  I understand it costs
+only a few dollars per month (and maybe you need to buy new modems,
+obviously I don't know about that.)
+
+Finding out where they are calling from and who they are trying to log in
+as is largely a matter of checking your configuration and your log files.
+To record the CID you need to know what program you use to answer the call.
+(I assume you already paying to have CID presented to your line, and that
+your modem is capable of decoding this information.)  Many people prefer
+mgetty, which I'm not familiar with.  (I use getty_ps which I find much
+more simple.)  Assuming mgetty is more-or-less similar to getty_ps in this
+regard, you need to add init strings to make your modem display CID, and
+you need to adjust the configuration file so that CID is recorded
+somewhere.  I hear that mgetty already knows about this, so it should be
+easy.  Remember to read *your* modem manual (pointed stare) to find out the
+init string applicable to your modem.
+
+There are (at least) two parts to answering how to find out who they are
+trying to log in as.  Mgetty has an AutoPPP option, which makes it
+recognise PPP frames and automatically invoke pppd.  (Getty_ps + my patch
+has the same feature.) If they are trying to log on using a PPP
+authentication then read up about whatever pppd uses to record invalid log
+in attempts.  If you use a PAM enabled unix, and on this list that's highly
+likely, and if you have pppd setup to use "unix login authentication" then
+useful information will be logged using syslogd.  Authentication failure
+from PAM looks somewhat like:
+
+   "authentication failure; (uid=0) -&gt; joeuser for ppp service"
+
+This indicates that they tried to log in as joeuser.  Mind you pppd can
+also use it's own secrets or chap-secrets file, and not use PAM.
+
+If they are not sending PPP frames, whatever getty you use will ask them
+for a username and then exec /bin/login, which will ask for a password and
+authenticate them.  The comments about PAM apply here, too.  Login does not
+have to use PAM and maybe you have one which doesn't, but it will surely
+log using syslog either way.
+
+You need to find out what syslog messages to keep, and the answer to that
+can be gleaned from manual pages for getty, login, pppd and pam.  Don't
+forget to read syslogd man page, too.  Finally, a word of advise that is
+always timely -- no, not RTFM, it's UTSL.  Use the source, Luke.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

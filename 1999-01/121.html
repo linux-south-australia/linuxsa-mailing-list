@@ -1,0 +1,159 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Linux:MBR & bootloader" -->
+<!-- FromName="Matthew Tippett" -->
+<!-- FromEmail="mtippett@ticons.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="pets@camtech.net.au" -->
+<!-- Date="Wed, 13 Jan 1999 00:28:57 +1030 (CST)" -->
+<!-- Id="199901121358.AAA14666@matt.ticons.com.au" -->
+<!-- Reference="369B1E67.7E28CF8B@camtech.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Linux:MBR & bootloader</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Tippett &lt;<I><A HREF="mailto:mtippett@ticons.com.au">mtippett@ticons.com.au</A></I>&gt;
+  To  : <A HREF="mailto:pets@camtech.net.au">pets@camtech.net.au</A>
+  Date: Wed, 13 Jan 1999 00:28:57 +1030 (CST)
+</PRE>
+<H1>Re: Linux:MBR & bootloader</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; 
+&gt; I want to set up two different linux operating systems on a new 4.3g 'C'
+&gt; drive and to coexist with Windows '95. 
+
+The correct term is Master and Slave for Primary, Master and Slave for
+Secondary, and so on...
+
+The 'C' drive-ism is related *only* to the first primary DOS partition on 
+the hard drive and only makes sense for MS DOS|Windows.  So more correctly, 
+you have a drive that you want to use as your primary master.  If you think
+of it in terms of master/slave on a primary/secondary/... controller 
+things will make a bit more sense (especially the Linux IDE HD naming
+convention).
+
+&gt; I envisage allocating say 1.2g to each of the linux Os's and the balance
+&gt; of the 'C'drive to Win '95. I also have a 1.2g 'd' drive that is
+&gt; available for Win '95.
+
+D: would be primary slave (as above)...
+
+My suggestion would be set the drive up as follows (assuming that 
+the drive is LBA with Cylinders &lt; 1024 ),
+
+/dev/hda? is the primary master
+/dev/hdb? is the primary slave
+
+	/dev/hda1 - 2.0 GB - Win95    
+	/dev/hda2 - 100 MB - Linux Swap
+	/dev/hda3 - 2.2 GB - Extended Partition
+	/dev/hda5 - 700 MB - Linux /home
+	/dev/hda6 - 750 MB - Linux / #1
+	/dev/hda7 - 750 MB - Linux / #2
+
+        /dev/hdb1 - 1.2 GB - Win95 
+
+Splitting the partition up that way will allow you to have your Windows 95
+install, two Linux installations (eg Caldera and RH) but still have a 
+common /home directory (really good for having access to data from both
+systems).
+
+&gt; My questions are;
+&gt; 
+&gt; 1) Will the MBR accept 3 (or more) operating systems?.
+
+The MBR is basically a small program, a partition table and a
+small areas with various bit patterns.  MS Operating Systems tend
+to be picky about some bit patterns.
+
+The partition table can have 4 partitions, one of the partitions can
+be an extended (as I have indicated above), within an extended partition
+you effectively have another 'pseudo' drive, which also has a partition
+table.  Generally these extended partitions only have a single partition
+in them.  Other logical drives are created by adding an extended 
+partition and creating drives within that....  Diagramatically the
+layout above becomes ...
+
+ +--------+----+---------------------+
+    win95  swap        extended
+               +-----+---------------+    These are logical drives
+                /home    extended         in the extended partition
+                     +-----+---------+    which is hidden by fdisk.
+                      / #1     ext.
+			   +---------+
+                              / #2
+Which logically becomes
+
++--------+----+-------+------+------+
+  win95   swap  /home   / #1   / #2
+
+&gt; 2) What would be the optimum workable strategy for disk allocation for
+&gt; each of the 3 operating systems for  'C' drive in terms of bootloading
+&gt; constraints?. 
+
+The small program in the boot sector normally (with DOS) looks for the 
+'active' or boot partition and then seeks to the first or boot sector 
+of the partition to start the operating system there.  
+
+That is why during most Linux installs you get the option to install
+LILO in either the MBR or the boot sector.  Each is designed to be 
+used at either stage in the boot process.
+
+If you take the boot sector option the MBR program needs to be told to 
+boot from the Linux partition.
+
+If you take the MBR option then pretty much straight away the LILO MBR 
+program runs code in (typically) the boot directory of the Linux
+filesystem to start the booting of the kernel or switching to DOS.
+
+Now back to the question....
+
+Since (as described above) the MBR installation of LILO pretty much 
+moves run a program that could do just about anything.  You are not 
+limited by anything in terms of the directions that the boot process
+goes.
+
+Of course you can always check out the Partition mini-HOWTO.
+
+Hope this all makes sense...
+
+Matt
+
+-- 
+Matthew Tippett          - +61 416 006 047     - <A HREF="mailto:mtippett@ticons.com.au">mtippett@ticons.com.au</A>
+Linux Support Initiative - BETA Testers Wanted - <A HREF="http://lsi.ticons.com.au/">http://lsi.ticons.com.au/</A>
+Tippett Information Consulting Pty Ltd -       - <A HREF="http://www.ticons.com.au/">http://www.ticons.com.au/</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

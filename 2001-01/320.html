@@ -1,0 +1,150 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="[Fwd: [reiserfs-list] major security bug in reiserfs (may affect SuSELinux)]" -->
+<!-- FromName="'David Lloyd'" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 10 Jan 2001 11:08:08 +1030" -->
+<!-- Id="3A5BAEF0.185E7C3F@rebel.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: [Fwd: [reiserfs-list] major security bug in reiserfs (may affect SuSELinux)]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 10 Jan 2001 11:08:08 +1030
+</PRE>
+<H1>[Fwd: [reiserfs-list] major security bug in reiserfs (may affect SuSELinux)]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+ooerr....
+
+-------- Original Message --------
+Subject: [reiserfs-list] major security bug in reiserfs (may affect SuSE
+Linux)
+Date: Wed, 10 Jan 2001 00:42:01 +0100
+From: Marc Lehmann &lt;<A HREF="mailto:pcg@goof.com">pcg@goof.com</A>&gt;
+To: <A HREF="mailto:BUGTRAQ@SECURITYFOCUS.COM">BUGTRAQ@SECURITYFOCUS.COM</A>,
+<A HREF="mailto:linux-kernel@vger.kernel.org">linux-kernel@vger.kernel.org</A>,<A HREF="mailto:reiserfs-list@namesys.com">reiserfs-list@namesys.com</A>
+
+We are still investigating, but there seems to be a major security
+problem
+in at least some versions of reiserfs. Since reiserfs is shipped with
+newer versions of SuSE Linux and the problem is too easy to reproduce
+and
+VERY dangerous I think alerting people to this problem is in order.
+
+We have tested and verified this problem on a number of different
+systems
+and kernels 2.2.17/2.2.8 with reiserfs-3.5.28 and probably other
+versions.
+
+Basically, you do:
+
+mkdir "$(perl -e 'print "x" x 768')"
+
+I.e. create a very long directory. The name doesn't seem to be of
+relevance (we found this out by doing mkdir "$(cat /etc/hosts)" for
+other
+tests). This works.  The next ls (or echo *) command will segfault and
+the
+kernel oopses. all following accesses to the volume in question will
+oops
+and hang the process, even afetr a reboot.
+
+reiserfsck (the filesystem check program) does _NOT_ detect or solve
+this
+problem:
+
+Replaying journal..ok
+Checking S+tree..ok
+Comparing bitmaps..ok
+
+But fortunately, rmdir &lt;filename&gt; works and seems to leave the
+filesystem
+undamaged.
+
+Since a kernel oops results (see below), this indicates a buffer overrun
+(the kernel jumps to address 78787878, which is "xxxx") inside the
+kernel,
+which is of course very nasty (think ftp-upload!) and certainly gives
+you
+root access from anywhere, even from inside a chrooted environment. We
+didn't pursue this further.
+
+The best workaround at this time seems to be to uninstall reiserfs
+completely or not allow any user access (even indirect) to these
+volumes.
+While this individual bug might be easy to fix, we believe that other,
+similar bugs should be easy to find so reiserfs should not be trusted
+(it
+shouldn't be trusted to full user access for other reasons anyway, but
+it
+is still widely used).
+
+Unable to handle kernel paging request at virtual address 78787878
+current-&gt;tss.cr3 = 0d074000, %cr3 = 0d074000
+*pde = 00000000
+Oops: 0002
+CPU:    0
+EIP:    0010:[&lt;c013f875&gt;]
+EFLAGS: 00010282
+eax: 00000000   ebx: bfffe78c   ecx: 00000000   edx: bfffe78c
+esi: ccbddd62   edi: 78787878   ebp: 00000300   esp: ccbddd3c
+ds: 0018   es: 0018   ss: 0018
+Process bash (pid: 292, process nr: 54, stackpage=ccbdd000)
+Stack: c013f66a ccbddf6c cd100000 ccbddd62 0000030c c0136d49 00000700
+00002013 
+       00001000 7878030c 78787878 78787878 78787878 78787878 78787878
+78787878 
+       78787878 78787878 78787878 78787878 78787878 78787878 78787878
+78787878 
+Call Trace: [&lt;c013f66a&gt;] [&lt;c0136d49&gt;] 
+Code: 89 1f 8b 44 24 18 29 47 08 31 c0 5b 5e 5f 5d 81 c4 2c 01 00 
+
+
+-- 
+      -----==-                                             |
+      ----==-- _                                           |
+      ---==---(_)__  __ ____  __       Marc Lehmann      +--
+      --==---/ / _ \/ // /\ \/ /       <A HREF="mailto:pcg@opengroup.org">pcg@opengroup.org</A> |e|
+      -=====/_/_//_/\_,_/ /_/\_\       XX11-RIPE         --+
+    The choice of a GNU generation                       |
+                                                         |
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,93 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: oops! sorry that last one came out too soon! ipchains again!" -->
+<!-- FromName="Michael Neuling" -->
+<!-- FromEmail="mneuling@radlogic.com.au" -->
+<!-- ToName="jonty rhodes" -->
+<!-- ToEmail="jtsoong@hotmail.com" -->
+<!-- Date="Wed, 30 Aug 2000 10:33:20 +0930" -->
+<!-- Id="200008300103.KAA01344@flea.radnet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: oops! sorry that last one came out too soon! ipchains again!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Neuling &lt;<I><A HREF="mailto:mneuling@radlogic.com.au">mneuling@radlogic.com.au</A></I>&gt;
+  To  : jonty rhodes &lt;<I><A HREF="mailto:jtsoong@hotmail.com">jtsoong@hotmail.com</A></I>&gt;
+  Date: Wed, 30 Aug 2000 10:33:20 +0930
+</PRE>
+<H1>Re: oops! sorry that last one came out too soon! ipchains again!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Jonty,
+
+&gt; Chain input (policy DENY):
+&gt; target prot opt     source                destination           ports
+&gt; ACCEPT     tcp  ------  10.2.1.0/24          0.0.0.0/0         80 &gt;   80
+&gt; ACCEPT     tcp  ------  0.0.0.0/0            10.2.1.0/24     80 -&gt;   80
+
+The second rule is not doing what you want.  Here is the path a packet
+takes thru a linux box (ripped from the ipchains howto).
+
+        ----------------------------------------------------------------
+        |            ACCEPT/                              lo interface |
+        v           REDIRECT                  _______                  |
+--&gt; C --&gt; S --&gt; ______ --&gt; D --&gt; ~~~~~~~~ --&gt;|forward|----&gt; _______ --&gt; 
+    h     a    |input |    e    {Routing }   |Chain  |     |output |ACCEPT
+    e     n    |Chain |    m    {Decision}   |_______| ---&gt;|Chain  |
+    c     i    |______|    a     ~~~~~~~~        |     | -&gt;|_______|
+    k     t       |        s       |             |     | |     |    
+    s     y       |        q       |             v     | |     |    
+    u     |       v        e       v            DENY/  | |     v    
+    m     |     DENY/      r   Local Process   REJECT  | |   DENY/
+    |     v    REJECT      a       |                   | |  REJECT
+    |   DENY               d       --------------------- | 
+    v                      e -----------------------------
+   DENY                              
+
+Note that it hits the input chain before it is demasquraded
+Therefore masquraded packets coming back the internet look like they
+are to the ppp0 IP address not the internal IPs.  Therefore you are
+filtering them out the the second rule.
+
+BTW netfilter (2.4 linux stuff) fixes this confusion.
+
+Regards,
+Michael
+--
+Michael Neuling                        <A HREF="mailto:mneuling@radlogic.com.au">mneuling@radlogic.com.au</A> (o_ 
+RADLogic Pty Ltd, Adelaide, South Australia ph: +61 8 8373-3990 //\ 
+<A HREF="http://www.radlogic.com.au">http://www.radlogic.com.au</A>                  fx: +61 8 8373-3251 V_/_
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

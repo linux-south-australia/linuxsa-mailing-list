@@ -1,0 +1,170 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Strange X-Windows problem with vanilla kernel on RH9" -->
+<!-- FromName="'Graham Smith'" -->
+<!-- FromEmail="linuxsalist@sonicresolutions.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="27 Jul 2003 20:48:29 +0930" -->
+<!-- Id="1059304709.12572.142.camel@bravo.sonicresolutions.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Strange X-Windows problem with vanilla kernel on RH9</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Graham Smith &lt;<I><A HREF="mailto:linuxsalist@sonicresolutions.com">linuxsalist@sonicresolutions.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 27 Jul 2003 20:48:29 +0930
+</PRE>
+<H1>Strange X-Windows problem with vanilla kernel on RH9</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi All.
+
+I have encountered a strange problem recently with my RH9.0 installation
+and I'm wondering if anybody might be able to point me in the right
+direction.
+
+I recently changed over to a vanilla kernel (2.4.21) from Redhat's
+kernel (2.4.20-18.9), so that I could patch the kernel with the ACPI
+diff's, to get ACPI going with my mainboard.
+
+Anyway, that all went swimmingly and all was well until I tried to
+launch Gimp.  For some reason the Gimp startup box stalled with
+half-drawn text in it and failed to go any further.  If I killed gimp
+and then started it again, it would get a little further along the
+startup process and stop again.  If I repeated this process another 2
+times, it would eventually load OK.  I could then close down Gimp and
+reload it and it would come straight up OK.  However if I closed down
+the X-Windows session and restarted it, I would need to go through this
+process again in order to get Gimp to run.  Very strange!!
+
+Anyway, I ran strace on gimp and below is the last few lines of output
+from strace when it freezes up on loading the first time:
+
+gettimeofday({1059292239, 875342}, NULL) = 0
+gettimeofday({1059292239, 875392}, NULL) = 0
+poll([{fd=3, events=POLLIN}, {fd=4, events=POLLIN}], 2, 0) = 0
+gettimeofday({1059292239, 875540}, NULL) = 0
+gettimeofday({1059292239, 875585}, NULL) = 0
+poll([{fd=3, events=POLLIN}, {fd=4, events=POLLIN}], 2, 0) = 0
+write(3, "8\0\4\0\7\0\200\2\0@\0\0\271\0\200\2Ke\5\0j\0\200\2\7\0"...,
+1064) = 1064
+ioctl(3, FIONREAD, [0])                 = 0
+gettimeofday({1059292239, 875833}, NULL) = 0
+ioctl(3, FIONREAD, [0])                 = 0
+gettimeofday({1059292239, 875916}, NULL) = 0
+ioctl(3, FIONREAD, [0])                 = 0
+poll([{fd=3, events=POLLIN}, {fd=4, events=POLLIN}], 2, 0) = 0
+gettimeofday({1059292239, 876350}, NULL) = 0
+write(3, "\22\0\30\0\5\0\200\2(\0\0\0)\0\0\0 e\5\0\22\0\0\0004\0"...,
+216) = 216
+ioctl(3, FIONREAD, [0])                 = 0
+gettimeofday({1059292239, 879452}, NULL) = 0
+ioctl(3, FIONREAD, [0])                 = 0
+poll([{fd=3, events=POLLIN}, {fd=4, events=POLLIN}], 2, 0) = 0
+gettimeofday({1059292239, 879799}, NULL) = 0
+write(3, ";\0\5\0\t\0\200\2\0\0\0\0\0\0I\1,\1\20\0F\0\5\0\5\0\200"...,
+596) = 596
+ioctl(3, FIONREAD, [0])                 = 0
+poll([{fd=3, events=POLLIN}, {fd=4, events=POLLIN}], 2, 0) = 0
+write(3, "+\0\1\0", 4)                  = 4
+read(3, 0xbffff730, 32)                 = -1 EAGAIN (Resource
+temporarily unavailable)
+select(4, [3], NULL, NULL, NULL)        = 1 (in [3])
+read(3, "\n\3O\2\5\0\200\2\0\0\0\0\0\0@\0\0\0\0\0\0\0\0\0\310\365"...,
+32) = 32
+read(3, 0xbffff730, 32)                 = -1 EAGAIN (Resource
+temporarily unavailable)
+select(4, [3], NULL, NULL, NULL
+
+I'm no programmer and I don't know enough about the inner workings of
+the code to be able to interpret this into anything meaningful.
+
+Anyway, the really odd thing is that if I go back to the Redhat
+2.4.20-18.9 kernel, all is well.  This problem only occurs if I run the
+vanilla kernel.  I should point out that I used Redhat's config files as
+the basis of the configuration for the vanilla kernel, so the kernel
+config is identical to the Redhat one, barring the extra ACPI stuff.  So
+I tried turning the ACPI related options off, to see if that was the
+cause, but the problem with Gimp still occurred.  I even tried
+downloading and installing the vanilla 2.4.20 kernel, in case it was a
+2.4.20 -&gt; 2.4.21 oddity.. still no go.  The only way I can get Gimp to
+load first time is to run the Redhat kernel.
+
+I should also note I can customise the Redhat kernel using Redhat's
+source, and this works fine also.  The problem seems to be caused by
+something Redhat have done to their kernel source that I'm not doing to
+the vanilla kernel.  I thought it was strange, however, that this would
+effect the running of X Windows apps.  I have also noticed certain
+operations in Open Office now causes it to freeze, which again doesn't
+happen under the Redhat kernel, so Gimp is really just an convenient way
+of replicating the fault.  However I believe that whatever is causing
+this problem is effecting other XWindows apps other than Gimp.
+
+The only other bit of information that I came across (having no idea if
+it's relevant) was I noticed this difference in the XFree86 log files,
+when booting between the two Kernels:
+
+Under Redhat's 2.4.20-18.9 Kernel:
+(II) PCI: stages = 0x03, oldVal1 = 0x8000fb40, mode1Res1 = 0x80000000
+
+Under Vanilla 2.4.21 Kernel:
+(II) PCI: stages = 0x03, oldVal1 = 0x00000000, mode1Res1 = 0x80000000
+
+I'm not sure, again, if this could be the cause of the trouble but it
+was the only difference I could detect in the XFree86 side of things.
+
+I have done extensive searching on all of the above issues on the Net
+and turned up nothing.  I guess not too many folk use vanilla kernels
+with Redhat distro's.  It would be OK if I could apply the ACPI patch to
+the Redhat kernel but it fails, I assume, thanks to other patches/mods
+Redhat must apply.
+
+If anybody has any ideas about how I could troubleshoot this further, I
+would be most grateful.  I really don't want to have to run Redhat's own
+"Doctored" kernel in order to get apps to start up/operate cleanly but I
+just don't possess enough programming oriented skills to be able to
+start troubleshooting the problem using the strace output I'm getting.
+
+Many thanks,
+
+Cheers,
+Graham
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

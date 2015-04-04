@@ -1,0 +1,204 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="How to set up Timesheet.php in Mandrake 9 - A time & billing program" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="linuxcpa@netscape.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 01 Jan 2003 02:56:39 -0800" -->
+<!-- Id="3E12C967.4020005@netscape.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: How to set up Timesheet.php in Mandrake 9 - A time & billing program</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:linuxcpa@netscape.net">linuxcpa@netscape.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 01 Jan 2003 02:56:39 -0800
+</PRE>
+<H1>How to set up Timesheet.php in Mandrake 9 - A time & billing program</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Ok, so I got sick of whining, and decided to go out and do something.  I
+still hope that things are better than I fear that they might. Ok,
+enough of that.
+
+
+I have a list of applications that I am hunting down Linux replacements
+for.
+As of yesterday, I was down to nine, but as of now,  we have a good
+chance to be down to eight. :-)
+
+
+The program is timesheet.php.
+
+<A HREF="http://www.stratlink.com.au/timesheet/">http://www.stratlink.com.au/timesheet/</A>
+
+This is how you set it up if you are interested:
+
+
+Necessary Software:
+
+1. L  inux
+2. A  pache
+3. M  ysql
+4. P  HP (mod_php4) (Even if you have installed PHP, you still need
+mod_php4 from RPMfind.net)
+
+(LAMP)
+
+5. Timesheet.php
+6. Webmin helped, but was not essential.
+
+*************************************************************************************************************************
+
+How you set it up:
+
+A. Install all 4 components of (LAMP) &lt;b&gt;Don't forget mod_php!&lt;/b&gt;
+
+
+B. Set the MySQL Password
+
+         When you set up timesheet.php later on, it will ask you for the
+administrator's name and password, so lets get it out of the way now,
+so there are no surprises.
+
+         The first obsticle is figuring out how to log into Mysql.
+
+         If you installed MySQL from an RPM and not source, it will
+install with a blank user name and password.
+         When I was first asked to provide the user name and password for
+MySQL, I knew I hadn't provided one, so as I do with Webmin and Swat,
+         I logged in as root and used my root password. That is secure,
+and it makes sense.
+
+         But for Mysql, bzzzzzzzzzzzzzzzzzzzzzzt!
+
+         Wrong answer.
+
+         Instead, just run this command at the prompt:
+
+         mysqladmin -u root password the_password_you_choose
+
+         Just, as an example:  lets say I decide I want to use "OPENup"
+as a password....I would then type the following at the shell:
+
+         mysqladmin -u root password OPENup
+
+         You are done with MySQL! :-)
+
+
+C. Edit /etc/httpd/conf/httpd.conf
+
+         You will need to have this line included in the httpd.conf <A HREF="file:">file:</A>
+
+         Addtype application/x-httpd-php .php
+         I simply placed it at the end. placed them at the end.
+
+         I will note that installing mod_php-4.0.6-3.2mdk.rpm added these
+lines to httpd.conf and also installed libphp4.so in the extramodules
+subdirectory:
+
+                 &lt;IfDefine HAVE_PHP4&gt;
+                 LoadModule php4_module    extramodules/libphp4.so
+                 &lt;/IfDefine&gt;
+         I saw in another thread, that it was a problem if those lines,
+or the file were missing.
+
+         I also had to comment out three lines from httpd.conf:
+
+         # &lt;IfDefine HAVE_PHP4&gt;
+         #AddModule mod_php4.c
+         #&lt;/IfDefine&gt;   (The .c raised an error)
+
+
+D. Set up timesheet.php
+
+     Download the program from:
+      <A HREF="http://www.stratlink.com.au/timesheet/timesheet_1.1.6.tar.gz">http://www.stratlink.com.au/timesheet/timesheet_1.1.6.tar.gz</A>
+      Put it in your home directory
+      type this:
+                         gzip -dc timesheet_1.1.6.tar.gz  | tar xvf -
+                         cd timesheet_1.1.6
+                          su (supply password)
+                           mkdir /srv/www/htdocs/timesheet (SuSE 8.1)
+                            mkdir /var/www/html/timesheet (Mandrake 9.0)
+                             sh install.sh
+
+                             When asked what the MySQL Administrator name
+is, use root, and OPENup, if you were silly enough to follow the example
+to the letter....
+                             When asked supply a password for the
+timesheet administrator
+                             When asked, just stick with his suggestion
+and use timesheet_
+                             When asked the full path is
+
+/var/www/html/timesheet (Mandrake 9.0)
+
+
+E. Use it:
+
+         Restart Apache and Mysql
+         Go to a web browser and point it to:
+
+           <A HREF="http://localhost/timesheet/">http://localhost/timesheet/</A>
+
+             You should be prompted for a log in at this point.
+
+
+Good luck and hope that this helps!
+
+James Leone
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

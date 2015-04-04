@@ -1,0 +1,137 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="W2K & Samba issues - cont'd" -->
+<!-- FromName="'Freeman, Peter (ERHS)'" -->
+<!-- FromEmail="Freeman.Peter@saugov.sa.gov.au" -->
+<!-- ToName="'LinuxSA (E-mail)'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 19 Jul 2001 15:30:58 +0930" -->
+<!-- Id="3390FF2B0DE0D21183B30008C70D751A08B99B83@sagemsg0003.sagemsmrd01.sa.gov.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: W2K & Samba issues - cont'd</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Freeman, Peter (ERHS) &lt;<I><A HREF="mailto:Freeman.Peter@saugov.sa.gov.au">Freeman.Peter@saugov.sa.gov.au</A></I>&gt;
+  To  : LinuxSA (E-mail) &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 19 Jul 2001 15:30:58 +0930
+</PRE>
+<H1>W2K & Samba issues - cont'd</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Have had some further developments in my little saga with storing
+W2K profiles on Samba.  I've been able to successfully create a 
+profile when logging in using the config below, however when I make
+a change (wallpaper etc) and log off, it refuses to save the profile
+back to the Samba share.  The contents of the log below show what
+has happened, but to me the file permissions should allow it, am I
+missing something here??
+
+(by successfully creating a profile I mean having a blank directory
+for the user in the Profiles share & letting W2K create it 
+automatically when logging in)
+
+note: all the test0[1,2,3] users are in group users
+
+------------------------------------------------------------
+share setup for profile storage - smb.conf
+------------------------------------------------------------
+
+[Profiles]
+	comment = Roaming Profile Storage
+	path = /storage/profiles
+	valid users = @users, @everyone
+	admin users = @itstaff
+	write list = @users, @itstaff, @everyone
+	force group = users
+	writeable = Yes
+	create mask = 0770
+	force create mode = 0770
+	directory mask = 0770
+	force directory mode = 0770
+	guest ok = No
+	browseable = No
+	strict locking = No
+
+------------------------------------------------------------
+File permissions on profiles share and its subdirectories
+------------------------------------------------------------
+
+drwxrws---    5 root     users         120 Jul 18 15:06 profiles
+
+
+drwxrws---    5 root     users         152 Jul 19 16:22 .
+drwxr-xr-x   11 root     root          328 Jul 19 16:22 ..
+drwxrws---   13 test01   users         456 Jul 19 16:09 test01
+drwxrws---    2 test02   users          48 Jul 19 16:02 test02
+drwxrws---    2 test03   users          48 Jul 19 16:02 test03
+
+
+------------------------------------------------------------
+This is from the log.&lt;machinename&gt;
+------------------------------------------------------------
+[2001/07/19 16:09:23, 2] smbd/process.c:switch_message(460)
+  switch_message: queueing message due to being in oplock break state.
+[2001/07/19 16:09:23, 3] smbd/oplock.c:initial_break_processing(702)
+  initial_break_processing: called for dev = 341, inode = 11304 tv_sec =
+3b56809b, tv_usec = 54cd7.
+  Current oplocks_open (exclusive = 1, levelII = 0)
+[2001/07/19 16:09:23, 3] smbd/process.c:process_smb(618)
+  Transaction 2190 of length 55
+[2001/07/19 16:09:23, 3] smbd/process.c:switch_message(448)
+  switch message SMBlockingX (pid 27464)
+[2001/07/19 16:09:23, 3] lib/doscalls.c:dos_ChDir(342)
+  dos_ChDir to /storage/profiles
+[2001/07/19 16:09:23, 3] smbd/oplock.c:initial_break_processing(702)
+  initial_break_processing: called for dev = 341, inode = 11304 tv_sec =
+3b56809b, tv_usec = 54cd7.
+  Current oplocks_open (exclusive = 0, levelII = 0)
+[2001/07/19 16:09:23, 3] smbd/oplock.c:initial_break_processing(739)
+  initial_break_processing: file test01/Recent/prfB.tmp (dev = 341, inode =
+11304) has no oplock.
+  Allowing break to succeed regardless.
+[2001/07/19 16:09:23, 3] smbd/oplock.c:oplock_break(1076)
+  oplock_break: returning success for dev = 341, inode = 11304
+  Current exclusive_oplocks_open = 0
+[2001/07/19 16:09:23, 2] smbd/open.c:check_share_mode(786)
+  Share violation on file (4,1,2,27464,test01/Recent/prfB.tmp,fcbopen = 0,
+flags = 0) = 0
+[2001/07/19 16:09:23, 3] smbd/error.c:error_packet(138)
+  error packet at line 878 cmd=162 (SMBntcreateX) eclass=1 ecode=32
+[2001/07/19 16:09:23, 3] smbd/error.c:error_packet(143)
+  error string = Permission denied
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

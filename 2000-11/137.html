@@ -1,0 +1,126 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Regexp (was Re: extract marked infix from filename with bash script?)" -->
+<!-- FromName="'Andrew Hill'" -->
+<!-- FromEmail="list@fornax.net" -->
+<!-- ToName="'David Lloyd'" -->
+<!-- ToEmail="lloy0076@rebel.net.au" -->
+<!-- Date="Mon, 06 Nov 2000 13:05:38 +1030" -->
+<!-- Id="3A0618FA.957E2DBC@fornax.net" -->
+<!-- Reference="3A04AC98.94DB397B@adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Regexp (was Re: extract marked infix from filename with bash script?)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Hill &lt;<I><A HREF="mailto:list@fornax.net">list@fornax.net</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  Date: Mon, 06 Nov 2000 13:05:38 +1030
+</PRE>
+<H1>Regexp (was Re: extract marked infix from filename with bash script?)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+David Lloyd wrote:
+&gt; Because I don't have an example of an actual file name (it would be
+&gt; useful), a perl regular expression such as:
+&gt; 
+&gt; s/.*\.D(d)+.*/$1/
+&gt; 
+&gt; ...reads "match any character, but when you see one single dot, followed
+&gt; by a non-digit, followed by one or more digits, save that for later and
+&gt; call it $1". I think you need something that will match the pattern and
+&gt; then allow you to extract just the digit parts.
+
+Hi All,
+
+Aren't regular expressions tricky? You need to be very careful about
+what you say. (And David, I'm not having a go here - I can't recall the
+number of times I've gotten a regexp wrong. I just want to help out
+anyone that may try to get the regexp you've written to work, and can't
+do so :-)
+
+Firstly, in the regexp above, "D" and "d" will match the letters "D" and
+"d", respectively. What you really want is "\D" and "\d" to match a non
+digit and a digit. Or, if you prefer, "\D" is the same as [^0-9] and
+"\d" is the same as [0-9].
+
+So, a regexp of:
+
+s/.*\.\D(\d)+.*/$1/
+
+is more what you are looking for.
+
+Now, the tricky part - what David has said about the way the regexp
+works is slightly misleading (though I am sure this wasn't the intent
+:-)
+
+In Perl, the way that this regexp will work is as follows: "Match zero
+or more characters that are valid for '.' (Often, this will mean match
+zero or more of anything until a new line, but you can put Perl into
+various modes, or use command modifiers to the regexp that will allow
+new lines to be matched by '.') Then, match a literal '.'. If you can't
+find a literal '.', then back off one character to the left, and try to
+match that literal '.' again. If you can't, back off again, and again,
+and so on."
+
+So what this means in that ".*\." will not match anything up to the
+first literal '.', and then the dot, but will match everything up to and
+including the last (rightmost) literal '.' in the string.
+
+The, it will continue, matching any non digit (or, if that fails, will
+then back off another character, try to match the '.', then the non
+digit, etc.), then match one or more digits, and then match zero or more
+of anything that '.' will match after that.
+
+So, in the assumed simple case that David was writing this regexp for,
+it probably would have worked as expected. But move it to the big wide
+world, and the explanation would have kept you wondering what was going
+on.
+
+
+Thought - I don't claim to be an absolute master of regexps, or a good
+public speaker, but would people be interested in a LinuxSA talk about
+regular expression and how they work (with most of the examples in Perl,
+seeing that's what I know?)
+
+Cheers,
+
+-- 
+Andrew Hill
+
+"Right now, I'd happily snort gunk from the sink if it would take
+my brain somewhere away from here...." - JB
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

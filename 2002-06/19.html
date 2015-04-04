@@ -1,0 +1,128 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Can't find localhost" -->
+<!-- FromName="'David Lloyd'" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="'Andrew'" -->
+<!-- ToEmail="bigwill@dodo.net.au" -->
+<!-- Date="Sun, 02 Jun 2002 11:52:06 +0930" -->
+<!-- Id="3CF9814E.538269D5@rebel.net.au" -->
+<!-- Reference="200206020135.g521ZgN22183@msv02-kent-syd.comindico.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Can't find localhost</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : Andrew &lt;<I><A HREF="mailto:bigwill@dodo.net.au">bigwill@dodo.net.au</A></I>&gt;
+  Date: Sun, 02 Jun 2002 11:52:06 +0930
+</PRE>
+<H1>Re: Can't find localhost</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Andrew
+
+&gt; "Could not connect to host"
+&gt; "localhost (port 901)"
+&gt; 
+&gt; This is when I've typed <A HREF="http://localhost:901/">http://localhost:901/</A> into the browser...
+&gt; 
+&gt; I have tried 127.0.0.1:901 - nogo
+&gt; I have tried 192.168.0.1:901 - still no go
+&gt; 
+&gt; I have searched for HOURS for a man page, help file or other clue but have
+&gt; drawn a complete blank
+
+* <A HREF="http://samba.mirror.aarnet.edu.au/samba/docs/man/swat.8.html">http://samba.mirror.aarnet.edu.au/samba/docs/man/swat.8.html</A>
+
+I suspect that SWAT is not configured to run via xinetd at all.
+
+A *total stab in the dark* configuration would be:
+
+[put a file containing the lines below in /etc/xinetd.d/swat]
+# SWAT
+#
+# Samba Configuration Service
+#
+#
+service swat
+{
+socket_type = stream;
+protocol = tcp;
+wait = no;
+user=root;
+group=root;
+server=/usr/bin/swat
+disable=no;
+}
+[END OF WHAT YOU SHOULD PUT IN -- DON'T PUT THIS LINE ITSELF IN]
+
+Now, the line "server=/usr/bin/swat" might be totally wrong. You need to
+find out where swat is actually installed. Try the following commands:
+
+locate swap | less
+cd /; find -name swat*
+
+The first command will be quicker. Look for one where somewhere in the
+path is a "bin", eg:
+
+/usr/bin/swat
+/usr/local/sbin/swat
+
+...but not /usr/share/man/swat
+
+You will need to restart xinetd by doing:
+
+[root]# service xinetd restart
+
+Then try to connect again.
+
+Please look at:
+
+man xinetd
+man smb
+man swat
+
+...but if your man pages for samba are missing they are on the samba
+web-site.
+DSL
+
+-- 
+And Ptah begat the thought and the word
+ And by these thoughts and words
+ Atum, mighty God, created the world from the void!
+ [An interpretation of the Memphite Creation myphs]
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

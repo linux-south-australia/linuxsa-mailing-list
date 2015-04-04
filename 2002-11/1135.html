@@ -1,0 +1,243 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Spamassassin Not Working * SOLVED * Upgrade to SuSE Linux 8.1" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="linuxcpa@netscape.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 26 Nov 2002 15:46:17 -0800" -->
+<!-- Id="3DE407C9.8090406@netscape.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Spamassassin Not Working * SOLVED * Upgrade to SuSE Linux 8.1</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:linuxcpa@netscape.net">linuxcpa@netscape.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 26 Nov 2002 15:46:17 -0800
+</PRE>
+<H1>Spamassassin Not Working * SOLVED * Upgrade to SuSE Linux 8.1</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+A few weeks ago I wrote that my SpamAssassin wasn't working on my local 
+machine any more.
+
+Well, I finally solved the problem today, and am ready to upgrade our 
+small staff to SuSE Linux 8.1
+
+I set SpamAssassin up exactly the way I had for the past two upgrades.
+
+SuSE Linux 8.1 shows these packages installed:
+
+1. perl-spamassassin 2.31
+2. spamassassin 2.31
+3. Perl 5.80
+4. amavis-sendmail 0.3.12pre8-80 (Note default uses postfix, this might 
+work, but I haven't used it)
+5. fetchmail 5.9.13-47
+6. fetchmailconf 5.9.13-47
+7. procmail 3.15.1-307
+8. sendmail 8.12.6-13
+
+
+The setup I would use, and the ****changes to it***** are as follows:
+
+&gt;  
+&gt;
+&gt; $HOME/.fetchmailrc :
+&gt;
+&gt; poll pop3.mymailserver.com with proto POP3
+&gt; user '<A HREF="mailto:james@mymailserver.com">james@mymailserver.com</A>' there with password 'XXXXX' is james here
+
+
+&gt;
+&gt;
+&gt; Here's my $HOME/.procmailrc:
+&gt;
+&gt; Path=$HOME/bin:/bin:/usr/bin:/usr/local/bin
+&gt; LOGFILE=$HOME/procmail.log
+&gt; VERBOSE=OFF
+&gt;
+&gt; #spamassassin
+&gt; :0fw
+&gt; |spamassassin -P  -c /usr/share/spamassassin                       
+&gt; ****CHANGED. THIS IS NO LONGER USED  ------&gt; -c 
+&gt; /usr/share/spamassassin****
+&gt;
+&gt; :0:
+&gt; *^X-spam-Status:Yes
+&gt; $HOME/spam/Inbox
+&gt;
+&gt; {
+&gt; EXITCODE=$?
+&gt; }
+
+
+##################For GUI People:###########################3
+
+fetchmail.sh
+
+&gt;
+&gt; Here is $HOME/fetchmail.sh, a shell script that starts fetchmail at 
+&gt; login inside KDE.
+&gt;
+&gt; #!/bin/bash
+&gt; fetchmail
+
+Autostart:
+
+&gt;
+&gt; A link to application, localed in $HOME/.kde/Autostart is set to run 
+&gt; in the terminal. It reads this in the execute box.
+&gt;
+&gt; sh $HOME/fetchmail.sh
+
+
+Nutscrape:
+
+&gt;
+&gt; IMPORTANT - $HOME/.mozilla/prefs.js must be edited so that the 
+&gt; incoming mail server type is changed from POP3 to movemail. Movemail 
+&gt; moves mail from the /var/spool/mail/james file to Netscape's local 
+&gt; user inbox.
+
+
+
+&gt;
+&gt;
+&gt; HOW IT WORKS:
+&gt;
+&gt; 1. Fetchmail retrieves mail from ISP
+&gt; 2. Fetchmail gives mail to sendmail
+&gt; 3. Sendmail calls up spamassassin
+&gt; 4. Sendmail gives the mail to procmail
+&gt; 5. Procmail sorts the mail and sends the spam to $HOME/spam
+&gt; (A dummy account must be set up in netscape, to read spam, but the 
+&gt; spam file must be deleted outside of Netscape 6.
+&gt;
+&gt; 6.The non spam mail is placed in /var/spool/mail with the local user's 
+&gt; name by procmail.
+&gt;
+&gt; 7. When the user logs into kde, the cycle starts. By the time the user 
+&gt; gets into Netscape 6, and clicks on get mail, his mail has started to 
+&gt; accumulate in /var/spool/mail and will be moved with Netscape's 
+&gt; Movemail to the local user inbox in Netscape.
+
+
+*****NEW FEATURE*****    In SuSE 8.1 there is a new feature to 
+spamassassin called spamd. I turned this on as a service from SuSE 
+Control Center, system, run level editor, run level properties. I show 
+this as running.
+
+   
+
+ :-(       :-(       :-(     PITFALLS:     :-(     :-(     :-(
+
+Stuff that wasted my time:
+
+
+1. You can't merely copy your old .procmailrc file into your home 
+directory, it produce an error called "Suspicious .procmailrc file 
+detected."
+
+Its a bit annoying for someone else to be playing system administrator 
+on my machine through programming.  They ought to simply offer to change 
+bits to their proper configuration or not do anything at all. The 
+warning is very unclear, but it is mostly related to other users having 
+permissions on your .procmailrc file.
+
+Solution:
+
+To create the file, I used this command:
+
+pico -w .procmailrc.
+
+and used pico.
+
+
+*****MARKING MESSAGES*****
+
+
+2.  They decided that you have to turn on the "****SPAM****" markings 
+for messages.  If I didn't know about looking at the message souce 
+(view/message source) in Netscape, I wouldn't have a clue that 
+spamassassin had determined that the message was spam.  I think that the 
+reverse should be true, as it was before, so newbies that are looking 
+for signs that the program works will get some indication that it does.
+
+To change this, simply edit the configuration <A HREF="file:">file:</A>
+ /etc/mail/spamassassin/local.cf
+
+Change the line that reads:
+
+rewrite_subject from 0 to 1
+
+
+*****PROCMAIL CONFIGURATION SETTINGS CHANGE*****
+
+I am refering to the removal of
+
+"-c /usr/bin/spamassassin"
+
+Once that was gone, the messages started getting marked as spam, and put 
+in their proper place.
+
+
+######  Troubleshooting symptoms  ######
+
+1. When viewing the message source, Spamassassin is shown as having 
+checked the mail, but there were no hits.
+
+    Soltion, loose this: "-c /usr/bin/spamassassin"
+
+2. Procmail doesn't start
+
+    Solution, do this: pico -w .procmailrc.
+
+3.  When I look at the message source it says that spamassassin gave the 
+message 17 points, and only 5 were required.  Ho w come this mail isn't 
+marked as spam, and it wasn't sent to $home/spam/Inbox (or /dev/null)?
+
+    Solution:  You are missing the "-P" from the "|spamassassin -P" line 
+in .procmailrc.  Further, if you want to mark your messages, you have to 
+edit /etc/mail/spamassassin/local.cf to read rewrite_subject 1.
+
+
+James Leone
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

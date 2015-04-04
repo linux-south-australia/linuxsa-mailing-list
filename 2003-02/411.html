@@ -1,0 +1,142 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: re hacked" -->
+<!-- FromName="'David Lloyd'" -->
+<!-- FromEmail="lloy0076@adam.com.au" -->
+<!-- ToName="'Danny Moss'" -->
+<!-- ToEmail="djmhbtgw@southcom.com.au" -->
+<!-- Date="Sat, 8 Feb 2003 10:48:49 +1030" -->
+<!-- Id="20030208104849.2a0623e1.lloy0076@adam.com.au" -->
+<!-- Reference="3E4444CA.4090104@southcom.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: re hacked</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@adam.com.au">lloy0076@adam.com.au</A></I>&gt;
+  To  : Danny Moss &lt;<I><A HREF="mailto:djmhbtgw@southcom.com.au">djmhbtgw@southcom.com.au</A></I>&gt;
+  Date: Sat, 8 Feb 2003 10:48:49 +1030
+</PRE>
+<H1>Re: re hacked</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Danny,
+
+
+Welcome back!
+
+RedHat 8.0 comes with a new kernel and a new set of firewall rules. It
+no longer uses the tool called "ipfwadm" but with enough fiddling it is
+backward compatible (1). The new tool it uses is called "iptables".
+
+A basic command to use is this:
+
+iptables -A POSTROUTING -t nat -o eth0 --source 10.0.10.0/24 -j
+MASQUERADE
+
+ - substitute "eth0" for the name of the outgoing ppp connection
+   o possible ppp0
+
+ - substitute 10.0.10.0/24 for the IP address range of your internal
+   machines
+   o you don't NEED this particular rule but it does sort of help to
+     make things more secure
+
+NOTE: This does NOT provide you with any particular security. Caveat
+emptor!
+
+If you add:
+
+iptables -A INPUT -i eth0 -p tcp --source any/0 --syn -j REJECT
+
+...again with the proper substitutions for (eth0) that will prevent any
+incoming TCP connections from the (eth0) interface (2).
+
+NOTE: This still does NOT provide you with a LOT of security but it's
+better than nothing.
+
+To learn more about iptables, I suggest the following resources:
+
+* <A HREF="http://freshmeat.net/projects/iptables-tutorial/">http://freshmeat.net/projects/iptables-tutorial/</A>
+* man iptables
+
+Here is a script that is suitable for a RedHat system for what you want
+to do. Save it in /etc/init.d as /etc/init.d/smoothwall [or whatever you
+want to call it]
+
+&lt;START&gt;
+#!/bin/bash
+#
+# chkconfig: 35 5 95
+# description: This implements a basic firewall
+
+case "$1" in
+
+start)
+    iptables -F INPUT
+    iptables -F OUTPUT
+    iptables -F FORWARD
+    iptables -A POSTROUTING -t nat -o eth0 --source 10.0.10.0/24 -j
+MASQUERADE    
+    iptables -A INPUT -i eth0 -p tcp --source \
+    10.0.0.99 --syn -j REJECT
+&lt;/START&gt;
+
+The "START" tags aren't included of course. Don't forget to
+substitute (eth0) and the (10.0....). You'll have to make sure the
+script is executable:
+
+# chmod 755 /etc/init.d/smoothwall
+
+...and then add it using chkconfig or ntsysv to your startup:
+
+chkconfig --level 35 smoothwall on
+ [the format for this command changed in RedHat 8.0; you may need to man
+  chkconfig or chkconfig --help]
+
+NOTE: this isn't the "approved" Redhat way of doing firewalls but I
+don't LIKE the approved way because it loses your comments if you have
+one.
+
+
+DSL
+
+(1) Don't bother about that - too difficult at the moment
+
+(2) The "SYNchronise" flag on a TCP connection is the indication a
+client wants to start a new TCP connection; if you don't want clients to
+start new TCP connections you just deny or reject them.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

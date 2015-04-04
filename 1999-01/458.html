@@ -1,0 +1,172 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="another attack!" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 29 Jan 1999 10:58:34 +1030" -->
+<!-- Id="199901290028.KAA27886@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: another attack!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 29 Jan 1999 10:58:34 +1030
+</PRE>
+<H1>another attack!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Dear experts on linux security,
+
+Following on what I was saying about attacks on my machines
+the other day, there was another attack last night.
+
+Some questions:
+
+1.	Is there some known NFS vulnerability that the
+	attacker is trying to exploit?
+	The attack is essentially identical to the attack about
+	4-6 weeks ago, except that this time they were'nt just
+	going through the set of all IP addresses in the world.
+	This time they went straight for the single machine that
+	did not have restricted domains for NFS mounting last time.
+	This seems to indicate that the recent attacker got this
+	info from the first attacker!
+	In the meantime, I've restricted the mount domain.
+
+2.	Do you think that the following lines in an ipfwadm script
+	should keep out future attacks?
+
+# Forbid NFS access from outside topology.org.
+ipfwadm -I -a accept -P udp -S 203.38.148.48/28 -D 0.0.0.0/0 2049 -v
+ipfwadm -I -a deny   -P udp                     -D 0.0.0.0/0 2049 -v -o
+
+	I have little idea of how to design a really good
+	set of ipfwadm commands.
+
+3.	Is there some place where people exchange info about 
+	how to protect against attacks? Like is there some coffee
+	lounge where people exchange tips on how to protect
+	oneself?
+
+I'll append the message I just sent to the sysadmin about the
+matter.
+
+Cheers,
+Alan Kennington.
+
+====================================================================
+From <A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>  Fri Jan 29 10:46:45 1999
+Date: Fri, 29 Jan 1999 10:46:43 +1030
+From: Alan Kennington &lt;<A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>&gt;
+To: <A HREF="mailto:sysadmin@cal.sfl.net">sysadmin@cal.sfl.net</A>
+Subject: NFS attack by  204.209.211.39 at 13:47 January 28.
+Cc: Alan Kennington &lt;<A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>&gt;
+
+Dear sysadmin,
+
+Last night I experienced an attack on one of my computers.
+Someone on the IP address 204.209.211.39 tried to mount one of
+my NFS exports, with a strange parameter which indicated
+that they were searching for some sort of NFS implementation bug.
+
+Luckily, the attack was not successful.
+But I thought you'd like to know about this attack.
+
+A check of the host address 204.209.211.1 shows that it is administered
+via:
+
+204.209.211.1 
+Server:  dog.topology.org
+Address:  203.38.148.51
+
+1.211.209.204.in-addr.arpa      name = frsanta01-e0.cal.sfl.net
+211.209.204.in-addr.arpa        nameserver = ns.cg.sfl.net
+211.209.204.in-addr.arpa        nameserver = ns.mt.sfl.net
+ns.cg.sfl.net   internet address = 139.142.2.2
+ns.mt.sfl.net   internet address = 209.135.99.2
+
+And a check in "whois" at internic says that you are
+the system administrator for this domain: sfl.net.
+
+The attack was at 5:17 south australian time (daylight saving), which is
+UTC 18:47, or US EST 13:47 on January 28.
+
+For the sake of the people who _do_ have a vulnerable NFS system,
+could you please determine the culprit and have a word with them?
+
+Cheers,
+Alan Kennington.
+
+PS. Here is a brief log of the attack:
+
+05:15:40.570000 204.209.211.39 &gt; rat.topology.org: icmp: echo request
+05:15:40.570000 rat.topology.org &gt; 204.209.211.39: icmp: echo reply
+05:15:41.040000 204.209.211.39.675 &gt; rat.topology.org.sunrpc: udp 56
+05:15:41.420000 rat.topology.org.sunrpc &gt; 204.209.211.39.675: udp 28
+05:15:42.100000 204.209.211.39.676 &gt; rat.topology.org.mount: udp 1068
+05:15:42.670000 alanke.lnk.telstra.net.1028 &gt; f.root-servers.net.domain: 36456 (45)
+05:15:43.330000 f.root-servers.net.domain &gt; alanke.lnk.telstra.net.1028: 36456- 0/2/1 (133)
+05:15:43.330000 alanke.lnk.telstra.net.1028 &gt; ns.fiberlink.net.domain: 36457 A? NS.TOR.SFL.NET. (32)
+05:15:43.340000 alanke.lnk.telstra.net.1028 &gt; ns.cg.sfl.net.domain: 36458+ (45)
+05:15:43.850000 ns.fiberlink.net.domain &gt; alanke.lnk.telstra.net.1028: 36457* 1/2/2 (131) (DF)
+05:15:43.870000 ns.cg.sfl.net.domain &gt; alanke.lnk.telstra.net.1028: 36458 NXDomain* 0/1/0 (133) (DF)
+05:15:43.970000 rat.topology.org.mount &gt; 204.209.211.39.676: udp 28
+05:15:49.420000 204.209.211.39.2295 &gt; rat.topology.org.10752: S 219483252:219483252(0) win 512 &lt;mss 1460&gt;
+05:15:49.420000 rat.topology.org.10752 &gt; 204.209.211.39.2295: R 0:0(0) ack 219483253 win 0
+
+[This log is on the firewall machine. The attack was on a different machine
+(rat) with a slightly different clock. All times are in UTC + 1030.]
+
+Here is the /var/lob/messages message on "rat":
+
+[There's some non-ascii here!]
+
+Jan 29 05:17:38 rat 
+Jan 29 05:17:38 rat syslogd: Cannot glue message parts together
+Jan 29 05:17:38 rat 29&gt;Jan 29 05:17:38 mountd[330]: NFS mount of ^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P!
+!
+^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P
+Jan 29 05:17:38 rat -^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E attempted from 204.209.211.39 
+Jan 29 05:17:39 rat mountd[330]: Unauthorized access by NFS client 204.209.211.39. 
+Jan 29 05:17:40 rat syslogd: Cannot glue message parts together
+Jan 29 05:17:39 rat mountd[330]: Blocked attempt of 204.209.211.39 to mount ^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^!
+!
+P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P^P
+Jan 29 05:17:40 rat ^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E^H(-^E
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

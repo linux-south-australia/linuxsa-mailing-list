@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: ipfwadm commands for FTP data connections" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Mon, 11 Sep 2000 14:27:09 +0930" -->
+<!-- Id="20000911142709.B38609@atdot.dotat.org" -->
+<!-- Reference="20000911134642.A29471@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: ipfwadm commands for FTP data connections</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Mon, 11 Sep 2000 14:27:09 +0930
+</PRE>
+<H1>Re: ipfwadm commands for FTP data connections</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Sep 11, 2000 at 01:46:42PM +0930, Alan Kennington wrote:
+
+ &gt; I want to be able to fetch files over FTP from the Internet
+ &gt; from all hosts 0,1,2,3, and I want some trusted users
+ &gt; to be able upload web server files to host 0 for publication.
+ &gt; I can see one solution - just deny myself the use of FTP,
+ &gt; and force the trusted users to get "ssh" on their
+ &gt; vanilla windXY boxes.
+ 
+The problem isn't as difficult as you make it out to be.  This solution
+is a tad extreme.
+
+ &gt; The FTP protocol really is not suited to an internet
+ &gt; dominated by juvenile delinquents.
+
+&lt;shrug&gt;  It seems to be doing ok so far.
+
+ &gt; To transfer a file, I've noticed in my logs that
+ &gt; the fetcher opens a connection on an unprivileged port
+ &gt; to the server.
+
+That's not true.  If you examine the logs more carefully you'll usually find
+that the server opens the connection back to the client.  The exception is
+when the client has requested passive mode, in which case it really does make
+a connection out.
+
+When you're not running in passive mode, an FTP "get" transfer goes like
+this:
+
+   - The clinet has an ftp control connection open on port 21.
+
+   - Client creates a local socket and bind()'s it.  It then uses
+     getsockaddr() to find out the port number which has been created
+     for it.
+
+   - Client sends "PORT w,x,y,z,a,b" to the server, where w,x,y,z are
+     the client's IP address octets and a,b are the octets of the port
+     number determined above, in network byte order.
+
+   - Client sends "RETR /some/file/name"
+
+   - Server creates a new socket and bind()s it to its own IP address on
+     port 20 (ftp-data).
+
+   - Server connects that socket to w.x.y.z on port [a,b] (where [a,b] is 
+     just my made up notation for "ntohs((a &lt;&lt; 8) | b)"
+
+   - Server transmits the contents of /some/file/name over that new connection.
+
+   - Connection complete;  new connection is shut down, which signals the
+     completion of the transfer to the client.
+
+It's the second connection, on unpredictable port numbers, which is the 
+problem for firewalls.
+
+There are a number of ways out of it.    Firstly, the client can select
+"passive" mode if the server supports it.  In passive mode, the client
+makes the connection out to the server, not the other way around (which is
+much easier to filter with a firewall:  You're probably already allowing 
+outbound connections on any port if you're halfway competent with IP
+filtering rules).
+
+Secondly, you can run your ftp's through a HTTP proxy -- If you do that, 
+the whole transfer happens over one connection, the one which is linking
+you to the proxy. 
+
+Thirdly, you can permit connections FROM any IP address on port 20 TO any
+of your IP addresses on any port number greater than 1024.  This isn't a 
+brilliant solution, but generally speaking you aren't running any "real"
+services on port numbers higher than 1024 anyway, so the security downside
+isn't necessarily as bad as it sounds.
+
+Fourthly, you can use a state-monitoring firewall.  You can't afford this :-)
+
+Fifthly, you can use NAT -- Ports which an ftp client aren't listening to
+won't work at all;  think of this as a poor-man's state-monitoring
+firewall.
+
+That should give you something to chew on, anyway.
+
+ &gt; To permit this, it seems like I have to permit all
+ &gt; TCP connections between ports 1024 and over.
+
+Not true.
+
+ &gt; PS.  I spent 6 hours last night converting
+ &gt; my libertine default-accept ipfwadm script
+ &gt; to the conservative default-deny script.
+
+It's probably quicker and easier to not convert them line-by-line, but
+instead to develop a security policy along the lines of, "I need to run
+an SMTP server, so TCP port 25 should be permitted to 192.168.2.6," and
+so on, then "compiling" that policy into access lists afterwards.  There
+are many good reasons for doing it that way.
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

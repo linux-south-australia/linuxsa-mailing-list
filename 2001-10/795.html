@@ -1,0 +1,128 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IPAC reset" -->
+<!-- FromName="'Justin Hawkins'" -->
+<!-- FromEmail="justin@internode.com.au" -->
+<!-- ToName="'Adam Dixon'" -->
+<!-- ToEmail="adix@adam.com.au" -->
+<!-- Date="Wed, 24 Oct 2001 16:59:22 +0930 (CST)" -->
+<!-- Id="20011024165741.N19956-100000@weasel.internode.com.au" -->
+<!-- Reference="DMEMKNICHPNCBOJMGLFDOEECCBAA.adix@adam.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IPAC reset</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Justin Hawkins &lt;<I><A HREF="mailto:justin@internode.com.au">justin@internode.com.au</A></I>&gt;
+  To  : Adam Dixon &lt;<I><A HREF="mailto:adix@adam.com.au">adix@adam.com.au</A></I>&gt;
+  Date: Wed, 24 Oct 2001 16:59:22 +0930 (CST)
+</PRE>
+<H1>Re: IPAC reset</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 24 Oct 2001, Adam Dixon wrote:
+
+&gt; I was wondering if anyone knows how to completely reset ipac data, since its
+&gt; all in the db, only daily information is important. I couldnt find any
+&gt; information on this in the docs or on the site.
+
+It very much is in the docs and on the site. From
+<A HREF="http://www.comlink.apc.org/~moritz/ipac.html">http://www.comlink.apc.org/~moritz/ipac.html</A> :
+
+---------------------------------------------------------------------------
+
+CLEANING UP
+
+fetchipac generates a single file every time it runs. The more often
+fetchipac runs, the more files you get and the more exact will be
+your accounting info. For example, if you run fetchipac every five
+minutes, ipacsum will be able to display accurate data for every
+five minute period.
+
+Every time ipacsum runs, you can let it make a summary file for
+all the files read to replace them. This will decrease the needed
+disk space and the time ipacsum needs to calculate sums for this
+period. You lose accuracy, though, since all data files are
+summarized into one, meaning there will be no more information
+when exactly the traffic occurred, but only the sum for the whole
+period.
+
+In general, it makes sense to periodically summarize the info
+for a past period. For example, you could run these cron jobs
+cleanups:
+
+ - run fetchipac every 15 minutes
+ - every hour, summarize the files of the hour 48 hours ago
+ - every day, summarize the files of the day 7 days ago
+ - every week, summarize the files of the week 11 weeks ago
+ - every year, summarize the files of the year 2 years ago
+
+With this scheme, you can have the data of the ip traffic with
+15-minute-accuracy for the past two days. For the last week, you
+still can tell at which day the traffic passed your machine. Keeping
+the daily files for 14 weeks, you have a daily overview of the last
+three months. After that, you keep weekly files only. After two years,
+you sum up the data of the year into one file.
+
+The daily cron jobs could look like this:
+
+# Summarize ip accounting info:
+# every day, sum up the data of 7 days ago into one file.
+1 0 * * * root /usr/local/bin/ipacsum -r -t "the day 7 days ago"
+&gt;/dev/null
+# every hour, sum up the data of 48 hours ago into one file
+2 * * * * root /usr/local/bin/ipacsum -r -t "the hour 48 hours ago"
+&gt;/dev/null
+# every week, sum up the data of the week 11 weeks ago into one file
+3 0 * * 0 root /usr/local/bin/ipacsum -r -t "the week 11 weeks ago"
+&gt;/dev/null
+# every year, sum up the data of the year 2 years ago into one file
+4 0 1 2 * root /usr/local/bin/ipacsum -r -t "the year 2 years ago"
+&gt;/dev/null
+
+---------------------------------------------------------------------------
+
+	- Justin
+
+-- 
+Justin Hawkins
+Internode Professional Access
+
+When a fellow says, "It ain't the money but the principle of the
+thing," it's the money.
+		-- Kim Hubbard
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,190 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Newbie Problem" -->
+<!-- FromName="'Christian Herring'" -->
+<!-- FromEmail="goldfishes@bigpond.com" -->
+<!-- ToName="'David Lloyd'" -->
+<!-- ToEmail="lloy0076@rebel.net.au" -->
+<!-- Date="Thu, 18 Jul 2002 13:08:02 +0930" -->
+<!-- Id="005401c22e0c$86221120$cc8cfea9@workstation" -->
+<!-- Reference="001301c22d93$c38faa50$0301a8c0@workstation" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Newbie Problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Christian Herring &lt;<I><A HREF="mailto:goldfishes@bigpond.com">goldfishes@bigpond.com</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  Date: Thu, 18 Jul 2002 13:08:02 +0930
+</PRE>
+<H1>Re: Newbie Problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+David,
+I have already inserted in /etc/modules.conf
+
+# alias eth1 100d1483 [which is the inserted module]
+
+but still get an unknown device error.  As you suggested I checked the
+/etc/sysconfig/network-script/ifcfg-eth*
+
+there is a eth0 there which is my 10/100 nic, but there is no eth1 which is
+supposed to be my adsl card.
+
+If I do an lsmod I can see the module there but it says that it is used by
+nothing.
+
+If i do a ifconfig eth1 it comes up but the first line says
+
+eth1      Linkencap UNSPEC         HWaddr     00-00-00-00-00-00-00 (lots of
+oo's)
+
+I dont have the source file for the driver
+
+The driver that I have came with an executable called 100dconfig which
+allows such commands as
+./100dconfig version
+which brings the the same result as the ifconfig eth1 but with another error
+
+ITEX_GET_CONFIG_1483: Operation not supported
+
+In /var/log messages there is a few lines indication that the module has
+been inserted properly however the last 2 say
+kernel # 100d_close  vc is NULL!
+kernel # modprobe cannot locate module connect
+
+By the way I am using Internode Professional with a static IP address. I am
+not sure if a setserial command would help the card be recognised
+
+Cheers and thanks for all of your help
+
+Christian Herring
+<A HREF="mailto:goldfishes@bigpond.com">goldfishes@bigpond.com</A>
+
+
+
+----- Original Message -----
+From: "David Lloyd" &lt;<A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A>&gt;
+To: "Christian Herring" &lt;<A HREF="mailto:goldfishes@bigpond.com">goldfishes@bigpond.com</A>&gt;
+Cc: &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Sent: Thursday, July 18, 2002 9:46 AM
+Subject: Re: Newbie Problem
+
+
+&gt;
+&gt; Christian
+&gt;
+&gt; &gt; I am trying to set up my Linux box  (Red Hat 7.3) as an adsl router with
+a
+&gt; &gt; D-Link dsl-100d pci card.
+&gt;
+&gt; :-)
+&gt;
+&gt; &gt; I have downloaded the drivers from the d-link site but when I insert the
+&gt; &gt; module into the kernal and then enter
+&gt; &gt; # ifconfig eth1 up
+&gt;
+&gt; Check what is in:
+&gt;
+&gt; /etc/sysconfig/network-scripts/ifcfg-eth*
+&gt;
+&gt; ...[ where * is some number ]. These are the configuration scripts for
+&gt; ethernet devices under RedHat 7.3.
+&gt;
+&gt; &gt; i get a unknown device error even after checking that the the driver has
+&gt; &gt; been inserted properly
+&gt;
+&gt; If it's loaded as a module, you'll need something in /etc/modules.conf.
+&gt; Here is a sample entry for my own NIC:
+&gt;
+&gt; [root]# cat modules.conf
+&gt; ...
+&gt; alias eth0 ne2k-pci
+&gt; ...
+&gt;
+&gt; You probably already know the name of the module that you're using, but
+&gt; if you don't they normally reside in:
+&gt;
+&gt; /lib/modules/2.4.[lots of numbers]/kernel/drivers/net
+&gt;
+&gt; ...look for one that has a similar name to the card. Mind you, it's
+&gt; probably easier to read the README which will just tell you what the
+&gt; name of the driver is.
+&gt;
+&gt; &gt; The driver was written for kernel 2.4.8-16 and I am running 2.4.18-3  it
+was
+&gt; &gt; the only one that I could find. I imagine that this does matter, but I
+dont know to what
+&gt; &gt; extent?
+&gt;
+&gt; These two kernels shouldn't have changed so much they'd upset the
+&gt; driver.
+&gt;
+&gt; &gt; Does anyone have a more up to date driver for this modem or any other
+&gt; &gt; suggestions?
+&gt;
+&gt; If you have the source to the driver, you could try rebuilding it on
+&gt; your current system; if you don't know how then if you do an "ls" in the
+&gt; source directory (it will probably have a Makefile in it or a file call
+&gt; configure) and send me the results of that "ls".
+&gt;
+&gt; [
+&gt;
+&gt; My hunch would be:
+&gt;
+&gt;
+&gt; ./configure
+&gt; make
+&gt; make install
+&gt;
+&gt; OR
+&gt;
+&gt; make
+&gt; make install
+&gt;
+&gt; OR
+&gt;
+&gt; make linux
+&gt; make install
+&gt;
+&gt; ]
+&gt;
+&gt; DSL
+&gt; --
+&gt; Do you have leprosy?
+&gt;  Consult Leviticus 13
+&gt;  See your priest!
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,122 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Setting up Linux PC as dumb Xterm" -->
+<!-- FromName="Geoffrey D. Bennett" -->
+<!-- FromEmail="g@netcraft.com.au" -->
+<!-- ToName="White Ben" -->
+<!-- ToEmail="ben.white@dsto.defence.gov.au" -->
+<!-- Date="Mon, 20 Apr 1998 21:37:12 +0930 (CST)" -->
+<!-- Id="199804201207.VAA11195@Mich.netcraft.com.au" -->
+<!-- Reference="66E50F76976FD111B3470000F81EA1CD4B6A5B@exchsa3.dsto.defence.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Setting up Linux PC as dumb Xterm</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Geoffrey D. Bennett &lt;<I><A HREF="mailto:g@netcraft.com.au">g@netcraft.com.au</A></I>&gt;
+  To  : White Ben &lt;<I><A HREF="mailto:ben.white@dsto.defence.gov.au">ben.white@dsto.defence.gov.au</A></I>&gt;
+  Date: Mon, 20 Apr 1998 21:37:12 +0930 (CST)
+</PRE>
+<H1>Re: Setting up Linux PC as dumb Xterm</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Hi all,
+&gt; I'm trying to set up xdm to act as a dumb linux terminal.
+&gt; I've set the only entry in the /etc/X11/xdm/Xaccess to
+&gt; be * CHOOSER BROADCAST.  I thought (after reading
+&gt; the man pages) that this should start up X and provide
+&gt; a list of all the hosts around which are "willing to manage".
+&gt; However, what actually happens, is the normal xlogin
+&gt; screen pops up....
+&gt; Has anyone had any experience with this?
+
+Hi Ben,
+
+When you start xdm, it will do two things:
+
+- listen for requests from remote displays
+- start up local X servers as dictated to by the Xservers file and
+  do the xlogin thing
+
+You are seeing what happens when xdm starts up a local X server.  Go
+to /etc/X11/xdm (or /usr/X11R6/lib/X11/xdm) and comment out this line
+from the Xservers <A HREF="file:">file:</A>
+:0 local /usr/X11R6/bin/X
+
+That will prevent xdm from starting the X server itself (you don't
+want it to because it will then put the xlogin thing on there).
+
+Taking advantage of the other thing that xdm does (that is, listening
+for requests from remote displays), you can then run commands like
+this (from anywhere, including your console):
+
+X -query yourhost
+- contact yourhost and get it to display its xlogin thing on your
+display
+
+X -broadcast
+- broadcast on the network for anyone wanting to display their xlogin
+thing on your display (the first one to respond gets picked)
+
+X -indirect yourhost
+- contact yourhost and get it to broadcast for hosts wanting to
+display their xlogin thing on your display, then give you a menu and
+let you pick which one you want
+
+The last one seems to be what you're asking for.
+
+I can't see a way to get xdm to start an X server for you and to not
+put its xlogin thing there (if you try ":0 local /usr/X11R6/bin/X
+-indirect yourhost" then you'll end up with both the xlogin screen and
+the host selection menu; not good!), but you can do something like
+this in your /etc/inittab:
+
+x:5:respawn:/usr/bin/X11/xdm -nodaemon
+x1:5:respawn:/usr/X11R6/bin/X -indirect yourhost
+
+This gets init to keep the X server alive and use yourhost for its
+chooser.
+
+I hope this helps explain things a bit?  If understand your question
+right, you don't actually need to run xdm (just do X -indirect
+someotherhostonyournetwork or even give X -indirect 255.255.255.255 a
+go).
+
+Regards,
+-- 
+Geoffrey D. Bennett (<A HREF="mailto:geoffrey@netcraft.com.au">geoffrey@netcraft.com.au</A>)
+Computer Systems Manager, NetCraft Australia
+<A HREF="http://www.netcraft.com.au/geoffrey/">http://www.netcraft.com.au/geoffrey/</A>
+Red Hat Linux Resellers: <A HREF="http://www.netcraft.com.au/redhat/">http://www.netcraft.com.au/redhat/</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

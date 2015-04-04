@@ -1,0 +1,94 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PostgreSQL and perl" -->
+<!-- FromName="Andrew Hill" -->
+<!-- FromEmail="list@fornax.net" -->
+<!-- ToName="Mark Newton" -->
+<!-- ToEmail="newton@atdot.dotat.org" -->
+<!-- Date="Thu, 20 Jul 2000 13:36:46 +0930" -->
+<!-- Id="39767AD6.4A4D9F2A@fornax.net" -->
+<!-- Reference="3975519D.D19CE64E@xavier.sa.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PostgreSQL and perl</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Hill &lt;<I><A HREF="mailto:list@fornax.net">list@fornax.net</A></I>&gt;
+  To  : Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  Date: Thu, 20 Jul 2000 13:36:46 +0930
+</PRE>
+<H1>Re: PostgreSQL and perl</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Mark Newton wrote:
+&gt; Use the "serial" attribute when you create the table:
+&gt; 
+&gt;    create table foo (
+&gt;       id serial,
+&gt;       some_random_value varchar(16)
+&gt;    );
+&gt; 
+&gt; The "id" field will autoincrement when you insert rows.
+&gt; 
+&gt; A warning, though:  If you use pg_dump to dump the table, then restore
+&gt; it back, the state of the serial number is not maintained:  After
+&gt; the restore creates the table, the serial number will be initialized
+&gt; to 0, which means your inserts will fail because they attempt to create
+&gt; duplicate keys.  This "feature" sucks so badly that words fail me.
+
+Another way to do this that I sent to Matthew off list is:
+
+  CREATE SEQUENCE "autoSeq";
+  CREATE TABLE "someTable" (
+        "autoNumber"    int4    PRIMARY KEY
+                                DEFAULT nextval('autoSeq'),
+        "moreFields"    text
+  );
+
+The advantage of doing it this way is that if you use "pgdump -D" to
+dump the table, it will dump the sequence definition out something like
+this:
+
+  CREATE SEQUENCE "autoSeq" start 8815 increment 1 maxvalue 2147483647
+minvalue 1 cache 1;
+
+As you can see, it gives you a "start" value for the sequence, so you
+can carry on where you left off :-)
+
+Cheers,
+
+-- 
+
+Andrew Hill
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

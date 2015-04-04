@@ -1,0 +1,113 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: comp sci question: fast status mask handling" -->
+<!-- FromName="Stephen Gun" -->
+<!-- FromEmail="guns@banksa.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="akenning@dog.topology.org, sharpe@ns.aus.com, tommyd@senet.com.au" -->
+<!-- Date="Mon, 07 Aug 2000 17:20:53 +0930" -->
+<!-- Id="s98eeff7.027@banksa.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: comp sci question: fast status mask handling</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Stephen Gun &lt;<I><A HREF="mailto:guns@banksa.com.au">guns@banksa.com.au</A></I>&gt;
+  To  : <A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>, <A HREF="mailto:tommyd@senet.com.au">tommyd@senet.com.au</A>
+  Date: Mon, 07 Aug 2000 17:20:53 +0930
+</PRE>
+<H1>Re: comp sci question: fast status mask handling</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt;&gt;&gt; Richard Sharpe wrote:
+
+&gt;You have a 32-bit field, and you know that only one bit is set in that
+&gt;32-bit field, and you want to quickly find it?
+
+On Intel Pentium Pro, Pentium II or Pentium III, the most efficient way to do this is use the BSF instruction. This will give you the offset from bit 0 of the lowest set bit. You can then use the result in a computed goto (jump table).
+
+e.g., assuming mask is in EAX:
+
+        TEST EAX,EAX
+        JZ   MaskEmpty
+        BSF  ECX,EAX
+        LEA  EBX,[jumptable+EAX*4]
+        JMP  EBX
+
+On a Pentium or Pentium MMX, you are better off converting the word to floating point, and calculating the jump offset from the exponent. This is kind of like getting the log in base 2:
+
+        TEST    EAX,EAX
+        JZ      MaskEmpty
+        XOR     ECX,ECX
+        MOV     DWORD PTR [TEMP+4],ECX
+        SUB     ECX,EAX
+        AND     EAX,ECX
+        MOV     DWORD PTR [TEMP],EAX
+        FILD    QWORD PTR [TEMP]
+        FSTP    QWORD PTR [TEMP]
+        MOV     ECX, DWORD PTR [TEMP+4]
+        SHR     ECX,20
+        SUB     ECX,3FFH
+        LEA  EBX,[jumptable+EAX*4]
+        JMP  EBX
+
+
+
+
+Regards,
+
+Stephen
+
+
+
+
+
+
+
+
+
+**********************************************************************
+   *****   IMPORTANT INFORMATION    *****
+This document should be read only by those persons to whom
+it is addressed and its content is not intended for use by
+any other persons. If you have received this message in
+error, please notify us immediately. Please also destroy and
+delete the message from your computer. Any unauthorised form
+of reproduction of this message is strictly prohibited.
+Bank SA is not liable for the proper and complete transmission
+of the information contained in this communication, nor for any
+delay in its receipt.
+**********************************************************************
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

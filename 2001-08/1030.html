@@ -1,0 +1,574 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="packet capture/modification/reinjection" -->
+<!-- FromName="'Adriel Kind'" -->
+<!-- FromEmail="akind@SPRI.Levels.UniSA.Edu.Au" -->
+<!-- ToName="'Linux SA Group'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 29 Aug 2001 16:49:33 +0930" -->
+<!-- Id="3B8C9785.533C7FCD@spri.levels.unisa.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: packet capture/modification/reinjection</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adriel Kind &lt;<I><A HREF="mailto:akind@SPRI.Levels.UniSA.Edu.Au">akind@SPRI.Levels.UniSA.Edu.Au</A></I>&gt;
+  To  : Linux SA Group &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 29 Aug 2001 16:49:33 +0930
+</PRE>
+<H1>packet capture/modification/reinjection</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi, 
+does anyone have any experience with capturing an IP packet, altering
+it, and then reinjecting it back into the network using raw sockets. 
+I've got standard TCP client/server processes running on two machines,
+but when i intercept the client's packets with pipe.c on another machine
+and forward them to the server, the server ignores them, even though
+they've been received.
+
+I can't work out whether it's a bug or whether the kernel TCP code
+somehow knows that the IP packet has been modified and rejects it. I'd
+imagine that if the latter case is true someone would have experienced
+similar problems before.
+
+Any help would be greatly appreciated...
+thanks,
+Adriel
+
+
+
+
+
+
+
+___________________________________________________________________________________
+Hi Adrian,
+
+I'm having a lot of trouble trying to get the packet intercept code
+working. I have a TCP link between 2 machines (say machines A & B),
+which works fine by itself, but when I try to intercept the IP packets
+with a raw socket on machine C, the link breaks down.
+
+It will help to draw this something like
+
+        A  &lt;--ip--&gt;  C  &lt;--ip--&gt;  B
+           &lt;--------tcp--------&gt;
+
+The TCP server process on machine B is set up normally, but the client
+process on machine A attempts to connect to machine C. Machine C takes
+the IP packet, replaces the destination address with B and the source
+address with C, recalculates the checksum etc., and then sends the
+packet off again. When C receives a packet from B, it does the reverse
+so that both machines think they're talking to C.
+
+Machine C seems to function correctly, but when B receives the
+connection request it doesn't accept it and sends nothing back. It seems
+to be some sort of problem with TCP rather than IP, but i can't work out
+why because the TCP header doesn't depend on the IP header and is
+received unmodified.
+
+Do you know anyone who's had any experience with this type of code, eg.
+raw sockets or packet sockets. There's lots of stuff on the web about
+packet capture, but i've found nothing about modifying and reinjecting
+the packets.
+
+Any help or references would be great. Cheers,
+Adriel
+
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ment;%%%%%%%%%%%%%%%%%%%%%%%%%%
+     Provide a transparent ment;IP link between processes on other machines.
+     
+   ment;  The TCP client attempts connection to this machine, ment;but the packet
+     is forwarded to the TCP server witment;h the IP addresses altered to make it
+     look like tment;he packet came from this machine. Packets coming from ment;the 
+     server are given the reverse modifications sment;o both the TCP client and 
+     server think they're tment;alking to this machine.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ment;%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+
+#iment;nclude &lt;linux/if_packet.h&gt;
+#include &lt;linux/if_ether.h&gt;ment;
+#include "netfun.h"
+
+
+
+int main( void)
+{
+
+     ip_pacment;ket pack; 
+     struct sockaddr_in sa;
+     int i=1, nment;, ip_sock, sa_sz = sizeof(sa), 
+     tot_from_jup = 0,ment; tot_from_voy = 0;
+     unsigned char *cp;
+           ment;          
+
+     memset( (char*)&pack, 0, IP_BUF_SIZE)ment;;
+
+ 
+     /* create IP socket */
+     ip_sock = nf_socment;ket( SOCK_RAW, IPPROTO_TCP);
+
+     /* set IP socket opment;tions to allow user-generated header */
+     nf_setsocment;kopt( ip_sock, 0, IP_HDRINCL, 1, "IP_HDRINCL");
+
+
+    ment; for(;;){
+   
+          /* receive incoming packet */
+ment;          n = nf_receive_ip( ip_sock, (char*)&pack, &sment;a, sa_sz, IP_BUF_SIZE);
+
+
+#ifdef NF_VERBOSE
+          ment;/* print out packet header, TCP port, etc. */ 
+	  prinment;tf("in: ");
+	  for( cp=(unsigned char*)&pack;
+	       ment;cp&lt;(unsigned char*)&pack+sizeof(ip_pack_hdr); cp++)
+	 ment; printf("%d ", *cp);
+	  printf("\nfrom port: %x\n", sament;.sin_port);
+#endif
+
+
+          /* Change the header adment;dresses to fool the TCP nodes */
+          /* This proment;cess runs on the SAT_ADDR machine         */
+         ment; 
+          if( pack.ip_hdr.ph_src_addr == htonl(inet_ment;network(JUP_ADDR))
+	      && htons( pack.tcp_hdr.th_dsment;t_port) &gt; 1024 ) {
+               inet_aton( VOY_ADDR,ment; &pack.ip_hdr.ph_dst_addr);
+               inet_aton( ment;SAT_ADDR, &pack.ip_hdr.ph_src_addr);
+	       nf_initsament;( ip_sock, &sa, VOY_ADDR, sa.sin_port);
+              ment; totfromjup++;
+          }else if( pack.ip_hdr.ph_src_ment;addr == htonl(inet_network(VOY_ADDR))
+		    && htons( ment;pack.tcp_hdr.th_dst_port) == SERV_PORT) {
+            ment;         inet_aton( JUP_ADDR, &pack.ip_hdr.ph_dst_addrment;);
+		     inet_aton( SAT_ADDR, &pack.ip_hdr.ph_src_addment;r);
+		     nf_initsa( ip_sock, &sa, JUP_ADDR, htons(SEment;RV_PORT));
+		     totfromvoy++;
+          }else {
+    ment;           printf("\ndodgy packet\n");
+          }
+   ment;       
+
+#ifdef NF_VERBOSE
+          printf( " total pment;ackets from voyager: %d, total from jupiter: %d\n",
+	 ment;           totfromvoy, totfromjup);
+
+	  printf("out: "ment;);
+	  for( cp=(unsigned char*)&pack;
+	       cp&lt;(unsigment;ned char*)&pack+sizeof(ip_pack_hdr); cp++)
+	    printfment;("%d ", *cp);
+	  printf("\n"); 
+#endif
+
+          /* sment;end the packet to the new address, hopefully the TCP kment;ernel code 
+           * at the other end will believement; it's for real. The kernel writes in
+           * the ment;new checksum                                          ment;     */ 
+          n = nf_send_ip( ip_sock, (char*)&pament;ck, &sa, sa_sz, n);
+
+          }
+
+     //nf_close( ip_ment;sock);
+
+     return 0;
+}
+  
+
+  }
+
+  ‰
+/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ment;\\\\\\\\\\\\\\\\\\\\\\\\\\
+	Functions for TCP/IP commument;nication using Berkeley sockets	      
+	Adriel August ment;2001						      
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ment;\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
+
+#include &lt;ment;stdio.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;sys/types.hment;&gt;
+#include &lt;features.h&gt;
+#include &lt;netinet/in.h&gt;
+#inclument;de &lt;errno.h&gt;
+                              
+#define   ment;SERV_PORT    0x8888         /* arbitrary port assignmement;nt  */
+#define   SAT_ADDR     "192.168.0.4"  /* local ment;addresses */
+#define   JUP_ADDR     "192.168.0.3"
+#defment;ine   VOY_ADDR     "192.168.0.2"
+ 
+#define   NF_VERBOSment;E                   /* print out relevant info if defiment;ned */
+
+
+extern    int  errno;
+
+/*%%%%%%%%%%%%%%%%%%%%ment;%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ment;%%%
+	General support and debug functions	      
+%%%%%%ment;%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ment;%%%%%%%%%%%%%%%%%*/
+
+
+/*******************************ment;***********************************************
+* NF_Pment;RINTADDR: Display info in sockaddr_in structure
+******ment;******************************************************ment;******************/
+void nf_printaddr( struct sockaddrment;_in *sa)
+{
+     unsigned char* cp;
+     int* i;
+     
+ment;     printf( "\nsin_family: %d\nsin_port: %d\nsin_addrment;: ", 
+               &sa-&gt;sin_family, ntohs(sa-&gt;sin_poment;rt));    
+     for( cp=(unsigned char*)&sa-&gt;sin_addr; ment;
+          cp&lt;(unsigned char*)&sa-&gt;sin_addr+sizeof(sa-ment;&gt;sin_addr); cp++)
+          printf( "%d.", *cp);
+     ment;printf("\n\n");
+}
+   
+
+
+/*****************************ment;*************************************************
+* erment;ror_exit: print out error condition, close socket, andment; exit
+************************************************ment;******************************/
+void error_exit( char*ment; err_msg, int error_no, int tcp_sock)
+{
+     perror(erment;r_msg);
+     errno = 0; strcpy( err_msg, "close()");
+ ment;    close( tcp_sock);
+#ifdef NF_VERBOSE
+     printf("ement;xiting...\n");
+     perror(err_msg);
+#endif     
+     ment;exit(-1);
+}
+
+
+/***************************************ment;***************************************
+* NF_INIT_SA: ment;initialise sockaddr_in structure
+*********************ment;******************************************************ment;***/
+void nf_initsa(int tcp_sock, struct sockaddr_in *ment;sa, char* addr, int port)
+{
+     char err_msg[0x80];
+ ment;
+     sa-&gt;sin_family = AF_INET;
+     sa-&gt;sin_port   = ment;htons(port);
+     errno = 0; strcpy( err_msg, "inet_atment;on()");
+     if( !inet_aton( addr, &sa-&gt;sin_addr))
+   ment;       error_exit( err_msg, errno, tcp_sock);
+}
+
+
+/***ment;******************************************************ment;*********************
+* NF_SOCKET: Create a new BSD soment;cket for internet protocols (TCP/IP)
+*****************ment;******************************************************ment;*******/
+int nf_socket( int type, int prcl)
+{
+     chament;r err_msg[0x80];
+     int sock;
+     
+     errno = 0; ment;strcpy( err_msg, "socket()");
+     if(( sock = socket(ment; PF_INET, type, prcl)) == -1 )
+          error_exit( ement;rr_msg, errno, sock);
+
+#ifdef NF_VERBOSE
+     perror(ement;rr_msg);
+#endif     
+     return sock;
+}
+
+/***********ment;******************************************************ment;*************
+* NF_SETSOCKOPT: Alter TCP/IP socket optment;ions
+*************************************************ment;*****************************/
+void nf_setsockopt( intment; sock, int level, int opt, int optval, char* optname )ment;
+{
+     int val = optval;
+     char err_msg[0x80];
+
+  ment;   errno = 0; 
+     strcpy( err_msg, "setsockopt() - "ment;); strcat( err_msg, optname); 
+     if( setsockopt( soment;ck, level, opt, (const void*)&val, sizeof(val)) 
+     ment;                == -1 )
+          error_exit( err_msg,ment; errno, sock);
+
+#ifdef NF_VERBOSE
+     perror(err_msg)ment;;
+#endif     
+}
+
+
+/***********************************ment;*******************************************
+* NF_CLOSEment;: Release connection and shut down socket
+************ment;******************************************************ment;************/
+void nf_close( int tcp_sock)
+{
+     charment; err_msg[0x80];
+
+     errno = 0; strcpy( err_msg, "cloment;se()");
+     if( close( tcp_sock))
+          error_eximent;t( err_msg, errno, tcp_sock);
+
+#ifdef NF_VERBOSE
+     ment;perror(err_msg);
+#endif
+}
+
+
+/*%%%%%%%%%%%%%%%%%%%%%%%%ment;%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ment;	Specific TCP stuff	      
+%%%%%%%%%%%%%%%%%%%%%%%%%%%ment;%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+ment;
+#define   N_CLIENTS      10        /* maximum number ment;of clients to accept */
+#define   TCP_BUF_SIZE   0xf00ment;0	   /* max # of bytes that can be sent in one 
+				  ment;    TCP data unit */
+
+
+/* TCP header  - assumes no optment;ions */
+typedef   struct
+{
+     u_int16_t  th_src_portment;;  /* source port            	*/
+     u_int16_t  th_dsment;t_port;  /* destination port 		*/
+     u_int32_t  th_sment;eq_n;     /* sequence number		*/
+     u_int32_t  th_acment;k_n;     /* acknowledgment number	        */
+     u_inment;t16_t  th_hl_flags;  /* TCP header length and flags	*/ment;
+     u_int16_t  th_win_sz;    /* window size			*/
+   ment;  u_int16_t  th_chksm;     /* checksum               	ment;*/	
+     u_int16_t  th_urg_p;     /* urgent pointer 		ment;*/
+}
+tcp_pack_hdr;
+
+
+/********************************ment;**********************************************
+* NF_BIment;ND: Bind socket to host address
+**********************ment;******************************************************ment;**/
+void nf_bind( int tcp_sock, struct sockaddr_in *sament;, int sa_sz)
+{
+     char err_msg[0x80];
+
+     errno = ment;0; strcpy( err_msg, "bind()");
+     if( bind( tcp_sockment;, (struct sockaddr* )sa, (socklen_t)sa_sz)) 
+         ment; error_exit( err_msg, errno, tcp_sock);
+
+#ifdef NF_VERment;BOSE
+     perror(err_msg);
+#endif     
+}
+
+
+/**********ment;******************************************************ment;**************
+* NF_LISTEN: Put socket into listen modment;e
+****************************************************ment;**************************/
+void nf_listen( int tcp_soment;ck)
+{
+     char err_msg[0x80];
+
+     errno = 0; strcpyment;( err_msg, "listen()");
+     if( listen( tcp_sock, N_Cment;LIENTS))
+          error_exit( err_msg, errno, tcp_socment;k);
+
+#ifdef NF_VERBOSE
+     perror(err_msg);
+#endif   ment;  
+}
+
+
+/**********************************************ment;********************************
+* NF_CONNECT: Attemptment; connection to host
+**********************************ment;********************************************/
+void nf_ment;connect( int tcp_sock, struct sockaddr_in *sa, int sa_ment;sz)
+{
+     char err_msg[0x80];
+     int new_sock;
+
+   ment;  errno = 0; strcpy( err_msg, "connect()");
+     if( cment;onnect( tcp_sock, (struct sockaddr*)sa, sa_sz))
+      ment;    error_exit( err_msg, errno, tcp_sock);
+
+#ifdef NF_ment;VERBOSE
+     perror(err_msg);
+#endif    
+
+}
+
+
+/*******ment;******************************************************ment;*****************
+* NF_ACCEPT: Accept incoming connectment;ion request and return file descriptor
+	     for new cment;onnection.
+*******************************************ment;***********************************/
+int nf_accept( inment;t tcp_sock, struct sockaddr_in *sa, int sa_sz)
+{
+     ment;char err_msg[0x80];
+     int new_sock;
+     
+     errnment;o = 0; strcpy( err_msg, "accept()");
+     if( ( new_soment;ck = accept( tcp_sock, (struct sockaddr*)sa, &sa_sz)) ment;== -1)
+          error_exit( err_msg, errno, tcp_sock)ment;;    
+
+#ifdef NF_VERBOSE
+     perror(err_msg);
+#endif ment;    
+
+     return new_sock;
+
+}
+
+
+/********************ment;******************************************************ment;****
+* NF_RECEIVE: Receive data from connection
+******ment;******************************************************ment;******************/
+int nf_receive( int tcp_sock, charment;* buf)
+{
+     char err_msg[0x80];
+     int n;
+     
+  ment;   errno = 0; strcpy( err_msg, "receive()");
+     if((ment; n = recv( tcp_sock, (void*)buf, TCP_BUF_SIZE, 0)) == ment;-1)
+          error_exit( err_msg, errno, tcp_sock);
+
+ment;#ifdef NF_VERBOSE
+     if(n){
+          perror(err_msgment;);
+          printf( "   - received %d bytes\n", n);
+ ment;    }
+#endif     
+    
+     return n;
+}       
+
+/*****ment;******************************************************ment;*******************
+* NF_SEND: Send data across connecment;tion
+*************************************************ment;*****************************/
+int nf_send(  int tcp_sment;ock, char* buf, int nbytes)
+{
+     char err_msg[0x80];ment;
+     int n;
+
+     errno = 0; strcpy( err_msg, "send()ment;");
+     if(( n = send( tcp_sock, buf, nbytes, 0)) == ment;-1) 
+          error_exit( err_msg, errno, tcp_sock);
+ment;
+#ifdef NF_VERBOSE
+     perror(err_msg);
+     printf( ment;"   - sent %d bytes\n", n);
+#endif
+
+     return n;
+}
+
+ment;
+
+
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ment;%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	Specific IP stuff	      ment;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ment;%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+#define IP_BUF_SIZE   0xffment;ff      /* max # of bytes that can be sent in one 
+			ment;	      IP packet */
+
+
+
+/* IPv4 packet header  - assumement;s no options */
+typedef   struct
+{
+     u_int8_t  ph_vment;_ihl;      /* version and header length 	*/
+     u_intment;8_t  ph_tos;	      /* type of service 		*/
+     u_int1ment;6_t ph_len;	      /* total packet length		*/
+     u_inment;t16_t ph_id;	      /* packet identification	        */ment;
+     u_int16_t ph_f_off;      /* fragment offset		*/
+ment;     u_int8_t  ph_ttl;	      /* time to live			*/
+    ment; u_int8_t  ph_prcl;	      /* protocol (as per RFC1700)ment;	*/	
+     u_int16_t ph_chksm;      /* header checksum	ment;	*/
+     u_int32_t ph_src_addr;   /* IP source addressment;		*/
+     u_int32_t ph_dst_addr;   /* IP destination ament;ddress	        */
+}
+ip_pack_hdr;
+
+
+
+/* IPv4 packet bufment;fer */
+typedef   struct
+{
+     ip_pack_hdr    ip_hdr;
+ment;     tcp_pack_hdr   tcp_hdr;
+     u_int8_t       data ment;[ IP_BUF_SIZE - sizeof( ip_pack_hdr) - 
+			   sizeof( ment;tcp_pack_hdr)];
+}
+ip_packet;
+
+
+
+
+/********************ment;******************************************************ment;****
+* NF_RECEIVE_IP: receive IP datagrams
+***********ment;******************************************************ment;*************/
+int nf_receive_ip( int ip_sock, unsignement;d char* buf, struct sockaddr_in* sa, 
+                ment;   int sa_sz, int n_bytes)
+{
+     char err_msg[0x80];
+ment;     int n;
+
+     errno = 0; strcpy( err_msg, "receivement;_ip()");
+     if(( n = recvfrom( ip_sock, buf, IP_BUF_ment;SIZE, 0, (struct sockaddr*)sa, 
+     		        (socklement;n_t*)&sa_sz))  ==   -1 )
+          error_exit( err_msgment;, errno, ip_sock);
+
+#ifdef NF_VERBOSE
+     perror(err_ment;msg);
+     printf( "   - received %d bytes\n", n);
+#enment;dif
+
+     return n;
+}
+
+
+/*****************************ment;*************************************************
+* NFment;_SEND_IP: send IP datagrams - assumes IP_HDRINCL optioment;n is enabled on the
+              socket
+*************ment;******************************************************ment;***********/
+int nf_send_ip( int ip_sock, unsigned chament;r* buf, struct sockaddr_in* sa, 
+                int sment;a_sz, int n_bytes)
+{
+     char err_msg[0x80];
+     intment; n;
+
+     errno = 0; strcpy( err_msg, "send_ip()");
+  ment;   if(( n = sendto( ip_sock, buf, n_bytes, 0, (struct ment;sockaddr*)sa, 
+     		      (socklen_t)sa_sz))  ==   -ment;1 )
+          error_exit( err_msg, errno, ip_sock);
+
+#ment;ifdef NF_VERBOSE
+     perror(err_msg);
+     printf( " ment;  - sent %d bytes\n", n);
+#endif
+
+     return n;
+
+}
+" ment;-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,608 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Samba 2.2.2 released (fwd)" -->
+<!-- FromName="'Matthew Geddes'" -->
+<!-- FromEmail="mgeddes@tellurian.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 16 Oct 2001 09:15:38 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0110160915080.364-100000@huachuca.tellurian.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Samba 2.2.2 released (fwd)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 16 Oct 2001 09:15:38 +0930 (CST)
+</PRE>
+<H1>Samba 2.2.2 released (fwd)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+This will probably be of interest to some of you out there...
+
+thx,
+Matt
+
+---------- Forwarded message ----------
+Date: Sat, 13 Oct 2001 16:22:20 -0700
+From: Jeremy Allison &lt;<A HREF="mailto:jra@samba.org">jra@samba.org</A>&gt;
+To: <A HREF="mailto:samba@samba.org">samba@samba.org</A>
+Cc: <A HREF="mailto:samba-technical@samba.org">samba-technical@samba.org</A>, <A HREF="mailto:samba-ntdom@samba.org">samba-ntdom@samba.org</A>, <A HREF="mailto:samba-announce@samba.org">samba-announce@samba.org</A>
+Subject: Samba 2.2.2 released
+
+The Samba Team is proud to announce the release of Samba 2.2.2.
+
+This is the latest stable release of Samba. This is the version that all
+production Samba servers should be running for all current bug-fixes.
+
+There are several important oplock logic bugs that have been fixed in
+this release, so an upgrade is recommended.
+
+Binary packages will be released shortly for major platforms. The source
+code can be downloaded from :
+
+<A HREF="ftp://ftp.samba.org/pub/samba/">ftp://ftp.samba.org/pub/samba/</A>
+
+in the file samba-2.2.2.tar.gz.
+
+The release notes follow.
+
+As always, all bugs are our responsibility.
+
+Regards,
+
+        The Samba Team.
+
+----------------------------------------------------------------------------
+              WHATS NEW IN Samba 2.2.2: 13th October 2001
+              ===========================================
+
+This is the latest stable release of Samba. This is the version that all
+production Samba servers should be running for all current bug-fixes.
+
+There are several important oplock logic bugs that have been fixed in
+this release, so an upgrade is recommended.
+
+New daemon included - winbindd
+------------------------------
+
+Samba 2.2.2 is the first release to include the winbind daemon.
+This code allows UNIX systems that implement the name service
+switch (nss) to be entered into a Windows NT/2000 domain and
+use the Domain controller for all user and group enumeration.
+
+This allows a Samba server added to a Windows domain to serve
+file and print services with *NO* local users needed in /etc/passwd
+and /etc/group - all users and groups are read directly from the
+Windows domain controller. In addition with pam_winbind which allows
+a PAM enabled UNIX system to use a Windows domain for authentication
+service this allows single sign on and account control across
+UNIX and Windows systems.
+
+The current version of winbindd shipped in 2.2.2 does have some
+memory leaks, which will be addressed for the next Samba release,
+so it is advisable to monitor the winbind process. This code is
+being used in production by several vendors, so the leaks are
+managable. In addition, this version of winbind does not work
+correctly against a Samba PDC, due to some missing calls on the
+PDC side. These problems are being addressed for the next Samba
+release, but it was thought better to release the code now rather
+than delay the main Samba code to match the winbind release schedule.
+
+For more information on using winbind, see the man pages for 
+winbindd and wbinfo.
+
+Note that winbindd is not installed by default.
+
+New/Changed parameters in 2.2.2
+-------------------------------
+
+For more information on these parameters, see the man pages for
+smb.conf.
+
+Added/changed parameters.
+-------------------------
+
+strict allocate
+
+Causes Samba not to create UNIX 'sparse' files, but to follow the
+Windows behaviour of always allocating on-disk space.
+
+use mmap
+
+Set to 'on' by default, only set to 'off' on HPUX 11.x or below or other
+UNIX systems that don't have coherent mmap/read-write internal caches.
+You should not need to set this parameter.
+
+nt acl support
+
+This parameter has been changed to a per-share option, and is very
+useful in enabling Windows 2000 SP2 to load/save profiles from a 
+Samba share.
+
+New printing parameters.
+------------------------
+
+disable spoolss
+
+Setting this parameter causes Samba to go back to the old 2.0.x
+LANMAN printing behaviour, for people who wish to disable the
+new SPOOLSS pipe.
+
+use client driver
+
+Causes Windows NT/2000 clients to need have a local printer driver
+installed and to treat the printer as local.
+
+New LDAP parameters.
+--------------------
+
+Samba 2.2.2 contains new code to maintain a Samba SAM database
+on a remote LDAP server. These parameters have been added as
+part of this code. These parameters are only available when Samba
+has been compiled with the --with-ldapsam option.
+
+ldap admin dn
+ldap ssl
+
+New SSL parameters.
+-------------------
+
+The SSL support in Samba has been fixed. These new parameters
+are part of the changes added. These parameters are only available
+when Samba has been compiled with the --with-ssl option. 
+Please see the smb.conf man page for details.
+
+ssl egd socket
+ssl entropy file
+ssl entropy bytes
+
+New winbindd parameters.
+------------------------
+
+These parameters are used by winbindd. See the man page for
+winbindd for details.
+
+winbind separator
+winbind uid
+winbind gid
+winbind cache time
+winbind enum users
+winbind enum groups
+template homedir
+template shell
+
+Removed parameters.
+-------------------
+
+share modes
+ldap root
+ldap root passwd
+
+New Documentation.
+------------------
+
+Some new README's have been added in the docs/ directory. These cover
+using roving profiles with Windows 2000 SP2 (docs/README.Win2kSP2),
+and how to use Samba to help prevent Windows virus spread
+(docs/README.Win32-Viruses).
+
+Quota problems on a Linux 2.4 kernel.
+-------------------------------------
+
+Currently the quota interfaces have diverged between the Linus
+2.4.x kernels and the Alan Cox 2.4.x kernels (the Alan Cox varients
+are shipped with RedHat). Running quota-enabled Samba compiled on
+an Alan Cox kernel works correctly on an Alan Cox kernel (the one
+shipped by default with RedHat 7.x) but fails on a Linus kernel.
+
+This is a mess, and hopefully Alan and Linus will sort it out soon.
+In the meantime we need to ship.....
+
+Changes in 2.2.2
+-----------------
+
+1). mmap tdb code disabled on HPUX. This should prevent the reports of
+tdb corruption on HUPX.
+2). Large file support set to off in Solaris 5.5 and below.
+3). Better CUPS detection.
+4). New SAM (password database) backends - smbpasswd (traditional),
+LDAP, NIS+ and Samba TDB.
+5). Quota fixups on Linux.
+6). libsmbclient stand-alone code added. Can be built as a shared library
+under Linux.
+7). Tru64 ACL suppport added.
+8). winbindd option added.
+9). Realloc fail tidyup fixes all over the code.
+10). Large improvement in hash table code efficiency - would be found with
+large stat caches.
+11). Error code consistency improved (still needs more work).
+12). Profile shared memory support added to nmbd.
+13). New Windows 2000/NT passthrough info levels added.
+14). readraw/writeraw code rewritten - many bugs fixed.
+15). UNIX password sync (non pam) code fixed, use correct wildcard matcher.
+16). Reverse DNS lookup avoided on socket open.
+17). Bug preventing nmbd re-registering names on WINS server timeout fixed.
+18). Zero length byte range lock code added. Much closer to Windows semantics.
+19). Alignment fault fixes for Linux/Alpha.
+20). Error checking on tdb returns vastly improved.
+21). Handling of delete on close fixed. No longer possible to leave 'dead'
+file entries.
+22). Handling of oplock break failure cleanups improved. Should not be
+able to leave 'dead' entries.
+23). Fix handling of errors trying to set 64 bit locks on 32 bit NFS mounts.
+24). Misc. MS-DFS code fixes.
+25). Ignore logon packets if not a PDC (needed for PDC/BDC failover).
+26). winbind pam module added.
+27). Order N^^2 enumeration of printers problem fixed.
+28). Password backend database code re-ordered to allow different password
+backends (at compile time currently).
+29). Improved print driver version detection for Windows 2000.
+30). Driver DEVMODE initialization fixes.
+31). Improved SYSV print parse code.
+32). Fixed enumeration of large numbers of users/groups from Windows clients.
+Code still too slow.
+33). Fix for buggy NetApp RPC pipe clients.
+34). Fix for NT sending multiple SetPrinterDataEx calls.
+35). Fix for logic bug where smbd could delay oplock break request messages
+from other smbd daemons whilst client kept us busy.
+36). Fix deadlock problem with connections tdb on enumeration.
+37). Fixes for setting/getting NT ACLs - improved POSIX mapping both ways.
+38). Removed unused readbmpx/writebmpx code.
+39). Attempt to fix Linux 2.4.x quota mess.
+40). Improved ctemp code for Windows 2000 compatibilty.
+41). Finally understood difference between set EOF and set allocation requests.
+Added strict allocate parameter to help.
+42). Correctly return name types on name to SID lookups.
+43). tdb spinlock code update.
+44). Use pread/pwrite on systems that have it to fix race condition in tdb code.
+
+Older release notes for Samba 2.2.x follow.
+
+-----------------------------------------------------------------------------
+The release notes for 2.2.1a follow :
+
+This is a minor bugfix release for 2.2.1, *NOT* security related.
+
+1). 2.2.1 had a bug where using smbpasswd -m to add a Windows NT or
+Windows2000 machine into a Samba hosted PDC would fail due to our
+stricter user name checking. We were disallowing user names
+containing '$', which is needed when using smbpasswd to add a
+machine into a domain. Automatically adding machines (using the
+native Windows tools) into a Samba domain worked correctly.
+
+2.2.1a fixes this single problem.
+
+-----------------------------------------------------------------------------
+The release notes for 2.2.1 follow :
+
+New/Changed parameters in 2.2.1
+-------------------------------
+
+Added parameters.
+-----------------
+
+obey pam restrictions
+
+When Samba is configured to use PAM, turns on or off Samba checking
+the PAM account restrictions. Defaults to off.
+
+pam password change
+
+When Samba is configured to use PAM, turns on or off Samba passing
+the password changes to PAM. Defaults to off.
+
+large readwrite
+
+New option to allow new Windows 2000 large file (64k) streaming
+read/write options. Needs a 64 bit underlying operating system
+(for Linux use kernel 2.4 with glibc 2.2 or above). Can improve performance
+by 10% with Windows 2000 clients. Defaults to off. Not as tested
+as some other Samba code paths.
+
+hide unreadable
+
+Prevents clients from seeing the existance of files that cannot
+be read. Off by default.
+
+enhanced browsing
+
+Turn on/off the enhanced Samba browing functionality (*1B names).
+Default is "on". Can prevent eternal machines in workgroups when
+WINS servers are not synchronised.
+
+Removed parameters.
+-------------------
+
+domain groups
+domain admin users
+domain guest users
+
+Changes in 2.2.1
+-----------------
+
+1). "find" command removed for smbclient. Internal code now used.
+2). smbspool updates to retry connections from Michael Sweet.
+3). Fix for mapping 8859-15 characters to UNICODE.
+4). Changed "security=server" to try with invalid username to prevent
+    account lockouts.
+5). Fixes to allow Windows 2000 SP2 clients to join a Samba PDC.
+6). Support for Windows 9x Nexus tools to allow security changes from Win9x.
+7). Two locking fixes added. Samba 2.2.1 now passes the Clarion network
+    lock tester tool for distributed databases.
+8). Preliminary support added for Windows 2000 large file read/write SMBs.
+9). Changed random number generator in Samba to prevent guess attacks.
+10). Fixes for tdb corruption in connections.tdb and file locking brlock.tdb.
+     smbd's clean the tdb files on startup and shutdown.
+11). Fixes for default ACLs on Solaris.
+12). Tidyup of password entry caching code.
+13). Correct shutdowns added for send fails. Helps tdb cleanup code.
+14). Prevent invalid '/' characters in workgroup names.
+15). Removed more static arrays in SAMR code.
+16). Client code is now UNICODE on the wire.
+17). Fix 2 second timstamp resolution everywhere if dos timestamp set to yes.
+18). All tdb opens now going through logging function.
+19). Add pam password changing and pam restrictions code.
+20). Printer driver management improvements (delete driver).
+21). Fix difference between NULL security descriptors and empty
+     security descriptors.
+22). Fix SID returns for server roles.
+23). Allow Windows 2000 mmc to view and set Samba share security descriptors.
+24). Allow smbcontrol to forcibly disconnect a share.
+25). tdb fixes for HPUX, OpenBSD and other OS's that don't have a coherent
+     mmap/file read/write cache.
+26). Fix race condition in returning create disposition for file create/open.
+27). Fix NT rewriting of security descriptors to their canonical form for
+     ACLs.
+28). Fix for Samba running on top of Linux VFAT ftruncate bug.
+29). Swat fixes for being run with xinetd that doesn't set the umask.
+30). Fix for slow writes with Win9x Explorer clients. Emulates Microsoft
+     TCP stack early ack specification error.
+31). Changed lock & persistant tdb directory to /var/cache/samba by default on
+     RedHat and Mandrake as they clear the /var/lock/samba directory on reboot.
+
+-----------------------------------------------------------------------------
+The release notes for 2.2.0a follow :
+
+SECURITY FIX
+============
+
+This is a security bugfix release for Samba 2.2.0. This release provides the
+following two changes *ONLY* from the 2.2.0 release.
+
+1). Fix for the security hole discovered by Michal Zalewski (<A HREF="mailto:lcamtuf@bos.bindview.com">lcamtuf@bos.bindview.com</A>)
+    and described in the security advisory below.
+2). Fix for the hosts allow/hosts deny parameters not being honoured.
+
+No other changes are being made for this release to ensure a security fix only.
+For new functionality (including these security fixes) download Samba 2.2.1
+when it is available.
+
+The security advisory follows :
+
+
+                IMPORTANT: Security bugfix for Samba
+                ------------------------------------
+
+June 23rd 2001
+
+
+Summary
+-------
+
+A serious security hole has been discovered in all versions of Samba
+that allows an attacker to gain root access on the target machine for
+certain types of common Samba configuration.
+
+The immediate fix is to edit your smb.conf configuration file and
+remove all occurances of the macro "%m". Replacing occurances of %m
+with %I is probably the best solution for most sites.
+
+Details
+-------
+
+A remote attacker can use a netbios name containing unix path
+characters which will then be substituted into the %m macro wherever
+it occurs in smb.conf. This can be used to cause Samba to create a log
+file on top of an important system file, which in turn can be used to
+compromise security on the server.
+
+The most commonly used configuration option that can be vulnerable to
+this attack is the "log file" option. The default value for this
+option is VARDIR/log.smbd. If the default is used then Samba is not
+vulnerable to this attack.
+
+The security hole occurs when a log file option like the following is
+used:
+
+  log file = /var/log/samba/%m.log
+
+In that case the attacker can use a locally created symbolic link to
+overwrite any file on the system. This requires local access to the
+server.
+
+If your Samba configuration has something like the following:
+
+  log file = /var/log/samba/%m
+
+Then the attacker could successfully compromise your server remotely
+as no symbolic link is required. This type of configuration is very
+rare.
+
+The most commonly used log file configuration containing %m is the
+distributed in the sample configuration file that comes with Samba:
+
+  log file = /var/log/samba/log.%m
+
+in that case your machine is not vulnerable to this attack unless you
+happen to have a subdirectory in /var/log/samba/ which starts with the
+prefix "log."
+
+Credit
+------
+
+Thanks to Michal Zalewski (<A HREF="mailto:lcamtuf@bos.bindview.com">lcamtuf@bos.bindview.com</A>) for finding this
+vulnerability.
+
+
+New Release
+-----------
+
+While we recommend that vulnerable sites immediately change their
+smb.conf configuration file to prevent the attack we will also be
+making new releases of Samba within the next 24 hours to properly fix
+the problem. Please see <A HREF="http://www.samba.org/">http://www.samba.org/</A> for the new releases.
+
+Please report any attacks to the appropriate authority.
+
+        The Samba Team
+        <A HREF="mailto:security@samba.org">security@samba.org</A>
+
+---------------------------------------------------------------------------
+
+The release notes for 2.2.0 follow :
+
+This is the official Samba 2.2.0 release. This version of Samba provides
+the following new features and enhancements.
+
+Integration between Windows oplocks and NFS file opens (IRIX and Linux
+2.4 kernel only). This gives complete data and locking integrity between
+Windows and UNIX file access to the same data files.
+
+Ability to act as an authentication source for Windows 2000 clients as
+well as for NT4.x clients.
+
+Integration with the winbind daemon that provides a single
+sign on facility for UNIX servers in Windows 2000/NT4 networks
+driven by a Windows 2000/NT4 PDC. winbind is not included in
+this release, it currently must be obtained separately. We are
+committed to including winbind in a future Samba 2.2.x release.
+
+Support for native Windows 2000/NT4 printing RPCs. This includes
+support for automatic printer driver download.
+
+Support for server supported Access Control Lists (ACLs).
+This release contains support for the following filesystems: 
+
+    Solaris 2.6+ 
+    SGI Irix 
+    Linux Kernel with ACL patch from <A HREF="http://acl.bestbits.at">http://acl.bestbits.at</A>
+	Linux Kernel with XFS ACL support.
+	Caldera/SCO UnixWare
+	IBM AIX
+	FreeBSD (with external patch)
+
+Other platforms will be supported as resources are
+available to test and implement the encessary modules. If
+you are interested in writing the support for a particular
+ACL filesystem, please join the samba-technical mailing
+list and coordinate your efforts. 
+ 
+On PAM (Pluggable Authentication Module) based systems - better debugging
+messages and encrypted password users now have access control verified via
+PAM - Note: Authentication still uses the encrypted password database.
+ 
+Rewritten internal locking semantics for more robustness.
+This release supports full 64 bit locking semantics on all
+(even 32 bit) platforms. SMB locks are mapped onto POSIX
+locks (32 bit or 64 bit) as the underlying system allows.
+
+Conversion of various internal flat data structures to use
+database records for increased performance and
+flexibility. 
+
+Support for acting as a MS-DFS (Distributed File System) server.
+
+Support for manipulating Samba shares using Windows client tools
+(server manager). Per share security can be set using these tools
+and Samba will obey the access restrictions applied.
+
+Samba profiling support (see below).
+
+Compile time option for enabling a (Virtual file system) VFS layer 
+to allow non-disk resources to be exported as Windows filesystems
+(such as databases etc.).
+
+The documentation in this release has been updated and converted
+from Yodl to DocBook 4.1. There are many new parameters since 2.0.7
+and some defaults have changed.
+
+Profiling support.
+------------------
+Support for collection of profile information. A shared 
+memory area has been created which contains counters for
+the number of calls to and the amount of time spent in
+various system calls, smb transactions and nmbd activity. See 
+the file profile.h for a complete listing of the information 
+collected. Sample code for a samba pmda (collection agent
+for Performance Co-Pilot) has been included in the pcp
+directory. 
+
+To enable the profile data collection code in samba, you must 
+compile samba with profile data support (run configure with 
+the --with-profiling-data option). On startup, collection of 
+data is disabled. To begin collecting data use the smbcontrol
+program to turn on profiling (see the smbcontrol man page).
+Profile information collection can be enabled for nmbd, all smbd
+processes or one or more selected processes. The profiling
+data collected is the aggragate for all processes that have
+profiling enabled.
+
+With samba compiled for profile data collection, you may see
+a very slight degradation in performance even with profiling
+collection turned off. On initial tests with NetBench on an
+SGI Origin 200 server, this degradation was not measureable 
+with profile collection off compared to no profile collection
+compiled into samba. 
+
+With count profile collection enabled on all clients, the 
+degradation was less than 2%. With full profile collection 
+enabled on all clients, the degradation was about 8.5%. 
+
+=====================================================================
+
+If you think you have found a bug please email a report to :
+
+        <A HREF="mailto:samba@samba.org">samba@samba.org</A>
+
+As always, all bugs are our responsibility.
+
+Regards,
+
+        The Samba Team.  
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

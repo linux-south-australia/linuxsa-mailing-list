@@ -1,0 +1,115 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: cron" -->
+<!-- FromName="'Anthony Symons'" -->
+<!-- FromEmail="ant@sa.pracom.com.au" -->
+<!-- ToName="'David Tanti'" -->
+<!-- ToEmail="david@rtime.com.au" -->
+<!-- Date="01 Nov 2001 17:55:31 +1030" -->
+<!-- Id="1004599531.11323.93.camel@ant.internal" -->
+<!-- Reference="NFBBKKMDOLNAJCHCCDENMEBCCAAA.david@rtime.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: cron</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  To  : David Tanti &lt;<I><A HREF="mailto:david@rtime.com.au">david@rtime.com.au</A></I>&gt;
+  Date: 01 Nov 2001 17:55:31 +1030
+</PRE>
+<H1>Re: cron</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+You can point it to a shell script rather than the tar command itself.
+Then have a script something like this (a cut down version of a backup
+script we use here):
+
+
+#!/bin/bash
+
+# what to backup
+DIRLIST="/etc /home/httpd /mnt/doco /mnt/server"
+
+# look for backup subdirectorys in home dirs and back them up too
+DYNAMICLIST=`find /home -maxdepth 2 -mindepth 2 -name backup`
+
+#do the tar. /dev/st0 is scsi tape zero, but you probably want to use a
+#file, or you could put it on another file system on another machine
+#which is better again. smb is a quick and easy option.
+
+tar -czvf /dev/st0 $DYNAMICLIST $DIRLIST 2&gt;&1 1&gt;/dev/null
+
+#remind Ant to change the tape
+echo -e "to:<A HREF="mailto:backups@foghorn">backups@foghorn</A>\nfrom:<A HREF="mailto:backup@flanders">backup@flanders</A>\nsubject:FLANDERS:
+backup `date` completed, change the tape" | sendmail -t
+
+
+
+
+On Thu, 2001-11-01 at 17:27, David Tanti wrote:
+&gt; I have put an entry in /etc/crontab being
+&gt; 
+&gt; 30 22 * * 1-5 tar cvf /
+&gt; 
+&gt; I am relatively new to Linux and appreciate this is rather a crude way of
+&gt; backing up everthing.  I was wondering if it is possible when the backup has
+&gt; started or completed if I can get sent an email telling me.
+&gt; 
+&gt; Is there something I can add to the command above to achieve what I want.
+&gt; 
+&gt; Thanks very much
+&gt; 
+&gt; Regards
+&gt; David
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+-- 
+Systems Administrator       
+Pracom Ltd.             
++61 8 82029074 -=- +61 402 100 671 
+<A HREF="mailto:anthony.symons@sa.pracom.com.au">anthony.symons@sa.pracom.com.au</A>
+
+PRIVILEGED - PRIVATE AND CONFIDENTIAL
+This electronic mail is solely for the use of the addressee and may
+contain information which is confidential or privileged.
+If you receive this electronic mail in error, please delete it from
+your system immediately and notify the sender by electronic mail or
+using any of the above contact details.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

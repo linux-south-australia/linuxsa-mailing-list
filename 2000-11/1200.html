@@ -1,0 +1,110 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: DAT Drive Wierdness" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Andrew Reid'" -->
+<!-- ToEmail="andrew.reid@plug.cx" -->
+<!-- Date="Thu, 30 Nov 2000 20:26:13 +1030" -->
+<!-- Id="3A26243D.D59A04AE@aarnet.edu.au" -->
+<!-- Reference="20001130072615.A3A6A407FC@mail.plug.cx" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: DAT Drive Wierdness</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Andrew Reid &lt;<I><A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A></I>&gt;
+  Date: Thu, 30 Nov 2000 20:26:13 +1030
+</PRE>
+<H1>Re: DAT Drive Wierdness</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Andrew Reid wrote:
+&gt; 
+&gt; All-of-a-sudden, the tape device (/dev/st0) reports as no device when I
+&gt; use mt (ie mt -f /dev/st0 rewind) it gives me a "/dev/st0 - no such
+&gt; device
+
+Have a look at the startup messages (using dmesg) and make
+sure that the drive is still being assigned st0.  You should
+see a line like the last line of this output:
+
+&gt; scsi0 : Adaptec AHA274x/284x/294x (EISA/VLB/PCI-Fast SCSI) 5.1.28/3.2.4
+&gt;        &lt;Adaptec AHA-294X SCSI host adapter&gt;
+&gt; scsi : 1 host.
+&gt; (scsi0:0:6:0) Synchronous at 10.0 Mbyte/sec, offset 8.
+&gt;   Vendor: HP        Model: C1533A            Rev: 9608
+&gt;   Type:   Sequential-Access                  ANSI SCSI revision: 02
+&gt; Detected scsi tape st0 at scsi0, channel 0, id 6, lun 0
+
+Also make sure that the /etc/modules.conf file is correct.   You
+need to define the controller.  And then define the st middle
+level driver for the device minor number that was discovered.
+
+&gt; # Controller: AHA-2940 (PCI), a AIC-7xxx variant
+&gt; #   SCSI physical: narrow, not differential
+&gt; #   SCSI ID: 7
+&gt; #   Connector: HP-CEN
+&gt; alias scsi_hostadapter aic7xxx
+&gt; # Tape: HP SureStore 6000 (model C1529-62702), 6MB on 120m DAT-2 with compression
+&gt; #   SCSI physical: narrow, not differential
+&gt; #   SCSI ID: 5
+&gt; #   Connector: Centronics
+&gt; #   Termination: external passive Centronics
+&gt; # it is the zeroth (and only) device detected on the SCSI
+&gt; # bus, so has minor number 0 for /dev/st0 and 128 for
+&gt; # /dev/nst0.
+&gt; alias char-major-9-0 st
+&gt; alias char-major-9-128 st
+
+You should also have some symbolic links to the default tape drive:
+
+  cd /dev
+  ln -s st0 tape
+  ln -s nst0 ntape
+
+This is all a right pain, and it takes a while to get your
+head about the way Linux treats SCSI tape drives.  devfs in
+2.4 fixes a lot of this nonsense.
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,93 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PC hardware interface for push buttons" -->
+<!-- FromName="'Mark Newton'" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="'Florin Dumitru'" -->
+<!-- ToEmail="florinel@arcom.com.au" -->
+<!-- Date="Thu, 20 Mar 2003 23:52:34 +1030" -->
+<!-- Id="20030320235234.A32155@atdot.dotat.org" -->
+<!-- Reference="3E79B7FC.6070503@arcom.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PC hardware interface for push buttons</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Florin Dumitru &lt;<I><A HREF="mailto:florinel@arcom.com.au">florinel@arcom.com.au</A></I>&gt;
+  Date: Thu, 20 Mar 2003 23:52:34 +1030
+</PRE>
+<H1>Re: PC hardware interface for push buttons</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, Mar 20, 2003 at 11:15:48PM +1030, Florin Dumitru wrote:
+
+ &gt; &gt; I'm faced with the situation that I need a doorbell, but why just buy 
+ &gt; &gt; one when I can do something cool, like rig up a SMS notification as 
+ &gt; &gt; well as getting a boring old chime? :)
+ &gt; 
+ &gt; Try a PCI card (one of the lowest available has 24 static I/O) from NI, 
+ &gt; or similar..
+
+Too expensive.  A DB9 connector, a length of wire, a resistor and a
+pushbutton switch will suffice.
+
+Wire the switch between +12V and DCD on the RS232 connector.  Wire the
+resistor between DCD and GND.
+
+RS232 data pins are active-low, signal pins are active high.  Presenting
++12V on DCD will assert carrier on the serial port.
+
+UNIX serial ports block on open until DCD is presented.
+
+The code to monitor the doorbell will look something like this:
+
+    forever {
+	open /dev/ttyS0	  # this will block until the button is pressed
+	close /dev/ttyS0  # don't need it anymore :-)
+	make doorbell noise
+	send SMS message
+    }
+
+Simple - A few lines of perl, and less than $10 expenditure.
+
+  - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

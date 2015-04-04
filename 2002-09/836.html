@@ -1,0 +1,118 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Caching Name Server Config" -->
+<!-- FromName="'Jim O'Halloran'" -->
+<!-- FromEmail="jim@kendle.com.au" -->
+<!-- ToName="'linuxsa@linuxsa.org.au'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 19 Sep 2002 17:17:23 +0930" -->
+<!-- Id="C16C7A51BA30D51187EE0000E8D8C9972F88B5@int-gw.kendle.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Caching Name Server Config</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jim O &lt;<I><A HREF="mailto:jim@kendle.com.au">jim@kendle.com.au</A></I>&gt;
+  To  : linuxsa@linuxsa.org.au &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 19 Sep 2002 17:17:23 +0930
+</PRE>
+<H1>Caching Name Server Config</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+I've got a Redhat 7.3 box which seems to be having issues with named...  The
+box is basically a fresh install, which I'm starting to configure as a
+proxy/firewall/NAT machine.  The machine in question (snares) has two
+network cards.  eth1 is connected to our internal network, and eth0 has a
+real IP on our DMZ network.  The DMZ network is connected to the internet
+through another Linux box (rockhopper) which acts as a router/firewall
+between the DMZ and the rest of the world...  So the configuration looks
+like this...
+
+Internal Network   &lt;---&gt;   eth1   snares   eth0    &lt;---&gt;  eth0 rockhopper
+&lt;---&gt; Internet
+(10.0.0.x)              (10.0.0.1)      (x.x.x.12)        (x.x.x.1)
+
+I'm using the default Red Hat configuration for the name server on snares,
+which should give me a basic caching only name server.  I've verified the
+named.conf (attached) against the DNS HOWTO's sample for a caching
+configuration and aside from some file name differences they appear
+identical.  My resolv.conf contains...
+
+nameserver 127.0.0.1
+
+... and named is running.  According to /var/log/messages named has started,
+and is listening on both eth adapters and 127.0.0.1.  There are no errors
+reported in /var/log/messages, and 'netstat -a' shows port 53 is listening
+on all interfaces.
+
+No iptables rules have been configured on snares (yet).  Rockhopper allows
+outbound connections on tcp port 80 and outbound/inbound traffic on port 53
+(both tcp and udp).  All other traffic to/from this box is logged then
+dropped by rockhopper.  Nothing is showing in the logs however.
+
+The problem is simply that named doesn't seem to be accepting any
+connections (on any interface).  Running nslookup against the new box either
+locally, or through either eth interface doesn't resolve any names for me...
+
+[<A HREF="mailto:jim@adelie">jim@adelie</A> /root]$ nslookup -sil
+&gt; server x.x.x.12
+Default server: x.x.x.12
+Address: x.x.x.12#53
+&gt; www.linuxsa.org.au
+;; connection timed out; no servers could be reached
+&gt; 
+
+... I get the same error if I do the same thing with 127.0.0.1 as well.  I'm
+stumped, does anyone have any suggestions as to what I've done wrong?
+
+Jim.
+
+---
+Jim O'Halloran
+Kendle Computer Services Pty. Ltd.
+Phone: (08) 8354 1600   (intl. +61-8-8354-1600)
+Fax: (08) 8354 1900 (intl. +61-8-8354-1900)
+
+Failure is not an option....
+       ... its included with all Microsoft products.
+
+
+
+
+<A HREF="836_named.conf">named.conf</A>
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

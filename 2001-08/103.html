@@ -1,0 +1,133 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: WWW authentication" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'Adam W'" -->
+<!-- ToEmail="woja@optushome.com.au" -->
+<!-- Date="Thu, 2 Aug 2001 23:18:22 +0930" -->
+<!-- Id="20010802231822.A23075@dog.topology.org" -->
+<!-- Reference="BDEDKMPEELEHGENEBKMGMECJCCAA.woja@optushome.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: WWW authentication</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : Adam W &lt;<I><A HREF="mailto:woja@optushome.com.au">woja@optushome.com.au</A></I>&gt;
+  Date: Thu, 2 Aug 2001 23:18:22 +0930
+</PRE>
+<H1>Re: WWW authentication</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, Aug 02, 2001 at 07:36:17PM +1000, Adam W wrote:
+&gt; I have set up an apache/linux(1.3.14 i think?) http server, and i would like
+&gt; an authorization dialog box to appear when the user goes into a specific
+&gt; directory.
+&gt; 
+&gt; Like the user types in <A HREF="http://server/directory/">http://server/directory/</A> and a dialog box appears,
+&gt; asking you the username and pass, the user enters in this info and then is
+&gt; given access to the webpage within the directory.
+&gt; 
+
+
+Adam,
+
+This is a fascinating little topic, which caused me much
+fuss the first time I did it.
+I still don't know how to do it neatly.
+
+Anyway, this is the set of things which I think are
+required. I hope I won't miss anything.
+
+In the relevant scope, you need to specify the Authentication
+file paths. E.g.
+
+&lt;Directory /&gt;
+    AuthUserFile  /etc/httpd/passwd
+    AuthGroupFile /etc/httpd/group  
+    # ....
+&lt;/Directory&gt; 
+
+E.g. see 
+<A HREF="http://httpd.apache.org/docs/mod/mod_auth.html">http://httpd.apache.org/docs/mod/mod_auth.html</A>#authuserfile
+
+In such a file, you have to somehow include some passwords.
+E.g.
+
+riemann:0vz2nO4S97eyo
+
+The only way I know of doing this is to use the passwd command to
+make password appear in the /etc/passwd or /etc/shadow file,
+and then copy it from there to the /etc/httpd/passwd file.
+There's probably some tool to do this more conveniently.
+
+Then in your .htaccess file for the directory you want
+to control access to, you put something like this:
+
+AuthType        Basic
+AuthName        xyz
+AuthUserFile    passwd
+AuthGroupFile   groups
+&lt;Limit GET&gt;
+require user    riemann
+&lt;/Limit&gt; 
+
+Apparently, this puts up a dialog box specifying a "realm"
+for the password. See
+<A HREF="http://httpd.apache.org/docs/mod/core.html">http://httpd.apache.org/docs/mod/core.html</A>#authname
+
+I think this AuthName thing is something like a
+label for the resource you are accessing, whereas the
+"user" can be any of several people who are allowed to
+access that domain. The "realm" seems to have no
+significance except to prompt the user in the dialog box.
+The "user" must exist in the password file, such as
+/etc/httpd/passwd.
+
+It looks from the documentation as though the 
+AuthName and "require" can be specified in the
+httpd.conf file in a Directory context as well as in
+the .htaccess file.
+
+<A HREF="http://httpd.apache.org/docs/mod/core.html">http://httpd.apache.org/docs/mod/core.html</A>#require
+<A HREF="http://httpd.apache.org/docs/mod/core.html">http://httpd.apache.org/docs/mod/core.html</A>#authname
+
+I hope I haven't missed out anything...
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,125 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Apache test results" -->
+<!-- FromName="Daniel Callan" -->
+<!-- FromEmail="dcallan@dataline.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 17 Nov 1998 18:36:02 +1000" -->
+<!-- Id="3.0.32.19981117183557.00833e20@hub.dataline.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Apache test results</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Callan &lt;<I><A HREF="mailto:dcallan@dataline.net.au">dcallan@dataline.net.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Tue, 17 Nov 1998 18:36:02 +1000
+</PRE>
+<H1>Re: Apache test results</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 18:09 17/11/98 +1000, I wrote:
+&gt;(AFAIK)
+&gt;Apache is listening for requests made to the IP addresses that
+&gt;resolve from the hostnames it is configured to serve.
+&gt;That's why the most common prob with Apache is when the DNS
+&gt;is not available, it can't make that initial resolution of the
+&gt;hostnames and therefore doesn't start because it has nothing to
+&gt;listen for.
+&gt;
+&lt;SNIP&gt;
+&gt;PPS: I'm currently configuring 1.3 on a spare server with two
+&gt;hostnames resolving to it the main IP with a virthost
+&gt;in the config (to test it for sure).
+&gt;
+
+Well, it is proven from my end anyway ;-)
+
+I just ran that test server and the virtual host took
+control of the main webserver's responses.
+(Must admit, I suspected it would be the other around but hey...)
+
+ie:
+
+hostname.dataline.net.au	=	XXX.XXX.XXX.128
+alias.dataline.net.au	=	XXX.XXX.XXX.128
+(both hosts resolve to the same IP)
+
+Server only responds to that one IP (no IP aliasing on that box)
+
+I setup the /usr/local/apache/conf/httpd.conf as:
+
+#################################################
+ServerName hostname.dataline.net.au
+
+[skip a bit of conf stuff]
+
+&lt;VirtualHost alias.dataline.net.au&gt;
+ServerAdmin <A HREF="mailto:hostmaster@alias.dataline.net.au">hostmaster@alias.dataline.net.au</A>
+DocumentRoot /usr/local/virtualhosts/alias.dataline.net.au/htdocs
+ServerName alias.dataline.net.au
+ScriptAlias /cgi-bin/ /usr/local/virtualhosts/alias.dataline.net.au/cgi-bin/
+ErrorLog /usr/local/virtualhosts/alias.dataline.net.au/logs/error_log
+TransferLog /usr/local/virtualhosts/alias.dataline.net.au/logs/access_log
+&lt;/VirtualHost&gt;
+#################################################
+
+I then fired up the httpd and then when it was running went to a browser
+and tested the two URLs:
+	<A HREF="http://hostname.dataline.net.au/">http://hostname.dataline.net.au/</A>
+&	<A HREF="http://alias.dataline.net.au/">http://alias.dataline.net.au/</A>
+
+Both of them came up with the "htdocs" dir of the virtualhost.
+(I doubled checked it with the access_logs of both dir structures
+and the virtualhost access_log had both hits in it)
+
+I don't have time to test the combined conf file idea as the
+existing 3-4 conf file system works fine (mime file is optional).
+
+Hope this helps,
+-Daniel
+
+
+         Daniel Callan
+        Network Manager
+
+     <A HREF="mailto:hostmaster@dataline.net.au">hostmaster@dataline.net.au</A>
+      -- DataLine.net.au --
+     <A HREF="http://dataline.net.au">http://dataline.net.au</A> 
+
+Q: Why do programmers always get Christmas and Halloween mixed up?
+A: Because DEC 25 = OCT 31
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

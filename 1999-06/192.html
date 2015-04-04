@@ -1,0 +1,100 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: UPS" -->
+<!-- FromName="" -->
+<!-- FromEmail="branko@senet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 12 Jun 1999 16:38:07 +0930 (CST)" -->
+<!-- Id="m10shtg-000GgFC@lector" -->
+<!-- Reference="003701beb2d6$21673530$0501a8c0@stephen" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: UPS</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: <A HREF="mailto:branko@senet.com.au">branko@senet.com.au</A>
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sat, 12 Jun 1999 16:38:07 +0930 (CST)
+</PRE>
+<H1>Re: UPS</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Steve Sloan wrote:
+
+&gt;I am trying to get a shutdown UPS cable going on a RH6 box using a Sola 310
+&gt;UPS. Sola have been quite helpful and reassured me that I have the correct
+&gt;cable and the correct software (Sola provides a Checkups program that
+&gt;monitors the UPS via the serial port). The basic command to test the UPS is
+&gt;
+&gt;checkups /dev/ttyS0
+&gt;
+&gt;This returns with a message that the cable is not attached. Sola advised me
+&gt;to check if getty is grabbing the port and to make sure the port is setup
+&gt;for a modem. As far as I can tell getty isn't using any serial ports as
+&gt;there are no entries in the /etc/inittab file and as for setting the port
+&gt;for a modem, I have no idea.
+
+Steve,
+
+I don't have any experience with UPS software but I think I can point
+you in the right direction to get the serial port working.
+
+It appears that Sola have asked you to set up the port /dev/ttyS0 for 
+use with a modem, meaning that flow control should be managed in hardware.  
+Apparently, the default setting for serial ports is XON/XOFF but the UPS 
+application expects RTS/CTS handshaking, when it doesn't get it, it
+assumes that the CTS/RTS lines are not connected and wrongly complains
+about the cable being detached.
+
+Your friends in setting serial ports are stty or setserial - take a
+look at the man pages.  Briefly, use "stty -a &lt; /dev/ttyS0" or
+"setserial -a /dev/ttyS0" to examine the settings.  BTW, ttyS0 is
+COM1 right?  Next set handshaking to RTS/CTS.  If you were mucking 
+around with a modem, you could use a comms program such as minicom 
+or cu to talk with the device hence prove that the settings are right
+- look in your UPS manual to see if it can be interrogated using plain 
+text.
+
+Finally, you will want to make the above changes permanent.  On my
+Debian system I did this for my PPP link by editing the file
+/etc/rc.boot/0setserial.  It could just as easily be put in the same
+place from which the ups software is started eg /etc/inittab or the
+applicable /etc/rc* file on your system.
+
+Hope this helps,
+-- 
+Branko Bratkovic
+<A HREF="mailto:branko@senet.com.au">branko@senet.com.au</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

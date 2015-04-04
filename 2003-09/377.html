@@ -1,0 +1,190 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: [ANNOUNCE] LinuxSA September 2003 Meeting" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Alan Kennington'" -->
+<!-- ToEmail="ak1.linuxsa@topology.org" -->
+<!-- Date="11 Sep 2003 12:21:32 +0930" -->
+<!-- Id="1063248692.4732.61.camel@andromache" -->
+<!-- Reference="20030909013719.GA1216@april.netcraft.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: [ANNOUNCE] LinuxSA September 2003 Meeting</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:ak1.linuxsa@topology.org">ak1.linuxsa@topology.org</A></I>&gt;
+  Date: 11 Sep 2003 12:21:32 +0930
+</PRE>
+<H1>Re: [ANNOUNCE] LinuxSA September 2003 Meeting</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+[Combining a few messages, I don't want to spend all day on this]
+
+&gt; The idea of modifying TCP stacks so as to increase end-to-end bitrate from 10
+&gt; Mbps to 100 Mbps sounds somewhat bizarre to me.  That sounds fine if there is
+&gt; only one user on the net. But suppose everyone on the net wants to use their
+&gt; 100 Mbps. Now you have a network which is so congested that you're back to
+&gt; where you started from, with the difference that the inequality between
+&gt; privileged users and ordinary users is much increased.
+
+If you read the Web100 web site at <A HREF="http://www.web100.org/">http://www.web100.org/</A> you
+see that the Web100 Project retains the "fairness" goal of
+TCP.  Web100 technologies are designed for wide deployment
+in the academic and commercial internet.  It's the very
+opposite of "...a kind of technical exercise, improving things
+for a small number of users...".
+
+It's actually more likely that non-Web100 IP implementations
+will be unfair to Web100-tuned stacks.  If you've got a TB to
+shift and you're only getting 30Mbps on a 100Mbps path then
+that user will in all likelyhood cut the file into parts and
+open multiple connections.  The Web100 user will use a single
+100Mbps connection and thus be penalised by most router
+queuing mechanisms.
+
+There is a related project, Net100, which discards fairness.
+The sponsors of that project run "mission-centric" networks
+where unfairness is fine (eg: if the data coming from the space
+probe is unfair to PoepleSoft users, then who gives a stuff as
+the network was built primarily to support space activities).
+
+Your concerns would be much better applied to Voice and Video
+traffic.  This UDP traffic, unlike TCP or Web100-tuned TCP,
+does not implement congestion control.  So it is unfair to
+TCP traffic.  Voice isn't a huge concern, as the bandwidths
+are small.  But we've already experienced episodes of video
+streams denying service to TCP traffic.  It's concerning
+that these applications have moved from experimental
+systems into deployment in Microsoft operating systems
+without the protocols being made TCP friendly.
+
+&gt; On the face of it, unless you can tell me something
+&gt; contrary, it looks like Web100 will clobber VoIP.
+
+It's the other way around.  VoIP traffic doesn't
+have congestion control and clobbers TCP traffic
+(regardless if it is Web100-tuned or not).
+
+&gt; A kludge-fix could be to split TCP and UDP into separate
+&gt; FIFOs and do them round robin or some such fair queueing
+&gt; idea. But that would be too simple.
+
+I think a better idea is at
+  <A HREF="http://www.aarnet.edu.au/engineering/networkdesign/qos/">http://www.aarnet.edu.au/engineering/networkdesign/qos/</A>
+(this is still a discussion-based site at the moment, a
+formal freeze of the AARNet3 QoS offering will occur in a
+few weeks).
+
+By getting members to mark TCP-unfriendly video traffic at
+source we can offer video a higher level of service compared
+to best effort but a worse level of service when the traffic
+starts to threaten congestion-controlled traffic.
+
+The technologies are DiffServ and Class Based Queuing.  Both
+have been around for a while and now have sufficient deployment
+to give them a burl.
+
+&gt; I would like to suggest (perhaps a little provocatively, but in all seriousness)
+&gt; that tuning up TCP stacks to do 100 Mbps on the open Internet is about as
+&gt; socially responsible as optimising spam software to send 10 times faster.
+
+Actually, spam won't be sent faster :-)  One of the points in
+my talk is that application protocols need to be redesigned to
+avoid unnecessary round-trips.  SMTP has too many query/response
+transactions to allow a lot of short messages to be sent at
+anywhere near line rate.
+
+Some other points:
+
+&gt; Specifically, I would call network queueing fair if, for example,
+&gt; all traffic in network nodes was queued with a separate FIFO (real
+&gt; or virtual) for each IP host source/destination pair, with round
+&gt; robin (per-byte, not per-packet) service for all FIFOs.
+
+That definition fails for multi-user machines.  Fairness
+considers competing connections (or "flows").  Queuing
+is "fair" if the lower bound on egress bandwidth for
+each flow is proportional to the number of flows.
+Achieving that doesn't require per-flow queues if you
+are willing to have a statistically-defined lower
+bound (ie, fine if the link has &gt;20 flows).
+
+&gt; I've read from time to time that Cisco do do some sorts
+&gt; of attempts at application-level classification and fair
+&gt; queueing -- in fact, I think they've got big heaps of patents
+&gt; on their own proprietary queueing algorithms.
+
+Classification and queuing are different functions.  Usually
+when you classify something it's because you intend to apply
+horribly unfair queuing to it (eg, classify VoIP to place it
+in a priority queue, or classify some likely denial of service
+traffic to place it in a bit-bucket).  Then you fairly queue
+the remaining traffic.
+
+Cisco thought long and hard about it's patent policy.  The
+outcome is surprisingly good.  From their web site:
+
+  Does Cisco use its patents as a source of revenue? 
+
+  Robert Barr: Cisco makes money by selling products
+  and services, not by licensing its patents. We use
+  our patents to support and protect our business, not
+  as a business in itself.
+
+  Does Cisco encourage the incorporation of its patents
+  into Industry Standards?
+
+  Robert Barr: Cisco is in a unique position because so
+  many of our inventions apply to networking interoperability.
+  Customers want interoperability between network products.
+  We support the standards-setting processes of the IEEE, ITU,
+  IETF and other standards organizations and consortiums and we
+  are gratified that our intellectual property is used in many
+  industry standards. While Cisco reserves the right to use its
+  patents defensively if necessary, we do not demand royalties
+  for patents that are used in industry standards.
+
+This makes Cisco amazingly easy for people like myself to
+deal with.
+
+-- 
+Glen Turner         Tel: (08) 8303 3936 or +61 8 8303 3936 
+Network Engineer          Email: <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>
+Australian Academic & Research Network   www.aarnet.edu.au
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

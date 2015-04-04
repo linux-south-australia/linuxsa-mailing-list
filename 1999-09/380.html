@@ -1,0 +1,146 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Confiuring XDMCP Broadcast" -->
+<!-- FromName="Martin Sandiford" -->
+<!-- FromEmail="ms@mcdev.com.au" -->
+<!-- ToName="Sulis, Adam" <SULISA@tc.gc.ca>, Linux SA" -->
+<!-- ToEmail="SULISA@tc.gc.ca" -->
+<!-- Date="17 Sep 1999 12:00:17 +0930" -->
+<!-- Id="m3yae6tgli.fsf@plugh.mccorp.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Confiuring XDMCP Broadcast</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Martin Sandiford &lt;<I><A HREF="mailto:ms@mcdev.com.au">ms@mcdev.com.au</A></I>&gt;
+  To  : Sulis, Adam" &lt;SULISA@tc.gc.ca&gt;, Linux SA &lt;<I><A HREF="mailto:SULISA@tc.gc.ca">SULISA@tc.gc.ca</A></I>&gt;
+  Date: 17 Sep 1999 12:00:17 +0930
+</PRE>
+<H1>Re: Confiuring XDMCP Broadcast</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+(Sorry for previous incomplete email - finger problem)
+
+&gt;&gt;&gt;&gt;&gt; "Adam" == Sulis, Adam &lt;<A HREF="mailto:SULISA@tc.gc.ca">SULISA@tc.gc.ca</A>&gt; writes:
+
+    Adam&gt; Hi group: I have installed XWin32 for Windows 95, and am
+    Adam&gt; trying to connect to a Redhat 6 box. I would like to be able
+    Adam&gt; to:
+
+    Adam&gt; 1. Have the box show up on the XDMCP Selector list
+    Adam&gt; 2. Run a full desktop session on XWin32 (RSH, single window)
+
+These seem to be different things.  If you are using XDMCP, you do not
+need to use rsh to login.
+
+You will need to start xdm (or on redhat 6, /etc/X11/prefdm).
+
+You can then use the XDMCP option with X-Win32 to connect to the Linux
+box.
+
+There are normally three ways that you can connect to an xdm server
+using an X server:
+
+1. Specify the IP address of the xdm server you wish to connect to (aka
+"query" mode).  If all is well, a login window will be displayed on the
+X server, and you will be logged into the xdm server.  You need to
+specify the IP of the xdm server to log in to.
+
+2. Use broadcast mode, where the X server sends out broadcast requests
+to connect to an xdm server.  The first xdm server that responds is the
+one you get a login window for. You do not need to specify IP addresses.
+
+3. Use "indirect" mode, where the X server requests that xdm server to
+run a "chooser" which displays a list of hosts that you can log in to
+with xdm.  You then choose one, and are logged in.  You will need to
+specify the IP address of the xdm server which will display the chooser.
+
+If you are using RH6 and gnome, then you are probably using gdm.  I have 
+not been able to get gdm to display a chooser for indirect mode, but I
+have been able to get xdm to work fine.  If you wish to try with xdm,
+you can "cd /etc/X11" and then "ln -sf /usr/X11R6/bin/xdm prefdm".
+
+I believe that XWin32 supports all of these options under the session
+setup (?).
+
+    Adam&gt; Here are my observations so far (thanks to the archive for
+    Adam&gt; reference):
+
+    Adam&gt; 1. I can get applications up by manually initiating a remote
+    Adam&gt; login: - Double-Click XWin32 - telnet to the Redhat box (in
+    Adam&gt; my case 1.2.3.1) - log in as root - issue "export
+    Adam&gt; DISPLAY=1.2.3.2:0.0" where 1.2.3.2 is the 95 box - issue
+    Adam&gt; "xcalc" (or xterm, netscape, or other x app)
+
+Good - pretty much all the components are working.
+
+    Adam&gt; 2. I modified the /etc/X11/xdm/Xservers file as follows:
+    Adam&gt; changed: :0 local /usr/X11R6/bin/X to: :0 local
+    Adam&gt; /usr/X11R6/bin/X -broadcast and restarted the box hoping
+    Adam&gt; that would cause the broadcast.
+
+This is probably not what you want.  Xdm will start local server(s) and
+show login windows on them if you wish.  If you do not need a local
+server, then comment this line out. In any case, you do not need the
+-broadcast.  -broadcast asks the local X server to connect to an xdm
+server, which happens automagically for servers started by xdm anyway.
+
+If you do not want to have X started automatically on the linux box, you 
+can comment this line out altogether.
+
+    Adam&gt; The Redhat box is configured with defaults, and works with
+    Adam&gt; manual login, so I suspect that I have to alter the server
+    Adam&gt; parms to allow XDMCP broadcasts.
+
+Yes, but probably on the X server, not the xdm server.  Have a look in
+the XWin32 setup options for XDMCP stuff. This is what you want.  Also
+read above about gdm vs xdm.
+
+A word of caution: the /etc/X11/xdm/Xaccess file specifies who will be
+able to get a login window and/or a chooser from your xdm server.  As
+shipped, RH6 allows *anyone* to get a login and/or chooser.  Some people
+may consider this a security flaw.
+
+    Adam&gt; I am having trouble finding documentation to RTFM. Perhaps
+    Adam&gt; if someone could point me in the right direction. This would
+    Adam&gt; make an excellent HOWTO.
+
+/usr/doc/HOWTO/mini/Remote-X-Apps is a good place to start.
+
+    Adam&gt; Any hints would be appreciated by this newbie.
+
+Cheers,
+Martin
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

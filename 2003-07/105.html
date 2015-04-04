@@ -1,0 +1,197 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Squid and NTLM authentication" -->
+<!-- FromName="'Daryl Tester'" -->
+<!-- FromEmail="Daryl.Tester@iocane.com.au" -->
+<!-- ToName="'Matthew Western'" -->
+<!-- ToEmail="mwestern@affairs.net.au" -->
+<!-- Date="Wed, 02 Jul 2003 21:49:23 +0930" -->
+<!-- Id="3F02CDCB.B6E1F063@iocane.com.au" -->
+<!-- Reference="000d01c34051$0b4bee00$03e214cb@mpw" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Squid and NTLM authentication</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  To  : Matthew Western &lt;<I><A HREF="mailto:mwestern@affairs.net.au">mwestern@affairs.net.au</A></I>&gt;
+  Date: Wed, 02 Jul 2003 21:49:23 +0930
+</PRE>
+<H1>Squid and NTLM authentication</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Matthew Western wrote:
+
+&gt; care to explain to this little doofus how you got it to work???
+
+No doofuslry required.  This isn't a "step by step" guide as such,
+just a list of notes that I used to get it up and running.  Probably
+the biggest issue is that when I wrote this, there wasn't an RPM
+for Squid 2.5, and if there were one now, you would probably still
+need to recompile it to add in the NTLM authentication.  Most of
+what follows is cut 'n' pasting.
+
+We have:
+.  A neat proxy server (Squid2.5-STABLE1)
+.  An NT domain network
+.  A desire to have the users of the proxy server authenticated
+   against the NT domain, so that we can apply access control
+   lists to authenticated users
+
+The Access Policy
+.  Allow selected IP addresses unrestricted access (typically servers,
+   whose IP addresses don't change and can't authenticate as the
+   processes are not "logged in" to the desktop).
+.  Allow all users access to a selected subset of domains.  This
+   allows all users to access, for example, www.whitepages.com.au
+.  Allow selected users unrestricted access to the Internet
+.  Otherwise, reject access to the Internet.
+
+Overview
+Squid version 2.5-STABLE1 is compiled with specific options to enable
+the NTLM helper processes.  Squid 2.5-STABLE1 is the minimum version
+required that natively supports both transparent NTLM authentication
+to Microsoft's Internet Explorer, as well as providing the backend
+processes that enable NTLM authentication to the NT Domain Controllers
+(without using winbind, which I'm loathe to use on a firewall type
+appliance).
+
+Compiling and Configuring Squid
+Configure options used on Squid 2.5 (matches RedHat's directory
+structure as much as possible).
+
+# ./configure --exec=/usr --bindir=/usr/sbin \
+    --libexecdir=/usr/lib/squid --localstatedir=/var \
+    --sysconfdir=/etc/squid -enable -gnuregex --disable-icmp \
+    --disable-snmp --disable-http-violations \
+    --disable-ident-lookups --enable-underscores \
+    --enable-ntlm-fail-open --enable-ntlm-auth-helpers="SMB" \
+    --enable-auth=ntlm
+
+# make
+# make install
+
+
+Squid Configuration
+The following configuration file achieves the policy outlined above.
+Please note that
+.  No modifications were made to the NT domain (e.g. no adding of
+   workstation accounts) - the authentication technique used by
+   Squid appears to be attempting to connect to the Domain Controller
+   using the supplied credentials, transparently passing the NT
+   Challenges and Responses between the browser and DC.
+.  The file /etc/squid/server.access contains a list of client IP
+   addresses that are allowed unrestricted access (server processes
+   are typically unable to provide authentication details).
+.  The file /etc/squid/all.domains.access contains a list of domains
+   that all users are allowed access to (e.g. www.whitepages.com.au).
+   If access is required to an entire sub-domain, for example *.ibm.com,
+   then use the shortened version of the domain name with the full stop
+   in place, .ibm.com, to allow access to any server under ibm.com.
+.  The file /etc/squid/all.users.access contains a list of NT account
+   names that are allowed unrestricted access to the Internet.  The
+   names must be fully qualified, i.e. domain-name\username, and must
+   be listed in lowercase.  NTLM authentication only takes place if the
+   above checks fail, to reduce the delay experienced by the users if
+   they are browsing domains listed in all.domains.access.  The
+   downside of this method is that the logs will not list the authorised
+   usernames when accessing the above "all users access" domains.
+
+
+##
+##  Minimalist Squid configuration using NTLM authentication.
+##  (highlights only).
+##
+
+#################################
+##  NTLM Authentication setup  ##
+#################################
+
+
+##  The following line wraps - watch it.
+auth_param ntlm         program /usr/lib/squid/ntlm_auth megacorp/ntserver01
+          megacorp/ntserver01  microcorp/ntserver03
+auth_param ntlm         children 5
+auth_param ntlm         max_challenge_reuses 5
+
+
+######################
+##  Access Control  ##
+######################
+
+##  Reminder: First acl-operator to match (either allow or deny) wins.
+
+acl             all src 0.0.0.0/0
+
+# Only allow access from Megacorp's subnet
+
+acl             mega_subnet src 10.0.0.0/16 127.0.0.0/8
+http_access     deny !mega_subnet
+
+# Allow servers that can't authenticate
+
+acl             all_server src "/etc/squid/server.access"
+http_access     allow all_server
+
+# Allow all users access to certain domains
+
+acl             all_domains dstdomain "/etc/squid/all.domains.access"
+http_access     allow all_domains
+
+# For whomever is left, force authentication then allow if authorised
+
+acl             all_access proxy_auth "/etc/squid/all.users.access"
+http_access     allow all_access
+
+# Allow all users to fetch misses (must have already authenticated
+# to get this far).
+
+miss_access     allow all
+
+# Default rule - deny access to all.
+
+icp_access      deny all
+http_access     deny all
+
+
+-- 
+Regards,
+  Daryl Tester,  Software Wrangler and Bit Herder, IOCANE Pty. Ltd.
+
+SCO Rep:  "Linux must die!  We shall prevail!"
+Offsider: "Bill, they can see your shirt sleeve."
+  -- <A HREF="http://ars.userfriendly.org/cartoons/?id">http://ars.userfriendly.org/cartoons/?id</A>=20030609
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

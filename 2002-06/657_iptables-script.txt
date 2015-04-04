@@ -1,0 +1,124 @@
+#!/bin/bash
+
+# Michael's IP Tables Script
+# -----------------------------------------------------
+# For use on a machine that acts as a gateway for a LAN
+# also as a mail/web/dns server
+# allowing unlimited access from LAN to the Internet
+# allowing SSH access restricted by IP
+# -----------------------------------------------------
+
+# Definitions
+EXTIFACE="ppp0"
+INTIFACE="eth0"
+INTNETIP="203.xx.xx.xx/x"
+EXTALLOW="myipaddress"
+NAMESERVER 1="nameserver1"
+NAMESERVER 2="nameserver2"
+BROADCAST="255.255.255.255"
+LOOPBACK="127.0.0.0/8"
+CLASS A="10.0.0.0/8"
+CLASS B="172.16.0.0/12"
+CLASS C="192.168.0.0/16"
+CLASS D MULTICAST="224.0.0.0/4"
+CLASS E RESERVED NET="240.0.0.0/5"
+PRIV PORTS="0:1023"
+UNPRIV PORTS="1024:65535"
+
+# --------------------------------------------
+
+# These lines are here in case rules are already in place and the script is ever rerun on the fly. 
+# We want to remove all rules and pre-exisiting user defined chains and zero the counters 
+# before we implement new rules. 
+iptables -F 
+iptables -X 
+iptables -Z 
+
+# Enable packet forwarding by kernel (should be on anyway)
+echo 1 > /proc/sys/net/ipv4/ip forward
+
+# Set the default policies - sets the default actions of the built-in chains.
+
+iptables -P INPUT DROP
+iptables -P FORWARD DROP 
+iptables -P OUTPUT ACCEPT
+
+# ---------------------------------------------
+
+# Don't accept source routed packets. Attackers can use source routing to generate 
+# traffic pretending to be from inside your network, but which is routed back along 
+# the path from which it came, namely outside, so attackers can compromise your 
+# network. Source routing is rarely used for legitimate purposes. 
+/bin/echo "0" > /proc/sys/net/ipv4/conf/all/accept source route 
+
+# Disable ICMP redirect acceptance. ICMP redirects can be used to alter your routing 
+# tables, possibly to a bad end. 
+/bin/echo "0" > /proc/sys/net/ipv4/conf/all/accept redirects 
+
+# Enable bad error message protection. 
+/bin/echo "1" > /proc/sys/net/ipv4/icmp ignore bogus error responses 
+
+# ---------------------------------------------
+
+# Allow unlimited traffic on the loopback interface. 
+iptables -A INPUT  -i lo -j ACCEPT 
+iptables -A OUTPUT -o lo -j ACCEPT 
+
+# Refuse packets claiming to be from a Class A private network. 
+iptables -A INPUT  -i $EXTIFACE -s $CLASS A -j DROP 
+
+# Refuse packets claiming to be from a Class B private network. 
+iptables -A INPUT  -i $EXTIFACE -s $CLASS B -j DROP 
+
+# Refuse packets claiming to be from a Class C private network. 
+iptables -A INPUT  -i $EXTIFACE -s $CLASS C -j DROP 
+
+# Refuse Class D multicast addresses. Multicast is illegal as a source address. 
+iptables -A INPUT -i $EXTIFACE -s $CLASS D MULTICAST -j DROP 
+
+# Refuse Class E reserved IP addresses. 
+iptables -A INPUT -i $EXTIFACE -s $CLASS E RESERVED NET -j DROP
+
+# Refuse packets claiming to be to the loopback interface. 
+# Refusing packets claiming to be to the loopback interface protects against 
+# source quench, whereby a machine can be told to slow itself down by an icmp source 
+# quench to the loopback. 
+iptables -A INPUT  -i $EXTIFACE -d $LOOPBACK -j DROP 
+
+# Refuse broadcast address packets. 
+iptables -A INPUT -i $EXTIFACE -d $BROADCAST -j DROP 
+
+# Drop local network traffic coming in from the external interface
+iptables -A INPUT -d $INTNETIP -i $EXTIFACE -j DROP
+
+# Reject ident probes with a tcp reset. 
+iptables -A INPUT -i $EXTIFACE -p tcp --dport 113 -j REJECT --reject-with tcp-reset 
+
+# ---------------------------------------------
+
+# Allow traffic to the net from the internal network
+iptables -A FORWARD -i $INTIFACE -s $INTNETIP -p tcp -j ACCEPT
+iptables -A FORWARD -i $INTIFACE -s $INTNETIP -p udp -j ACCEPT
+iptables -A FORWARD -i $INTIFACE -s $INTNETIP -p icmp -j ACCEPT
+
+# Allow connection to proxy server from local network
+iptables -A INPUT -i $INTIFACE -s $INTNETIP -p tcp -dport 3128 -j ACCEPT
+
+# Allow traffic from the internal network to get email
+iptables -A INPUT -i $INTIFACE -s $INTNETIP -p tcp -dport 110 -j ACCEPT
+
+# Allow traffic to the webserver on port 80
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+
+# Allow traffic to the SMTP server on port 25
+iptables -A INPUT -p tcp --dport 25 -j ACCEPT
+
+# Allow traffic to the DNS server on port 53
+iptables -A INPUT -p tcp --dport 53 -j ACCEPT
+iptables -A INPUT -p udp --dport 53 -j ACCEPT
+
+# Allow SSH traffic only from my ip's
+iptables -A INPUT -s $EXTALLOW -p tcp --dport 22 -j ACCEPT
+
+# Allow FTP traffic only from my ip's
+iptables -A INPUT -s $EXTALLOW -p tcp --dport 21 -j ACCEPT

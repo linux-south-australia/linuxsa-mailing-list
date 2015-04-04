@@ -1,0 +1,179 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Problems mounting drive as slave" -->
+<!-- FromName="'Anthony Symons'" -->
+<!-- FromEmail="ant@sa.pracom.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="andrewlord@internode.on.net" -->
+<!-- Date="14 Jun 2002 12:15:28 +0930" -->
+<!-- Id="1024022728.9282.353.camel@ant.internal" -->
+<!-- Reference="20020614020440.0696A58C9@localhost.localdomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Problems mounting drive as slave</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:andrewlord@internode.on.net">andrewlord@internode.on.net</A></I>&gt;
+  Date: 14 Jun 2002 12:15:28 +0930
+</PRE>
+<H1>Re: Problems mounting drive as slave</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+fstab is usually only used to mount your partitions normally on boot up.
+If you only want to grab some data off this old partition then you only
+need to:
+
+a) work out which partition number/device it is.
+
+eg hda for primary master
+   hdb for primary slave
+   hdc for secondary master
+   hdd for secondary slave.
+
+Once you know this, do:
+
+fdisk /dev/hdX 
+
+where X is the drive letter. Hit P enter to Print the partitioning. You
+should be able to see the letter. So, say your partition is /dev/hdc2
+
+b) mount the partition
+
+firstly, make a place for it:
+
+mkdir /mnt/place
+
+then mount it - mount should be able to automatically work out the
+filesystem type:
+
+mount /dev/hdc2 /mnt/place
+
+If it says its of an unknown type, then manually specify type eg:
+
+mount -t ext3 /dev/hdc2 /mnt/place
+
+or whatever file system it was. Once its mounted, you can copy your data
+off, unmount it, verify your data is ok, and blow away the old drive or
+whatever you want to do with it.
+
+Ant
+
+On Fri, 2002-06-14 at 11:34, Andrew Lord wrote:
+&gt; 
+&gt; 
+&gt; ----------  Forwarded Message  ----------
+&gt; 
+&gt; Subject: Re: Problems mounting drive as slave
+&gt; Date: Fri, 14 Jun 2002 11:33:56 +0930
+&gt; From: Andrew Lord &lt;<A HREF="mailto:andrew@localhost.localdomain">andrew@localhost.localdomain</A>&gt;
+&gt; To: "Richard Russell" &lt;<A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>&gt;
+&gt; 
+&gt; Hi Richard,
+&gt; 
+&gt; Thankyou for your response.
+&gt; 
+&gt; I did previously edit fstab and mtab and the result . . . well, it wasn't
+&gt; pretty.
+&gt; 
+&gt; I'll try some changes again in the light of the info you've provided below
+&gt; and will let you know how I go.
+&gt; 
+&gt; Thanks
+&gt; 
+&gt; Andrew Lord
+&gt; 
+&gt; &gt; hi andrew...
+&gt; &gt;
+&gt; &gt; briefly:
+&gt; &gt;
+&gt; &gt; /etc/fstab is the file that tells linux about your filesystems. you can
+&gt; &gt; edit it to add new filesystems, so you don't have to type a full mount
+&gt; &gt; command to mount them -- they can be mounted automatically, or you could
+&gt; &gt; type "mount &lt;mountpoint&gt;" to mount them without adding extra options.
+&gt; &gt;
+&gt; &gt; /etc/mtab is a kernel-created file that describes all the mounted
+&gt; &gt; filesystems. don't touch it...
+&gt; &gt;
+&gt; &gt; the mount program, when run by itself, will read the contents of
+&gt; &gt; /etc/mtab, format them nicely, and show you mounted filesytems. if you
+&gt; &gt; give it other options, it will mount a filesystem...
+&gt; &gt;
+&gt; &gt; eg:
+&gt; &gt;
+&gt; &gt; mount &lt;device&gt; &lt;mountpoint&gt;
+&gt; &gt;
+&gt; &gt; as an experiment, you can run mount by itself, edit /etc/mtab, adding
+&gt; &gt; another line similar but differnt to one of the lines already there, and
+&gt; &gt; then run mount again... here's an eg from my system:
+&gt; &gt;
+&gt; &gt; <A HREF="mailto:richard@gecko">richard@gecko</A>:~$ mount
+&gt; &gt; /dev/hda3 on / type ext2 (rw,errors=remount-ro,errors=remount-ro)
+&gt; &gt; proc on /proc type proc (rw)
+&gt; &gt; /dev/hda1 on /boot type ext2 (rw)
+&gt; &gt; <A HREF="mailto:richard@gecko">richard@gecko</A>:~$ sudo vi /etc/mtab
+&gt; &gt; <A HREF="mailto:richard@gecko">richard@gecko</A>:~$ mount
+&gt; &gt; /dev/hda3 on / type ext2 (rw,errors=remount-ro,errors=remount-ro)
+&gt; &gt; proc on /proc type proc (rw)
+&gt; &gt; /dev/hda1 on /boot type ext2 (rw)
+&gt; &gt; /dev/nosuchdevice on /nosuchmountpoint type ext5 (rw)
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; Lovely.
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; rr
+&gt; 
+&gt; -------------------------------------------------------
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+-- 
+Systems Administrator       
+Pracom Ltd.             
++61 8 82029074 -=- +61 402 100 671 
+<A HREF="mailto:anthony.symons@sa.pracom.com.au">anthony.symons@sa.pracom.com.au</A>
+
+PRIVILEGED - PRIVATE AND CONFIDENTIAL
+This electronic mail is solely for the use of the addressee and may
+contain information which is confidential or privileged.
+If you receive this electronic mail in error, please delete it from
+your system immediately and notify the sender by electronic mail or
+using any of the above contact details.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

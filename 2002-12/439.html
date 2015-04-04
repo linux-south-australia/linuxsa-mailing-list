@@ -1,0 +1,103 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Samba and Firewall" -->
+<!-- FromName="'Ralf Brandt'" -->
+<!-- FromEmail="rbrandt@bionomics.com.au" -->
+<!-- ToName="'Matthew Geddes'" -->
+<!-- ToEmail="mgeddes@tellurian.com.au" -->
+<!-- Date="Tue, 10 Dec 2002 09:02:47 +1030" -->
+<!-- Id="44945D836D68F54B8F2217880FC65A25180043@server.bionomics.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Samba and Firewall</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Ralf Brandt &lt;<I><A HREF="mailto:rbrandt@bionomics.com.au">rbrandt@bionomics.com.au</A></I>&gt;
+  To  : Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  Date: Tue, 10 Dec 2002 09:02:47 +1030
+</PRE>
+<H1>RE: Samba and Firewall</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Methew,
+I've tried to follow your suggestions. I've entered all the commands shown below (accepted w/o error message), but I still have the problem. What I could figure out is, that ones the Client has connection to the shared drives (e.g. the content of the server is browseable), then I can turn on the firewall and the connection still works. When I then reboot the client XP-machine the connection to the Samba drive are missing and I received the message, that some of the connected drives are not available. I'm new in the linux field therefore I started the firewall using the firewall 2 tool from Suse, and I have no idea what there really is going on. Maybe you could tell me how to edit the firewall configuration and then  launch it without touching the Suse tool.
+
+Thanks Ralf
+
+-----Original Message-----
+From: Matthew Geddes [mailto:<A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A>]
+Sent: Monday, 9 December 2002 4:54 PM
+To: Ralf Brandt
+Cc: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+Subject: Re: Samba and Firewall
+
+
+On Mon, 2002-12-09 at 15:40, Ralf Brandt wrote:
+&gt; I've configured SAMBA service. I've defined several shares which are, as expected accessible from the clients. However, after activating the firewall (I need IP masquerading) clients have no access anymore to the Samba service. Does anybody know how I can solve this problem.
+&gt;  
+&gt; Ralf
+
+The ports used are (as others have pointed out) 137,138 and 139 (and
+sometimes 445 for connectionless netbios?).
+
+	netbios-ssn: 137/TCP
+	netbios-dgm: 138/UDP
+	netbios-ns: 139/UDP
+
+Are currently open and listening (according to netstat -a) on my box.
+You could use a couple of rules such as:
+
+/sbin/iptables -A INPUT -i eth0 -p tcp --dport 137 -s 10.0.0.0/24 \
+	-j ACCEPT
+/sbin/iptables -A INPUT -i eth0 -p udp --dport 138 -s 10.0.0.0/24 \
+	-j ACCEPT
+/sbin/iptables -A INPUT -i eth0 -p udp --dport 139 -s 10.0.0.0/24 \
+	-j ACCEPT
+
+
+Assuming that your scenario is:
+
+ * deny all by default
+ * eth0 is the internal LAN
+ * The ip addresses of the machines within the LAN are in the
+10.0.0.0/255.255.255.0 network.
+
+
+Hope it helps,
+Matt
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

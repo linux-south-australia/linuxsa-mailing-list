@@ -1,0 +1,203 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Second network card" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="JEFFERY, Stuart" <Stuart.JEFFERY@eur.crowncork.com>, linuxsa" -->
+<!-- ToEmail="Stuart.JEFFERY@eur.crowncork.com" -->
+<!-- Date="Fri, 09 Jun 2000 17:17:44 +0900" -->
+<!-- Id="3.0.6.32.20000609171744.0097e320@203.16.214.248" -->
+<!-- Reference="BAE93C5034BCD211BB780008C75DED2101E2B894@ZZUK20" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Second network card</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : JEFFERY, Stuart" &lt;Stuart.JEFFERY@eur.crowncork.com&gt;, linuxsa &lt;<I><A HREF="mailto:Stuart.JEFFERY@eur.crowncork.com">Stuart.JEFFERY@eur.crowncork.com</A></I>&gt;
+  Date: Fri, 09 Jun 2000 17:17:44 +0900
+</PRE>
+<H1>RE: Second network card</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 08:50 AM 6/9/00 +0200, JEFFERY, Stuart wrote:
+&gt;You were right. The card isn't at 0x12c.
+&gt;However, when I tried insmod ne io=0x300, which is the correct
+&gt;address, I get the following error messages.
+&gt;
+&gt;Using /lib/modules/2.2.14-5.0/net/ne.o
+&gt;/lib/modules/2.2.14-5.0/net/ne.o: unresolved symbol ei_open
+&gt;/lib/modules/2.2.14-5.0/net/ne.o: unresolved symbol ethdev_init
+&gt;/lib/modules/2.2.14-5.0/net/ne.o: unresolved symbol ei_interrupt
+&gt;/lib/modules/2.2.14-5.0/net/ne.o: unresolved symbol NS8390_init
+&gt;/lib/modules/2.2.14-5.0/net/ne.o: unresolved symbol ei_close
+&gt;
+&gt;I'm guessing I did something wrong when I re-compiled the kernel
+&gt;for the NE2000 card driver support but I don't know what.
+
+Use modprobe, not insmod. The ne.o module depends on the 8390.o module.
+Modprobe should find it, where insmod won't even try.
+
+Then add all the right things to /etc/conf.modules:
+
+   alias eth0 ne
+   alias eth1 ne
+   options ne io=0x300,0xyyy
+
+where yyy is the io address that the second card is at.
+
+All of this is dealt with in my Linux course :-)
+
+&gt;Any ideas?
+&gt;
+&gt;Stuart Jeffery
+&gt;PC Systems Admin.
+&gt;CarnaudMetalbox Engineering
+&gt;
+&gt;-----Original Message-----
+&gt;From: Richard Sharpe [<A HREF="mailto:sharpe">mailto:sharpe</A>@ns.aus.com]
+&gt;Sent: 07 June 2000 03:55
+&gt;To: JEFFERY, Stuart; linuxsa
+&gt;Subject: Re: Second network card
+&gt;
+&gt;
+&gt;At 09:39 AM 6/8/00 +0200, JEFFERY, Stuart wrote:
+&gt;&gt;Hello all.
+&gt;&gt;
+&gt;&gt;I'm having problems adding a second network card to my server.
+&gt;&gt;It's an ISA NE2000 compatible card that works fine in other
+&gt;&gt;computers but seems to be giving me problems in this one.
+&gt;&gt;
+&gt;&gt;On bootup into Linux the following messages are displayed
+&gt;&gt;
+&gt;&gt;insmod: /lib/modules/2.2.14-5.0/net/ne.o: init_module: Device or resource
+&gt;&gt;busy
+&gt;&gt;insmod: /lib/modules/2.2.14-5.0/net/ne.o: insmod eth1 failed
+&gt;&gt;kernel: ne.c: No NE*000 card found at i/o = 0x12c
+&gt;
+&gt;Ummm, are you sure the card is actually at 0x12c? What address is the other
+&gt;card at? This usually indicates that the card can't be found where you said
+&gt;it was.
+&gt;
+&gt;Try probing some other obvious addresses, like 0x340, 0x320, 0x280 with the
+&gt;insmod command:
+&gt;
+&gt;  insmod ne io=0x340
+&gt;
+&gt;and so on.
+&gt;
+&gt;&gt;What's going on?
+&gt;&gt;This has been bugging me for ages. I even tried removing the old 
+&gt;&gt;Mandrake 6.0 installation and installing Redhat 6.2 to get it to
+&gt;&gt;work. No luck. I have compiled support for the NE2000 in the kernel
+&gt;&gt;and tried using netconf to get it to work.
+&gt;&gt;
+&gt;&gt;Help.
+&gt;&gt;
+&gt;&gt;Stuart Jeffery
+&gt;&gt;PC Systems Admin.
+&gt;&gt;CarnaudMetalbox Engineering.
+&gt;&gt;
+&gt;&gt;============================================
+&gt;&gt;The information contained in this message is
+&gt;&gt;confidential and intended only for the use
+&gt;&gt;of the individual or entity named above. If 
+&gt;&gt;you are not the intended recipient, you 
+&gt;&gt;should not further disseminate or copy this 
+&gt;&gt;message.
+&gt;&gt;
+&gt;&gt;CarnaudMetalbox Engineering plc
+&gt;&gt;Dockfield Road, Shipley, West Yorkshire, 
+&gt;&gt;BD17 7AY, England
+&gt;&gt;Registered Office: Dockfield Road,  Shipley,
+&gt;&gt;BD17 7AY  United Kingdom,
+&gt;&gt;Registered in England No. 472767
+&gt;&gt;============================================
+&gt;&gt;
+&gt;&gt;
+&gt;&gt;
+&gt;&gt;CONFIDENTIALITY NOTICE 
+&gt;&gt;The information contained in this e-mail is intended only for the
+&gt;&gt;confidential use of the above named recipient. If you are not the intended
+&gt;&gt;recipient or person responsible for delivering it to the intended
+&gt;recipient,
+&gt;&gt;you have received this communication in error and must not distribute or
+&gt;&gt;copy it.  Please accept the sender's apologies, notify the sender
+&gt;&gt;immediately by return e-mail and delete this communication.  Thank you. 
+&gt;&gt;
+&gt;&gt;-- 
+&gt;&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;&gt;To unsubscribe from the LinuxSA list:
+&gt;&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;&gt;
+&gt;&gt;
+&gt;
+&gt;Regards
+&gt;-------
+&gt;Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+&gt;Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+&gt;Co-author, SAMS Teach Yourself Samba in 24 Hours
+&gt;Author: First Australian 5-day, intensive, hands-on Linux SysAdmin course
+&gt;Author: First Australian 2-day, intensive, hands-on Samba course
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+&gt;
+&gt;CONFIDENTIALITY NOTICE 
+&gt;The information contained in this e-mail is intended only for the
+&gt;confidential use of the above named recipient. If you are not the intended
+&gt;recipient or person responsible for delivering it to the intended recipient,
+&gt;you have received this communication in error and must not distribute or
+&gt;copy it.  Please accept the sender's apologies, notify the sender
+&gt;immediately by return e-mail and delete this communication.  Thank you. 
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Co-author, SAMS Teach Yourself Samba in 24 Hours
+Author: First Australian 5-day, intensive, hands-on Linux SysAdmin course
+Author: First Australian 2-day, intensive, hands-on Samba course
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

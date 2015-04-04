@@ -1,0 +1,144 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="[Slightly OT] VBS.Stages.A Worm" -->
+<!-- FromName="Jim O'Halloran" -->
+<!-- FromEmail="jim@kendle.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 20 Jun 2000 15:30:17 +0930" -->
+<!-- Id="D1E188968903D4118E600040C787407305E49D@kcsserver.kendle.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: [Slightly OT] VBS.Stages.A Worm</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jim O'Halloran &lt;<I><A HREF="mailto:jim@kendle.com.au">jim@kendle.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Tue, 20 Jun 2000 15:30:17 +0930
+</PRE>
+<H1>[Slightly OT] VBS.Stages.A Worm</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+Just when you thought it was safe to run an email server...  There seems to
+be another Outlook worm going around...  It came through here this morning
+and blew our mail spool out to 10 times its normal size.  I've attached a
+script which will grep /var/spool/mail for signs of this virus, and move
+users mail files out the way (with notifications to my admin account and the
+user) if its found.  I'm running it on a cron job every 2 minutes.  Its
+pretty basic, but it does seem to work, so I hope it helps someone.
+
+On a different note...  Does anyone know of a quick way to remove individual
+messages from the mail file if a grep finds something???
+
+Jim.
+
+&lt;Script Attached&gt;
+
+---
+Jim O'Halloran
+Kendle Computer Services Pty. Ltd.
+Phone: (08) 8354 1600   (intl. +61-8-8354-1600)
+Fax: (08) 8354 1900 (intl. +61-8-8354-1900)
+
+For more than 4 generations the IT Professionals were the guardians of 
+quality and stability in software. Before the dark times. Before
+Microsoft...
+
+ 
+
+
+#!/bin/sh
+
+# This script scans the mail spool looking for signs of the VBS.Stages.A
+# worm.  It removes the user's mail file from the spool and notifies the
+# administrator and the user if anything is found.
+
+TMPFILE=/root/wormed.txt
+SUBJFILE=/root/subjects.txt
+
+#Check the mail spool for signs of the stages worm.
+cd /var/spool/mail
+grep "filename=\"LIFE_" * -l &gt; $TMPFILE
+
+#Loop through the infected users.
+for USER in `cat $TMPFILE`
+do
+  #Copy the mail files and re-create the users mail file.
+  NEWNAME=$USER.`date +%s`
+  cp /var/spool/mail/$USER /var/spool/mail/infected/$NEWNAME 
+  echo "" &gt; /var/spool/mail/$USER
+  chown $USER /var/spool/mail/$USER
+  chgrp mail /var/spool/mail/$USER
+
+  # Get a list of subject lines for the user.
+  cat /var/spool/mail/infected/$NEWNAME | grep "Subject:" &gt; $SUBJFILE
+
+  $ Email the postmaster to notify that something is wrong.
+  (                                                                         
+   echo "To: Jim O'Halloran &lt;<A HREF="mailto:jim@kendle.com.au">jim@kendle.com.au</A>&gt;"                          
+   echo "From: Jim OHalloran &lt;<A HREF="mailto:jim@kendle.com.au">jim@kendle.com.au</A>&gt;"                           
+   echo "Subject: Stages Worm in the mail spool!"
+   echo                                                                     
+   echo "VBS.Stages.A was found in $USER's mail file.  The file has been"
+   echo "moved to the infected directory, and renamed to $NEWNAME."
+   echo ""
+   cat $SUBJFILE
+   echo ""
+   echo "Jim."
+  ) 2&gt;&1 | /usr/lib/sendmail -t                                      
+
+  # Email the user and explain what happened to their mail.
+  (                                                                      
+   echo "To: $USER &lt;$USER&gt;"                         
+   echo "From: Jim OHalloran &lt;<A HREF="mailto:jim@kendle.com.au">jim@kendle.com.au</A>&gt;"                        
+   echo "Subject: A Virus was found in your email. ($NAMENAME)"                        
+   echo                                                                  
+   echo "The VBS.Stages.A virus was found in your email files. To"
+   echo "prevent you from being infected, we have renamed the file"
+   echo "to $NEWNAME.  A list of subject lines from you old mail file"      
+   echo "is attached below, if there is any messages you think are"
+   echo "important in that list, please reply to this message, and"
+   echo "indicate which messages you require."
+   echo ""
+   cat $SUBJFILE                                                         
+   echo ""                                                               
+   echo "Jim."                                                           
+  ) 2&gt;&1 | /usr/lib/sendmail -t
+done
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

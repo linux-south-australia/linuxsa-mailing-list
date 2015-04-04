@@ -1,0 +1,87 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SendMail and Rebuilding Db's" -->
+<!-- FromName="Dieter Jansen" -->
+<!-- FromEmail="dieter@tplex.com.au" -->
+<!-- ToName="Daryl Tester" <dt@picknowl.com.au>, "David Lloyd" -->
+<!-- ToEmail="dt@picknowl.com.au" -->
+<!-- Date="Sun, 15 Oct 2000 14:43:00 +0930" -->
+<!-- Id="02ac01c03666$ab68a560$027c14cb@unicycle.com.au" -->
+<!-- Reference="39E79EC3.6358760A@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SendMail and Rebuilding Db's</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dieter Jansen &lt;<I><A HREF="mailto:dieter@tplex.com.au">dieter@tplex.com.au</A></I>&gt;
+  To  : Daryl Tester" &lt;dt@picknowl.com.au&gt;, "David Lloyd &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  Date: Sun, 15 Oct 2000 14:43:00 +0930
+</PRE>
+<H1>Re: SendMail and Rebuilding Db's</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Daryl Tester wrote:
+
+&gt; Sendmail doesn't know how to build these files, unlike the /etc/aliases
+&gt; database, and uses them in a "read-only" fashion.  So you're looking at
+&gt; an external cause (most likely process).  I know RedHat ship a Makefile
+&gt; that lives in the /etc/mail/ directory where these db's normally live
+&gt; for rebuilding them; perhaps that's being run nightly?
+
+Close - there is a Makefile as you say, but as far as I know it
+is not initiated nightly.  The culprit is more likely to be the
+following from /etc/rc.d/init.d/sendmail:
+
+    for i in virtusertable access domaintable mailertable ; do
+      if [ -f /etc/mail/$i ] ; then
+        makemap hash /etc/mail/$i &lt; /etc/mail/$i
+      fi
+    done
+
+Have a look in last and see if the timestamps correspond to the
+most recent reboot.
+
+It's caught me too - especially when you add some new maps.  I
+do hope RedHat will not develop the Billy habit of "helping"
+too much!  I suppose it's a balancing act, with so many RedHat
+users being relatively inexperienced.
+
+Cheers, Dieter.
+
+--
+Dieter Jansen                                   Tetraplex Pty Ltd
+<A HREF="mailto:dieter@tplex.com.au">dieter@tplex.com.au</A>                      <A HREF="http://www.tplex.com.au/">http://www.tplex.com.au/</A>
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,133 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PPP with TPG & Rh 6.1" -->
+<!-- FromName="Don Collins" -->
+<!-- FromEmail="doncol@mail.mdt.net.au" -->
+<!-- ToName="Tim" -->
+<!-- ToEmail="saf@penguinpowered.com" -->
+<!-- Date="Mon, 24 Jan 2000 23:44:22 +1030" -->
+<!-- Id="388C502D.DF5A546F@mail.mdt.net.au" -->
+<!-- Reference="Pine.LNX.4.10.10001241354180.1276-100000@frogbert.localfrog" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PPP with TPG & Rh 6.1</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Don Collins &lt;<I><A HREF="mailto:doncol@mail.mdt.net.au">doncol@mail.mdt.net.au</A></I>&gt;
+  To  : Tim &lt;<I><A HREF="mailto:saf@penguinpowered.com">saf@penguinpowered.com</A></I>&gt;
+  Date: Mon, 24 Jan 2000 23:44:22 +1030
+</PRE>
+<H1>Re: PPP with TPG & Rh 6.1</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Here's  how a friend who is on this list did it for me a few years ago .. it
+should do what you want with appropriate tweaking.
+
+# ----  script to invoke dialing in to ISP (/usr/local/bin/dialtpg  ???)------
+
+#!/bin/sh
+/bin/setserial /dev/cua1 spd_vhi
+/usr/sbin/pppd /dev/cua1 115200
+# ---- end of script to invoke dialing in to ISP ------
+
+then you need for it to do the actuall connecting via a options file.  This
+assumes second serial port for modem (cua1)
+
+# ------  /etc/ppp/options.cua1 ----
+-detach
+asyncmap 0x00000000
+defaultroute
+netmask 255.255.255.0 /dev/cua1
+crtscts
+modem
+connect '/usr/sbin/chat -v ABORT BUSY ABORT "NO CARRIER" "" ATZ OK ATM0L0 OK
+ATDT82222222 CONNECT "" "ogin:" "username" "ssword:" "secret" ""'
+# ------ end of   /etc/ppp/options.cua1 ----
+
+the 'connect' line is one continuous line with a space after CONNECT.. not two
+lines as above.
+You'll need to edit the name, password and ISP phone number
+
+Type 'dialtpg' and it should fire up!
+hope this helps.
+regards ... Don
+
+Tim wrote:
+
+&gt; Hi Nathan
+&gt;
+&gt; I use both TPG and RH 6.1.  And yes, I too had some early problems
+&gt; connecting.  However, the PPP howto assisted greatly with this.
+&gt;
+&gt; Basically, what I do now is this: run minicom to dial in.  TPG uses
+&gt; text-based logins and not PAP, so this may be one reason that your
+&gt; connects are failing.  After typing in my username and password, and
+&gt; choosing 'ppp' as my choice, I leave minicom without resetting the modem
+&gt; (ctr-a-q).  After this, I run pppd and everything seems fine.  Note that I
+&gt; do this as root (ok ok, that's not good, but i don't think there's any
+&gt; great security risk in doing this).
+&gt;
+&gt; I strongly recommend you read the PPP howto, as this gives a detailed
+&gt; explanation of what to do.  It also goes into how to create scripts that
+&gt; users can use to dial in and log on automatically.  These too worked for
+&gt; me, but due to reinstalls and laziness I haven't bothered with them again
+&gt; :)
+&gt;
+&gt; One thing to keep in mind is to run the pppd as soon as you leave minicom.
+&gt; A good idea is to have it in your shell history so you can just tap the
+&gt; 'up' key a few times.  I had some problems at one stage due to TPG
+&gt; disconnecting me, which i think was due to not starting pppd quickly
+&gt; enough.
+&gt;
+&gt; Another small but vital tip: make sure your modem's speed in both minicom
+&gt; and pppd are identical.  The default init strings in minicom should work
+&gt; ok with most modems.
+&gt;
+&gt; Hope this helps, and once again, I stress you read to PPP howto.
+&gt;
+&gt; Cheers,
+&gt;
+&gt; Tim Riley, TPG connectivity expert :)
+&gt;
+&gt; --
+&gt; Tim
+&gt; "Go go gadget kernel compile!"
+&gt; <A HREF="http://saffire.cjb.net">http://saffire.cjb.net</A> | <A HREF="mailto:saf@penguinpowered.com">saf@penguinpowered.com</A>
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+--
+
+Don Collins - <A HREF="mailto:doncol">mailto:doncol</A>@mail.mdt.net.au
+<A HREF="http://www.mdt.net.au/~doncol">http://www.mdt.net.au/~doncol</A>
+
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

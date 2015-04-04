@@ -1,0 +1,139 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Send file as email attachment from command line?" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="michael" -->
+<!-- ToEmail="michael@home.lyppard.com.au" -->
+<!-- Date="Sat, 25 Mar 2000 19:07:36 +1030" -->
+<!-- Id="38DC7AD0.3143A4BC@aarnet.edu.au" -->
+<!-- Reference="Pine.LNX.4.10.10003251231440.25639-100000@sandwich.home.lyppard.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Send file as email attachment from command line?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : michael &lt;<I><A HREF="mailto:michael@home.lyppard.com.au">michael@home.lyppard.com.au</A></I>&gt;
+  Date: Sat, 25 Mar 2000 19:07:36 +1030
+</PRE>
+<H1>Re: Send file as email attachment from command line?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+michael wrote:
+&gt; Is there some utility to do this and have the file recognised by it's type
+&gt; at the other end? I'm thinking that I can cat the file and pipe it to
+&gt; mail, but that will just send an email with the contents of the file in
+&gt; the body, right? What is required is a mime-aware email client that can
+&gt; be driven from the command line...
+
+E-mail attachments are implemented by putting special markers
+into e-mail to mark the limits of the attachment and its type.
+You can see what this looks by typing
+
+  less /var/spool/mail/$USER
+
+and looking at an e-mail with a header containing
+
+  Content-Type: multipart/...
+
+If the attachment is binary, then it is converted to text.
+The program mimencode will do this for you.
+
+The entire process is known as MIME (Internet mail multimedia
+extension).  MIME is defined in RFC1341 available everywhere
+including
+
+  <A HREF="http://mirror.aarnet.edu.au/ietf/rfc/rfc1341.txt">http://mirror.aarnet.edu.au/ietf/rfc/rfc1341.txt</A>
+
+So to send a MIME email you end up doing something like
+
+  writemail ${TO} ${BODYFILE} ${ATTACHFILE} | sendmail ${SMOPTIONS}
+
+where writemail looks vaguely like
+
+  FROM='Glen Turner &lt;<A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>&gt;'
+  TO= 'Fred Bloggs &lt;<A HREF="mailto:fred.bloggs@example.edu.au">fred.bloggs@example.edu.au</A>&gt;'
+  SUBJECT='A file for you'
+
+  BODYFILE=fred.txt
+  ATTACHFILE=fred.jpeg
+  ATTACHFILETYPE='image/jpeg'
+
+  MIMEPART=`date +%s`
+  MIMEPART="--${USER}${MIMEPART}"
+
+  # E-mail header
+  cat &lt;&lt;EOF
+  From: ${FROM}
+  To: ${TO}
+  Subject: ${SUBJECT}
+  MIME-Version: 1.0
+  Content-Type: multipart/mixed;boundary="---=NextPart1"
+
+  EOF
+
+  # Main text header
+  cat &lt;&lt;EOF
+  ${MIMEPART}
+  Content-Type: text/plain; charset="iso-9958-1"
+  Content-Transfer-Encoding: 7bit
+
+  EOF
+
+  # Main text
+  cat ${BODYFILE}
+  
+  # Attachment header
+  cat &lt;&lt;EOF
+  ${MIMEPART}
+  Content-Type: ${ATTACHFILETYPE}; name="${ATTACHFILE}"
+  Content-transfer-Encoding: base64
+  Content-Disposition: attachment; filename="${ATTACHFILE}"
+
+  EOF
+
+  # Attachment
+  mimencode ${ATTACHFILE}  
+
+  # The end
+  echo ${MIMEPART}--
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ Earth is a single point of failure
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

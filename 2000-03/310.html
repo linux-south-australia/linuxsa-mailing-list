@@ -1,0 +1,166 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Internode and DNS" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Richard Sharpe" -->
+<!-- ToEmail="sharpe@ns.aus.com" -->
+<!-- Date="Wed, 15 Mar 2000 14:38:59 +1030" -->
+<!-- Id="20000315143858.A65439@atdot.dotat.org" -->
+<!-- Reference="3.0.6.32.20000315111402.0090cb20@203.16.214.248" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Internode and DNS</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  Date: Wed, 15 Mar 2000 14:38:59 +1030
+</PRE>
+<H1>Re: Internode and DNS</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Mar 15, 2000 at 11:14:02AM +1000, Richard Sharpe wrote:
+
+ &gt; Is anyone else having DNS problems with Internode at all?
+ 
+[ fx: mark puts his Internode hat on ]
+
+ &gt; I am currently having the following problems:
+ &gt;   I cannot resolve any samba.org addresses via Internode. Eg, www.samba.org
+ &gt;   or us1.samba.org, etc.
+ 
+<A HREF="mailto:newton@gizmo">newton@gizmo</A>&gt; nslookup -q=any samba.org.
+Server:  ns2.on.net
+Address:  192.231.203.2
+
+Non-authoritative answer:
+samba.org       nameserver = KONG.BSTC.NET
+samba.org       nameserver = SAMBA.ANU.EDU.AU
+
+Authoritative answers can be found from:
+samba.org       nameserver = KONG.BSTC.NET
+samba.org       nameserver = SAMBA.ANU.EDU.AU
+KONG.BSTC.NET   internet address = 63.238.153.11
+
+
+Ok, so samba.anu.edu.au is one of the official nameservers for samba.org.
+Curious, there's no IP address listed for it, so let's find out who it
+really is:
+
+<A HREF="mailto:newton@gizmo">newton@gizmo</A>&gt; nslookup -q=any samba.anu.edu.au. ns1.anu.edu.au.
+Server:  ns1.anu.edu.au
+Address:  150.203.1.10
+
+samba.anu.edu.au        canonical name = samba.org
+anu.edu.au      nameserver = ns1.anu.edu.au
+anu.edu.au      nameserver = una.anu.edu.au
+anu.edu.au      nameserver = ns.adelaide.edu.au
+ns1.anu.edu.au  internet address = 150.203.1.10
+una.anu.edu.au  internet address = 150.203.22.28
+ns.adelaide.edu.au      internet address = 129.127.40.3
+<A HREF="mailto:newton@gizmo">newton@gizmo</A>&gt; 
+
+Bloody hell, it's a CNAME -- no wonder it isn't working:  You aren't
+supposed to use CNAMEs in NS records.  Bizarre DNS failures caused
+by poisoned cache entries will result if you do.  
+
+Funnily enough, it looks like our cache has been poisoned with respect
+to "samba.org".  I can only see NS records for it, but other nameservers
+I've queried elsewhere in the world return A records when I ask for them.
+
+So, I'm about to restart our nameservers here, which will have the 
+effect of clearing the bogus cache data.  Meanwhile, you should do
+one of the following:
+
+   (a) talk to the ANU hostmaster;  Get them to change "samba.anu.edu.au"
+       from a CNAME record to an A record with IP address 150.203.164.44; or
+
+   (b) talk to the samba.org hostmaster;  Get them to redelegate samba.org
+       so that samba.anu.edu.au does not appear as one of the official
+       nameservers for the zone (they could use "samba.org" as one of the
+       official servers instead; it's supposed to be the same machine, after
+       all);  or
+
+Without doing one of those things, the CNAME record will cause wierd 
+failures on a subset of nameservers across the net (the exact subset
+will probably depend on the version of BIND which is in use, which might
+explain why many other ISPs can resolve your queries).  It may work in
+99.9% of cases, but a CNAME in an NS record really isn't the right thing
+to do.
+
+ &gt; I have spoken to Internode tech support on this,
+
+Who did you call?  A quick straw poll around the office hasn't turned up
+anyone who rememered talking to you, and I don't know who would have told
+you that samba.org is being moved.
+
+ &gt; and their claim is that
+ &gt; the Samba.org domain is being moved and the problems are to be expected.
+ &gt; This I find hard to believe for two reasons:
+ &gt; 1. As a member of the Samba team I have heard nothing about any such move.
+ &gt; 2. I can resolve these names to addresses from another machine in Adelaide 
+ &gt;    as well as other machines in Canberra.
+
+I've done a bit more investigation about this last comment, which has 
+uncovered a quirk which is also having an effect -- One of the samba.org
+nameservers is at 63.238.153.11.  If I trace to that from one of our
+networks which is routed via Telstra, the trace stops inside alter.net's
+network in the US.  If I do it from one of our networks which is routed
+via our satellite connectivity to the US, it goes "all the way".  This 
+suggests that either Telstra is incorrectly advertising the routes we're
+advertising to them, or alter.net is incorrectly receiving them (unsure
+at the moment - I haven't found any other subnets which experience that 
+problem so it's a bit harder to test).  In any case, our Australian
+nameservers are on terrestrially-routed subnets, so they're affected by
+this.
+
+I've logged a fault with Telstra to get them to check-up on those
+advertisements;  we'll get this sorted out as soon as possible. 
+
+Note that if samba.org was properly delegated (i.e.: the NS records
+pointed to A records instead of CNAMEs) this wouldn't be a problem
+because our nameservers would be able to fall-back to the ANU ones
+in the event that the overseas ones weren't reachable, but that's sadly
+impossible at the moment.
+
+Cheers,
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

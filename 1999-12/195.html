@@ -1,0 +1,91 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: X Display" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Subba Rao" -->
+<!-- ToEmail="subb3@attglobal.net" -->
+<!-- Date="Thu, 9 Dec 1999 19:08:50 +1030" -->
+<!-- Id="19991209190850.A10474@atdot.dotat.org" -->
+<!-- Reference="19991208211914.A16326@attglobal.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: X Display</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Subba Rao &lt;<I><A HREF="mailto:subb3@attglobal.net">subb3@attglobal.net</A></I>&gt;
+  Date: Thu, 9 Dec 1999 19:08:50 +1030
+</PRE>
+<H1>Re: X Display</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Dec 08, 1999 at 09:19:14PM -0500, Subba Rao wrote:
+
+ &gt; I use XDM on my system. When I login and try to "su - localuser" in
+ &gt; a xterm, I get the following message:
+ &gt; /dev/ttypc: Operation not permitted
+
+That's normal:  It's because /dev/ttypc is owned by root (because root
+is logged in on it) and "localuser"'s .cshrc, .bashrc, .profile or
+whatever is trying to do a "mesg y" or "mesg n".  The "mesg" command
+does its stuff by chmod'ing its controlling terminal; you can only
+chmod files you own, but since root owns the terminal (/dev/ttypc),
+localuser can't chmod it.
+
+The short answer is, "Ignore that message".
+ 
+ &gt; After I set and export the DISPLAY value to :0.0 and I try to call an
+ &gt; X application, I get,
+ &gt; Xlib: connection to ":0.0" refused by server
+ &gt; Xlib: Client is not authorized to connect to Server
+ &gt; Error: Can't open display: :0.0
+
+That's because the magic secret in root's .Xauthority file can't
+be seen by the localuser.
+
+See the Xsecurity and xauth manpages ("man Xsecurity" and "man xauth")
+to see how to fix this.
+
+Note that although you can completely disable X security ("xhost +"),
+this is definitely not recommended if you value the integrity of your
+system.
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

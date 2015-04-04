@@ -1,0 +1,276 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="samba speed" -->
+<!-- FromName="'Andrew Halliday'" -->
+<!-- FromEmail="andrew@recalldesign.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 13 Dec 2000 11:59:40 +1030" -->
+<!-- Id="005901c064a4$2a369c10$df5d0fcb@recalldesign.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: samba speed</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Halliday &lt;<I><A HREF="mailto:andrew@recalldesign.com">andrew@recalldesign.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 13 Dec 2000 11:59:40 +1030
+</PRE>
+<H1>samba speed</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi, I was wondering if anyone could help me with this samba speed problem.
+
+BACKGROUND:
+I am using Samba Version 2.0.7.  in a box on our lan whose sole purpose is
+to serve mp3s using a samba share so that people dont waste space on their
+workstations.  It is on the external network (behind nothing) which means
+that it has to pass through a router to get to the lan, but i cant see this
+as being a problem.
+
+Box specs:
+p1-120
+24mb ram
+debian (recent release - cant remember the versio number)
+default kernel
+10mb ethernet card (Realtek)
+
+The problems are that mp3s skip.  Chronically.  They play fine for the first
+5 seconds and then skip for half a second every 2-3 seconds (caching?!).
+This is only with one user on the box.  Annoying.  Initially I thought it
+was my machine (client), since all my workmates in my cubicle have much
+faster computer (mine: 200, theirs: 500+++).  However, someone just walked
+up to me with a 700 and complained of the same skipping problem.
+
+So I went and read the man page for smb.conf and read speed.txt and made the
+following additions to my smb.conf <A HREF="file:">file:</A>
+
+oplock = True
+level2 oplocks = true
+fake oplocks = yes
+share modes = off
+read prediction = yes
+
+and also changed:
+socket options = TCP_NODELAY IPTOS_LOWDELAY
+from
+socket options = TCP_NODELAY
+
+According to speed.txt, these changes should have astronomically improved
+speed.  I copied a file and it did appear to improve speed, but only
+marginally.  More specifically, it took 4minutes 32sec to copy a 3.52mb file
+... which is an absolute nightmare compared to the speeds i have seen samba
+work at before ... ie as if it were like a local hard disk (almost) !!!
+
+So WHATS BOTTLENECKING?!
+The client? (mostlikely)- given that it works okay on some clients, in which
+case how do you set options for that - i havent seen any smb options in
+windows ...
+The network card? - but i thought it would be able to handle ***1*** mp3
+stream!
+RAM? - ie an mp3 plays fine for the first few seconds ... suggesting some
+form of caching issue?
+
+
+Thoughts anyone?
+
+AndrewH
+
+PS Here are some PS and TOP listings during and after the copy
+
+DURING
+------
+  F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+100 S     0     1     0  0  60   0 -   303 select ?        00:00:11 init
+040 S     0     2     1  0  60   0 -     0 bdflus ?        00:00:00 kflushd
+040 S     0     3     1  0  60   0 -     0 kupdat ?        00:00:01 kupdate
+040 S     0     4     1  0  60   0 -     0 kpiod  ?        00:00:00 kpiod
+040 S     0     5     1  0  60   0 -     0 kswapd ?        00:00:38 kswapd
+140 S     0   137     1  0  60   0 -   322 select ?        00:00:01 syslogd
+140 S     0   139     1  0  60   0 -   403 syslog ?        00:00:01 klogd
+000 S    31   171     1  0  60   0 -  1389 select ?        00:00:00
+postmaster
+140 S     0   185     1  0  61   0 -   653 select ?        00:00:43 sshd
+000 S     0   196     1  0  60   0 -   299 read_c tty2     00:00:00 getty
+000 S     0   197     1  0  60   0 -   299 read_c tty3     00:00:00 getty
+000 S     0   198     1  0  60   0 -   299 read_c tty4     00:00:00 getty
+000 S     0   199     1  0  60   0 -   299 read_c tty5     00:00:00 getty
+000 S     0   200     1  0  60   0 -   299 read_c tty6     00:00:00 getty
+000 S     0   790     1  0  60   0 -   299 read_c tty1     00:00:00 getty
+140 S     0  5985   185  0  61   0 -   764 select ?        00:00:08 sshd
+100 S  1000  5986  5985  0  60   0 -   565 wait4  pts/2    00:00:00 bash
+100 S     0  6053  5986  0  65   0 -   579 wait4  pts/2    00:00:02 bash
+140 S     0  6629     1  0  60   0 -   319 select ?        00:00:00 atalkd
+140 S     0  6633     1  0  60   0 -   520 select ?        00:00:00 afpd
+040 S     0  6635     1  0  60   0 -   309 select ?        00:00:00 papd
+140 S     0  6662     1  0  60   0 -  9301 select ?        00:00:02 apache
+140 S 65534  6664  6662  0  60   0 -  9316 posix_ ?        00:00:00 apache
+140 S 65534  6670  6662  0  60   0 -  9307 wait_f ?        00:00:00 apache
+140 S     0  6711   185  0  60   0 -   743 select ?        00:00:01 sshd
+100 S  1000  6712  6711  0  60   0 -   563 wait4  pts/0    00:00:00 bash
+100 S     0  6713  6712  0  60   0 -   573 read_c pts/0    00:00:00 bash
+140 S     0  6747     1  0  60   0 -   605 select ?        00:00:00 nmbd
+140 S     0  6751     1  0  60   0 -   744 select ?        00:00:00 smbd
+140 S 65534  6754  6751  0  64   0 -  1081 select ?        00:00:01 smbd
+100 R     0  6759  6053  0  71   0 -   772 -      pts/2    00:00:00 ps
+
+ 12:02pm  up 4 days, 18:09,  2 users,  load average: 0.00, 0.00, 0.00
+31 processes: 30 sleeping, 1 running, 0 zombie, 0 stopped
+CPU states:   1.2% user,   1.8% system,   0.0% nice,  97.1% idle
+Mem:   21748K av,  21300K used,    448K free,  15464K shrd,   1444K buff
+Swap: 127980K av,   2804K used, 125176K free                 11728K cached
+
+  PID USER     PRI  NI  SIZE  RSS SHARE STAT  LIB %CPU %MEM   TIME COMMAND
+ 6760 root      15   0  1368 1368   760 R       0  2.1  6.2   0:00 top
+ 6754 nobody     3   0  2788 2788  2452 S       0  0.5 12.8   0:02 smbd
+ 5985 root       1   0   452  240   140 S       0  0.1  1.1   0:08 sshd
+    1 root       0   0   112   68    52 S       0  0.0  0.3   0:11 init
+    2 root       0   0     0    0     0 SW      0  0.0  0.0   0:00 kflushd
+    3 root       0   0     0    0     0 SW      0  0.0  0.0   0:01 kupdate
+    4 root       0   0     0    0     0 SW      0  0.0  0.0   0:00 kpiod
+    5 root       0   0     0    0     0 SW      0  0.0  0.0   0:38 kswapd
+  137 root       0   0   264  224   172 S       0  0.0  1.0   0:01 syslogd
+  139 root       0   0   572  164   136 S       0  0.0  0.7   0:01 klogd
+  171 postgres   0   0   220    0     0 SW      0  0.0  0.0   0:00
+postmaster
+  185 root       0   0   536  444   372 S       0  0.0  2.0   0:43 sshd
+  196 root       0   0    64    0     0 SW      0  0.0  0.0   0:00 getty
+  197 root       0   0    64    0     0 SW      0  0.0  0.0   0:00 getty
+  198 root       0   0    64    0     0 SW      0  0.0  0.0   0:00 getty
+  199 root       0   0    64    0     0 SW      0  0.0  0.0   0:00 getty
+  200 root       0   0    64    0     0 SW      0  0.0  0.0   0:00 getty
+  790 root       0   0    64    0     0 SW      0  0.0  0.0   0:00 getty
+ 5986 andrew     0   0   288    0     0 SW      0  0.0  0.0   0:00 bash
+ 6053 root       3   0   788  656   488 S       0  0.0  3.0   0:02 bash
+ 6629 root       0   0   112   48    40 S       0  0.0  0.2   0:00 atalkd
+ 6633 root       0   0   180    0     0 SW      0  0.0  0.0   0:00 afpd
+ 6635 root       0   0    64    0     0 SW      0  0.0  0.0   0:00 papd
+ 6662 root       0   0  2132 2108  2048 S       0  0.0  9.6   0:02 apache
+ 6664 nobody     0   0  2264 2248  2104 S       0  0.0 10.3   0:00 apache
+ 6670 nobody     0   0  2164 2140  2072 S       0  0.0  9.8   0:00 apache
+ 6711 root       0   0  1448 1420  1184 S       0  0.0  6.5   0:01 sshd
+ 6712 andrew     0   0  1316 1316  1036 S       0  0.0  6.0   0:00 bash
+ 6713 root       0   0  1380 1380  1060 S       0  0.0  6.3   0:00 bash
+ 6747 root       0   0  1280 1280   924 S       0  0.0  5.8   0:00 nmbd
+ 6751 root       0   0  1296 1296  1140 S       0  0.0  5.9   0:00 smbd
+
+AFTER
+-----
+  F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+100 S     0     1     0  0  60   0 -   303 select ?        00:00:11 init
+040 S     0     2     1  0  60   0 -     0 bdflus ?        00:00:00 kflushd
+040 S     0     3     1  0  60   0 -     0 kupdat ?        00:00:01 kupdate
+040 S     0     4     1  0  60   0 -     0 kpiod  ?        00:00:00 kpiod
+040 S     0     5     1  0  60   0 -     0 kswapd ?        00:00:38 kswapd
+140 S     0   137     1  0  60   0 -   322 select ?        00:00:01 syslogd
+140 S     0   139     1  0  60   0 -   403 syslog ?        00:00:01 klogd
+000 S    31   171     1  0  60   0 -  1389 select ?        00:00:00
+postmaster
+140 S     0   185     1  0  60   0 -   653 select ?        00:00:43 sshd
+000 S     0   196     1  0  60   0 -   299 read_c tty2     00:00:00 getty
+000 S     0   197     1  0  60   0 -   299 read_c tty3     00:00:00 getty
+000 S     0   198     1  0  60   0 -   299 read_c tty4     00:00:00 getty
+000 S     0   199     1  0  60   0 -   299 read_c tty5     00:00:00 getty
+000 S     0   200     1  0  60   0 -   299 read_c tty6     00:00:00 getty
+000 S     0   790     1  0  60   0 -   299 read_c tty1     00:00:00 getty
+140 S     0  5985   185  0  61   0 -   764 select ?        00:00:09 sshd
+100 S  1000  5986  5985  0  60   0 -   565 wait4  pts/2    00:00:00 bash
+100 S     0  6053  5986  0  67   0 -   579 wait4  pts/2    00:00:02 bash
+140 S     0  6629     1  0  60   0 -   319 select ?        00:00:00 atalkd
+140 S     0  6633     1  0  60   0 -   520 select ?        00:00:00 afpd
+040 S     0  6635     1  0  60   0 -   309 select ?        00:00:00 papd
+140 S     0  6662     1  0  60   0 -  9301 select ?        00:00:02 apache
+140 S 65534  6664  6662  0  60   0 -  9316 posix_ ?        00:00:00 apache
+140 S 65534  6670  6662  0  60   0 -  9307 wait_f ?        00:00:00 apache
+140 S     0  6711   185  0  60   0 -   743 select ?        00:00:01 sshd
+100 S  1000  6712  6711  0  60   0 -   563 wait4  pts/0    00:00:00 bash
+100 S     0  6713  6712  0  60   0 -   573 read_c pts/0    00:00:00 bash
+140 S     0  6747     1  0  60   0 -   605 select ?        00:00:00 nmbd
+140 S     0  6751     1  0  60   0 -   744 select ?        00:00:00 smbd
+140 S 65534  6754  6751  0  60   0 -  1081 select ?        00:00:03 smbd
+100 R     0  6770  6053  0  79   0 -   772 -      pts/2    00:00:00 ps
+
+ 12:10pm  up 4 days, 18:17,  2 users,  load average: 0.07, 0.02, 0.00
+31 processes: 30 sleeping, 1 running, 0 zombie, 0 stopped
+CPU states:   1.6% user,   0.8% system,   0.0% nice,  97.7% idle
+Mem:   21748K av,  21324K used,    424K free,  15464K shrd,    488K buff
+Swap: 127980K av,   2804K used, 125176K free                 12708K cached
+
+  PID USER     PRI  NI  SIZE  RSS SHARE STAT  LIB %CPU %MEM   TIME COMMAND
+ 6771 root      18   0  1368 1368   760 R       0  1.5  6.2   0:00 top
+ 5985 root       4   0   452  240   140 S       0  0.7  1.1   0:10 sshd
+    1 root       0   0   112   68    52 S       0  0.0  0.3   0:11 init
+    2 root       0   0     0    0     0 SW      0  0.0  0.0   0:00 kflushd
+    3 root       0   0     0    0     0 SW      0  0.0  0.0   0:01 kupdate
+    4 root       0   0     0    0     0 SW      0  0.0  0.0   0:00 kpiod
+    5 root       0   0     0    0     0 SW      0  0.0  0.0   0:38 kswapd
+  137 root       0   0   264  224   172 S       0  0.0  1.0   0:01 syslogd
+  139 root       0   0   572  164   136 S       0  0.0  0.7   0:01 klogd
+  171 postgres   0   0   220    0     0 SW      0  0.0  0.0   0:00
+postmaster
+  185 root       0   0   536  444   372 S       0  0.0  2.0   0:43 sshd
+  196 root       0   0    64    0     0 SW      0  0.0  0.0   0:00 getty
+  197 root       0   0    64    0     0 SW      0  0.0  0.0   0:00 getty
+  198 root       0   0    64    0     0 SW      0  0.0  0.0   0:00 getty
+  199 root       0   0    64    0     0 SW      0  0.0  0.0   0:00 getty
+  200 root       0   0    64    0     0 SW      0  0.0  0.0   0:00 getty
+  790 root       0   0    64    0     0 SW      0  0.0  0.0   0:00 getty
+ 5986 andrew     0   0   288    0     0 SW      0  0.0  0.0   0:00 bash
+ 6053 root       1   0   788  656   488 S       0  0.0  3.0   0:02 bash
+ 6629 root       0   0   112   48    40 S       0  0.0  0.2   0:00 atalkd
+ 6633 root       0   0   180    0     0 SW      0  0.0  0.0   0:00 afpd
+ 6635 root       0   0    64    0     0 SW      0  0.0  0.0   0:00 papd
+ 6662 root       0   0  2132 2108  2048 S       0  0.0  9.6   0:02 apache
+ 6664 nobody     0   0  2264 2248  2104 S       0  0.0 10.3   0:00 apache
+ 6670 nobody     0   0  2164 2140  2072 S       0  0.0  9.8   0:00 apache
+ 6711 root       0   0  1448 1420  1184 S       0  0.0  6.5   0:01 sshd
+ 6712 andrew     0   0  1316 1316  1036 S       0  0.0  6.0   0:00 bash
+ 6713 root       0   0  1380 1380  1060 S       0  0.0  6.3   0:00 bash
+ 6747 root       0   0  1280 1280   924 S       0  0.0  5.8   0:00 nmbd
+ 6751 root       0   0  1296 1296  1140 S       0  0.0  5.9   0:00 smbd
+ 6754 nobody     0   0  2788 2788  2452 S       0  0.0 12.8   0:03 smbd
+
+Normally there is a lot more memory free ...
+
+ --------------------------------------------------------------
+ Andrew Halliday         | Phone   : +61 8 8217 0500
+ Recall Design Pty Ltd   | Fax     : +61 8 8217 0555
+ 53 Gilbert Street       | Mobile  : 0407 779980
+ Adelaide SA 5000        | E-mail  : <A HREF="mailto:andrew@recalldesign.com">andrew@recalldesign.com</A>
+ AUSTRALIA               | Website : <A HREF="http://www.recalldesign.com">http://www.recalldesign.com</A>
+ --------------------------------------------------------------
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

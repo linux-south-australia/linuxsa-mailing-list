@@ -1,0 +1,115 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: using sed to cleanup a mac text file" -->
+<!-- FromName="Andrew Whyte" -->
+<!-- FromEmail="andrew@netregistry.au.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 08 Oct 1999 09:12:35 +1000" -->
+<!-- Id="37FD28E3.4553190A@netregistry.au.com" -->
+<!-- Reference="199910070700.QAA23690@vodka.lynx.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: using sed to cleanup a mac text file</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Whyte &lt;<I><A HREF="mailto:andrew@netregistry.au.com">andrew@netregistry.au.com</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Fri, 08 Oct 1999 09:12:35 +1000
+</PRE>
+<H1>Re: using sed to cleanup a mac text file</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I hate to jump into a fiesty argument ;-)  But I thought I'd offer this
+little bit of info on how to ditch the ^M things in text files. :-)
+
+
+Someone mentioned using \015 for a DOS style carriage return?
+This is cool, but another suggestion is to use CTRL-V followed by CTRL-M
+
+CTRL-V causes the Shell to make the next character literal and not obey it.
+So you'll get a real ^M character displayed on the command line, and not interpreted,
+thus causing a line feed in the shell.
+
+So with this in mind,  you can try these two ideas.
+(make the ^M with a  CTRL-V CTRL-M sequence!)
+
+cat macfile | tr -d '^M' &gt; unixfile
+
+or
+
+cat macfile | sed -e 's/^M//' &gt; unixfile
+
+There is no need to replace it with a \n coz thats already there of course,
+all your doing is striping the CR (\r) not the LF (\n). 
+
+As for perl, although it works great for this task, personally I would
+just use the tr or sed alternative, coz I think it's faster.
+
+If you need to check and see if your file is now okay,
+try a   'cat -vet'  this will display the Control charaters in the file.
+
+$ cat -vet test.txt 
+test^M$
+ing^M$
+the^M$
+thing^M$
+
+$ cat test.txt | tr -d '^M' &gt; out.test
+$ cat -vet out.test
+test$
+ing$
+the$
+thing$
+
+$ cat test.txt | sed -e 's/^M//' &gt; out.test.2
+$ cat -vet out.test.2
+test$
+ing$
+the$
+thing$
+
+
+Happy  Perling    s/Perling/Seding/   :-)
+
+
+
+-- 
+Andrew Whyte
+Senior System Administrator
+_____________________________________________
+NetRegistry     <A HREF="http://www.netregistry.au.com">http://www.netregistry.au.com</A>
+Tel: +61 2 9699 6099  |  Fax: +61 2 9699 6088
+PO Box 2088   Sydney   NSW   1043   Australia
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

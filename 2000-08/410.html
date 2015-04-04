@@ -1,0 +1,97 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: .bash_profile .bashrc etc." -->
+<!-- FromName="Andrew Burrow" -->
+<!-- FromEmail="alburrow@cs.adelaide.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="dan.kortschak@adelaide.edu.au" -->
+<!-- Date="Mon, 14 Aug 2000 11:12:55 +0930" -->
+<!-- Id="200008140142.LAA07127@krypton.cs.adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: .bash_profile .bashrc etc.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Burrow &lt;<I><A HREF="mailto:alburrow@cs.adelaide.edu.au">alburrow@cs.adelaide.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:dan.kortschak@adelaide.edu.au">dan.kortschak@adelaide.edu.au</A>
+  Date: Mon, 14 Aug 2000 11:12:55 +0930
+</PRE>
+<H1>Re: .bash_profile .bashrc etc.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Hi, I'm having problems getting my .bash_profile to run properly. Here
+&gt; is what I have:
+
+I think you have a subtle problem of timing here.  Namely, in
+"~/.bash_profile" you source "~/.login" before you actually export the
+variables.  Why not use
+
+	export PATH=$PATH:$HOME/bin
+	export BASH_ENV=$HOME/.bashrc
+	export USERNAME="dkortsch"
+
+so that the variables are exported at the same time as being changed.
+
+
+On another point, why do you have a login file and a profile file?
+This could be causing problems in scripts that search for a profile or
+a login file, i.e., they might use only one of the files.  Read the
+section on "INVOCATION" in the bash manpage.  It suggests that they
+are alternatives.  It reads:
+
+       Login shells:
+         On login (subject to the -noprofile option):
+               if /etc/profile exists, source it.
+
+               if ~/.bash_profile exists, source it,
+                 else if ~/.bash_login exists, source it,
+                   else if ~/.profile exists, source it.
+
+         On exit:
+               if ~/.bash_logout exists, source it.
+
+
+
+And just to be super painfully pedantic ;-), there is a subtle problem
+with "~/.bashrc" in general.  Is it a feature, or a bug in the shell?
+Again from the bash manpage section on invocation:
+
+       Non-login interactive shells:
+         On startup (subject to the -norc and -rcfile options):
+               if ~/.bashrc exists, source it.
+
+       Non-interactive shells:
+         On startup:
+               if the environment variable ENV is non-null, expand
+               it and source the file it names, as if the command
+                       if [ "$ENV" ]; then . $ENV; fi
+               had been executed, but do not use PATH to search
+               for the pathname.  When not started in Posix mode, bash
+               looks for BASH_ENV before ENV.
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

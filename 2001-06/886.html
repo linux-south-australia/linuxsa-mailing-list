@@ -1,0 +1,112 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RAID Array Problems" -->
+<!-- FromName="'Andrew Reid'" -->
+<!-- FromEmail="andrew.reid@plug.cx" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="26 Jun 2001 10:09:33 +0930" -->
+<!-- Id="993515973.1057.1.camel@percible.alfred.cx" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RAID Array Problems</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Reid &lt;<I><A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 26 Jun 2001 10:09:33 +0930
+</PRE>
+<H1>RAID Array Problems</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi All, I've got a rather urgent and pressing problem that's making my
+ears hurt :-(
+
+Last night, some bright spark decided to break something at the main
+switchboard causing AGL to have to come out and kill the power for about
+three hours. The UPS lasted for 2 of them, but it died. We couldn't even
+see in the server room to plug a monitor in and type 'halt'.
+
+Anyway, all but one of the servers have recovered properly. The server
+that hasn't is the main mail server (My personal FreeBSD Mail server is
+still running fine -- hence this email).
+
+It's a problem regarding the RAID array. /dev/md0 is a RAID-1 Array for
+the /home partition where all the mail is stored.
+
+The rc script that starts the RAID software and mounts the partition
+failed. More digging revealed that something had more seriously shit
+itself.
+
+[<A HREF="mailto:root@mail">root@mail</A> /]# raidstart --all
+/dev/md0: Invalid argument
+
+I assumed that mounting would fail, but I tried anyway:
+
+[<A HREF="mailto:root@mail">root@mail</A> /]# mount /dev/md0 /home
+/dev/md0: Device not configured
+mount: you must specify the filesystem type
+
+'dmesg' revealed something that looked rather dubious:
+
+(read) sdb1's sb offset: 8891264 [events: 6a4e2b50]
+md: invalid raid superblock magic on sdb1
+md: sdb1 has invalid sb, not importing!
+could not import sdb1!
+autostart sdb1 failed!
+
+/proc/mdstat didn't reveal much either:
+
+[<A HREF="mailto:root@mail">root@mail</A> /]# cat /proc/mdstat 
+Personalities : [raid1] 
+read_ahead not set
+unused devices: &lt;none&gt;
+
+&lt;weep, weep&gt; Please tell me that my RAID Array is OK and that everything
+will be happy happy. Please! Anyone?
+
+Desperately yours,
+
+   - andrew
+
+--
+void signature () {
+	cout &lt;&lt; "Andrew Reid -- <A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A>" &lt;&lt; endl ;
+	cout &lt;&lt; "Cell: +61 401 946 813" &lt;&lt; endl;
+	cout &lt;&lt; "Quidquid latine dictum sit, altum viditur" &lt;&lt; endl;
+}
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

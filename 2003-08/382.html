@@ -1,0 +1,353 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: ftp server setup" -->
+<!-- FromName="'Tek Gear :: Jason'" -->
+<!-- FromEmail="jason@tekgear.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 6 Aug 2003 23:43:29 +0930" -->
+<!-- Id="000901c35c24$edd08670$0201a8c0@JASON" -->
+<!-- Reference="GNECLCLHIFNNAHMOKHDPGENFDGAA.list@davey.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: ftp server setup</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Tek Gear :: Jason &lt;<I><A HREF="mailto:jason@tekgear.net.au">jason@tekgear.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 6 Aug 2003 23:43:29 +0930
+</PRE>
+<H1>RE: ftp server setup</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+netstat -ap | grep xinet
+unix  2      [ ]         DGRAM                    8166   1281/xinetd 
+
+service xinetd restart
+Stopping xinetd: [  OK  ]
+Starting xinetd: [  OK  ]
+
+So xinetd is is running but none of its services are?
+
+Tek Gear: Aussie Online Solutions
+ABN: 65 962 184 294
+Web Site: www.tekgear.net.au
+
+Jason Hausler: Proprietor
+Email: <A HREF="mailto:jason@tekgear.net.au">jason@tekgear.net.au</A>
+Mobile: +61 0422 239 133
+
+Disclaimer: If you are not the intended recipient, any use,
+distribution, disclosure or copying of this information is prohibited.
+If you receive this email in error,  notify us by return email and
+delete it and any attachments from your system. This email is not
+intended to create legally binding rights or obligations unless stated
+otherwise.
+
+
+
+-----Original Message-----
+From: John Arthur [mailto:<A HREF="mailto:list@davey.net.au">list@davey.net.au</A>] 
+Sent: Wednesday, 6 August 2003 12:51 PM
+To: Tek Gear :: Jason; <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+Subject: RE: ftp server setup
+
+
+Looking at your reply i noticed that you do not have ANY instances of
+xinetd running!
+
+try this
+
+netstat -ap | grep xinet
+
+and you should get something like this........
+
+[<A HREF="mailto:root@computer">root@computer</A> root]# netstat -ap | grep xinet
+tcp    0  0 *:imaps            *:*       LISTEN      28243/xinetd
+tcp    0  0 *:pop3s            *:*       LISTEN      28243/xinetd
+tcp    0  0 *:pop3             *:*       LISTEN      28243/xinetd
+tcp    0  0 *:imap             *:*       LISTEN      28243/xinetd
+tcp    0  0 computer.net:35539 *:*       LISTEN      28243/xinetd
+tcp    0  0 *:ftp              *:*       LISTEN      28243/xinetd
+tcp    0  0 *:telnet           *:*       LISTEN      28243/xinetd
+
+
+
+if you do not. (Is telnet running?)
+
+At your current terminal type
+
+tail -f /var/log/messages
+
+Then -Open another console window (either ssh/telnet or Alt-F2,F3 at the
+console) log on and type
+
+service xinetd restart
+
+you should get something like this......
+
+Aug  6 12:47:04 computer xinetd: xinetd shutdown succeeded
+Aug  6 12:47:05 computer xinetd[1888]: xinetd Version 2.3.11 started
+with
+libwrap loadavg options compiled in.
+Aug  6 12:47:05 computer xinetd[1888]: Started working: 8 available
+services
+Aug  6 12:47:07 computer xinetd: xinetd startup succeeded
+
+
+But I think you will get something different because I do not think you
+have xinetd running correctly
+
+&gt; -----Original Message-----
+&gt; From: Tek Gear :: Jason [mailto:<A HREF="mailto:jason@tekgear.net.au">jason@tekgear.net.au</A>]
+&gt; Sent: Wednesday, 6 August 2003 11:41 AM
+&gt; To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; Subject: RE: ftp server setup
+&gt;
+&gt;
+&gt; Using netstat -anp displays:
+&gt; tcp        0      0 0.0.0.0:20000           0.0.0.0:*
+&gt; LISTEN      946/perl
+&gt; tcp        0      0 0.0.0.0:1024            0.0.0.0:*
+&gt; LISTEN      525/rpc.statd
+&gt; tcp        0      0 0.0.0.0:1025            0.0.0.0:*
+&gt; LISTEN      712/rpc.mountd
+&gt; tcp        0      0 0.0.0.0:873             0.0.0.0:*
+&gt; LISTEN      693/rpc.rquotad
+&gt; tcp        0      0 0.0.0.0:3306            0.0.0.0:*
+&gt; LISTEN      886/mysqld
+&gt; tcp        0      0 0.0.0.0:139             0.0.0.0:*
+&gt; LISTEN      906/smbd
+&gt; tcp        0      0 127.0.0.1:783           0.0.0.0:*
+&gt; LISTEN      922/perl
+&gt; tcp        0      0 0.0.0.0:111             0.0.0.0:*
+&gt; LISTEN      506/portmap
+&gt; tcp        0      0 0.0.0.0:6000            0.0.0.0:*
+&gt; LISTEN      1012/X
+&gt; tcp        0      0 0.0.0.0:10000           0.0.0.0:*
+&gt; LISTEN      956/perl
+&gt; tcp        0      0 0.0.0.0:80              0.0.0.0:*
+&gt; LISTEN      762/httpd
+&gt; tcp        0      0 192.168.1.1:53          0.0.0.0:*
+&gt; LISTEN      888/named
+&gt; tcp        0      0 127.0.0.1:53            0.0.0.0:*
+&gt; LISTEN      888/named
+&gt; tcp        0      0 0.0.0.0:22              0.0.0.0:*
+&gt; LISTEN      660/sshd
+&gt; tcp        0      0 0.0.0.0:3128            0.0.0.0:*
+&gt; LISTEN      938/(squid)
+&gt; tcp        0      0 127.0.0.1:953           0.0.0.0:*
+&gt; LISTEN      888/named
+&gt; tcp        0      0 127.0.0.1:25            0.0.0.0:*
+&gt; LISTEN      732/sendmail: accep
+&gt; tcp        0      0 0.0.0.0:443             0.0.0.0:*
+&gt; LISTEN      762/httpd
+&gt; tcp        0      0 192.168.1.1:22          192.168.1.2:1304
+&gt; ESTABLISHED 1035/sshd
+&gt; udp        0      0 0.0.0.0:1024            0.0.0.0:*
+&gt; 525/rpc.statd
+&gt; udp        0      0 0.0.0.0:2049            0.0.0.0:*
+&gt; -
+&gt; udp        0      0 0.0.0.0:1026            0.0.0.0:*
+&gt; -
+&gt; udp        0      0 0.0.0.0:1027            0.0.0.0:*
+&gt; 712/rpc.mountd
+&gt; udp        0      0 0.0.0.0:1028            0.0.0.0:*
+&gt; 888/named
+&gt; udp        0      0 192.168.1.1:137         0.0.0.0:*
+&gt; 911/nmbd
+&gt; udp        0      0 0.0.0.0:137             0.0.0.0:*
+&gt; 911/nmbd
+&gt; udp        0      0 192.168.1.1:138         0.0.0.0:*
+&gt; 911/nmbd
+&gt; udp        0      0 0.0.0.0:138             0.0.0.0:*
+&gt; 911/nmbd
+&gt; udp        0      0 0.0.0.0:10000           0.0.0.0:*
+&gt; 956/perl
+&gt; udp        0      0 0.0.0.0:20000           0.0.0.0:*
+&gt; 946/perl
+&gt; udp        0      0 192.168.1.1:53          0.0.0.0:*
+&gt; 888/named
+&gt; udp        0      0 127.0.0.1:53            0.0.0.0:*
+&gt; 888/named
+&gt; udp        0      0 0.0.0.0:3130            0.0.0.0:*
+&gt; 938/(squid)
+&gt; udp        0      0 0.0.0.0:870             0.0.0.0:*
+&gt; 693/rpc.rquotad
+&gt; udp        0      0 0.0.0.0:111             0.0.0.0:*
+&gt; 506/portmap
+&gt; Active UNIX domain sockets (servers and established)
+&gt; Proto RefCnt Flags       Type       State         I-Node PID/Program
+&gt; name    Path
+&gt; unix  2      [ ACC ]     STREAM     LISTENING     3157
+968/gdm-binary
+&gt; /tmp/.gdm_socket
+&gt; unix  2      [ ACC ]     STREAM     LISTENING     1893   751/gpm
+&gt; /dev/gpmctl
+&gt; unix  2      [ ACC ]     STREAM     LISTENING     3166   1012/X
+&gt; /tmp/.X11-unix/X0
+&gt; unix  17     [ ]         DGRAM                    886    485/syslogd
+&gt; /dev/log
+&gt; unix  2      [ ACC ]     STREAM     LISTENING     2950   886/mysqld
+&gt; /var/lib/mysql/mysql.sock
+&gt; unix  2      [ ACC ]     STREAM     LISTENING     1984   802/xfs
+&gt; /tmp/.font-unix/fs7100
+&gt; unix  3      [ ]         STREAM     CONNECTED     3195   1012/X
+&gt; /tmp/.X11-unix/X0
+&gt; unix  3      [ ]         STREAM     CONNECTED     3194
+1020/gdmgreeter
+&gt;
+&gt; unix  3      [ ]         STREAM     CONNECTED     3191   1012/X
+&gt; /tmp/.X11-unix/X0
+&gt; unix  3      [ ]         STREAM     CONNECTED     3190
+1020/gdmgreeter
+&gt;
+&gt; unix  3      [ ]         STREAM     CONNECTED     3176   802/xfs
+&gt; /tmp/.font-unix/fs7100
+&gt; unix  3      [ ]         STREAM     CONNECTED     3175   1012/X
+&gt;
+&gt; unix  3      [ ]         STREAM     CONNECTED     3178   1012/X
+&gt; /tmp/.X11-unix/X0
+&gt; unix  3      [ ]         STREAM     CONNECTED     3169
+1011/gdm-binary
+&gt;
+&gt; unix  2      [ ]         DGRAM                    3095   956/perl
+&gt;
+&gt; unix  2      [ ]         DGRAM                    3085   922/perl
+&gt;
+&gt; unix  2      [ ]         DGRAM                    3024   935/squid
+&gt;
+&gt; unix  2      [ ]         DGRAM                    2492   888/named
+&gt;
+&gt; unix  2      [ ]         DGRAM                    2038   841/rhnsd
+&gt;
+&gt; unix  2      [ ]         DGRAM                    1998   819/anacron
+&gt;
+&gt; unix  2      [ ]         DGRAM                    1987   802/xfs
+&gt;
+&gt; unix  2      [ ]         DGRAM                    1936   771/crond
+&gt;
+&gt; unix  2      [ ]         DGRAM                    1880
+&gt; 741/clientmqueue
+&gt; unix  2      [ ]         DGRAM                    1861   732/sendmail:
+&gt; accep
+&gt; unix  2      [ ]         DGRAM                    1692   674/xinetd
+&gt;
+&gt; unix  2      [ ]         DGRAM                    1471
+647/ez-ipupdate
+&gt;
+&gt; unix  2      [ ]         DGRAM                    1112   606/apmd
+&gt;
+&gt; unix  2      [ ]         DGRAM                    948    525/rpc.statd
+&gt;
+&gt; unix  2      [ ]         DGRAM                    897    489/klogd
+&gt;
+&gt; So it looks like xinietd is running but not listening on the port.
+&gt;
+&gt; I have also chkconfig xinetd on and resarted the service. Still not
+&gt; good.
+&gt;
+&gt; Ftp localhost
+&gt; Connection refused.
+&gt;
+&gt; Tek Gear: Aussie Online Solutions
+&gt; ABN: 65 962 184 294
+&gt; Web Site: www.tekgear.net.au
+&gt;
+&gt; Jason Hausler: Proprietor
+&gt; Email: <A HREF="mailto:jason@tekgear.net.au">jason@tekgear.net.au</A>
+&gt; Mobile: +61 0422 239 133
+&gt;
+&gt; Disclaimer: If you are not the intended recipient, any use,
+&gt; distribution, disclosure or copying of this information is prohibited.
+&gt; If you receive this email in error,  notify us by return email and
+&gt; delete it and any attachments from your system. This email is not
+&gt; intended to create legally binding rights or obligations unless stated
+&gt; otherwise.
+&gt;
+&gt;
+&gt;
+&gt; -----Original Message-----
+&gt; From: Richard Russell [mailto:<A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>]
+&gt; Sent: Wednesday, 6 August 2003 11:26 AM
+&gt; To: 'Tek Gear :: Jason'; <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; Subject: RE: ftp server setup
+&gt;
+&gt;
+&gt; &gt; That command does nothing for me. It runs and then returns me
+&gt; &gt; back ready for another command. There is no display of anything.
+&gt;
+&gt; That means FTP is not running.
+&gt;
+&gt; Take a closer look at what netstat -anp does (use the man pages -- the
+&gt; 'p'
+&gt; can also be useful). It's handy.
+&gt;
+&gt; OK, now you need to get ftp running. You can either use xinetd or
+&gt; standalone
+&gt; -- your choice. Judging from what you told us about the xinetd config
+&gt; for
+&gt; the ftp server, it appears that xinetd itself isn't running. If you'd
+&gt; like
+&gt; to use xinetd, you'll need to start it -- easiest way to do that in RH
+&gt; is
+&gt; 'chkconfig xinetd on', or something like that... You'll also need to
+&gt; manually start xinetd with: '/etc/init.d/xinetd start' ...
+&gt;
+&gt; rr
+&gt;
+&gt; --
+&gt; Richard Russell
+&gt; Yellow Goanna P/L
+&gt; m: +61 412 827 805
+&gt; e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+&gt; w: <A HREF="http://www.yellowgoanna.com">http://www.yellowgoanna.com</A>
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on
+irc.freenode.net
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the
+subject
+&gt;
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

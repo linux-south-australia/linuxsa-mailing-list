@@ -1,0 +1,150 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: NVidia driver pain" -->
+<!-- FromName="'David Creed'" -->
+<!-- FromEmail="dcreed@bsal.com.au" -->
+<!-- ToName="'Barney Wrightson'" -->
+<!-- ToEmail="barney.wrightson@dsto.defence.gov.au" -->
+<!-- Date="Tue, 20 May 2003 10:49:31 +0930" -->
+<!-- Id="3EC982A3.7050304@bsal.com.au" -->
+<!-- Reference="3EC977F6.1080708@dsto.defence.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: NVidia driver pain</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Creed &lt;<I><A HREF="mailto:dcreed@bsal.com.au">dcreed@bsal.com.au</A></I>&gt;
+  To  : Barney Wrightson &lt;<I><A HREF="mailto:barney.wrightson@dsto.defence.gov.au">barney.wrightson@dsto.defence.gov.au</A></I>&gt;
+  Date: Tue, 20 May 2003 10:49:31 +0930
+</PRE>
+<H1>Re: NVidia driver pain</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Thanks guys, last night I found evidence of a serious brain fade, I'd 
+downloaded the kernel-headers for 2.4.20-1 but not for 2.4.20-1-k7, DOH!
+After apt-getting the correct headers and using
+"export IGNORE_CC_MISMATCH=yes" things went better, but the kernel 
+module still wouldn't load automatically.
+It exists and I can load it manually with insmod.
+The NVIDIA script exits with errors talking about not being happy with 
+non-GPL modules but at least the module exists.
+I'll just have to tack "/sbin/insmod nvidia" onto the end of one of the 
+rc3.d scripts.
+But at least it all works now, and I can get 150 fps while running 
+EGOBOO, which will make my daughter (and me of course) very happy.
+
+Thanks again for you patience and suggestions,
+David Creed
+
+
+
+Barney Wrightson wrote:
+&gt; David Creed wrote:
+&gt; 
+&gt;&gt; -----BEGIN PGP SIGNED MESSAGE-----
+&gt;&gt; Hash: SHA1
+&gt;&gt;
+&gt;&gt; Hi list, I'm just trying to install Nvidia drivers on Debian/Knoppix 
+&gt;&gt; Unstable and coming up against problems.
+&gt;&gt; kernel is standard Debian
+&gt;&gt; <A HREF="mailto:root@ferret">root@ferret</A>:/usr/src# uname -r
+&gt;&gt; 2.4.20-1-k7
+&gt;&gt;
+&gt;&gt; I tried to install Nvidia drivers version NVIDIA-Linux-x86-1.0-4349.run
+&gt;&gt; and found I needed to install source code for 2.4.20, did this, 
+&gt;&gt; unzipped and untarred it, pointed /usr/src/linux at 
+&gt;&gt; kernel-source-2.4.20 and re ran the Nvidia installer.
+&gt;&gt; Next problem was a message saying 
+&gt;&gt; /usr/src/linux/include/linux/modversions.h didn't exist, I had a look 
+&gt;&gt; and there was a modsetver.h, so I did ln -s modsetver.h modversions.h
+&gt;&gt; that seemed to satisfy things until on my next attempt to install I 
+&gt;&gt; got errors about different versions of compilers used to compile my 
+&gt;&gt; kernel and being used to compile the Nvidia driver and that I should 
+&gt;&gt; investigate IGNORE_CC_MISMATCH, so my next move was to
+&gt;&gt; export IGNORE_CC_MISMATCH=yes
+&gt;&gt; Now it get's beyond my level of skills and exits with (to me anyway) 
+&gt;&gt; obsure messages about "conflicting types for `kernel_thread'" which 
+&gt;&gt; means nothing to me.
+&gt;&gt; I'm hoping someone can help me with this, as it's bloody frustrating.
+&gt;&gt; I've attached the /var/log/nvidia-installer.log file for referance.
+&gt;&gt;
+&gt;&gt; Thanks in advance,
+&gt;&gt; David Creed
+&gt; 
+&gt; 
+&gt; David,
+&gt;     Having gone through this process myself (using vanilla debian 
+&gt; unstable), I think I can get you though it :) The fixes to your problems 
+&gt; are these:
+&gt; 
+&gt; 1. You need the setup that was used to build your current kernel, so 
+&gt; what you need to do is "apt-get install kernel-headers-2.4.20-1-k7" 
+&gt; which will have the config and modversions.h that were used to build 
+&gt; your current kernel. You don't even need the full source once you do 
+&gt; this. I think it sticks it in /usr/src/kernel-headers-2.4.20-1-k7 or 
+&gt; something like that.
+&gt; 
+&gt; 2. To fix the CC mismatch you'll need to set the version of CC to the 
+&gt; same one the kernel used, which I would guess is 2.95, while the default 
+&gt; installed version is probably 3.2. To do this, before building do 
+&gt; "export CC=/usr/bin/gcc-2.95" make sure that /usr/bin/gcc-2.95 exists - 
+&gt; I might have the filename wrong, or it might need to be installed - but 
+&gt; you get the idea.
+&gt; 
+&gt; If you want to keep things debianised - It might pay to use the packaged 
+&gt; version of the drivers and follow the README.Debian files in 
+&gt; /usr/share/doc/&lt;package_name&gt; on how to build them "the debian way". It 
+&gt; is pretty straightforward once you get used to it.
+&gt; 
+&gt; HTH
+&gt; Barney
+&gt; 
+
+-- 
+  10:18:01 up 277 days, 23:49,  2 users,  load average: 0.00, 0.00, 0.00
+
+
+####################################################################
+
+This e-mail is confidential and is intended solely for the use of the
+individual or entity to whom it is addressed. If you are not an
+intended recipient then you have received this e-mail in error and
+any use, dissemination, forwarding, printing or copying is strictly
+prohibited. You should contact the sender by return then delete all
+the material from your system.
+
+####################################################################
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

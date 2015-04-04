@@ -1,0 +1,111 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="PDF Create Script for Samba Printer" -->
+<!-- FromName="'Matthew Western'" -->
+<!-- FromEmail="mwestern@affairs.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 15 May 2003 09:39:54 +0930" -->
+<!-- Id="FD14944A4C95D211AF350004AC4C55A4070D8A91@mx.sola.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: PDF Create Script for Samba Printer</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Western &lt;<I><A HREF="mailto:mwestern@affairs.net.au">mwestern@affairs.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 15 May 2003 09:39:54 +0930
+</PRE>
+<H1>PDF Create Script for Samba Printer</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi All,
+I've got a working samba printer to pdf and used the sample script from
+<A HREF="http://www.linuxgazette.com/issue72/bright.html">http://www.linuxgazette.com/issue72/bright.html</A>  and am trying to modify it
+so the pdf created at the end is the same as the job name submitted by the
+person.   I've got it as far as the job name getting through but it chops
+the filename at the space which didn't really surpise me.  the man page
+tells me that %J is the job name.
+
+Anybody a whiz with these scripts can help me out?
+-----smb.conf
+[pdf]
+        comment = PDF Printer
+        path = /etc/samba/pdfoutput
+        public = yes
+        writeable = yes
+        printable = yes
+        print command = /etc/samba/pdfwrite.sh %s %J
+        lpq command =
+        lprm command =
+-----pdfwrite.sh
+
+#!/bin/sh
+
+# Simple script to convert a specified postscript file into a PDF document
+# and place it in a location that is shared by the Samba server.
+#
+# Arguments:
+#   1st - The name of the spool file
+#
+# John Bright, 2001, <A HREF="mailto:jbright@winfordeng.com">jbright@winfordeng.com</A>
+
+# We will create the pdf into a temporary file based upon the current date
+and time.
+# After we are finished, we'll rename it to a file with the same date, but
+ending
+# in .pdf.  We do this because if a user tries to open a PDF that is still
+being written,
+# they will get a message that it is corrupt, when it is actually just not
+done yet.
+
+DATE=`date +%b%d-%H%M%S`
+
+# Directory in which to place the output
+# Be sure this directory exists and is writable by the user that Samba
+# is running as (for example, the nobody user)
+OUTDIR=/etc/samba/pdfoutput
+
+#ps2pdf $1 $OUTDIR/$DATE.temp
+#mv $OUTDIR/$DATE.temp $OUTDIR/$DATE.pdf
+#rm $1
+
+ps2pdf $1 $OUTDIR/$1.temp
+cp $OUTDIR/$1.temp $OUTDIR/$2.pdf
+
+#rm $1
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

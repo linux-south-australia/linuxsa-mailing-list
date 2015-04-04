@@ -1,0 +1,126 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: New H ard Drive-Update" -->
+<!-- FromName="'Pigeon'" -->
+<!-- FromEmail="jah.pigeon@ukonline.co.uk" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 17 May 2003 13:51:42 +0100" -->
+<!-- Id="20030517125142.GA1005@pigeon.pigeonloft" -->
+<!-- Reference="200305171947.29963.cabernet@ihug.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: New H ard Drive-Update</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Pigeon &lt;<I><A HREF="mailto:jah.pigeon@ukonline.co.uk">jah.pigeon@ukonline.co.uk</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 17 May 2003 13:51:42 +0100
+</PRE>
+<H1>Re: New H ard Drive-Update</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sat, May 17, 2003 at 07:47:29PM +0930, Brian Marr wrote:
+&gt; The PC is now bootable with its new drive- so some progress. One of my 
+&gt; problems was having the CDrom as 1st Boot disk and hd1 as the second. After 
+&gt; failing to boot on the cdrom grub was looking to boot hd1 however hd0 was the 
+&gt; bootable hard drive. Once this was changed things started looking up : ) In 
+&gt; addition getting the jumpers correct helped. 
+&gt; Is it ok to have the CDrom as Secondary Master and hdd1 (40GB Seagate) as 
+&gt; Secondary Slave ?
+
+Is this because having the CD-ROM as primary slave doesn't work?
+
+&gt; The reason I ask is because I cannot mount hdd1 yet. I am getting error 
+&gt; messages about an ide-disk driver not present and Reiserfsck failing when the 
+&gt; system boots. Yet when booting into rescue and running reiserfsck it on this 
+&gt; drive it completes without any problems.
+
+Is the rescue kernel identical with the normal boot kernel?
+
+Here's some possibly relevant stuff from the kernel docs (2.4.20,
+dunno what kernel you've got but this stuff isn't new)
+
+  Use old disk-only driver on primary interface
+    CONFIG BLK DEV HD IDE
+  There are two drivers for MFM/RLL/IDE disks.  Most people use just
+  the new enhanced driver by itself.  This option however installs the
+  old hard disk driver to control the primary IDE/disk interface in
+  the system, leaving the new enhanced IDE driver to take care of only
+  the 2nd/3rd/4th IDE interfaces.  Doing this will prevent you from
+  having an IDE/ATAPI CD-ROM or tape drive connected to the primary
+  IDE interface.  Choosing this option may be useful for older systems
+  which have MFM/RLL/ESDI controller+drives at the primary port
+  address (0x1f0), along with IDE drives at the secondary/3rd/4th port
+  addresses.
+
+  Normally, just say N here; you will then use the new driver for all
+  4 interfaces.
+
+  Include IDE/ATA-2 DISK support
+    CONFIG BLK DEV IDEDISK
+  This will include enhanced support for MFM/RLL/IDE hard disks.  If
+  you have a MFM/RLL/IDE disk, and there is no special reason to use
+  the old hard disk driver instead, say Y.  If you have an SCSI-only
+  system, you can say N here.
+
+  If you want to compile this driver as a module ( = code which can be
+  inserted in and removed from the running kernel whenever you want),
+  say M here and read &lt;<A HREF="file:Documentation/modules.txt&gt">file:Documentation/modules.txt&gt</A>;.  The module
+  will be called ide-disk.o.  Do not compile this driver as a module
+  if your root file system (the one containing the directory /) is
+  located on the IDE disk. If unsure, say Y.
+
+My guess is your normal kernel has CONFIG BLK DEV HD IDE set and does
+not have CONFIG BLK DEV IDEDISK set, whereas your rescue kernel does
+have CONFIG BLK DEV IDEDISK set. This suggests that you need to
+recompile your kernel if you want to use more than one hard disk.
+
+-- 
+Pigeon
+
+Be kind to pigeons
+Get my GPG key here: <A HREF="http://pgp.mit.edu:11371/pks/lookup?op">http://pgp.mit.edu:11371/pks/lookup?op</A>=get&search=0x21C61F7F
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.0.6 (GNU/Linux)
+Comment: For info see <A HREF="http://www.gnupg.org">http://www.gnupg.org</A>
+
+iD8DBQE+xjBeUxADjyHGH38RAlwLAKCOy0//mTz3R0a0ofrP3Q6Bl65VQgCfcB5a
+d7eDV/ghsjAWNyiI3FcDFxg=
+=XMI1
+-----END PGP SIGNATURE-----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

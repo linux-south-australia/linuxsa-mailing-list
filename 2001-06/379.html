@@ -1,0 +1,128 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Bind 9 and BPD secondary" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 10 Jun 2001 01:11:59 +0930" -->
+<!-- Id="20010610011159.A11950@dog.topology.org" -->
+<!-- Reference="025c01c0f099$7f2249f0$1602a8c0@internal" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Bind 9 and BPD secondary</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 10 Jun 2001 01:11:59 +0930
+</PRE>
+<H1>Re: Bind 9 and BPD secondary</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sat, Jun 09, 2001 at 01:36:01PM +0930, Steve Sloan wrote:
+&gt; 
+&gt; I am trying to get Bind 9 on RH7.1 to transfer a primary zone to a secondary
+&gt; on BPD,
+&gt; 
+&gt; The log tells me that there are no errors but it doesn't even appear to try
+&gt; and do a transfer,
+&gt; I have tryed adding options like notify and also-notify in the named.conf
+&gt; file but still no go.
+
+
+Steve,
+
+Here's another comment on your query.
+I ran tcpdump while changing a zone file (topoz.net), and then
+sent a HUP to "named", and got this:
+
+dog /var/named# tcpdump -i ppp0 port 53 and host lns1.telstra.net or net 139.130.4.0/24 
+[....]
+
+====================================================================
+23:40:32.851206 alanke.lnk.telstra.net.4840 &gt; ns1.telstra.net.domain: 20890 [b2&3=0x10] [1au] AAAA? ns1.telstra.net. (44) (DF)
+23:40:32.989553 ns1.telstra.net.domain &gt; alanke.lnk.telstra.net.4840: 20890 FormErr- [0q] 0/0/0 (12)
+23:40:32.990124 alanke.lnk.telstra.net.4840 &gt; ns1.telstra.net.domain: 5224 AAAA? ns1.telstra.net. (33) (DF)
+23:40:33.149545 ns1.telstra.net.domain &gt; alanke.lnk.telstra.net.4840: 5224*- 0/1/0 (83)
+23:40:33.151797 alanke.lnk.telstra.net.4840 &gt; ns1.telstra.net.domain: 34111 notify [b2&3=0x2400] [1a] SOA? topoz.net. (88) (DF)
+23:40:33.299547 ns1.telstra.net.domain &gt; alanke.lnk.telstra.net.4840: 34111 notify Refused- 0/0/0 (27)  
+====================================================================
+
+And some time later, there's an apparently regularly scheduled query and response:
+
+====================================================================
+01:05:45.369543 lns1.telstra.net.2948 &gt; dog.topology.org.domain: 62101 SOA? topoz.net. (27)
+01:05:45.370640 dog.topology.org.domain &gt; lns1.telstra.net.2948: 62101*- 1/3/2 SOA (183) (DF)
+
+01:05:45.789548 ns1.telstra.net.3678 &gt; dog.topology.org.domain: S 2899771684:2899771684(0) win 65535 &lt;mss 1460,nop,wscale 1,nop,nop,timestamp 332732140 0&gt; (DF)
+01:05:45.789754 dog.topology.org.domain &gt; ns1.telstra.net.3678: S 2069916326:2069916326(0) ack 2899771685 win 5792 &lt;mss 1460,nop,nop,timestamp 364878865 332732140,nop,wscale 0&gt; (DF)
+01:05:45.959565 ns1.telstra.net.3678 &gt; dog.topology.org.domain: . 1:1(0) ack 1 win 33304 &lt;nop,nop,timestamp 332732156 364878865&gt; (DF)
+01:05:45.969557 ns1.telstra.net.3678 &gt; dog.topology.org.domain: P 1:30(29) ack 1 win 33304 &lt;nop,nop,timestamp 332732156 364878865&gt; (DF)
+01:05:45.969674 dog.topology.org.domain &gt; ns1.telstra.net.3678: . 1:1(0) ack 30 win 5792 &lt;nop,nop,timestamp 364878883 332732156&gt; (DF)
+01:05:45.971711 dog.topology.org.domain &gt; ns1.telstra.net.3678: P 1:186(185) ack 30 win 5792 &lt;nop,nop,timestamp 364878883 332732156&gt; (DF)
+01:05:46.159558 ns1.telstra.net.3678 &gt; dog.topology.org.domain: . 30:30(0) ack 186 win 33211 &lt;nop,nop,timestamp 332732177 364878883&gt; (DF)
+01:05:46.179551 ns1.telstra.net.3678 &gt; dog.topology.org.domain: P 30:59(29) ack 186 win 33304 &lt;nop,nop,timestamp 332732177 364878883&gt; (DF)
+01:05:46.219577 dog.topology.org.domain &gt; ns1.telstra.net.3678: . 186:186(0) ack 59 win 5792 &lt;nop,nop,timestamp 364878908 332732177&gt; (DF)
+01:05:46.239106 dog.topology.org.domain &gt; ns1.telstra.net.3678: P 186:501(315) ack 59 win 5792 &lt;nop,nop,timestamp 364878909 332732177&gt; (DF)
+01:05:46.439556 ns1.telstra.net.3678 &gt; dog.topology.org.domain: . 59:59(0) ack 501 win 33146 &lt;nop,nop,timestamp 332732206 364878909&gt; (DF)
+01:05:46.449551 ns1.telstra.net.3678 &gt; dog.topology.org.domain: F 59:59(0) ack 501 win 33304 &lt;nop,nop,timestamp 332732206 364878909&gt; (DF)
+01:05:46.450298 dog.topology.org.domain &gt; ns1.telstra.net.3678: F 501:501(0) ack 60 win 5792 &lt;nop,nop,timestamp 364878931 332732206&gt; (DF)
+01:05:46.599558 ns1.telstra.net.3678 &gt; dog.topology.org.domain: . 60:60(0) ack 502 win 33304 &lt;nop,nop,timestamp 332732222 364878931&gt; (DF)      
+====================================================================
+
+I.e. The BP secondary server thing lns1.telstra.net first does a regular query over UDP.
+It then opens a TCP connection from IP interface ns1.telstra.net
+to my primary.
+And that fetches the relevant zone info.
+
+And that's what should happen in your system.
+I.e. the BP machine does a regularly scheduled query to your machine,
+and if something has changed, it opens a TCP connection to fetch
+the new data.
+
+Cheers,
+Alan Kennington.
+
+--------------------------------------------------------------------
+    name: Dr. Alan Kennington
+  e-mail: <A HREF="mailto:akenning@topology.org">akenning@topology.org</A>
+ website: <A HREF="http://www.topology.org/">http://www.topology.org/</A>
+    city: Adelaide, South Australia
+  coords: 34.88051 S, 138.59334 E
+timezone: UTC+0930 <A HREF="http://www.topology.org/timezone.html">http://www.topology.org/timezone.html</A>
+ pgp-key: <A HREF="http://www.topology.org/key_ak2.asc">http://www.topology.org/key_ak2.asc</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

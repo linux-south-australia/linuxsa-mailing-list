@@ -1,0 +1,132 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: partitions" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="Chuckles <chuckles34@iname.com>, linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 18 Apr 2000 15:03:01 +0930" -->
+<!-- Id="38FBF38D.2105E40C@aarnet.edu.au" -->
+<!-- Reference="01dd01bfa8ee$897e45a0$0d00a8c0@interdyne.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: partitions</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:Chuckles <chuckles34@iname.com>">Chuckles <chuckles34@iname.com></A>, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Tue, 18 Apr 2000 15:03:01 +0930
+</PRE>
+<H1>Re: partitions</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+[ Do we want "I/O" as a meeting topic?  Say partitions, performance, logical
+  volume managers, RAID, backup strategies and finishing with hierarchical
+  storage management and storage area arrays? ]
+
+
+Chuckles wrote:
+&gt; 
+&gt; Firstly i would like to ask anyone about their recommended partition sizes,
+&gt; I have finaly upgraded my p100 with 1.3 GB HD to a p3-550 with 20 GB HD. I'm
+&gt; give 5GB to a win partition as their will be other users of the computer who
+&gt; want to run win95 (plus there are a few games i still like to play :)). The
+&gt; rest will be allocated to Linux with the partitions
+&gt; /
+&gt; /home
+&gt; /usr/local
+&gt; /tmp
+&gt; 
+&gt; does anyone have recommendation for sizes i should allocate to these
+&gt; partitions considering i'm using the box as a gateway, programming tool and
+&gt; general computing tool (ie web, word proc. etc). Are there any other
+&gt; partitions i should consider?
+&gt; 
+&gt; I was thinking of having tmp quite large and using it as the main file
+&gt; repository for all users. Is it possible to assign the /tmp partition to a
+&gt; vfat partition so that it is also accessible when i'm in windows?
+
+Aggh.  /tmp should be a filesystem that retains UNIX permissions or you
+are going to undermine security.  Using /tmp to transfer files isn't
+a good idea anyway: the contents of /tmp are not guarunteed across a
+reboot (that is, the init or shutdown script can do "rm -rf /tmp").
+
+If you have a big disk, you want a /boot partition.  It and
+the DOS partition will need to be non-extended partitions
+entirely below 1023 cylinders.
+
+On big machines, puting /var in its own partition is a good idea,
+as with /tmp.  This stops run-away processes from filling /.
+
+If it is a multi-user machine, then put /home into its own
+partition or use quotas.
+
+Having a different partition for /usr/local is unusual,
+/usr is often given its own partition as it then has
+much better odds of coming back without corruption should
+the system be uncleanly shut down (as it's unusual to write
+to /usr).
+
+It's traditional to put all the major subdirectories
+of / into their own partitions.  There is a tradeoff between
+convenience and robustness.  Obviously, if you have more
+users and a busier machine then the importanace of robustness
+grows.
+
+Try and put the swap partition in the middle of the disk.
+Ditto with /var (which gets a lot of I/O from log files)
+and /tmp.
+
+Having put stuff into its own partitions, you can optimise
+them a bit.  The two most worthwhile are to increase the
+block size (to say 4KB) and to turn off access time updating.
+
+Finally, once your machine gets above a certain size you
+can't go past multiple disks.  For example, a web server
+reads from /home/httpd and writes to /var/log/httpd.  So
+puting those on seperate disks is a huge performance gain
+as the disk head doesn't swing from one side of the disk
+to the other and back with each web request.
+
+I'm not sure what the status of the logical volume manager
+code is, but LVMs make all this partition fiddling a lot
+more straightfoward.
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ Earth is a single point of failure
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

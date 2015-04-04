@@ -1,0 +1,204 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IPv6 and frame sizes (was: Anyone going to meeting with laptopwith GbE?)" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Andrew Pullin'" -->
+<!-- ToEmail="andrew@hotspurbgc.com.au" -->
+<!-- Date="Tue, 15 Jul 2003 11:47:42 +0930" -->
+<!-- Id="3F136446.7010601@aarnet.edu.au" -->
+<!-- Reference="008001c34a00$2b311c00$c2de26cb@hotspurbgc.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IPv6 and frame sizes (was: Anyone going to meeting with laptopwith GbE?)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Andrew Pullin &lt;<I><A HREF="mailto:andrew@hotspurbgc.com.au">andrew@hotspurbgc.com.au</A></I>&gt;
+  Date: Tue, 15 Jul 2003 11:47:42 +0930
+</PRE>
+<H1>Re: IPv6 and frame sizes (was: Anyone going to meeting with laptopwith GbE?)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+IPv4 fragmentation doesn't quite work as you describe.
+
+A host sends a packet.  If this exceeds a link MTU then the
+router attached to that link fragments the packet so each
+of the packet fragments is small enough to pass across the
+link.
+
+The router at the other end of the link does not reassemble
+the packets but simply forwards them.  This makes sense, for
+two reasons
+
+1) packet reassembly would force the router to track state
+    about each connection crossing a link and thus would set
+    an upper limit on the number of connections which could
+    cross a link at any one time.  An IP packet can be 64KB
+    in size, so a reasonable number of connections could
+    impose memory requirements in the MB.
+
+2) the downstream router might not see all the fragments
+    as they might take another path through the network to
+    the host.  Imagine per-packet round-robin on a link or
+    a routing change on a path.
+
+The receiving host is the only party which is always guarunteed
+to see all fragments, so it must be able to do packet reassembly.
+So the design question is "why should routers need to reassemble
+packets when the receiver has to be able to do so anyway"?
+
+Fragmentation is massively inefficient comapred to sending the
+right-sized frame in the first place.  For this reason most IPv4
+implementations do "path MTU discovery" and set the Don't Fragment
+option on packets.
+
+If the path changes, thus perhaps decreasing MTU, then the packets
+get to a router that will try to fragment them, go "whoops the
+Don't Fragment option is set", and will send back a ICMP error
+"fragmentation required and DF set".
+
+The sending host will use that ICMP error as a hint to drop
+the sent MTU.  By guessing about the IPv4 sender will eventually
+find a MTU just at or below the smallest MTU on the packet's
+path.
+
+
+IPv6 has two changes from IPv4.
+
+1) Path MTU discovery is compulsory and there is no packet
+    fragmentation.
+
+IPv6 is aimed at making life easier for ASIC designers.  So complicated
+schemes like fragmentation aren't looked upon well (as the ASIC either
+needs to be complex or packets which need fragmentation punted to
+the CPU, which puts a limit on the packets-per-second).
+
+Given that Path MTU Discovery works well in IPv4, the IPv6 designers
+dropped fragmentation altogether.
+
+2) The ICMPv6 "Packet Too Big" has information.
+
+The ICMPv4 message "Fragmentation Required and DF Set" just tells
+the sender that the sent packet is too big for a link.  So the
+sender is forced to guess the next MTU to try, which is hard to do.
+
+Ther ICMPv6 message "Packet Too Big" tells the sender what the MTU
+of the link the packet tried to cross was.  So the sender knows what
+MTU size to try next (it still might fail, as the next link could
+have a even smaller MTU, but the right packet size will be found
+pretty quickly).
+
+There is no way that this calculation is 5% of the total packet
+transmission CPU.  In any case, it's obviously well less than
+the CPU used in the IPv4 algorithm to guess the path MTU.
+
+&gt; I am also a little confused in that if at present the standard for LANs
+&gt; is ethernet (with an MTU of 1500 bytes), then under IPv6 wouldn't that be
+&gt; the smallest MTU along the route and so the packets would be this big?
+
+The smallest MTU of a path doesn't differ between IPv4 and IPv6.
+The packets run over the same link-layer technologies (ethernet,
+ATM, SDH, PPP over dialup) and it's the link-layer technology
+which sets the biggest packet which can cross the link.
+
+&gt; ...if the path is worked out prior to transmission, what happens if the
+ &gt; path changes enroute for different packets to that the calculation
+ &gt; was done on?
+
+new path MTU &gt; old path MTU
+
+   Nothing, so packets are now smaller than those which could be
+   sent so the connection is suboptimal.  Implication for hosts
+   is that cached path MTUs should time out.
+
+new path MTU = old path MTU
+
+   All's well.
+
+new path MTU &lt; old path MTU
+
+   Router connected to link with the small MTU sends a ICMPv6 "Too Big"
+   to the sending host.  The sending host records the new path MTU size
+   and lowers the size of sent packets accordingly.
+
+   For reliable connections such as TCP, the implementation can wait
+   for the TCP Ack timer to expire and re-send the packet.  This isn't
+   optimal (as the TCP now thinks it has encountered congestion) so
+   most implementations cheat and the IP layer hints to the TCP layer
+   that the MTU has changed and TCP immediately retransmits without
+   entering congestion avoidance (ie, low performance) mode.
+
+&gt; Finally, under IPv6 the hop count is restricted to prevent endless loops
+ &gt;(amongst&gt; other things), and this is good, but it is restricted to a
+ &gt; relatively low number, like 16 or 20 (how quickly I forget). Surely
+ &gt; much data would need more hops than that to get to some places.
+
+IPv4 and IPv6 both have a counter which is decremented per
+hop.  IPv4's is called Time To Live (the original idea being
+that it would be decremented once per second or once per hop,
+but in practice no packet is queued in a router for more than
+a second).  IPv6's is called Hop Count.
+
+TTL and Hop Count do exactly the same thing.  They allow a
+looping packet to be discarded rather than live in the
+network forever.
+
+TTL and Hop Count both start with a value of 64.  The older
+RFCs have smaller values.  You need to be careful with RFCs,
+they often have details amended by later RFCs.  There's also
+"implementation practice" which isn't documented in a RFC
+which is designed to be a standard -- this is to allow implementation
+practices to change over the years.  Sometimes the current
+implementation practice is documented in a "informational"
+RFC, other times it isn't but is simply known informally
+to the implementation community.
+
+This distinction between "informational" and "standards-track"
+RFCs doesn't exist in older RFCs (like those defining IPv4,
+ICMPv4 and TCP) so you need to read those with an eye to
+identifying what statements are standards-setting and which
+are merely good advice for implementers of that period
+(and perhaps still good advice today, or perhaps not).
+
+-- 
+  Glen Turner         Tel: (08) 8303 3936 or +61 8 8303 3936
+  Network Engineer          Email: <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>
+  Australian Academic & Research Network   www.aarnet.edu.au
+-- 
+  linux.conf.au 2004, Adelaide          lca2004.linux.org.au
+  Main conference 14-17 January 2004   Miniconfs from 12 Jan
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,117 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: LILO stops at LI" -->
+<!-- FromName="Daniel Callan" -->
+<!-- FromEmail="dcallan@dataline.net.au" -->
+<!-- ToName="dgtlHUMAN" -->
+<!-- ToEmail="tumor@numb.com" -->
+<!-- Date="Tue, 24 Aug 1999 12:36:35 +1000" -->
+<!-- Id="3.0.32.19990824123625.00a853e0@hub.dataline.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: LILO stops at LI</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Callan &lt;<I><A HREF="mailto:dcallan@dataline.net.au">dcallan@dataline.net.au</A></I>&gt;
+  To  : dgtlHUMAN &lt;<I><A HREF="mailto:tumor@numb.com">tumor@numb.com</A></I>&gt;
+  Date: Tue, 24 Aug 1999 12:36:35 +1000
+</PRE>
+<H1>Re: LILO stops at LI</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 17:09 23/08/99 -0400, you wrote:
+&gt;try this. this used to happen when i put changed my hard drive mode to large
+&gt;to LBA or any other mode.
+&gt;Onl;y the mode that was set when i installed lilo wokred. and i thnk i set
+&gt;it on auto so it did whatever it wanted itself. so try playing around with
+&gt;your HD modes. 
+
+We have seen this happen sometimes even if you just change kernel versions.
+(the drive mode/CHS is identified differently during kernel dev probing)
+
+Basically, LILO is not _quite_ finding the bootsector (from what I 
+understand anyway) and usually you can get the system to boot 
+again either by:
+
+a) Booting from disk (but loading your HDD root system), taking note
+of the geometry that your kernel identifies during the dev probing.
+Then adding this geometry to your lilo.conf in one of two ways:
+(which one works seems to depend on kernel version)
+##################################
+#eg-1:
+disk = /dev/hda
+       bios = 0x80
+       sectors = 63
+       heads = 15
+       cylinders = 13446
+image = /vmlinuz
+  root = /dev/hda1
+  label = Linux
+#################################
+#eg-2:
+image = /vmlinuz
+	append = "hd=13446,15,63"
+  root = /dev/hda1
+  label = Linux
+#################################
+
+*[must run 'lilo' when finished to run this config into boot sector]
+
+
+(b) By trying all the available combinations of CMOS HD block modes
+with (and without) both types of method (a) drive geometry statements
+included in the LILO config.
+
+
+The only occasions when both of these tricks combined has failed
+were when we had to create a 500M hda1 partition to boot from
+because the was no other way. However, this has been more to do
+with that machine's bios not liking 1024+ cylinder drives, and
+has only ever happend once or twice.
+
+Good luck,
+
+Regards
+-Daniel
+
+
+         Daniel Callan
+        System Engineer/
+       Senior Programmer
+
+     <A HREF="mailto:hostmaster@dataline.net.au">hostmaster@dataline.net.au</A>
+      -- DataLine.net.au --
+     <A HREF="http://dataline.net.au">http://dataline.net.au</A> 
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

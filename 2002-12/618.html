@@ -1,0 +1,103 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Resolved: Problems with portmapper" -->
+<!-- FromName="'Andrew Hill'" -->
+<!-- FromEmail="list@fornax.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="12 Dec 2002 14:59:20 +1030" -->
+<!-- Id="1039667360.1399.18.camel@slave-i" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Resolved: Problems with portmapper</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Hill &lt;<I><A HREF="mailto:list@fornax.net">list@fornax.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 12 Dec 2002 14:59:20 +1030
+</PRE>
+<H1>Resolved: Problems with portmapper</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+Big thanks to Daryl and nik for helping me solve this one.
+
+
+
+The Problem: As a preliminary to setting up an NFS server, I was making
+sure that the portmapper for RPC was working as it should. However, the
+command 'rpcinfo -p', which should show all the RPC services the
+portmapper knows about, would time out.
+
+
+
+The Details: Helpful hints suggested that I look at the
+/etc/hosts.{allow,deny} and at my firewall rules. It was also suggested
+that I use the 'rpcinfo -u' and 'rpcinfo -t' versions of the command
+(see man page) to see if UDP/TCP worked independently. It turned out
+that UDP did work, while TCP did not.
+
+Finally, after turning on logging for my firewall rules, it was noted
+that the 'rpcinfo -t' option was logging a denied packet that was the
+REPLY from the portmapper service to the rpcinfo command.
+
+As it turns out, it would appear that the rpcinfo command, when using
+TCP, (sometimes?) sends a request to the portmapper (on port 111) using
+a port number LESS THAN 1024.
+
+Of course, I had firewall rules set up that denied access to ports less
+than 1024, other than for services that I had specifically opened. The
+fact that rpcinfo (sometimes?) uses a port number less than 1024
+prevented 'rpcinfo -p' from working on the local host as a result.
+
+
+
+The Solution: Don't firewall communications that are both to and from
+127.0.0.1 on a machine.
+
+
+
+Thanks again all!
+
+-- 
+Andrew Hill
+
+This may seem a bit weird, but that's okay, because it is weird.
+-The Perl v5.0 manual page.
+
+<A HREF="618_signature.asc">signature.asc</A>
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,106 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Broadcom (tg3) unicast IP transmit failure" -->
+<!-- FromName="'Paul Schulz'" -->
+<!-- FromEmail="paul@mawsonlakes.org" -->
+<!-- ToName="'Glen Turner'" -->
+<!-- ToEmail="glen.turner@aarnet.edu.au" -->
+<!-- Date="Mon, 19 Jan 2004 22:26:05 +1030" -->
+<!-- Id="1074513365.3792.16.camel@localhost" -->
+<!-- Reference="1074511159.5101.29.camel@andromache" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Broadcom (tg3) unicast IP transmit failure</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Paul Schulz &lt;<I><A HREF="mailto:paul@mawsonlakes.org">paul@mawsonlakes.org</A></I>&gt;
+  To  : Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  Date: Mon, 19 Jan 2004 22:26:05 +1030
+</PRE>
+<H1>Re: Broadcom (tg3) unicast IP transmit failure</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Glen,
+
+Here is the patch that allows bridging to work 
+(c/o Sarah Bolderoff)
+ 
+When the broadcom network card checksums packets, it seems 
+to assume that all the packets it sends comes from it's
+own IP address. 
+
+The solution is to turn off checksumming. The following works 
+for the '5703 A2' chip which is in the IBM x305 servers.
+
+Paul.
+
+----------------------------------------------------------------
+diff -Naur linux-2.4.20/drivers/net/tg3.c
+linux-2.4.20-np/drivers/net/tg3.c
+--- linux-2.4.20/drivers/net/tg3.c      Fri Nov 29 10:23:14 2002
++++ linux-2.4.20-np/drivers/net/tg3.c   Thu Jan 23 14:46:54 2003
+@@ -6161,6 +6161,10 @@
+        if (tp-&gt;pci chip rev id == CHIPREV ID 5700 B0)
+                tp-&gt;tg3 flags |= TG3 FLAG BROKEN CHECKSUMS;
+  
++       /* 5703 A2 have issues with checksumming too. (sarah) */
++       if (tp-&gt;pci chip rev id == CHIPREV ID 5703 A2)
++               tp-&gt;tg3 flags |= TG3 FLAG BROKEN CHECKSUMS
++
+        /* Regardless of whether checksums work or not, we configure
+         * the StrongARM chips to not compute the pseudo header
+checksums
+         * in either direction.  Because of the way Linux checksum
+support
+-----------------------------------------------------------------
+
+On Mon, 2004-01-19 at 21:49, Glen Turner wrote:
+&gt; Last week I had Dell out to replace a faulty
+&gt; ethernet RJ-45 connector on a C600 laptop.
+&gt; They replaced the entire motherboard, upgrading
+&gt; to BIOS A08 in the process.
+&gt; 
+&gt; Now the ethernet controller sees no unicast recieved
+&gt; traffic. The annoying result is that DHCP works, but ARP
+&gt; doesn't.
+&gt; 
+&gt; Before I call Dell again, has anyone experienced
+&gt; anything similar?
+&gt; 
+&gt; Ta,
+&gt; Glen
+
+<A HREF="708_signature.asc">signature.asc</A>
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,154 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IPCop" -->
+<!-- FromName="'Michael'" -->
+<!-- FromEmail="michael@home.lyppard.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 26 Mar 2003 15:03:33 +1030" -->
+<!-- Id="20030326150333.07876604.michael@home.lyppard.com.au" -->
+<!-- Reference="20030326113753.6607b3e0.michael@home.lyppard.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IPCop</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael &lt;<I><A HREF="mailto:michael@home.lyppard.com.au">michael@home.lyppard.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 26 Mar 2003 15:03:33 +1030
+</PRE>
+<H1>Re: IPCop</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 26 Mar 2003 13:47:38 +1030
+"Marcfive" &lt;<A HREF="mailto:marcfive@optusnet.com.au">marcfive@optusnet.com.au</A>&gt; wrote:
+
+&gt; It would appear that the dns requests are going out (or perhaps coming
+&gt; in) on the orange interface (eth1) rather than the red interface
+&gt; (eth2).(Which is connected via a NIC to our network)
+&gt; 
+&gt; any ideas?
+
+Hi.
+
+Can you log into the IPCop via ssh?
+
+If so, it might be instructive to view the output of the route command.
+Here is mine:
+
+<A HREF="mailto:root@ipcop">root@ipcop</A>:~ $ route
+Kernel IP routing table
+Destination  Gateway  Genmask         Flags Metric Ref    Use Iface
+172.31.40.xx *        255.255.255.255 UH    0      0        0 ppp0
+192.168.1.0  *        255.255.255.0   U     0      0        0 eth0
+1.1.1.0      *        255.255.255.0   U     0      0        0 eth1
+default      172.31.40.xx 0.0.0.0     UG    0      0        0 ppp0
+
+I have only 2 network cards though (pppoe on eth1), but you get the
+drift. Is it possible that you have the cards connected to the incorrect
+ethernet ports, or some other murphy-esque error?
+
+Looking at the dns config on the box itself, I see that the resolv.conf
+seems to live in /etc/ppp/resolv.conf, and in my (Manual) setup,
+contains the lines:
+
+nameserver 192.231.203.132
+nameserver 192.231.203.3
+
+and in my /var/log/messages:
+Mar 23 04:27:27 ipcop dnsmasq[17701]: reading /etc/ppp/resolv.conf
+Mar 23 04:27:27 ipcop dnsmasq[17701]: using nameserver 192.231.203.132
+Mar 23 04:27:27 ipcop dnsmasq[17701]: using nameserver 192.231.203.3
+
+There are limited tools included in IPCop, but I see tracepath is there,
+and could be used to identify where the packets are heading...
+
+What version of IPCop are you on, I see that 1.2 is out and a number of
+fixes are posted - time to upgrade from my 1.2pre4...
+
+Michael
+
+&gt; 
+&gt; cheers. 
+&gt; mark.
+&gt; 
+&gt; &gt; -----Original Message-----
+&gt; &gt; From: Michael [mailto:<A HREF="mailto:michael@home.lyppard.com.au">michael@home.lyppard.com.au</A>]
+&gt; &gt; Sent: Wednesday, 26 March 2003 11:38 AM
+&gt; &gt; To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; &gt; Subject: Re: IPCop
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; Hi.
+&gt; &gt; 
+&gt; &gt; On Wed, 26 Mar 2003 10:06:04 +1030
+&gt; &gt; "Marcfive" &lt;<A HREF="mailto:marcfive@optusnet.com.au">marcfive@optusnet.com.au</A>&gt; wrote:
+&gt; &gt; 
+&gt; &gt; &gt; Hi Peoples,
+&gt; &gt; &gt; Has anyone had any experience with IPCop?
+&gt; &gt; &gt; I have installed it as a firewall/gateway to our network.
+&gt; &gt; &gt; I can access websites from the local lan with IP addresses but not
+&gt; &gt; &gt; Domain names.
+&gt; &gt; &gt; Same with pop mail etc. (Only via ip address)
+&gt; &gt; &gt; Has anyone had this kind of problem before?
+&gt; &gt; 
+&gt; &gt; Would be worthwhile to know if DNS lookups work on the IPCop box
+&gt; &gt; itself, but you can switch between auto/manual on the web interface.
+&gt; &gt; You may find some clues to your problem in /var/log/messages as
+&gt; &gt; well.
+&gt; &gt; 
+&gt; &gt; On the 'Dialup' page in the web interface, at the bottom, there is
+&gt; &gt; the DNS setup area. If you have it set to automatic, and it isn't
+&gt; &gt; working, try getting the dns server's address from your ISP and
+&gt; &gt; setting the DNS to manual and put the IP address in the entry box.
+&gt; &gt; 
+&gt; &gt; Also, make sure your client machines have their DNS set to the IP
+&gt; &gt; address of your IPCop box.
+&gt; &gt; 
+&gt; &gt; Michael
+&gt; &gt; &gt; 
+&gt; &gt; &gt; I have three nics,
+&gt; &gt; &gt; Green - Local
+&gt; &gt; &gt; Orange - 'protected' webserver
+&gt; &gt; &gt; Red - to the internet (static ip address)
+&gt; &gt; &gt; 
+&gt; &gt; &gt; Is this enough info?
+&gt; &gt; &gt; 
+&gt; &gt; &gt; Cheers in advance..
+&gt; &gt; &gt; Mark.
+&gt; &gt; &gt; 
+&gt; &gt; &gt; -- 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

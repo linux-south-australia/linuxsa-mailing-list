@@ -1,0 +1,148 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="[Fwd: Re: Exit status codes]" -->
+<!-- FromName="'Anthony Symons'" -->
+<!-- FromEmail="ant@sa.pracom.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="12 Dec 2001 16:07:47 +1030" -->
+<!-- Id="1008135467.13736.8.camel@ant.internal" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: [Fwd: Re: Exit status codes]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 12 Dec 2001 16:07:47 +1030
+</PRE>
+<H1>[Fwd: Re: Exit status codes]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Oops, forgot to cc the list.
+
+Mark, you could also try:
+
+strace domainname
+
+It might provide some clues with the calls immediatly before the exit.
+
+Ant
+-- 
+Systems Administrator       
+Pracom Ltd.             
++61 8 82029074 -=- +61 402 100 671 
+<A HREF="mailto:anthony.symons@sa.pracom.com.au">anthony.symons@sa.pracom.com.au</A>
+
+PRIVILEGED - PRIVATE AND CONFIDENTIAL
+This electronic mail is solely for the use of the addressee and may
+contain information which is confidential or privileged.
+If you receive this electronic mail in error, please delete it from
+your system immediately and notify the sender by electronic mail or
+using any of the above contact details.
+
+Subject: Re: Exit status codes
+From: Anthony Symons &lt;<A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A>&gt;
+To: Mark &lt;<A HREF="mailto:markc@trinity.sa.edu.au">markc@trinity.sa.edu.au</A>&gt;
+In-Reply-To: &lt;<A HREF="mailto:5.1.0.14.2.20011212153205.00b1f1e8@mail">5.1.0.14.2.20011212153205.00b1f1e8@mail</A>&gt;
+References: &lt;<A HREF="mailto:5.1.0.14.2.20011212153205.00b1f1e8@mail">5.1.0.14.2.20011212153205.00b1f1e8@mail</A>&gt;
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+X-Mailer: Evolution/1.0 (Preview Release)
+Date: 12 Dec 2001 16:01:51 +1030
+Message-Id: &lt;<A HREF="mailto:1008135112.13739.4.camel@ant.internal">1008135112.13739.4.camel@ant.internal</A>&gt;
+Mime-Version: 1.0
+
+Wierd. Have you tryed the verbose flag? I just had a look at the sources
+and there doesnt seem to be any code at a quick glance that would return
+9.
+
+[<A HREF="mailto:ant@ant">ant@ant</A> net-tools-1.60]# cat hostname.c |grep exit
+        exit(1);
+        exit(1);
+        exit(1);
+        exit(1);
+        exit(1);
+    exit(5); /* E_VERSION */
+    fprintf(stderr, _("       hostname -V|--version|-h|--help      
+print info and exit\n\n"));
+    exit(4); /* E_USAGE */
+            exit(1);
+    exit(0);
+[<A HREF="mailto:ant@ant">ant@ant</A> net-tools-1.60]#
+
+Oh yeah, its hostname because:
+
+[<A HREF="mailto:ant@ant">ant@ant</A> net-tools-1.60]# ls -al `which domainname`
+lrwxrwxrwx    1 root     root            8 Oct  3 23:52 /bin/domainname
+-&gt; hostname*
+
+Ant
+
+On Wed, 2001-12-12 at 15:37, Mark wrote:
+&gt; Hi All,
+&gt; 
+&gt; does anyone know where I can find a list of exit status codes (using the 
+&gt; bash shell).  I run a command and then type $? and get a non-zero even 
+&gt; though the command appears to have run correctly.
+&gt; 
+&gt; For info, the command is domainname and the exit code is 9.
+&gt; 
+&gt; it's been annoying the hell out of me all afternoon.
+&gt; 
+&gt; Cheers
+&gt; Mark Collis
+&gt; Trinity College
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+-- 
+Systems Administrator       
+Pracom Ltd.             
++61 8 82029074 -=- +61 402 100 671 
+<A HREF="mailto:anthony.symons@sa.pracom.com.au">anthony.symons@sa.pracom.com.au</A>
+
+PRIVILEGED - PRIVATE AND CONFIDENTIAL
+This electronic mail is solely for the use of the addressee and may
+contain information which is confidential or privileged.
+If you receive this electronic mail in error, please delete it from
+your system immediately and notify the sender by electronic mail or
+using any of the above contact details.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

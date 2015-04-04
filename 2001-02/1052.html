@@ -1,0 +1,164 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: pppd reconnect script" -->
+<!-- FromName="'Jake Hawkes'" -->
+<!-- FromEmail="jake@infinitylimited.net" -->
+<!-- ToName="'Michael Kratz','LinuxSA Mailing List'" -->
+<!-- ToEmail="michael_kratz@hotmail.com,linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 27 Feb 2001 03:15:32 +0000" -->
+<!-- Id="3A9B1BD4.552329F6@infinitylimited.net" -->
+<!-- Reference="F29Zofu45XijWQK3zrw00007f44@hotmail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: pppd reconnect script</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  To  : Michael Kratz &lt;<I><A HREF="mailto:michael_kratz@hotmail.com">michael_kratz@hotmail.com</A></I>&gt;<BR>        LinuxSA Mailing List &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 27 Feb 2001 03:15:32 +0000
+</PRE>
+<H1>Re: pppd reconnect script</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Michael Kratz wrote:
+&gt; 
+&gt; Hi Jake, thanks for your input, I am trying hard to understand this script
+&gt; but it is kinda a little over my head, how does it work??
+
+Michael, I took the liberty of cc'ing the list. Maybe someone else will
+gain something.
+
+
+&gt; so where would i add the bit like 'pppd call provider' I dont use the ppp0up
+&gt; thing i dont understand that either!!!! pretty dumb eh! I ve only been
+&gt; messing with linux since the installfest.
+&gt; 
+&gt; &gt;so...
+&gt; &gt;
+&gt; &gt;#!/bin/bash
+&gt; &gt;ping -c1 1.1.1.1
+
+here, 1.1.1.1 is the ip of your ppp peer. when you do a ifconfig, you
+will see a lines like this:
+ppp0      Link encap:Point-to-Point Protocol  
+          inet addr:166.72.64.158  P-t-P:166.72.52.11 
+Mask:255.255.255.255
+
+so, I would replace 1.1.1.1 with 166.72.52.11
+
+whenever you run a command, it will return a status. This way, scripts
+can tell if the program had an error or not. This is always stored in
+the assumed variable $? in bash.
+
+(An assumed variable is one that you do not define, and is usually set
+by something other than your code)
+
+&gt; &gt;
+&gt; &gt;STATUS=$?
+
+I store the value of the variable here for readability.
+
+&gt; &gt;
+&gt; &gt;echo "$STATUS returned"
+
+a debug message
+
+&gt; &gt;
+&gt; &gt;case $STATUS in
+
+a case (or switch) statement. This allows me to test the value of the
+variable against many values, unlike an "if" statement, which only tests
+the value against one value[1].
+
+&gt; &gt;     0)
+&gt; &gt;         echo "next host in route alive"
+&gt; &gt;         ;;
+
+here, I say "if the value of status is 0, the print this line, and then
+jump to the end of the case statement.
+
+&gt; &gt;     1)
+&gt; &gt;         echo "no packets returned"
+&gt; &gt;         ;;
+
+here, I say "if the value of status is 1, the print this line, and then
+jump to the end of the case statement.
+
+
+&gt; &gt;     2)
+&gt; &gt;         echo "there was an error"
+&gt; &gt;         ;;
+
+same
+
+&gt; &gt;     *)
+&gt; &gt;         echo "I dunno"
+
+
+here I say, if I have not had any matches yet, then print this line
+
+&gt; &gt;esac
+
+this is the end of the case statement. When I say "jump to the end of
+the case statement", here is where it jumps to.
+
+you can put any number of commands in the case statements. so, you would
+put:
+
+
+	1)
+	   echo "link dead, initiating redial";
+	   killall pppd
+	   pppd call provider
+	   ;;
+
+
+be aware that the ;; is important. it signifies the end of that block of
+code, it is particular to case() statements in bash scripts.
+
+
+I reckon that you might be using debian, or at least something without
+"ifup" which I think is redhat (and so Mandrake to I think).
+
+any debian-ers out there know the best way to initiate a redial? I
+haven't looked to see if it is pppd that does the redial of the ifup
+script.
+
+--
+Jake Hawkes B.Eng, (CSE)
+
+Sleep is good. It'll keep you from going psychotic.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

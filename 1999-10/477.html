@@ -1,0 +1,202 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: linux uses.." -->
+<!-- FromName="Jake Hawkes" -->
+<!-- FromEmail="jake@eclectic.com.au" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Thu, 28 Oct 1999 13:10:29 +0930" -->
+<!-- Id="3817C5AD.C1997507@eclectic.com.au" -->
+<!-- Reference="199910271257.WAA09150@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: linux uses..</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Thu, 28 Oct 1999 13:10:29 +0930
+</PRE>
+<H1>Re: linux uses..</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Just a note:
+
+Real Time Linux <A HREF="http://luz.cs.nmt.edu/~rtlinux/">http://luz.cs.nmt.edu/~rtlinux/</A> is what you would want.
+
+A breif rundown of how it works:
+
+the system is broken up into bits: the real time kernel (rtk) the kernel
+and everything else.
+
+
+the rtkernel runs the normal kernel as its lowest priority process. your
+bash shell runs under the normal kernel. you write you real time apps as
+kernel modules, and insert them into the real time kernel.
+
+The real time kernel masks *all* interupts while it is running your
+module, and these interrupts are queued and handled when your module
+gives up control. You can be assured that when your module is running,
+nothing else is. You will not be swapped out. (As I found out when I had
+an infinite loop in the module. Nothing else for it but a hard reset,
+ctl-alt-del wasn't going to help:)
+
+the accuracy of the timing is in th order of us, but there is still
+jitter. 
+
+I'm no kernel coding person, but I managed to write a kernel module to
+do what I needed. The trivckyt thing is, becasue its a kernel module,
+there is no "normal" IO. To communictae to an interactove program
+running under the normal kernel you either have to use shared memeory,
+or what I used, real time pipes. These are fifo pipes that can be talked
+to from the real time kernel and from any process in running under the
+normal kernel.
+
+In case your interested, the project I used this in ws a group project
+to implement some fuzzy logic. The data aquisition happened via the a/d
+board the data was processed in a user process and the resulting data
+was passed back to the d/a board to control motors and stuff.
+
+
+
+Alan Kennington wrote:
+&gt; 
+&gt; You can even just forget about the paging problem
+&gt; when considering real-time.
+&gt; 
+&gt; Suppose you need to do something at a given time,
+&gt; and you have a kernel module with locked pages
+&gt; which is waiting for a clock to interrupt it
+&gt; to do something or other. If the kernel
+&gt; is busy doing some paging for a kmalloc()
+&gt; call or something, then you just have to wait.
+&gt; 
+&gt; E.g. I just found this in the kmalloc function:
+&gt; 
+&gt; ----------------------------------------------
+&gt;         save_flags(flags);
+&gt;         cli();
+&gt; 
+&gt;         bucket-&gt;nfrees++;
+&gt;         bucket-&gt;nbytesmalloced -= ptr-&gt;bh_length;
+&gt; 
+&gt;         ptr-&gt;bh_next = page-&gt;firstfree;
+&gt;         page-&gt;firstfree = ptr;
+&gt;         if (!page-&gt;nfree++) {
+&gt; /* Page went from full to one free block: put it on the freelist. */
+&gt;                 if (bucket-&gt;nblocks == 1)
+&gt;                         goto free_page;
+&gt;                 page-&gt;next = *pg;
+&gt;                 *pg = page;
+&gt;         }
+&gt; /* If page is completely free, free it */
+&gt;         if (page-&gt;nfree == bucket-&gt;nblocks) {
+&gt;                 for (;;) {
+&gt;                         struct page_descriptor *tmp = *pg;
+&gt;                         if (!tmp)
+&gt;                                 goto not_on_freelist;
+&gt;                         if (tmp == page)
+&gt;                                 break;
+&gt;                         pg = &tmp-&gt;next;
+&gt;                 }
+&gt;                 *pg = page-&gt;next;
+&gt; free_page:
+&gt;                 bucket-&gt;npages--;
+&gt;                 free_kmalloc_pages(page, bucket-&gt;gfporder, dma);
+&gt;         }
+&gt;         restore_flags(flags);
+&gt; --------------------------------------------------
+&gt; 
+&gt; That's a lot of code between the cli() which blocks out all
+&gt; interrupts (except for NMI) and the restore_flags().
+&gt; A for loop through the page list is going to use up a lot
+&gt; of cycles! Even at 400 MHz, this could be quite a long time.
+&gt; 
+&gt; Now another more basic problem......
+&gt; 
+&gt; My /proc/interrupts has:
+&gt; 
+&gt; ================================================
+&gt;            CPU0
+&gt;   0:    9000700          XT-PIC  timer
+&gt;   1:      78922          XT-PIC  keyboard
+&gt;   2:          0          XT-PIC  cascade
+&gt;   4:     560830          XT-PIC  serial
+&gt;   8:          2          XT-PIC  rtc
+&gt;  10:     261429          XT-PIC  Intel EtherExpress Pro 10/100 Ethernet
+&gt;  11:      68398          XT-PIC  ncr53c8xx
+&gt;  12:       7927          XT-PIC  es1371
+&gt;  13:          1          XT-PIC  fpu
+&gt;  14:    1905754          XT-PIC  ide0
+&gt;  15:          5          XT-PIC  ide1
+&gt; NMI:          0
+&gt; ================================================
+&gt; 
+&gt; Suppose your kernel module is at priority 13 or whatever.
+&gt; It is still in danger of being interrupted by IDE.
+&gt; 
+&gt; And when the hardware interrupt does happen for
+&gt; your module, you still have to wait for the
+&gt; kernel to do some basic processing before it
+&gt; actually hands on to your module bottom half.
+&gt; 
+&gt; So that's 3 reasons why you can forget
+&gt; real real-time in linux.
+&gt; 
+&gt; Cheers,
+&gt; Alan Kennington.
+&gt; 
+&gt; --------------------------------------------------------------------
+&gt;    name: Dr. Alan Kennington
+&gt;  e-mail: <A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>
+&gt; website: <A HREF="http://topology.org/">http://topology.org/</A>
+&gt;    city: Adelaide, South Australia
+&gt;  coords: 34.89744 S, 138.58970 E
+&gt; pgp-key: <A HREF="http://topology.org/key_ak1.asc">http://topology.org/key_ak1.asc</A>
+&gt; saying1: `The Internet is the parliament of the people.' ak 28/5/1999.
+&gt; saying2: `Seek truth from facts.' mao or deng, 1970s?
+&gt; saying3: `Let a 1000 flowers bloom, let a 1000 schools contend.' mao, 1970s?
+&gt; saying4: `Cut down the tall poppies.' mao, a few months later.
+&gt; 
+&gt; --
+&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+--
+Jake Hawkes, B. Eng (CSE)
+e-mail: <A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A>
+
+Chaos, panic, & disorder -- my work here is done.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

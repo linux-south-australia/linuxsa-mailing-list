@@ -1,0 +1,160 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="wireless & pcmcia: just some gotchas" -->
+<!-- FromName="'Toby:Wintrmute'" -->
+<!-- FromEmail="tjc@lost.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 26 Jun 2002 18:51:55 +0930 (CST)" -->
+<!-- Id="20020626180910.L21207-100000@marbles.lost.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: wireless & pcmcia: just some gotchas</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby:Wintrmute &lt;<I><A HREF="mailto:tjc@lost.net.au">tjc@lost.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 26 Jun 2002 18:51:55 +0930 (CST)
+</PRE>
+<H1>wireless & pcmcia: just some gotchas</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+I've been setting up a wireless network over the last few days, using
+pcmcia-&gt;pci bridge cards and orinoco wireless cards.
+
+This is just an email to tell you about a couple of problems I hit, and
+solved. I thought I'd pass the info along to save you the hassles I had.
+
+Note that my laptop, which already had everything setup magically by
+Mandrake, worked fine -- i plugged in the wireless card and it went BEEP
+and started going ok ;)
+
+The stuff below is from my attempts to get everything working with my
+custom kernel, bridges, etc....
+
+
+
+Firstly, I found a problem where i kept getting errors in my syslog like
+"NETDEV WATCHDOG: eth2 timed out... resetting card" whenever I tried to do
+anything with the wireless card.
+
+The solution to this was to add a line to my /etc/modules.conf like:
+
+options i82365 irq_mode=0
+
+This tells the module for the pcmcia bridge that it can only have access
+to the PCI irqs in my machine, and not the ISA ones. This fixed the
+problem.
+
+
+
+The other problem I had was that iwconfig, iwspy, and so on, all claimed i
+had no wireless extensions available for my wireless device. (eth2).
+
+This was because my kernel did not have "wireless radio network support"
+enabled. I went back in and turned it on, rebuilt the kernel, rebooted,
+and everything was fine.
+
+I had this disabled in the kernel because I thought it should be -- since
+I was using the external pcmcia-cs setup which included the wireless
+devices.
+
+
+
+This is the long step by step version of what I did:
+
+Get kernel source, set it up so pcmcia is disabled, no pcmcia drivers are
+built, etc. However you do need to check the box for wireless radio
+networking support -- just don't tick the boxes to build drivers for
+individual cards. (THat'll be done by pcmcia-cs)
+
+(At this point you may want to copy the latest version of wireless.h from
+/usr/src/linux/include/linux/ into /usr/include/linux.)
+
+After getting that kernel up n running, come back and download build and
+extract pcmcia-cs - i used version 3.1.34. (with the orinoco airsnort
+patch)
+I used the default options, and it all built and installed fine.
+
+Download, build, and install the wireless-tools package.
+
+
+edit /etc/pcmcia/wireless.opts and configure it the way you'd like.. (eg.
+default channel, speed, options and so on)
+
+
+Now, run /etc/init.d/pcmcia start and it hopefully that goes well.
+(i had to comment out the pre-install pcmcia_core CARDMGR_OPTS=-f...etc
+line in /etc/modules.conf before that worked though, but i think thats
+because my machine is a bit wierd)
+
+
+Now insert the wireless card into the socket. Wait a second, then type
+dmesg
+
+This should give you some debugging info about the card and bridge and so
+on.. basically it should all look positive. If not, time to start
+debugging.
+
+
+Now try pinging an address on the wireless subnet.. if it comes back fine,
+you can stop reading now.
+
+If not, type dmesg, and look for those netdev watchdog timeouts.. If you
+are getting them, go back and add the irq_mode=0 to the modules.conf, then
+run '/etc/init.d/pcmcia stop' and then run it again with 'start'.
+
+
+Anyway, hope all this helps,
+
+Toby
+
+PS. And don't forget your firewalls :)
+eg:
+iptables -N WIRELESS
+#insert rules here
+
+iptables -I INPUT 3 -i $WIRELESSIF -j WIRELESS
+
+-- 
+we dance to the sound of sirens
+we watch genocide to relax
+we dance to the sound of sirens
+we are the heroes of self-deception
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,96 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Unusual sendmail question." -->
+<!-- FromName="Geoffrey D. Bennett" -->
+<!-- FromEmail="g@netcraft.com.au" -->
+<!-- ToName="Justin Hawkins" -->
+<!-- ToEmail="justin@tardis.mx.com.au" -->
+<!-- Date="Thu, 9 Jul 1998 21:34:41 +0930 (CST)" -->
+<!-- Id="199807091204.VAA03868@Kara.netcraft.com.au" -->
+<!-- Reference="Pine.LNX.3.96.980709222028.1535A-100000@tardis.mx.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Unusual sendmail question.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Geoffrey D. Bennett &lt;<I><A HREF="mailto:g@netcraft.com.au">g@netcraft.com.au</A></I>&gt;
+  To  : Justin Hawkins &lt;<I><A HREF="mailto:justin@tardis.mx.com.au">justin@tardis.mx.com.au</A></I>&gt;
+  Date: Thu, 9 Jul 1998 21:34:41 +0930 (CST)
+</PRE>
+<H1>Re: Unusual sendmail question.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Would it be hard to persuade sendmail to send out smtp messages (locally
+&gt; originating ones), preferebly on to a smarthost, but never ever under any
+&gt; circumstances to receive SMTP mail?
+
+Hi Justin,
+
+Not hard at all.  It's in the man pages even :-).
+
+# grep "daemon " /etc/rc.d/init.d/sendmail
+daemon /usr/sbin/sendmail -bd -q1h
+
+Running "man sendmail" tells me:
+
+     -bd         Run as a daemon.  This requires Berkeley IPC.  Sendmail will
+                 fork and run in background listening on socket 25 for incom-
+                 ing SMTP connections.  This is normally run from /etc/rc.
+
+     -q[time]    Processed saved messages in the queue at given intervals.  If
+                 time is omitted, process the queue once.  Time is given as a
+                 tagged number, with `s' being seconds, `m' being minutes, `h'
+                 being hours, `d' being days, and `w' being weeks.  For exam-
+                 ple, `-q1h30m' or `-q90m' would both set the timeout to one
+                 hour thirty minutes.  If time is specified, sendmail will run
+                 in background.  This option can be used safely with -bd.
+
+To confirm:
+
+# /etc/rc.d/init.d/sendmail stop
+Shutting down sendmail: sendmail 
+# sendmail -q1h
+# ps auxww | grep sendmail
+root      1309  0.5  1.4  1432   952  ?  S    22:22   0:00 sendmail -q1h 
+# telnet 0 smtp
+Trying 0.0.0.0...
+<A HREF="telnet:">telnet:</A> Unable to connect to remote host: Connection refused
+
+Regards,
+-- 
+Geoffrey D. Bennett (<A HREF="mailto:geoffrey@netcraft.com.au">geoffrey@netcraft.com.au</A>)
+Computer Systems Manager, NetCraft Australia
+<A HREF="http://www.netcraft.com.au/geoffrey/">http://www.netcraft.com.au/geoffrey/</A>
+Red Hat Linux Resellers: <A HREF="http://www.netcraft.com.au/redhat/">http://www.netcraft.com.au/redhat/</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

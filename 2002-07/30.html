@@ -1,0 +1,108 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba Tuning" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="Matthew.Cook@tekelek.com.au" -->
+<!-- Date="Tue, 2 Jul 2002 09:56:23 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.44.0207020920590.16871-100000@bush.aarnet.adelaide.edu.au" -->
+<!-- Reference="OFA2447C13.E9FEF771-ONE9256BE9.007DB23E-E9256BE9.007F7252@LocalDomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba Tuning</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:Matthew.Cook@tekelek.com.au">Matthew.Cook@tekelek.com.au</A></I>&gt;
+  Date: Tue, 2 Jul 2002 09:56:23 +0930 (CST)
+</PRE>
+<H1>Re: Samba Tuning</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Further to Richard's reply.
+
+You actually want a fair bit of idle CPU.  If you don't have
+any idle CPU than Samba will need to wait behind other processes
+before it gets it's allocation of CPU time.  If the other processes
+are CPU-bound Samba might end up waiting 0.005s per packet.  The 
+jargon for this is the "run queue length" and some utilities
+will display that.
+
+You might find the 'bonnie' disk benchmarking program useful
+for tracking server bottlenecks.  Look at the 'sequential
+output - block' figure and the 'random seeks - per sec'
+figures.
+
+Your client I/O traffic will usually be a mix of these, the
+number of seeks will increase more than proportionately with
+the number of clients (the more users, the greater the odds
+that the disk head will need to be moved to satisfy the request).
+
+High-end servers come with 10,000RPM disks, explicitly to get
+the head movement time down.  This is professional kit, so
+simply use the fastest disks you can reasonably find (say
+7200 rather than 5400).
+
+If you use IDE then set the hdparm and idebus= settings optimally
+for your hardware.
+
+Use the ext2 or xfs filesystems.  The others suck for file
+serving applications, as you would expect from their design
+goals.
+
+Make sure you have a fair whack of RAM.  A lot of the user I/O
+requests should be cachable.  There is also a cache on the disks
+themselves,  If you are buying more IDE disk, try for a 8MB cache
+rather than the standard 2MB cache.  Fiddle with the disk pre-
+fetching parameters to make this cache work best for your I/O
+mix.
+
+If you have a UPS, consider enabling write caching on the disk.
+A single-machine UPS will set you back about $200, so this might
+be a cheap way to improve throughput.
+
+Finally, start a log book and keep the benchmark results in
+the book.  You'll find them very handy.
+
+-- 
+Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

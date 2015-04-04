@@ -1,0 +1,137 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="ldap global address book using referral" -->
+<!-- FromName="'Corisen'" -->
+<!-- FromEmail="csyap@starnet.gov.sg" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 9 Dec 2000 01:45:44 +0800" -->
+<!-- Id="002f01c0613e$b44a2ac0$247d9cca@mindef" -->
+<!-- Reference="NEBBIDFGCLPNOAPPJALJMEDPCBAA.jbcurry@hline.localhealth.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: ldap global address book using referral</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Corisen &lt;<I><A HREF="mailto:csyap@starnet.gov.sg">csyap@starnet.gov.sg</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 9 Dec 2000 01:45:44 +0800
+</PRE>
+<H1>ldap global address book using referral</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+hi,
+
+i've further my experiment on referral by trying to create a global address
+book.
+i've created 3 different suffix on 3 separate databases running on the same
+openldap server box:
+1. o=global (used to glue the other 2 separate suffix)
+2. dc=domain1,dc=org
+3. dc=domain2,dc=org
+
+a snapshot of slapd.conf looks like below:
+database   ldbm
+suffix        "o=global"
+rootdn      "cn=admin,o=global"
+rootpw     secret
+
+database   ldbm
+suffix        "dc=domain1,dc=org"
+rootdn      "cn=admin,dc=domain1,dc=org"
+rootpw     secret
+
+database   ldbm
+suffix        "dc=domain2,dc=org"
+rootdn      "cn=admin,dc=domain2,dc=org"
+rootpw     secret
+
+
+                                                   o=global
+                                                        |
+                        -------------------------------------------
+                        |
+|
+               ou=domain1
+ou=domain2
+                        :
+:
+                        : referral
+: referral
+                        :
+:
+     dc=domain1,dc=org                                   dc=domain2,dc=org
+                        |
+|
+               ou=people
+ou=people
+
+
+i've added the following referrals to the first database (o=global):
+dn: ref="ldap://ldap.mydomain.org/dc=domain1,dc=org", ou=domain1,o=global
+objectclass: top
+objectclass: referral
+ref: ldap://ldap.mydomain.org/dc=domain1,dc=org
+
+dn: ref="ldap://ldap.mydomain.org/dc=domain2,dc=org", ou=domain2,o=global
+objectclass: top
+objectclass: referral
+ ref: ldap://ldap.mydomain.org/,dc=domain2,dc=org
+
+using "ldapsearch -b o=global cn=*" command line utility return users from
+both domain1 and domain2 (which is what i wanted). using netscape address
+book directory service and setting the base as "o=global" is also able to
+return search results from both domain1 and domain2.
+
+the problem is with outlook express. it seems like outlook express is not
+smart enough to chase referrals. setting "o=global" as the base for
+directory service, search only shows result from domain1. it did not
+traverse to domain2.
+
+is this a known problem with outlook express or there is something wrong
+with my design/configuration?
+
+pls kindly advise how can i solve the problem for outlook express.
+
+would really appreciate your comments/view on using such design as a glue to
+create global address book via referrals. is there any potential problem
+with ACL? will there be problem to administer/maintain such a design.
+
+i've been posting questions about my test result and really hope that all
+the experience ldap users here can provide feedback.
+
+thank you.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

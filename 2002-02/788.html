@@ -1,0 +1,202 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="NAT Accounting" -->
+<!-- FromName="'Adam Smith'" -->
+<!-- FromEmail="adam.smith@sageautomation.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 22 Feb 2002 15:25:58 +1030" -->
+<!-- Id="001a01c1bb5d$37bed350$fa00a8c0@bugman" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: NAT Accounting</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adam Smith &lt;<I><A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 22 Feb 2002 15:25:58 +1030
+</PRE>
+<H1>NAT Accounting</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+All,
+
+I'm suffering immensely trying to get my Internet usage logged and
+counted, and I'd really appreciate some help because I'm ripping my hair
+out at the moment.  Blood pressure rising.  Tensions setting in.  Hands
+shaking.  Eyes popping.  Hair standing on end.
+
+I'm going around in circles.
+
+*SHORT CLAUSE* I am by far not an expert in this area, nor do I even
+know what I'm talking about regarding this stuff half the time :)  So
+some of the configurations I put in here might be completely wrong or
+far fetched, so please bear with my naivety!
+
+**What I'd like**
+-----------------
+
+I'd like to be able to be able to see for each IP address how many bytes
+are being NATted in.  That way I will be able to accurately see how much
+data is being passed in from the Internet, and in turn, find out where
+all our bandwidth is going.
+
+
+**Our configuration**
+---------------------
+
+We have a FreeBSD OPEN firewall for NAT (the LAN Default Gateway), which
+in turn NATs out through our router.
+
+I have attempted to use "ipacct" to count bytes per IP address on my
+network as previously mentioned in
+<A HREF="http://www.linuxsa.org.au/mailing-list/2002-02/646.html">http://www.linuxsa.org.au/mailing-list/2002-02/646.html</A> and unreplied to
+:(
+
+I was about to jump off a cliff trying to get that to work, so attempted
+to use another program called "ipa". <A HREF="http://www.simon.org.ua/ipa.">http://www.simon.org.ua/ipa.</A>
+
+These are the configurations I can tell you:
+
+IP Address Range for LAN, 192.168.0.0/16
+
+-----/etc/ipf.rules---------
+
+pass in on eth0 from any to 192.168.0.0/16
+pass out from 192.168.0.0/16 to any
+
+count in on eth0 from any to 192.168.0.254
+count out on eth0 from 192.168.0.254 to any
+count in on eth0 from any to 192.168.0.0/16
+count out on eth0 from 192.168.0.0/16 to any
+
+----------------------------
+
+**Results from running 'ipfstat -r /etc/ipf.rules':
+
+	<A HREF="mailto:root@vanity">root@vanity</A> /root # ipftest -r /etc/ipf.rules
+	opening rule file "/etc/ipf.rules"
+
+If I put in:
+
+	in on eth0 freebsd.org 192.168.0.54
+
+I get:
+
+	input: in on eth0 freebsd.org 192.168.0.54
+	pass ip 20(20) 0 216.136.204.21 &gt; 192.168.0.54
+	--------------
+
+And:
+
+	out on eth0 192.168.0.55 freebsd.org
+	input: out on eth0 192.168.0.55 freebsd.org
+	pass ip 20(20) 0 192.168.0.55 &gt; 216.136.204.21
+	--------------
+
+It would appear they work, to me.
+
+But I get from ipfstat
+
+	 input packets:         blocked 14 passed 56453 nomatch 11
+counted 0 short 0
+	output packets:         blocked 12 passed 55598 nomatch 12
+counted 0 short 0
+
+They should be being counted for this to work.....
+
+I really do need some help with this because it's important that I am
+able to see how much is used by whom.
+
+If anyone could help or point me in the right direction with a
+comprehensive HOWTO I would appreciate it, however I have done a lot of
+reading and surfing and haven't found much that helps me with my
+particular problem.
+
+Is there any other config/output information you need me to share?
+
+My previous email may have gone unnoticed but this is a very important
+project to get working for me, and I really need the help.
+
+
+Thankyou,
+
+
+--
+Adam Smith
+IT Officer
+SAGE Automation Pty Ltd.
+
+Phone:  +61 8 82760703
+Mobile: 0414 895 273
+
+<A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A>
+<A HREF="http://www.sageautomation.com">http://www.sageautomation.com</A>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--
+Adam Smith
+IT Officer
+SAGE Automation Pty Ltd.
+
+Phone:  +61 8 82760703
+Mobile: 0414 895 273
+
+<A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A>
+<A HREF="http://www.sageautomation.com">http://www.sageautomation.com</A>
+ 
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

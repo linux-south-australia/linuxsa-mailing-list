@@ -1,0 +1,115 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: C question: read()" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Tyson LT" -->
+<!-- ToEmail="tlt@smug.adelaide.edu.au" -->
+<!-- Date="Mon, 21 Sep 1998 15:55:30 +0930 (CST)" -->
+<!-- Id="199809210625.PAA01766@rebel.net.au" -->
+<!-- Reference="3605CFBB.913367C@smug.adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: C question: read()</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Tyson LT &lt;<I><A HREF="mailto:tlt@smug.adelaide.edu.au">tlt@smug.adelaide.edu.au</A></I>&gt;
+  Date: Mon, 21 Sep 1998 15:55:30 +0930 (CST)
+</PRE>
+<H1>Re: C question: read()</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Tyson LT &lt;<A HREF="mailto:tlt@smug.adelaide.edu.au">tlt@smug.adelaide.edu.au</A>&gt; said:
+&gt; I want to be able to read in any character without waiting for an
+&gt; EOL...the equiv function in MS - C is getch()...
+
+This is surprisingly complicated to do in Unix -- at least most people
+seem to be surprised when they first find out the answer.  Before I give
+the answer I will embark on a lecturette about *how* to find the answer.
+As is most often the answer with Unix, the answer is your friend and
+mine: man.  We'll use the keyword search option for man (man -k), and
+look for manual pages with the keyword, 'character'.  Thus:
+
+   bash$ man -k character
+   Tk_SetWindowVisual (3) - change visual characteristics of window
+   Unicode (7)          - the unified 16-bit super character set
+   addch, waddch, mvaddch, mvwaddch, echochar, wechochar (3) - add a character
+       (with attributes) to a curses window, then advance the cursor
+   addchstr, addchnstr, waddchstr, waddchnstr, mvaddchstr, mvaddchnstr,
+       mvwaddchstr, mvwaddchnstr (3) - add a string of characters (and
+       attributes) to a curses window
+   addstr, addnstr, waddstr, waddnstr, mvaddstr, mvaddnstr, mvwaddstr,
+       mvwaddnstr (3) - add a string of characters to a curses window and
+       advance cursor
+   ascii (7)            - the ASCII character set encoded in octal, decimal,
+       and hexadecimal
+   attroff, wattroff, attron, wattron, attrset, wattrset, standend, wstandend,
+       standout, wstandout (3) - curses character and window attribute control
+       routines
+   charsets (4)         - programmer's view of character sets and 
+       internationalization
+   delch, wdelch, mvdelch, mvwdelch (3) - delete character under the cursor 
+       in a curses window
+   fgetc, fgets, getc, getchar, gets, ungetc (3) - input of characters and 
+       strings
+   fputc, fputs, putc, putchar, puts (3) - output of characters and strings
+   getch, wgetch, mvgetch, mvwgetch, ungetch (3) - get (or push back) 
+       characters from curses terminal keyboard
+
+There's more, but the last one displayed above is the one we want.  If
+you're not sure how you were supposed to work that out, the answer is also
+simple: start reading *each* manual page.  You'll quickly get a feel for
+which ones are wrong (e.g. any page not in section 3).
+
+So there's your answer: one of the getch calls in the curses library.
+Don't forget to link your program against the curses library!
+
+If you are curious about why it's not easier: Unix is a multi-user operating
+system.  In order to operate more efficiently it tries to buffer I/O.  (Did
+you know that the time to read n characters is less related to the size
+of n, and more related to the number of read() system calls you use?)
+Terminals are line-buffered, so when you call for a single character,
+Unix suspends you until a full line has been entered.  (The characters
+will be returned to you, one by one, if that's how you ask for them.)
+
+Also: note that manual pages are *never* optional components with Unix.
+It's a pity that Red Hat don't realise this.  It seems that Red Hat 4.2
+leaves most of the manual pages out when you do a binary install.  This
+is a sufficient reason to NOT buy Red Hat.
+
+Regards,
+
+David
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,123 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: ReiserFS Speed" -->
+<!-- FromName="'Mark Newton'" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="'Andrew Reid'" -->
+<!-- ToEmail="andrew.reid@plug.cx" -->
+<!-- Date="Mon, 5 Mar 2001 22:02:50 +1030" -->
+<!-- Id="20010305220250.E33570@atdot.dotat.org" -->
+<!-- Reference="20010305043541.3B4F91F982@mail.plug.cx" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: ReiserFS Speed</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Andrew Reid &lt;<I><A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A></I>&gt;
+  Date: Mon, 5 Mar 2001 22:02:50 +1030
+</PRE>
+<H1>Re: ReiserFS Speed</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Mar 05, 2001 at 03:07:35PM +1030, Andrew Reid wrote:
+
+ &gt; I'd like to know if ReiserFS provides a `significant' speed increase.
+ &gt; I'd be interested to know weather installing it on the proxy server or
+ &gt; something like that where hard drive hits are higher would increase the
+ &gt; speed...
+
+Journalling filesystems usually perform ok, provided you have "enough"
+RAM for caching.
+
+"Enough" is usually considerably larger than it would be if you weren't
+using a journalling filesystem.
+
+The reason for this has to do with the way the filesystem writes data.
+Writes tend to be contiguous and sequential (and nice and quick), because
+they largely involve appending to a linear log.  Reads, on the other
+hand, need to cope with the idea that the order of the log is essentially
+random, rather and optimized for time in the way that "traditional"
+filesystems are.
+
+A diagram will help here.  If two processes are writing to file A and
+file B at exactly the same time, with 64k writes, the log might end up
+looking like this:
+
+- - - ------------------------------------------------------------ - - - -
+           |  64k | 64k  | 64k  | 64k  | 64k  | 64k  | 64k  |    
+           |      |      |      |      |      |      |      |    
+           |   A  |  B   |  A   |  B   |  A   |  B   |  A   |    
+- - - ------------------------------------------------------------ - - - -
+
+the disk head would have been able to write this log without needing
+to seek;  it would have been nice and quick.
+
+A process attempting to read either of those files, however, would need
+to deal with the fact that blocks from files A and B would be spread out
+all over the log.  The issue is "worse" if the files aren't actually 
+being written to at the same time, e.g., if file A receives 200 kbytes of
+data, then file B receives 800 Mbytes, then file A receives another 6 Mbytes,
+the two chunks of file A could be spread out over a very large area of
+the disk, and lots of head seeking could be needed to read it.
+
+Journalling filesystems deal with this in a variety of ways.  For example,
+during writing, physical writes might be delayed until there is a large
+enough chunk of a file waiting for output (a couple of Mbytes, for example).
+This means you need more cache memory to hold unwritten data to get good
+performance out of the filesystem (because if you run out of RAM it'll
+free some by flushing disk data whether it's "ready" or not).  And during
+reading the filesystem will "read-ahead" in the background while your
+process is digesting the first few blocks of data that has been delivered
+to it -- this needs more RAM too, because the OS could conceivably read
+many times more data from the disk than the process actually wants to
+access, and that'd be data which would never have been cached if you weren't
+using a journalling filesystem with an aggressive read-ahead policy.
+
+If you have enough RAM, the performance of a journalling FS can be higher
+than with a non-journalling filesystem.  I've personally seen an SGI 
+Origin 2000 system with a multi-terabyte filesystem doing disk I/O in
+the gigabyte-per-second range with XFS on XLV logical volumes -- But the
+system had several dozen gigabytes of memory available to cache filesystem 
+buffers :-)
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

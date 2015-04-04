@@ -1,0 +1,130 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: tapes" -->
+<!-- FromName="'David Lloyd'" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="'Robyn Manning'" -->
+<!-- ToEmail="rmanning@micronet.net.au" -->
+<!-- Date="Sun, 03 Jun 2001 22:33:31 +0930" -->
+<!-- Id="3B1A35A3.55C05304@rebel.net.au" -->
+<!-- Reference="200106030505.OAA15164@mail.micronet.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: tapes</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : Robyn Manning &lt;<I><A HREF="mailto:rmanning@micronet.net.au">rmanning@micronet.net.au</A></I>&gt;
+  Date: Sun, 03 Jun 2001 22:33:31 +0930
+</PRE>
+<H1>Re: tapes</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Robyn!
+
+&gt; Does anyone know where I can get some qic-80 type tapes. 
+
+I have no idea about that.
+
+&gt; I have 2 tape drives
+&gt; here that I think take them and I'd like to try it out. The drives are the
+&gt; sort that connect to the floppy cable and both were setup fine in Windows.
+
+I'd get their exact model number and start searching on google to see if
+they have any drivers. If they were pure SCSI tape drives I'd say
+without doubt they work with Linux but I've never seen anything about
+tapes that connect to floppy drives. Perhaps a more specific model
+number and brand would be helpful...
+
+&gt; The only tapes I have are some 40MB 205feet and these wont work in these
+&gt; drives. I'm a newbie when it comes to tape drives. Can't I just specify the
+&gt; type and length of tape I'm using?
+
+When you can get Linux to speak to the device you probably don't need to
+specify that at all. Supposing that your tape drives will eventually
+behave like SCSI tape drives (DLT's, DAT's), my understanding is this:
+
+1) Data on a tape is just a stream of bits
+
+File separators are either recognisable by the hardware, or might
+consist of some predetermined sequence. Whichever, the hardware or the
+driver will just "know" this so you don't have to worry.
+
+2) Writing to a tape
+
+You just throw bits at the tape device and the tape will work. With SCSI
+tapes you have devices that will rewind after a command (/dev/st0 for
+example) and devices that will not rewind after a command (/dev/nst0). A
+non-rewindable device is useful if you just want to keep on adding stuff
+to the tape without having to worry about clobbering what's already on
+there.
+
+3) Reading from a tape
+
+You get bits out of the tape device. You can use something like dd
+if=/dev/nst0 of=tape.dd with all the options that dd takes (man dd). It
+won't read past the file mark if it finds one, or the end of tape (for
+obvious reasons).
+
+4) How do you determine end of tape?
+
+Well, according to the amanda distribution the most sane way is to
+assume that any EOF or error is actually the end of tape (that's a
+paraphrase by the way so don't quote me). In other words, you don't
+necessarily know. In addition because tape drives have the nasty of
+performing hardware compression you may not actually know either.
+
+Hence, you may not KNOW how large your tape is.
+
+5) Sending commands to the tape drive
+
+Using the mt command with -f, eg:
+
+mt -f /dev/nst0 rewind
+mt -f /dev/nst0 status
+mt -f /dev/nst0 fsf
+
+Look up man mt.
+
+CAVEAT:
+Because your tape drives are _not_ SCSI tape drives and what I've said
+broadly applies to the SCSI tape drives I work with, they may have
+different characteristics; they're almost certainly not going to be
+called "/dev/st0 or /dev/nst0" but I may be proven wrong. I hope that
+what I've said will help you a little in understanding how tapes work.
+
+DSL
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

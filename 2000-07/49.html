@@ -1,0 +1,191 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IDE vs SCSI (was: Performance with Raid 0 using IDE drives)" -->
+<!-- FromName="MWP" -->
+<!-- FromEmail="hirm@chariot.net.au" -->
+<!-- ToName="Greg Lehey" -->
+<!-- ToEmail="grog@lemis.com" -->
+<!-- Date="Sun, 2 Jul 2000 17:17:19 +0930" -->
+<!-- Id="001101bfe3f9$c03f50c0$0201a8c0@comp" -->
+<!-- Reference="395C4D5D.6E6E3A30@mail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IDE vs SCSI (was: Performance with Raid 0 using IDE drives)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: MWP &lt;<I><A HREF="mailto:hirm@chariot.net.au">hirm@chariot.net.au</A></I>&gt;
+  To  : Greg Lehey &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  Date: Sun, 2 Jul 2000 17:17:19 +0930
+</PRE>
+<H1>Re: IDE vs SCSI (was: Performance with Raid 0 using IDE drives)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On an extra note,
+Ive set up 2x 2Gb hdd's in software RAID 0 in my linux box. They are using
+the MB's hdd controller, one on the primary, the other on the secondary. The
+MB is an old socket7 FX chipset board (running a P200MMX).
+Although i dont get twice the hdd speed, I do get faster hdd write/read
+speeds than just one of the drives alone. About 1.5x faster which is better
+than nothing.
+
+MWP
+
+&gt; &gt; On Sun, Jul 02, 2000 at 01:38:49AM +0930, David Newall wrote:
+&gt; &gt;
+&gt; &gt;&gt; Suppose you tried to put a mirrored (aka raid 0) set on a single IDE
+&gt; &gt;&gt; controller then every write would have to complete on one drive before
+&gt; &gt;&gt; it could even start on the second.  This would obviously reduce write
+&gt; &gt;&gt; performance by 50%.
+&gt;
+&gt; (and to explicitly answer the original submitter's real question, yes,
+&gt; you can leave your unused other drive connected to the controller, as
+&gt; long as it's really unused).
+&gt;
+&gt; &gt; Agreed totally.  The big issue here is that IDE sucks donkeys' balls.
+&gt; &gt; End of story :-)
+&gt;
+&gt; Without a more thorough investigation of donkey's balls, I'd contest
+&gt; that statement.
+&gt;
+&gt; &gt; It has been "designed" (and I use that word lightly) as a
+&gt; &gt; cheap-and-nasty lowest-common-denominator way of attaching a hard
+&gt; &gt; disk to an ISA-bus PC, and subsequent versions have been bolted-on
+&gt; &gt; to non-ISA systems by butchering that thing which passed for a
+&gt; &gt; specification to make it even more perverse and arcane.  Why is it
+&gt; &gt; that you can pick up any SCSI controller and expect it to work with
+&gt; &gt; any SCSI drive, but the IDE interface "standard" is so ritually
+&gt; &gt; buggered by so many vendors that every general purpose OS on the
+&gt; &gt; market ships with basic features like IDE DMA turned off by default
+&gt; &gt; because they can't be assumed to work at all?
+&gt;
+&gt; Hmm.  Why don't you come out here and I'll give you a handful of SCSI
+&gt; host adaptors to play around with.
+&gt;
+&gt;   "SCSI isn't magic.  There are some very sound reasons why it is
+&gt;   occasionally necessary to sacrifice a live goat to the SCSI chain".
+&gt;
+&gt; &gt; Anyone who is serious about running a high performance server is
+&gt; &gt; *strongly* recommended to use SCSI.  Ignore benchmarks which claim
+&gt; &gt; a higher megabyte-per-second value for IDE drives; They're
+&gt; &gt; meaningless, because usually servers are more interested in I/O
+&gt; &gt; transactions per second,
+&gt;
+&gt; No, they're meaningless because almost nobody does sequential I/O in
+&gt; real-world applications.
+&gt;
+&gt; &gt; not megabytes-per-second, and SCSI will always deliver more I/Os per
+&gt; &gt; second than a comparable IDE drive because of innovations like
+&gt; &gt; tagged command queueing, basic things which IDE can't hold a candle
+&gt; &gt; to.
+&gt;
+&gt; As I was reminded yesterday, parallel SCSI still sends out its
+&gt; commands at 5 MB/s async.  ATA (previously known as IDE) connections
+&gt; are simpler, so they don't need this backwards compatibility, and they
+&gt; issue the commands at the (fixed) bus speed.
+&gt;
+&gt; A lot of myths have grown up about the difference between SCSI and
+&gt; ATA, and in perpetrating them many people have not noticed ATA
+&gt; sneaking up behind them.  I've recently been looking at the
+&gt; differences, and they're not nearly as big as you may think.  In
+&gt; particular:
+&gt;
+&gt;   When you're looking at multi-user systems, disk bandwidth is the
+&gt;   number of bytes transferred per second.  You can get speeds like 20
+&gt;   MB/s or 30 MB/s if you're transferring sequentially, but this just
+&gt;   about mandates a single process, so the values are meaningless.  In
+&gt;   real life, you position, you transfer, you repeat.  So the real
+&gt;   throughput is dependent on the transfer rate, the average latency,
+&gt;   and the average transfer size.
+&gt;
+&gt;   Average latency is in the order of 7 ms.  Average transfer size is
+&gt;   in the order of 8 kB, which means about 400 µs on a modern drive,
+&gt;   whether ATA or SCSI.
+&gt;
+&gt;   High-end SCSI drives can usually position about 1 ms, maybe 2 ms
+&gt;   faster than ATA drives.  On the other hand, despite tagged queueing
+&gt;   (which, BTW, modern ATA drives also support), the command setup is
+&gt;   slower (look at the spec).  A few years back I looked at the
+&gt;   behaviour of SCSI drives with a SCSI bus analyser and found that the
+&gt;   setup time could exceed 1 ms.  I'm sure things are better now, but
+&gt;   they're probably still slower than on an ATA bus.
+&gt;
+&gt;   Clearly, the real-life transfer rate is much more dependent on the
+&gt;   latency than the sequential transfer rate.  It's also dependent on
+&gt;   the transfer size, but you don't get much option with that.
+&gt;
+&gt; So what's the real disadvantage of ATA drives?  They're generally a
+&gt; little slower in latency, and you really need a separate ATA
+&gt; controller for each of them.  On the other hand, they're also cheaper,
+&gt; and so are the controllers.  On the other hand, a good SCSI host
+&gt; adaptor will cost more per drive than an ATA controller.
+&gt;
+&gt; &gt; IDE drives will happily provide the illusion of better performance
+&gt; &gt; on a single-user system, until you try to put "real" load through
+&gt; &gt; them (the reason they look like they're giving better performance is
+&gt; &gt; because it's rather difficult for a single user to put "real" load
+&gt; &gt; through them during day-to-day activities).  As soon as you put an
+&gt; &gt; IDE disk on a multi-user server, though, expect performance to drop
+&gt; &gt; through the floor.
+&gt;
+&gt; Would you like to measure that?  Run some device benchmarks against
+&gt; both SCSI and ATA and compare the results?  Here are the results of
+&gt; running rawio against the fastest ATA and SCSI drives on my test
+&gt; machine:
+&gt;
+&gt;            Random read  Sequential read    Random write Sequential write
+&gt; ID          K/sec  /sec    K/sec  /sec     K/sec  /sec     K/sec  /sec
+&gt; ata        1547.2    96   6696.7   409    1532.0    94    6184.4   377
+&gt; scsi       1242.6    78   1236.3    75    1295.6    77    1310.6    80
+&gt;
+&gt; Now admittedly I'm comparing 2 year old SCSI drives with modern ATA
+&gt; drives, so this isn't fair.  But it doesn't exactly slam ATA.  You
+&gt; presumably have modern SCSI drives available; how do they perform?
+&gt;
+&gt; &gt; ... and let's not even mention the performance implications of swapping
+&gt; &gt; on an IDE drive, shall we?  Thank you.
+&gt;
+&gt; Why not?  Hopefully swap drives aren't maxed out, in which case the
+&gt; latency isn't as much of an issue.
+&gt;
+&gt; Greg
+&gt; --
+&gt; Finger <A HREF="mailto:grog@lemis.com">grog@lemis.com</A> for PGP public key
+&gt; See complete headers for address and phone numbers
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

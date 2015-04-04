@@ -1,0 +1,77 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IPC for Apache module child processes (technical)" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Mon, 08 May 2000 00:23:27 +0930" -->
+<!-- Id="39158367.66C04FB4@aarnet.edu.au" -->
+<!-- Reference="20000506061913.A17376@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IPC for Apache module child processes (technical)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>
+  Date: Mon, 08 May 2000 00:23:27 +0930
+</PRE>
+<H1>Re: IPC for Apache module child processes (technical)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Alan Kennington wrote:
+&gt; 
+
+&gt; I'm going to balance bandwidth according to remote IP address,
+&gt; which means that I will probably hash the 32 bits down to
+&gt; about 12, and jump from a hash table into a heap of fixed-length
+&gt; records, and then do gargabe collection on this in the usual manner.
+
+It all sounded good until "garbage collection". Read the old LISP
+lists or the current Java lists to see how very horrible implmenting
+GC in shared memory can be.  Just explicity free any records by
+putting them onto a free list.  This will give you much better
+locatity of reference -- thus avoiding parts of the data structure
+paging out under high load.
+
+I'd also suggest you use a prime number of hash buckets.  For
+example, there are very few IP addresses under 127.0.0.0
+compared to the number above it, so you need a hash function
+that is resilient to this.  Despite requiring the slowest
+integer math operation, using (addr % 13) will give you
+much better performance than (addr % 12), as the % 12
+version will only give you 6 effective hash buckets due to
+the skewed distribution of IP addresses.
+
+  [ For non-C speakers:
+    Mathemeticians know (A % B) as the remainder function.
+    This is the same as the modulus function that you may
+    have used in high school (at least for A&gt;0 and B&gt;0).
+  ]
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

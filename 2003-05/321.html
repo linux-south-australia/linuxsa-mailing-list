@@ -1,0 +1,178 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Putting it all together / office multifunctionals & Linux" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="linuxcpa@netscape.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="Daryl.Tester@iocane.com.au" -->
+<!-- Date="Fri, 09 May 2003 10:55:19 -0700" -->
+<!-- Id="3EBBEB87.8080102@netscape.net" -->
+<!-- Reference="3EBB38A5.7020303@netscape.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Putting it all together / office multifunctionals & Linux</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:linuxcpa@netscape.net">linuxcpa@netscape.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  Date: Fri, 09 May 2003 10:55:19 -0700
+</PRE>
+<H1>Re: Putting it all together / office multifunctionals & Linux</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+<A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A> wrote:
+
+&gt;James Leone wrote:
+&gt;
+&gt;  
+&gt;
+&gt;&gt;Ok, I looked over the etheral sniff some more and I think that the
+&gt;&gt;multifunctional sends out an FTP job. :-D
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;Yep, that looks very much like an FTP session to a non-standard port.
+&gt;
+&gt;  
+&gt;
+&gt;&gt;1. The Windows 2000 "server" sends an arp broadcast to the
+&gt;&gt;multifunctional.  (I think this means ping)
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;ARP = address resolution protocol.  The W2K is trying to find
+&gt;out what MAC address is associated with an IP address.  This
+&gt;is an integral function of IP which Unix/Linux does fine .
+&gt;  
+&gt;
+This is what I am missing. The W2k server somehow announces to the 
+multifunctional that there is a machine named James with a certain ip 
+address that is an ftp server, ready to receive transmissions.  I need 
+to sniff when that takes place. It was already in place during the last 
+sniff.
+
+JL
+
+&gt;  
+&gt;
+&gt;&gt;4. Another message from multifunctional port 1035 to win2k virtual
+&gt;&gt;server at port 3670 "USER anonymous"
+&gt;&gt;5. Win2k virtual server sends messsage from port 3670 to multifunctional
+&gt;&gt;port 1035 "331 Password required..."
+&gt;&gt;6. Message from multifunctional port 1035 to win2k virtual server port
+&gt;&gt;3670 "PASS .."
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;It's just logging in anonymously (duh!), and I'm not sure if ethereal
+&gt;is obscuring the password here, or it really is ".".  Shouldn't matter
+&gt;though - traditionally anonymous logins have accepted any password.
+&gt;
+&gt;  
+&gt;
+&gt;&gt;8. Message from multifunctional port 1035 to win2k virtual server port
+&gt;&gt;3670 "CWD /d000074756b
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;Interesting - does it always go to this directory?  (You'll probably
+&gt;need to capture a few more sessions to determine this).
+&gt;
+&gt;  
+&gt;
+&gt;&gt;10. M (1035) -&gt; W2vs (3670) "CWD 20030507220642105..."
+&gt;&gt;11. W2kvs (3670) -&gt; M (1035) "550 .."
+&gt;&gt;12. M(1035) -&gt; W2vs (3670) "MKD 20030507220642105..."
+&gt;&gt;13. W2k(3670)-&gt;M(1035) "257 MKD command successful..."
+&gt;&gt;14. M (1035) -&gt; W2vs (3670) "CWD 20030507220642105..."
+&gt;&gt;15. W2k(3670)-&gt;M(1035) "250 CWD command sucessful..."
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;This is interesting - the scanner tried to move into a
+&gt;directory that didn't exist, so it then created the
+&gt;directory and tried again (this time succeeding).  I
+&gt;think it might do the same for step 8.  That directory
+&gt;looks suspiciously date/time stampish, too.
+&gt;
+&gt;  
+&gt;
+&gt;&gt;16. M (1035) -&gt; W2vs (3670) "TYPE I.."
+&gt;&gt;17. W2k(3670)-&gt;M(1035) "200 TYPE command sucessful..."
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;Sets binary transfer mode.
+&gt;
+&gt;  
+&gt;
+&gt;&gt;18. M (1035) -&gt; W2vs (3670) "PORT 192,168,0,125,4,12.."
+&gt;&gt;19. W2k(3670)-&gt;M(1035) "200 PORT command sucessful..."
+&gt;&gt;18. M (1035) -&gt; W2vs (3670) "STOR page1.."
+&gt;&gt;19. W2k(3670)-&gt;M(1035) "150 Data connection..."
+&gt;&gt;20. Scanned document is sent from M (1036)-&gt;W2kvs(1092)
+&gt;&gt;
+&gt;&gt;On line 18, I know what the first 4 numbers are. Any guesses?
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;Standard FTP protocol - it's the port number for the data
+&gt;connection, module 256 (the connection details you've mostly
+&gt;seen above having occurred on the control connection).
+&gt;
+&gt;4 * 256 + 12 = 1036.  Now look at the port number in step 20.
+&gt;
+&gt;  
+&gt;
+&gt;&gt;This looks like plain old ping and then FTP. Tsk, tsk, tsk.
+&gt;&gt;    
+&gt;&gt;
+&gt;
+&gt;Congratulations, you've just reverse engineered their proprietary
+&gt;"protocol".  It looks like anonymous FTP on a non-standard port,
+&gt;which you should be able to set up just fine under Unix/Linux.
+&gt;Go get 'em, James!
+&gt;
+&gt;
+&gt;  
+&gt;
+
+-- 
+Your favorite stores, helpful shopping tools and great gift ideas. 
+Experience the convenience of buying online with <A HREF="mailto:Shop@Netscape">Shop@Netscape</A>! 
+<A HREF="http://shopnow.netscape.com/">http://shopnow.netscape.com/</A>
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,627 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Searching the Mailing List archives" -->
+<!-- FromName="Andrew Hill" -->
+<!-- FromEmail="list@fornax.net" -->
+<!-- ToName="linuxsa" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 23 Feb 2000 10:40:05 +1030" -->
+<!-- Id="38B3255D.6E2EE26A@fornax.net" -->
+<!-- Reference="Pine.LNX.4.10.10002221921260.26270-100000@sandwich.home.lyppard.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Searching the Mailing List archives</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Hill &lt;<I><A HREF="mailto:list@fornax.net">list@fornax.net</A></I>&gt;
+  To  : linuxsa &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 23 Feb 2000 10:40:05 +1030
+</PRE>
+<H1>Re: Searching the Mailing List archives</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+michael wrote:
+&gt; This comes up reasonable often (searching the archives) Can't we have a
+&gt; session at one of the meetings on ht//dig or some search engine that could
+&gt; be applied to the archives? Apart from the odd flame war, there's a wealth
+&gt; of information in there...
+
+There is also a way to do this with Perl and Berkely's DB thingy.
+
+I've attached some example code if anyone is interested. It should only
+need a few changes to work with the list/your web site....
+
+(Hopefully I cut out the surronding HTML gunk that was there without
+killing it to badly :-)
+
+-- 
+
+Andrew Hill
+#!/usr/bin/perl
+
+#Copyright (C) 1999 Andrew Hill
+#Email: <A HREF="mailto:andrew@fornax.net">andrew@fornax.net</A>
+
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#See <A HREF="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</A> for details
+
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+
+require 'error.pl';
+
+sub parse_form_data {
+
+    local (*FORM_DATA) = @_;
+
+    # POST or GET?
+    if ($ENV{'REQUEST_METHOD'} eq "GET") {
+	$query_string = $ENV{'QUERY_STRING'};
+    }
+    elsif ($ENV{'REQUEST_METHOD'} eq "POST") {
+	read (STDIN, $query_string, $ENV{'CONTENT_LENGTH'});
+    }
+    else {
+	&return_error(500, "Server Error", "Unable to decode form, server uses unsupported method");
+	exit(1);
+    }
+
+    @value_pairs = split(/&/, $query_string);
+    foreach $key_value (@value_pairs) {
+	($key, $value) = split(/=/, $key_value);
+	$key =~ tr/+/ /;
+	$key =~ s/%([\dA-Fa-f][\dA-Fa-f])/pack("C", hex($1))/eg;
+	$value =~ tr/+/ /;
+	$value =~ s/%([\dA-Fa-f][\dA-Fa-f])/pack("C", hex($1))/eg;
+
+	if (defined($FORM_DATA{$key})) {
+	    $FORM_DATA{$key} = join("\0", $FORM_DATA{$key}, $value);
+	}
+	else {
+	    $FORM_DATA{$key} = $value;
+	}
+    }
+}
+
+
+1;
+
+#!/usr/bin/perl
+
+#Copyright (C) 1999 Andrew Hill
+#Email: <A HREF="mailto:andrew@fornax.net">andrew@fornax.net</A>
+
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#See <A HREF="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</A> for details
+
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+
+sub return_error {
+    local($status, $keyword, $message) = @_;
+
+    print "Content-type: text/html", "\n\n";
+
+    print &lt;&lt;End_Of_Error;
+
+&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+  "<A HREF="http://www.w3.org/TR/REC-html40/loose.dtd">http://www.w3.org/TR/REC-html40/loose.dtd</A>"&gt;
+&lt;HTML&gt;
+&lt;HEAD&gt;
+  &lt;TITLE&gt;Error&lt;/TITLE&gt;
+&lt;/HEAD&gt;
+&lt;BODY BGCOLOR="white"&gt;
+
+      &lt;TABLE WIDTH="100%" BORDER="0" CELLPADDING="10" CELLSPACING="0"&gt;
+        &lt;TR&gt;
+          &lt;TD&gt;
+            &lt;FONT FACE="arial"&gt;
+
+            &lt;BR&gt;
+            &lt;BR&gt;
+            &lt;P ALIGN="justify"&gt;
+              &lt;FONT SIZE="+1"&gt;
+                Error: $status - $keyword
+              &lt;/FONT&gt;
+            &lt;/P&gt;
+            &lt;HR&gt;
+            &lt;P ALIGN="justify"&gt;
+              $message
+            &lt;/P&gt;
+
+            &lt;/FONT&gt;
+          &lt;/TD&gt;
+        &lt;/TR&gt;
+      &lt;/TABLE&gt;
+
+&lt;/BODY&gt;
+&lt;/HTML&gt;
+
+End_Of_Error
+}
+
+1;
+
+#!/usr/bin/perl
+
+#Copyright (C) 1999 Andrew Hill
+#Email: <A HREF="mailto:andrew@fornax.net">andrew@fornax.net</A>
+
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#See <A HREF="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</A> for details
+
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+
+require 5;
+use DB_File;     # Access DB databases
+use Fcntl;       # Needed for above...
+use File::Find;  # Directory searching
+undef $/;        # Don't obey line boundaries
+$currentKey = 0;
+
+chdir("public_html/cgi-bin")
+  || die("$!: Could not chdir to public_html/cgi-bin");
+
+  #######################################################
+  # Words that should not be indexed:
+
+  $wordfile = "donotindexwordlist.txt";
+  open(F, $wordfile) || die("$0: couldn't open $wordfile: $!\n");
+  while(&lt;F&gt;) {
+    push(@doNotIndex, split);
+  }
+  close(F);
+
+#######################################################
+#  Single database version:
+#  Stores file entries in index.db as &lt;NULL&gt;&lt;binary file number&gt;
+#  The leading NULL prevents any word entries from colliding.
+
+# Delete old index.db and attach %indexdb to database
+unlink("index.db");
+tie(%indexdb, 'DB_File', "index.db", O_RDWR | O_CREAT, 0644, $DB_File::DB_BTREE);
+
+# Index all subdirecories - excludes the root "index.html" page.
+find(\&IndexFile, "../subdir1/");
+find(\&IndexFile, "../subdir2/");
+
+# Close database
+untie(%indexdb);
+
+#######################################################
+
+sub IndexFile {
+    if(!-f) { return; } #If not a plain file, return
+    if(/\.html?$/) {    # Handle HTML files
+        # Print out the current file so we can see which 
+        # file is being processed
+	print "$File::Find::name\n";
+	open(HTML_FILE,$_);
+	my($text) = &lt;HTML_FILE&gt;;  # Read entire file into private, 
+                                  # lexically scoped variable
+        my($title) = $text;       # Read entire file into private, 
+                                  # lexically scoped variable
+        # Strip out the HTML Menu from $text
+        $text =~ s/&lt;!-- BEGIN MENU --&gt;(.*?)&lt;!-- END MENU --&gt;//is;
+        # Strip out the &lt;HEAD&gt; element from $text
+        $text =~ s/&lt;HEAD&gt;.*&lt;\/HEAD&gt;//is;
+        # Strip out all HTML tags from $text
+	$text =~ s/&lt;[^&gt;]*&gt;//g;
+
+        # Get the "title" of the web page - this may or may not be
+        # the actual HTML title - do some Perl to get it :-)
+        # $title =~ s/Insert REGEXP here/$1/s;
+
+	# Index all the words under the current key
+	my($wordsIndexed) = &IndexWords($text, $currentKey);
+	# Map key to this filename
+	$indexdb{pack"xn",$currentKey} = "$title\ $File::Find::name";
+	$currentKey++;
+    }
+}
+
+#######################################################
+
+sub IndexWords {
+    my($words, $fileKey) = @_;
+    # Split text into Array of words
+    my(@words) = split(/[^a-zA-Z0-9\xc0-\xff\+\/\_]+/, lc $words);
+    @words = grep { s/\// /; $_ } # Remove "/"s
+             @words;
+    @words = grep { s/^[^a-zA-Z0-9\xc0-\xff]+//; $_ } # Strip leading punct
+             grep { length &gt; 1 } # Must be longer than one character
+             grep { /[a-zA-Z0-9\xc0-\xff]/ } # Must have an alphanumeric
+             grep { !/\b[0-9]+\b/ } # Must not be just a number
+             grep { !/\b[0-9]+(am|pm)\b/i } # Must not be a time
+             grep { !/\b[0-9]+(mm|cm|m|km)\b/i } # Must not be a distance
+             grep { !/\b[0-9]+(st|nd|rd|th)\b/i } # Must not be a date
+             @words;
+
+          #######################################################
+          # Words that should not be indexed:
+
+          foreach $removeWord (@doNotIndex) {
+            @words = grep { !/\b$removeWord\b/ } @words;
+          }
+
+          #######################################################
+
+    # Print the words out - currently only for testing, so that the list
+    # of indexed words can be seen, and new non-indexed words and synonyms
+    # added
+    print "@words\n\n";
+
+    # For each word, add key to word database
+    foreach (sort @words) {
+      my($a) = $indexdb{$_};
+      $a .= pack "n",$fileKey;
+      $indexdb{$_} = $a;
+    }
+    # Return count of words indexed
+    return scalar(@words);
+}
+
+#######################################################
+
+#!/usr/bin/perl
+
+#Copyright (C) 1999 Andrew Hill
+#Email: <A HREF="mailto:andrew@fornax.net">andrew@fornax.net</A>
+
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#See <A HREF="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</A> for details
+
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+
+require 5;
+use DB_File;
+use Fcntl;
+require 'parse.pl';
+require 'error.pl';
+
+$website = "Your Website In Here";
+$contact = "Your Email In Here";
+
+  #####################################################
+  # Words that were not indexed by the 
+  # indexer.pl script:
+
+  $wordfile = "public_html/cgi-bin/donotindexwordlist.txt";
+  if (open(F, $wordfile)) {
+    while(&lt;F&gt;) {
+      push(@doNotIndex, split);
+    }
+    close(F);
+  } else {
+    &return_error(500,"File Open Error","Unable to open the internal word list database.");
+    exit(0);
+  }
+
+#######################################################
+# Parse the search form data
+
+&parse_form_data(*FORM_DATA);
+
+if ($FORM_DATA{'search'} =~ /[\|\:\;\(\)\*\&\^\%\$\#\@\!\?\&gt;\&lt;\.\,\'\`\~]+/) {
+  &return_error(500,"Input Error","The input you gave this search is not permitted.&lt;br&gt;&lt;br&gt;(Try to avoid using punctuation characters in forms.)");
+  exit(0);
+}
+
+#######################################################
+# Print out the search result HTML Page - Part 1
+# (static content)
+
+print "content-type: text/html\n\n";
+
+print &lt;&lt;End_Search_Results_Part_1;
+
+&lt;HTML&gt;
+&lt;HEAD&gt;
+  &lt;TITLE&gt;Search Result&lt;/TITLE&gt;
+&lt;/HEAD&gt;
+&lt;BODY BGCOLOR="white"&gt;
+
+      &lt;TABLE WIDTH="100%" BORDER="0" CELLPADDING="10" CELLSPACING="0"&gt;
+        &lt;TR&gt;
+          &lt;TD&gt;
+            &lt;FONT FACE="arial"&gt;
+
+End_Search_Results_Part_1
+
+#######################################################
+# Print out the search result HTML Page
+# (dynamic content)
+
+#######################################################
+# Open the binary tree databases
+tie(%index, DB_File, 'index.db', O_RDONLY, 0, $DB_BTREE);
+
+#######################################################
+# Put the search words into @words
+@words = split /\s+/, $FORM_DATA{'search'};
+
+#######################################################
+# Find any words that _must_ be matched, as indicated
+# by a "+", put them in @mustFind, and remove them 
+# from @words
+foreach $word (@words) {
+  # If the word start with a "+"...
+  if ($word =~ /\+(.*)/) {
+    # ... then remove the "+"...
+    $word =~ s/^\+//;
+    # ... and store the word in @mustFind
+    push (@mustFind, $word);
+  }
+}
+foreach $word (@mustFind) {
+  @words = grep { !/\b$word\b/ } @words;
+}
+
+#######################################################
+# Find any words that _must not_ be matched, as 
+# indicated by a "-", put them in @mustNotFind,
+# and remove them from @words
+foreach $word (@words) {
+  # If the word start with a "-"...
+  if ($word =~ /\-(.*)/) {
+    # ... then remove the "-"...
+    $word =~ s/^\-//;
+    # ... and store the word in @mustNotFind
+    push (@mustNotFind, $word);
+  }
+}
+foreach $word (@mustNotFind) {
+  @words = grep { !/\b$word\b/ } @words;
+}
+
+#######################################################
+# Lookup the files that match words to be found
+# If there are words that _must_ be found...
+if (scalar(@mustFind) &gt; 0) {
+  # ... look up each word that _must_ be found (in
+  # @mustFind) that's in the binary tree database
+  foreach $word (@mustFind) {
+    # Find the keys that have $word in them
+    $keys = $index{lc $word};
+    foreach $key (unpack("n*",$keys))
+      { $matches{$key}++; }
+    # Now also find each normal word (in @words) 
+    # that's in the binary tree database, but 
+    # ignore any keys that are not already in
+    # %matches
+    foreach $normalWord (@words) {
+      $normalKeys = $index{lc $normalWord};
+      foreach $key (unpack("n*",$normalKeys)) {
+        if (exists $matches{$key}) {
+          $matches{$key}++;
+        }
+      }
+    }
+  }
+}
+# If there are no words that _must_ be found...
+else {
+  # ... just look up the each normal word to be found
+  # (in @words) that's in the binary tree database
+  foreach $word (@words) {
+    # ... find the keys that have $word in them
+    $keys = $index{lc $word};
+    foreach $key (unpack("n*",$keys)) {
+      $matches{$key}++;
+    }
+  }
+}
+
+#######################################################
+# Now remove all matches that have words in them that
+# _must not_ be found
+foreach $word (@mustNotFind) {
+  # ... find the keys that have $word in them
+  $keys = $index{lc $word};
+  foreach $key (unpack("n*",$keys)) {
+    if (exists $matches{$key}) {
+      delete $matches{$key};
+    }
+  }
+}
+
+#######################################################
+# Rank results in order by the total number of matches
+@matches = sort { $matches{$b} &lt;=&gt; $matches{$a} || $a &lt;=&gt; $b } (keys %matches);
+
+#######################################################
+# If no matches, display that result...
+if (scalar(@matches) == 0) {
+  print "  &lt;H2&gt;\n    Sorry!\n  &lt;\/H2&gt;\n";
+  print "  &lt;P ALIGN=\"justify\"&gt;\n    No documents were found that matched your search for \"";
+  print "$FORM_DATA{'search'}";
+  print "\".\n";
+  # Add each word that was ignored into the @ignored array
+  foreach $removedWord (@doNotIndex) {
+    push(@ignored, grep { /\b$removedWord\b/ } @words);
+  }
+  # Display ignored word(s), if any
+  if (scalar(@ignored) == 1) {
+    print "    (The word \"";
+    print "@ignored";
+    print "\" was ignored).\n";
+  }
+  if (scalar(@ignored) &gt; 1) {
+    print "    (The words \"";
+    print "@ignored";
+    print "\" were ignored).\n";
+  }
+  print "  &lt;P&gt;\n    Perhaps you should try searching the Internet with Google?\n  &lt;\/P&gt;\n";
+  print "\n";
+  print "&lt;\!-- Search Google --&gt;\n";
+  print "&lt;FORM method=\"GET\" action=\"http:\/\/www.google.com\/search\" NAME=\"google\" TARGET=\"_blank\"&gt;\n";
+  print "  &lt;TABLE bgcolor=\"\#FFFFFF\"&gt;&lt;TR&gt;&lt;TD&gt;\n";
+  print "    &lt;A HREF=\"http:\/\/www.google.com\/\"&gt;\n";
+  print "    &lt;IMG SRC=\"http:\/\/www.google.com\/logos\/Logo_40wht.gif\" BORDER=\"0\" WIDTH=\"128\" HEIGHT=\"53\" ALT=\"Google\" align=\"middle\"&gt;&lt;\/A&gt;\n";
+  print "    &lt;INPUT TYPE=\"text\" name=\"q\" size=\"31\" maxlength=\"255\" value=\"\"&gt;\n";
+  print "    \&nbsp\;\&nbsp\;\&nbsp\;&lt;INPUT type=\"submit\" name=\"sa\" VALUE=\"Search\"&gt;\n";
+  print "  &lt;\/TD&gt;&lt;\/TR&gt;&lt;\/TABLE&gt;\n";
+  print "&lt;\/FORM&gt;\n";
+  print "&lt;SCRIPT LANGUAGE=\"javascript\"&gt;\n";
+  print "  &lt;\!--\n";
+  print "    function setGoogleSearch() \{\n";
+  print "      document.google.q.value=\'";
+  print "$FORM_DATA{'search'}";
+  print "\'\;\n      return true\;\n";
+  print "    \}\n";
+  print "    setGoogleSearch()\n";
+  print "  \/\/ --&gt;\n";
+  print "&lt;\/SCRIPT&gt;\n";
+  print "&lt;\!-- Search Google --&gt;\n";
+}
+
+#######################################################
+# ... otherwise display the results of the search
+else {
+  print "  &lt;P ALIGN=\"justify\"&gt;&lt;FONT SIZE=\"\-1\"&gt;\n";
+  print "    &lt;I&gt;You searched for \"";
+  print "$FORM_DATA{'search'}";
+  print "\"";
+  # Add each word that was ignored into the @ignored array
+  foreach $removedWord (@doNotIndex) {
+    push(@ignored, grep { /\b$removedWord\b/ } @words);
+  }
+  # Display ignored word(s), if any
+  if (scalar(@ignored) == 1) {
+    print " (the word \"";
+    print "@ignored";
+    print "\" was ignored)";
+  }
+  if (scalar(@ignored) &gt; 1) {
+    print " (the words \"";
+    print "@ignored";
+    print "\" were ignored)";
+  }
+  print ".&lt;\/I&gt;\n  &lt;\/FONT&gt;&lt;\/P&gt;\n";
+  print "  &lt;P ALIGN=\"justify\"&gt;\n    These documents might be what you're looking for.\n";
+  print "    Documents with a higher confidence are probably better matches.\n  &lt;\/P&gt;\n";
+  print "    &lt;TABLE BORDER=\"0\"&gt;\n";
+  print "      &lt;TR&gt;\n";
+  print "        &lt;TD WIDTH=\"30\%\" ALIGN=\"center\"&gt;&lt;FONT FACE=\"arial\"&gt;\n";
+  print "          &lt;B&gt;Confidence&lt;\/B&gt;\n";
+  print "        &lt;\/TD&gt;\n";
+  print "        &lt;TD WIDTH=\"10\%\" ALIGN=\"center\"&gt;&lt;FONT FACE=\"arial\"&gt;\n";
+  print "          &lt;BR&gt;\n";
+  print "        &lt;\/TD&gt;\n";
+  print "        &lt;TD WIDTH=\"60\%\" ALIGN=\"left\"&gt;&lt;FONT FACE=\"arial\"&gt;\n";
+  print "          &lt;B&gt;Document&lt;\/B&gt;\n";
+  print "        &lt;\/TD&gt;\n";
+  print "      &lt;\/TR&gt;\n";
+  # Look up keys in the binary tree databse and...
+  foreach $key (@matches) {
+    $name = $index{pack("xn",$key)};
+    # ... split the result into it's components
+    if (($number, $title, $url) = ("$matches{$key}: $name" =~ /(\d*):(?:\s*?)(.*)(?:\ \.\.)(.*)/s)) {
+      print "      &lt;TR&gt;\n";
+      print "        &lt;TD ALIGN=\"center\"&gt;&lt;FONT FACE=\"arial\"&gt;\n";
+      print "          $number\n";
+      # Print the number of hits
+      print "        &lt;\/TD&gt;\n";
+      print "        &lt;TD ALIGN=\"center\"&gt;&lt;FONT FACE=\"arial\"&gt;\n";
+      print "          &lt;BR&gt;\n";
+      print "        &lt;\/TD&gt;\n";
+      print "        &lt;TD ALIGN=\"left\"&gt;&lt;FONT FACE=\"arial\"&gt;\n";
+      # Open the HREF link
+      print "          &lt;A HREF=\"http:\/\/$website\/$url\"&gt;";
+      # Print the title
+      print "$title";
+      # Close the link
+      print "&lt;\/A&gt;\n";
+      print "        &lt;\/TD&gt;\n";
+      print "      &lt;\/TR&gt;\n";
+    }
+  }
+  print "    &lt;\/TABLE&gt;\n";
+}
+
+#######################################################
+# Close the binary tree databases
+untie(%index);
+
+#######################################################
+# Print out the search result HTML Page - Part 2
+# (static content)
+
+print &lt;&lt;End_Search_Results_Part_2;
+
+            &lt;BR&gt;
+            &lt;P ALIGN="justify"&gt;&lt;FONT SIZE="-1"&gt;
+              If you can't find something, try searching for a synonym! You can also prefix a word 
+              with a + (plus) or a - (minus) if you want to specify a word that must, or must not 
+              be, found. If you experience problems, or if you find that a word you &lt;I&gt;really&lt;/I&gt; 
+              want to search for is being ignored, please email
+              &lt;A HREF="mailto:$contact"&gt;$contact&lt;/A&gt;. Thanks.
+
+            &lt;/FONT&gt;&lt;/P&gt;
+
+
+            &lt;/FONT&gt;
+          &lt;/TD&gt;
+        &lt;/TR&gt;
+      &lt;/TABLE&gt;
+
+&lt;/BODY&gt;
+&lt;/HTML&gt;
+
+End_Search_Results_Part_2
+
+exit (0);
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

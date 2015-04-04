@@ -1,0 +1,127 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: rat was cracked!" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 10 Sep 2000 14:20:26 +0900" -->
+<!-- Id="3.0.6.32.20000910142026.00a28810@203.16.214.248" -->
+<!-- Reference="20000910010422.A23505@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: rat was cracked!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 10 Sep 2000 14:20:26 +0900
+</PRE>
+<H1>Re: rat was cracked!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 01:04 AM 9/10/00 +0930, Alan Kennington wrote:
+&gt;Someone cracked my linux 5.2 machine on 5 July 2000!!!!
+
+I have some comments on this.
+
+Firstly, as Mark Newton has said, have a look at the various articles on
+Buffer Overflows. A long stream on 0x90 is a signature of one type of
+buffer overflow, as they are NOPs in the Intel x86 architecture. Of course,
+they do not have to have 0x90s on the front.  A long stream of A's is a
+probe to find out where the buffer begins on the stack and the distance to
+the return address.
+
+The main purpose of this style of attack is to get a root shell, and then
+do more. Of course, with such a root shell, you are typing blind, but
+people will construct programs to carry out the full attack.
+
+Secondly, what you have told us can be described as a comedy of errors. No
+only were .rhosts in use, and services were running that just should not
+have been running (pop2), you were not using IPchains to stop people from
+getting to possibly vulnerable services from the Internet. Were you running
+the stock standard named on that machine as well? If so, it runs as root
+and has a known buffer overflow script out there (t666.c).
+
+My advice in all these cases is defence in depth:
+
+1. ipchains to block all ports from outside and then open up only the
+   essential ports:
+
+   INT=&lt;your internal interface&gt;
+   EXT=&lt;your external interface&gt;
+   ipchains -P input REJECT  # Or DENY if you prefer
+   ipchains -A input -i INT -j ACCEPT # Allow access from inside
+   ipchains -A input -i lo -j ACCEPT  # And the loopback int for squid, etc
+   ipchains -A input -p tcp -d &lt;my-ip&gt; 80 -j ACCEPT # Allow WWW
+
+   And add the few extra rules for the protocols you need, including DNS 
+   (53 udp and tcp for zone transfers), SMTP, SSH, etc.
+
+   You might also need:
+
+   ipchains -A input -p tcp ! -y -j ACCEPT # or something like it.
+
+   Check the IPchains howto and other resources. 
+
+2. Remove everything you don't understand from /etc/inetd.conf. Well,
+   comment it out.
+
+   Hmmm, you don't understand anything in there? Well, you are vulnerable,
+   and maybe you should purchase some skills from someone.
+
+   Of course, to a certain extent you are protected by 1 above, but it won't
+   hurt to be paranoid.
+
+3. Switch off all services you don't understand. See comments from above.
+
+4. Update to the latest version all servers you allow outside access to to.
+   Consider running them as a non-root user and inside a chroot jail. 
+   However, be aware that the latest buffer overflow techniques involve
+   breaking out of a Linux chroot jail. 
+
+   You might want to consider FreeBSD if you want more security in this area.
+
+Remember, there is a spectrum here, with convenience at one end, which
+means little or no security, and security at the other end, which means
+little or no usability.
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Contributing author, SAMS Teach Yourself Samba in 24 Hours
+Author, Special Edition, Using Samba
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

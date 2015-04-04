@@ -1,0 +1,159 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Filtering with virussnag was Re: trace" -->
+<!-- FromName="'Shaun Branden'" -->
+<!-- FromEmail="shaun@pcuse.com" -->
+<!-- ToName="'magpie'" -->
+<!-- ToEmail="cabernet@e-access.com.au" -->
+<!-- Date="Wed, 17 Dec 2003 17:11:38 +1030" -->
+<!-- Id="20031217064138.GB344@pcuse.com" -->
+<!-- Reference="20031217094412.GB2525@Gringo.local" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Filtering with virussnag was Re: trace</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Shaun Branden &lt;<I><A HREF="mailto:shaun@pcuse.com">shaun@pcuse.com</A></I>&gt;
+  To  : magpie &lt;<I><A HREF="mailto:cabernet@e-access.com.au">cabernet@e-access.com.au</A></I>&gt;
+  Date: Wed, 17 Dec 2003 17:11:38 +1030
+</PRE>
+<H1>Re: Filtering with virussnag was Re: trace</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Dec 17, 2003 at 08:14:12PM +1030, magpie wrote:
+&gt; &gt; Just filter all virus.exe attatchments using procmail. I use virussnag
+&gt; &gt; (google for it) which just works. It stops whatever I want it to, in
+&gt; &gt; this case
+&gt; &gt; "${NASTYEXT:-(exe|hta|pif|scr|shs|vb[se]|ws[fh]|(doc|txt|xls)\.)}"
+&gt; &gt; 
+&gt; &gt; simple and you may learn something
+&gt; 
+&gt; Should virussnag work from the command line ? While testing the script I got
+&gt; the following.
+&gt; Brian
+
+No, it is a procmail rc file. Include it from your .procmailrc as:
+INCLUDERC=$PMDIR/virussnag or similar. There are instructions in the
+comments at the top of the file.
+
+I have included the file in this post to try and stop the confusion. You
+need to setup procmail and include this file in the ~/.procmailrc. If you
+are still having trouble email me directly and I will walk you through
+it.
+
+shaun
+
+
+########################## VIRUS SNAGGERS, ver. 1.1b #########################
+##################### by Dallman Ross &lt;<A HREF="mailto:dman@spamless.us">dman@spamless.us</A>&gt; #####################
+#################### Copyright (c) 9/2003, by the author #####################
+########## MAY BE USED WITH ATTRIBUTION & INTACT COPYRIGHT NOTICE; ###########
+##################### PLEASE COMMENT ANY CHANGES AS YOURS #################### 
+
+# Place this file in its entirety somewhere reasonable.  Then run it from
+# your .procmailrc with a line like this (remove the leading comment char):
+#
+#   INCLUDERC = /somewhere/reasonable/virussnag
+
+# Caught mail is saved by default to a file called "VIRUS".  You can
+# run as-is or pre-set $MYVIRUS to something other than the default.
+# Or set it to /dev/null if you're feeling macho.  E.g.,
+#
+#   MYVIRUS = /dev/null  # optional line in your .procmailrc to change default
+#   INCLUDERC = /somewhere/reasonable/virussnag
+
+
+######################## Variables Section
+
+ SHELL    = /bin/sh             # portable, predictable, parsimonious
+ SPACE    = " "
+ TAB      = "	"               # that was a literal tab in the quotes
+ WS       = $SPACE$TAB          # whitespace var
+ DQ       = '"'                 # double-quotation mark
+ GO       = 9876543210          # saturated max exceeds 2147483647
+ STOP     = -$GO                # saturated min overruns -2147483647
+ MYVIRUS  = "${MYVIRUS:-VIRUS}" # filename where viruses will be saved
+
+ VFROM
+ :0  # find asserted From: line, if exists (called VFROM to avoid conflicts)
+  * $  $GO^0  ^From:[$WS]+\/.*
+  * $  $GO^0  ^From:\/.*
+  { VFROM = $MATCH }
+
+ :0  # save the value of Content-Type:
+  * $  ^Content-Type:.*\/[^$WS][^;]+
+  { CTYPE = $MATCH }
+
+# You can set your own $NASTYEXT bad-extension set if you wish, though
+# I recommend only doing so if you are very comfortable with regexes and
+# understand which of the extensions I've required be part of a double-
+# extension set.
+
+ NASTYEXT = "${NASTYEXT:-(exe|hta|pif|scr|shs|vb[se]|ws[fh]|(doc|txt|xls)\.)}"
+
+
+######################## Recipe Section
+
+ :0:  # 030821 () based loosely on an original from Philip Guenther
+  * $           $GO^0    ^Content-[^$WS]+:.*=$DQ?[^$DQ]*\.$NASTYEXT
+  * $         $STOP^0  !  CTYPE ?? ^^multipart
+  * $  B  ??    $GO^0    ^Content-[^$WS]+:.*($[$WS].*)*=[$WS]*($[$WS]+)*$DQ?\
+                                          [^$DQ]*\.$NASTYEXT
+  $MYVIRUS
+
+
+ :0  # 030821 () Klez variants; based on original from Bart Schaefer
+  *                       &gt; 50000
+  * $    $GO^0  CTYPE  ??  ^^(attachment|multipart/alternative)
+  * $  $STOP^0  CTYPE  ??  /report^^
+  * $    $GO^0  VFROM  ??  MAILER-DAEMON
+  * $    $GO^0  VFROM  ??  Lyris ListManager
+  {
+     :0 B:  # 030821 () if we're here, go ahead and egrep the body
+      *           ^Content-Type:(.*\&lt;)?(audio/x-|application)
+      * $  $GO^0  ()&lt;i?frame[$WS]*src=(3d)?cid:
+      * $  $GO^0  ^--[^$SPACE]+$$Content-
+      * $  $GO^0  ^--[^$SPACE]+$--[^$SPACE]+$
+      $MYVIRUS
+  }
+
+
+-- 
+Shaun Branden; email: <A HREF="mailto:shaun@pcuse.com">shaun@pcuse.com</A>; icq: 10469563
+Computerbank South Australia: sa.computerbank.org.au
+Computerbank gives away computer systems created from
+donated hardware and opensource software.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

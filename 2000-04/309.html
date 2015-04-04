@@ -1,0 +1,158 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Filesystem Wierdness" -->
+<!-- FromName="Phil Hutton" -->
+<!-- FromEmail="philhutton@bigfoot.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 16 Apr 2000 12:30:21 +0930" -->
+<!-- Id="20000416123021.A6500@odin.fdns.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Filesystem Wierdness</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Phil Hutton &lt;<I><A HREF="mailto:philhutton@bigfoot.com">philhutton@bigfoot.com</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sun, 16 Apr 2000 12:30:21 +0930
+</PRE>
+<H1>Filesystem Wierdness</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi...
+
+I have an interesting problem with an ext2 file system.  It seems that the free
+inodes count on the filesystem is getting corrupted, which is causing some
+problems.
+
+The following messages get dumped to the console (regularly):
+---
+EXT2-fs error (device ide0(3,5)): ext2_new_inode: Free inodes count
+corrupted in group 132
+EXT2-fs error (device ide0(3,5)): ext2_new_inode: Free inodes count
+corrupted in group 132
+EXT2-fs error (device ide0(3,5)): ext2_new_block: Free blocks count
+corrupted for block group 7
+EXT2-fs error (device ide0(3,5)): ext2_new_block: Free blocks count
+corrupted for block group 7
+---
+
+The machine is a proxy server running squid, and the partition with problems is
+the main cache partition.  After running for 4-5 days the corruption gets bad
+enough that the kernel thinks that there are no free inodes, and declares that
+the disk is full.  This causes squid to die, and users to get upset.  When this
+happens the cache partition must be unmounted, fscked and remounted.  Squid can
+then be restarted.
+
+Normally I'd say that this is a hardware problem, but the only problem that
+fsck ever finds is block bitmap differences.  If the disk was having problems
+I'd expect to see more errors.
+
+I'm including some more information at the end of this message.  Does anyone
+have any suggestions as to what may be causing the problem, or how the problem
+may be fixed?
+
+- Is squid doing something strange when it unlinks files?
+- Is the kernel having problems with such a big partition? (see below)
+- Is the disk stuffed?
+
+Thanks for your help.
+
+System:
+PIII 500
+256 M RAM
+27 GB HD
+RedHat 6.1
+Squid 2.3.STABLE2
+Kernel 2.2.14
+
+Output from df -k:
+---
+Filesystem           1k-blocks      Used Available Use% Mounted on
+/dev/hda1              5842632   1904028   3641808  34% /
+/dev/hda5             20161172   2042772  17094260  11% /cache
+---
+
+Output from df -i:
+---
+Filesystem            Inodes   IUsed   IFree IUse% Mounted on
+/dev/hda1             743360   70048  673312    9% /
+/dev/hda5            2562240  148705 2413535    6% /cache
+---
+
+Dump of session where squid has died and the partition is fscked:
+---
+[<A HREF="mailto:root@erwin">root@erwin</A> /root]# cd /usr/local/squid/logs
+[<A HREF="mailto:root@erwin">root@erwin</A> logs]# tail cache.log
+2000/04/15 04:02:19| Target number of buckets: 33512
+2000/04/15 04:02:19| Using 65536 Store buckets
+2000/04/15 04:02:19| Max Mem  size: 32768 KB
+2000/04/15 04:02:19| Max Swap size: 18432000 KB
+2000/04/15 04:02:19| /cache/1/swap.state.new: (28) No space left on device
+FATAL: storeDirOpenTmpSwapLog: Failed to open swap log.
+Squid Cache (Version 2.3.STABLE2): Terminated abnormally.
+CPU Usage: 0.030 seconds = 0.010 user + 0.020 sys
+Maximum Resident Size: 0 KB
+Page faults with physical i/o: 261
+[<A HREF="mailto:root@erwin">root@erwin</A> logs]# cd
+[<A HREF="mailto:root@erwin">root@erwin</A> /root]# umount /cache
+[<A HREF="mailto:root@erwin">root@erwin</A> /root]# fsck /cache
+Parallelizing fsck version 1.15 (18-Jul-1999)
+e2fsck 1.15, 18-Jul-1999 for EXT2 FS 0.5b, 95/08/09
+/dev/hda5 contains a file system with errors, check forced.
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+Block bitmap differences:  -239250 -245650 -2675346 -4384146 -4384658 -4390546
+Fix&lt;y&gt;? yes
+Inode bitmap differences:  -76691 -93779 -94291 -2072659 -2168211
+Fix&lt;y&gt;? yes
+/dev/hda5: ***** FILE SYSTEM WAS MODIFIED *****
+/dev/hda5: 144224/2562240 files (8.1% non-contiguous), 568987/5120710 blocks
+[<A HREF="mailto:root@erwin">root@erwin</A> /root]# mount /cache
+[<A HREF="mailto:root@erwin">root@erwin</A> /root]# /etc/rc.d/init.d/squid start
+Starting squid: squid
+---
+
+
+-- 
+Phil Hutton
+Systems Administrator
+Lincoln College, Adelaide, Australia
+Phone:  +61 8 8290 6124
+E-mail: <A HREF="mailto:philhutton@bigfoot.com">philhutton@bigfoot.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

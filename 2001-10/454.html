@@ -1,0 +1,210 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SAMBA + LDAP + Win98SE" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="'Toby Corkindale'" -->
+<!-- ToEmail="tjcorkin@sa.pracom.com.au" -->
+<!-- Date="Mon, 15 Oct 2001 21:10:25 +0930" -->
+<!-- Id="3BCACB29.5000906@ns.aus.com" -->
+<!-- Reference="Pine.LNX.4.33.0110151629490.9386-100000@localhost.localdomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SAMBA + LDAP + Win98SE</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@sa.pracom.com.au">tjcorkin@sa.pracom.com.au</A></I>&gt;
+  Date: Mon, 15 Oct 2001 21:10:25 +0930
+</PRE>
+<H1>Re: SAMBA + LDAP + Win98SE</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Toby Corkindale wrote:
+
+ &gt; You have increased
+ &gt; a) the number of global file descriptors
+ &gt;    (/proc/sys/fs/file-max)
+ &gt; b) the number of files per shell and children
+ &gt;    (ulimit -n)
+
+Hmmm, Toby, I might have mistaken what you meant, but the per-process 
+open file descriptor number is not a limit per-process group or anything 
+like that.
+
+That is, each process gets the same ... I would dare say that as long as 
+this number is 100 or above, Samba will be OK. That allows about 90 
+files open per client, since smbd reserves 10 for its own use.
+
+ &gt; ..right?
+ &gt;
+ &gt; It looks like the problem is, as you say, running out of global file
+ &gt; descriptors.
+ &gt;
+ &gt; You can investigate who has these by looking in
+ &gt; /proc/$PID/fd/
+ &gt;
+ &gt; (where $PID is a process ID on the system)
+ &gt; loop thru every one, and you will probably find one PID which is 
+hogging ALL
+ &gt; the file descriptors. Once you've done this, you can set about fixing it.
+ &gt;
+ &gt; Ignore the suggestions to use lsof logging to disk repetitively, thats a
+ &gt; huge waste of processor power and disk!
+ &gt;
+ &gt; A small perl script will be able to iterate thru the processes in 
+/proc/ and
+ &gt; report on the count of number of files in each's fd directory.. Set it so
+ &gt; that when the count gets over, say, 1000, it logs the process's PID and
+ &gt; command line to something..
+ &gt;
+ &gt; Once you have info on the offending process, get back to us, and someone
+ &gt; will probably know of an available fix.
+ &gt;
+ &gt; Hope this helps!
+ &gt;
+ &gt; -Toby
+ &gt;
+ &gt; On Mon, 15 Oct 2001 <A HREF="mailto:James.Wilson@compsm.com.au">James.Wilson@compsm.com.au</A> wrote:
+ &gt;
+ &gt;
+ &gt;&gt;The kernel by the looks...
+ &gt;&gt;
+ &gt;&gt;[<A HREF="mailto:root@server">root@server</A> log]# cat messages* | grep "Too many" | more
+ &gt;&gt;Oct  9 08:13:12 server xinetd[2274]: warning: cannot open 
+/etc/hosts.allow:
+ &gt;&gt;Too many open files in system
+ &gt;&gt;Oct  9 08:13:12 server xinetd[2274]: warning: cannot open 
+/etc/hosts.deny:
+ &gt;&gt;Too many open files in system
+ &gt;&gt;Oct  9 08:13:12 server xinetd[2275]: warning: cannot open 
+/etc/hosts.allow:
+ &gt;&gt;Too many open files in system
+ &gt;&gt;Oct  9 08:13:12 server xinetd[2275]: warning: cannot open 
+/etc/hosts.deny:
+ &gt;&gt;Too many open files in system
+ &gt;&gt;Oct  9 08:13:12 server xinetd[2276]: warning: cannot open 
+/etc/hosts.allow:
+ &gt;&gt;Too many open files in system
+ &gt;&gt;Oct  9 08:13:12 server xinetd[2276]: warning: cannot open 
+/etc/hosts.deny:
+ &gt;&gt;Too many open files in system
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;                    Andrew Reid
+ &gt;&gt;                    &lt;andrew.reid@        To: 
+<A HREF="mailto:James.Wilson@compsm.com.au">James.Wilson@compsm.com.au</A>
+ &gt;&gt;                    plug.cx&gt;             cc:     <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+ &gt;&gt;                                         Subject:     Re: SAMBA + 
+LDAP + Win98SE
+ &gt;&gt;                    15/10/2001
+ &gt;&gt;                    09:50 am
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;On Sun, Oct 14, 2001 at 02:22:58PM +0930, <A HREF="mailto:James.Wilson@compsm.com.au">James.Wilson@compsm.com.au</A> 
+wrote:
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;&gt;At some of the smaller sites, this problem is not so much an issue,
+ &gt;&gt;&gt;
+ &gt;&gt;however
+ &gt;&gt;
+ &gt;&gt;&gt;on the larger sites it can take workstations at least 2mins to kick off
+ &gt;&gt;&gt;
+ &gt;&gt;the
+ &gt;&gt;
+ &gt;&gt;&gt;login.bat.  There is no utilization on the network (1% on the fiber
+ &gt;&gt;&gt;
+ &gt;&gt;switch)
+ &gt;&gt;
+ &gt;&gt;&gt;and the server is ticking at 3% on each cpu (slapd).
+ &gt;&gt;&gt;
+ &gt;&gt;Do you have any working name resolution? Does each address in the DHCP
+ &gt;&gt;pool have a corresponding DHCP entry?
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;&gt;Another issue, is that at one particularly large site, we have an issue
+ &gt;&gt;&gt;where the server complains ti has too many open files and bombs.  We
+ &gt;&gt;&gt;
+ &gt;&gt;upped
+ &gt;&gt;
+ &gt;&gt;&gt;the servers memory to 1gb and the open file limit to 20000.  This was
+ &gt;&gt;&gt;
+ &gt;&gt;also
+ &gt;&gt;
+ &gt;&gt;&gt;hit!!
+ &gt;&gt;&gt;
+ &gt;&gt;Which component is complaining about this? SAMBA, the kernel? You
+ &gt;&gt;shouldn't need that much memory in a fileserver.
+ &gt;&gt;
+ &gt;&gt;   - andrew
+ &gt;&gt;
+ &gt;&gt;--
+ &gt;&gt;void signature () {
+ &gt;&gt;           cout &lt;&lt; "Andrew Reid -- <A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A>" &lt;&lt; endl;
+ &gt;&gt;           cout &lt;&lt; "Cell: +61 401 946 813" &lt;&lt; endl;
+ &gt;&gt;           cout &lt;&lt; "Quidquid latine dictum sit, altum viditur" &lt;&lt; endl;
+ &gt;&gt;}
+ &gt;&gt;
+ &gt;&gt;--
+ &gt;&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on 
+irc.linux.org.au
+ &gt;&gt;To unsubscribe from the LinuxSA list:
+ &gt;&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;
+ &gt;&gt;
+ &gt;
+
+
+-- 
+Richard Sharpe, <A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A>, LPIC-1
+www.samba.org, www.ethereal.com, SAMS Teach Yourself Samba
+in 24 Hours, Special Edition, Using Samba
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,110 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Header in Mailing List" -->
+<!-- FromName="Nathan Bailey" -->
+<!-- FromEmail="Nathan.Bailey@cc.monash.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="andrae@humbug.org.au" -->
+<!-- Date="Fri, 18 Dec 1998 13:10:27 +1100" -->
+<!-- Id="199812180210.NAA18893@goaway.cc.monash.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Header in Mailing List</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Nathan Bailey &lt;<I><A HREF="mailto:Nathan.Bailey@cc.monash.edu.au">Nathan.Bailey@cc.monash.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:andrae@humbug.org.au">andrae@humbug.org.au</A>
+  Date: Fri, 18 Dec 1998 13:10:27 +1100
+</PRE>
+<H1>Re: Header in Mailing List</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Andrae Muys &lt;<A HREF="mailto:a.muys@mailbox.uq.edu.au">a.muys@mailbox.uq.edu.au</A>&gt; wrote:
+&gt;No elm, no perl (it's a hacking tool remember :), I rather expect that
+
+Perl only does what can less easily be done using sed, awk, cut and
+grep -- ie. this is a rather short-sighted view if you have any of these
+other binaries.  If you _don't_, then the below will be quite difficult.
+
+&gt;Anyone know how it might be done in bourne shell?  I do have access to
+&gt;that (and I am allowed scripts provided they don't come from rootshell :).
+
+Do you get agrep?  That allows you to grep chunks instead of lines.
+I expect you don't get formail (which is part of procmail, I think?),
+which would be really helpful.  A shell script of the form:
+	# we pipe seperate messages to this script from our .forward, so
+	# it only every expects to receive one email message
+	(paraphrasing here)
+	write line to temporary file (ie. &gt;&gt; /tmp/newmail.$$)
+		if line is one of the headers we like to check (eg. set in a
+		config file or in this script) then check it.
+
+		if it is a blank line, that's the end of the headers,
+		so stop checking.  Write the rest of the file out,
+		and do whatever action you decided from the above
+		checking, ie. cat the file to the appropriate folder:
+
+			cat /tmp/newmail.$$ &gt;&gt; $HOME/Mail/$decidedfolder
+			rm /tmp/newmail.$$
+	# end script
+
+This doesn't do any file locking, which is a rather critical operation
+in mail filtering.  The easiest way to do that is to have a lock file,
+and have a while loop that waits for this process to somehow own the
+lock file, eg (excuse the csh, the code below isn't mine :-)
+while (1)
+  set mypid="$$"
+  set mylockfile=locked.$mypid
+  echo $mypid &gt; $mylockfile
+  while ( -f locked )
+        sleep 100
+  end
+  mv  $mylockfile locked
+  sleep 5
+  set whogotit=`cat locked`
+  if ( $whogotit == $mypid ) break
+end
+
+You also probably want to have some way to make sure you don't lose mail
+if something wierd happens in your shell script.
+
+Ultimately, your life would be easier if you just convince your sysadmin
+that, whilst you can hack the equivalent functionality in shell, you will
+probably chew less system load if you run a program designed to do this:
+ie. procmail.
+
+re,
+Nate
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

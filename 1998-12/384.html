@@ -1,0 +1,130 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="System call input" -->
+<!-- FromName="Michael Pearson" -->
+<!-- FromEmail="alcaron@ozemail.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 20 Dec 1998 18:21:52 +0000 (Local time zone must be set--see zic manual page)" -->
+<!-- Id="Pine.LNX.4.05.9812201800590.31916-100000@longbow.claymore" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: System call input</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Pearson &lt;<I><A HREF="mailto:alcaron@ozemail.com.au">alcaron@ozemail.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sun, 20 Dec 1998 18:21:52 +0000 (Local time zone must be set--see zic manual page)
+</PRE>
+<H1>System call input</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+I'm currently working on a kernel system call called simply "ttymigrate".
+In effect, it will enable a user to make a process either switch tty's, or
+direct itself to a file/device. Some of you at the last linuxsa meeting
+probably heard me yammering about it. I need some input from you lot on
+what the best way to do this will be.
+
+
+Issues which have already been covered:
+
+Q. Why don't you just use screen/some other program?
+A. I don't like screen. I want to be able to move a process around
+-without- running some sort of parent program for the process.
+
+Q. That's super hackish/bogus/implements policy in the kernel/creeping
+featurism/feeping creaturism.
+A. I know. It's still fun though, and will be very usefull to me once I've
+finished it. It's also a way to familiraize (erk. spelling) me to the
+kernel sources, which is a good thing. :)
+
+Q. Why isn't this mail going to <A HREF="mailto:linux-kernel@vger.rutgers.edu">linux-kernel@vger.rutgers.edu</A>?
+A. I wanted to get the input of this list first. And, from what I hear,
+the development kernels are undergoing a code freeze atm - that means no
+new functionality, just bugfixes and suchlike. Correct me if I'm wrong. :)
+
+Q. Wasn't this going to be an ioctl?
+A. Yeah, but I changed my mind, seeing as it messes with processes more
+than it does file descriptors.
+
+
+Now, firstly I need some sort of input on the best permission policy for
+this sort of thing. Note that whenever I refer to a tty or tty_struct
+I'm referring to the tty which will be moved to. I'm currently considering
+the following options:
+
+- If you're not root, you can't do anything with it.
+
+- Only work if the process to be moved is yours, and the tty-&gt;pgrp's
+effective uid is yours.
+
+- Only work if the process to be moved is yours, and ALL the processes
+using the tty in question are yours.
+
+Of course, the following simple policy will apply if you want to direct a
+process to a file or non tty device:
+
+- Only work if the process to be moved is yours, and you have read/write
+permission to the file.
+
+
+Also, I'm considering the best way to do this. The current preference is:
+
+1. a file descriptor to a tty/file and pid of process in question is
+passed to the syscall.
+2. syscall performs sanity/permission checks (see above)
+3. the tty-&gt;pgrp is changed to the pgrp of the pid.
+4. the pid-&gt;tty is changed to the tty, or null if not a tty
+5. copy the details of the tty/file descriptor to the fd's 0,1 and 2 of
+the process
+
+
+Hopefully, that'll cause the process to effectively be on the new tty.
+There's one or two things I haven't covered yet, though:
+
+- What to do with the process(s) on the tty that's being moved to.
+- Whether I should move every process running on the old tty to the new
+tty, or just the individual process.
+
+
+Ta,
+Michael
+
+PS. This is my first project with the linux kernel, and my second in
+linux, so if there's anything obvious that I've missed please shout. Also,
+ta for Paul/Michael's input on this at the linuxsa meeting, too.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

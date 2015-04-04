@@ -1,0 +1,186 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: I'm new to Linux - help!!!" -->
+<!-- FromName="'Alex Wallis'" -->
+<!-- FromEmail="awol@prepaidonline.com.au" -->
+<!-- ToName="'linuxsa@linuxsa.org.au'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 08 Mar 2003 14:12:21 +1030" -->
+<!-- Id="3E69669D.B9CFFFD@prepaidonline.com.au" -->
+<!-- Reference="000901c2e4f8$f6660a60$e9fefea9@ours" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: I'm new to Linux - help!!!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alex Wallis &lt;<I><A HREF="mailto:awol@prepaidonline.com.au">awol@prepaidonline.com.au</A></I>&gt;
+  To  : linuxsa@linuxsa.org.au &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 08 Mar 2003 14:12:21 +1030
+</PRE>
+<H1>Re: I'm new to Linux - help!!!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Trevor Mason wrote:
+&gt; 
+&gt; Gidday all,
+&gt; Have recently experienced the wonders of RedHat 7.1, Mandrake 8 & 9
+&gt; and desire to go much further as Windows does not "do it for me" any
+&gt; longer.
+
+Good for you! I hope you like to read? Everything you really need is at
+<A HREF="http://www.tldp.org">http://www.tldp.org</A>
+
+&gt; Having said that, have a small Windows network at home and wish to set
+&gt; up RedHat 7.1 as my file and mail server (Wife and kids don't want to
+&gt; leave security of Windows for now).
+
+Redhat 8.0 is much slicker, more user friendly, and very windows-like.
+
+&gt; Issues facing me at present are
+&gt; 
+&gt;   1. getting Network to talk to redhat (not sure if it is my NIC,
+&gt;      protocol, or settings)
+
+I guess you want a NAT firewall? Redhat ships with lokkit which can be
+accessed by typing into a root prompt the command "setup".
+
+RH7.1 by default ships with ipchains enabled if I recall correctly, so
+first you should turn that off and enable iptables instead. At a root
+prompt do....
+
+chkconfig --level 123456 ipchains off ; service ipchains stop ; rmmod
+ipchains
+
+...and then do....
+
+chkconfig --level 35 iptables on
+
+An extremely quick and very newbie friendly iptables NAT/firewall script
+can be found at <A HREF="http://www.freshmeat.net/projects/quicktables.">http://www.freshmeat.net/projects/quicktables.</A> Just
+download and run the script and it'll generate an rc.firewall script for
+you. Then you simply run it like...
+
+chmod +x rc.firewall ; ./rc.firewall
+
+Another very good firewall that I personally use on my rh8 box is at
+<A HREF="http://monmotha.mplug.org">http://monmotha.mplug.org</A>
+
+Once the firewall script has been run once you have to save the rulesets
+so that redhat will use them on every boot.
+
+service iptables save
+
+And that should get your network all setup and running.
+
+&gt;   2. setting file permissions on server
+
+File permissions are pretty well already setup for you. Just make sure
+to ONLY use root for admin tasks like running services and installing
+packages, and dont use it for normal tasks like running user apps and
+especially not X. Do man chmod for details if you need to change
+anything yourself.
+
+&gt;   3. Setting up modem/dialup from redhat to internet
+
+Redhat 7.1 uses wvdial as it's default dialer, but that can be
+configured from the gui. Do man wvdial for more details on it. The
+config for it is in /etc/wvdial.conf
+Another very user friendly gui dialer is kppp.
+
+&gt;   4. Setting up a mail server (sendmail or qmail?)
+
+Sendmail is a Mail Tranfer Agent. To setup an actual mail server you
+would need an MX record pointing to your machine which is problematic on
+a dialup. I use www.no-ip.com to get around the dynamic IP limitations,
+which is a free service that provides a small app to update your IP
+every time you dial-in. So you can use a hostname like mine is
+awol.no-ip.org and you can also setup a MX (Mail eXchange) record there
+too. Then you can have mailbox accounts like <A HREF="mailto:user@yourname.no-ip.org">user@yourname.no-ip.org</A> and
+set your family's windows mail software to get their mail from the
+gateway machine.
+
+Then you need to run mail server software like pop or imap. I personally
+use imap as you can then have a webmail interface running on your apache
+web server called squirrelmail. Once installed you can set it to start
+on every boot with a quick "chkconfig imap on" command. Do man chkconfig
+for details and "chkconfig --list" will show you what's set to start at
+what run level. Do "less /etc/inittab" for a quick rundown on what run
+levels mean.
+
+&gt; 
+&gt; Main problem for me is learning the "linux-speak", understanding how
+&gt; devices are configured, how do I check them, make sure they are
+&gt; working etc.
+
+I have a quick list of common linux commands is available on my home
+machine at <A HREF="http://awol.no-ip.org/commands.html">http://awol.no-ip.org/commands.html</A>
+But I stole most of that from <A HREF="http://www.cafecomputer.com/faqindex.htm">http://www.cafecomputer.com/faqindex.htm</A>
+
+&gt; Any assistance and guidance would be greatly appreciated.
+
+You can get instant help & answers on Internet Relay Chat, the so called
+"chat rooms" your mother warned you about. The linuxsa mailing has a
+channel on irc.freenode.net called #linuxsa so fire up xchat and make
+your way there to speak to me or someone else. We're mostly lurkers
+there so you may have to make some noise to get our attention. Saying a
+person's nickname usually works. There's also channels #redhat &
+#linuxhelp on EFNET (<A HREF="http://www.efnet.org">http://www.efnet.org</A> for a list of servers) where
+there's always 100+ people ready and willing to help with any linux
+probs.
+
+&gt; Am located in country SA, in Mt Gambier district - if there is anyone
+&gt; local here would love to get together for a "look" at a working system
+&gt; to learn.
+
+Too far from Adelaide for me I'm afraid, but if you're ever coming back
+towards "civilization" at any time let me know and perhaps something
+could be arranged. I'm sure others will be willing too.
+
+&gt; thanks in anticipation
+&gt; Trev
+
+I hope I haven't confused you, and that this has helped.
+
+Alex
+
+P.S. Best to set your Outlook to send in plain text as html postings
+tend to get either ignored or rude responses.
+-- 
+`When you say "I wrote a program that crashed Windows", people just
+stare at you blankly and say "Hey, I got those with the system, *for
+free*".'
+(By Linus Torvalds)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

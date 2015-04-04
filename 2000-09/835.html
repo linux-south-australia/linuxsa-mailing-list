@@ -1,0 +1,173 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="sshd unreliable" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 19 Sep 2000 05:47:04 +0930" -->
+<!-- Id="20000919054704.A18989@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: sshd unreliable</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 19 Sep 2000 05:47:04 +0930
+</PRE>
+<H1>sshd unreliable</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+SSH not 100% reliable!!
+
+Once again, I find that "sshd" can just lock up and
+refuse to accept connections. Here are the symptoms on
+the client side when I try to use "scp":
+
+===========================================
+Could not create pipes: Too many open files
+lost connection
+===========================================
+
+And here's what the server "sshd" produces in the log <A HREF="file:">file:</A>
+
+===========================================
+Sep 19 05:02:46 dog sshd[18963]: log: Connection from 203.38.148.52 port 2464
+Sep 19 05:02:48 dog sshd[18963]: log: RSA authentication for akenning accepted.
+Sep 19 05:02:48 dog PAM_pwdb[18963]: (sshd) session opened for user akenning by (uid=0)
+Sep 19 05:02:48 dog sshd[18963]: fatal: Local: Could not create pipes: Too many open files
+Sep 19 05:02:48 dog PAM_pwdb[18963]: (sshd) session closed for user akenning 
+===========================================
+
+I tried killing off child processes of the "sshd" process.
+But that didn't help.
+If I kill the parent process, I lose the connection.
+And then, of course, I can't get into the machine any more.
+
+I've checked the man-manuals for sshd and scp. No clues there.
+Maybe I have to read the source.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++
+Moral of story:
+
+If you rely on "ssh" as your only way to log in to a machine,
+then you risk losing all contact.
+E.g. if you're overseas, you can lose contact until you return home.
+This happened to me once, but luckily I had another machine on
+the same LAN which also had sshd. So I logged in to that one and
+used the nefarious "rsh" to get back in and restart "sshd".
+
+The OpenSSH software is clearly not yet at the level of reliability
+that you would want to place too much trust in it.
+Then again, I use it with "scp" maybe 50 times a day.
+Eventually, it seems that the process just acquires too many
+open files.
+
+Is there some way I can list the files opened by a process?
+I can't find this in the "fuser" and "ps" manuals.
+Aha. Found it. It's in the file /proc/1286/fd for process 1286.
+
+Hmmm. 24 open files. Is that too many? Contents of /proc/1286/fd:
+
+--------------------------------------------------------
+lrwx------   1 root     root           64 Sep 19 05:26 0 -&gt; [0301]:2169
+lrwx------   1 root     root           64 Sep 19 05:26 1 -&gt; [0301]:2169
+lr-x------   1 root     root           64 Sep 19 05:26 10 -&gt; [0301]:3362
+lr-x------   1 root     root           64 Sep 19 05:26 11 -&gt; [0301]:3362
+lr-x------   1 root     root           64 Sep 19 05:26 12 -&gt; [0301]:3362
+lr-x------   1 root     root           64 Sep 19 05:26 13 -&gt; [0301]:3362
+lr-x------   1 root     root           64 Sep 19 05:26 14 -&gt; [0301]:3362
+lr-x------   1 root     root           64 Sep 19 05:26 15 -&gt; [0301]:3362
+lr-x------   1 root     root           64 Sep 19 05:26 16 -&gt; [0301]:3362
+lr-x------   1 root     root           64 Sep 19 05:26 17 -&gt; [0301]:3362
+lrwx------   1 root     root           64 Sep 19 05:26 18 -&gt; [0000]:6113
+lr-x------   1 root     root           64 Sep 19 05:26 19 -&gt; [0301]:3362
+lrwx------   1 root     root           64 Sep 19 05:26 2 -&gt; [0301]:2169
+lrwx------   1 root     root           64 Sep 19 05:26 20 -&gt; [0301]:2698
+lr-x------   1 root     root           64 Sep 19 05:26 21 -&gt; [0301]:4266
+lrwx------   1 root     root           64 Sep 19 05:26 22 -&gt; [0000]:6251
+lrwx------   1 root     root           64 Sep 19 05:26 23 -&gt; [0000]:6254
+lr-x------   1 root     root           64 Sep 19 05:26 3 -&gt; [0301]:3362
+lrwx------   1 root     root           64 Sep 19 05:26 4 -&gt; [0000]:6245
+lrwx------   1 root     root           64 Sep 19 05:26 5 -&gt; [0301]:2698
+lr-x------   1 root     root           64 Sep 19 05:26 6 -&gt; [0301]:3362
+lr-x------   1 root     root           64 Sep 19 05:26 7 -&gt; [0301]:3362
+lr-x------   1 root     root           64 Sep 19 05:26 8 -&gt; [0301]:3362
+lr-x------   1 root     root           64 Sep 19 05:26 9 -&gt; [0301]:3362 
+----------------------------------------------------------
+
+
+While checking this all out, the main sshd process crashed but left
+a few child processes (one of which I am using to write this note).
+But none of these child processes reponds to new login attempts.
+
+"man getdtablesize" says I can have 256 open file descriptors.
+So where's the problem?
+Maybe the now-dead sshd process had 256 descriptors open.
+Too late to check now.
+It seems believable at 50 accesses a day for 5 days.
+
+Well, now I've re-started "sshd" on the machine in question.
+And everything's back to normal. But if I had killed the old
+process, I think it would have killed all connections.
+So one must wait until it dies by itself.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+Moral 2:
+Always keep a spare key!
+I almost removed the "login" service on the machine in question.
+Lucky I thought about it longer than 2 seconds.
+So much for removing all services!!!
+
+Moral 3:
+When analysing security of systems, one has to look at all possible
+(or credible) failure modes, not just the technically exciting ones
+like eavesdroppers on the net. 
+E.g. ssh daemon software can crash or malfunction.
+Passwords can be forgotten.
+Etc. etc. etc.
+You have to look at the whole network of system states,
+estimate probablities of all transitions, etc. etc. etc.
+
+Cheers,
+Alan Kennington.
+
+PS. Please don't tell me that I have to get the latest
+version of OpenSSH. 
+Do you really think there's something magic about
+last week's release?
+New releases fix old bugs and introduce new ones!
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

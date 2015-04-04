@@ -1,0 +1,104 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: FreeBSD -- 2 identical drives, different geometries..." -->
+<!-- FromName="'Andrew Speer'" -->
+<!-- FromEmail="andrew.speer@isolutions.com.au" -->
+<!-- ToName="'Richard Russell'" -->
+<!-- ToEmail="richard@yellowgoanna.com" -->
+<!-- Date="Fri, 29 Mar 2002 13:53:31 +1030" -->
+<!-- Id="200203290318.g2T3IU027510@carbon.isolutions.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: FreeBSD -- 2 identical drives, different geometries...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Speer &lt;<I><A HREF="mailto:andrew.speer@isolutions.com.au">andrew.speer@isolutions.com.au</A></I>&gt;
+  To  : Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  Date: Fri, 29 Mar 2002 13:53:31 +1030
+</PRE>
+<H1>Re: FreeBSD -- 2 identical drives, different geometries...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Richard,
+
+I also had this problem on one box (Linux though) when I was setting up 
+mirrored drives. Two identical Seagate drives reported different geometries 
+when linux booted. I eventually had to specify the drive geometry to the 
+kernel via a boot time option, "hda=c,h,s hdc=c,h,s", and all was OK. If you 
+can do this under FreeBSD somehow I imagine you might be OK.
+
+I took this from:
+
+<A HREF="http://www.linuxdoc.org/HOWTO/Large-Disk-HOWTO-14.html">http://www.linuxdoc.org/HOWTO/Large-Disk-HOWTO-14.html</A>#ss14.2
+
+----
+
+14.2 Nonproblem: Identical disks have different geometry? 
+
+`I have two identical 10 GB IBM disks. However, fdisk gives different sizes 
+for them. Look: 
+ 
+# fdisk -l /dev/hdb
+Disk /dev/hdb: 255 heads, 63 sectors, 1232 cylinders
+Units = cylinders of 16065 * 512 bytes
+
+   Device Boot  Start      End   Blocks   Id  System
+/dev/hdb1           1     1232  9896008+  83  Linux native
+# fdisk -l /dev/hdd
+Disk /dev/hdd: 16 heads, 63 sectors, 19650 cylinders
+Units = cylinders of 1008 * 512 bytes
+
+   Device Boot  Start      End   Blocks   Id  System
+/dev/hdd1           1    19650  9903568+  83  Linux native
+ How come?' 
+
+What is happening here? Well, first of all these drives really are 10gig: hdb 
+has size 255*63*1232*512 = 10133544960, and hdd has size 16*63*19650*512 = 
+10141286400, so, nothing is wrong and the kernel sees both as 10.1 GB. Why 
+the difference in size? That is because the kernel gets data for the first 
+two IDE disks from the BIOS, and the BIOS has remapped hdb to have 255 heads 
+(and 16*19650/255=1232 cylinders). The rounding down here costs almost 8 MB. 
+
+If you would like to remap hdd in the same way, give the kernel boot 
+parameters `hdd=1232,255,63'. 
+
+----
+
+Hope this helps,
+
+Andrew
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

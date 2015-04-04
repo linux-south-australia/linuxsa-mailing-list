@@ -1,0 +1,218 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Modem and other hardware recommendations" -->
+<!-- FromName="'Anthony Symons'" -->
+<!-- FromEmail="ant@sa.pracom.com.au" -->
+<!-- ToName="'Brian Marr'" -->
+<!-- ToEmail="cabernet@internode.on.net" -->
+<!-- Date="Fri, 06 Jul 2001 16:51:50 +0930" -->
+<!-- Id="3B45670E.182B24D7@sa.pracom.com.au" -->
+<!-- Reference="Pine.LNX.4.10.10107061207550.21032-100000@lftbww01.loftuscomp.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Modem and other hardware recommendations</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  To  : Brian Marr &lt;<I><A HREF="mailto:cabernet@internode.on.net">cabernet@internode.on.net</A></I>&gt;
+  Date: Fri, 06 Jul 2001 16:51:50 +0930
+</PRE>
+<H1>Re: Modem and other hardware recommendations</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Ants mega quick kernel compilation rundown:
+
+For kernels, rather than use the RPMs I'd recommend downloading the
+kernel source from:
+
+<A HREF="http://mirror.aarnet.edu.au/pub/linux/kernel/v2.4/linux-2.4.6.tar.bz2">http://mirror.aarnet.edu.au/pub/linux/kernel/v2.4/linux-2.4.6.tar.bz2</A>
+
+for 2.4.6 (provided you have 2.4 allready, otherwise other issues come
+in to play.
+
+Then do:
+
+[<A HREF="mailto:ant@ant">ant@ant</A> ~]$ su -
+Password: 
+[<A HREF="mailto:root@ant">root@ant</A> /root]# cd /usr/src 
+remove the linux link
+[<A HREF="mailto:root@ant">root@ant</A> /src]# rm linux          
+[<A HREF="mailto:root@ant">root@ant</A> /src]# tar -xIvf /wherever/linux-2.4.6.tar.bz2
+
+to unpack your kernel.
+Then:
+
+mv linux linux-2.4.6
+ln -s linux-2.4.6 linux
+
+to set up your paths and sym links correctly. Then:
+
+cd linux
+make menuconfig
+
+to get your menu (you'll need some idea about what hardware you have and
+some idea about how the kernel works to make one that has the support
+you need.)
+
+then quit and save.
+
+make dep
+make bzImage (you could do make zImage, but I dont cos my kernels are
+usually too big)
+make modules
+make modules_install
+
+Ensure that you got no errors in any of the previous steps. If you did
+check over the error and try to change your config and then do a "make
+clean" and start again.
+
+If it worked continue:
+
+cp System.map /boot/System.map-2.4.6
+cp arch/i386/boot/bzImage /boot/bzImage-2.4.6
+
+(the version numbers are added so that your system can have multiple
+different kernels simultaniously so you can quickly pick an old one if a
+problem becomes apparent)
+
+Then if using grub edit /boot/grub/menu.lst appropriatly and your done
+
+if using lilo:
+
+vi /etc/lilo.conf
+
+Its probably something like:
+
+boot=/dev/hda
+lba32
+read-only
+prompt
+timeout=50
+vga=normal
+
+image=/boot/bzImage-2.4.6
+root=/dev/hda3
+label=linux
+append=" mem=188M ide1=autotune ide0=autotune"
+
+image=/boot/bzImage-2.4.5
+root=/dev/hda3
+label=linux-2.4.5
+append=" mem=188M ide1=autotune ide0=autotune"
+
+so copy one of the sections to the top, and change the image line to
+point to your kernel and change the label of your old one to something
+that identifies it. Save your changes, run lilo. You should see
+something like:
+
+[<A HREF="mailto:root@ant">root@ant</A> /root]# lilo
+Added linux *
+Added linux-2.4.5
+Added linux-2.4.4
+Added linux-2.4.2
+Added linux-2.2.18
+Added failsafe
+
+The * denotes the default entry. The others show that they will be
+available incase you want to use them instead you will have the option.
+
+Presuming no errors from lilo, your done. You'll never need to touch an
+old kernel again. And next time you make your own kernel copy the file
+.config from /usr/src/linux-2.4.6 to the directory with the new kernel
+and do a:
+
+make oldconfig
+
+That'll only ask the new questions and so you dont have to configure
+from scratch, and can more quickly do the next upgrade.
+
+Cheers,
+Ant
+
+PS: It's a good idea to throw in a few extra ls -al commands around the
+place and just make sure things are as you expect them to be if your not
+familiar with the system (eg /usr/src/linux is a link and not a
+directory etc).
+
+Brian Marr wrote:
+&gt; 
+&gt; ?= &lt;<A HREF="mailto:Pine.LNX.4.10.10107061207550.21032-100000@lftbww01.loftuscomp.com.au">Pine.LNX.4.10.10107061207550.21032-100000@lftbww01.loftuscomp.com.au</A>&gt;
+&gt; MIME-Version: 1.0
+&gt; Message-Id: &lt;<A HREF="mailto:01070616331704.06291@gringo">01070616331704.06291@gringo</A>&gt;
+&gt; Content-Transfer-Encoding: 8bit
+&gt; 
+&gt; My current install of  Mandrake 8.0 does not have the kernel sources either.
+&gt; There is nothing to "make menuconfig" with. Can anyone say how we get these
+&gt; on our systems ? What packages are required ?
+&gt; 
+&gt; Cheers
+&gt; Brian Marr
+&gt; 
+&gt; On Friday 06 July 2001 12:10, Dale Long wrote:
+&gt; &gt; On Fri, 6 Jul 2001, Anthony Symons wrote:
+&gt; &gt; &gt; &gt; You also need the kernel source installed. The headers alone will not
+&gt; &gt; &gt; &gt; do. The kernel source requires this that and the other thing.
+&gt; &gt; &gt; &gt; Thank goodness for the Mandrake Software Manager. It sounds like a plug
+&gt; &gt; &gt; &gt; for Debian.
+&gt; &gt; &gt;
+&gt; &gt; &gt; I tend to forget about that stuff as I compile all my own kernels and do
+&gt; &gt; &gt; everything manually. Works for me... There aint no bugs in vi[1]. :)
+&gt; &gt;
+&gt; &gt; With this particular installation of Mandrake 8.0 I chose 'install
+&gt; &gt; everything' in the installation as I wanted to review it before doing a
+&gt; &gt; 'production' installation. For some reason the kernel and some other
+&gt; &gt; things were left out.
+&gt; &gt;
+&gt; &gt; Dale.
+&gt; 
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+Systems Administrator       
+Pracom Ltd.             
++61 8 82029074 -=- +61 402 100 671 
+<A HREF="mailto:anthony.symons@sa.pracom.com.au">anthony.symons@sa.pracom.com.au</A>
+
+PRIVILEGED - PRIVATE AND CONFIDENTIAL
+This electronic mail is solely for the use of the addressee and may
+contain information which is confidential or privileged.
+If you receive this electronic mail in error, please delete it from
+your system immediately and notify the sender by electronic mail or
+using any of the above contact details.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

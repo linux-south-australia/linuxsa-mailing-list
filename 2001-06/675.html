@@ -1,0 +1,126 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="BIND 9.1.0 bug resurfaces" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 21 Jun 2001 14:54:59 +0930" -->
+<!-- Id="20010621145459.A13851@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: BIND 9.1.0 bug resurfaces</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 21 Jun 2001 14:54:59 +0930
+</PRE>
+<H1>BIND 9.1.0 bug resurfaces</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+That BIND 9.1.0 bug that I mentioned a few weeks
+ago has resurfaced, even though I took some of
+the courses of action (well, one at least) that
+were recommended.
+
+Here are the symptoms.
+
+When I run nslookup with my BIND 9.1.0 name server
+I get this:
+
+====================================================
+dingo /home/akenning&gt; nslookup www.foreignteacher.com.tw
+Server:  dog.topology.org
+Address:  203.38.148.51
+
+*** dog.topology.org can't find www.foreignteacher.com.tw: Non-existent host/domain
+dingo /home/akenning&gt; 
+====================================================
+
+When I use the Telstra nameserver, I get this:
+
+====================================================
+hamster /etc# nslookup www.foreignteacher.com.tw
+Server:  uneeda.telstra.net
+Address:  139.130.4.4
+
+Name:    www.foreignteacher.com.tw
+Address:  192.72.83.8
+
+hamster /etc# 
+====================================================
+
+No matter which machines I make the query to dog.topology.org
+from, I get the same negative response.
+
+Now what I did to my /etc/named.conf file on dog is this:
+
+====================================================
+options {
+    directory "/var/named";
+    pid-file "/var/run/named/named.pid";
+    auth-nxdomain no;
+    allow-recursion {
+        localhost;
+        203.38.148.48/28;   // Topology.org network.
+        203.48.2.224/27;    // Topoz.net network.
+        };
+    }; 
+====================================================
+
+I.e. I just let my own machines to the recursion thing.
+And I take it that this is waht I was supposed to do
+to stop other people mucking around with the named cache,
+and generally wasting my bandwidth, RAM, etc.
+
+
+Could anyone please either tell me what I can do to
+diagnose and fix this itnermittent problem?
+
+Cheers,
+Alan Kennington.
+
+--------------------------------------------------------------------
+    name: Dr. Alan Kennington
+  e-mail: <A HREF="mailto:akenning@topology.org">akenning@topology.org</A>
+ website: <A HREF="http://www.topology.org/">http://www.topology.org/</A>
+    city: Adelaide, South Australia
+  coords: 34.88051 S, 138.59334 E
+timezone: UTC+0930 <A HREF="http://www.topology.org/timezone.html">http://www.topology.org/timezone.html</A>
+ pgp-key: <A HREF="http://www.topology.org/key_ak2.asc">http://www.topology.org/key_ak2.asc</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

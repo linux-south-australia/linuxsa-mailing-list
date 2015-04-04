@@ -1,0 +1,100 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: my first DOS attack" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="Daryl Tester" -->
+<!-- ToEmail="dt@picknowl.com.au" -->
+<!-- Date="Wed, 06 Sep 2000 10:00:12 +0930" -->
+<!-- Id="39B59014.EF5B7E5C@aarnet.edu.au" -->
+<!-- Reference="20000903202053.A7487@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: my first DOS attack</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  Date: Wed, 06 Sep 2000 10:00:12 +0930
+</PRE>
+<H1>Re: my first DOS attack</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Daryl Tester wrote:
+&gt; 
+&gt; &gt; ROFL.  Checking a source IP address costs 32 table lookups in the
+&gt; &gt; worst case, three in the average case.  So it actually saves routing
+&gt; &gt; resources, as subsequent routers don't have to forward the packet.
+&gt; 
+&gt; I meant from a CPU point of view.  I've just had to put a filter
+&gt; on a FDDI interface (all port 80 traffic to a specific IP address)
+&gt; and the additional load is noticeable.  Mind you, the router is
+&gt; probably now underspec'd for that interface ...
+
+I meant from a CPU point of view:
+
+  interface Ethernet0
+    ip verify unicast reverse-path
+
+requires one routing table lookup.  A CPU-based routing table implemented
+using a Patrica tree takes 32 table references in the worst case to
+resolve an IP address to an interface.  In practice, it takes about
+three table references, this is, almost always faster than using
+an access list.
+
+&gt; &gt; Cisco is under siginficant pressure to alter their default.
+&gt; 
+&gt; Their default doesn't do _anything_.  "no ip routing", from memory.
+&gt; I guess they're doing the old "once you configure it, it's your
+&gt; responsibility" trick.
+
+When IOS creates an interface, it installs particular defaults.  For
+example, the interface is created shut down, without an IP address,
+and disallowing directed broadcasts.  The pressure is on to expand
+this to be:
+
+  interface Ethernet0
+    no ip address
+    no ip directed-broadcast
+    no ip proxy-arp
+    no ip redirects
+    ip verify unicast reverse-path
+    shutdown
+
+Thus the Internet is protected from the clueless and lazy.  Yes, sometimes
+the defaults need to be removed, but these ISPs by definition are not
+clueless (or are about to gain clue the hard way).
+
+Glen
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

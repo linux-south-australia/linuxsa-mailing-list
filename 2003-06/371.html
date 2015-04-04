@@ -1,0 +1,187 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="uptime = 1 day, Grrrrr...." -->
+<!-- FromName="'David Creed'" -->
+<!-- FromEmail="dcreed@bsal.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="ak.linuxsa@topology.org" -->
+<!-- Date="Wed, 11 Jun 2003 09:33:26 +0930" -->
+<!-- Id="3EE671CE.9070907@bsal.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: uptime = 1 day, Grrrrr....</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Creed &lt;<I><A HREF="mailto:dcreed@bsal.com.au">dcreed@bsal.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  Date: Wed, 11 Jun 2003 09:33:26 +0930
+</PRE>
+<H1>uptime = 1 day, Grrrrr....</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Alan, hope you don't mind me asking a dumb question, but you mentioned 
+in this post
+<A HREF="http://www.linuxsa.org.au/mailing-list/2003-04/598.html">http://www.linuxsa.org.au/mailing-list/2003-04/598.html</A>;
+that the problem with limited uptime reporting periods related to 
+"jiffies" (whatever they are) and also to the fact that
+  2^32 / (100*60*60*24) = 497.1026962962
+
+My dumb question is, "is this a product of using a 32 bit operating 
+system, and will this uptime reporting limit change if I'm using a 64 
+bit operating system, specifically linux on Alpha ?"
+
+Thanks for your patience,
+David Creed
+
+
+
+-- 
+  08:59:01 up 299 days, 22:30,  3 users,  load average: 0.00, 0.00, 0.00
+
+####################################################################
+
+This e-mail is confidential and is intended solely for the use of the
+individual or entity to whom it is addressed. If you are not an
+intended recipient then you have received this e-mail in error and
+any use, dissemination, forwarding, printing or copying is strictly
+prohibited. You should contact the sender by return then delete all
+the material from your system.
+
+####################################################################
+
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: uptime = 1 day, Grrrrr...." -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="<A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A>" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>" -->
+<!-- Date="Sun, 20 Apr 2003 16:21:05 +0930" -->
+<!-- Id="<A HREF="mailto:20030420162105.A21684@dog.topology.org">20030420162105.A21684@dog.topology.org</A>" -->
+<!-- Reference="<A HREF="mailto:20030420153519.A24685@mullet.moonee.beach">20030420153519.A24685@mullet.moonee.beach</A>" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: uptime = 1 day, Grrrrr....</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 20 Apr 2003 16:21:05 +0930
+</PRE>
+<H1>Re: uptime = 1 day, Grrrrr....</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, Apr 20, 2003 at 03:35:19PM +1000, Robert Thorsby wrote:
+&gt; On 2003.04.20 15:21 Alan Kennington wrote:
+[...]
+&gt; &gt; Who's bright idea was it to make it impossible to boast a 500+ day
+&gt; &gt; uptime?
+&gt; 
+&gt; I think you will find that after 497 days the kernel counter runs out 
+&gt; of digits so it starts all over again -- just like the odometer of your 
+&gt; car.
+&gt; 
+&gt; Even worse, when playing around with the 2.5 kernel the counter was 
+&gt; accelerated by an order of magnitude, so it recycles after 49.7 days. 
+
+Just checking this in "bc", I got this:
+
+2^32 / (100*60*60*24)
+497.1026962962
+
+Obviously it's the "jiffies" variable that's being reported in "uptime".
+I guess this just rubs in the well-known point that device driver and
+kernel writers who rely on "jiffies" to measure time are taking a risk
+over periods of more than 497 days.
+
+So maybe... there could be some lurking bugs in the kernel which surface
+after 497 days, like if someone compares two jiffies values to work
+out which even occurred first.
+So it might not be such a bad idea to reboot after 497 days after all.
+
+Since "gettimeofday", or the kernel equivalent do_gettimeofday,
+runs correctly until 2038 some time, you would have thought that the
+user-level "uptime" command would have some way of subtracting
+current time from the epoch of the last boot.
+
+Does anyone just happen to know of a convenient way of finding out,
+within the kernel, what the last boot time was?
+Or is "jiffies" the closest approximation to a "time since boot"
+parameter within the kernel?
+
+Cheers,
+Alan Kennington.
+
+PS. It's now just 34 years and 9 months to Unix doomsday:
+<A HREF="http://www.merlyn.demon.co.uk/critdate.htm#UNIX">http://www.merlyn.demon.co.uk/critdate.htm#UNIX</A>
+Hmmm. And the year after that, we get hit by asteroid 2003 EP4 maybe:
+<A HREF="http://neo.jpl.nasa.gov/risk/2003ep4.html">http://neo.jpl.nasa.gov/risk/2003ep4.html</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

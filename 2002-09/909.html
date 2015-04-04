@@ -1,0 +1,114 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: consolehelpter in rh7.3" -->
+<!-- FromName="'Andy Zivkovic'" -->
+<!-- FromEmail="andy@a-z.au.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 22 Sep 2002 11:18:58 +0930" -->
+<!-- Id="LEEMKLALDICPKJECCGCLKECNCDAA.andy@a-z.au.com" -->
+<!-- Reference="3D8BE52F.C1511CE7@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: consolehelpter in rh7.3</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andy Zivkovic &lt;<I><A HREF="mailto:andy@a-z.au.com">andy@a-z.au.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 22 Sep 2002 11:18:58 +0930
+</PRE>
+<H1>RE: consolehelpter in rh7.3</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+# which poweroff
+/usr/bin/poweroff
+# rpm -qif /usr/bin/poweroff
+Name        : usermode                     Relocations: (not relocateable)
+Version     : 1.53                              Vendor: Red Hat, Inc.
+Release     : 2                             Build Date: Tue 16 Apr 2002
+08:15:58 EST
+Install date: Sat 31 Aug 2002 13:27:55 EST      Build Host:
+stripples.devel.redhat.com
+Group       : Applications/System           Source RPM:
+usermode-1.53-2.src.rpm
+Size        : 175212                           License: GPL
+Packager    : Red Hat, Inc. &lt;<A HREF="http://bugzilla.redhat.com/bugzilla&gt">http://bugzilla.redhat.com/bugzilla&gt</A>;
+Summary     : Tools for certain user account management tasks.
+Description :
+The usermode package contains the userhelper program, which can be
+used to allow configured programs to be run with superuser privileges
+by ordinary users.
+
+
+Using RPM to list the files in usermode, it puts poweroff, halt and reboot
+in /usr/bin, not /sbin (however, those commands do exist in there, as part
+of the SysVinit package. It also puts files in /etc/pam.d (named poweroff,
+halt and reboot).
+
+Also, there's a package called usermode-gtk-1.53-2.i386.rpm, which provides
+some graphical tools (I don't have it installed). Doing a rpm -qR usermode
+doesn't list any libraries or packages that i recognise as requiring X.
+
+
+I don't understand pam's config files, but I assumed that poweroff should
+allow all users to power down the computer, although I wouldn't be surprised
+if it's default config doesn't allow that, since it would be quite a serious
+security problem.
+
+Here's the contents of the config <A HREF="file:">file:</A>
+#%PAM-1.0
+auth       sufficient   /lib/security/pam_rootok.so
+auth       required    /lib/security/pam_console.so
+#auth       required     /lib/security/pam_stack.so service=system-auth
+account    required     /lib/security/pam_permit.so
+
+I tried commenting out the auth required line (that wasn't already commented
+out), but that didn't help, so i tried adding a auth required
+/lib/security/pam_permit.so (I saw a pam_deny.so in the directory, which I
+assumed would always deny, and permit looked like the only possible one that
+would always allow). That worked (at least, it allows normal users to
+reboot).
+
+I wish I got an error message before giving me a hint what the problem was.
+Since I saw those commands were symlinks to consolehelper, and that was
+segfaulting, I assumed they were crashing too (so I didn't even think of
+checking /var/log/messages) :(
+
+Oh well, all solved now.
+
+thanks,
+Andy
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

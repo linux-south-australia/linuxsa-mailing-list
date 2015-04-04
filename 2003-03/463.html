@@ -1,0 +1,146 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Which is faster on modern CPU?" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="ak.linuxsa@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 10 Mar 2003 18:53:23 +1030" -->
+<!-- Id="20030310185323.A32048@dog.topology.org" -->
+<!-- Reference="3E6BD7BB.1060807@aarnet.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Which is faster on modern CPU?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 10 Mar 2003 18:53:23 +1030
+</PRE>
+<H1>Re: Which is faster on modern CPU?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Mar 10, 2003 at 10:39:31AM +1030, Glen Turner wrote:
+&gt; 
+&gt; I've got kernel code that optionally collects variables.
+&gt; The obvious code is:
+&gt; 
+&gt;    if (collecting_counters) {
+&gt;        counter1++;
+&gt;        counter2++;
+&gt;    }
+&gt; 
+
+
+Glen,
+
+Just replying to the original question, this
+kind of issue used to come up a lot when I was programming
+a 68k to do Bresenham's line algorithm, which you probably
+know uses a couple of integer comparisons to simulate
+floating point comparisons to keep a graphics line as close
+as possible to a straight line.
+I used a fairly sophisticated technique to improve the
+the standard algorithm by a factor of 2.6 in the critical loop.
+But this expanded about 6 lines of assembly language out to
+about 250 lines.
+(A guy in England - where I was then working - had just finished
+a PhD on graphics optimization, and he showed me the first page of his
+thesis where he had stated _the_ optimal implementation of 
+Bresenham's line algorithm. He had breathing difficulties when
+I showed him 4 or 5 optimization tricks which he hadn't yet used.
+He told me I was "mad". Anyway, I just state this to give you some
+idea of my previous fanaticism for optimisation.)
+
+The first trick in my bag of tricks for optimizing conditional code
+where the control parameter changes rarely but is inside a loop
+is to, of course, have two loops and choose which loop to enter 
+rather than choosing actions within the loop.
+
+if (collecting_counters) {
+	while (...) {
+		/* lots of stuff */
+		counter1++;
+		counter2++;
+		/* lots more stuff */
+		}
+	}
+else {
+        while (...) {
+                /* lots of stuff */
+                /* lots more stuff */
+                }
+        }
+
+This approach _may_ be faster.
+But the costs are:
+-	difficult to maintain because code is duplicated
+-	may actually go slower because of program text cache interactions
+
+This approach can be extended into a huge code tree with a different copy of
+the inner loop for each set of control variable values.
+
+It seems to me like the linux kernel is the most difficult place to
+do any optimization at all.
+You have unknown processors, unknown compilers, unknown optimization levels,
+unknown cache sizes and architectures, unknown numbers of CPUs etc.
+How could anyone predict the run-speed impact of any change in kernel code?
+Your comment about it being political sounds right.
+
+My main point was, in fact, that the variability in runtime provides such a
+huge level of background noise that you just can't detect improvements from
+code optimization by doing speed tests. Although I still do try to optimize,
+I (almost) never waste time doing speed tests.
+
+In my readings of those parts of the kernel which should be written
+to go like the clappers, I've been astonished at the huge amount of
+useless guff and sloppy unoptimized code. Especially in network device drivers
+(e.g. ethernet, ATM), but also further up in the IP stack, I've seen code that
+looks as leisurely as applications software. It's only the "modern CPU" which
+saves the linux IP data paths from code bloat.
+
+By the way, the last trick in by bag of tricks for loop optimization was
+to recompile the assembly language code of the inner loop
+before each entry into the loop. If the loop runs often enough, it's
+beneficial to recompile before entering the loop - but you have to
+count cycles. And then you have to test each time whether it's beneficial
+to do the optimization.
+(It was at this point in my explanation that the Computer Engineering PhD
+from [old] York told me I was "mad".)
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

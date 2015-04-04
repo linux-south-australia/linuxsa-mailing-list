@@ -1,0 +1,104 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: corrupt /dev/lvm - bizzare properties" -->
+<!-- FromName="'Daryl Tester'" -->
+<!-- FromEmail="Daryl.Tester@iocane.com.au" -->
+<!-- ToName="'Chris Doherty'" -->
+<!-- ToEmail="chris.doherty@adelaide.edu.au" -->
+<!-- Date="Mon, 09 Feb 2004 01:22:40 +1030" -->
+<!-- Id="40264D38.FB8EFFA8@iocane.com.au" -->
+<!-- Reference="1076243017.40262a493baa1@pandani.services.adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: corrupt /dev/lvm - bizzare properties</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  To  : Chris Doherty &lt;<I><A HREF="mailto:chris.doherty@adelaide.edu.au">chris.doherty@adelaide.edu.au</A></I>&gt;
+  Date: Mon, 09 Feb 2004 01:22:40 +1030
+</PRE>
+<H1>Re: corrupt /dev/lvm - bizzare properties</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Chris Doherty wrote:
+
+&gt; &gt; &gt; <A HREF="mailto:root@connect4">root@connect4</A>:~# ls -la /dev/lvm
+&gt; &gt; &gt; ?---rws-w-  8306 840966198 976250230 875573298 Sep 24  2004 /dev/lvm
+&gt; &gt;
+&gt; &gt; Did fsck actually report this as a problem?  My guess is that the
+&gt; 
+&gt; the filesystem can't be mounted (which is the really worrying part) so i can't
+&gt; fsck it.
+
+Firstly, you leave a file system unmounted if you are going to fsck it.
+
+OK, you didn't quite get what I meant.  /dev/lvm is supposed to be a
+character mode device.  It isn't anymore.  That means that it's been
+corrupted (the *entry* for the device, not the device itself).  The
+fsck that I was talking about is the one run on the file system where
+/dev resides, which is most likely the root file system, "/".
+
+I originally thought /dev/lvm might have been a special device for talking
+to the underlying LVM module, but then -
+
+&gt; <A HREF="mailto:root@connect4">root@connect4</A>:~# mount -t ext3 /dev/vg1/lv1 /data
+&gt; mount: /dev/vg1/lv1 is not a valid block device
+&gt; <A HREF="mailto:root@connect4">root@connect4</A>:~# ls /dev/vg1/
+&gt; total 124
+&gt; dr-xr-xr-x    2 root     root         4096 Feb  6 18:46 ./
+&gt; drwxr-xr-x   22 root     root       118784 Feb  8 14:19 ../
+&gt; crw-r-----    1 root     disk     109,   0 Feb  6 18:46 group
+&gt; brw-rw----    1 root     disk      58,   0 Feb  6 18:46 lv1
+
+shows /dev/vg1/group with the exact same major/minor number as what
+you wrote before.
+
+What does "vgdisplay -v /dev/vg1" show?
+
+&gt; the fsck that i mentioned previously was run on the other (available)
+&gt; filesystems, thinking that perhaps the LVM binaries (or some other related tool)
+&gt; had been corrupted.
+
+You didn't run fsck on a *live* file system, did you?
+
+
+-- 
+Regards,
+  Daryl Tester,  Software Wrangler and Bit Herder, IOCANE Pty. Ltd.
+
+"If I have been given to see further than other men,
+ it is because I have stood on the faces of midgets."  -- Astrel Joie
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

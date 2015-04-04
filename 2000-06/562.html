@@ -1,0 +1,145 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: system write(2) call bounds checking" -->
+<!-- FromName="John Brazel" -->
+<!-- FromEmail="john@tellurian.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Mon, 19 Jun 100 15:26:41 +0930 (CST)" -->
+<!-- Id="200006190556.PAA28667@tellurus.tellurian.com.au" -->
+<!-- Reference="20000619140421.A28120@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: system write(2) call bounds checking</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: John Brazel &lt;<I><A HREF="mailto:john@tellurian.com.au">john@tellurian.com.au</A></I>&gt;
+  To  : <A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>
+  Date: Mon, 19 Jun 100 15:26:41 +0930 (CST)
+</PRE>
+<H1>Re: system write(2) call bounds checking</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; /usr/src/linux-2.2.16/kernel/sysctl.c
+&gt; ----------------------------------------------------------------------
+&gt; static ssize_t do_rw_proc(int write, struct file * file, char * buf,
+&gt;                           size_t count, loff_t *ppos)
+&gt; {
+&gt;         int op;
+&gt;         struct proc_dir_entry *de;
+&gt;         struct ctl_table *table;
+&gt;         size_t res;
+&gt;         ssize_t error;
+&gt; 
+&gt;         de = (struct proc_dir_entry*) file-&gt;f_dentry-&gt;d_inode-&gt;u.generic_ip;
+&gt;         if (!de || !de-&gt;data)
+&gt;                 return -ENOTDIR;
+&gt;         table = (struct ctl_table *) de-&gt;data;
+&gt;         if (!table || !table-&gt;proc_handler)
+&gt;                 return -ENOTDIR;
+&gt;         op = (write ? 002 : 004);
+&gt;         if (ctl_perm(table, op))
+&gt;                 return -EPERM;
+&gt; 
+&gt;         res = count;
+&gt; 
+&gt;         /*
+&gt;          * FIXME: we need to pass on ppos to the handler.
+&gt;          */
+&gt; 
+&gt;         error = (*table-&gt;proc_handler) (table, write, file, buf, &res);
+&gt;         if (error)
+&gt;                 return error;
+&gt;         return res;
+&gt; }
+&gt; ----------------------------------------------------------------------
+&gt; 
+&gt; This function seems to get all write(2) calls out of the system call
+&gt; mapping table. I'm not totally certain about this.
+
+	Erm, nope. sys_write() should be in the file read_write.c in the
+	fs/ subdirectory (this is the entry point for the write systemcall).
+
+	It then finds the set of file operations pertaining to that [v]inode,
+	and calls the appropriate write function for that inode (in this
+	case, do_rw_proc, given that the opened file is a file in the /proc
+	file system).
+
+&gt; There are two possible lines of argument here.
+&gt; 1. It's okay for a "count" parameter to be an unsigned integer
+&gt;    in the range 2G to $G-1.
+&gt;    This sounds fair enough, except that a negative value
+&gt;    will then be returned by write(2), which will be interpreted
+&gt;    as an error condition.
+
+	Actually, the write(2) syscall is defined only to return -1 on error.
+	Despite the fact that write(2) takes a size_t count argument (unsigned)
+	and returns an ssize_t (signed) result, the userland code should check 
+	to ensure that the return value != -1.
+
+	Merely checking for a negative return value in userland code is WRONG.
+
+	(Furthur checks could be made by clearing errno if count == 2^32-1
+	and if the return value == -1, checking whether or not errno is set).
+
+&gt; 2. "count" values between 4G and 4G-1 should be flagged by
+&gt;    do_rw_proc as an error, in which case such values may not be
+&gt;    parameters to write(2).
+&gt;    And this would mean that the linux kernel code is erroneous.
+
+	It's pretty ugly that the syscall takes a size_t count and yet returns
+	a ssize_t: perhaps passing an int arg that receives the number of
+	bytes written might be better. However, since that's not POSIX,
+	it's unlikely write(2) will ever be changed. :)
+
+&gt; Whether you permit "count" values between 2G and 4G-1 or not,
+&gt; it looks like something bad will happen. If you do permit it,
+&gt; then the semantics of the return value is faulty.
+
+	Only for 4G-1.
+
+&gt; Executive summary:
+&gt; This all reinforces the view that the linux kernel
+&gt; is lucky kludgerama. I.e. the code is not "tight" in the sense
+&gt; of checking every function return value and all function arguments
+&gt; to ensure no errors.
+
+	I think it's a little difficult to keep the kernel consistent when so
+	many disparate groups are working on it.
+
+	In any case, it would appear that since the u/l code is erroneously
+	checking the return values from write(2), the point is a little 
+	mooted.
+J.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

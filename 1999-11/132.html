@@ -1,0 +1,108 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: UDP port 752 does what?" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Matthew Tippett" -->
+<!-- ToEmail="mtippett@ticons.com.au" -->
+<!-- Date="Sun, 7 Nov 1999 11:28:25 +1030 (CST)" -->
+<!-- Id="199911070058.LAA16737@atdot.dotat.org" -->
+<!-- Reference="199911061351.AAA32560@matt.ticons.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: UDP port 752 does what?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Matthew Tippett &lt;<I><A HREF="mailto:mtippett@ticons.com.au">mtippett@ticons.com.au</A></I>&gt;
+  Date: Sun, 7 Nov 1999 11:28:25 +1030 (CST)
+</PRE>
+<H1>Re: UDP port 752 does what?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Matthew Tippett wrote:
+
+ &gt; &gt; rat:root#&gt; lsof -i udp:752
+ &gt; &gt; lsof: WARNING: compiled for Linux release 2.0.34; this is 2.0.36.
+ &gt; 
+ &gt; Not too wierd, the thing that lsof does is trawl all through system
+ &gt; references to filesystems, processes, networking and such.  So if it is
+ &gt; run against a kernel that it hasn't been built against, then there may be
+ &gt; quite a few required system calls that may not be friendly.
+
+It's worse than that - system calls aren't the problem, it's the layout
+of internal system datastructures.
+
+If there's a struct in the kernel it wants to examine which looks like
+this:
+
+       struct {
+          pid_t   f_pid;
+          void    *f_acl;
+       } futz;
+
+then it'll expect to see the "f_acl" pointer at an offset of +2 from 
+the beginning of each instance of the structure it finds (because the
+preceeding element, the pid_t, is 2 bytes long).
+
+If, in a later version of the kernel, someone has changed the "futz"
+structure to look like this:
+
+       struct {
+          pid_t   f_pid;
+          uid_t   f_uid;
+          void    *f_acl;
+       } futz;
+
+... then lsof will see garbage (which consists of two bytes of uid_t
+and 6 bytes of a pointer) when it tries to access the value at offset +2
+(which will have been compiled in, based on the contents of the include
+files which match the current kernel at the time it was compiled).
+
+Additionally, if there are an array of futz structures and it's walking
+through them by saying "futzpointer += sizeof(struct futz)", it'll 
+increment by the wrong number of bytes when it tries to find the next
+entry in the array because the running kernel's futz structure is longer
+than the one that was compiled-in.
+
+This is why you often need to compile utilities like ps, netstat, vmstat,
+etc when you upgrade your kernel.
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

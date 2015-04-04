@@ -1,0 +1,133 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Mandrake and keeping multiple machines up to date" -->
+<!-- FromName="'Michael Firkins'" -->
+<!-- FromEmail="michael@home.lyppard.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="25 May 2002 16:57:15 +0930" -->
+<!-- Id="1022311635.14979.126.camel@celery.home.lyppard.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Mandrake and keeping multiple machines up to date</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Firkins &lt;<I><A HREF="mailto:michael@home.lyppard.com.au">michael@home.lyppard.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 25 May 2002 16:57:15 +0930
+</PRE>
+<H1>Mandrake and keeping multiple machines up to date</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi.
+
+Having 2 Mandrake 8.2 machines (a notebook and a desktop) at home, and
+wanting to sync them for packages and updates, I delved into the wonders
+of rpmdrake and was soon immersed in urpmi and friends.
+
+What I found was a system that mostly works for 1 workstation, but was a
+bit lacking in documentation and flexibility for local rpm repositories.
+I also found that rpmdrake was touchy about adding 'sources' and liked
+to give me an error 'failed with error 2' and would occasionally stop
+responding with no indication as to what was happening. 
+
+Spending time in the man pages and various scripts on the system, I
+gained the impression that I was working with a lesser cousin of apt. It
+was also apparent that there is no man pages that specifically address
+the local repository issue for urpmi or rpmdrake. On the other hand, apt
+is well documented and I have had cause to use it with fink on Mac OS
+10. Remembering the exchange between Dan and Geoffrey regarding apt and
+rpm for the netcraft RedHat 7.3 mirror, I started hunting around and
+turned up an article in the June 2000 PC Authority Mag on apt and rpm.
+
+Using the article as a guide, I grabbed the apt src.rpm from
+www.freshrpms.net and built and installed it on my system. I built my
+existing repository into an apt source by symlinking the RPM directories
+from my existing rpmdrake style repository into an apt tree so that it
+looked thus:
+
+/var/www/html/install
+--&gt; apt/
+    ---&gt; 8.2/
+         ---&gt; base/
+         ---&gt; RPMS.install1/
+         ---&gt; RPMS.install2/
+         ---&gt; RPMS.install3/
+         ---&gt; RPMS.install4/
+         ---&gt; RPMS.kde3/
+         ---&gt; RPMS.updates/
+    ---&gt; SRPMS.install1/
+    ---&gt; SRPMS.install2/
+    ---&gt; SRPMS.install3/
+    ---&gt; SRPMS.install4/
+    ---&gt; SRPMS.kde3/
+    ---&gt; SRPMS.updates/
+
+Then I ran a command to generate the hdlists etc:
+
+genbasedir --topdir=/var/www/html/install/apt --bloat --progress 8.2
+updates install1 install2 install3 install4 kde3
+
+This completed without error. Now over to the notebook, install apt, and
+change the redhat config in /etc/apt/sources.list so that it reflects my
+local repository by adding:
+
+rpm <A HREF="http://my_local_repository_host/">http://my_local_repository_host/</A>  install/apt/8.2 install1 install2
+install3 install4 kdes updates
+
+And commenting out the RH7.3 stuff.
+
+Now to run 'apt-get update'
+
+Initially there were some complaints about missing directories in
+/var/cache/apt and /var/state which I created by hand until the tree was
+filled. Then the command completed, connecting to the repository and
+processing the data from the repository. I installed a package requiring
+dependencies and it completed without error. This is good! Very good.Now
+I can sync the updates to one box, and update both at will, as well as
+install anything I need from the install rpms.
+
+Question: Are there any local mirrors of the Mandrake updates, esp. the
+security updates? Rpmdrake does not show any Australian sites.
+
+Regards,
+
+Michael
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

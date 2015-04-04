@@ -1,0 +1,135 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: making a faster system" -->
+<!-- FromName="Richard Russell" -->
+<!-- FromEmail="richard@austrics.com.au" -->
+<!-- ToName="Andreja Zivkovic" -->
+<!-- ToEmail="andy@zt.zivkotech.net.au" -->
+<!-- Date="Mon, 17 Jan 2000 09:09:34 +1030" -->
+<!-- Id="388248A6.FC1C079@austrics.com.au" -->
+<!-- Reference="NDBBLGMFILMBOEMELBAOMEBDCBAA.andy@zivkotech.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: making a faster system</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@austrics.com.au">richard@austrics.com.au</A></I>&gt;
+  To  : Andreja Zivkovic &lt;<I><A HREF="mailto:andy@zt.zivkotech.net.au">andy@zt.zivkotech.net.au</A></I>&gt;
+  Date: Mon, 17 Jan 2000 09:09:34 +1030
+</PRE>
+<H1>Re: making a faster system</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+An interesting extension of this idea (and one which, in practice, could
+surely never work) is to do a source-only distribution, which could then
+be compiled on any platform. Set up a debian-like auto update feature,
+but have it work with source RPMs, compiled and optimised locally for
+each platform. This could provide an interesting alternative to Java's
+platform-independance -- instead of distributing software as
+platfor-independant bytecode, distribute it as platform-independant
+source code... all you really need is a mechanism to make this work, and
+shitloads of testing...
+
+Just an idle thought...
+
+rr
+
+Andreja Zivkovic wrote:
+&gt; 
+&gt; A thread similar to this was around before, but I don't keep every message
+&gt; posted, and I couldn't find it in the archives (mainly because they're
+&gt; grouped in months, and I don't know which month of which year the thread was
+&gt; in).
+&gt; 
+&gt; Anyway, I recently decided I needed something interesting to do, so I
+&gt; thought, why use binaries made for a i386 (I use RedHat 6.1), when I have a
+&gt; PII? I decided to go straight into trying this, before finding out how to
+&gt; really achieve this. Firstly, I'd like advice on how to do it, and if what I
+&gt; already tried is good enough, then why I couldn't get glibc to compile.
+&gt; 
+&gt; Firstly, I'd like some advice. I like RPMs a lot. It lets me
+&gt; uninstall/upgrade packages without me having to keep a log for each package,
+&gt; trying to remember where every file it contains was installed. Some
+&gt; programs' Makefile lets you do a 'make uninstall', but not all do, and in
+&gt; the past, I haven't kept the source for what I've used. Also, I don't know
+&gt; how to write rpm spec files (looking through them, it doesn't look too hard,
+&gt; but the major problem, in my opinion, is that I'd have to separately compile
+&gt; the program, find every file the program uses, then use that info to build
+&gt; the spec file, so I can compile it again).
+&gt; 
+&gt; What I tried was copy /usr/lib/rpm/rpmrc to /root/.rpmrc and add the line
+&gt; 'optflags:
+&gt; i686 -O5 -ffast-math -funroll-loops -fomit-frame-pointer -march=pentiumpro -
+&gt; mcpu=pentiumpro'
+&gt; (it's on the same line in the file, but I'm sure that the above line will be
+&gt; cut at around 80 characters).
+&gt; and I used 'rpm --rebuild --target=i686 &lt;rpm source&gt;' to build it. Compiling
+&gt; some programs (ypbind comes to mind), these flags were used, so I figure,
+&gt; they should be built for a i686 CPU and optimised.
+&gt; 
+&gt; Is this the right way to make optimised programs for the i686, or do I need
+&gt; to get PentiumGCC and use that? Since PentiumGCC is a patch to GCC, I think
+&gt; I should be able to use the egcs source rpm to make a PentiumGCC rpm. Will
+&gt; that work? :)
+&gt; 
+&gt; If what I'm doing is good enough, why can't I compile glibc? First of all,
+&gt; it ignored the compiler flags I defined in .rpmrc, and secondly when it runs
+&gt; the configure script, it complains that my kernel headers are too old. It
+&gt; needs kernel headers &gt;= 2.0.10, but RH6.1 comes with kernel 2.2.12 (yes, the
+&gt; kernel-headers was installed, and I even installed kernel-source). I even
+&gt; tried using the headers from linux-2.3.33, and I got the same error (headers
+&gt; too old). This only happened if I gave rpm the --target i686 argument. If I
+&gt; didn't do that, configure would work, but it would set the build platform as
+&gt; i386-redhat-linux-gnu, instead of i686-redhat-linux-gnu. If I manually ran
+&gt; the configure script with the same arguments as rpm tried, it worked, but I
+&gt; didn't set the same shell variables (CCFLAGS, etc).
+&gt; 
+&gt; does compiling things like glibc (and other libraries) and egcs with
+&gt; optimisation flags actually help, or should I only bother optimising the
+&gt; 'end' applications?
+&gt; 
+&gt; Finally, does anyone know if I rebuild every package for the i686 and make a
+&gt; CD with a i686 directory instead of the i386, will the install program
+&gt; automagically work?
+&gt; 
+&gt; thanks in advance for all the help,
+&gt; Andy
+&gt; 
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+Richard Russell              | work:   +61 8 8207 1940
+<A HREF="mailto:richard@austrics.com.au">richard@austrics.com.au</A>      | mobile:    0412 827 805
+------------------------------------------------------
+  My overriding goal in life is to have a Fatwa
+    issued against me by an Islamic Ayatullah.
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

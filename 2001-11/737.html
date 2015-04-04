@@ -1,0 +1,220 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="devfs again" -->
+<!-- FromName="'Darrin Ritter'" -->
+<!-- FromEmail="rittercr@chariot.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 26 Nov 2001 00:22:40 +1030" -->
+<!-- Id="3C00F7A8.3DFCD74E@chariot.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: devfs again</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Darrin Ritter &lt;<I><A HREF="mailto:rittercr@chariot.net.au">rittercr@chariot.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 26 Nov 2001 00:22:40 +1030
+</PRE>
+<H1>devfs again</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi
+
+I've Been having a great time getting my Linux machine to play DVD's
+with the Xine player and all has been going well until I wanted to play
+an encrypted DVD. I have been able to get a copy of Xine that is
+supposed to play them but the documentation says that i need to have
+write access to the dvd drive device in order to play them.
+
+I am using mandrake 8.1 which uses devfsd and have been able to get it
+to load a link by adding the lines:
+#added 25/11/01 for dvd player
+
+LOOKUP		^dvd$	CFUNCTION GLOBAL symlink ./ide/host0/bus1/target1/lun0/cd
+dvd $devpath
+
+REGISTER	^./dvd$	CFUNCTION GLOBAL symlink
+./ide/host0/bus1/target1/lun0/cd dvd
+
+#UNREGISTER	^./dvd$	CFUNCTION GLOBAL unlink dvd
+
+
+
+but have been un able to modify the permissions with the following line:
+REGISTER     ^./dvd       PERMISSIONS   root.dvdusers   770
+
+I have already created a new group dvdusers and intend to allow the
+users to be in this group.
+
+the main documentation that I have been using is man pages devfsd and
+devfsd.conf. If anyone is aware of other docs I'd be happy to read them,
+and If some one is successful in getting the encrypted DVD's to play on
+MDK 8.1 I'd like to here how the did it.
+
+I have included my devfsd.conf file below for comment
+
+Regards Darrin Ritter
+
+# Sample /etc/devfsd.conf configuration file.
+# Richard Gooch  &lt;<A HREF="mailto:rgooch@atnf.csiro.au">rgooch@atnf.csiro.au</A>&gt;		3-JUL-2000
+#
+# Changes for Mandrake Linux:
+#
+# Thierry Vignaud &lt;<A HREF="mailto:tvignaud@mandrakesoft.com">tvignaud@mandrakesoft.com</A>&gt;
+#	- autoload of modules on inode lookup
+#	- auto{load,save} of permissions in /var/lib/dev-state/
+#	- add an example of how to force default
+#	- more ALSA stuff
+#	- prevent devfsd to auto{save,load} permissions & ownerships
+#	  on Unix98 ptys (/dev/pts)
+#	- handle CD burners too
+#	- call dynamic scripts on device creation/removal
+
+#
+# Enable full compatibility mode for old device names. You may comment
+these
+# out if you don't use the old device names. Make sure you know what
+you're
+# doing!
+REGISTER	.*		MKOLDCOMPAT
+UNREGISTER	.*		RMOLDCOMPAT
+
+# You may comment out the above and uncomment the following if you've
+# configured your system to use the original "new" devfs names or the
+really
+# new names
+#REGISTER	vc/.*		MKOLDCOMPAT
+#UNREGISTER	vc/.*		RMOLDCOMPAT
+#REGISTER	pty/.*		MKOLDCOMPAT
+#UNREGISTER	pty/.*		RMOLDCOMPAT
+#REGISTER	misc		MKOLDCOMPAT
+#UNREGISTER	misc		RMOLDCOMPAT
+
+# You may comment these out if you don't use the original "new" names
+REGISTER	.*		MKNEWCOMPAT
+UNREGISTER	.*		RMNEWCOMPAT
+
+# Enable module autoloading. You may comment this out if you don't use
+# autoloading
+LOOKUP		.*		MODLOAD
+
+#
+# Uncomment this if you want permissions to be saved and restored
+# Do not do this for pseudo-terminal devices
+REGISTER	^pt[sy]/.*	IGNORE
+CHANGE		^pt[sy]/.*	IGNORE
+CREATE		^pt[sy]/.*	IGNORE
+CHANGE		.*		COPY	$devpath /lib/dev-state/$devname
+CREATE		.*		COPY	$devpath /lib/dev-state/$devname
+DELETE		.*		CFUNCTION GLOBAL unlink /lib/dev-state/$devname
+UNREGISTER	.*		CFUNCTION GLOBAL unlink /lib/dev-state/$devname
+
+#
+# Uncomment this if you want the old /dev/cdrom symlink
+# (e.g. those specifying CD-ROM type, mouse port, modem port etc)
+#
+LOOKUP		^cdrom$		CFUNCTION GLOBAL symlink cdroms/cdrom0 $devpath
+REGISTER	^cdroms/cdrom0$	CFUNCTION GLOBAL symlink cdroms/cdrom0 cdrom
+UNREGISTER	^cdroms/cdrom0$	CFUNCTION GLOBAL unlink cdrom
+
+#added 25/11/01 for dvd player
+
+LOOKUP		^dvd$	CFUNCTION GLOBAL symlink ./ide/host0/bus1/target1/lun0/cd
+dvd $devpath
+
+REGISTER	^./dvd$	CFUNCTION GLOBAL symlink
+./ide/host0/bus1/target1/lun0/cd dvd
+REGISTER     ^./dvd       PERMISSIONS   root.dvdusers   770
+#UNREGISTER	^./dvd$	CFUNCTION GLOBAL unlink dvd
+
+
+
+REGISTER	^v4l/video0$	CFUNCTION GLOBAL symlink v4l/video0 video
+UNREGISTER	^v4l/video0$	CFUNCTION GLOBAL unlink video
+
+# ALSA stuff
+LOOKUP 		snd 		MODLOAD ACTION snd
+REGISTER 	sound/.*	EXECUTE /sbin/pam_console_apply
+REGISTER 	snd/.*		EXECUTE /sbin/pam_console_apply
+
+
+# Add Link for dsp & dsp1
+REGISTER	^sound/dsp0$	CFUNCTION GLOBAL symlink sound/dsp0 dsp
+UNREGISTER	^sound/dsp0$	CFUNCTION GLOBAL unlink dsp
+
+
+
+# Manage USB mouse
+REGISTER	^input/mouse0$	CFUNCTION GLOBAL symlink input/mouse0 usbmouse
+UNREGISTER	^input/mouse0$	CFUNCTION GLOBAL unlink usbmouse
+
+# dynamic desktop and co
+
+#REGISTER	.*/part.*	EXECUTE /etc/dynamic/scripts/part.script add
+$devpath
+#UNREGISTER	.*/part.*	EXECUTE /etc/dynamic/scripts/part.script del
+$devpath
+
+REGISTER	v4l/video.*	EXECUTE /etc/dynamic/scripts/webcam.script add
+$devpath
+UNREGISTER	v4l/video.*	EXECUTE /etc/dynamic/scripts/webcam.script del
+$devpath
+
+REGISTER	usb/scanner.*	EXECUTE /etc/dynamic/scripts/scanner.script add
+$devpath
+UNREGISTER	usb/scanner.*	EXECUTE /etc/dynamic/scripts/scanner.script del
+$devpath
+
+REGISTER	usb/rio500	EXECUTE /etc/dynamic/scripts/rio500.script add
+$devpath
+UNREGISTER	usb/rio500	EXECUTE /etc/dynamic/scripts/rio500.script del
+$devpath
+
+REGISTER	usb/tts/[13579]	EXECUTE /etc/dynamic/scripts/visor.script add
+$devpath
+UNREGISTER	usb/tts/[13579]	EXECUTE /etc/dynamic/scripts/visor.script del
+$devpath
+
+
+REGISTER	\(usb/\)\?\(lp\|printer\).*	EXECUTE
+/etc/dynamic/scripts/lp.script add $devpath
+UNREGISTER	\(usb/\)\?\(lp\|printer\).*	EXECUTE
+/etc/dynamic/scripts/lp.script del $devpath
+
+# devfsd.conf ends here
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

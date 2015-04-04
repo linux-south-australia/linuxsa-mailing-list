@@ -1,0 +1,137 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Unix / Windows Interoperability" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="rsharpe@richardsharpe.com" -->
+<!-- ToName="'Adam Smith'" -->
+<!-- ToEmail="adam.smith@sageautomation.com" -->
+<!-- Date="Tue, 3 Dec 2002 21:30:35 -0800 (PST)" -->
+<!-- Id="Pine.LNX.4.33.0212032125150.20212-100000@ns.aus.com" -->
+<!-- Reference="00a501c29b4e$30c7f3c0$e209a8c0@bugman" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Unix / Windows Interoperability</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:rsharpe@richardsharpe.com">rsharpe@richardsharpe.com</A></I>&gt;
+  To  : Adam Smith &lt;<I><A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A></I>&gt;
+  Date: Tue, 3 Dec 2002 21:30:35 -0800 (PST)
+</PRE>
+<H1>Re: Unix / Windows Interoperability</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 4 Dec 2002, Adam Smith wrote:
+
+&gt; Here come the bits about password synchronization:
+&gt; --------------------------------------------------
+&gt; 
+&gt; According to what I've read, this can be done with PAM on the Unix side
+&gt; of things, and something like Microsoft's "Services for Unix."  What
+&gt; other alternatives are there to "Services for Unix?"  How do they rate
+&gt; in comparison?  I had a package called Cygwin referred to me but from
+&gt; what I've read I don't think it supports password synchronization.  I
+&gt; don't think that running Services for Unix would be a problem, and
+&gt; ideally it's probably preferred because who better than Microsoft to
+&gt; know how to integrate something into Windows?  Funly enough, it makes
+&gt; sense.  Their closed-source environment has made me feel like I can
+&gt; trust their product better than any third party's in this case.
+
+Cygwin does nothing for you in this area. What you probably want to do is 
+to make the Win2K DC carry all the accounts and password hashes, or use 
+LDAP. Using LDAP might me more work than you want peform right now. 
+PAM_NTDOM will allow your UNIX users to authenticate against a Win2K DC 
+and to modify their passwords from UNIX if you need to.
+ 
+&gt; (Here come some questions! . . .)
+&gt; 
+&gt; Once installed, how exactly does this process work?  
+&gt; If I have two systems running a flavour of Unix, what happens now when a
+&gt; user changes his/her password?  
+
+It is changed on the central password server.
+
+&gt; According to a couple of MS Whitepapers on SFU, Windows changes the
+&gt; password under NT, and then sends a request to PAM listening on all
+&gt; relevant Unix boxes to synchronize the password.  What happens then?  Is
+&gt; their password change rewritten in /etc/passwd?  Is some sort of system
+&gt; function called that changes the password?
+
+Don't listen to MS. That is the crapiest way to do it.
+
+&gt; What happens to accounts that don't exist?  If I go about creating an
+&gt; account under NT, do I then have to go and create it on -all- my Unix
+&gt; boxen that require it?  What is the best way to address account
+&gt; conformity across Unix?
+
+Use winbindd. That way you never have to say sorry^W^Wcreate accounts on 
+the UNIX machines.
+
+&gt; 
+&gt; Here come the bits about Samba:
+&gt; -------------------------------
+&gt; 
+&gt; We're about to purchase a file server with a rather large amount of
+&gt; storage space in it.  I'd like to run FreeBSD on it.  I've set up Samba
+&gt; several times before and I'm quite comfortable in using it, however I've
+&gt; never used it on a corporate scale.  I'm very wary of what I should look
+&gt; out for when it comes to managing a "Windows-like" environment under
+&gt; Samba.
+&gt; 
+&gt; According to what I am aware of, under Unix you have permissions that
+&gt; are divided into OWNER/GROUP/EVERYONE.  If I have a file that is, for
+&gt; example:
+&gt; 
+&gt; -rwxr--r--   1 adam  www    8030 Nov 25 22:00 index.php
+&gt; 
+&gt; It's readwriteexecute by adam, readable by 'www,' and readable by
+&gt; everyone else.
+&gt; 
+&gt; How do you modify permissions to incorporate multiple group-level
+&gt; access?  I've read somewhere once, that Samba supports "NT-Like"
+&gt; permissions.  I am curious about it, but could live with Unix
+&gt; permissions as required.
+&gt; I am imagining that moving our current NT system over to Samba is going
+&gt; to be nightmarish, and is going to take careful planning to be
+&gt; successfully achieved in one swift motion.
+
+Current versions of Linux include ACLs which give you some compatibility 
+with MS ACLs, but not full compatibility. FreeBSD 5.0 will also have ACLs.
+
+Regards
+-----
+Richard Sharpe, rsharpe[at]ns.aus.com, rsharpe[at]samba.org, 
+sharpe[at]ethereal.com, <A HREF="http://www.richardsharpe.com">http://www.richardsharpe.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

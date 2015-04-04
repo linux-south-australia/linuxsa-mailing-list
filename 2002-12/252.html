@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Unix / Windows Interoperability" -->
+<!-- FromName="'Matthew Geddes'" -->
+<!-- FromEmail="mgeddes@tellurian.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="adam.smith@sageautomation.com" -->
+<!-- Date="05 Dec 2002 09:18:55 +1030" -->
+<!-- Id="1039042136.6523.49.camel@hilarious" -->
+<!-- Reference="00a501c29b4e$30c7f3c0$e209a8c0@bugman" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Unix / Windows Interoperability</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A></I>&gt;
+  Date: 05 Dec 2002 09:18:55 +1030
+</PRE>
+<H1>Re: Unix / Windows Interoperability</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 2002-12-04 at 15:02, Adam Smith wrote:
+&gt; Hey all,
+&gt; 
+&gt; I'm going to give you a run down of some thoughts going around my head,
+&gt; and because I've never done any of the things outlined below before, and
+&gt; some of you probably have, I'd love to get some feedback to make sure
+&gt; I'm heading our company in the right directions.
+
+[snip]
+
+As you've probably already seen, there are a number of ways of achieving
+what you're after:
+
+	* Using third party software such as NISGINA and commercial
+	alternatives
+	* Using Microsoft's SFU and other UNIX compatibility stuff
+	* (As Richard mentioned) Run Winbindd
+	* Use a unix box as the PDC
+
+NISGINA (or any Windows GINA) is kind of like a PAM module. It is used
+to replace the Windows login screen / authentication DLL and allow you
+to authenticate through different means. Novell's Netware client for
+Windows NT/2K ships with a GINA for Windows (hence the login screen
+changing). NISGINA is a GINA that allows a Windows machine to
+authenticate using NIS or NIS+. Unless you have a reason to go with
+NIS/NIS+, this probably isn't an option worth pursuing.
+
+Microsoft's SFU and other UNIX software is probably also not worth
+pursuing. At MCSE school, they'll teach you that Windows NT is
+completely UNIX compatible. By "completely UNIX compatible", they mean:
+
+	* It comes with a telnet and an FTP client
+	* Microsoft TCP/IP printing is mostly LPR/LPD compatible
+	* standard tools (with not-so-standard syntax) such as route and 		arp
+exist.
+	* There's a POSIX subsystem under Windows that allows you to 		compile
+and POSIX compliant application on Windows. I've 		never heard of this
+working.
+
+I haven't come across a copy of SFU, but looking at their website, the
+list of features is quite small and probably won't be a complete
+solution. Besides, you have to pay for it :-)
+
+Richard's suggestion of using Winbindd is a good one. When using
+winbindd (check out the documentation that's included with the latest
+version of Samba from samba.org), your UNIX machine effectively creates
+a workstation trust with the NT domain (the same way an NT workstation
+or a Member server would), which allows something like this:
+
+	Debian GNU/Linux 3.0 linuxserver tty1
+
+	login: Administrator
+	password: ********
+
+	<A HREF="mailto:Administrator@linuxserver">Administrator@linuxserver</A>:~$ 
+
+So, instead of having a seperate UNIX and Windows accounts database,
+it's possible to use the Windows accounts database for the UNIX users.
+Because winbind uses PAM, you can turn this behaviour on or off for
+individual services.
+
+The final method for managing authentication between Windows and UNIX is
+to configure Samba to act as a PDC for the domain and to have Samba
+store it's accounts in an LDAP directory. This has a number of
+advantages.
+
+The first of which is that you can also store your UNIX accounts in the
+LDAP directory and set up the 'unix passwd sync' Samba option, which
+will tell Samba that whenever a user changes their password from within
+Windows, to also change it in the UNIX accounts database
+
+Another advantage is that you can point and Mac OSX clients you may have
+lying around directly at the LDAP directory and they can authenticate
+using the UNIX user accounts.
+
+Any UNIX system that supports PAM (Solaris, Linux , FreeBSD and
+apparently HP/UX, to name a few) can authenticate off the LDAP directory
+using the pam_ldap and nss_ldap modules available at padl.com.
+
+Yet another advantage is the availability of GUI administration tools.
+There's heaps of LDAP admin tools written for most platforms, but if
+you're running a platform that has GTK+ available (possibly including
+Windows), you can use Directory Administrator, which is designed for
+administering UNIX and Windows user accounts in an LDAP directory.
+
+As you can see, you've got plenty of options when it comes to
+authentication. I doubt that any will provide a perfect solution, but
+given the nature of the problem, that's expected. As I mentioned before,
+the documentation that comes with Samba (grab the latest version) has a
+huge amount of documentation on how to do the above and also comes with
+a soft-copy of 'Using Samba' from O'Reilly.
+
+You will also find plenty of people around Adelaide who are willing to
+volunteer help, as well as commercial companies that support this sort
+of thing.
+
+Hope it helps,
+Matt
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,175 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: slack admins in the UK" -->
+<!-- FromName="Michael Davies" -->
+<!-- FromEmail="michaeld@senet.com.au" -->
+<!-- ToName="David Newall" -->
+<!-- ToEmail="davidn@rebel.net.au" -->
+<!-- Date="Wed, 27 Sep 2000 19:27:23 +0930" -->
+<!-- Id="39D1C483.CDC6D0F@senet.com.au" -->
+<!-- Reference="Pine.BSF.4.21.0009182111150.83963-100000@augustus.tellurian.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: slack admins in the UK</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Davies &lt;<I><A HREF="mailto:michaeld@senet.com.au">michaeld@senet.com.au</A></I>&gt;
+  To  : David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  Date: Wed, 27 Sep 2000 19:27:23 +0930
+</PRE>
+<H1>Re: slack admins in the UK</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Just got back from interstate.  Time to respond...
+
+David Newall wrote:
+&gt; I have spent significant effort writing reusable libraries, and if I say so
+&gt; myself I have produced quite brilliant pieces of code, but they proved to
+&gt; have limited potential for re-use because the language that I chose -- UCSD
+&gt; Pascal -- fell out of favour.  I am sure there would be thousands of COBOL
+&gt; programmers who know exactly how I feel.
+
+Languages come and go, but C remains :-)  But seriously folks, on Unix,
+as long as your language of choice supports .o import, code reuse is
+_possible_ albeit not easy.  I've personally reused Fortran/C++/C in a C
+program[1] successfully this way.
+ 
+&gt; Another reason why code re-use is not the success that its pundits expected
+&gt; is that many programmers do prefer to re-invent a wheel rather than use
+&gt; somebody else's.  
+
+Not-Invented-Here (NIH) is very common.  Sometime ago a manager wrote
+that down on my performance appraisel.  Since then I have worked on
+fixing that chink.  Yes, programmers like to do it themselves, but
+significant reduction in development time CAN be achieved if code reuse
+is aggressively perused, in the right circumstances, even if that means
+linking in some bloat[2].
+
+&gt;                   That's not entirely unreasonable: often the wheel you get
+&gt; is the wrong colour and it can be easier to make a new wheel than to work
+&gt; out how to paint somebody else's.
+
+That's ok for simple bits of code, but if you're talking large portions
+of code[3] then coding is only a small part of the equation.  Testing
+effort (amongst other things) needs to be considered.  And often if you
+can inherit a test suite for a body of code, and you have confidence in
+it, then it's probably worthwhile learning the code - afterall one of
+the key attributes of programming is laziness[4].
+
+&gt; Finally, wheels are often hard to identify.  Something as complicated as
+&gt; Mozilla will surely consist of many great components, but the effort of
+&gt; working out which ones stand alone, and which ones require others, and
+&gt; exactly what those other components are (and note the recursive nature of
+&gt; that problem) can be large.  This is a sub-class of the issue I raised
+&gt; in the immediately preceeding paragraph.
+
+Of course.  "Here's some code.  Go find something to resuse.", is almost
+always destined to failure.  I believe that both Star Office and Mozilla
+has large volumes of documentation explaining how stuff works.  This
+(IMHO) is a necessary prerequisite to any serious large-scale reuse
+effort.
+
+I guess if I wanted to waffle more, I could talk about small-scale reuse
+and large-scale reuse.  Small-scale reuse I class as #defines, small
+functions, etc that do something in a cool, or innovative way.  These
+are found by examining the code, and have the greatest chance of being
+reused.  Large-scale reuse I define as groups of functions, subsystems,
+libraries of useful code.  Grouping smaller things into larger useful
+things is harder, takes more effort, but of course reaps the greatest
+rewards.  Much harder to identify from code, much easier to find from
+documentation.  We could digress more into design patterns etc, but
+we'll leave it there for now.
+
+&gt; To conclude: there no doubt are many useful bits of code in both Mozilla
+&gt; and GNOME, but don't assume that they will be easy to lift out.  I Have
+&gt; seen none of Mozilla's code, but going on (extensive) past experience I
+&gt; anticipate the effort to re-use to be larger than the effort to re-write.
+
+I'm glad Linus decided to reuse GCC, and not write his own compiler
+first.  I'm glad he didn't go further and write his own language first
+and then the compiler.  I'm glad Brian Behlendorf (sp?) didn't write
+apache from scratch. but started with the NCSA web server first.  And
+there's plenty more examples.  "We stand on the shoulders on our
+predecessors, not on their toes". (credit to someone in the open source
+community)
+
+And here comes the big contradiction.  It is said that none of the
+original kernel exists in Linux anymore.  Apache has rewritten
+everything at least once.  But, without reuse, these projects wouldn't
+have happenned.  Indeed significant portions of the original
+_architecture_ (interfaces?) remain in these projects, but bits can be
+rewritten as the need arises, or even reused from other projects.  What
+am I saying?  Different projects have different requirements.  And even
+different requirements at different times.
+
+Star Office has quality import filters that no-one has been able to
+develop in the open-source community, so re-using them is worthwhile. 
+Even if the code is krusty.  Mozilla has given us the gecko rendering
+engine, which is being reused elsewhere already.  Even the Linix kernel
+itself has been hacked and slashed into a much smaller and featureless
+kernel and reused in embedded devices.
+
+My summary is that reuse is important and an important factor in
+reducing development effort.  It may result in less-than-optimal code,
+but sometimes that's ok.
+
+&gt; NB: Algorithm re-use is an entirely different story.  
+
+True.  No disagreement there.  Algorithms are much easier to reuse.
+
+Michael...
+
+[1] -  I led a 120 KSLOC project with 80 KSLOC reused from another
+project.  We completed development in 10 months with 4 programmers
+including myself, including integration to custom hardware.  A lot of
+fun, and it surprised me what we could achieve through code reuse.
+
+[2] - but what's important?  Tight code or quick development schedule? 
+Each project has different priorities, so sometimes you can live with
+_some_ bloat, if that means satisfying the customer.
+
+[3] - like &gt; 1000 lines of code.
+
+[4] - along with hubris and impatience.  See the camel book, or Larry
+Wall's talks available on-line for explanation.
+
+-- 
+Michael Davies         "Do what you think is interesting, do something
+that
+<A HREF="mailto:michaeld@senet.com.au">michaeld@senet.com.au</A>   you think is fun and worthwhile, because
+otherwise 
+                        you won't do it well anyway."  -- Brian
+Kernighan.
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

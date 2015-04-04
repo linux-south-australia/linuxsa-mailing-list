@@ -1,0 +1,123 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="ext2 weirdness - always 100% full" -->
+<!-- FromName="'Jake Hawkes'" -->
+<!-- FromEmail="jakehawkes2001@yahoo.com" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 16 Sep 2001 11:52:19 -0700 (PDT)" -->
+<!-- Id="20010916185219.93312.qmail@web20109.mail.yahoo.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: ext2 weirdness - always 100% full</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jakehawkes2001@yahoo.com">jakehawkes2001@yahoo.com</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 16 Sep 2001 11:52:19 -0700 (PDT)
+</PRE>
+<H1>ext2 weirdness - always 100% full</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+hey gang, long time no speak, eh?
+
+ok, summary of problem:
+shutdown machine normally,
+reboot
+X wont start.
+
+looked into the problem, found:
+unix:/1700 removed from font search path
+
+ok, so no xfs, not fonts, no X.
+but xfs is running. must be problem with the socket then right?
+
+df shows me:
+Filesystem     1k blocks      Used      Avail     Use%     Mounted On
+/dev/hda5        4851656   4369044      0         100%     /
+/dev/hda1          51206      6090      42472      13%     /boot
+
+
+ok, so the filesyste is full, and only root can write. But there is no way the filesystem can be
+full - unless something is wrong.  e2fsck checks out fine eventually.  it had to attach some lost
+directory nodes to /lost+found, but now it check clean everytime.
+
+
+I can make the filesystem have more free space by deleting things, but I would not be able to
+delete enough to get it less than 100%.  I'm thinking there may be a recursive link somewhere, or
+I was copyinhg a directory recursively and that filled the disk, but I can not find anything
+strange with "df" or "find / -size +10000k -print".
+
+So I checked the partitions:
+fdisk /edv/hda shows me
+
+disk /dev/hda: 240 heads, 63 sectors, 776 cylinders
+Units = cylinders of 15120 * 512 bytes
+
+device    boot  start   end   Blocks   Id   System
+/dev/hda1 *     1       7      52888+  83   Linux
+/dev/hda2       8       776  5813640   5    Extended
+/dev/hda5       8       659  4929088+  83   Linux
+/dev/hda6       660     712   400648+  82   Linux Swap
+
+questions are:
+is the partition table screwed? Should the start and end for hda2 and hda5 be the same?  The
+machine still funs fine, and I think I can rescue the filesystem.  I would prefer not to have to
+reformat the disk.  this is a laptop and I am in a slow internet area.
+
+I'm fairly certain this is the problem thats stopping X.  When I take out the xfs font path and
+put in the raw directories, X starts then KDE bombs with no error, except an error in the X log
+which says authentication failed.
+
+any help would be appreciated.
+
+thanks,
+Jake
+
+=====
+---
+Jacob Hawkes, B. Eng (CSE)
+Programmer / Analyst
+Metso Automation
+<A HREF="mailto:jacob.hawkes@metso.com">jacob.hawkes@metso.com</A>
+<A HREF="mailto:jakehawkes2001@yahoo.com">jakehawkes2001@yahoo.com</A> (while onsite in Venezuela)
+
+__________________________________________________
+Terrorist Attacks on U.S. - How can you help?
+Donate cash, emergency relief information
+<A HREF="http://dailynews.yahoo.com/fc/US/Emergency_Information/">http://dailynews.yahoo.com/fc/US/Emergency_Information/</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,143 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Old hat" -->
+<!-- FromName="Gaelyne Gasson" -->
+<!-- FromEmail="gaelyne@videocam.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail=""Parker, Kevin" <KParker@workcover.sa.gov.au>, linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 16 Nov 1999 15:31:16 +1030 (CST)" -->
+<!-- Id="14384.58652.269645.944349@videocam.net.au" -->
+<!-- Reference="21223AA63B2CD21188140008C74C807101AB9064@ex1.internal.workcover.sa.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Old hat</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Gaelyne Gasson &lt;<I><A HREF="mailto:gaelyne@videocam.net.au">gaelyne@videocam.net.au</A></I>&gt;
+  To  : <A HREF="mailto:"Parker">"Parker</A>, <A HREF="mailto:Kevin" <KParker@workcover.sa.gov.au>">Kevin" <KParker@workcover.sa.gov.au></A>, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Tue, 16 Nov 1999 15:31:16 +1030 (CST)
+</PRE>
+<H1>Re: Old hat</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+G'day Kevin,
+
+ On 16 November 1999 Parker, Kevin wrote:
+
+ &gt; I seem to vaguely recall something a while ago on this list about people
+ &gt; hooking their C64's, or something similar, into Linux boxes.
+
+It's quite possible, and thanks to this ability, development of PPP
+for the C64 is coming along fairly well, I'm pleased to report.  :-)
+
+ &gt; Does anyone know if this has been done using TRS80's (Model III's, Model
+ &gt; IV's and Model 16's in particular).
+
+This is the info sheet I send to people interested in connectiong
+their Commodore computers to a Linux box.  You'll need a null modem
+and an ANSI or VT100 terminal program for the TRS80. 
+
+
+----------------------------------------------------------------------
+Connecting the C64/128 to a Linux computer as a dumb terminal
+
+I use a Turbo232 cartridge connected to the Linux computer via a null
+modem connection.  Null modem adapters can be found at any Tandy's,
+Radio Shack, or most computer stores. You may also need a gender changer
+to connect it together if the plugs don't match.
+
+Note: The following is a quick summary of the 'Linux Serial HOWTO',
+      chapter 8 ("How Do I Set Up A Terminal Connected To My PC?")
+
+Within Linux, as root, edit /etc/gettydefs
+
+Find the lines near the top starting like:
+  DT&lt;baudrate&gt;..........
+
+Look for a line with DTxxxx where xxxx is the baud rate you want to use.
+If one exists already, then skip down to editing /etc/inittab.
+
+Copy one of the 'DT' entries (DT = Dumb Terminal) and ensure that ALL
+the numbers (including the last one) are the same as the baud rate of
+your C64/128 term program (EG, DT38400 or DT115200). You're just
+making an appropriate config line for your terminal speed. If you use
+hardware flow control, you will need to add the flag "CRTSCTS" to the
+line. For example, the following is a 2400bps entry with h/w flow control:
+DT2400# B2400 CS8 CLOCAL # B2400 SANE CRTSCTS CLOCAL #@S @B login: #DT2400
+ Save the file. 
+
+Edit /etc/inittab
+Down near the bottom, you'll see a row of lines with the heading 
+"# Run gettys in standard run levels" after the last one (probably
+"6:2345:respawn...."), add one that looks like this: 
+
+S1:2345:respawn:/sbin/getty ttyS1 DT115200 vt100
+
+This example is for Com Port 2. If your null-modem connection is using
+Com Port one, change the line to "S0.........ttyS0...." or S2 and
+ttyS2 for Com Port 3, etc.  
+
+The "DT115200" text should be the same as your baud rate for your C=
+term program. If you use 38400, change DT115200 to DT38400. The last part
+(vt100) is the default terminal emulation. Save the file.
+
+With the C= connected to the Linux computer via null modem run a VT100
+term program such as Novaterm, Desterm or Dialogue, make sure it's at
+the same baud rate as you've set in the /etc/inittab and
+/etc/gettydefs files.
+
+Type "/sbin/init q" on the server (to reset the inittab file), and
+watch the 128's screen. You'll be prompted for a login name and then
+password. Your C= is now connect to the Linux box as a dumb terminal!
+
+If you want to be able to login as root from the C64/128 (via shell)
+you'll have to add TTYS1 (or your serial port equivalent) to the
+/etc/securetty file.
+----------------------------------------------------------------------
+
+There's also a section on SLIP that I can send if it's needed.  
+
+
+
+Cheers,
+Gaelyne
+
+
+ //\         /\\    Gaelyne R. Gasson        <A HREF="mailto:gaelyne@videocam.net.au">gaelyne@videocam.net.au</A>
+|| * \ . . / * ||   90 Hilliers Rd           Phone: +61 8 8322-2716
+ \\____\X/____//    Reynella, S.A. 5161      Fax:   +61 8 8387-5810
+  / *  /O\  * \     Australia                ICQ:   5069384
+  \__/  "  \__/     <A HREF="http://videocam.net.au">http://videocam.net.au</A>   <A HREF="http://vcsweb.com">http://vcsweb.com</A>
+                    C64/128 Support  *  Web Hosting  *  Web Design
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

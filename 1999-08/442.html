@@ -1,0 +1,102 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: squid exceeds filemap limits" -->
+<!-- FromName="Daniel Callan" -->
+<!-- FromEmail="dcallan@dataline.net.au" -->
+<!-- ToName="Andreja Zivkovic" -->
+<!-- ToEmail="andy@zt.zivkotech.net.au" -->
+<!-- Date="Mon, 23 Aug 1999 14:07:23 +1000" -->
+<!-- Id="3.0.32.19990823140719.00b59100@hub.dataline.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: squid exceeds filemap limits</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Callan &lt;<I><A HREF="mailto:dcallan@dataline.net.au">dcallan@dataline.net.au</A></I>&gt;
+  To  : Andreja Zivkovic &lt;<I><A HREF="mailto:andy@zt.zivkotech.net.au">andy@zt.zivkotech.net.au</A></I>&gt;
+  Date: Mon, 23 Aug 1999 14:07:23 +1000
+</PRE>
+<H1>Re: squid exceeds filemap limits</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+At 22:25 22/08/99 +0930, you wrote:
+&gt;I looked quickly at squid's web site, but couldn't find anything on
+&gt;filemaps. Since squid worked happily for quite a few weeks/months happily, i
+&gt;find this strange. Oh, using cachemgr.cgi, i can see 7874 out of 7874
+&gt;filemap bits are being used, but that doesn't help me personally :(
+&gt;
+&gt;any ideas?
+&gt;
+
+I'm not sure about 'filemaps', but it does sound like the same
+"not enough file descriptors" problem that we were originally experiencing 
+with our squid servers once their usage got up to something sizable.
+They basically couldn't open enough files at one time to service 
+all the requests it had to serve, and would go into a negative spiral.
+
+The default number of file descriptors under our kernels was 256 
+but you can get a patch for your kernel to change this to something
+a bit more scalable to squid's requirements (we found 1024 to be sufficient).
+
+Check out:
+<A HREF="http://www.avana.net/~ventura/docs/linux/linux-fd-tweak.html">http://www.avana.net/~ventura/docs/linux/linux-fd-tweak.html</A>
+
+And check your status with a "uname -a" output.
+
+*ASIDE
+This is actually one of the reasons we eventually changed our proxy 
+servers to run under FreeBSD. The file-desc count is bigger by default
+and the whole system is better geared for the sheer number of connections
+it must serve per day. Having said that, I still fumble around the
+interface and building kernels is pretty rigorous compared to Linux, 
+so we are definately not converting any other servers, ;-) 
+but for large scale proxy machines, it does seem to be a good alternative
+(for heavily loaded linux-driven squid boxes that can't keep up).
+
+Hope this helped,
+Regards
+-Daniel
+
+
+         Daniel Callan
+        System Engineer/
+       Senior Programmer
+
+     <A HREF="mailto:hostmaster@dataline.net.au">hostmaster@dataline.net.au</A>
+      -- DataLine.net.au --
+     <A HREF="http://dataline.net.au">http://dataline.net.au</A> 
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

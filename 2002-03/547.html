@@ -1,0 +1,106 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Log message from mail server." -->
+<!-- FromName="'David Lloyd'" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="'damar'" -->
+<!-- ToEmail="damar@netvigator.com" -->
+<!-- Date="Sun, 18 Mar 2007 22:17:43 +1030" -->
+<!-- Id="45FD26DF.EF1D1B09@rebel.net.au" -->
+<!-- Reference="003101c1ce63$2dd1e8a0$dec1000a@user" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Log message from mail server.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : damar &lt;<I><A HREF="mailto:damar@netvigator.com">damar@netvigator.com</A></I>&gt;
+  Date: Sun, 18 Mar 2007 22:17:43 +1030
+</PRE>
+<H1>Re: Log message from mail server.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Damar
+
+&gt; I have been receiving this message from my mail server, running
+&gt; Mandrake 7.0 with sendmail-8.9.3-18mdk:
+&gt; 
+&gt;     errors occured while rotating /var/log/httpd/error_log
+&gt; 
+&gt;     httpd: no process killed
+&gt;     error running postrotate script
+
+That's actually logrotate whining aout something.
+
+I've taken a look at my own system in /etc/logrotate.d/apache
+
+I've seen:
+
+/var/log/httpd/error_log {
+    missingok
+    postrotate
+   /bin/kill -HUP `cat /var/run/httpd.pid 2&gt;/dev/null` 2&gt; /dev/null ||
+true
+    endscript
+}
+
+
+This means that if there's no error log there it's ok. After rotating it
+kill the process with the process ID set in /var/run/httpd.pid. You
+don't have apache running so it's not going to kill apache at all...
+
+&gt; Seeing the content, it looks like from the httpd service, but I have
+&gt; stopped that service for some time.
+
+See above, but you've actually answered your own question unwittingly.
+You don't have apache running, but the logrotate script tries to send a
+SIGHUP to an apache process. Hence it thinks that there is an error...
+
+&gt; Any ideas?
+
+See above.
+
+Also, HTML is just evil. Can you please convince Outlook Express to not
+send it? Some people on this list will ignore it, others will flame you
+for it, some will ask you politely to not send HTML e-mail...and as the
+Phantom says to Christine, "I will give you one, last chance..." ;-P
+
+DSL 
+-- 
+Train comes I don't know it's destination...
+  It's a one way ticket to a mad man's situation!
+  (Overload - Sugababes)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

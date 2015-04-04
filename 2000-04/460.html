@@ -1,0 +1,90 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: MD5 and shadow file" -->
+<!-- FromName="Daryl Tester" -->
+<!-- FromEmail="dt@picknowl.com.au" -->
+<!-- ToName="Edward Sawma" -->
+<!-- ToEmail="e-sawma@nwu.edu" -->
+<!-- Date="Tue, 25 Apr 2000 19:35:15 +0930" -->
+<!-- Id="39056DDB.A2A63F41@picknowl.com.au" -->
+<!-- Reference="4.2.2.20000421224717.01892a10@hecky.acns.nwu.edu" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: MD5 and shadow file</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  To  : Edward Sawma &lt;<I><A HREF="mailto:e-sawma@nwu.edu">e-sawma@nwu.edu</A></I>&gt;
+  Date: Tue, 25 Apr 2000 19:35:15 +0930
+</PRE>
+<H1>Re: MD5 and shadow file</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Edward Sawma wrote:
+
+&gt; Does anyone have any experience in directly modifying the shadow file with
+&gt; MD5 encryption?
+
+Yes, use "useradd(8)" or "adduser" to manage the password file.  It's
+more "portable" (insofar that it probably only works on Linux and a
+few other Unix variants), but it will shield you from the intricacies
+of file locking, directory creating and all the other fluff that goes
+with creating user accounts, especially if the interfaces decide to
+change.
+
+&gt; I've installed the MD5 and Crypt::PasswdMD5 modules, and neither seem
+&gt; to work.
+
+The crypt MD5 routines are actually built into the standard libc crypt()
+function ("info libc crypt" for more information). The "$1$" prefix tells
+crypt() to use MD5 instead of the (dis-)standard DES crypt routines.
+
+&gt; I think my problem is with the "salt".  I don't really know much
+&gt; about this "salt" concept, or what the "salt" should be in order for the
+&gt; encrypted string to be properly recognized by linux.
+
+The salt stops my "secretpassword" from looking like your "secretpassword"
+(where "secretpassword" is taken literally).  The salt is created at
+password creation time (from some pseudo-random source), and used
+to encrypt the password.  As the password is never decrypted (both DES
+and MD5 algorithms used are one-way encryptions), the salt is used
+to encrypt the plain text password when it comes time to verify the
+password, and then the newly encrypted password is compared with
+the pre-existing encrypted password.  If they match, then there is a
+good chance (also literally) that the passwords match.
+
+
+Regards,
+  Daryl Tester
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

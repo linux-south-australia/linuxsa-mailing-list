@@ -1,0 +1,116 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Black Magic and Kernel recompiles" -->
+<!-- FromName="'Matthew Geddes'" -->
+<!-- FromEmail="mgeddes@tellurian.com.au" -->
+<!-- ToName="'Richard Sharpe'" -->
+<!-- ToEmail="rsharpe@richardsharpe.com" -->
+<!-- Date="15 Jan 2003 10:29:16 +1030" -->
+<!-- Id="1042588756.22335.250.camel@hilarious" -->
+<!-- Reference="Pine.LNX.4.33.0301141554000.8329-100000@ns.aus.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Black Magic and Kernel recompiles</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  To  : Richard Sharpe &lt;<I><A HREF="mailto:rsharpe@richardsharpe.com">rsharpe@richardsharpe.com</A></I>&gt;
+  Date: 15 Jan 2003 10:29:16 +1030
+</PRE>
+<H1>Re: Black Magic and Kernel recompiles</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 2003-01-15 at 10:25, Richard Sharpe wrote:
+
+&gt; I think I got this to work once, and I think I posted the secret sauce to 
+&gt; LinuxSA at some stage. I think it is Makefile cruft left around.
+&gt; 
+&gt; You have to move the .config file out of the way, then do a 'make 
+&gt; reallyclean' or something like that, and then move the .config file back, 
+&gt; and then you are right.
+&gt; 
+&gt; Red Hat seem to have got this wrong for a long time.
+
+Couldn't find anything on linuxsa, but found this post of yours to a
+redhat list:
+
+https://listman.redhat.com/pipermail/redhat-install-list/2001-June/031253.html
+
+Just to be sure, I tried an rpm -e kernel-source then removed the
+/usr/src/linux-* directory and all files beneath it (things like .config
+and .depend, etc). Then:
+
+ * rpm -ivh kernel-source-[same-version-and-build].rpm.
+ * make clean
+ * make mrproper (as per the above post)
+ * make bzImage (as per RedHat's destructions linked in my previous
+post)
+
+The last step failed with:
+make -C kernel fastdep
+make[2]: Entering directory `/usr/src/linux-2.4.18-18.7.x/kernel'
+make[2]: *** No rule to make target
+`/usr/src/linux-2.4.18-18.7.x/include/linux/autoconf.h', needed by
+`/usr/src/linux-2.4.18-18.7.x/include/linux/modules/signal.ver'.  Stop.
+
+Then:
+ * make dep
+
+which failed with the same error. But:
+
+ * make oldconfig
+ * make dep
+
+didn't ask me any questions (I was using one of the
+RedHat-supplied.configs for that kernel tree) and the make dep finished
+this time. At the moment it's doing a make bzImage and I noticed that
+smp.c compiled this time (as opposed to last time, when it complained
+about syntax errors in that same file).
+
+Well, the bzImage just finished and I'm building the modules. So it
+seems that the way to do this is:
+
+rpm -ivh kernel-source*.rpm
+make mrproper
+cp configs/whatever .config
+make oldconfig dep bzImage modules modules_install
+
+I swear, if Debian released official CDs more often.....  :-)
+
+I'm going to assume that the modules are going to compile and thank you
+all for your suggestions.
+Matt
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

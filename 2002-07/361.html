@@ -1,0 +1,125 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: thumbnails, mogrify and large filesizes" -->
+<!-- FromName="'Jake Hawkes'" -->
+<!-- FromEmail="jakehawkes2001@yahoo.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 12 Jul 2002 11:55:09 -0700 (PDT)" -->
+<!-- Id="20020712185509.91207.qmail@web20105.mail.yahoo.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: thumbnails, mogrify and large filesizes</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jakehawkes2001@yahoo.com">jakehawkes2001@yahoo.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 12 Jul 2002 11:55:09 -0700 (PDT)
+</PRE>
+<H1>Re: thumbnails, mogrify and large filesizes</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I use PHP and the image libraries that come with it.  Not the most elegant, but it allows for
+minimal work when uploading and creating new pages:
+
+$image = @imagecreatefromjpeg($file);
+$orig_w=ImageSX($image);
+$orig_h=ImageSY($image);
+
+// here, either $h or $w or both have been supplied to the function..
+        // chose the dimension to scale with
+        //
+        if( ($orig_h &gt; $orig_w) && isset($h) )
+        {
+                $factor = $orig_h / $h;
+                $w = $orig_w / $factor;
+        }
+        else
+        {
+                if(isset($w))
+                {
+                        $factor = $orig_w / $w;
+                        $h = $orig_h / $factor;
+                }
+                else
+                {
+                        // need to scale by height even
+                        // though we should scale by width
+                        // but no wanted width was supplied
+                        $factor = $orig_h / $h;
+                        $w = $orig_w / $factor;
+                }
+        }
+
+        $thumb=ImageCreate($w,$h);
+        if(!$thumb) {
+                make_error_image("cannot create new thumbnail image", $h,$w);
+                return;
+        }
+        # upgrade to php 4.0.6 and GD &gt; 2.0 and use imagecopyresampled() instead
+        #
+        ImageCopyResized($thumb,$image,0,0,0,0,$w,$h,$orig_w,$orig_h);
+
+        header("Content-type: image/jpeg");
+        ImageJPEG($thumb, $thumbname, 100);
+
+        readfile($thumbname);
+
+
+
+I have this wrapped with some cacheing so that I only create the thumbnail os a specified size
+once.  This also allows me to store a cookie on the viewers browser that remembers the users
+picture size preference, and wether the server should scale the image or the browser.
+
+My audience ranges from my mother (dial up, tech-less) to my friends (broadband, tech-full) to my
+uncle (tech-full, broadband, likes to print hiugh quality images)
+
+So this way, I only have to upload from the camera once, and everybody can get the images how they
+like.
+
+Works quite well (although no-one has said otherwise :))
+
+=====
+Jacob Hawkes, B. Eng (CSE)
+<A HREF="mailto:jakehawkes2001@yahoo.com">jakehawkes2001@yahoo.com</A>
+<A HREF="http://www.infinitylimited.net/">http://www.infinitylimited.net/</A>
+
+__________________________________________________
+Do You Yahoo!?
+Sign up for SBC Yahoo! Dial - First Month Free
+<A HREF="http://sbc.yahoo.com">http://sbc.yahoo.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

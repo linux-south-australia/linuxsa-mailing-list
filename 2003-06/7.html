@@ -1,0 +1,530 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="How to make your own Unix print driver out of a Windows PCL 5 .ppdprint driver file [SuSE 8.2] [Konica 7022 IP-423]" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 31 May 2003 17:57:40 -0700" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: How to make your own Unix print driver out of a Windows PCL 5 .ppdprint driver file [SuSE 8.2] [Konica 7022 IP-423]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 31 May 2003 17:57:40 -0700
+</PRE>
+<H1>How to make your own Unix print driver out of a Windows PCL 5 .ppdprint driver file [SuSE 8.2] [Konica 7022 IP-423]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Well more multifunctional adventures!   :-)
+
+As I had mentioned earlier, we did not stick with the Gestetner, and we 
+ended up getting a Konica 7022 multifunctional. It doesn't seem to have 
+a scan feature,  but  faxes can be sent from a workstation, supposedly 
+only in Windows. (What to do next?)
+
+SuSE ships with some generic drivers, but I wasn't completely satisfied 
+with them.
+
+After a whole lot of expirimentation I was able to work out a quick and 
+dirty way of turning this particular .ppd into one that could be used in 
+any Unix system that uses Cups & foomatic AFAIK.
+
+I tested this in SuSE 8.2, so I can vouch for that for sure, but I am 
+pretty sure that you can do this in almost any type of Unix.
+
+The raw .ppd file from Konica for their IP-423 class of Multifunctional 
+printers shipped with this configuration, minus the uncommented portions 
+that I added, allowing the driver to operate in SuSE Linux 8.2:
+
+&gt; *PPD-Adobe: "4.3"
+&gt; *FormatVersion: "4.3"
+&gt; *LanguageVersion: English
+&gt; *LanguageEncoding: ISOLatin1
+&gt; *FileVersion: "1.0.2[1]"
+
+*cupsVersion:    1.0
+*cupsManualCopies: True
+*cupsModelNumber:  2
+*cupsFilter:    "application/vnd.cups-postscript 0 foomatic-rip"
+*%pprRIP:        foomatic-rip other
+
+&gt;
+&gt;
+&gt; *Manufacturer:  "Konica"
+&gt; *ModelName: "Konica IP-423 PCL"
+&gt; *ShortNickName: "Konica IP-423 PCL"
+&gt; *NickName: "Konica IP-423 PCL"
+&gt; *PCFileName: "IP423.PPD"
+&gt; *Product: "(IP423)"
+&gt; *PSVersion: "(3011.103)"
+
+*FoomaticIDs: Konica-IP423
+*FoomaticRIPCommandLine: "gs -q -dPARANOIDSAFER -dNOPAUSE -dBATCH -sDE&&
+VICE=stp %A%Z -sOutputFile=- -"
+*End
+
+*FoomaticRIPOption Model: enum CmdLine A 10
+*FoomaticRIPOptionSetting Model=pcl-4: " -sModel=pcl-4"
+
+
+
+
+&gt;
+&gt;
+&gt; *% === Device Capabilities ============
+&gt; *LanguageLevel: "3"
+&gt; *ColorDevice: False
+&gt; *DefaultColorSpace: Gray
+&gt; *SuggestedJobTimeout: "0"
+&gt; *SuggestedWaitTimeout: "300"
+&gt; *LandscapeOrientation: Plus90
+&gt; *RequiresPageRegion All: True
+&gt;
+&gt; *DefaultOutputOrder: Normal
+&gt;
+&gt;
+&gt; *ScreenFreq: "85.0"
+&gt; *ScreenAngle: "45.0"
+&gt; *DefaultScreenProc: Dot
+&gt; *ScreenProc Dot: "
+&gt; {abs exch abs 2 copy add 1 gt {1 sub dup mul exch 1 sub dup mul add 1
+&gt; sub }{dup mul exch dup mul add 1 exch sub }ifelse }
+&gt; "
+&gt; *End
+&gt; *ScreenProc Line: "{ pop }"
+&gt; *ScreenProc Ellipse: "{ dup 5 mul 8 div mul exch dup mul exch add sqrt 
+&gt; 1 exch sub }"
+&gt;
+&gt; *DefaultTransfer: Null
+&gt; *Transfer Null: "{ }"
+&gt; *Transfer Null.Inverse: "{ 1 exch sub }"
+&gt;
+&gt;
+&gt;
+&gt; *FreeVM: "14000000"
+&gt; *VMOption None/64MB RAM: "14000000"
+&gt; *VMOption 96Meg/96MB RAM: "22000000"
+&gt; *VMOption 128Meg/128MB RAM: "26000000"
+&gt; *VMOption 160Meg/160MB RAM: "30000000"
+&gt; *VMOption 192Meg/192MB RAM: "34000000"
+&gt; *VMOption 224Meg/224MB RAM: "38000000"
+&gt; *VMOption 256Meg/256MB RAM: "42000000"
+&gt; *VMOption 288Meg/288MB RAM: "42000000"
+&gt; *VMOption 320Meg/320MB RAM: "42000000"
+&gt; *VMOption 352Meg/352MB RAM: "42000000"
+&gt; *VMOption 384Meg/384MB RAM: "42000000"
+&gt; *VMOption 416Meg/416MB RAM: "42000000"
+&gt; *VMOption 448Meg/448MB RAM: "42000000"
+&gt; *VMOption 480Meg/480MB RAM: "42000000"
+&gt; *VMOption 512Meg/512MB RAM: "42000000"
+&gt;
+&gt;
+&gt; *% === Installable Options ===========
+&gt; *OpenGroup: InstallableOptions/Options Installed
+&gt;
+&gt; *OpenUI *InstalledMemory/Memory Configuration: PickOne
+&gt; *OrderDependency: 1 AnySetup *InstalledMemory
+&gt; *DefaultInstalledMemory: None
+&gt; *InstalledMemory None/64MB RAM: ""
+&gt; *InstalledMemory 96Meg/96MB RAM: ""
+&gt; *InstalledMemory 128Meg/128MB RAM: ""
+&gt; *InstalledMemory 160Meg/160MB RAM: ""
+&gt; *InstalledMemory 192Meg/192MB RAM: ""
+&gt; *InstalledMemory 224Meg/224MB RAM: ""
+&gt; *InstalledMemory 256Meg/256MB RAM: ""
+&gt; *CloseUI: *InstalledMemory
+&gt;
+&gt;
+&gt; *% === Print Quality & Effects ===============
+&gt; *OpenUI *Resolution/Printer Resolution: PickOne
+&gt; *OrderDependency: 10 DocumentSetup *Resolution
+&gt; *DefaultResolution: 600dpi
+&gt; *Resolution 600dpi/600 dpi: ""
+&gt; *CloseUI: *Resolution
+&gt;
+&gt;
+&gt; *OpenUI *Duplex/Duplex:  PickOne
+&gt; *OrderDependency: 15 AnySetup *Duplex
+&gt; *DefaultDuplex: None
+&gt; *Duplex None/- None -: ""
+&gt; *Duplex DuplexTumble/Short Edge Binding: ""
+&gt; *Duplex DuplexNoTumble/Long Edge Binding: ""
+&gt; *CloseUI: *Duplex
+&gt;
+&gt; *% === Collate (Sort/Group) ============
+&gt; *OpenUI *Collate/Collate: Boolean
+&gt; *OrderDependency: 1 AnySetup *Collate
+&gt; *DefaultCollate: True
+&gt; *Collate True/Sort: ""
+&gt; *Collate False/Group: ""
+&gt; *CloseUI: *Collate
+&gt; *% === End Collate (Sort/Group) ========
+&gt;
+&gt;
+&gt; *% ===================================
+&gt; *%         Switch Input Trays
+&gt; *%  Number in invocation string is used
+&gt; *%  as internal devmode bin number
+&gt; *% ===================================
+&gt; *OpenUI *InputSlot/Paper Source: PickOne
+&gt; *OrderDependency: 40 AnySetup *InputSlot
+&gt; *DefaultInputSlot: Auto
+&gt; *InputSlot Auto/Auto Select: "7"
+&gt; *InputSlot Tray1/Tray 1: "257"
+&gt; *InputSlot Tray2/Tray 2: "258"
+&gt; *InputSlot Tray3/Tray 3: "259"
+&gt; *InputSlot Tray4/Tray 4: "260"
+&gt; *InputSlot Env/Manual Feed: "4"
+&gt; *CloseUI: *InputSlot
+&gt; *CloseGroup: InstallableOptions/Options Installed
+&gt;
+&gt;
+&gt; *% === Paper Handling ===================
+&gt; *% Use these entries to set paper size unless there is a specific
+&gt; *% reason to use PageRegion, such as when using manual feed.
+&gt; *OpenUI *PageSize: PickOne
+&gt; *OrderDependency: 55 AnySetup *PageSize
+&gt; *DefaultPageSize: Letter
+&gt; *PageSize Statement/5.5" x 8.5": "6"
+&gt; *PageSize Letter/8.5" x 11":     "1"
+&gt; *PageSize Legal/8.5" x 14":      "5"
+&gt; *PageSize Tabloid/11" x 17":     "3"
+&gt; *PageSize A3/A3 - 297 x 420 mm:  "8"
+&gt; *PageSize A4/A4 - 210 x 297 mm:  "9"
+&gt; *PageSize A5/A5 - 148 x 210 mm:  "11"
+&gt; *PageSize B4/B4 - 250 x 354 mm:  "12"
+&gt; *PageSize B5/B5 - 182 x 257 mm:  "13"
+&gt; *PageSize B6/B6 - 128 x 182 mm:  "257"
+&gt; *PageSize F4/F4 - 8.0 x 13 in.:  "311"
+&gt; *PageSize 8K/8K - 267 x 390 mm:  "273"
+&gt; *PageSize 16K/16K - 195 x 267 mm: "274"
+&gt; *CloseUI: *PageSize
+&gt;
+&gt; *% === These entries will set up the frame buffer. Usually used with 
+&gt; manual feed. ===
+&gt; *OpenUI *PageRegion: PickOne
+&gt; *OrderDependency: 60 AnySetup *PageRegion
+&gt; *DefaultPageRegion: Letter
+&gt; *PageRegion Statement/Statement: "statement"
+&gt; *PageRegion Letter/Letter:       "letter"
+&gt; *PageRegion Legal/Legal:         "legal"
+&gt; *PageRegion Tabloid/Tabloid:     "tabloid"
+&gt; *PageRegion A3/A3: "a3"
+&gt; *PageRegion A4/A4: "a4"
+&gt; *PageRegion A5/A5: "a5"
+&gt; *PageRegion B4/B4: "b4"
+&gt; *PageRegion B5/B5: "b5"
+&gt; *PageRegion B6/B6: "b6"
+&gt; *PageRegion F4/F4: "f4"
+&gt; *PageRegion 8K/8K: "8k"
+&gt; *PageRegion 16K/16K: "16k"
+&gt; *CloseUI: *PageRegion
+&gt;
+&gt; *% === These entries provide the imageable areas of the media option 
+&gt; keywords. ===
+&gt; *DefaultImageableArea: Letter
+&gt; *ImageableArea Statement/Statement: "12.24 12.24 383.76 599.76"
+&gt; *ImageableArea Letter/Letter: "12.24 12.24 599.76 779.76"
+&gt; *ImageableArea Legal/Legal: "12.24 12.24 599.76 995.76"
+&gt; *ImageableArea Tabloid/Tabloid: "12.24 12.24 779.76 1211.76"
+&gt; *ImageableArea A3/A3: "12.24 12.24 829.76 1178.76"
+&gt; *ImageableArea A4/A4: "12.24 12.24 582.76 829.76"
+&gt; *ImageableArea A5/A5: "12.24 12.24 407.76 582.76"
+&gt; *ImageableArea B4/B4: "12.24 12.24 716.76 1019.76"
+&gt; *ImageableArea B5/B5: "12.24 12.24 503.76 716.76"
+&gt; *ImageableArea B6/B6: "12.24 12.24 349.92 502.56
+&gt; *ImageableArea F4/F4: "12.24 12.24 563.76 923.76"
+&gt; *ImageableArea 8K/8K: "12.24 12.24 741.77 1084.76"
+&gt; *ImageableArea 16K/16K: "12.24 12.24 534.84 741.77"
+&gt;
+&gt; *% === These provide the physical dimensions of the media, by option 
+&gt; keyword. ===
+&gt; *DefaultPaperDimension: Letter
+&gt; *PaperDimension Statement/Statement: "396 612"
+&gt; *PaperDimension Letter/Letter:       "612 792"
+&gt; *PaperDimension Legal/Legal:         "612 1008"
+&gt; *PaperDimension Tabloid/Tabloid:     "792 1224"
+&gt; *PaperDimension A3/A3: "842 1191"
+&gt; *PaperDimension A4/A4: "595 842"
+&gt; *PaperDimension A5/A5: "420 595"
+&gt; *PaperDimension B4/B4: "729 1032"
+&gt; *PaperDimension B5/B5: "516 729"
+&gt; *PaperDimension B6/B6: "362.16 514.80"
+&gt; *PaperDimension F4/F4: "576 936"
+&gt; *PaperDimension 8K/8K: "754.01 1097.00"
+&gt; *PaperDimension 16K/16K: "547.08 754.01"
+&gt;
+&gt; *% === Font Information =====================
+&gt; *DefaultFont: Times-Roman
+&gt; *Font Albertus-XBold/Albertus Extra Bold: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font Albertus/Albertus Medium: Standard "(001.001)" Standard ROM
+&gt; *Font AntiqueOlive-Bold/Antique Olive Bold: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font AntiqueOlive-Italic/Antique Olive Italic: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font AntiqueOlive/Antique Olive: Standard "(001.001)" Standard ROM
+&gt; *Font Arial-Bold/Arial Bold: Standard "(001.001)" Standard ROM
+&gt; *Font Arial-BoldItalic/Arial Bold Italic: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font Arial-Italic/Arial Italic: Standard "(001.001)" Standard ROM
+&gt; *Font Arial/Arial: Standard "(001.001)" Standard ROM
+&gt; *Font AvantGarde-Book/ITC Avant Garde Gothic Book: Standard 
+&gt; "(001.002)" Standard ROM
+&gt; *Font AvantGarde-BookOblique/ITC Avant Garde Gothic Book Oblique: 
+&gt; Standard "(001.002)" Standard ROM
+&gt; *Font AvantGarde-Demi/ITC Avant Garde Gothic Demi Bold: Standard 
+&gt; "(001.003)" Standard ROM
+&gt; *Font AvantGarde-DemiOblique/ITC Avant Garde Gothic Demi Oblique Bold: 
+&gt; Standard "(001.003)" Standard ROM
+&gt; *Font Bookman-Demi/ITC Bookman Demi Bold: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font Bookman-DemiItalic/ITC Bookman Demi Italic Bold: Standard 
+&gt; "(001.001)" Standard ROM
+&gt; *Font Bookman-Light/ITC Bookman Light: Standard "(001.001)" Standard ROM
+&gt; *Font Bookman-LightItalic/ITC Bookman Light Italic: Standard 
+&gt; "(001.001)" Standard ROM
+&gt; *Font CGOmega-Bold/CG Omega Bold: Standard "(001.001)" Standard ROM
+&gt; *Font CGOmega-BoldItalic/CG Omega Bold Italic: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font CGOmega-Italic/CG Omega Italic: Standard "(001.001)" Standard ROM
+&gt; *Font CGOmega/CG Omega: Standard "(001.001)" Standard ROM
+&gt; *Font CGTimes-Bold/CG Times Bold: Standard "(001.001)" Standard ROM
+&gt; *Font CGTimes-BoldItalic/CG Times Bold Italic: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font CGTimes-Italic/CG Times Italic: Standard "(001.001)" Standard ROM
+&gt; *Font CGTimes/CG Times: Standard "(001.001)" Standard ROM
+&gt; *Font Clarendon/Clarendon Condensed Bold: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font Coronet/Coronet Italic: Standard "(001.001)" Standard ROM
+&gt; *Font Courier-Bold/Courier Bold: Standard "(001.001)" Standard ROM
+&gt; *Font Courier-BoldItalic/Courier Bold Italic: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font Courier-Italic/Courier Italic: Standard "(001.001)" Standard ROM
+&gt; *Font Courier/Courier: Standard "(001.001)" Standard ROM
+&gt; *Font PS-Courier-Bold/CourierPS Bold: Standard "(001.004)" Standard ROM
+&gt; *Font PS-Courier-BoldOblique/CourierPS Bold Oblique: Standard 
+&gt; "(001.004)" Standard ROM
+&gt; *Font PS-Courier-Oblique/CourierPS Oblique: Standard "(001.004)" 
+&gt; Standard ROM
+&gt; *Font PS-Courier/CourierPS: Standard "(001.004)" Standard ROM
+&gt; *Font Garamond-Bold/Garamond Halbfett Bold: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font Garamond-BoldItalic/Garamond Kursiv Halbfett Bold: Standard 
+&gt; "(001.001)" Standard ROM
+&gt; *Font Garamond-Italic/Garamond Kursiv: Standard "(001.001)" Standard ROM
+&gt; *Font Garamond/Garamond Antiqua: Standard "(001.001)" Standard ROM
+&gt; *Font Helvetica-Bold/Helvetica Bold: Standard "(001.002)" Standard ROM
+&gt; *Font Helvetica-BoldOblique/Helvetica Bold Oblique: Standard 
+&gt; "(001.002)" Standard ROM
+&gt; *Font Helvetica-Narrow-Bold/Helvetica Narrow Bold: Standard 
+&gt; "(001.000)" Standard ROM
+&gt; *Font Helvetica-Narrow-BoldOblique/Helvetica Narrow Bold Oblique: 
+&gt; Standard "(001.000)" Standard ROM
+&gt; *Font Helvetica-Narrow-Oblique/Helvetica Narrow Oblique: Standard 
+&gt; "(001.000)" Standard ROM
+&gt; *Font Helvetica-Narrow/Helvetica Narrow: Standard "(001.000)" Standard ROM
+&gt; *Font Helvetica-Oblique/Helvetica Oblique: Standard "(001.002)" 
+&gt; Standard ROM
+&gt; *Font Helvetica/Helvetica: Standard "(001.002)" Standard ROM
+&gt; *Font LetterGothic-Bold/Letter Gothic Bold: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font LetterGothic-Italic/Letter Gothic Italic: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font LetterGothic/Letter Gothic: Standard "(001.001)" Standard ROM
+&gt; *Font Lineprinter/Line Printer: Standard "(001.001)" Standard ROM
+&gt; *Font Marigold/Marigold: Standard "(001.001)" Standard ROM
+&gt; *Font NewCenturySchlbk-Bold/New Century Schoolbook Bold: Standard 
+&gt; "(001.005)" Standard ROM
+&gt; *Font NewCenturySchlbk-BoldItalic/New Century Schoolbook Bold Italic: 
+&gt; Standard "(001.004)" Standard ROM
+&gt; *Font NewCenturySchlbk-Italic/New Century Schoolbook Italic: Standard 
+&gt; "(001.003)" Standard ROM
+&gt; *Font NewCenturySchlbk-Roman/New Century Schoolbook: Standard 
+&gt; "(001.004)" Standard ROM
+&gt; *Font Palatino-Bold/Palatino Bold: Standard "(001.002)" Standard ROM
+&gt; *Font Palatino-BoldItalic/Palatino Bold Italic: Standard "(001.002)" 
+&gt; Standard ROM
+&gt; *Font Palatino-Italic/Palatino Italic: Standard "(001.002)" Standard ROM
+&gt; *Font Palatino-Roman/Palatino Roman: Standard "(001.001)" Standard ROM
+&gt; *Font Symbol/Symbol: Special "(001.003)" Special ROM
+&gt; *Font PS-Symbol/SymbolPS: Standard "(001.001)" Standard ROM
+&gt; *Font Times-Bold/Times Bold: Standard "(001.002)" Standard ROM
+&gt; *Font Times-BoldItalic/Times Bold Italic: Standard "(001.004)" 
+&gt; Standard ROM
+&gt; *Font Times-Italic/Times Italic: Standard "(001.002)" Standard ROM
+&gt; *Font Times-Roman/Times Roman: Standard "(001.002)" Standard ROM
+&gt; *Font TimesNew-Bold/Times New Roman Bold: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font TimesNew-BoldItalic/Times New Roman Bold Italic: Standard 
+&gt; "(001.001)" Standard ROM
+&gt; *Font TimesNew-Italic/Times New Roman Italic: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font TimesNew/Times New Roman: Standard "(001.001)" Standard ROM
+&gt; *Font Univers-Bold/Univers Bold: Standard "(001.001)" Standard ROM
+&gt; *Font Univers-BoldItalic/Univers Bold Italic: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font Univers-Condensed-Bold/Univers Condensed Bold: Standard 
+&gt; "(001.001)" Standard ROM
+&gt; *Font Univers-Condensed-BoldItalic/Univers Condensed Bold Italic: 
+&gt; Standard "(001.001)" Standard ROM
+&gt; *Font Univers-Condensed-Italic/Univers Condensed Medium Italic: 
+&gt; Standard "(001.001)" Standard ROM
+&gt; *Font Univers-Condensed/Univers Condensed Medium: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font Univers-Italic/Univers Medium Italic: Standard "(001.001)" 
+&gt; Standard ROM
+&gt; *Font Univers/Univers Medium: Standard "(001.001)" Standard ROM
+&gt; *Font Wingdings/Wingdings: Standard "(001.001)" Standard ROM
+&gt; *Font ZapfChancery-MediumItalic/ITC Zapf Chancery Medium Italic: 
+&gt; Standard "(001.003)" Standard ROM
+&gt; *Font ZapfDingbats/ITC Zapf Dingbats: Special "(001.001)" Special ROM
+&gt;
+&gt; *% === Change Log ===
+&gt; *% 02/03/2000 V 1.0.0
+&gt; *% 06/30/2000 V 1.0.1
+
+*% 05/31/2003 v 1.0.2 (Unix Foomatic Ghostscript tweaks by James Leone)
+
+&gt;
+&gt; *%
+&gt; *% end of PPD file for Konica IP-423 PCL
+
+As you can see, not much needs to be done.   I don't understand how or 
+why it works, just that it works.
+
+Ignorance is bliss. :-)
+
+
+I also discovered while I was trying different things, that you can 
+actually add features to the driver that the Windows driver does not 
+already have.   :-)  
+
+ The syntax is kinda like http - at the least the very little of http 
+that I know....
+
+&lt;p&gt;  (yeah, that's a paragraph, and that's all I know)
+
+Anyway, all I did was poke around in some other drivers and cannabalize 
+the parts that I wanted for my driver. Just open up the .ppd file with a 
+text editor, and take the bits you want. Just be sure that it comes from 
+an equivalent driver language.
+
+Here is an example of some cannabalized code that fit into the driver, 
+and the features showed as configurable, and changes had effect on my 
+print outs:
+
+&gt; *OpenGroup: PrintoutMode/Printout Mode
+&gt;
+&gt; *OpenUI *GSResolution/Ghostscript Resolution: PickOne
+&gt; *OrderDependency: 100 AnySetup *GSResolution
+&gt; *DefaultGSResolution: 600x600DPI
+&gt; *GSResolution FromPrintoutMode/Controlled by 'Printout Mode': "%% 
+&gt; FoomaticRIPOptionSetting: GSResolution=@PrintoutMode"
+&gt; *GSResolution 150x150DPI/150 x 150 DPI: "&lt;&lt;/HWResolution[150 
+&gt; 150]&gt;&gt;setpagedevice"
+&gt; *GSResolution 300x300DPI/300 x 300 DPI: "&lt;&lt;/HWResolution[300 
+&gt; 300]&gt;&gt;setpagedevice"
+&gt; *GSResolution 600x600DPI/600 x 600 DPI: "&lt;&lt;/HWResolution[600 
+&gt; 600]&gt;&gt;setpagedevice"
+&gt; *CloseUI: *GSResolution
+&gt;
+&gt; *OpenUI *Quality/Quality: PickOne
+&gt; *OrderDependency: 100 AnySetup *Quality
+&gt; *DefaultQuality: 600dpi
+&gt; *Quality FromPrintoutMode/Controlled by 'Printout Mode': "%% 
+&gt; FoomaticRIPOptionSetting: Quality=@PrintoutMode"
+&gt; *Quality 150dpi/150x150 DPI: "&lt;&lt;/Quality(150dpi)&gt;&gt;setpagedevice"
+&gt; *Quality 300dpi/300x300 DPI: "&lt;&lt;/Quality(300dpi)&gt;&gt;setpagedevice"
+&gt; *Quality 600dpi/600x600 DPI: "&lt;&lt;/Quality(600dpi)&gt;&gt;setpagedevice"
+&gt; *CloseUI: *Quality
+&gt;
+&gt; *OpenUI *OutputType/Output Type: PickOne
+&gt; *OrderDependency: 100 AnySetup *OutputType
+&gt; *DefaultOutputType: Grayscale
+&gt; *OutputType FromPrintoutMode/Controlled by 'Printout Mode': "%% 
+&gt; FoomaticRIPOptionSetting: OutputType=@PrintoutMode"
+&gt; *OutputType BlackAndWhite/Black and White: "&lt;&lt;/Color 2&gt;&gt;setpagedevice"
+&gt; *OutputType Grayscale/Gray Scale: "&lt;&lt;/Color 0&gt;&gt;setpagedevice"
+&gt; *CloseUI: *OutputType
+&gt;
+&gt; *OpenUI *ImageType/Image Type: PickOne
+&gt; *OrderDependency: 100 AnySetup *ImageType
+&gt; *DefaultImageType: Photographs
+&gt; *ImageType FromPrintoutMode/Controlled by 'Printout Mode': "%% 
+&gt; FoomaticRIPOptionSetting: ImageType=@PrintoutMode"
+&gt; *ImageType Photographs/Continuous-tone photographs: "&lt;&lt;/ImageType 
+&gt; 2&gt;&gt;setpagedevice"
+&gt; *ImageType LineArt/Line art: "&lt;&lt;/ImageType 0&gt;&gt;setpagedevice"
+&gt; *ImageType Solids/Primarily solid colors or smooth gradients: 
+&gt; "&lt;&lt;/ImageType 1&gt;&gt;setpagedevice"
+&gt; *CloseUI: *ImageType
+&gt;
+&gt; *OpenUI *Dither/Dither Algorithm: PickOne
+&gt; *OrderDependency: 100 AnySetup *Dither
+&gt; *DefaultDither: Floyd
+&gt; *Dither FromPrintoutMode/Controlled by 'Printout Mode': "%% 
+&gt; FoomaticRIPOptionSetting: Dither=@PrintoutMode"
+&gt; *Dither Adaptive/Adaptive Hybrid: "&lt;&lt;/Dither(Adaptive)&gt;&gt;setpagedevice"
+&gt; *Dither EvenTone/EvenTone: "&lt;&lt;/Dither(EvenTone)&gt;&gt;setpagedevice"
+&gt; *Dither Fast/Fast: "&lt;&lt;/Dither(Fast)&gt;&gt;setpagedevice"
+&gt; *Dither Floyd/Hybrid Floyd-Steinberg: "&lt;&lt;/Dither(Floyd)&gt;&gt;setpagedevice"
+&gt; *Dither Ordered/Ordered: "&lt;&lt;/Dither(Ordered)&gt;&gt;setpagedevice"
+&gt; *Dither VeryFast/Very Fast: "&lt;&lt;/Dither(VeryFast)&gt;&gt;setpagedevice"
+&gt; *CloseUI: *Dither
+&gt;
+&gt; *CloseGroup: PrintoutMode
+
+
+Always use what the manufacturer gives you.  You can add additional 
+features if you are willing to see if your printer will chuck a wobbley.
+
+
+Cheers,
+
+James Leone
+
+
+
+
+
+[1] Was 1.0.1
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

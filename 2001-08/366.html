@@ -1,0 +1,144 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Slow "Internet" (was: [OT] Can't Think of a Subject)" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 9 Aug 2001 16:01:24 +0930" -->
+<!-- Id="20010809160124.A32149@dog.topology.org" -->
+<!-- Reference="997370333.1069.143.camel@percible.alfred.cx" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Slow "Internet" (was: [OT] Can't Think of a Subject)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 9 Aug 2001 16:01:24 +0930
+</PRE>
+<H1>Re: Slow "Internet" (was: [OT] Can't Think of a Subject)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, Aug 10, 2001 at 12:48:52AM +0930, Andrew Reid wrote:
+&gt; On 09 Aug 2001 15:01:11 +0930, Alan Kennington wrote:
+&gt; 
+&gt; &gt; By the way, I estimate that my bills are going to go up
+&gt; &gt; by about A$50 per month as a result of my 20 IPs with
+&gt; &gt; port 80 in use.
+&gt; 
+&gt; Do you have an estimate on the size of each (failed) request? Up and
+&gt; downloaded data.     
+
+Andrew,
+
+Here's a failed attempt. (The number of packets is almost always 3.)
+
+15:29:59.558111 203.48.124.209.1390 &gt; 203.48.2.149.80: S [tcp sum ok] 3865909429:3865909429(0) win 16384 &lt;mss 1460,nop,nop,sackOK&gt; (DF) (ttl 121, id 37232, len 48)
+15:30:02.418097 203.48.124.209.1390 &gt; 203.48.2.149.80: S [tcp sum ok] 3865909429:3865909429(0) win 16384 &lt;mss 1460,nop,nop,sackOK&gt; (DF) (ttl 121, id 37484, len 48)
+15:30:08.438106 203.48.124.209.1390 &gt; 203.48.2.149.80: S [tcp sum ok] 3865909429:3865909429(0) win 16384 &lt;mss 1460,nop,nop,sackOK&gt; (DF) (ttl 121, id 38014, len 48) 
+
+Total PPP payload must be 48 bytes per packet.
+Add N bytes overhead for Bigpond's charging, because
+they probably count the PPP header/trailer too.
+But then again, I do have some sort of PPP compression.
+
+So let's say N=2, to make the arithmetic simpler.
+Then for A IP addresses at R probes per hour, that's
+
+150 * A * R * 24 * 30 bytes
+
+in every (roughly) 30-day charing period.
+
+With my A = 48, R = 9, I get 46.6 (decimal)
+MBytes per month - form the ISP to me.
+
+At roughly 21 cents per MByte, that's about
+A$10 per month extra for Bigpond.
+
+But that's just the probes which miss my HTTP
+servers.
+
+In the case of hitting a real HTTP server, I get much more.
+(See below.) This amounts to:
+
+downstream (ISP to me): 48+40+1500+1500+938+52+40+40 = 4158 bytes.
+upstream   (me to ISP): 48+40+40+40+1500+90+40 = 1798 bytes.
+
+This time, let's forget the PPP overhead.
+Now for my 20 active HTTP ports, I get:
+
+downstream: 4158 * 20 * 9 * 24 * 30 = 539 MBytes/month
+upstream:   1798 * 20 * 9 * 24 * 30 = 233 MBytes/month.
+
+The downstream would be about $113/month.
+The upstream would be about $21/month.
+Very roughly speaking, Bigpond charges the maximum of these two numbers.
+The real killer is the 4kB payload which the worm sends in
+its request packet.
+(Because of the other real traffic on my net, the real cost
+will probably be in fact around $50/month extra, or about
+$600 over the next year if this continues.)
+
+Obviously this is making me think that I have to
+abandon IP-based hosting if this goes on for much longer.
+Right now, I'm assuming though that the hacker brotherhood
+(are there female black hats? - probalby not...)
+will "fix" the problem some time real soon.
+
+Cheers,
+Alan Kennington.
+
+============================================================
+Trace for HTTP server hit.
+Note mangled IP/port number due to iptables.
+
+15:30:57.248093 203.48.124.209.3134 &gt; 139.130.140.14.8002: S [tcp sum ok] 3962476746:3962476746(0) win 16384 &lt;mss 1460,nop,nop,sackOK&gt; (DF) (ttl 121, id 42349, len 48)
+15:30:57.248281 203.48.2.130.80 &gt; 203.48.124.209.3134: S [tcp sum ok] 3177052944:3177052944(0) ack 3962476747 win 5840 &lt;mss 1460,nop,nop,sackOK&gt; (DF) (ttl 64, id 0, len 48)
+15:30:57.678106 203.48.124.209.3134 &gt; 139.130.140.14.8002: . [tcp sum ok] 3962476747:3962476747(0) ack 3177052945 win 17520 (DF) (ttl 121, id 42382, len 40)
+15:30:58.338153 203.48.124.209.3134 &gt; 139.130.140.14.8002: . 0:1460(1460) ack 1 win 17520 (DF) (ttl 121, id 42383, len 1500)
+15:30:58.338354 203.48.2.130.80 &gt; 203.48.124.209.3134: . [tcp sum ok] 1:1(0) ack 1461 win 8760 (DF) (ttl 64, id 18434, len 40)
+15:30:58.508150 203.48.124.209.3134 &gt; 139.130.140.14.8002: . 1460:2920(1460) ack 1 win 17520 (DF) (ttl 121, id 42384, len 1500)
+15:30:58.509543 203.48.2.130.80 &gt; 203.48.124.209.3134: . [tcp sum ok] 1:1(0) ack 2921 win 11680 (DF) (ttl 64, id 18435, len 40)
+15:30:58.888113 203.48.124.209.3134 &gt; 139.130.140.14.8002: P 2920:3818(898) ack 1 win 17520 (DF) (ttl 121, id 42465, len 938)
+15:30:58.888367 203.48.2.130.80 &gt; 203.48.124.209.3134: . [tcp sum ok] 1:1(0) ack 3819 win 14600 (DF) (ttl 64, id 18436, len 40)
+15:30:58.889563 203.48.2.130.80 &gt; 203.48.124.209.3134: . 1:1461(1460) ack 3819 win 14600 (DF) (ttl 64, id 18437, len 1500)
+15:30:58.889716 203.48.2.130.80 &gt; 203.48.124.209.3134: P [tcp sum ok] 1461:1511(50) ack 3819 win 14600 (DF) (ttl 64, id 18438, len 90)
+15:30:59.222534 203.48.2.130.80 &gt; 203.48.124.209.3134: F [tcp sum ok] 1511:1511(0) ack 3819 win 14600 (DF) (ttl 64, id 18439, len 40)
+15:31:00.078100 203.48.124.209.3134 &gt; 139.130.140.14.8002: . [tcp sum ok] 3818:3818(0) ack 1 win 17520 &lt;nop,nop,sack sack 1 {1511:1512} &gt; (DF) (ttl 121, id 42596, len 52)
+15:31:00.168091 203.48.124.209.3134 &gt; 139.130.140.14.8002: R [tcp sum ok] 3962480565:3962480565(0) win 0 (DF) (ttl 121, id 42606, len 40)
+15:31:00.178097 203.48.124.209.3134 &gt; 139.130.140.14.8002: R [tcp sum ok] 3962480565:3962480565(0) win 0 (ttl 121, id 42607, len 40)  
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

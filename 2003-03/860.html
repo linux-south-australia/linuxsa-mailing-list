@@ -1,0 +1,112 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="CUPS and converting remote postscript to raster for epson stylus" -->
+<!-- FromName="'Michael'" -->
+<!-- FromEmail="michael@home.lyppard.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 16 Mar 2003 18:38:41 +1030" -->
+<!-- Id="20030316183841.5716c869.michael@home.lyppard.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: CUPS and converting remote postscript to raster for epson stylus</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael &lt;<I><A HREF="mailto:michael@home.lyppard.com.au">michael@home.lyppard.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 16 Mar 2003 18:38:41 +1030
+</PRE>
+<H1>CUPS and converting remote postscript to raster for epson stylus</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi.
+
+After the death of our old laser printer today, I decided to plug an
+epson stylus colour 760 into the network and serve it up to the other
+boxes on the network. I ran into problems that there is no clear answer
+to in the cups documentation, or the web by google-ing.
+
+The stylus is connected via DLink DP101 print server to the network.
+The cups server is a debian woody box with a bunch of cups debs
+installed, including the cupsys-bsd.
+
+I struck 2 problems:
+
+1. After setting it up in cups, I could not print from the server - the
+light would wink, but nothing printed.
+
+Resolution #1
+-&gt; apt-get install cupsys-driver-gimpprint
+-&gt; Reconfigure the printer to use the gimp-print driver
+-&gt; Restart cups
+
+Printing in full colour now!
+
+2. The network clients could print, but their postscript output was
+printing postscript as text. (spooling the jobs was no problem)
+
+Resolution #2
+-&gt; Waste hours searching the cups doco and the web to no avail.
+-&gt; Start tracking what the spooled jobs are being identified as with the
+file command - they are identified as postscript, but the filters are
+not activated for some reason.-&gt; Eventually, track the lpd daemon
+'cups-lpd' and find it's configuration in the /etc/inetd.conf.-&gt; Read
+the man page for cups-lpd, which delivers the following gem:
+
+OPTIONS
+       The -o option to cups-lpd inserts options  for  all  print
+       queues.  Most often this is used to disable the "l" filter
+       so that remote print  jobs  are  filtered  as  needed  for
+       printing:
+
+           printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd   
+       cups-lpd -o document-format=application/octet-stream
+
+       The  example shown resets the document format to be appli­
+       cation/octet-stream, which forces  auto-detection  of  the
+       print file type.
+
+-&gt; make the change, and kill -HUP the inetd, and everything is working!
+
+Interestingly, with the standard entry in inetd.conf, the file
+identification in /var/log/cups/error_log is application/vnd.cups-raw. I
+searched the web for that string, and all I could find was a few people
+with similar, but unresolved problems. Hopefully, this post will find
+it's way into google and save some people a bit of time and frustration.
+
+Michael
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

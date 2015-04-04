@@ -1,0 +1,183 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: routing" -->
+<!-- FromName="Daryl Pilkington" -->
+<!-- FromEmail="darylp@senet.com.au" -->
+<!-- ToName="Leigh Hart" -->
+<!-- ToEmail="hart@dotat.com" -->
+<!-- Date="Mon, 09 Oct 2000 14:07:03 +1100" -->
+<!-- Id="39E13657.6A6C37C5@senet.com.au" -->
+<!-- Reference="200010082211.HAA22972@at.dotat.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: routing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Pilkington &lt;<I><A HREF="mailto:darylp@senet.com.au">darylp@senet.com.au</A></I>&gt;
+  To  : Leigh Hart &lt;<I><A HREF="mailto:hart@dotat.com">hart@dotat.com</A></I>&gt;
+  Date: Mon, 09 Oct 2000 14:07:03 +1100
+</PRE>
+<H1>Re: routing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Leigh,
+
+Thanks,
+
+Is it possible because telnetd is running on the router its stopping
+telnet to route?
+
+Both NICs *are* plugged into the hub.
+For testing purposes, your suggestion of using 2 collision domains via a
+x-over cable is A Good Idea, just to get things working, then I can
+fiddle.
+
+I'll get rid of 1 of the default routes.
+
+Will let you know.
+
+Leigh Hart wrote:
+&gt; 
+&gt; Hi Daryl,
+&gt; 
+&gt; Daryl Pilkington &lt;<A HREF="mailto:darylp@senet.com.au">darylp@senet.com.au</A>&gt; wrote:
+&gt; &gt;
+&gt; &gt; There is one physical LAN, running from a dumb 10MB hub, so there is 1
+&gt; &gt; collision domain.
+&gt; 
+&gt; This is probably why you are seeing confusing results - try running
+&gt; with host #1 and the router in the hub, and host #2 linked to the
+&gt; router with a crossover ethernet cable - you have two seperate NICs
+&gt; in the router, why not use them?  :)
+&gt; 
+&gt; &gt;  host #1                 router                host #2
+&gt; &gt; 10.2.1.35              10.2.1.250           192.168.1.100
+&gt; &gt;                       192.168.1.250
+&gt; &gt;
+&gt; &gt;                              Ping?
+&gt; &gt; 10.2.1.35 -&gt; 10.2.1.250        Y
+&gt; &gt; 10.2.1.35 -&gt; 192.168.1.250     Y
+&gt; &gt; 10.2.1.35 -&gt; 192.168.1.100     Y
+&gt; &gt;
+&gt; &gt;                             Telnet?
+&gt; &gt; 10.2.1.35 -&gt; 10.2.1.250        Y
+&gt; &gt; 10.2.1.35 -&gt; 192.168.1.250     N
+&gt; &gt; 10.2.1.35 -&gt; 192.168.1.100     N
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; HOST #1
+&gt; &gt; \mptn\bin\setup.cmd
+&gt; &gt; route -fh
+&gt; &gt; arp -f
+&gt; &gt; inetcfg -s synattack 1
+&gt; &gt; inetcfg -s keepalive 60
+&gt; &gt; inetcfg -s multidefrt 0
+&gt; &gt; ifconfig lo 127.0.0.1
+&gt; &gt; ifconfig lan0 10.2.1.35 netmask 255.255.255.0 mtu 1500
+&gt; &gt; route add -net 192.168.1.0 10.2.1.250 -netmask 255.255.255.0
+&gt; &gt; route add default 10.2.1.1
+&gt; &gt; ipgate off
+&gt; &gt;
+&gt; &gt; netstat -r
+&gt; &gt; destination router        netmask         metric flags intrf
+&gt; &gt;
+&gt; &gt; default     10.2.1.1      0.0.0.0         0      UGSP   lan0
+&gt; &gt; 10.2.1      10.2.1.35     255.255.255.0   0      UC     lan0
+&gt; &gt; 127.0.0.1   127.0.0.1     255.255.255.255 0      UH     lo
+&gt; &gt; 192.168.1   10.2.1.250    255.255.255.0   0      UGSP   lan0
+&gt; &gt;
+&gt; &gt; ROUTER
+&gt; &gt; \mptn\bin\setup.cmd
+&gt; &gt; route -fh
+&gt; &gt; arp -f
+&gt; &gt; inetcfg -s synattack 1
+&gt; &gt; inetcfg -s keepalive 60
+&gt; &gt; inetcfg -s multidefrt 1
+&gt; &gt; ifconfig lo 127.0.0.1
+&gt; &gt; ifconfig lan0 10.2.1.250 netmask 255.255.255.0 mtu 1500
+&gt; &gt; route add default 10.2.1.250
+&gt; &gt; ifconfig lan1 192.168.1.250 netmask 255.255.255.0 mtu 1500
+&gt; &gt; route add default 192.168.1.250
+&gt; &gt; ipgate on
+&gt; 
+&gt; You have two default routes here - pick one and remove the other
+&gt; and disable multidefrt.
+&gt; 
+&gt; You don't need two default routes, all that does is cause the
+&gt; router to load share packets to destinations the router doesn't
+&gt; have a routing entry for via the two seperate default routes, ie
+&gt; in two different directions each time it sees packets!
+&gt; 
+&gt; Utterly useless and just adds to the confusion :)
+&gt; 
+&gt; &gt; netstat -r
+&gt; &gt; destination   router        netmask         metric flags intrf
+&gt; &gt;
+&gt; &gt; default       10.2.1.250    0.0.0.0         0      UCSP  lan0
+&gt; &gt; default       192.168.1.250 0.0.0.0         0      UCSP  lan1
+&gt; &gt; 10.2.1        10.2.1.250    255.255.255.0   0      UC    lan0
+&gt; &gt; 127.0.0.1     127.0.0.1     255.255.255.255 0      UH    lo
+&gt; &gt; 192.168.1.250 192.168.1.250 255.255.255.0   0      UC    lan1
+&gt; &gt;
+&gt; &gt; I know there is some smart network people out there, any ideas?
+&gt; 
+&gt; Try the above (seperate collision domains, one default route) and
+&gt; you'll probably find that either that the pings will stop working,
+&gt; or telnet will work.
+&gt; 
+&gt; I'm not familiar enough with OS/2 to guess which one will be most
+&gt; likely here :-)
+&gt; 
+&gt; Good luck!
+&gt; 
+&gt; Cheers
+&gt; 
+&gt; Leigh
+
+-- 
+Regards, 
+
+Daryl  Pilkington 
+
+//// The PC Therapist, Business Computing Integration
+O&lt;O  AUSTRALIA
+\_/
+&lt;O&gt;  OS/2 Warp, Redhat Linux, DB2
+     IBM Certified Systems Expert
+
+        email: <A HREF="mailto:darylp@pc-therapist.com.au">darylp@pc-therapist.com.au</A>
+          ICQ: 91914134
+          Tel: +61-414-327-957
+Fax/Voicemail: +61-416-991-462
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

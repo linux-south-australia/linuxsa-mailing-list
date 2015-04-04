@@ -1,0 +1,128 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: non-standard serial speeds" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Anthony Symons'" -->
+<!-- ToEmail="ant@sa.pracom.com.au" -->
+<!-- Date="Mon, 17 Jun 2002 13:40:39 +0930" -->
+<!-- Id="3D0D613F.9080206@aarnet.edu.au" -->
+<!-- Reference="1024278590.30246.14.camel@ant.internal" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: non-standard serial speeds</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  Date: Mon, 17 Jun 2002 13:40:39 +0930
+</PRE>
+<H1>Re: non-standard serial speeds</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Anthony Symons wrote:
+&gt; I'm trying to develp a smartcard program for linux. The cavet is that my
+&gt; smartcard device uses a 3.58mhz crystal, where as the smartcard expects
+&gt; a 6mhz clock. This means that the cards sense of time is somewhat
+&gt; skewed, and its idea of 9600,8,E,2 is really 5720,8,E,2. I have programs
+&gt; that work under windows fine (and even wine under linux), they just call
+&gt; a serial set speed type function with "5720" and bingo, its set. Under
+&gt; linux however, it seems a little trickyer...
+&gt; 
+&gt; Anyone have any idea how to do this in C, or if not, with serserial?
+&gt; (since I have its source). As far as I can tell, I need to set spd_cust
+&gt; divisor 20, as 115200/20=~5720. The code in set serial doesnt seem to
+&gt; support a divisor with decimals, as to get a real 5720 would require a
+&gt; divisor of 20.13986013986014.
+&gt; 
+&gt; Also, it seems relevant to baud_base, which seems to be 115200 although
+&gt; it depends on the crystal speed on the serial card. I dont know how to
+&gt; verify this, as I suspect this might be whats wrong. 
+&gt; 
+&gt; Does anyone have any experience with these kinds of serial operation, or
+&gt; can give me some pointer to docs with relevant levels of info? (the
+&gt; serial programming howto is a joke if you dont want a normal 8,N,1
+&gt; setting).
+
+Using setserial
+  - Set the option "spd_cust".
+  - Set the clock divisor.  This follows the formula
+      divisor = clock_rate / (bps * 16)
+    the clock_rate of an IBM PC/AT is 1843200.
+
+setserial /dev/ttyS0 spd_cust divisor 20
+
+In the application set the baud rate to the magic value of 38400.
+
+Don't change baud_base unless you've changed the crystal on the
+motherboard -- baud_base is the UART's clock / 16.  If the
+UART has a 2* or 4* second divisor then the serial driver will
+automatically activate this if it is needed.  To see how this
+works, have a look at change_speed() in
+
+  /usr/src/linux/drivers/char/serial.c
+
+which says
+
+	if (info-&gt;state-&gt;type == PORT_16C950) {
+		if (baud &lt;= baud_base)
+			serial_icr_write(info, UART_TCR, 0);
+		else if (baud &lt;= 2*baud_base) {
+			serial_icr_write(info, UART_TCR, 0x8);
+			baud_base = baud_base * 2;
+		} else if (baud &lt;= 4*baud_base) {
+			serial_icr_write(info, UART_TCR, 0x4);
+			baud_base = baud_base * 4;
+		} else
+			serial_icr_write(info, UART_TCR, 0);
+	}
+
+Note that you won't get better accuracy with the 2* or 4* TCR clock,
+so the best you can do is
+
+   bps = 1843200 / (20 * 16)
+       = 5760
+
+Even if you write your own device driver you can't do better than
+this, as the divisor register on the UART accepts an integer, not
+a floating point number.  Other operating systems probably quitely
+round off the input value of 5720 to 5760.  This is only a 0.7% error.
+The error shouldn't matter for an asychronous link, as the clock is
+reset at the rising edge of each character's start bit.
+
+Regards,
+Glen
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

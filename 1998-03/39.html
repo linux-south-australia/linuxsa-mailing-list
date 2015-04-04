@@ -1,0 +1,110 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: File permissions through Samba" -->
+<!-- FromName="adrian" -->
+<!-- FromEmail="adrian@econ-outlook.com.au" -->
+<!-- ToName="Alex Garner" -->
+<!-- ToEmail="mlist@lynx.net.au" -->
+<!-- Date="Mon, 09 Mar 1998 01:42:24 +1030" -->
+<!-- Id="3502B558.BB7631FF@econ-outlook.com.au" -->
+<!-- Reference="3.0.3.32.19980304170218.0073b9ec@lynx.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: File permissions through Samba</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: adrian &lt;<I><A HREF="mailto:adrian@econ-outlook.com.au">adrian@econ-outlook.com.au</A></I>&gt;
+  To  : Alex Garner &lt;<I><A HREF="mailto:mlist@lynx.net.au">mlist@lynx.net.au</A></I>&gt;
+  Date: Mon, 09 Mar 1998 01:42:24 +1030
+</PRE>
+<H1>Re: File permissions through Samba</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Alex
+I use samba on several machines - it's great.
+the interaction between permissions, locking etc. is tricky but what you
+are after is pretty straight forward  - "create mode" allows you to
+change the mask samba applies on top of the usual permission masks. by
+default it is set to 0750 - not much use to you!!!
+in a redhat environment a better setting is 775 which matches the usual
+umask.
+
+Samba also does domething funny with the user execute bit which it turns
+on for ordinary files - It uses it to simulate the fat "archive" bit
+which unix doesn't have. There is a setting somewhere to turn this off
+but you don't need to worry about it (it doesn't do any harm) 
+
+My public directory settings on my home networks server are:
+
+[public]
+   comment = Public Stuff
+   path = /home/samba
+   public = yes
+   writable = yes
+   printable = no
+   write list = @root
+   create mode = 0775
+
+note: I restrict writing to persons in the root group on this machine
+
+on my office server I restrict access to the staff group (@staff)
+
+[public]
+   comment = Public Stuff
+   path = /home/samba
+   public = yes
+   writable = yes
+   printable = no
+   write list = @staff
+   create mode = 0775
+
+I've  set the unix permissions for the samba directory to match as 
+
+drwxrwsr-x  16 root     staff        1024 Jan 30 15:10 samba
+
+note the group is set to staff  (chown .staff /home/samba)
+and  the set gid in on to enable files created in the directory to be 
+modifiable by others in the staff group not just the person who placed
+them there
+ (chmod g+s /home/samba)
+
+you most likely are looking for something in /home/httpd/html... and
+might like to have a group  called webauthors instead of the whole staff
+- principles are the same. 
+
+hope this helps
+
+regards
+Adrian Butterworth
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

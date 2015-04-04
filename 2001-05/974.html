@@ -1,0 +1,146 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: in case you thought I had any spare time to keep contributing here :)" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 29 May 2001 15:48:25 +0930" -->
+<!-- Id="20010529154825.A592@dog.topology.org" -->
+<!-- Reference="3B134AE1.958F863B@xavier.sa.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: in case you thought I had any spare time to keep contributing here :)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 29 May 2001 15:48:25 +0930
+</PRE>
+<H1>Re: in case you thought I had any spare time to keep contributing here :)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, May 29, 2001 at 04:38:17PM +0930, Matthew Geddes wrote:
+&gt; &gt; 
+&gt; &gt; .....Well, as usual, the HUP to my BIND 9.1 named process
+&gt; &gt; does not improve the situation, but completely restarting
+&gt; &gt; named _does_ fix it all up.
+&gt; &gt; 
+&gt; &gt; Maybe I need to write a script to restart "named"
+&gt; &gt; every week, or every 24 hours.
+&gt; &gt; It seems like BIND 9.1 just goes stale somehow.
+&gt; 
+&gt; Perhaps there is a problem with your DNS configuration? Do your logs
+&gt; mention anything? We are using BIND 9.1 here quite nicely.
+
+
+Matt,
+
+It just says this:
+
+=============================================================
+May 29 14:37:51 dog /usr/sbin/named[32718]: starting BIND 9.1.0 -c /etc/named.conf -u named
+May 29 14:37:51 dog /usr/sbin/named[32718]: using 1 CPU
+May 29 14:37:51 dog /usr/sbin/named[32720]: loading configuration from '/etc/named.conf'
+May 29 14:37:51 dog /usr/sbin/named[32720]: listening on IPv4 interface lo, 127.0.0.1#53
+May 29 14:37:51 dog /usr/sbin/named[32720]: listening on IPv4 interface eth0, 203.38.148.51#53
+May 29 14:37:51 dog /usr/sbin/named[32720]: listening on IPv4 interface ppp0, 139.130.140.14#53
+May 29 14:37:51 dog /usr/sbin/named[32720]: running  
+=============================================================
+
+The previous named restart was May 8.
+
+Every now and then, though, it gives this little message:
+
+=============================================================
+May 11 02:13:38 dog /usr/sbin/named[8976]: no longer listening on 139.130.140.14#53
+
+May 11 03:13:38 dog /usr/sbin/named[8976]: listening on IPv4 interface ppp0, 139.130.140.14#53 
+
+May 11 22:13:38 dog /usr/sbin/named[8976]: no longer listening on 139.130.140.14#53
+
+May 11 23:13:38 dog /usr/sbin/named[8976]: listening on IPv4 interface ppp0, 139.130.140.14#53
+=============================================================
+
+But those are the only message from May 8 to May 29.
+
+This is probably the relevant set of lines from /etc/named.conf.
+
+=============================================================
+options {
+    directory "/var/named";
+    pid-file "/var/run/named/named.pid";
+    auth-nxdomain no;
+    };  
+logging {
+    category default { default_syslog; default_debug; };      
+    category lame-servers { null; };  
+    };
+zone "localhost" IN {
+    type master;
+    file "localhost.zone";
+    allow-update { none; };
+    }; 
+zone "0.0.127.in-addr.arpa" in {
+    type master;
+    file "127.0.0.zone";
+    allow-update { none; };
+    }; 
+zone "topology.org" in {
+    type master;
+    file "topology.org.zone";
+    }; 
+[....]
+=============================================================
+
+It's difficult to see anything dodgy in there.
+Here's my version:
+
+=============================================================
+dog /etc# named -v
+BIND 9.1.0 
+=============================================================
+
+Maybe I need to udpate it again - to BIND 9.1.2.
+But I really hate that I have to keep updating my software
+every time something goes wrong.
+MS users just re-boot their machine.
+Linux users just download the next version.
+I'd prefer to get insight into why things happen.
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

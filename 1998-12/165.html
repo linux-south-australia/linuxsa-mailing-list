@@ -1,0 +1,139 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Removing Linux" -->
+<!-- FromName="Phil Nitschke" -->
+<!-- FromEmail="phil@caemrad.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="10 Dec 1998 23:27:03 +1030" -->
+<!-- Id="wq90gg6tpc.fsf@toby.caemrad.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Removing Linux</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Phil Nitschke &lt;<I><A HREF="mailto:phil@caemrad.com.au">phil@caemrad.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: 10 Dec 1998 23:27:03 +1030
+</PRE>
+<H1>Re: Removing Linux</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt;&gt;&gt;&gt;&gt; "SR" == Stephen Reynolds &lt;<A HREF="mailto:spr@ozemail.com.au">spr@ozemail.com.au</A>&gt; writes:
+
+  SR&gt; Here's a tale of a lost three day weekend trying to dual boot
+  SR&gt; Linux and NT.
+
+&lt;sad saga deleted&gt;
+
+  SR&gt; 7 - Finally, I understand why Elvis shot his Cadillac when it
+  SR&gt; wouldn't start! . I have this overwhelming urge to shoot fdisk,
+  SR&gt; LPB and Linux. I didn't like his music but I'm now a soul
+  SR&gt; brother
+
+I don't think it should be that hard...  Here are my pointers (taken
+from a Debian background, but RedHat should be similar).
+
+(1) If you have a decent BIOS, then it should offer a low-level format
+    utility.  Often it includes choices like "Normal", "Large" and "LBA".
+    If you start with a low-level LBA format of a 4.3 GB drive, you should
+    end up with about (!) 128 heads, 63 sectors, 1047 cylinders, so where
+    LILO goes on the disk should not be an issue.  Many of the READMEs are
+    out of date and talk about 60 MB disks with 6 heads and 1000
+    cylinders; this should not be a problem anymore.
+
+(2) Secondly, _partition_ (do not format the first partition yet) the
+    drive with _linux_ fdisk.  An example partition setup might be:
+
+    1/. hda1 is a 2 Gig (fat32?) NT partition (about 500 cylinders)
+    2/. hda2 is an extended partition that contains several logical 
+        partitions:
+          - hda5 : /         50 Mb
+          - hda6 : /var      50 Mb
+          - hda7 : swap      96 Mb
+          - hda8 : /tmp      64 Mb
+    3/. hda3 contains a 1 Gig /usr partition
+    4/. hda4 contains a 1 Gig /home partition
+
+    Make your system boot off of /dev/hda1 at first, if you wish.  (fdisk
+    allows you to mark a partition as bootable.)  Later, if you use LILO
+    (and I recommend that you do), you would run linux fdisk again and
+    make /dev/hda2 the boot partition, as lilo would load stuff from
+    /dev/hda5 (your root ("/") partition under unix).
+
+    I have a vague memory that LILO ignores the "active" flags, but I
+    could be wrong.
+
+(3) Thirdly, install NT on your first partition.  DOS/NT fdisk should
+    recognise only the 2 Gig partition, and should allow you to format it
+    in a couple of different ways.  (Sorry, you'd know more about this
+    part than I would.)  All that I'd suggest is that you do not use NTFS,
+    or if you do, check out <A HREF="http://www.informatik.hu-berlin.de/~loewis/ntfs/">http://www.informatik.hu-berlin.de/~loewis/ntfs/</A>
+    Does NT allow you to use FAT32?
+
+(4) Finally, use a "rescue" floppy, or continue the install-from-CD to
+    re-mount the previously initialised linux partitions, load your
+    linux distribution and then install lilo.
+
+    In this example, a /etc/lilo.conf file might look like this:
+
+       boot           = /dev/hda2
+       root           = /dev/hda5
+       install        = /boot/boot.b
+       map            = /boot/map
+       vga            = normal
+       default        = /vmlinuz
+       delay          = 100
+       compact
+
+       image=/vmlinuz
+               label  = Linux
+               vga    = extended
+               read-only
+
+       other          = /dev/hda1
+               label  = NT
+               table  = /dev/hda
+
+    Obviously check that the files exist; don't just copy this example
+    verbatim!  Here I've specified the Linux-root-partition as the boot
+    device because the Master Boot Record (MBR) of the harddisk is owned
+    by Windows NT.
+
+I hope these suggestions make it easier for someone someday.
+
+-- 
+Phil
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

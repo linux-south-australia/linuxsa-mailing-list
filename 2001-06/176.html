@@ -1,0 +1,200 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Module compilation hell." -->
+<!-- FromName="'Toby Corkindale'" -->
+<!-- FromEmail="tjcorkin@sa.pracom.com.au" -->
+<!-- ToName="'James Mclean'" -->
+<!-- ToEmail="james@adam.com.au" -->
+<!-- Date="Tue, 5 Jun 2001 11:55:08 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0106051150360.16903-100000@localhost.localdomain" -->
+<!-- Reference="991701111.3b1c28770bada@thunder.adam.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Module compilation hell.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@sa.pracom.com.au">tjcorkin@sa.pracom.com.au</A></I>&gt;
+  To  : James Mclean &lt;<I><A HREF="mailto:james@adam.com.au">james@adam.com.au</A></I>&gt;
+  Date: Tue, 5 Jun 2001 11:55:08 +0930 (CST)
+</PRE>
+<H1>Re: Module compilation hell.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hell, why stop there? Grab the *latest* kernel (2.4.5) and give it a whirl..
+As an added bonus, you get heaps of free shiny bugfixes! Yeah! ;)
+
+I suspect you'll find the problem isn't really what version of the kernel
+you're using though; after all 2.4.2 worked fine, as did 2.4.1 and 2.4.x.. i
+don't a public release kernel has ever not-compiled-at-all out of the box in
+recent years.. although i've noticed that the early 2.4.x kernels had a few
+things that only worked as modules or static, and not both.
+*glares at stochastic queueing code*
+
+try a:
+`make clean;make mrproper;make menuconfig;make dep;make modules`
+cycle and see if things go better after that, if you still can't get
+anywhere with an up-to-date kernel..
+
+You should be using the new version of gcc, so i'd undo your changes there,
+by the way.
+
+
+-Toby
+
+On Tue, 5 Jun 2001, James Mclean wrote:
+
+&gt;
+&gt; Grab the 2.4.3 kernel, I have heard of problems with the 2.4.2 kernel. I run a
+&gt; 2.4.3 on my gateway with an ne2k-pci card, module compiles fine. Give that a
+&gt; try!
+&gt;
+&gt; &gt; I'm trying to compile a 2.4.2 kernel and modules on a redhat 7.1 box.
+&gt; &gt; In
+&gt; &gt; essence, the kernel compiles fine but the module compilation falls over
+&gt; &gt; with what looks like header problems.
+&gt; &gt;
+&gt; &gt; At first I used the bundled Redhat gcc but eventually installed the
+&gt; &gt; egcs
+&gt; &gt; compatibility stuff and used kgcc (by editing the 'CC' entry in the
+&gt; &gt; makefile).
+&gt; &gt;
+&gt; &gt; The kernel headers and source for 2.4.2 are installed cleanly and I am
+&gt; &gt; following the pattern make dep && make clean && make bzImage && make
+&gt; &gt; modules (and the rest - if only it would work!).
+&gt; &gt;
+&gt; &gt; The first problem arose compiling a module for my ethernet card (module
+&gt; &gt; ne2k-pci). This would spit a couple of hundered lines of warning
+&gt; &gt; messages and fail with "Error 2". I then changed the configuration to
+&gt; &gt; push this ethernet card support into the kernel (not as a module) and
+&gt; &gt; recompiled (from scratch). This worked fine!
+&gt; &gt;
+&gt; &gt; However, the next module now in the list (the dummy network interface)
+&gt; &gt; fails with warning messages  like:
+&gt; &gt;
+&gt; &gt; make -C net modules
+&gt; &gt; make[2]: Entering directory `/usr/src/linux-2.4.2/drivers/net'
+&gt; &gt; kgcc -D__KERNEL__ -I/usr/src/linux-2.4/include -Wall
+&gt; &gt; -Wstrict-prototypes
+&gt; &gt; -O2 -fomit-frame-pointer -fno-strict-aliasing -fno-common
+&gt; &gt; -Wno-unused -pipe  -march=i586 -DMODULE -DMODVERSIONS -include
+&gt; &gt; /usr/src/linux-2.4/include/linux/modversions.h   -c -o dummy.o dummy.c
+&gt; &gt; In file included from /usr/src/linux-2.4/include/linux/wait.h:19,
+&gt; &gt;                  from /usr/src/linux-2.4/include/linux/fs.h:12,
+&gt; &gt;                  from /usr/src/linux-2.4/include/linux/capability.h:17,
+&gt; &gt;                  from /usr/src/linux-2.4/include/linux/binfmts.h:5,
+&gt; &gt;                  from /usr/src/linux-2.4/include/linux/sched.h:9,
+&gt; &gt;                  from /usr/src/linux-2.4/include/linux/skbuff.h:19,
+&gt; &gt;                  from /usr/src/linux-2.4/include/linux/netdevice.h:143,
+&gt; &gt;                  from dummy.c:36:
+&gt; &gt; /usr/src/linux-2.4/include/asm/processor.h:248: warning: `EISA_bus'
+&gt; &gt; redefined
+&gt; &gt; /usr/src/linux-2.4/include/linux/modules/i386_ksyms.ver:68: warning:
+&gt; &gt; this is the location of the previous definition
+&gt; &gt; In file included from dummy.c:34:
+&gt; &gt; /usr/src/linux-2.4/include/linux/module.h:173: nondigits in number and
+&gt; &gt; not hexadecimal
+&gt; &gt; /usr/src/linux-2.4/include/linux/module.h:173: nondigits in number and
+&gt; &gt; not hexadecimal
+&gt; &gt; /usr/src/linux-2.4/include/linux/module.h:173: nondigits in number and
+&gt; &gt; not hexadecimal
+&gt; &gt; /usr/src/linux-2.4/include/linux/module.h:173: nondigits in number and
+&gt; &gt; not hexadecimal
+&gt; &gt; /usr/src/linux-2.4/include/linux/module.h:173: parse error before
+&gt; &gt; `62dada05'
+&gt; &gt; /usr/src/linux-2.4/include/linux/module.h:173:
+&gt; &gt; `inter_module_register_R_ver_str' declared as function returning a
+&gt; &gt; function
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt;
+&gt; &gt; This feels like the compilation has some problems finding the correct
+&gt; &gt; headers. But I am perplexed that moving a module (e.g: ne2k-pci) into
+&gt; &gt; the kernel for compilation removes the problem!
+&gt; &gt;
+&gt; &gt; I worked through the kernel how-to to look for hints. Indeed, the only
+&gt; &gt; difference in method I can see is that the 'quick-start' bit of the
+&gt; &gt; kernel how-to suggests that after compiling the kernel, the box be
+&gt; &gt; rebooted with the new kernel before compiling/installing the modules.
+&gt; &gt; The APC linux pocket-book, my other tome of refernce, included no such
+&gt; &gt; step.
+&gt; &gt;
+&gt; &gt; In wonderment, I tried this - but succeeded only in having a bad time
+&gt; &gt; as
+&gt; &gt; the box - lacking many appropriate modules - failed to boot into a
+&gt; &gt; useable state.
+&gt; &gt;
+&gt; &gt; This must work for 10 of thousands of other ppl so I am clearly doing
+&gt; &gt; something daft. Any ideas? Why should module compilation be different?
+&gt; &gt;
+&gt; &gt;  confused module matt
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; -- Matt Brennan || Vision Systems Ltd || +61 8 8300 4686
+&gt; &gt; --
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on
+&gt; &gt; irc.linux.org.au
+&gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt;
+&gt; &gt;
+&gt;
+&gt;
+&gt;
+
+-- 
+ Toby Corkindale
+ UNIX Developer, Core Tech R&D
+ Technology SA, Pracom Ltd
+ 288 Glen Osmond Road
+ Fullarton,	5063
+ South Australia
+ Tel: +61 8 8202 9075
+ Fax: +61 8 8202 9001
+ mailto:<A HREF="mailto:Toby.Corkindale@sa.pracom.com.au">Toby.Corkindale@sa.pracom.com.au</A>
+ <A HREF="http://www.sa.pracom.com.au/">http://www.sa.pracom.com.au/</A>
+
+                  PRIVILEGED - PRIVATE AND CONFIDENTIAL
+
+   Privileged/Confidential Information may be contained in this message.
+   If you are not the addressee indicated in this message, you may not
+   copy or deliver this message to anyone.  In such case, you should
+   destroy this message and notify the sender by reply email. Opinions,
+   conclusions and other information in this message that do not relate
+   to the official business of this organisation shall be understood as
+   neither given nor endorsed by it.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

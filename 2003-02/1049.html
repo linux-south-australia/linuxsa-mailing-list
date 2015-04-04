@@ -1,0 +1,121 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="PS2 mouse problem - 1 second polling apparently" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="ak.linuxsa@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 24 Feb 2003 03:06:09 +1030" -->
+<!-- Id="20030224030609.A29290@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: PS2 mouse problem - 1 second polling apparently</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 24 Feb 2003 03:06:09 +1030
+</PRE>
+<H1>PS2 mouse problem - 1 second polling apparently</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Has anyone had a problem with a PS/2 mouse showing a 1-second delay
+before the effect shows on the screen?
+
+Since I wanted to free up my COM1 port for use in some PPP hacking,
+I whipped out the serial mouse (whose middle button never worked anyway)
+and put in a PS/2 mouse.
+I tried using the SuSE 6.2 SaX tool, which was a complete disaster which
+locked up the PC etc. etc.
+
+Then I tried modifying the XF86Config file.
+I changed it from this:
+
+-------------------------------------------------------
+Section "Pointer"
+Protocol             "Microsoft"
+Device               "/dev/mouse"
+
+SampleRate           60
+Emulate3Buttons
+Emulate3Timeout      200
+BaudRate             1200
+EndSection
+-------------------------------------------------------
+
+to this:
+
+-------------------------------------------------------
+Section "Pointer"
+  Protocol    "PS/2"
+  Device      "/dev/psaux"
+EndSection
+-------------------------------------------------------
+
+Unfortunately, this still resulted in COM1 being used until
+I made /dev/mouse link to /dev/psaux instead of /dev/ttyS0.
+
+Now this doesn't seem to be an X window system specific thing.
+Exactly the same symptoms occur for "gpm -t ps2 /dev/psaux"
+with X not running at all - just plain text on the console.
+
+==================================================
+The symptoms are more precisely:
+
+I move the mouse.
+The cursor moves a second later.
+If I move the mouse 5 times a second, the motions
+occur concatenated about once a second.
+Obviously the mosue motion messages are being stored somewhere.
+
+It seems like the mouse is being sampled by the mainboard
+once a second.
+Somehow the mouse is not sending data normally to the mainboard.
+It's being polled once a second apparently.
+
+The mainboard is: MSI MS-5187.
+The kernel is: 2.4.0.
+The mouse is: Logitech
+(Other identical logitech mice work fine on my other machines.)
+
+Has anyone seen anything like this?
+Is there something I could try to make the problem go away?
+(Nothing too drastic, please.)
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

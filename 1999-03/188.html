@@ -1,0 +1,141 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Big disk drive + small PC + linux" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Rick Marshall" -->
+<!-- ToEmail="rjm@herzfeld.com.au" -->
+<!-- Date="Fri, 12 Mar 1999 14:45:10 +1030 (CST)" -->
+<!-- Id="199903120415.OAA74943@atdot.dotat.org" -->
+<!-- Reference="36E82FDE.D85F2DDC@herzfeld.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Big disk drive + small PC + linux</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Rick Marshall &lt;<I><A HREF="mailto:rjm@herzfeld.com.au">rjm@herzfeld.com.au</A></I>&gt;
+  Date: Fri, 12 Mar 1999 14:45:10 +1030 (CST)
+</PRE>
+<H1>Re: Big disk drive + small PC + linux</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Rick Marshall wrote:
+
+ &gt; Can't speak for Linux because I haven't tried it, but in the old days SCO,
+ &gt; Interactive, and Solaris could boot any size disk irrespective of the
+ &gt; BIOS. This is because Unix and (I presume) Linux store the disk config in
+ &gt; the boot sector. All you should need is any BIOS def to get going. We used
+ &gt; to use type 1 and let Unix take over from there.
+
+Linux is rather different from most other UNIXes in the way it boots.
+
+Here's the lowdown:  If you attempt to use the BIOS, you cannot reasonably
+expect to access any part of the disk past cylinder number 1023.  This
+is why disks go through that stupid translation stuff to lie about their
+geometry:  can you really imagine a disk that's 15mm high having 32
+platters (64 heads) in it?  No?  So why do so many systems report so 
+many disks as having 64 heads?  Because if you articifically inflate the
+number of heads you can articifically compensate by lowering the number
+of cylinders you pretend to have. 
+
+So the fireware on the disk works it all out to compensate for the 
+short-sighted limiting design developed by the original BIOS writers
+at IBM.
+
+You end up with a problem, however, when you have a disk that's so large
+that even with geometry remapping you can't fit the disk into the BIOS's
+constraints.
+
+On a Linux system you must split your disk up into multiple partitions
+so that your boot partition is less than 1024 cylinders in size.  I think
+Windows is also limited accordingly.  Most other UNIXes, however, aren't.
+
+Most UNIXes use a multiple stage boot
+
+  1st stage:  Boot sector at the start of your disk
+  2nd stage:  Larger program which is limited in size like the 1st stage
+              usually is, which can contain "real" device drivers for 
+              disks and knowledge of UNIX filesystems
+  kernel   :  you get the idea.
+
+The first stage boot doesn't know how to load kernels;  it just knows
+about the second stage bootloader, which is usually kept somewhere in
+a reserved portion of the disk (which, on PC UNIXes, is always inside
+the first 1024 cylinders).  The first stage's job is to load the second
+stage and execute it.
+
+The second stage bootloader can put the CPU into protected mode (which
+removes the stupid 640k or 1 Mbyte limit on memory accessing at the 
+cost of rendering BIOS device drivers unusable) and use a built-in
+(non-BIOS) disk device driver and built-in knowledge of the structure
+of a UNIX filesystem to load a kernel, which is usually called /unix
+or /stand/unix or something like that.  This is the system employed
+by SCO, Solaris, UnixSwear, et al.
+
+Linux takes an alternative approach: It uses the BIOS for I/O, which
+gives you your 1024-cylinder limit.  It also means the secondary
+bootstrap (LILO) can't run in protected mode, which gives you the
+kernel size limitation (ever built kernels that are too large to
+boot?).  The advantage that this gives is that LILO can be substantially
+simpler to implement.
+
+FreeBSD has recently taken yet another approach.  It uses the two-stage
+boot system described above to load a third-stage bootstrap, called
+/boot/loader. /boot/loader implements a shell-like interface to system
+configuration and a forth interpreter which can be used for customization.
+Based on instructions in a config file, /boot/loader takes care of
+loading the kernel and any boot-time modules.  /boot/loader runs entirely
+in protected mode and doesn't care how big your disk is.
+
+Linux could benefit from that third approach: Rather than using LILO
+to boot /vmLinuz or whatever, it should be possible to write a tertiary
+bootstrap and have LILO boot that instead.  This would have the benefit
+of introducing significant extra functionality, usability and 
+configurability without having any impact whatsoever on the existing
+boot-time infrastructure employed by Linux.
+
+Does anyone want to take on a holiday project? :-)
+
+In the short term, you need to make sure that the disk you're booting
+from features a boot partition which falls entirely within the first
+1024 cylinders.
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1958-3414 ------------- Fax: +61-8-83034403 -----
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

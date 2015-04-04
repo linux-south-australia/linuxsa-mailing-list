@@ -1,0 +1,855 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: HOW TO USE IPCHAINS - MANDRAKE LINUX 8.1 FIREWALL" -->
+<!-- FromName="'Toby Corkindale'" -->
+<!-- FromEmail="tjcorkin@sa.pracom.com.au" -->
+<!-- ToName="'James Leone Home'" -->
+<!-- ToEmail="jleone@pacbell.net" -->
+<!-- Date="Wed, 3 Apr 2002 09:47:54 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0204030939340.15012-100000@localhost.localdomain" -->
+<!-- Reference="000701c1da80$61076c30$8500a8c0@james" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: HOW TO USE IPCHAINS - MANDRAKE LINUX 8.1 FIREWALL</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@sa.pracom.com.au">tjcorkin@sa.pracom.com.au</A></I>&gt;
+  To  : James Leone Home &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  Date: Wed, 3 Apr 2002 09:47:54 +0930 (CST)
+</PRE>
+<H1>Re: HOW TO USE IPCHAINS - MANDRAKE LINUX 8.1 FIREWALL</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hmm... I probably missed the original message, but why didn't you just use
+iptables? Its the default for recent kernels and distributions, and its
+definately superior.
+
+
+Along another tack, can I suggest actually using some chains (or tables) in
+your firewall script? It'll make it all a lot more readable, and simpler for
+the firewall itself.
+
+Try setting it up to something like
+
+check some rules.
+if match IP mask of allowed computers, jump to different table.
+(or just do the one-by-one checking of IPs to jump to the other table)
+otherwise check other rules
+otherwise deny
+
+Then make that other table for the allowed computers do things like:
+check ports (using ranges here would make it simpler too).
+check whatever else.
+otherwise deny.
+
+
+You should end up with a much more manageable script this way.
+Can you see how you just add rules to the second table, and they affect all
+the allowed computers? Or else if you want to add a new computer this way,
+it just takes one line, rather than copy-and-pasting heaps..
+
+-Toby
+
+
+On Tue, 2 Apr 2002, James Leone Home wrote:
+
+&gt; I can't believe it but I figured out how to use ipchains on Manduck 8.1.
+&gt;
+&gt; Below is the explanation I wrote for internal purposes.
+&gt;
+&gt; MANDRAKE LINUX FIREWALL
+&gt;
+&gt;
+&gt;
+&gt; As of this writing, we are using Mandrake Linux 8.1, Linux kernel version
+&gt; 2.4.8.
+&gt;
+&gt; The firewall uses IPCHAINS, not IPTABLES or IPFWADM. So when you look
+&gt; elsewhere for guidance, make sure you look for IPCHAINS.
+&gt;
+&gt; Also, this can change in the future if we switch from Mandrake Linux 8.1.
+&gt;
+&gt; To set up the firewall, DO NOT USE THE WIZZARD. IT DON'T WORK.
+&gt;
+&gt; To set up the firewall, go into mandrake control center, services and make
+&gt; sure that IPCHAINS is checked off and show as running.
+&gt;
+&gt; Each machine has a manually assigned ip number and has been granted specific
+&gt; rights to the samba server.
+&gt;
+&gt; Go to Applications, and text editor and make sure that the following lines
+&gt; are added to the end of the file /etc/rc.d/rc.local:
+&gt;
+&gt; (Right now I am saying block all communications by default, but let me
+&gt; modify the default policy.)
+&gt;
+&gt; ipchains -P input -j DENY
+&gt;
+&gt; ipchains -P output -j DENY
+&gt;
+&gt; ipchains -P forward -j DENY
+&gt;
+&gt; ipchains -P output -j -p udp DENY
+&gt;
+&gt; (For each machine I am saying that communications with a source from a
+&gt; specific ip number and port to a destination with a specific ip number and
+&gt; port should be accepted. I did this for each machine. "-P tcp" means tcp
+&gt; protocol, -s means source, -d means destination, -j means do what I say
+&gt; next, in this case ACCEPT. -y clears up the reception.
+&gt;
+&gt; # Leone's Machine
+&gt;
+&gt; ipchains -A input -s 192.168.0.133 135 -d 192.168.0.100 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.133 137 -d 192.168.0.100 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.133 137 -d 192.168.0.100 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.133 138 -d 192.168.0.100 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.133 138 -d 192.168.0.100 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.133 139 -d 192.168.0.100 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.133 139 -d 192.168.0.100 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.133 389 -d 192.168.0.100 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.133 443 -d 192.168.0.100 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.133 445 -d 192.168.0.100 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.133 636 -d 192.168.0.100 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 135 -d 192.168.0.133 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.133 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.133 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.133 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.133 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.133 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.133 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 389 -d 192.168.0.133 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 443 -d 192.168.0.133 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 445 -d 192.168.0.133 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 636 -d 192.168.0.133 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; # Jack's Machine
+&gt;
+&gt; ipchains -A input -s 192.168.0.11 135 -d 192.168.0.100 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.11 137 -d 192.168.0.100 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.11 137 -d 192.168.0.100 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.11 138 -d 192.168.0.100 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.11 138 -d 192.168.0.100 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.11 139 -d 192.168.0.100 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.11 139 -d 192.168.0.100 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.11 389 -d 192.168.0.100 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.11 443 -d 192.168.0.100 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.11 445 -d 192.168.0.100 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.11 636 -d 192.168.0.100 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 135 -d 192.168.0.11 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.11 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.11 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.11 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.11 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.11 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.11 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 389 -d 192.168.0.11 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 443 -d 192.168.0.11 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 445 -d 192.168.0.11 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 636 -d 192.168.0.11 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; # Mary's Machiine
+&gt;
+&gt; ipchains -A input -s 192.168.0.14 135 -d 192.168.0.100 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.14 137 -d 192.168.0.100 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.14 137 -d 192.168.0.100 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.14 138 -d 192.168.0.100 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.14 138 -d 192.168.0.100 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.14 139 -d 192.168.0.100 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.14 139 -d 192.168.0.100 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.14 389 -d 192.168.0.100 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.14 443 -d 192.168.0.100 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.14 445 -d 192.168.0.100 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.14 636 -d 192.168.0.100 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 135 -d 192.168.0.14 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.14 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.14 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.14 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.14 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.14 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.14 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 389 -d 192.168.0.14 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 443 -d 192.168.0.14 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 445 -d 192.168.0.14 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 636 -d 192.168.0.14 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; # Craske's Machine
+&gt;
+&gt; ipchains -A input -s 192.168.0.97 135 -d 192.168.0.100 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.97 137 -d 192.168.0.100 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.97 137 -d 192.168.0.100 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.97 138 -d 192.168.0.100 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.97 138 -d 192.168.0.100 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.97 139 -d 192.168.0.100 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.97 139 -d 192.168.0.100 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.97 389 -d 192.168.0.100 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.97 443 -d 192.168.0.100 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.97 445 -d 192.168.0.100 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.97 636 -d 192.168.0.100 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 135 -d 192.168.0.97 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.97 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.97 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.97 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.97 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.97 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.97 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 389 -d 192.168.0.97 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 443 -d 192.168.0.97 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 445 -d 192.168.0.97 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 636 -d 192.168.0.97 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; # Ricky's Machine
+&gt;
+&gt; ipchains -A input -s 192.168.0.12 135 -d 192.168.0.100 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.12 137 -d 192.168.0.100 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.12 137 -d 192.168.0.100 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.12 138 -d 192.168.0.100 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.12 138 -d 192.168.0.100 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.12 139 -d 192.168.0.100 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.12 139 -d 192.168.0.100 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.12 389 -d 192.168.0.100 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.12 443 -d 192.168.0.100 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.12 445 -d 192.168.0.100 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.12 636 -d 192.168.0.100 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 135 -d 192.168.0.12 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.12 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.12 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.12 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.12 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.12 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.12 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 389 -d 192.168.0.12 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 443 -d 192.168.0.12 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 445 -d 192.168.0.12 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 636 -d 192.168.0.12 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; #Edward's Machine
+&gt;
+&gt; ipchains -A input -s 192.168.0.10 135 -d 192.168.0.100 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.10 137 -d 192.168.0.100 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.10 137 -d 192.168.0.100 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.10 138 -d 192.168.0.100 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.10 138 -d 192.168.0.100 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.10 139 -d 192.168.0.100 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.10 139 -d 192.168.0.100 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.10 389 -d 192.168.0.100 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.10 443 -d 192.168.0.100 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.10 445 -d 192.168.0.100 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.10 636 -d 192.168.0.100 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 135 -d 192.168.0.10 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.10 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.10 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.10 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.10 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.10 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.10 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 389 -d 192.168.0.10 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 443 -d 192.168.0.10 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 445 -d 192.168.0.10 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 636 -d 192.168.0.10 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; # Substitute Nancy
+&gt;
+&gt; ipchains -A input -s 192.168.0.15 135 -d 192.168.0.100 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.15 137 -d 192.168.0.100 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.15 137 -d 192.168.0.100 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.15 138 -d 192.168.0.100 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.15 138 -d 192.168.0.100 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.15 139 -d 192.168.0.100 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.15 139 -d 192.168.0.100 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.15 389 -d 192.168.0.100 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.15 443 -d 192.168.0.100 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.15 445 -d 192.168.0.100 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.15 636 -d 192.168.0.100 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 135 -d 192.168.0.15 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.15 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.15 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.15 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.15 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.15 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.15 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 389 -d 192.168.0.15 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 443 -d 192.168.0.15 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 445 -d 192.168.0.15 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 636 -d 192.168.0.15 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; # Kwan's Machine
+&gt;
+&gt; ipchains -A input -s 192.168.0.16 135 -d 192.168.0.100 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.16 137 -d 192.168.0.100 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.16 137 -d 192.168.0.100 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.16 138 -d 192.168.0.100 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.16 138 -d 192.168.0.100 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.16 139 -d 192.168.0.100 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.16 139 -d 192.168.0.100 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.16 389 -d 192.168.0.100 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.16 443 -d 192.168.0.100 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.16 445 -d 192.168.0.100 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.16 636 -d 192.168.0.100 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 135 -d 192.168.0.16 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.16 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.16 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.16 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.16 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.16 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.16 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 389 -d 192.168.0.16 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 443 -d 192.168.0.16 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 445 -d 192.168.0.16 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 636 -d 192.168.0.16 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; # Nancy/Ann's Machine
+&gt;
+&gt; ipchains -A input -s 192.168.0.115 135 -d 192.168.0.100 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.115 137 -d 192.168.0.100 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.115 137 -d 192.168.0.100 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.115 138 -d 192.168.0.100 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.115 138 -d 192.168.0.100 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.115 139 -d 192.168.0.100 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.115 139 -d 192.168.0.100 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.115 389 -d 192.168.0.100 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.115 443 -d 192.168.0.100 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.115 445 -d 192.168.0.100 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.115 636 -d 192.168.0.100 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 135 -d 192.168.0.115 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.115 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.115 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.115 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.115 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.115 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.115 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 389 -d 192.168.0.115 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 443 -d 192.168.0.115 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 445 -d 192.168.0.115 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 636 -d 192.168.0.115 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; # Chris' Machine
+&gt;
+&gt; ipchains -A input -s 192.168.0.8 135 -d 192.168.0.100 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.8 137 -d 192.168.0.100 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.8 137 -d 192.168.0.100 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.8 138 -d 192.168.0.100 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.8 138 -d 192.168.0.100 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.8 139 -d 192.168.0.100 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.8 139 -d 192.168.0.100 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.8 389 -d 192.168.0.100 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.8 443 -d 192.168.0.100 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.8 445 -d 192.168.0.100 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A input -s 192.168.0.8 636 -d 192.168.0.100 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 135 -d 192.168.0.8 135 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.8 137 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 137 -d 192.168.0.8 137 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.8 138 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 138 -d 192.168.0.8 138 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.8 139 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 139 -d 192.168.0.8 139 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 389 -d 192.168.0.8 389 -p udp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 443 -d 192.168.0.8 443 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 445 -d 192.168.0.8 445 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt; ipchains -A output -s 192.168.0.100 636 -d 192.168.0.8 636 -p tcp -y -j
+&gt; ACCEPT
+&gt;
+&gt;
+&gt;
+&gt; ipx_configure --auto_interface=on --auto_primary=on
+&gt;
+&gt; ipx_interface delall
+&gt;
+&gt; ipx_interface add -p eth1 802.3
+&gt;
+&gt; ipx_interface check eth1 802.3
+&gt;
+&gt; ncpmount -S BAM -V SYS -U James /mnt/BAM/SYS
+&gt;
+&gt;
+&gt;
+&gt; JL
+&gt;
+&gt; 4/2/2002 11:30:35 AM
+&gt;
+&gt;
+&gt;
+
+-- 
+ Toby Corkindale
+ UNIX Developer, Core Tech R&D
+ Technology SA, Pracom Ltd
+ 288 Glen Osmond Road
+ Fullarton,	5063
+ South Australia
+ Tel: +61 8 8202 9075
+ Fax: +61 8 8202 9001
+ mailto:<A HREF="mailto:Toby.Corkindale@sa.pracom.com.au">Toby.Corkindale@sa.pracom.com.au</A>
+ <A HREF="http://www.sa.pracom.com.au/">http://www.sa.pracom.com.au/</A>
+
+                  PRIVILEGED - PRIVATE AND CONFIDENTIAL
+
+   Privileged/Confidential Information may be contained in this message.
+   If you are not the addressee indicated in this message, you may not
+   copy or deliver this message to anyone.  In such case, you should
+   destroy this message and notify the sender by reply email. Opinions,
+   conclusions and other information in this message that do not relate
+   to the official business of this organisation shall be understood as
+   neither given nor endorsed by it.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,798 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="HOW TO USE IPCHAINS - MANDRAKE LINUX 8.1 FIREWALL" -->
+<!-- FromName="'James Leone Home'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="'James Leone Home','Alex Wallis','Michael Kratz'," -->
+<!-- ToEmail="jleone@pacbell.net,awol@prepaidonline.com.au,mkratz@internode.on.net,markrose70@yahoo.com" -->
+<!-- Date="Tue, 02 Apr 2002 11:55:45 -0800" -->
+<!-- Id="" -->
+<!-- Reference="002901c1d797$ecc0b3d0$a60f5c8f@michaelk" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: HOW TO USE IPCHAINS - MANDRAKE LINUX 8.1 FIREWALL</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone Home &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : James Leone Home &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;<BR>        Alex Wallis &lt;<I><A HREF="mailto:awol@prepaidonline.com.au">awol@prepaidonline.com.au</A></I>&gt;<BR>        Michael Kratz &lt;<I><A HREF="mailto:mkratz@internode.on.net">mkratz@internode.on.net</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:markrose70@yahoo.com">markrose70@yahoo.com</A></I>&gt;
+  Date: Tue, 02 Apr 2002 11:55:45 -0800
+</PRE>
+<H1>HOW TO USE IPCHAINS - MANDRAKE LINUX 8.1 FIREWALL</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I can't believe it but I figured out how to use ipchains on Manduck 8.1.
+
+Below is the explanation I wrote for internal purposes.
+
+MANDRAKE LINUX FIREWALL
+
+
+
+As of this writing, we are using Mandrake Linux 8.1, Linux kernel version
+2.4.8.
+
+The firewall uses IPCHAINS, not IPTABLES or IPFWADM. So when you look
+elsewhere for guidance, make sure you look for IPCHAINS.
+
+Also, this can change in the future if we switch from Mandrake Linux 8.1.
+
+To set up the firewall, DO NOT USE THE WIZZARD. IT DON'T WORK.
+
+To set up the firewall, go into mandrake control center, services and make
+sure that IPCHAINS is checked off and show as running.
+
+Each machine has a manually assigned ip number and has been granted specific
+rights to the samba server.
+
+Go to Applications, and text editor and make sure that the following lines
+are added to the end of the file /etc/rc.d/rc.local:
+
+(Right now I am saying block all communications by default, but let me
+modify the default policy.)
+
+ipchains -P input -j DENY
+
+ipchains -P output -j DENY
+
+ipchains -P forward -j DENY
+
+ipchains -P output -j -p udp DENY
+
+(For each machine I am saying that communications with a source from a
+specific ip number and port to a destination with a specific ip number and
+port should be accepted. I did this for each machine. "-P tcp" means tcp
+protocol, -s means source, -d means destination, -j means do what I say
+next, in this case ACCEPT. -y clears up the reception.
+
+# Leone's Machine
+
+ipchains -A input -s 192.168.0.133 135 -d 192.168.0.100 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.133 137 -d 192.168.0.100 137 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.133 137 -d 192.168.0.100 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.133 138 -d 192.168.0.100 138 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.133 138 -d 192.168.0.100 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.133 139 -d 192.168.0.100 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.133 139 -d 192.168.0.100 139 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.133 389 -d 192.168.0.100 389 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.133 443 -d 192.168.0.100 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.133 445 -d 192.168.0.100 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.133 636 -d 192.168.0.100 636 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 135 -d 192.168.0.133 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.133 137 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.133 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.133 138 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.133 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.133 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.133 139 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 389 -d 192.168.0.133 389 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 443 -d 192.168.0.133 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 445 -d 192.168.0.133 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 636 -d 192.168.0.133 636 -p tcp -y -j
+ACCEPT
+
+# Jack's Machine
+
+ipchains -A input -s 192.168.0.11 135 -d 192.168.0.100 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.11 137 -d 192.168.0.100 137 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.11 137 -d 192.168.0.100 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.11 138 -d 192.168.0.100 138 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.11 138 -d 192.168.0.100 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.11 139 -d 192.168.0.100 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.11 139 -d 192.168.0.100 139 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.11 389 -d 192.168.0.100 389 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.11 443 -d 192.168.0.100 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.11 445 -d 192.168.0.100 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.11 636 -d 192.168.0.100 636 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 135 -d 192.168.0.11 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.11 137 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.11 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.11 138 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.11 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.11 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.11 139 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 389 -d 192.168.0.11 389 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 443 -d 192.168.0.11 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 445 -d 192.168.0.11 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 636 -d 192.168.0.11 636 -p tcp -y -j
+ACCEPT
+
+# Mary's Machiine
+
+ipchains -A input -s 192.168.0.14 135 -d 192.168.0.100 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.14 137 -d 192.168.0.100 137 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.14 137 -d 192.168.0.100 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.14 138 -d 192.168.0.100 138 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.14 138 -d 192.168.0.100 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.14 139 -d 192.168.0.100 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.14 139 -d 192.168.0.100 139 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.14 389 -d 192.168.0.100 389 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.14 443 -d 192.168.0.100 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.14 445 -d 192.168.0.100 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.14 636 -d 192.168.0.100 636 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 135 -d 192.168.0.14 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.14 137 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.14 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.14 138 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.14 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.14 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.14 139 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 389 -d 192.168.0.14 389 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 443 -d 192.168.0.14 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 445 -d 192.168.0.14 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 636 -d 192.168.0.14 636 -p tcp -y -j
+ACCEPT
+
+# Craske's Machine
+
+ipchains -A input -s 192.168.0.97 135 -d 192.168.0.100 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.97 137 -d 192.168.0.100 137 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.97 137 -d 192.168.0.100 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.97 138 -d 192.168.0.100 138 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.97 138 -d 192.168.0.100 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.97 139 -d 192.168.0.100 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.97 139 -d 192.168.0.100 139 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.97 389 -d 192.168.0.100 389 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.97 443 -d 192.168.0.100 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.97 445 -d 192.168.0.100 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.97 636 -d 192.168.0.100 636 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 135 -d 192.168.0.97 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.97 137 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.97 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.97 138 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.97 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.97 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.97 139 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 389 -d 192.168.0.97 389 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 443 -d 192.168.0.97 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 445 -d 192.168.0.97 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 636 -d 192.168.0.97 636 -p tcp -y -j
+ACCEPT
+
+# Ricky's Machine
+
+ipchains -A input -s 192.168.0.12 135 -d 192.168.0.100 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.12 137 -d 192.168.0.100 137 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.12 137 -d 192.168.0.100 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.12 138 -d 192.168.0.100 138 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.12 138 -d 192.168.0.100 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.12 139 -d 192.168.0.100 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.12 139 -d 192.168.0.100 139 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.12 389 -d 192.168.0.100 389 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.12 443 -d 192.168.0.100 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.12 445 -d 192.168.0.100 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.12 636 -d 192.168.0.100 636 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 135 -d 192.168.0.12 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.12 137 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.12 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.12 138 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.12 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.12 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.12 139 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 389 -d 192.168.0.12 389 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 443 -d 192.168.0.12 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 445 -d 192.168.0.12 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 636 -d 192.168.0.12 636 -p tcp -y -j
+ACCEPT
+
+#Edward's Machine
+
+ipchains -A input -s 192.168.0.10 135 -d 192.168.0.100 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.10 137 -d 192.168.0.100 137 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.10 137 -d 192.168.0.100 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.10 138 -d 192.168.0.100 138 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.10 138 -d 192.168.0.100 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.10 139 -d 192.168.0.100 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.10 139 -d 192.168.0.100 139 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.10 389 -d 192.168.0.100 389 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.10 443 -d 192.168.0.100 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.10 445 -d 192.168.0.100 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.10 636 -d 192.168.0.100 636 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 135 -d 192.168.0.10 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.10 137 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.10 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.10 138 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.10 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.10 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.10 139 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 389 -d 192.168.0.10 389 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 443 -d 192.168.0.10 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 445 -d 192.168.0.10 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 636 -d 192.168.0.10 636 -p tcp -y -j
+ACCEPT
+
+# Substitute Nancy
+
+ipchains -A input -s 192.168.0.15 135 -d 192.168.0.100 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.15 137 -d 192.168.0.100 137 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.15 137 -d 192.168.0.100 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.15 138 -d 192.168.0.100 138 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.15 138 -d 192.168.0.100 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.15 139 -d 192.168.0.100 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.15 139 -d 192.168.0.100 139 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.15 389 -d 192.168.0.100 389 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.15 443 -d 192.168.0.100 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.15 445 -d 192.168.0.100 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.15 636 -d 192.168.0.100 636 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 135 -d 192.168.0.15 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.15 137 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.15 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.15 138 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.15 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.15 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.15 139 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 389 -d 192.168.0.15 389 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 443 -d 192.168.0.15 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 445 -d 192.168.0.15 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 636 -d 192.168.0.15 636 -p tcp -y -j
+ACCEPT
+
+# Kwan's Machine
+
+ipchains -A input -s 192.168.0.16 135 -d 192.168.0.100 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.16 137 -d 192.168.0.100 137 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.16 137 -d 192.168.0.100 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.16 138 -d 192.168.0.100 138 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.16 138 -d 192.168.0.100 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.16 139 -d 192.168.0.100 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.16 139 -d 192.168.0.100 139 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.16 389 -d 192.168.0.100 389 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.16 443 -d 192.168.0.100 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.16 445 -d 192.168.0.100 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.16 636 -d 192.168.0.100 636 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 135 -d 192.168.0.16 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.16 137 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.16 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.16 138 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.16 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.16 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.16 139 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 389 -d 192.168.0.16 389 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 443 -d 192.168.0.16 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 445 -d 192.168.0.16 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 636 -d 192.168.0.16 636 -p tcp -y -j
+ACCEPT
+
+# Nancy/Ann's Machine
+
+ipchains -A input -s 192.168.0.115 135 -d 192.168.0.100 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.115 137 -d 192.168.0.100 137 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.115 137 -d 192.168.0.100 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.115 138 -d 192.168.0.100 138 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.115 138 -d 192.168.0.100 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.115 139 -d 192.168.0.100 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.115 139 -d 192.168.0.100 139 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.115 389 -d 192.168.0.100 389 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.115 443 -d 192.168.0.100 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.115 445 -d 192.168.0.100 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.115 636 -d 192.168.0.100 636 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 135 -d 192.168.0.115 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.115 137 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.115 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.115 138 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.115 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.115 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.115 139 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 389 -d 192.168.0.115 389 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 443 -d 192.168.0.115 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 445 -d 192.168.0.115 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 636 -d 192.168.0.115 636 -p tcp -y -j
+ACCEPT
+
+# Chris' Machine
+
+ipchains -A input -s 192.168.0.8 135 -d 192.168.0.100 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.8 137 -d 192.168.0.100 137 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.8 137 -d 192.168.0.100 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.8 138 -d 192.168.0.100 138 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.8 138 -d 192.168.0.100 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.8 139 -d 192.168.0.100 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.8 139 -d 192.168.0.100 139 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.8 389 -d 192.168.0.100 389 -p udp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.8 443 -d 192.168.0.100 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.8 445 -d 192.168.0.100 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A input -s 192.168.0.8 636 -d 192.168.0.100 636 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 135 -d 192.168.0.8 135 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.8 137 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 137 -d 192.168.0.8 137 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.8 138 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 138 -d 192.168.0.8 138 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.8 139 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 139 -d 192.168.0.8 139 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 389 -d 192.168.0.8 389 -p udp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 443 -d 192.168.0.8 443 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 445 -d 192.168.0.8 445 -p tcp -y -j
+ACCEPT
+
+ipchains -A output -s 192.168.0.100 636 -d 192.168.0.8 636 -p tcp -y -j
+ACCEPT
+
+
+
+ipx_configure --auto_interface=on --auto_primary=on
+
+ipx_interface delall
+
+ipx_interface add -p eth1 802.3
+
+ipx_interface check eth1 802.3
+
+ncpmount -S BAM -V SYS -U James /mnt/BAM/SYS
+
+
+
+JL
+
+4/2/2002 11:30:35 AM
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

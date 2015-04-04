@@ -1,0 +1,176 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PPP, Dynamic IP, and an IPCHAINS script" -->
+<!-- FromName="Darryl Ross" -->
+<!-- FromEmail="dross+linuxsa@syc.asn.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 20 Jun 2000 11:51:21 +0930" -->
+<!-- Id="01f901bfda5e$3a1e2ba0$0714a8c0@dross2" -->
+<!-- Reference="4.3.2.7.0.20000618193806.00ac9590@pop3.sprint.ca" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PPP, Dynamic IP, and an IPCHAINS script</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Darryl Ross &lt;<I><A HREF="mailto:dross+linuxsa@syc.asn.au">dross+linuxsa@syc.asn.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Tue, 20 Jun 2000 11:51:21 +0930
+</PRE>
+<H1>Re: PPP, Dynamic IP, and an IPCHAINS script</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Sorry if someone has already replied to this, I'm still catching up on my
+email...
+
+Under Redhat, you can edit the file /etc/ppp/ip-up.local to run commands
+when your PPP interface is brought up, and likewise, /etc/ppp/ip-down.local
+when the interface is brought down. For the following I am going to assume
+that you only make 1 ppp connection. If you connect to more than one ppp
+server, or you act as a dial-in server, email me off list and I'll expand on
+it for you.
+
+In your /etc/ppp/ip-up.local file, you need to put something like:
+
+==============================
+#!/bin/sh
+
+# This script is called with the following arguements:
+#   $1  interface name
+#   $2  tty name
+#   $3  speed
+#   $4  remote IP address
+#   $5  local IP address
+#   $6  ipparam name
+
+PPPDEVICE=$1
+LOCALPPPIP=$5
+REMOTEPPPIP=$4
+export PPPDEVICE LOCALPPPIP REMOTEPPPIP
+==============================
+
+Then in your firewall scripts you can just reference any of those variables
+using the shell environment.
+
+Darryl
+
+
+
+--
+
+Darryl Ross
+Network and Systems Administrator
+Service to Youth Council, Inc
+Adelaide, Australia
+E-Mail: <A HREF="mailto:dross@syc.asn.au">dross@syc.asn.au</A>
+
+
+
+----- Original Message -----
+From: "Adam J. Sulis" &lt;<A HREF="mailto:asulis@range.on.ca">asulis@range.on.ca</A>&gt;
+To: &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Sent: Monday, June 19, 2000 9:09 AM
+Subject: PPP, Dynamic IP, and an IPCHAINS script
+
+
+&gt; I hope this doesn't transmit in HTML - first email using Eudora (I think I
+&gt; have it all config'd). Sorry if it does, just let me know and I'll fix it.
+&gt;
+&gt; I have a difficult problem which I hope you may be able to help me with. I
+&gt; have RedHat 6.2's PPPD set up to dial my ISP. My 'ppp-on' script is called
+&gt; from near the top of my init.d/firewall script, giving the ability to
+bring
+&gt; up the connection, wait 30 seconds to log in, then run the IPCHAINS stuff
+&gt; (which is quite large). By combining the two actions into one script, I am
+&gt; able to control them by one command, 'firewall restart'. I have a crontab
+&gt; script that checks for a valid ppp0 every five minutes. If not found, it
+&gt; restarts the firewall script and all would be fine.
+&gt;
+&gt; Here is the glitch: Once dialed in, my ppp0 interface is given a dynamic,
+&gt; random IP from the ISP's pool. However, a few lines of code later in the
+&gt; script, my firewall script pre-sets a number of variables, one of which is
+&gt; the external interface IP, "IPADDR". I need to find a way to pass the new
+&gt; IP address to this variable on-the-fly so that IPCHAINS can pick it up and
+&gt; use it. The affected part of the script (trimmed for size) appears at the
+&gt; end of this message.
+&gt;
+&gt; I considered doing an 'ifconfig ppp0 &gt; /root/ifdump.txt' and then parsing
+&gt; it for the IP and redirecting it into the variable, but that seems messy.
+&gt; It would be nice if I could either export a variable right from pppd or
+&gt; chat, or somehow intercept the IP passing to the kernel and "set" the
+&gt; variable in the system. Is there perhaps a place where the IP is stored,
+in
+&gt; a text file somewhere?
+&gt;
+&gt; Any suggestions to get this idea, or any other approach working would be
+&gt; most appreciated. My knowledge is growing, but I sometimes "engineer"
+&gt; myself into a corner.
+&gt;
+&gt; Thanks in advance,
+&gt;
+&gt; Adam Sulis
+&gt; <A HREF="mailto:asulis@sprint.ca">asulis@sprint.ca</A>
+&gt;
+&gt; Here is the code section:
+&gt; &lt;snip&gt;
+&gt; # See how we were called.
+&gt; case "$1" in
+&gt;    start)
+&gt;          echo -n "Starting Firewalling Services: "
+&gt;
+&gt; # ---------------------------------------------------
+&gt; #  Bring up PPP
+&gt; #
+&gt; /etc/ppp/ppp-on
+&gt; sleep 30
+&gt;
+&gt; # Some definitions for easy maintenance.
+&gt;
+&gt; # ------------------------------------------------------------------------
+&gt; #  EDIT THESE TO SUIT YOUR SYSTEM AND ISP.
+&gt;
+&gt; EXTERNAL_INTERFACE="ppp0"               # whichever you use
+&gt; LOCAL_INTERFACE_1="eth1"                # whichever you use
+&gt; LOOPBACK_INTERFACE="lo"
+&gt;
+&gt; IPADDR="208.164.186.1"
+&gt; LOCALNET_1="172.16.1.0/24"              # whatever private range you use
+&gt; ANYWHERE="any/0"
+&gt; &lt;/snip&gt;
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

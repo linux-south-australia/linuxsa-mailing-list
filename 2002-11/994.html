@@ -1,0 +1,148 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Firewall box using PCI ADSL modem" -->
+<!-- FromName="'Andrew Braund'" -->
+<!-- FromEmail="andrew@allcnet.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 23 Nov 2002 08:04:40 +1030" -->
+<!-- Id="NDBBIFBEJKPAFOALJJAPAEALLEAA.andrew@allcnet.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Firewall box using PCI ADSL modem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Braund &lt;<I><A HREF="mailto:andrew@allcnet.com">andrew@allcnet.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 23 Nov 2002 08:04:40 +1030
+</PRE>
+<H1>Firewall box using PCI ADSL modem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I am currently interested in getting a firewall box going.
+I intended to use IPCOP, used it before with dialup modem and worked well.
+I want to try to use a PCI ADSL modem and this does not appear to be supported,
+(maybe in 0.1.2 but haven't been able to find where to download that, will look
+more).
+QOS stuff will probably be of interest to me soon, also want to get wireless
+going
+but I don't think IPCOP is going to support this till 0.2 using the newer kernel.
+
+I don't really want to mess around with IPCOP if it can't do
+all I want.
+
+To experiment, I set up a Debian box to play around with a PCI ADSL card.
+
+Details follow, questions at the end...
+
+
+debian:/home/ab/adsl# uname -a
+Linux debian 2.2.20-idepci #1 Sat Apr 20 12:45:19 EST 2002 i686 unknown
+
+The PCI card came with modules for 2.2.14, 2.2.16 and 2.4.2.
+
+When I load the module;
+===============8&lt;============================
+debian:/home/ab/adsl# insmod -f itex1483-2.2.16.o vpi=8 vci=35
+Warning: kernel-module version mismatch
+        itex1483-2.2.16.o was compiled for kernel version 2.2.16
+        while this kernel is version 2.2.20-idepci
+Warning: loading itex1483-2.2.16.o will taint the kernel: forced load
+===============8&lt;============================
+
+It seems to be doing something usefull, from /var/log/messages;
+
+===============8&lt;============================
+Nov 23 18:05:07 debian kernel: itexadsl: LINUX_VERSION_CODE = 131600 (0x20210)
+Nov 23 18:05:07 debian kernel: itexadsl: vpi/vci=8/35 framing=1
+Nov 23 18:05:07 debian kernel: itexadsl: version= 2.2.5.0058 , built date= Mon
+May  7 13:09:26 PDT 2001
+Nov 23 18:05:07 debian kernel: itexadsl: card# 0, ix=0x0, bus=0x0, fn=0x40,
+ven=0x1471, dev=0x188
+Nov 23 18:05:07 debian kernel: itexadsl: total 1 card(s) found.
+Nov 23 18:05:07 debian kernel: itexadsl: irq=0xa, ioaddr=0x6500,
+membase=0xe4020000
+Nov 23 18:05:07 debian kernel: itexadsl: card #0 - MAC: 00:90:96:2c:67:98 from
+eeprom.
+Nov 23 18:05:07 debian kernel: itexadsl: ITeX i90388 chip.
+Nov 23 18:05:07 debian kernel: eth1: Hardware address :  00:90:96:2c:67:98
+Nov 23 18:05:09 debian kernel: itexadsl: modem line disconnected.
+Nov 23 18:05:13 debian kernel: card #0 - current modem state : ACTIVATING.
+Nov 23 18:05:17 debian kernel: card #0 - current modem state : INITIALIZING.
+Nov 23 18:05:23 debian kernel: card #0 - current modem state : IDLE.
+Nov 23 18:05:23 debian kernel: itexadsl: modem line disconnected.
+Nov 23 18:05:27 debian kernel: card #0 - current modem state : ACTIVATING.
+Nov 23 18:05:33 debian kernel: card #0 - current modem state : INITIALIZING.
+Nov 23 18:05:40 debian kernel: itexadsl: modem line connected. (card_no: 0)
+Nov 23 18:05:40 debian kernel: itexadsl: upstream latency - fast
+Nov 23 18:05:40 debian kernel: itexadsl: downstream latency - fast
+Nov 23 18:05:40 debian kernel: itexadsl: card #0 - data rate: 128 / 512  (line
+rate: 220 / 684) kbps
+Nov 23 18:05:41 debian kernel: card #0 - current modem state : SHOWTIME_L0.
+===============8&lt;============================
+
+the lights on the modem do the right things and the output of ifconfig now
+includes;
+
+===============8&lt;============================
+eth1      Link encap:Ethernet  HWaddr 00:90:96:2C:67:98
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:100
+          RX bytes:0 (0.0 b)  TX bytes:0 (0.0 b)
+          Interrupt:10 Base address:0x6500
+===============8&lt;============================
+I think my next step is to try to set up PPPoA but first a few questions;
+
+It seems that the source for the module is not available, only binary builds
+for a few kernel versions like 2.2.14, 2.2.16 or 2.4.2. Is this alone a good
+reason to toss the whole idea of PCI ADSL?
+
+Is it a really bad idea to try to use 2.2.16 with a 2.2.20 kernel?
+
+I have found some comments on the net saying that a PCI ADSL card will
+consume lots of CPU, however on a Win2k box (1.2G Athlon) while downloading
+Debian at around 53KBytes/sec I see processor usage go from an idle rate
+of around 6% to a rate of 7-8%, not something I consider a problem.
+
+If the general advice from the list is that PCI is a bad idea then what
+about USB? I could just use my ethernet ADSL modem but that seems too easy :-).
+
+Regards
+Andrew Braund
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,123 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Xvnc problem" -->
+<!-- FromName="Jake Hawkes" -->
+<!-- FromEmail="jake@eclectic.com.au" -->
+<!-- ToName="Edward Sawma" -->
+<!-- ToEmail="e-sawma@nwu.edu" -->
+<!-- Date="Mon, 29 Nov 1999 15:01:19 +1030" -->
+<!-- Id="38420197.142DD247@eclectic.com.au" -->
+<!-- Reference="4.2.0.58.19991128003914.00c26650@hecky.acns.nwu.edu" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Xvnc problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A></I>&gt;
+  To  : Edward Sawma &lt;<I><A HREF="mailto:e-sawma@nwu.edu">e-sawma@nwu.edu</A></I>&gt;
+  Date: Mon, 29 Nov 1999 15:01:19 +1030
+</PRE>
+<H1>Re: Xvnc problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+brief thingy about xwindows.
+
+client &lt;---&gt; server
+
+the server is what displays the stuff to your screen, the client is what
+does the clever bits.
+
+in most cases, people will have the client and the server running on the
+same machine. e.g. the client (netscape, gnome, kde, xterms...) talks to
+the server (X11).
+
+the X window system was origionally designed to be used in a "thin
+client" situation. eg., big grunty UNIX box running all the clients for
+a computer pool full of Xterms (boxs with keyboard, mouse, screen videa
+and network card). The server ran all the clients, and the Xterm ran all
+the servers.
+
+So, when you log onto a server, and type "netscape" at the prompt, it
+looks at your DISPLAY variable and from this decides where to send the
+Xwindows commands (command like draw window, accept mouse click etc). If
+this is not set, I think it defaults to the local machine. If there is
+no server waiting, you get _X11TransSocketINETConnect: Can't connect:
+errno = 111.
+
+So in times past, the solution was to make sure that the DISPLAY
+variable was set. In fact, I have a script in my login that does this
+for me. It look like this:
+#!/bin/tcsh
+setenv DISPLAY ${REMOTEHOST}:0.0
+
+now, my knowledge breaks down a bit when it comes to xauth. Xauth the
+program is used to manipulate Xauthority (security) key data. the
+Xauthority protocol is used by the Xserver to communicate with the
+client machine to restrict who can connect.
+
+&gt; seems that the tag "-auth /root/.Xauthority" that the startup script
+&gt; "vncserver" uses when executing Xvnc, is causing the problem.  When it is
+
+so, this would seem that you are specifiying the program to use the file
+/root/.Xauthority as the place to look for the Xauthority key data. By
+removeing this line, I assume that would disable the use of xauth, but
+you may need to read up on that client.
+
+the xhost + command tells the server to allow connections from any
+machine. Anywehere. the xhost system is another (weaker) security thing. 
+
+I think you will find though, that if you specify a program to run using
+xauth then it will override anything xhosts has to say.
+
+other things to check:
+the server should have an environment variable:
+
+DISPLAY xxx.xxx.xxx.xxx:0.0 (xxx's is the IP address of the machine
+running the *server* (see above)
+
+in most cases though, you'll be running the server and client on the
+same box, so:
+DISPLAY :0.0 will be fine.
+
+
+
+
+--
+Jake Hawkes, B. Eng (CSE)
+e-mail: <A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A>
+
+<A HREF="http://www.projecteclectic.com">http://www.projecteclectic.com</A>
+
+Chaos, panic, & disorder -- my work here is done.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

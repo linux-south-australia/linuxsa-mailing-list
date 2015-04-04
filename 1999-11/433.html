@@ -1,0 +1,110 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: filesystem problem" -->
+<!-- FromName="Daryl Tester" -->
+<!-- FromEmail="dt@picknowl.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="jcampos@di.fc.ul.pt" -->
+<!-- Date="Sun, 21 Nov 1999 12:33:40 +1030 (CST)" -->
+<!-- Id="199911210203.MAA07074@orac.picknowl.com.au" -->
+<!-- Reference="38359DE3.46B6D9FE@ui.icat.fc.ul.pt" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: filesystem problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  To  : <A HREF="mailto:jcampos@di.fc.ul.pt">jcampos@di.fc.ul.pt</A>
+  Date: Sun, 21 Nov 1999 12:33:40 +1030 (CST)
+</PRE>
+<H1>Re: filesystem problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Jo\\ao Campos wrote:
+
+&gt; Thanks for all the help regarding my ongoing fs problem, but I can't
+&gt; seem to solve it.
+
+You weren't.  The additional information was for my benefit. :-)
+ 
+&gt;&gt;     ls -l /usr/local/squid/cache/00/02/00000252
+
+&gt; br-xrw--wT   1 28521    25956     32, 101 Jun 11  2032
+
+Hmmm.
+
+&gt; What do b,c,t,T mean?
+
+It means (most likely) that your inode is corrupted.  I've had this
+happen on development box, coincidently enough, also with squid files.
+
+&gt;&gt;     cat /usr/local/squid/cache/00/02/00000252 &gt; /dev/null
+
+&gt; cat /usr/local/squid/cache/00/02/00000251 &gt;/dev/null
+&gt; cat: /usr/local/squid/cache/00/02/00000251: No such device
+
+Expected.
+
+&gt;&gt;     rm /usr/local/squid/cache/00/02/00000252
+
+&gt; rm /usr/local/squid/cache/00/02/00000251 
+&gt; rm: remove `/usr/local/squid/cache/00/02/00000251'? y
+&gt; rm: cannot unlink `/usr/local/squid/cache/00/02/00000251':
+&gt; Operation not permitted
+
+Also expected; these are the exact symptoms that I had.  From here,
+you have two solutions that spring to mind.
+
+1) Rebuild the filesystem of the hard disk (using mke2fs).  OK if
+   your squid cache is on its own partition, a bummer if it isn't
+   (which is what this one appears to be).
+2) (* Danger, Will Robinson *) Use debugfs to modify / remove these
+   inodes.  DOING SO WILL VOID ANY AND/OR ALL YOUR WARRANTIES THAT
+   COME WITH YOUR LINUX DISTRIBUTION, may traumatise your cat beyond
+   repair, cause the collapse of world peace, or at worse, corrupt
+   your file system.
+
+&gt; What should I do now?
+
+Seriously, I haven't used debugfs before, and wouldn't recommend
+it to people who aren't comfortable as to how the Unix filesystem
+hangs together.  Backup what you can off that file system, then
+rebuild it from scratch.  If this is a "production" squid setup,
+consider putting the cache on its own partition, but only for the
+reason of keeping a tight rein on its disk usage.  Squid is unlikely
+(very) to have caused the corrupt inode in the first place.
+
+Regards,
+  Daryl Tester
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

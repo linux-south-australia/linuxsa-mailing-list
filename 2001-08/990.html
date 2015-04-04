@@ -1,0 +1,201 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="[Fwd: FreeBSD Security Advisory FreeBSD-SA-01:57.sendmail]" -->
+<!-- FromName="'Andrew Reid'" -->
+<!-- FromEmail="andrew.reid@plug.cx" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="28 Aug 2001 10:24:52 +0930" -->
+<!-- Id="998960093.1659.11.camel@percible.alfred.cx" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: [Fwd: FreeBSD Security Advisory FreeBSD-SA-01:57.sendmail]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Reid &lt;<I><A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 28 Aug 2001 10:24:52 +0930
+</PRE>
+<H1>[Fwd: FreeBSD Security Advisory FreeBSD-SA-01:57.sendmail]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+-----Forwarded Message-----
+From: FreeBSD Security Advisories &lt;<A HREF="mailto:security-advisories@FreeBSD.org">security-advisories@FreeBSD.org</A>&gt;
+To: FreeBSD Security Advisories &lt;<A HREF="mailto:security-advisories@FreeBSD.org">security-advisories@FreeBSD.org</A>&gt;
+Subject: FreeBSD Security Advisory FreeBSD-SA-01:57.sendmail
+
+
+-----BEGIN PGP SIGNED MESSAGE-----
+
+=============================================================================
+FreeBSD-SA-01:57                                           Security Advisory
+                                                                FreeBSD, Inc.
+
+Topic:          sendmail contains local root vulnerability
+
+Category:       core
+Module:         sendmail
+Announced:      2001-08-27
+Credits:        Cade Cairnss &lt;<A HREF="mailto:cairnsc@securityfocus.com">cairnsc@securityfocus.com</A>&gt;
+Affects:        FreeBSD 4-STABLE after August 27, 2000 and prior to
+                the correction date, FreeBSD 4.1.1-RELEASE,
+                4.2-RELEASE, 4.3-RELEASE
+Corrected:      2001-08-21 01:36:37 UTC (FreeBSD 4.3-STABLE)
+                2001-08-22 05:34:11 UTC (RELENG_4_3)
+FreeBSD only:   NO
+
+I.   Background
+
+sendmail is a mail transfer agent.
+
+II.  Problem Description
+
+Sendmail contains an input validation error which may lead to the
+execution of arbitrary code with elevated privileges by local users.
+Due to the improper use of signed integers in code responsible for the
+processing of debugging arguments, a local user may be able to supply
+the signed integer equivalent of a negative value supplied to
+sendmail's "trace vector".  This may allow a local user to write data
+anywhere within a certain range of locations in process memory.
+Because the '-d' command-line switch is processed before the program
+drops its elevated privileges, the attacker may be able to cause
+arbitrary code to be executed with root privileges. 
+
+III. Impact
+
+Local users may be able to execute arbitrary code with root privileges.
+
+IV.  Workaround
+
+Do not allow untrusted users to execute the sendmail binary.
+
+V.   Solution
+
+One of the following:
+
+1) Upgrade your vulnerable FreeBSD system to 4.3-STABLE or the
+RELENG_4_3 security branch after the respective correction dates.
+
+2) FreeBSD 4.x systems after August 27, 2000 and prior to the
+correction date:
+
+The following patch has been verified to apply to FreeBSD
+4.1.1-RELEASE, 4.2-RELEASE, 4.3-RELEASE and 4-STABLE dated prior to
+the correction date.
+
+Download the patch and the detached PGP signature from the following
+locations, and verify the signature using your PGP utility.
+
+# fetch <A HREF="ftp://ftp.freebsd.org/pub/FreeBSD/CERT/patches/SA-01:57/sendmail.patch">ftp://ftp.freebsd.org/pub/FreeBSD/CERT/patches/SA-01:57/sendmail.patch</A>
+# fetch <A HREF="ftp://ftp.freebsd.org/pub/FreeBSD/CERT/patches/SA-01:57/sendmail.patch.asc">ftp://ftp.freebsd.org/pub/FreeBSD/CERT/patches/SA-01:57/sendmail.patch.asc</A>
+
+Execute the following commands as root:
+
+# cd /usr/src
+# patch -p &lt; /path/to/patch
+# cd /usr/src/lib/libsmutil
+# make depend && make all
+# cd /usr/src/usr.sbin/sendmail
+# make depend && make all install
+
+3) FreeBSD 4.3-RELEASE systems:
+
+An experimental upgrade package is available for users who wish to
+provide testing and feedback on the binary upgrade process.  This
+package may be installed on FreeBSD 4.3-RELEASE systems only, and is
+intended for use on systems for which source patching is not practical
+or convenient.
+
+If you use the upgrade package, feedback (positive or negative) to
+<A HREF="mailto:security-officer@FreeBSD.org">security-officer@FreeBSD.org</A> is requested so we can improve the
+process for future advisories.
+
+During the installation procedure, backup copies are made of the
+files which are replaced by the package.  These backup copies will
+be reinstalled if the package is removed, reverting the system to a
+pre-patched state.
+
+# fetch <A HREF="ftp://ftp.FreeBSD.org/pub/FreeBSD/CERT/packages/SA-01:57/security-patch-sendmail-01.57.tgz">ftp://ftp.FreeBSD.org/pub/FreeBSD/CERT/packages/SA-01:57/security-patch-sendmail-01.57.tgz</A>
+# fetch <A HREF="ftp://ftp.FreeBSD.org/pub/FreeBSD/CERT/packages/SA-01:57/security-patch-sendmail-01.57.tgz.asc">ftp://ftp.FreeBSD.org/pub/FreeBSD/CERT/packages/SA-01:57/security-patch-sendmail-01.57.tgz.asc</A>
+
+Verify the detached PGP signature using your PGP utility.
+
+# pkg_add security-patch-sendmail-01:57.tgz
+
+Restart sendmail after applying the patch by executing the following
+commands as root:
+
+# killall sendmail
+# /usr/sbin/sendmail -bd -q30m
+
+The flags to sendmail may need to be adjusted as required for the
+local system configuration.
+
+VI.   Correction details
+
+The following is the sendmail $Id$ revision number of the file that
+was corrected for the supported branches of FreeBSD.  The $Id$
+revision number of the installed source can be examined using the
+ident(1) command.
+
+  Revision   Path
+  8.20.22.4  src/contrib/sendmail/src/trace.c
+
+VII.  References
+
+&lt;URL:<A HREF="http://www.securityfocus.com/bid/3163&gt">http://www.securityfocus.com/bid/3163&gt</A>;
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.0.6 (FreeBSD)
+Comment: For info see <A HREF="http://www.gnupg.org">http://www.gnupg.org</A>
+
+iQCVAwUBO4q+6lUuHi5z0oilAQH2xQP/e5UR1/UiVoNLjWnZr/3Ufk11/Dx0jeux
+W43znQ3Hae7ZDK17bUvvJ0t3uSq7mgzP1EmHYhjWWvrVNOaKLNO2C7oiTBWeyNWj
+J+hk26jZQO74mQDdZVwIr4SbE+tMTUIfEcVcXv7++ZS3xbyh3wyQKZipD5UElnLs
+ek/7MzKM83E=
+=Lv0A
+-----END PGP SIGNATURE-----
+
+   - andrew
+
+-- 
+void signature () {
+	cout &lt;&lt; "Andrew Reid -- <A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A>" &lt;&lt; endl ;
+	cout &lt;&lt; "Cell: +61 401 946 813" &lt;&lt; endl;
+	cout &lt;&lt; "Quidquid latine dictum sit, altum viditur" &lt;&lt; endl;
+}
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

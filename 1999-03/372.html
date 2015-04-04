@@ -1,0 +1,131 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Redirecting email to a file" -->
+<!-- FromName="" -->
+<!-- FromEmail="justin@tardis.mx.com.au" -->
+<!-- ToName="Darryl Ross" -->
+<!-- ToEmail="darryl@bachblue.com.au" -->
+<!-- Date="Mon, 22 Mar 1999 22:06:47 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.04.9903222152470.29570-100000@tardis.mx.com.au" -->
+<!-- Reference="005d01be7437$d1183340$0201a8c0@darryl" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Redirecting email to a file</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: <A HREF="mailto:justin@tardis.mx.com.au">justin@tardis.mx.com.au</A>
+  To  : Darryl Ross &lt;<I><A HREF="mailto:darryl@bachblue.com.au">darryl@bachblue.com.au</A></I>&gt;
+  Date: Mon, 22 Mar 1999 22:06:47 +1030 (CST)
+</PRE>
+<H1>Re: Redirecting email to a file</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, 22 Mar 1999, Darryl Ross wrote:
+
+&gt; My program reads in a straight text file. I need to get that mail to be
+&gt; saved as a text file. It is the only mail that I get from that address
+&gt; (sender). How can I filter it out? And please don't just say "use procmail"!
+&gt; At least give me a hint about *how* to do it!  :)
+
+Use procmail!
+
+Oops.
+
+OK I do exactly what you say. Here's the files you need to setup:
+
+.forward ------------------------------------------------------------
+"|IFS=' ' && exec /usr/bin/procmail -f- || exit 75 #USERNAME"
+---------------------------------------------------------------------
+
+Replace the USERNAME with your login username. Make sure procmail really
+is /usr/bin/procmail (which procmail)
+
+.procmailrc ---------------------------------------------------------
+VERBOSE=off
+
+#Replace `mail' with your mail directory (Pine uses mail, Elm uses Mail)
+MAILDIR=$HOME/mail
+
+#Directory for storing procmail log and rc files
+PMDIR=$HOME/.procmail
+
+LOGFILE=$PMDIR/log
+INCLUDERC=$PMDIR/rc.maillists
+---------------------------------------------------------------------
+
+.procmail/rc.maillists ----------------------------------------------
+:0
+* From:.*<A HREF="mailto:someaddress@somewhere.com.au">someaddress@somewhere.com.au</A>
+DIRECTORY
+---------------------------------------------------------------------
+
+Replace DIRECTORY with the name of an *existing* directory in the ~/mail
+folder and messages from that address will go into seperate files in that
+directory, like so:
+
+[<A HREF="mailto:tv@tardis">tv@tardis</A> tvarch]$ ls -l
+total 277
+-rw-------   1 tv       tv          69888 Mar  6 12:17 msg.XZB
+-rw-------   1 tv       tv          69364 Feb 27 22:29 msg.YcB
+-rw-------   1 tv       tv          68857 Feb 19 21:16 msg.cWB
+-rw-------   1 tv       tv          68767 Feb 16 00:04 msg.gWB
+
+If instead of specifying a directory in the procmail recipe you specify a
+file (which may or may not exist yet in your mail/ directory it will
+create a standard folder, suitable for reading with pine or whatever. This
+is how I filter linuxsa and other mailing lists I receive.
+
+Off the topic of your query, but possibly interesting nonetheless, here is
+some nifty stuff you can put into .pinerc to make reading mailing lists
+you cut up with procmail easier:
+
+.pinerc (portion only) ----------------------------------------------
+# List of incoming msg folders besides INBOX, e.g. ={host2}inbox,
+{host3}inbox
+# Syntax: optnl-label {optnl-imap-host-name}folder-path
+incoming-folders=LinuxSA mail/linuxsa,
+        A Word A Day mail/a-word-a-day,
+        Freshmeat mail/Freshmeat,
+        LRP mail/LRP,
+        Cyphesis mail/Cyphesis
+----------------------------------------------------------------------
+
+Now when you enter pine instead of just having one inbox, you will have
+multiple that pine will look for new mail in. Use tab to quickly read all
+your new mail.
+
+Hope this all helps someone!
+
+	- Justin
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

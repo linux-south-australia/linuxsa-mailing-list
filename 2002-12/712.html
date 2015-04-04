@@ -1,0 +1,92 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Segmentation fault when attempting to mount floppies and CD's" -->
+<!-- FromName="'Greg 'groggy' Lehey'" -->
+<!-- FromEmail="grog@lemis.com" -->
+<!-- ToName="'Andrew Lord'" -->
+<!-- ToEmail="andrewlord@internode.on.net" -->
+<!-- Date="Sun, 15 Dec 2002 18:46:33 +1030" -->
+<!-- Id="20021215081633.GB53628@wantadilla.lemis.com" -->
+<!-- Reference="200212151727.45585.andrewlord@internode.on.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Segmentation fault when attempting to mount floppies and CD's</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Greg  &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  To  : Andrew Lord &lt;<I><A HREF="mailto:andrewlord@internode.on.net">andrewlord@internode.on.net</A></I>&gt;
+  Date: Sun, 15 Dec 2002 18:46:33 +1030
+</PRE>
+<H1>Re: Segmentation fault when attempting to mount floppies and CD's</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sunday, 15 December 2002 at 17:27:45 +0000, Andrew Lord wrote:
+&gt; Hi,
+&gt;
+&gt; I have recently (soon after changing fstab, below, to allow all users to mount
+&gt; & umount floppies & CDs) found that when I attempt to mount floppies and CDs
+&gt; I get:
+&gt;
+&gt; # mount /mnt/floppy
+&gt; Segmentation fault
+&gt; #
+
+That's a bug.  System software shouldn't SIGSEGV.  But looking at your
+/etc/fstab, there's an obvious reason:
+
+&gt; /mnt/floppy /mnt/floppy supermount
+&gt; /mnt/cdrom /mnt/cdrom supermount
+
+You can't mount a directory, it should be a device.  You also don't
+have a file system type for either file system.  Compare with the root
+file system:
+
+&gt; /dev/hda5 / ext2 defaults 1 1
+
+Your fstab also contains a lot of other invalid stuff.
+
+By comparison, this is what I have in my (Linux) /etc/fstab:
+
+/dev/cdrom              /cdrom              iso9660 noauto,owner,ro 0 0
+/dev/fd0                /mnt/floppy             auto    noauto,owner    0 0
+
+I suspect that would work for you too.
+
+Greg
+--
+Finger <A HREF="mailto:grog@lemis.com">grog@lemis.com</A> for PGP public key
+See complete headers for address and phone numbers
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

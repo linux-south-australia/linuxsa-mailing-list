@@ -1,0 +1,143 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Data Accounting for a system running IP Masq" -->
+<!-- FromName="Jake Hawkes" -->
+<!-- FromEmail="jake@infinitylimited.net" -->
+<!-- ToName="James Morgan" -->
+<!-- ToEmail="jmorgan@bigpond.net.au" -->
+<!-- Date="Thu, 11 May 2000 04:01:26 +0930" -->
+<!-- Id="3919AAFE.9FEF4FE3@infinitylimited.net" -->
+<!-- Reference="000901bfba54$35067ca0$8b01a8c0@vic.bigpond.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Data Accounting for a system running IP Masq</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  To  : James Morgan &lt;<I><A HREF="mailto:jmorgan@bigpond.net.au">jmorgan@bigpond.net.au</A></I>&gt;
+  Date: Thu, 11 May 2000 04:01:26 +0930
+</PRE>
+<H1>Re: Data Accounting for a system running IP Masq</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+James Morgan wrote:
+&gt; 
+&gt; Hi there,
+&gt; 
+&gt; I was just wondering if any one could help.
+&gt; 
+&gt; What systems does linux use for IP accounting. We mainly want to monitor the
+&gt; volume of traffic to and from each internal IP address. It would also be
+&gt; nice if we could check the destination/origin of the traffic.
+&gt; 
+&gt; Which components of linux would allow me to do this.
+&gt; 
+&gt; Regards
+&gt; 
+&gt; James Morgan
+&gt; 
+
+create new chain to account for joes pc
+ipchains -N joespc
+
+append a rule to the input chain that matches all packets dst
+joesip(10.1.1.69)
+ipchains -A input -d 10.1.1.69 -j joespc
+
+append a rule to the output chain that matches all packets src
+joesip(10.1.1.69)
+ipchains -A output -s 10.1.1.69 -j joespc
+
+and away it goes - counting packets.
+
+to get the counts, do
+ipchains -L -v -x
+-List -verbose -xpand (means dont do 64k or 5M etc, just do straight
+bytes)
+
+[<A HREF="mailto:root@dialin01">root@dialin01</A> network-scripts]# ipchains -L -v -x
+Chain input (policy ACCEPT: 1244892 packets, 276937977 bytes):
+pkts bytes target prot opt    tosa tosx  ifname mark outsize source  
+destination ports
+30    2268 george all  ------ 0xFF 0x00  ppp4                anywhere
+anywhere    n/a
+ 0       0 lyn    all  ------ 0xFF 0x00  ppp5                anywhere
+anywhere    n/a
+ 1     216 murray all  ------ 0xFF 0x00  ppp2                anywhere
+anywhere    n/a
+Chain forward (policy ACCEPT: 1045141 packets, 259750045 bytes):
+Chain output (policy ACCEPT: 1158833 packets, 273302011 bytes):
+pkts bytes target prot opt    tosa tosx  ifname mark outsize source  
+destination ports
+24    4556 george all  ------ 0xFF 0x00  ppp4                anywhere
+anywhere    n/a
+ 0       0 lyn    all  ------ 0xFF 0x00  ppp5                anywhere
+anywhere    n/a
+ 0       0 murray all  ------ 0xFF 0x00  ppp2                anywhere
+anywhere    n/a
+Chain george (2 references):
+Chain lyn (2 references):
+Chain murray (2 references):
+
+
+or, if you want to use a script use:
+cat /proc/net/ip_fwchains 
+ input 00000000/00000000-&gt;00000000/00000000 ppp4 0 0 0 0 0 0 0  0-65535
+0-65535 AFF X00 00000000 0 0 george
+ input 00000000/00000000-&gt;00000000/00000000 ppp5 0 0 0 0 0 0 0  0-65535
+0-65535 AFF X00 00000000 0 0    lyn
+ input 00000000/00000000-&gt;00000000/00000000 ppp2 0 0 0 0 0 0 0  0-65535
+0-65535 AFF X00 00000000 0 0 murray
+output 00000000/00000000-&gt;00000000/00000000 ppp4 0 0 0 0 1 0 56 0-65535
+0-65535 AFF X00 00000000 0 0 george
+output 00000000/00000000-&gt;00000000/00000000 ppp5 0 0 0 0 0 0 0  0-65535
+0-65535 AFF X00 00000000 0 0    lyn
+output 00000000/00000000-&gt;00000000/00000000 ppp2 0 0 0 0 0 0 0  0-65535
+0-65535 AFF X00 00000000 0 0 murray
+
+where this means:
+chain srcdst iface flg invflg proto flg ?? pkts ?? bytes srcprt tosand
+tosxor redir mark outsize target
+
+dont ask me where I got these definitions from :) I think I looked in
+the source, or was it ipchains-save ..... (??)
+
+--
+Jake Hawkes, B.Eng (CSE)
+
+"I'm only smart enough to know how stupid I am", Joe Strummer.
+
+
+p.s. i hope you appreciate the formating that went into that mesg :)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

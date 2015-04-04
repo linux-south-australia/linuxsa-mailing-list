@@ -1,0 +1,131 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="CUPS & Samba weirdness" -->
+<!-- FromName="Phil Hutton" -->
+<!-- FromEmail="philhutton@bigfoot.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 23 May 2000 23:30:39 +0930" -->
+<!-- Id="20000523233039.B1464@odin.fdns.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: CUPS & Samba weirdness</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Phil Hutton &lt;<I><A HREF="mailto:philhutton@bigfoot.com">philhutton@bigfoot.com</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Tue, 23 May 2000 23:30:39 +0930
+</PRE>
+<H1>CUPS & Samba weirdness</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi...
+
+Here's the story:
+
+I administer a lab here that has 11 NT machines with access to the Internet and
+a printer.  We also have around 120 other machines (owned by students that live
+here) connected to our network.  The PDC is a Linux server running Samba, which
+also handles the printing.  The server runs CUPS for printing, as it has some
+page logging features.
+
+I've written software that lets us charge the users for printing and Internet
+access.  The Internet side is working nicely.  The printing side is a real pain.
+
+This is how it works:
+I have a mysql database that stores user credit.  When documents are printed
+CUPS logs the number of pages printed to /var/cups/logs/page_log.  I have a
+daemon that reads the file and deducts credit from whoever's used the printer.
+
+That works fairly well, except for one problem.  CUPS gets the number of pages
+in the document from the %%Pages: line in the postscript.  And Windows NT seems
+to have a habit of setting the pagecount to 1.  Intermittently.  And some of the
+users (may) have worked out that they can print to a postscript file, change the
+%%Pages line from 75 to 1 and use lpr to print the file, getting charged for
+only 1 page.
+
+So I wrote a program (essentially a wrapper for lp and lpr) that scans the
+postscript for %%Page: lines and counts them.  It then compares the count to the
+%%Pages: line, and if they don't match it fixes the %%Pages: line in the
+postscript file before it is printed.  This worked quite well for commands like
+"lpr something.ps".  But when I looked at the logs that I was generating I
+noticed that not everything was getting accounted for.  And I realised that
+there was another problem: "cat something.ps | lpr".  So I made the wrapper
+intercept stdin and dump it out to a file, then run the real lpr on the new
+file.
+
+The lpr wrapper works well in Linux in all standard situations.  But when an NT
+machine prints to it from Samba, the wrapper dumps out a 0 length file from
+stdin.  And then the file prints SUCCESSFULLY.  At first I thought it must have
+been the way I was reading stdin so I tried using read() and write().  But still
+0 length files from Samba, and good files when run from a command line.
+
+So, my question:  Where is the input coming from?
+- It's not coming from the command line.
+- It's not getting printed from a file dumped from stdin.
+
+So the only thing I can think of is that it is, in fact, coming from stdin, and
+my code isn't intercepting it properly.  But my code doesn't even /call/ lpr
+until all input from stdin has been dumped.  The code to dump from stdin is:
+
+char buf[1024];
+int infd, outfd, bytesread;
+
+infd = fileno(stdin);
+outfd = open(...);
+
+while ((bytesread = read(infd, buf, sizeof(buf))) &gt; 0)
+{
+  write(outfd, buf, bytesread);
+}
+close(outfd);
+
+I wouldn't be surprised if Windows is sending some ^Ds, but I'd have thought
+that read() and write() would just pass them through.
+
+So Unix C programming, CUPS, and Samba gurus: what do you reckon?
+
+I'm expect this description is pretty poor.  If you think you might have an idea
+of various options feel free to e-mail me for more details.
+
+TIA.
+
+-- 
+Phil Hutton
+Systems Administrator
+Lincoln College, Adelaide, Australia
+Phone:  +61 8 8290 6124
+E-mail: <A HREF="mailto:philhutton@bigfoot.com">philhutton@bigfoot.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

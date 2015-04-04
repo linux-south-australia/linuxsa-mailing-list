@@ -1,0 +1,121 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Firewall / Ipchains" -->
+<!-- FromName="'Daniel Callan'" -->
+<!-- FromEmail="dcallan@wias.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 26 Aug 2001 17:42:17 +1000" -->
+<!-- Id="5.0.2.1.1.20010826173602.027c41b0@mail.wias.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Firewall / Ipchains</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Callan &lt;<I><A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 26 Aug 2001 17:42:17 +1000
+</PRE>
+<H1>Re: Firewall / Ipchains</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+[ Sorry, I actually sent this to Mick hours ago but buggered up the CC to 
+list address :-\ ]
+
+To: "Mick Collins" &lt;<A HREF="mailto:mickwell@bigpond.com">mickwell@bigpond.com</A>&gt;
+From: Daniel Callan &lt;<A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A>&gt;
+Subject: Re: Firewall / Ipchains
+Cc: <A HREF="mailto:linuxsa@linusa.org.au">linuxsa@linusa.org.au</A>
+
+Hi Mick,
+
+At 02:30  26/08/01 +0930, you wrote:
+ &gt;I have previously sent a e-mail to this list about my firewall. Someone
+ &gt;answered it and said that the reason I cant ftp and stuff is because the
+ &gt;default input policy is DENY.
+
+That's watering it down a bit, but yeah ;-)
+I was saying that you have 2 ways of looking at any pkt filetering gateway:
+a) DENY &lt;Specific list of bad things&gt; ; then ALLOW EVERYTHING
+OR
+b) ALLOW &lt;Specific list of necessary services&gt; ; then DENY EVERYTHING
+
+The philosophy behind choice A is somewhat naive because it is practically
+impossible to keep abreast of every possible trojan port that gets invented
+or used by the script-kiddies who are sending the kind of packets that
+ipchains is being used to block.
+
+So, quite rightly, you have used choice B.
+The only snag here is that you need to examine _exactly_ what network
+services you are running there (never a bad thing really). Once you know
+what protocols/ports you need to allow for your server (eg: apache=TCP/80,
+sendmail=TCP/25, pop3=TCP/110, etc...) and make rules for them.
+
+Outbound connection's return traffic is sweet if you have this little rule:
+/sbin/ipchains -A input -i eth0 -p tcp --dport 1024:65535  !-j ACCEPT -l
+
+
+ &gt; Is there anyways to change this so It will all
+ &gt;work. Like Halflife, Quake Servers and stuff??
+
+Even in the previous thread, you have not yet clarified
+the details of your traffic scenario. This is why my original
+posting was not a perfect recipe for you to just 'plug-in'.  ;-)
+
+I'll assume for now we are talking about ppp clients running
+these games and connecting to an internet server somewhere?
+
+What are the specifics of these protocols?
+ie: client &lt;--&gt; server == [C_PORT_NO] &lt;--&gt; [S_PORT_NO]
+Are they TCP or UDP?
+(No, I haven't run any of these games through ipchains before,
+so I don't know their specs...just tcpdump some tests with
+the "input" chains flushed).
+
+Assuming they were 'standard' TCP, client=random_high_port to server=set_port
+connections, the return traffic rule (above) and the following would work:
+
+#Allow Outbound Game Requests
+/sbin/ipchains -A input -i ppp+ -p tcp --dport S_PORT_NO -j ACCEPT -l
+
+You basically need to find out exactly what it is you want to allow, and then
+write rules for them (or at least tell us so we can suggest some for you ;-).
+
+Cheers,
+-Daniel
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

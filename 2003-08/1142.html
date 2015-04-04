@@ -1,0 +1,119 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: [SCO] some code sees the light" -->
+<!-- FromName="'John Arthur'" -->
+<!-- FromEmail="list@davey.net.au" -->
+<!-- ToName="'Greg 'groggy' Lehey'" -->
+<!-- ToEmail="grog@lemis.com" -->
+<!-- Date="Thu, 21 Aug 2003 21:20:41 +0930" -->
+<!-- Id="GNECLCLHIFNNAHMOKHDPEENNDGAA.list@davey.net.au" -->
+<!-- Reference="20030821075452.GJ20240@wantadilla.lemis.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: [SCO] some code sees the light</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: John Arthur &lt;<I><A HREF="mailto:list@davey.net.au">list@davey.net.au</A></I>&gt;
+  To  : Greg  &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  Date: Thu, 21 Aug 2003 21:20:41 +0930
+</PRE>
+<H1>RE: [SCO] some code sees the light</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Greg,
+
+You say,
+&gt; - There's no question that it was derived from System V.4.
+
+
+Why was it not derived from this?
+&lt;<A HREF="http://minnie.tuhs.org/UnixTree/32VKern/usr/src/sys/sys/malloc.c.html&gt">http://minnie.tuhs.org/UnixTree/32VKern/usr/src/sys/sys/malloc.c.html&gt</A>;
+
+Is it really that difficult to assume that while making the minor changes
+(adding the ASSERTS & spinlocks) that the comment was not tidied up to make
+the first 2 sentences 1 line each and remove the "* The swap map unit is
+512 bytes." comment?
+
+I know that that's what I would have done.
+
+
+/*
+ * Allocate 'size' units from the given
+ * map. Return the base of the allocated
+ * space.
+ * In a map, the addresses are increasing and the
+ * list is terminated by a 0 size.
+ * The swap map unit is 512 bytes.
+ * Algorithm is first-fit.
+ */
+malloc(mp, size)
+struct map *mp;
+{
+	register unsigned int a;
+	register struct map *bp;
+
+	for (bp=mp; bp-&gt;m_size; bp++) {
+		if (bp-&gt;m_size &gt;= size) {
+			a = bp-&gt;m_addr;
+			bp-&gt;m_addr += size;
+			if ((bp-&gt;m_size -= size) == 0) {
+				do {
+					bp++;
+					(bp-1)-&gt;m_addr = bp-&gt;m_addr;
+				} while ((bp-1)-&gt;m_size = bp-&gt;m_size);
+			}
+			return(a);
+		}
+	}
+	return(0);
+}
+
+
+From
+<A HREF="http://www.perens.com/SCO/SCOSlideShow.html">http://www.perens.com/SCO/SCOSlideShow.html</A>
+
+AT&T was actually found to have lost its copyright to the code in question
+during the lawsuit, because the code wasn't published. This would not be
+the case today, as there have been changes in copyright law. But the
+judge's decision back then was:
+
+Consequently, I find that Plaintiff has failed to demonstrate a likelihood
+that it can successfully defend its copyright in [Unix version] 32V.
+Plaintiff's claims of copyright violations are not a basis for injunctive
+relief.
+
+John
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

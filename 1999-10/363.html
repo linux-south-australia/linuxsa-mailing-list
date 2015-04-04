@@ -1,0 +1,151 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="scsi driver bug?" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 21 Oct 1999 15:54:39 +0930" -->
+<!-- Id="199910210624.PAA18067@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: scsi driver bug?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 21 Oct 1999 15:54:39 +0930
+</PRE>
+<H1>scsi driver bug?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Linux SCSI experts:
+
+How do I know if I'm looking at a reall kernel bug
+or just something that I caused myself?
+The following messages get into my messages file
+when I type 
+
+	echo scsi add-single-device 0 0 5 0 &gt; /proc/scsi/scsi
+
+as super-user when I have a SCSI scanner attached
+to the Tekram SCSI card.
+
+==========================================================
+Oct 21 15:34:17 emu kernel: scsi singledevice 0 0 5 0
+Oct 21 15:34:17 emu kernel:   Vendor: UMAX      Model: Astra 1220S       Rev: V1.3
+Oct 21 15:34:17 emu kernel:   Type:   Scanner                            ANSI SCSI revision: 02
+Oct 21 15:34:17 emu kernel: Unable to handle kernel paging request at virtual address c8027b30
+Oct 21 15:34:17 emu kernel: current-&gt;tss.cr3 = 00e98000, %cr3 = 00e98000
+Oct 21 15:34:17 emu kernel: *pde = 07d31063
+Oct 21 15:34:17 emu kernel: *pte = 00000000
+Oct 21 15:34:17 emu kernel: Oops: 0000
+Oct 21 15:34:17 emu kernel: CPU:    0
+Oct 21 15:34:17 emu kernel: EIP:    0010:[scan_scsis_single+1012/1692]
+Oct 21 15:34:17 emu kernel: EFLAGS: 00010286
+Oct 21 15:34:17 emu kernel: eax: 00000001   ebx: 00000006   ecx: c024ed14   edx: c5206000
+Oct 21 15:34:17 emu kernel: esi: c8027b18   edi: c38a0eb0   ebp: c2c83e00   esp: c2c83d2c
+Oct 21 15:34:17 emu kernel: ds: 0018   es: 0018   ss: 0018
+Oct 21 15:34:17 emu kernel: Process csh (pid: 1015, process nr: 143, stackpage=c2c83000)
+Oct 21 15:34:17 emu kernel: Stack: 00000005 00000000 00000006 c03b5200 00000282 c0098dd0 c03b5200 c03b5200
+Oct 21 15:34:17 emu kernel:        c0098dd0 c01206bb c03b5080 00000246 c03b5208 c03b5200 c38a0eb0 00000088
+Oct 21 15:34:17 emu kernel:        c2c83d94 c047f000 00000001 00000000 00000000 00000000 c2c83d80 00000000
+Oct 21 15:34:17 emu kernel: Call Trace: [kmem_cache_grow+499/916] [scan_scsis+395/964] [wake_up_process+58/64] [scsi_devic
+e_types+2241/2931] [wake_up_process+58/64] [__wake_up+59/68] [printk+357/372]
+Oct 21 15:34:17 emu kernel:        [scsi_device_types+2241/2931] [scsi_proc_info+541/1088] [scsi_device_types+2242/2931] [
+scsi_proc_info+680/1088] [dispatch_scsi_info+51/160] [proc_writescsi+104/140] [proc_writescsi+0/140] [sys_write+194/236]
+Oct 21 15:34:17 emu kernel:        [system_call+52/56]
+Oct 21 15:34:17 emu kernel: Code: 8b 56 18 85 d2 74 12 ff 74 24 40 ff d2 89 c2 8b 4c 24 44 01
+==========================================================
+
+Not a pretty sight!!
+The "echo" process also crashed:
+
+--------------------------------------------------
+emu emu/akenning# echo scsi add-single-device 0 0 5 0 &gt; /proc/scsi/scsi
+Segmentation fault
+bash-2.03#
+--------------------------------------------------
+
+...and dropped out of the "csh" back to the "bash" shell.
+
+The set-up is as follows:
+
+CPU: 	K6-2/400
+linux:	2.2.10
+distr:	SuSE 6.2
+SCSI:	Tekram DC-310
+Scanner: Umax Astra 1220S
+
+Other details at <A HREF="http://topology.org/site.html">http://topology.org/site.html</A>
+
+The scanner was supposedly SCSI, but came with
+two 25-pin DB25 connectors.
+It's listed in all the SANE scanner software
+compatiblity lists as being supported.
+
+But.... since my SCSI card has a SCSI-II port,
+I bought a SCSI-II to DB25 connector ($20)
+and connected it all up.
+Then, whether the power is on or off,
+the linux kernle refuses to boot. It says that
+/dev/sda has a bad file system, even though
+I have:
+
+/dev/sda	target 0, IBM drive
+/dev/sdb	target 5, scanner
+
+I had to disconnect the SCSI cable to even
+get the OS to boot.
+And that's why I then typed the "add-single-device"
+command to get the scanner to be recognized.
+
+I've now run this command again, and it seems
+to be permanently hung.
+It doesn't respond to ctrl-C or ctrl-Z.
+
+Something tells me the SCSI driver
+has put the process into permanent sleep while
+waiting for something that will never happen.
+
+Question:
+If the above indicates a bug, who do I send a report to?
+
+To my way of thinking, any process or driver which
+gets a segmentation fault has a serious bug.
+
+Cheers,
+Alan Kennington.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

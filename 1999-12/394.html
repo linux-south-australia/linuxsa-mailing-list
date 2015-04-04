@@ -1,0 +1,215 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="New Linux Mandrake Setup" -->
+<!-- FromName="David" -->
+<!-- FromEmail="delyn@email.com" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 17 Dec 1999 02:37:06 +1030" -->
+<!-- Id="38590E2A.DCE96E98@email.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: New Linux Mandrake Setup</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David &lt;<I><A HREF="mailto:delyn@email.com">delyn@email.com</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 17 Dec 1999 02:37:06 +1030
+</PRE>
+<H1>New Linux Mandrake Setup</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi
+Hoping someone can help, I admit I'm a Newbie I've been reading heaps
+but I don't understand some of the lingo or where to make the
+modifications required.
+Here's the basics
+I've just installed Mandrake Linux with KDE and I've run into a few
+problems.
+1. Modem Installation
+2. Sound card Configuration
+3. Scanner Set up
+4. and a query PCI Devices not Identified by system
+5. A suitable Smaller Linux Installation using RPM style for 486 w 4 mg
+ram 170 mg HDD i.e. can be loaded by floppy  prefer Xwindows.
+Before you read on be warned It's a long Email I've included all the
+details I think relevant and probably some that aren't.If there are
+details i should hae provided please ask me for them.
+What I've seen so far I like but I do like to have my system setup so
+everything works. (I mean all the time not like MS)
+PS I've managed to setup my 3Dfx Banshee to run in 16bit color 1024 x
+764 and boot direct to KDE but that was minor compared to the above
+
+
+
+1. I have a ISA Dynalink Internal modem
+I have altered the Bios to set this card up as ISA
+I have run isapnp dumped it to etc/isapnp.conf and ended up with a heap
+of options
+In W98 it setup as (IRQ 11) ( IO 03e8h-03e8h)
+so I Unhashed the appropriate options and got a conflict , tried all the
+other option and either got a conflict or denied access I rehashed the
+(IO) option and it sets up on IRQ 11
+QUESTION Do I need the (IO) set here or not?
+If so How?
+(/proc/ioports Appendix A  below)
+(/proc/interupts Appendix B below)
+(/proc/dma Appendix c below)
+Having determined the above correctly how do I find which port it is set
+up in; I gather from the documentation(and I admit I have misinterpreted
+it ) that each IO port is a different ttys?? which then needs to be
+linked to /dev/modem by inserting a line something like,  ln
+/dev/ttys??  /dev/modem .
+I am using KDE and/or Gnome, I haven't decided which way to go yet so If
+I need to do something in either of these i.e.. to use Kppp and Netscape
+Communicator Please let me know.
+PS I am using these as the most similar to what I am used to I know
+there are other tools and I will try them my immediate concern is to
+replace this system from MS.
+
+
+
+
+2. I have a cmi8330 onboard sound system which I am having problems
+setting up In part it relates to the above as isapnp dumps the settings
+for this when I was trying to set up the modem.
+I chose the following options
+LD 0
+IO  0     0 x0530   IRQ 12
+IO  1     1 x 388
+DMA 0
+
+LD1
+IO 0    0x330    IRQ 9
+
+LD 2
+IO  0   00x200
+
+LD 3
+IO  0   0x220    IRQ 5
+DMA 0  ch3
+DMA 1  ch5
+
+after a lot of "playing" before it was accepted by isapnp however it
+still throws a line something like  "LD does not ..... this may not
+matter ...please insert the line (...) after doing as this suggests it
+appears to load correctly but still does not play.
+PS I tried sndconfig and it wouldn't set up properly either although it
+did give me some sound at test it would not play midi or wav file later.
+
+pss I noticed on reboot I am getting a red fail for
+/module 2.2-9-19 mdk/misc  mpu401.0 mit_module     (or something to this
+effect)
+I'm wondering if this setup is conflicting with my modem setting up,
+just a thought!
+
+3. I have a Microtech Scanmaker E6 on its proprietary SCSI card which
+does not get recognized at setup by the SCSI detection portion of the
+setup. This is an ISA Card with the Bios set to ISA for it. The set up
+in W98 is
+IRQ 9 - Adaptec AHA -150X/1510/152X/AIC-6x60 SCSI host adapter using IO
+0140h - 015Fh
+Can someone please guide me where to go next, or even howto configure
+this manually if required.
+
+4. While meandering through files trying to find more relevant
+information on the above I found /proc/pci listing 6 devices 2 of which
+are registered as unknown devices. Does this mean I need to modify the
+system to work properly with these devices or are they identified
+elsewhere. I think judging from the names given (acer Labs) they are
+system parts of the Alladin M/B. Anyway I included the portion of
+proc/pci file as Appendix D below.
+Actually a few of the settings I expected in the following files i.e.
+printer on IRQ 7 dont appear to be present .
+
+5. I have a smaller system  that I would like to set up for the kids I
+am looking for a small Linux system to set up on it but Redhat/Mandrake
+is far to big for the HDD and when the cut down xwindows is applied far
+to slow on 4 mg is there a smaller version using RPMs as I would like it
+to be compatable or at least similar to set up. Any Ideas or Sites to
+pick up these from would be appreciated.Or the basic list of Rpms
+required to put together my own small system if necessary
+
+Appendix A    (IO ports   /proc/ioports)
+0000 - 001f    dma1
+0000 - 0020    pic1
+0040 - 005f    timer
+0060 - 006f    keyboard
+0070 - 007f    rtc
+0080 - 008f    dma page req
+00a0 - 00bf    pic2
+00c0 - 00df    dma2
+00f0 - 00ff    fpu
+0170 - 0177    ide1
+01f0 - 01f7    ide 0
+02f8 - 02ff    serial (auto) com2
+0376 - 0376    ide 1
+03c0 - 03df    vga +
+03f6 - 03f6    ide 0
+03f8 - 03ff    serial (auto) com1
+0530 - 0533    wss config
+0534 - 0537    mss audio codec
+ffa0 - ffa7    ide0
+ffa8 - ffaf    ide1
+
+Appendix B (Interupts   /proc/interupts)
+0        timer
+1        keyboard
+2        cascade
+4        serial
+5        mss codec
+8        rtc
+13      fpu
+14      ide0
+15      ide1
+nmi
+
+Appendix C (DMA  /proc/dma)
+0     mss codecs
+4     cascade
+
+Appendix D  (PCI     /proc/pci)
+
+PCI devices found
+    bus 0 device 0 function 0
+        Host bridge : Acer Labs unknown device (rev 5)
+            Vendor ID 10b9 Device ID 1621
+        Slow devsel   Master Capable  No bursts
+    bus 0 device 0 function 0
+        Host bridge : Acer Labs unknown device (rev 1)
+            Vendor ID 10b9 Device ID 5247
+        Fast devsel   Master Capable  No bursts  min 0nt=11
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

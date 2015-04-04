@@ -1,0 +1,251 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: MRTG graphing" -->
+<!-- FromName="'Chandra Sekar'" -->
+<!-- FromEmail="vchandrasekar@lycos.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au, "James Mclean" <james@adam.com.au>" -->
+<!-- Date="Wed, 06 Jun 2001 20:48:56 -0700" -->
+<!-- Id="GDFLGBFNCECBDBAA@mailcity.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: MRTG graphing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Chandra Sekar &lt;<I><A HREF="mailto:vchandrasekar@lycos.com">vchandrasekar@lycos.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto: "James Mclean" <james@adam.com.au>"> "James Mclean" <james@adam.com.au></A></I>&gt;
+  Date: Wed, 06 Jun 2001 20:48:56 -0700
+</PRE>
+<H1>Re: MRTG graphing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+---
+James,
+
+I have enabled MRTG on my ISDN BRI Interface on my Cisco router and it works fine. Below are the Configuration details for SNMP on the Router for which we are monitoring the traffic.
+
+logging trap notifications
+logging 172.27.135.143
+access-list 10 permit 172.27.135.143
+access-list 11 permit 172.27.135.143
+snmp-server community public RO 10
+snmp-server community private RW 11
+snmp-server location CR/MD
+snmp-server chassis-id Router_RTR
+snmp-server host 172.27.135.143 private
+
+Below is the step which I followed for Installing MRTG wich Works fine
+
+Installation Instructions for Configuring Multi Router Traffic Grapher (MRTG)
+
+Necessary Files,
+Download basic graph drawing library from
+<A HREF="http://www.boutell.com/gd/">http://www.boutell.com/gd/</A>
+
+PNG graphics files from
+<A HREF="http://www.libpng.org/pub/png/">http://www.libpng.org/pub/png/</A>
+
+Finally libpng is needed to compress the graphics files you create
+<A HREF="http://www.info-zip.org/pub/infozip/zlib/">http://www.info-zip.org/pub/infozip/zlib/</A>
+
+And last the mrtg itself
+<A HREF="http://ee-staff.ethz.ch/~oetiker/webtools/mrtg/pub">http://ee-staff.ethz.ch/~oetiker/webtools/mrtg/pub</A>
+
+Compilation Procedures
+
+First create a directory for the compilation.
+
+mkdir –p /usr/local/src
+cd /usr/local/src
+
+First Install zlib, the procedure is
+gunzip –c zlib.tar.gz | tar xf –
+mv zlib-?.?.?/ zlib
+cd zlib
+./configure
+make
+cd ..
+
+Installation procedure for libpng
+gunzip –c libpng-?.?.?.tar.gz | tar xf –
+mv libpng-?.?.? libpng
+cd libpng
+make –f scripts/makefile.std CC=gcc ZLIBLIB=../zlib ZLIBINC=../zlib
+rm *.so.* *.so
+cd ..
+
+And now you can compile gd
+gunzip -c gd-?.?.?.tar.gz | tar xf -
+mv gd-?.?.? gd
+cd gd
+make INCLUDEDIRS="-I. -I../zlib -I../libpng" \
+LIBDIRS="-L../zlib -L. -L../libpng" \
+LIBS="-lgd -lpng -lz -lm"
+cd ..
+
+MRTG COMPILATION
+cd /home/httpd/
+mkdir mrtg
+cd /usr/local
+gunzip -c mrtg-?.?.?.tar.gz | tar xvf -
+cd mrtg-?.?.?
+./configure
+make
+cd bin
+./cfgmaker --global 'WorkDir: /home/httpd/mrtg' \
+--global 'Options[_]: bits,growright' \
+--output /home/httpd/mrtg/mrtg.cfg \
+<A HREF="mailto:community@router.abc.xyz">community@router.abc.xyz</A> 
+
+Running MRTG
+
+/usr/local/mrtg-?.?.?/bin/mrtg /home/httpd/mrtg/mrtg.cfg
+
+When you run the mrtg for the first time there will be lots of complaints about missing log files. Don't worry, this is for the first 2 times you start mrtg.
+
+You can automate this by adding a line in crontab
+
+0,5,10,15,20,25,30,35,40,45,50,55 * * * * /usr/local/mrtg-?.?.?/bin/mrtg /home/httpd/mrtg/mrtg.cfg
+
+A minimal startup script to put into init.d
+
+#! /bin/sh
+cd /usr/local/mrtg-?.?.?/bin && ./mrtg --user=mrtg-user /home/httpd/mrtg/mrtg.cfg
+
+Note:
+
+RunAsDaemon: Yes in your mrtg.cfg file
+Edit the httpd.conf for the ServerName and DocumentRoot
+ServerName is your local_machine_name
+
+DocumentRoot "/home/httpd/mrtg"
+
+Start the httpd service
+From the browser on the URL path type //&lt;ServerName&gt;/&lt;/home/httpd/mrtg/*.html&gt;
+
+Hope this may solve your problem
+
+ --Sekar
+
+
+
+On Thu, 7 Jun 2001 12:05:25   
+ James Mclean wrote:
+&gt;All,
+&gt;
+&gt;I have setup MRTG to monitor my ISDN interface on my RedHat 7.1
+&gt;router/gateway/etc. Installation went with out a hitch (once I followed
+&gt;instructions!), however it does not seem to be operating correctly. I am
+&gt;most likely missing something here...
+&gt;
+&gt;According to the MRTG website, no extra SNMP software needs to be installed.
+&gt;My graphs are not actually showing any data, so perhaps extra software is
+&gt;needed?
+&gt;
+&gt;The boxen that I am monitoring is hydrogen.jamesmc.org, which also has the
+&gt;webserver and MRTG installed apon, the graphs can be seen at
+&gt;<A HREF="http://mrtg.jamesmc.org">http://mrtg.jamesmc.org</A>
+&gt;
+&gt;Why is it not actually monitoring traffic?
+&gt;
+&gt;Included below, various configs from MRTG.
+&gt;
+&gt;/var/mrtg/mrtg.cfg
+&gt;
+&gt;### Global Config Options
+&gt;
+&gt;#  for UNIX
+&gt;# WorkDir: /home/http/mrtg
+&gt;
+&gt;#  to get bits instead of bytes and graphs growing to the right
+&gt;# Options[_]: growright, bits
+&gt;
+&gt;WorkDir: /var/mrtg
+&gt;Options[_]: growright,bits
+&gt;Target[hydrogen]: 2:<A HREF="mailto:public@hydrogen.jamesmc.org">public@hydrogen.jamesmc.org</A>
+&gt;MaxBytes[hydrogen]: 8000
+&gt;Title[hydrogen]: ISDN Link traffic analysis
+&gt;PageTop[hydrogen]: &lt;h1&gt;Traffic on our ISDN connection&lt;/h1&gt;
+&gt;
+&gt;======
+&gt;Output of running MRTG manually...
+&gt;
+&gt;[<A HREF="mailto:root@hydrogen">root@hydrogen</A> /etc]# /usr/local/mrtg-2/bin/mrtg /var/mrtg/mrtg.cfg
+&gt;SNMP Error:
+&gt;no response received
+&gt;SNMPv1_Session (remote host: "hydrogen.jamesmc.org" [203.2.124.203].161)
+&gt;                  community: "public"
+&gt;                 request ID: 1166735918
+&gt;                PDU bufsize: 8000 bytes
+&gt;                    timeout: 2s
+&gt;                    retries: 5
+&gt;                    backoff: 1)
+&gt; at /usr/local/mrtg-2/bin/../lib/mrtg2/SNMP_util.pm line 450
+&gt;SNMPGET Problem for ifInOctets.2 ifOutOctets.2 sysUptime sysName on
+&gt;<A HREF="mailto:public@hydrogen.jamesmc.org">public@hydrogen.jamesmc.org</A>
+&gt; at /usr/local/mrtg-2/bin/mrtg line 1491
+&gt;WARNING: Expected a number but got ''
+&gt;WARNING: Expected a number but got ''
+&gt;
+&gt;
+&gt;======
+&gt;Crontab entry... its not running every 5 minuites like it should either.
+&gt;
+&gt;0,5,10,15,20,25,30,35,40,45,50,55,60 * * * * /usr/local/mrtg-2/bin/mrtg
+&gt;/var/mrtg/mrtg.cfg --logging /var/log/mrtg.log
+&gt;
+&gt;
+&gt;HELP!
+&gt;
+&gt;cheers
+&gt;james mclean
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+
+Get 250 color business cards for FREE!
+<A HREF="http://businesscards.lycos.com/vp/fastpath/">http://businesscards.lycos.com/vp/fastpath/</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

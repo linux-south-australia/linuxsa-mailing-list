@@ -1,0 +1,108 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="moved a hard drive to a new PC" -->
+<!-- FromName="'Scott Frase'" -->
+<!-- FromEmail="frases@hotmail.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 03 Feb 2001 19:25:48" -->
+<!-- Id="F146q4gtopWd7KKQpQq00003f47@hotmail.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: moved a hard drive to a new PC</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Scott Frase &lt;<I><A HREF="mailto:frases@hotmail.com">frases@hotmail.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 03 Feb 2001 19:25:48
+</PRE>
+<H1>moved a hard drive to a new PC</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Thought you might like to hear my experience moving a Red Hat install 
+originally located on a hard drive that was a secondary IDE slave (hdd), but 
+now moved to a primary master (hda).
+
+I recently got a old pentium 100 from a friend for some etherboot 
+experimentations.  The drive I was going to use in this box was originally 
+configured as a secondary slave (hdd) in another machine.  While as 
+secondary slave, I installed Red Hat 6.1 server and all it's partitions (/, 
+/usr, /home, /var, swap) on the same hard disk.
+
+My problem was that when I moved the hard drive over to the new experimental 
+box, all the LILO references pointed to /dev/hdd1 as boot and root devices.  
+  This wasn't good, as I had installed the hard drive as a primary master 
+(/dev/hda).  Hmmm.  I originally thought that I could simply use the 
+"root=/dev/hda1" and "boot=/dev/hda1" command line parameters to my boot 
+floppy in order to point LILO to the correct boot and root partitions.  I 
+was wrong.
+
+What I forgot about was /etc/fstab.  Fstab keeps all the filesystem 
+information for your pc.  So, when I booted into Red Hat with my "boot.." 
+and "root.." parameters, Linux gave me a host of errors saying that it 
+couldn't find the partition at /dev/hdd1.  /dev/hdd1 was the location of my 
+boot and root partitions as they existed in the old machine.  OK.  So all I 
+had to do was edit /etc/fstab and change the filesystem references from 
+/dev/hdd* to /dev/hda*, right.  Well, when I went to do this, I forgot that 
+Linux loads the root partition in read only mode during error conditions.  
+What was I to do now?  There must be some way to edit this thing, right?
+
+What helped me out of this jam was that at the LILO boot prompt, you can 
+feed in a read-write parameter to LILO.  When my boot floppy got to the LILO 
+prompt, here's are the arguments that I sent to LILO in order to allow me to 
+edit /etc/fstab:
+
+LILO
+boot: boot=/dev/hda1 root=/dev/hda1 rw
+
+The "rw" parameter mounted the root filesystem as read-write, thus giving me 
+permission to edit /etc/fstab and change the references from where my Linux 
+system was originally installed (/dev/hdd*) to my new installation 
+(/dev/hda*).  Once I saved the file and rebooted, all my filesystems came up 
+like a charm.  I then was able to go into linuxconf, edit LILO to the 
+correct root and boot partitions, and tag the Master Boot Record of the hard 
+drive so that I didn't have to boot from a floppy.
+
+now if only my damn Xconfig worked right..
+
+cheers,
+scott
+
+
+_________________________________________________________________
+Get your FREE download of MSN Explorer at <A HREF="http://explorer.msn.com">http://explorer.msn.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

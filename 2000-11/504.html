@@ -1,0 +1,103 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Print Server" -->
+<!-- FromName="'Phil Hutton'" -->
+<!-- FromEmail="philhutton@bigfoot.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 14 Nov 2000 13:38:46 +1030" -->
+<!-- Id="20001114133846.A3394@odin.lincoln.college.adelaide.edu.au" -->
+<!-- Reference="3a109e0e.1def.0@esc.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Print Server</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Phil Hutton &lt;<I><A HREF="mailto:philhutton@bigfoot.com">philhutton@bigfoot.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 14 Nov 2000 13:38:46 +1030
+</PRE>
+<H1>Re: Print Server</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi...
+
+&gt; Does anyone know how to set print quota on a linux server?
+
+Assuming Linux is the print server:
+This is (unfortunately) not trivial.  There are two print servers
+(that I know of) that will do page accounting: CUPS and LPRng.
+
+CUPS is relatively easy to install & configure, but its page
+accounting is very average.  On PostScript printers (I'm not sure what
+happens with other printers) it uses the %%Pages: line in the
+PostScript for the page count.  Sometimes Windows misreports this
+count as 1, and smart users can modify this line so that they only get
+charged for 1 page when printing their 70 page document.
+
+LPRng is harder to install & configure, but its page accounting is
+very good.  It uses the printer's hardware page counter to figure out
+how many pages were actually printed for each job.  However, this only
+works for certain printers, and then only if you're using a
+bidirectional interface (Ethernet or serial -- bidirectional parallel
+is not supported).  We're using a HP LaserJet 4MV PS connected over
+Ethernet, and the page accounting works very nicely.  LPRng also
+displays the user name and job name on the printer's display, which I
+think is pretty cool.  ;-)
+
+So, once you've got page accounting you need to somehow restrict
+access to the printer when there is no quota left.  For LPRng I've
+done this by writing an accounting filter.  The filter gets called
+once the job has been spooled.  It checks if the appropriate user has
+credit and either allows the job to continue or removes it from the
+spool.  I don't think it's this easy with CUPS.  I've also got a
+program that parses the printer accounting file and updates the
+database when users print pages.  You'll probably need to build
+something similar - I don't think there's a standard solution out
+there.
+
+You can find CUPS at <A HREF="http://www.cups.org">http://www.cups.org</A> and LPRng at
+<A HREF="http://www.lprng.org.">http://www.lprng.org.</A>
+
+HTH.
+
+-- 
+                             Phil Hutton
+----------------------------------------------------------------------
+Systems Administrator                                  Lincoln College
+Phone:  +61 8 8290 6124                 E-mail: <A HREF="mailto:philhutton@bigfoot.com">philhutton@bigfoot.com</A>
+Finger <A HREF="mailto:phil@hutton.sh">phil@hutton.sh</A> for my PGP public key.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,164 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Simple MASQ - FTP Not working." -->
+<!-- FromName="'Matthew Western'" -->
+<!-- FromEmail="mwestern@affairs.net.au" -->
+<!-- ToName="'Anthony Symons'" -->
+<!-- ToEmail="ant@sa.pracom.com.au" -->
+<!-- Date="Thu, 22 Aug 2002 15:34:07 +0930" -->
+<!-- Id="FD14944A4C95D211AF350004AC4C55A406417DDE@mx.sola.com.au" -->
+<!-- Reference="FD14944A4C95D211AF350004AC4C55A40646E10B@mx.sola.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Simple MASQ - FTP Not working.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Western &lt;<I><A HREF="mailto:mwestern@affairs.net.au">mwestern@affairs.net.au</A></I>&gt;
+  To  : Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  Date: Thu, 22 Aug 2002 15:34:07 +0930
+</PRE>
+<H1>RE: Simple MASQ - FTP Not working.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+ah is that my problem.  thanks heaps.  not sure if this is the right way to
+do it but i also did a modprobe ip_nat_ftp and it works like that way as
+well.  ah it's nice to have it working and move onto my next project...
+
+thanks for the feedback
+Matt
+
+
+-----Original Message-----
+From: Anthony Symons [mailto:<A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A>]
+Sent: Thursday, August 22, 2002 3:06 PM
+To: <A HREF="mailto:mwestern@affairs.net.au">mwestern@affairs.net.au</A>
+Subject: Re: Simple MASQ - FTP Not working.
+
+
+Oh yeah, Ive made too many posts to linux sa today allready, but it just
+clicked - you need ESTABLISHED,RELATED! as its classed as a related
+connection!
+
+Ant
+
+On Thu, 2002-08-22 at 15:09, Matthew Western wrote:
+&gt; Hi All,
+&gt;
+&gt; This question seems to crop up a bit, but after reading the previous
+replies
+&gt; I am no closer to solving this problem.
+&gt;
+&gt; I've got a simple router that i'm trying to add Masquerading to.
+Everything
+&gt; works AFAIK but FTP fails to do anything useful.  I can login sucessfully
+to
+&gt; the FTP server 'out there' but as soon as i do an 'ls' or try to upload
+&gt; something, it goes to sleep and says '425 Can't build data connection:
+&gt; Operation already in progress.'
+&gt;
+&gt; I've changed from using ipchains to using iptables but this exact same
+&gt; problem has cropped up.  I've attached my iptables script which is very
+&gt; basic.  I've changed the IPs to something fictitious.
+&gt;
+&gt; I've been reading this:
+&gt; <A HREF="http://www.netfilter.org/documentation/HOWTO//NAT-HOWTO-4.html">http://www.netfilter.org/documentation/HOWTO//NAT-HOWTO-4.html</A>#ss4.1
+&gt; but FTP doesn't work for me.
+&gt;
+&gt; any ideas people?
+&gt; Thanks
+&gt; Matt
+&gt;
+&gt;
+&gt;
+&gt; Inside Machine - 10.1.1.2
+&gt; |
+&gt; 10.1.1.1
+&gt; Router
+&gt; 203.20.20.1
+&gt; |
+&gt; internet
+&gt;
+&gt; -------------------------------------------------------
+&gt;
+&gt; #Point this to your copy of ip_tables
+&gt; IPT="/sbin/iptables"
+&gt;
+&gt; #Load the module.
+&gt; modprobe ip_tables
+&gt; modprobe iptable_nat
+&gt; modprobe ip_conntrack_ftp
+&gt;
+&gt; #Flush old rules etc
+&gt; $IPT -F
+&gt; $IPT -F -t nat
+&gt; #$IPT -X firewall
+&gt;
+&gt; #enable IP forwarding
+&gt; echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+&gt;
+&gt; #Disabling IP Spoofing attacks.
+&gt; echo 2 &gt; /proc/sys/net/ipv4/conf/all/rp_filter
+&gt;
+&gt; #default policies
+&gt; $IPT -A POSTROUTING -t nat -s 10.1.1.0/24 -o eth0 -j MASQUERADE
+&gt; $IPT -P FORWARD ACCEPT
+&gt; $IPT -P INPUT ACCEPT
+&gt; $IPT -P OUTPUT ACCEPT
+&gt;
+&gt; #NAT stuff out
+&gt; $IPT -A FORWARD -p all -s 10.1.1.2 -m state --state NEW,ESTABLISHED -j
+&gt; ACCEPT
+&gt; $IPT -A FORWARD -p all -d 10.1.1.2 -m state --state ESTABLISHED -j ACCEPT
+&gt;
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+--
+Systems Administrator
+Pracom Ltd.
++61 8 82029074 -=- +61 402 100 671
+<A HREF="mailto:anthony.symons@sa.pracom.com.au">anthony.symons@sa.pracom.com.au</A>
+
+PRIVILEGED - PRIVATE AND CONFIDENTIAL
+This electronic mail is solely for the use of the addressee and may
+contain information which is confidential or privileged.
+If you receive this electronic mail in error, please delete it from
+your system immediately and notify the sender by electronic mail or
+using any of the above contact details.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

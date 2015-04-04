@@ -1,0 +1,121 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: [OT] FreeBSD Distfiles" -->
+<!-- FromName="'Jarrod Sayers'" -->
+<!-- FromEmail="Jarrod.Sayers@unisa.edu.au" -->
+<!-- ToName="'Wilkinson,Alex'" -->
+<!-- ToEmail="Alex.Wilkinson@dsto.defence.gov.au" -->
+<!-- Date="Fri, 15 Feb 2002 11:11:15 +1030 (CST)" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: [OT] FreeBSD Distfiles</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jarrod Sayers &lt;<I><A HREF="mailto:Jarrod.Sayers@unisa.edu.au">Jarrod.Sayers@unisa.edu.au</A></I>&gt;
+  To  : Wilkinson,Alex &lt;<I><A HREF="mailto:Alex.Wilkinson@dsto.defence.gov.au">Alex.Wilkinson@dsto.defence.gov.au</A></I>&gt;
+  Date: Fri, 15 Feb 2002 11:11:15 +1030 (CST)
+</PRE>
+<H1>Re: [OT] FreeBSD Distfiles</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, 15 Feb 2002, Wilkinson,Alex wrote:
+
+&gt; Date: Fri, 15 Feb 2002 10:10:50 +1030 (CST)
+&gt; From: "Wilkinson,Alex" &lt;<A HREF="mailto:Alex.Wilkinson@dsto.defence.gov.au">Alex.Wilkinson@dsto.defence.gov.au</A>&gt;
+&gt; To: Jarrod Sayers &lt;<A HREF="mailto:Jarrod.Sayers@unisa.edu.au">Jarrod.Sayers@unisa.edu.au</A>&gt;
+&gt; Cc: "Wilkinson,Alex" &lt;<A HREF="mailto:Alex.Wilkinson@dsto.defence.gov.au">Alex.Wilkinson@dsto.defence.gov.au</A>&gt;,
+&gt;      <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; Subject: Re: [OT] FreeBSD Distfiles
+&gt;
+&gt; On Fri, 15 Feb 2002, Jarrod Sayers wrote:
+&gt;
+&gt; Jarrod:&gt;&gt;There is no easy way of getting it to check on a CDROM first, that will
+&gt; Jarrod:&gt;&gt;have to be done manually.
+&gt;
+&gt; woops...I probably ment second. It checks /usr/ports/distfiles first and
+&gt; if the file is not there then the cdrom...etc
+&gt;
+&gt; # Search CDROM first if mounted, symlink instead of copy if
+&gt; # FETCH_SYMLINK_DISTFILES is set
+&gt; CD_MOUNTPTS?=   /cdrom ${CD_MOUNTPT}
+&gt; .for MOUNTPT in ${CD_MOUNPTS}
+&gt; .if exists(${MOUNTPT}/ports/distfiles)
+&gt; _MASTER_SITE_OVERRIDE:= <A HREF="file:">file:</A>${MOUNTPT}/ports/distfiles/${DIST_SUBDIR}/ ${_MASTER_SITE_OVERRIDE}
+
+I stand corrected :)  This assumes that the CDROM is already mounted
+though.  Also, the current set of distfiles is around 4gb (??) and changes
+all the time so unless you have a fixed branch of the ports tree (eg.
+RELEASE_4_5_0), your CDROM containing a small percentage of them will
+become quickly outdated.  For example, over the past 6 months or so,
+sanctuary has accumulated 5 versions of ProFTPD, 5 of OpenLDAP and nearly
+2 of everything else :)
+
+&gt; Jarrod:&gt;&gt;This may be what your trying to do... I have a master repository here at
+&gt; Jarrod:&gt;&gt;work called sanctuary that caches all the distfiles we use here on campus.
+&gt; Jarrod:&gt;&gt;I then add this into every machines /etc/make.conf <A HREF="file:">file:</A>
+&gt; Jarrod:&gt;&gt;MASTER_SITE_BACKUP?=\
+&gt; Jarrod:&gt;&gt;	<A HREF="ftp://sanctuary.magill.unisa.edu.au/pub/FreeBSD/ports/distfiles/">ftp://sanctuary.magill.unisa.edu.au/pub/FreeBSD/ports/distfiles/</A>${DIST_SUBDIR}/ \
+&gt; Jarrod:&gt;&gt;        <A HREF="ftp://ftp2.au.freebsd.org/pub/FreeBSD/ports/distfiles/">ftp://ftp2.au.freebsd.org/pub/FreeBSD/ports/distfiles/</A>${DIST_SUBDIR}/ \
+&gt; Jarrod:&gt;&gt;        <A HREF="ftp://ftp.au.freebsd.org/pub/FreeBSD/ports/distfiles/">ftp://ftp.au.freebsd.org/pub/FreeBSD/ports/distfiles/</A>${DIST_SUBDIR}/ \
+&gt; Jarrod:&gt;&gt;        <A HREF="ftp://ftp.freebsd.org/pub/FreeBSD/ports/distfiles/">ftp://ftp.freebsd.org/pub/FreeBSD/ports/distfiles/</A>${DIST_SUBDIR}/
+&gt; Jarrod:&gt;&gt;MASTER_SITE_OVERRIDE?=${MASTER_SITE_BACKUP}
+&gt; Jarrod:&gt;&gt;
+&gt; Jarrod:&gt;&gt;The client then checks their own /usr/ports/distfiles folder and if it
+&gt; Jarrod:&gt;&gt;isnt there, checks sanctuary, ftp2.au, ftp.au and finally ftp before
+&gt; Jarrod:&gt;&gt;trying the original master site listed in the Makefile.  I then have it
+&gt; Jarrod:&gt;&gt;copy any new distfiles back to sanctuary for future use but that bits
+&gt; Jarrod:&gt;&gt;optional :)
+&gt;
+&gt; Yup that's exactly what I was looking for.
+&gt;
+&gt; Was that in the /usr/ports/Mk/bsd.port.mk file ?
+
+No, that bit goes in the /etc/make.conf file on the system.  If I were
+you, I wouldn't be altering files like that unless you want a headache
+later.  Its really simple to hack but after a CVSup update, your changes
+will disappear :|  Stick to the overriding conf files that aren't touched
+on an update.
+
+Cheers,
+
+Jarrod Sayers
+Client Services
+Information Technology Services Unit
+University of South Australia, Magill Campus.
+Phone: +61 8 8302 4809
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

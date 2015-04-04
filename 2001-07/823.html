@@ -1,0 +1,157 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: simple squid setup" -->
+<!-- FromName="'Dave Fitch'" -->
+<!-- FromEmail="davidf@parachilna.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 16 Jul 2001 22:29:57 +0930" -->
+<!-- Id="20010716222957.A29546@spiral" -->
+<!-- Reference="3B52D289.731FFBB5@webmedia.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: simple squid setup</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dave Fitch &lt;<I><A HREF="mailto:davidf@parachilna.com">davidf@parachilna.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 16 Jul 2001 22:29:57 +0930
+</PRE>
+<H1>Re: simple squid setup</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Jul 16, 2001 at 09:09:53PM +0930, Ben Kramer wrote:
+&gt; Dave Fitch wrote:
+&gt; &gt; Fair enough, a good sort of error message, but I'm buggered
+&gt; &gt; if I can work out these ACLs.  Do I even need them at all
+&gt; &gt; for my simple case?
+&gt; Yes, do you want other people on the internet to use your proxy server
+&gt; !?
+
+no, just the local net
+
+&gt; snippets from my conf:
+&gt; 
+&gt; #
+&gt; #Recommended minimum configuration:
+&gt; acl all src 0.0.0.0/0.0.0.0
+&gt; acl int src 192.168.1.0/255.255.255.0
+&gt; ...
+&gt; #
+&gt; # INSERT YOUR OWN RULE(S) HERE TO ALLOW ACCESS FROM YOUR CLIENTS
+&gt; http_access allow int
+
+I've got:
+
+#Defaults:
+acl all src 0.0.0.0/0.0.0.0
+acl manager proto cache_object
+acl localhost src 127.0.0.1/255.255.255.255
+acl SSL_ports port 443 563
+acl Safe_ports port 80 21 443 563 70 210 1025-65535
+acl purge method PURGE
+acl CONNECT method CONNECT
+
+#Default configuration:
+http_access allow manager localhost
+http_access deny manager
+http_access allow purge localhost
+http_access deny purge
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports
+
+#
+# INSERT YOUR OWN RULE(S) HERE TO ALLOW ACCESS FROM YOUR CLIENTS
+#
+http_access deny all
+acl int src 192.168.1.0/255.255.255.0
+http_access allow int
+
+
+but I still get the same error,
+the cache.log says (I turned on debugging):
+
+2001/07/16 22:23:15| aclCheckFast: list: 0x82046b0
+2001/07/16 22:23:15| aclMatchAclList: checking all
+2001/07/16 22:23:15| aclMatchAcl: checking 'acl all src 0.0.0.0/0.0.0.0'
+2001/07/16 22:23:15| aclMatchIp: '192.168.1.2' found
+2001/07/16 22:23:15| aclMatchAclList: returning 1
+2001/07/16 22:23:15| aclCheck: checking 'http_access allow manager localhost'
+2001/07/16 22:23:15| aclMatchAclList: checking manager
+2001/07/16 22:23:15| aclMatchAcl: checking 'acl manager proto cache_object'
+2001/07/16 22:23:15| aclMatchAclList: returning 0
+2001/07/16 22:23:15| aclCheck: checking 'http_access deny manager'
+2001/07/16 22:23:15| aclMatchAclList: checking manager
+2001/07/16 22:23:15| aclMatchAcl: checking 'acl manager proto cache_object'
+2001/07/16 22:23:15| aclMatchAclList: returning 0
+2001/07/16 22:23:15| aclCheck: checking 'http_access allow purge localhost'
+2001/07/16 22:23:15| aclMatchAclList: checking purge
+2001/07/16 22:23:15| aclMatchAcl: checking 'acl purge method PURGE'
+2001/07/16 22:23:15| aclMatchAclList: returning 0
+2001/07/16 22:23:15| aclCheck: checking 'http_access deny purge'
+2001/07/16 22:23:15| aclMatchAclList: checking purge
+2001/07/16 22:23:15| aclMatchAcl: checking 'acl purge method PURGE'
+2001/07/16 22:23:15| aclMatchAclList: returning 0
+2001/07/16 22:23:15| aclCheck: checking 'http_access deny !Safe_ports'
+2001/07/16 22:23:15| aclMatchAclList: checking !Safe_ports
+2001/07/16 22:23:15| aclMatchAcl: checking 'acl Safe_ports port 80 21 443 563 70 210 1025-65535'
+2001/07/16 22:23:15| aclMatchAclList: returning 0
+2001/07/16 22:23:15| aclCheck: checking 'http_access deny CONNECT !SSL_ports'
+2001/07/16 22:23:15| aclMatchAclList: checking CONNECT
+2001/07/16 22:23:15| aclMatchAcl: checking 'acl CONNECT method CONNECT'
+2001/07/16 22:23:15| aclMatchAclList: returning 0
+2001/07/16 22:23:15| aclCheck: checking 'http_access deny all'
+2001/07/16 22:23:15| aclMatchAclList: checking all
+2001/07/16 22:23:15| aclMatchAcl: checking 'acl all src 0.0.0.0/0.0.0.0'
+2001/07/16 22:23:15| aclMatchIp: '192.168.1.2' found
+2001/07/16 22:23:15| aclMatchAclList: returning 1
+2001/07/16 22:23:15| aclCheck: match found, returning 0
+2001/07/16 22:23:15| aclCheckCallback: answer=0
+
+and access.log has:
+
+995287995.811      4 192.168.1.2 TCP_DENIED/403 1030 GET <A HREF="http://spiral/">http://spiral/</A> - NONE/- -
+
+
+So obviously I haven't got the hang of the deny/allow stuff!
+I want to deny everyone access to my squid except 
+192.168.1.0/255.255.255.0 who can do whatever they like.
+
+Any hints?
+
+Thanks,
+Dave.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

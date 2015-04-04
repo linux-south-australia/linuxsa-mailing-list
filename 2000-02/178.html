@@ -1,0 +1,119 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="sshd[3663]: error: Failed to allocate pty." -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 12 Feb 2000 10:22:40 +1030" -->
+<!-- Id="200002112352.KAA03811@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: sshd[3663]: error: Failed to allocate pty.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 12 Feb 2000 10:22:40 +1030
+</PRE>
+<H1>sshd[3663]: error: Failed to allocate pty.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Warning! Warning!
+
+Anybody thinking of relying on sshd for remote login
+to their home site while overseas in s'Gravenhage
+should think again.
+Luckily I set up _two_ computers as sshd servers.
+Because one of them failed:
+
+====================================================
+Feb 12 09:52:44 dog sshd[3660]: log: Connection from 195.232.106.4 port 1025
+Feb 12 09:52:57 dog sshd[3660]: log: RSA authentication for akenning accepted.
+Feb 12 09:53:04 dog PAM_pwdb[3660]: (sshd) session opened for user akenning by (uid=0)
+Feb 12 09:53:28 dog sshd[3663]: log: Connection from 195.232.106.4 port 1027
+Feb 12 09:53:34 dog pam[3663]: unable to dlopen(/lib/security/pam_nologin.so)
+Feb 12 09:53:34 dog pam[3663]: [dlerror: /lib/security/pam_nologin.so: cannot open shared object <A HREF="file:">file:</A> Too ma
+ny open files]
+Feb 12 09:53:34 dog pam[3663]: adding faulty module: /lib/security/pam_nologin.so
+Feb 12 09:53:44 dog sshd[3663]: log: RSA authentication for akenning accepted.
+Feb 12 09:53:44 dog PAM_pwdb[3663]: (sshd) session opened for user akenning by (uid=0)
+Feb 12 09:53:48 dog sshd[3663]: error: /dev/ttyp4: Too many open files
+Feb 12 09:53:48 dog sshd[3663]: error: Failed to allocate pty.
+Feb 12 09:53:51 dog sshd[3663]: fatal: Local: Could not create pipes: Too many open files
+Feb 12 09:53:51 dog PAM_pwdb[3663]: (sshd) session closed for user akenning
+Feb 12 09:54:42 dog pam_rhosts_auth[3667]: allowed to <A HREF="mailto:akenning@emu.topology.org">akenning@emu.topology.org</A> as akenning
+====================================================
+
+The last line is where I sneeked in to the machine
+sideways from the other sshd-enabled machine.
+
+It looks like after about 100 successful sshd logins
+(order of magnitude only), sshd didn't close all those
+pty handles and just reached the system limit.
+Unfortunately it just doesn't do anything
+that might be called fail-safe.
+
+Part of the problem is that fact that I was in a company
+that had N-ISDN link-up to the net - where the
+connection was closed whenever the link was idle.
+As a result, every 10 minutes or so, my sshd connection
+was dropped at my end, but maybe not at the
+server end.
+
+When I recognized the problem, I set up a
+ping process to keep the link alive (and cost my
+emplooyer more in ISDN connection costs), so 
+that ssh links didn't fail anymore.
+
+But finally I reached the limit anyway.
+
+to be fail-safe, maybe you need to run
+_two_ ssh daemons on different ports independently.
+
+The above log, by the way shows two failed ssh
+logins, not one.
+
+Anyway, be warned !!! Or be prawned!
+
+Cheers,
+Alan Kennington.
+
+PS. I'm going to miss the linux meeting by 12 hours.
+did someone say there's a mystery guest.
+I wonder if it's someone famous....
+Every time I just miss a meeting, someone famous
+shows up!
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,153 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba Authentication [Was: Samba user management]" -->
+<!-- FromName="'Matthew Geddes'" -->
+<!-- FromEmail="mgeddes@tellurian.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="adam.smith@sageautomation.com" -->
+<!-- Date="12 Mar 2003 14:28:54 +1030" -->
+<!-- Id="1047441534.27365.43.camel@hilarious" -->
+<!-- Reference="347C66CAA5AEB948AA431B1C1BCF99BA01C22F92@adlex3.elderslimited.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba Authentication [Was: Samba user management]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A></I>&gt;
+  Date: 12 Mar 2003 14:28:54 +1030
+</PRE>
+<H1>Re: Samba Authentication [Was: Samba user management]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+This e-mail's quite long and hopefully some use. I've tried to address
+the first question and most of the rest in the first chunk and I'll try
+to address the bits I've missed as I get to them.
+
+On Wed, 2003-03-12 at 13:37, Adam Smith wrote:
+&gt; 
+&gt; On this topic, what is generally seen as the "best" way to authenticate
+&gt; users?
+
+It depends a great deal on which platforms are involved. A Linux,
+FreeBSD or Solaris system (maybe HP/UX) all support PAM. This allows
+most (if not all) services to use a standard API to manage
+authentication. Behind PAM, it's possible to change where the
+authentication information (username, password, login restrictions, etc)
+is stored. It might be in a particular format of text file (/etc/passwd)
+or in a database stored on another host, which you could access using
+some standard protocol such as LDAP or NIS+. Or it could even be a
+not-so-standard protocol like SMB/CIFS/MSRPC, where the database at the
+other end is the registry.
+
+Most systems have an architecturally similar pluggable authentication
+system. Mac OS/X has one and also makes use of PAM and Windows NT
+codebase systems (NT,2K,XP) systems have something called GINA. These
+all do functionally the same thing - allow applications writers to say
+to the system "authenticate this user". The system can then be
+configured to use one particular type of authentication over another.
+
+The problem is that for many systems, there are a limited number of
+authentication modules available for most systems. Linux PAM has a very
+large number of modules available (not just for authentication), whereas
+Windows, for example, has very few. The two you're most likely to come
+across for Windows are the Netware client, which installs a GINA and a
+GINA called NISGINA, which allows an NT machine to authenticate off a
+NIS+ server.
+
+My recommendation for a Windows system would be to make use of it's own
+native protocols. Many applications make an assumption that this will be
+the case and it will save you much grief later.
+
+For Apple systems, you can either use the standard password file stuff
+that's implemented natively, or make use of an LDAP or Active Directory
+directory.
+
+For Linux and other PAM-enabled systems, I'd go with whatever you like
+:-). LDAP is quite popular and a personal favourite of mine and has
+other advantages which I'll try to cover a little further down this
+page.
+
+&gt; I have set up a Samba domain as you all know from recent posts (Regarding
+&gt; the thread "FW: I just can't do it.")  No decisions have been made about
+&gt; that yet.
+&gt; 
+&gt; I still need to think about the bigger picture.  What is the best method
+&gt; for integrating authentication into one central place?  PAM, using what
+&gt; method?
+
+Questions to ask yourself:
+
+ * Which services will be running on which platforms and do they do any
+	authentication?
+ * How does each particular service handle authentication?
+
+&gt; I will be authenticating the following:
+&gt; 
+&gt; 	o  A Red Hat server with clients connecting via Telnet
+
+telnetd on RedHat Linux (since version 5.x?) supports PAM and therefore
+everything PAM can use as a password backend.
+
+&gt; 	o  Clients connecting via SSH
+
+SSHd also supports PAM and it's backends
+
+&gt; 	o  Clients authenticating from Windows workstations via a Samba
+&gt; 	   Domain
+
+When using the 'encrypt passwords = no' option in smb.conf, Samba can
+(if compiled to do so) authenticate using PAM. If you have the 'encrypt
+passwords' option set to yes, you cannot.
+
+Samba itself can store passwords in a variety of different ways
+(smbpasswd text file, LDAP directory, TDB)
+
+&gt; 	o  VPN through Cisco 827/IPSEC (TBA)
+
+I think most IPSec implementations can use either a shared key or
+certificate-based authentication to start the actual VPN session. The
+Cisco one may also be able to authenticate using a protocol such as
+RADIUS or even Microsoft's NT Domain / RPC crud.
+
+After the session's set up, it's up to the service being used by the
+user to make sure that the individual user is authenticated properly.
+
+&gt; 	o  Dial-Up clients
+
+This one kinda depends on what the modems are plugged into. If it's some
+kind of RADIUS speaking device, it can use RADIUS :-). It may be an NT
+box or a Linux box and would therefore most likely suffer from the same
+authentication deficiencies as the platform at the other end.
+
+&gt; The one big piece of the puzzle which is missing so far is centralized
+&gt; authentication.  I have a big idea of exactly how this should work, but
+&gt; what is the solution I'm looking for?
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,121 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="odd crond problem, virtual server" -->
+<!-- FromName="Mailing List Account" -->
+<!-- FromEmail="mlist@sohoweb.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 28 Jun 1999 09:27:09 -0500" -->
+<!-- Id="4.1.19990628092615.00a26b90@sohoweb.net" -->
+<!-- Reference="3.0.5.32.19990628211819.00935230@mail.adelaide.on.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: odd crond problem, virtual server</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mailing List Account &lt;<I><A HREF="mailto:mlist@sohoweb.net">mlist@sohoweb.net</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 28 Jun 1999 09:27:09 -0500
+</PRE>
+<H1>odd crond problem, virtual server</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I am having problems getting crond to run correctly under a virtual server
+(done with the virtual server HOW-TO as a guide) under 2.2.10ac4. It is
+working fine under 2.0.36.
+
+The crond in the main server is running fine, but the virtuals are failing
+to STAT a file correctly. Following is a diff of the strace output from a
+virtual (&lt;&lt;) and the main server (&gt;&gt;). It appears the value of st_mode is
+getting set differently in the two environments. Why would that be
+happening, and how can I correct it?
+
+Note: crontrace is the virtual, maintrace is the main. Maintrace is the
+working one, crontrace is the non-working one.
+
+
+[root: /virtual/weather] # diff crontrace maintrace
+5,6c5,6
+&lt; fstat(4, {st_mode=S_ISVTX|0327, st_size=0, ...}) = 0
+&lt; mmap(0, 8161, PROT_READ, MAP_PRIVATE, 4, 0) = 0x40014000
+---
+&gt; fstat(4, {st_mode=031032, st_size=0, ...}) = 0
+&gt; mmap(0, 10786, PROT_READ, MAP_PRIVATE, 4, 0) = 0x40014000
+11,14c11,14
+&lt; mmap(0, 974392, PROT_READ|PROT_EXEC, MAP_PRIVATE, 4, 0) = 0x40016000
+&lt; mprotect(0x400fc000, 32312, PROT_NONE)  = 0
+&lt; mmap(0x400fc000, 20480, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED, 4,
+0xe5000) = 0x400fc000
+&lt; mmap(0x40101000, 11832, PROT_READ|PROT_WRITE,
+MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x40101000
+---
+&gt; mmap(0, 974392, PROT_READ|PROT_EXEC, MAP_PRIVATE, 4, 0) = 0x40017000
+&gt; mprotect(0x400fd000, 32312, PROT_NONE)  = 0
+&gt; mmap(0x400fd000, 20480, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED, 4,
+0xe5000) = 0x400fd000
+&gt; mmap(0x40102000, 11832, PROT_READ|PROT_WRITE,
+MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x40102000
+16c16
+&lt; munmap(0x40014000, 8161)                = 0
+---
+&gt; munmap(0x40014000, 10786)               = 0
+18c18
+&lt; getpid()                                = 18663
+---
+&gt; getpid()                                = 18672
+26c26
+&lt; fstat(4, {st_mode=S_ISVTX|0325, st_size=0, ...}) = 0
+---
+&gt; fstat(4, {st_mode=0, st_size=0, ...})   = 0
+32,33c32,33
+&lt; getpid()                                = 18663
+&lt; write(4, "18663\n", 6)                  = 6
+---
+&gt; getpid()                                = 18672
+&gt; write(4, "18672\n", 6)                  = 6
+39,40c39,40
+&lt; stat("cron", {st_mode=S_ISVTX|0264, st_size=0, ...}) = 0
+&lt; fork()                                  = 18664
+---
+&gt; stat("cron", {st_mode=031366, st_size=0, ...}) = 0
+&gt; fork()                                  = 18673
+
+
+Best,
+Scott Temaat, CEO
+SOHOWeb Technologies, LLC (<A HREF="http://sohoweb.net">http://sohoweb.net</A>)
+
+Effective Web Presence Doesn't Cost -- IT PAYS
+Toll-Free: 888-421-SOHO
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

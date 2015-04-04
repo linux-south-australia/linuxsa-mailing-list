@@ -1,0 +1,123 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="[linuxsa-list] Full Disk -Reply (long)" -->
+<!-- FromName="Steve O'CONNOR" -->
+<!-- FromEmail="soconnor@baea.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="peobrien@bold.net.au, linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 23 Mar 1998 19:09:15 +1030" -->
+<!-- Id="s51691fc.020@bunya_smtp" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: [linuxsa-list] Full Disk -Reply (long)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Steve O'CONNOR &lt;<I><A HREF="mailto:soconnor@baea.com.au">soconnor@baea.com.au</A></I>&gt;
+  To  : <A HREF="mailto:peobrien@bold.net.au">peobrien@bold.net.au</A>, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 23 Mar 1998 19:09:15 +1030
+</PRE>
+<H1>[linuxsa-list] Full Disk -Reply (long)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Try this -
+
+1) Find a path that has a decent amount of disk space consumed.
+    The du command can be your friend here ...
+
+    try - du /usr
+            du /var
+            du /usr/local
+
+    Choose a 'directory' to place on the 2nd scsi disk.  A good choice
+    might be /usr.
+
+     Try to find something that uses about 50% of your disk space.
+
+2) setup the 2nd scsi disk, format, mkext2fs, etc. 
+
+3) Make a directory, call it /disk2 or something like that, and then mount the
+new disk into that directory
+
+    mount /dev/scsi_disk2_device_name /disk2
+
+4) Now recursively copy the directory tree chosen in step 1) onto the
+new disk.
+
+    cp -R /usr /disk2
+
+5) Unmount the new disk
+
+   cd /
+   umount /disk2
+
+6) Add the 2nd disk to your mount table.
+     (I think you edit /etc/fstab ??? - someone please confirm how
+      to do this ...)
+
+    it will be something like :
+    /dev/scsi_disk_2_name  /usr     ... blah blah blah
+     ^device                           ^where to put it
+
+7) Rename the old directory chosen in step 1)
+
+     cd /
+     mv /usr /old_usr
+
+8) reboot
+
+9) After reboot, try
+      
+      df
+
+     This should now show
+     /        /dev/scsi1     200MB/230MB  99% full
+     /usr  /dev/scsi2      150MB/300MB  20% full
+
+    So you can see that /usr is now rooted on the 2nd scsi drive.
+
+If you are happy , rm -rf /old_usr.
+
+You have now balanced your files across 2 drives without changing any
+file names, or creating any new symlinks, or dealing with stupid concepts
+such as D:, E:, etc.
+
+BE CAREFUL - you have to get step 6 right, or when you reboot you will
+not have a /usr partitiion, and you will have to manually login as root and
+mount the 2nd scsi drive as /usr before you can do anything useful.
+
+UNIX/Linux is designed to be able to be bootable / useable without all the
+files in the /usr subdir. - You cannot destroy the world by loosing your
+/usr partition, but you can scare yourself badly.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

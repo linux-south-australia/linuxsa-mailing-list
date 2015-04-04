@@ -1,0 +1,140 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Hostname" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 27 Jul 2001 22:20:46 +0930" -->
+<!-- Id="20010727222046.A25369@dog.topology.org" -->
+<!-- Reference="20010727221455.A30506@spiral" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Hostname</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 27 Jul 2001 22:20:46 +0930
+</PRE>
+<H1>Re: Hostname</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, Jul 27, 2001 at 10:14:57PM +0930, Dave Fitch wrote:
+&gt; On Sat, Jul 28, 2001 at 12:00:04PM +0930, Andrew Williss wrote:
+&gt; &gt; Hi list,
+&gt; &gt; what file, sets the hostname and domainame of the machine on BOOT?
+&gt; &gt; I thought my /etc/hosts would do this but it doesn't...
+&gt; &gt; I have to manually set my hostname ie
+&gt; &gt; <A HREF="mailto:root@pikachiu">root@pikachiu</A> root$ hostname [myhostname]
+&gt; &gt; why is this so?
+&gt; 
+&gt; it depends on your distribution (they're all different!).
+&gt; To find the right place to set it find where it's getting
+&gt; set at boot time.  Do a 'grep -i hostname /etc/init.d/*'
+&gt; (or make that under /etc/rc.d for deadrat/redhat etc)
+&gt; 
+
+
+Dave,
+
+Here's a partial answer...
+
+========================================================
+I just checked out my old RH 5.2 system, and it has a
+line like this in /etc/inittab:
+
+# System initialization.
+si::sysinit:/etc/rc.d/rc.sysinit
+
+And if you look at rc.sysinit, you see all of the
+defaults etc. for setting up the hostname at
+boot time.
+
+E.g. my old RH5.2 system has this in rc.sysinit:
+
+if [ -f /etc/sysconfig/network ]; then
+    . /etc/sysconfig/network
+else
+    NETWORKING=no
+    HOSTNAME=localhost
+fi
+
+and then this:
+
+if [ ! -f /etc/HOSTNAME ]; then
+    echo ${HOSTNAME} &gt; /etc/HOSTNAME
+fi
+
+and so forth.
+
+And the file /etc/sysconfig/network has this:
+
+HOSTNAME=rat  
+
+========================================
+My SuSE 7.1 system has this in /etc/inittab:
+
+# check system on startup
+# first script to be executed if not booting in emergency (-b) mode
+si:I:bootwait:/etc/init.d/boot
+
+And the file /etc/init.d/boot has this:
+
+. /etc/rc.config
+
+and later this:
+
+# set hostname and domainname
+#
+test -n "$FQHOSTNAME" && {
+    echo -n Setting up hostname
+    hostname ${FQHOSTNAME%%.*}
+    rc_status -v -r
+}
+
+So in the SuSE case, the host name really comes from the
+system configuration file.
+
+=========================================
+Hmmm. So that means that the hostname in both cases comes from
+a configuration file.
+
+And it just gets _written_ to /etc/HOSTNAME.
+
+Cheers,
+Alan Kennington. 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

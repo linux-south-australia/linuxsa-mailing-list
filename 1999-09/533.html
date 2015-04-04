@@ -1,0 +1,126 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: sendmail problem" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Thu, 23 Sep 1999 21:04:25 +0930 (CST)" -->
+<!-- Id="Pine.BSF.3.96.990923205316.24240F-100000@augustus.tellurian.com.au" -->
+<!-- Reference="199909230947.TAA12361@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: sendmail problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Thu, 23 Sep 1999 21:04:25 +0930 (CST)
+</PRE>
+<H1>Re: sendmail problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+May I be lazy and simply give you the rules which I use?
+
+Careful of tabs in the rule.  Put the names of the sites you will relay for
+in /etc/sendmail.cR.  Note some sites prefer to use IP addresses rather
+than hostnames.  I like names, and indeed the rule which I use permits
+complete domains to be relayed, for example if your /etc/sendmail.cR
+includes foo.net, then it will accept mail for relay from foo.net and
+bar.foo.net.  Use of names does leave you open for reverse-IP address
+spoofing, for example if I know that you relay for foo.net then I can
+configure my DNS to translate my ip address as foo.net.  Calculate your
+risk and decide how you want to do it.
+
+If you want to use IP addresses instead of names, replace {client_name}
+with {client_address} in the first rule of Scheck_rcpt, and ensure that all
+of your local addresses are included in class w (in Cw and Fw).
+
+If you don't like permitting complete domains to be relayed, remove $* from
+the first two rules of Sremove_local.
+
+
+$ cat hack/norelay.m4
+LOCAL_CONFIG
+FR-o /etc/sendmail.cR
+
+LOCAL_RULESETS
+Scheck_rcpt
+
+# anything originating locally is ok
+R$*			$: $(dequote "" $&{client_name} $) $| $1
+R$* $=w $| $*		$@ OK
+R$* $=R $| $*		$@ OK
+R$@ $| $*		$@ OK
+
+# not sent locally.  anything terminating locally is ok
+R$* $| $*		$: $&gt;3 $2
+R$+			$: $&gt;remove_local $1
+
+# anything non-local is bogus
+R$* &lt; @ $* &gt; $*		$#error $: 550 Relaying Denied for $1 &lt; @ $2 &gt; $3
+
+Sremove_local
+R$* &lt; @ $* $=R . &gt; $*	$&gt;3 $1 $4
+R$* &lt; @ $* $=w . &gt; $*	$: $&gt;remove_local $&gt;3 $1 $4
+R$* &lt; @ $* &gt; $*		$@ $1 &lt; @ $2 &gt; $3
+
+# dequote local part
+R$*			$: $&gt;3 $(dequote $1 $)
+R$* &lt; @ $* &gt; $*		$: $&gt;remove_local $1 &lt; @ $2 &gt; $3
+
+$ cat cf/rebel.mc
+divert(-1)
+include(`../m4/cf.m4')
+define(`confDEF_USER_ID',``8:12'')
+define(`confDOMAIN_NAME', ``rebel.net.au'')
+OSTYPE(`linux')
+undefine(`UUCP_RELAY')
+undefine(`BITNET_RELAY')
+FEATURE(nopercent)
+FEATURE(nouucp)
+FEATURE(redirect)
+FEATURE(always_add_domain)
+FEATURE(use_cw_file)
+FEATURE(local_procmail)
+HACK(norelay)		&lt;========= add this line near here
+HACK(spamsite)
+MAILER(procmail)
+MAILER(smtp)
+
+
+Regards,
+
+David
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

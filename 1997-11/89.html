@@ -1,0 +1,276 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Linux Pentium F0-0F bug." -->
+<!-- FromName="Matthew Tippett" -->
+<!-- FromEmail="matthew.tippett@dsto.defence.gov.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 13 Nov 1997 17:24:14 +1030" -->
+<!-- Id="346AA416.A8321466@dsto.defence.gov.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Linux Pentium F0-0F bug.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Tippett &lt;<I><A HREF="mailto:matthew.tippett@dsto.defence.gov.au">matthew.tippett@dsto.defence.gov.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Thu, 13 Nov 1997 17:24:14 +1030
+</PRE>
+<H1>Linux Pentium F0-0F bug.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I have been requested to post the F00F bugfix for Linux.
+
+It is actually in the 2.1.63 kernel.
+
+Care of BUGTRAQ here is the fix. (extracted from teh 62-63 patch.)
+
+IIRC just cut the headers and footers off apply it.  Keep in mind that it
+is a patch from 2.1.62 *TO* 2.1.63.  I doubt it would cleanly go from other
+kernels.  Some assembly would be required.
+
+-----------------------------------------------
+
+diff -u --recursive --new-file v2.1.62/linux/arch/i386/kernel/setup.c
+linux/arch/i386/kernel/setup.c
+--- v2.1.62/linux/arch/i386/kernel/setup.c      Tue Sep 23 16:48:46 1997
++++ linux/arch/i386/kernel/setup.c      Wed Nov 12 11:09:56 1997
+@@ -42,6 +42,7 @@
+ char x86_mask = 0;             /* set by kernel/head.S */
+ int x86_capability = 0;                /* set by kernel/head.S */
+ int fdiv_bug = 0;              /* set if Pentium(TM) with FP bug */
++int pentium_f00f_bug = 0;      /* set if Pentium(TM) with F00F bug */
+ int have_cpuid = 0;             /* set if CPUID instruction works */
+
+ char x86_vendor_id[13] = "unknown";
+@@ -359,6 +360,7 @@
+                                        "fdiv_bug\t: %s\n"
+                                        "hlt_bug\t\t: %s\n"
+                                       "sep_bug\t\t: %s\n"
++                                      "pentium_f00f_bug\t\t: %s\n"
+                                        "fpu\t\t: %s\n"
+                                        "fpu_exception\t: %s\n"
+                                        "cpuid\t\t: %s\n"
+@@ -367,6 +369,7 @@
+                                        CD(fdiv_bug) ? "yes" : "no",
+                                        CD(hlt_works_ok) ? "no" : "yes",
+                                       sep_bug ? "yes" : "no",
++                                      pentium_f00f_bug ? "yes" : "no",
+                                        CD(hard_math) ? "yes" : "no",
+                                        (CD(hard_math) && ignore_irq13)
+                                          ? "yes" : "no",
+diff -u --recursive --new-file v2.1.62/linux/arch/i386/kernel/traps.c
+linux/arch/i386/kernel/traps.c
+--- v2.1.62/linux/arch/i386/kernel/traps.c      Sun Sep  7 13:10:42 1997
++++ linux/arch/i386/kernel/traps.c      Wed Nov 12 11:09:56 1997
+@@ -413,6 +413,51 @@
+
+ #endif /* CONFIG_MATH_EMULATION */
+
++static struct
++{
++       short limit __attribute__((packed));
++       void * addr __attribute__((packed));
++       short __pad __attribute__((packed));
++} idt_d;
++
++void * idt2;
++
++__initfunc(void trap_init_f00f_bug(void))
++{
++       pgd_t * pgd;
++       pmd_t * pmd;
++       pte_t * pte;
++       unsigned long twopage;
++
++       printk("moving IDT ... ");
++
++       twopage = (unsigned long) vmalloc (2*PAGE_SIZE);
++
++       idt2 = (void *)(twopage + 4096-7*8);
++
++       memcpy(idt2,&idt,sizeof(idt));
++
++       idt_d.limit = 256*8-1;
++       idt_d.addr = idt2;
++       idt_d.__pad = 0;
++
++        __asm__ __volatile__("\tlidt %0": "=m" (idt_d));
++
++       /*
++        * Unmap lower page:
++        */
++       pgd = pgd_offset(current-&gt;mm, twopage);
++       pmd = pmd_offset(pgd, twopage);
++       pte = pte_offset(pmd, twopage);
++
++       pte_clear(pte);
++       flush_tlb_all();
++
++       printk(" ... done\n");
++}
++
++
++
+ __initfunc(void trap_init(void))
+ {
+        int i;
+diff -u --recursive --new-file v2.1.62/linux/arch/i386/mm/fault.c
+linux/arch/i386/mm/fault.c
+--- v2.1.62/linux/arch/i386/mm/fault.c  Wed Oct 15 16:04:23 1997
++++ linux/arch/i386/mm/fault.c  Wed Nov 12 11:09:55 1997
+@@ -74,6 +74,25 @@
+        return 0;
+ }
+
++asmlinkage void divide_error(void);
++asmlinkage void debug(void);
++asmlinkage void nmi(void);
++asmlinkage void int3(void);
++asmlinkage void overflow(void);
++asmlinkage void bounds(void);
++asmlinkage void invalid_op(void);
++
++asmlinkage void do_divide_error (struct pt_regs *, unsigned long);
++asmlinkage void do_debug (struct pt_regs *, unsigned long);
++asmlinkage void do_nmi (struct pt_regs *, unsigned long);
++asmlinkage void do_int3 (struct pt_regs *, unsigned long);
++asmlinkage void do_overflow (struct pt_regs *, unsigned long);
++asmlinkage void do_bounds (struct pt_regs *, unsigned long);
++asmlinkage void do_invalid_op (struct pt_regs *, unsigned long);
++
++extern int * idt2;
++extern int pentium_f00f_bug;
++
+ /*
+  * This routine handles page faults.  It determines the address,
+  * and the problem, and then passes it off to one of the appropriate
+@@ -170,6 +189,46 @@
+                goto out;
+        }
+
++       printk("&lt;%p/%p&gt;\n", idt2, (void *)address);
++       /*
++        * Pentium F0 0F C7 C8 bug workaround:
++        */
++       if ( pentium_f00f_bug && (address &gt;= (unsigned long)idt2) &&
++                       (address &lt; (unsigned long)idt2+256*8) ) {
++
++               void (*handler) (void);
++               int nr = (address-(unsigned long)idt2)/8;
++               unsigned long low, high;
++
++               low = idt[nr].a;
++               high = idt[nr].b;
++
++               handler = (void (*) (void)) ((low&0x0000ffff) | (high&0xffff0000));
++               printk("&lt;handler %p... ", handler);
++               unlock_kernel();
++
++               if (handler==divide_error)
++                       do_divide_error(regs,error_code);
++               else if (handler==debug)
++                       do_debug(regs,error_code);
++               else if (handler==nmi)
++                       do_nmi(regs,error_code);
++               else if (handler==int3)
++                       do_int3(regs,error_code);
++               else if (handler==overflow)
++                       do_overflow(regs,error_code);
++               else if (handler==bounds)
++                       do_bounds(regs,error_code);
++               else if (handler==invalid_op)
++                       do_invalid_op(regs,error_code);
++               else {
++                       printk("INVALID HANDLER!\n");
++                       for (;;) __cli();
++               }
++               printk("... done&gt;\n");
++               goto out;
++       }
++
+        /* Are we prepared to handle this kernel fault?  */
+        if ((fixup = search_exception_table(regs-&gt;eip)) != 0) {
+                printk(KERN_DEBUG "%s: Exception at [&lt;%lx&gt;] cr2=%lx (fixup: %lx)\n",
+@@ -193,6 +252,7 @@
+                flush_tlb();
+                goto out;
+        }
++
+        if (address &lt; PAGE_SIZE)
+                printk(KERN_ALERT "Unable to handle kernel NULL pointer
+dereference");
+        else
+diff -u --recursive --new-file v2.1.62/linux/include/asm-i386/bugs.h
+linux/include/asm-i386/bugs.h
+--- v2.1.62/linux/include/asm-i386/bugs.h       Thu Sep 11 09:02:24 1997
++++ linux/include/asm-i386/bugs.h       Wed Nov 12 11:09:55 1997
+@@ -166,6 +166,32 @@
+        }
+ }
+
++/*
++ * All current models of Pentium and Pentium with MMX technology CPUs
++ * have the F0 0F bug, which lets nonpriviledged users lock up the system:
++ */
++
++extern int pentium_f00f_bug;
++
++__initfunc(static void check_pentium_f00f(void))
++{
++       /*
++        * Pentium and Pentium MMX
++        */
++       printk("checking for F00F bug ...");
++       if(x86==5 && !memcmp(x86_vendor_id, "GenuineIntel", 12))
++       {
++               extern void trap_init_f00f_bug(void);
++
++               printk(KERN_INFO "\nIntel Pentium/[MMX] F0 0F bug detected - turning
+on workaround.\n");
++               pentium_f00f_bug = 1;
++               trap_init_f00f_bug();
++       } else {
++               printk(KERN_INFO " no F0 0F bug in this CPU, great!\n");
++               pentium_f00f_bug = 0;
++       }
++}
++
+ __initfunc(static void check_bugs(void))
+ {
+        check_tlb();
+@@ -173,5 +199,6 @@
+        check_hlt();
+        check_popad();
+        check_amd_k6();
++       check_pentium_f00f();
+        system_utsname.machine[1] = '0' + x86;
+ }
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

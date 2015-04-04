@@ -1,0 +1,93 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Squid" -->
+<!-- FromName="Phil Hutton" -->
+<!-- FromEmail="philhutton@bigfoot.com" -->
+<!-- ToName="Tharmarajah Kesavan" -->
+<!-- ToEmail="rajah@asiatic.com.my" -->
+<!-- Date="Mon, 19 Jul 1999 18:48:13 +0930" -->
+<!-- Id="3792ED55.7C645563@bigfoot.com" -->
+<!-- Reference="000b01bed1b6$24435c80$be0109bc@asiaticweb" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Squid</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Phil Hutton &lt;<I><A HREF="mailto:philhutton@bigfoot.com">philhutton@bigfoot.com</A></I>&gt;
+  To  : Tharmarajah Kesavan &lt;<I><A HREF="mailto:rajah@asiatic.com.my">rajah@asiatic.com.my</A></I>&gt;
+  Date: Mon, 19 Jul 1999 18:48:13 +0930
+</PRE>
+<H1>Re: Squid</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi...
+
+&gt; I would like to know, how to restrict certain IP Addresses from surfing the
+&gt; www.
+
+Try something like this (in squid.conf):
+
+---
+acl allowedmachines src 192.168.1.5/255.255.255.0
+192.168.1.6/255.255.255.0
+acl all src 0.0.0.0/0.0.0.0
+
+http_access allow allowedmachines
+http_access deny all
+---
+
+Or if that would be too much of a pain
+---
+acl mydomain src 192.168.1.0/255.255.255.0
+acl all src 0.0.0.0/0.0.0.0
+acl deniedmachines src 192.168.1.3/255.255.255.0
+192.168.1.20/255.255.255.0
+
+http_access deny deniedmachines
+http_access allow mydomain
+http_access deny all
+---
+
+One of the two examples above will be easier than the other depending on
+how many machines you have.  The former will always be more secure, but
+if you have 200 machines on your network it could get ugly unless you
+write some kind of script to do it for you.
+
+I would certainly recommend a http_access deny all at the end, so that
+people from outside your domain can't use your proxy.
+
+If you need clarification on any of this feel free to e-mail me direct.
+
+Phil Hutton.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

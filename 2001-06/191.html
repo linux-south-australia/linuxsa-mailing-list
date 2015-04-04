@@ -1,0 +1,156 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Module compilation hell." -->
+<!-- FromName="'Robyn Manning'" -->
+<!-- FromEmail="rmanning@micronet.net.au" -->
+<!-- ToName="'Matt Brennan'," -->
+<!-- ToEmail="matt.brennan@vsl.com.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 5 Jun 2001 16:28:56 +0930" -->
+<!-- Id="200106050632.QAA18451@mail.micronet.net.au" -->
+<!-- Reference="3B1C2329.D82C185E@adpro.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Module compilation hell.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Robyn Manning &lt;<I><A HREF="mailto:rmanning@micronet.net.au">rmanning@micronet.net.au</A></I>&gt;
+  To  : Matt Brennan &lt;<I><A HREF="mailto:matt.brennan@vsl.com.au">matt.brennan@vsl.com.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 5 Jun 2001 16:28:56 +0930
+</PRE>
+<H1>Re: Module compilation hell.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Matt
+
+When I compile a kernel these are the settings that always stuff me around.
+
+Prompt for development and/or incomplete code / drivers  NO
+Enable loadable module support  YES
+Set version information on all modules symbols  NO
+Kernel module loader  YES
+MTRR support  NO
+Math emulation  NO
+
+These are what I use and they work for me you can try them can't kill much 
+provided you have a backup kernel you can use.
+
+Robyn
+
+ps This is my personal view and not necessarily correct.
+
+
+
+On Tue,  5 Jun 2001 09:39, Matt Brennan wrote:
+&gt; I'm trying to compile a 2.4.2 kernel and modules on a redhat 7.1 box. In
+&gt; essence, the kernel compiles fine but the module compilation falls over
+&gt; with what looks like header problems.
+&gt;
+&gt; At first I used the bundled Redhat gcc but eventually installed the egcs
+&gt; compatibility stuff and used kgcc (by editing the 'CC' entry in the
+&gt; makefile).
+&gt;
+&gt; The kernel headers and source for 2.4.2 are installed cleanly and I am
+&gt; following the pattern make dep && make clean && make bzImage && make
+&gt; modules (and the rest - if only it would work!).
+&gt;
+&gt; The first problem arose compiling a module for my ethernet card (module
+&gt; ne2k-pci). This would spit a couple of hundered lines of warning
+&gt; messages and fail with "Error 2". I then changed the configuration to
+&gt; push this ethernet card support into the kernel (not as a module) and
+&gt; recompiled (from scratch). This worked fine!
+&gt;
+&gt; However, the next module now in the list (the dummy network interface)
+&gt; fails with warning messages  like:
+&gt;
+&gt; make -C net modules
+&gt; make[2]: Entering directory `/usr/src/linux-2.4.2/drivers/net'
+&gt; kgcc -D__KERNEL__ -I/usr/src/linux-2.4/include -Wall -Wstrict-prototypes
+&gt; -O2 -fomit-frame-pointer -fno-strict-aliasing -fno-common
+&gt; -Wno-unused -pipe  -march=i586 -DMODULE -DMODVERSIONS -include
+&gt; /usr/src/linux-2.4/include/linux/modversions.h   -c -o dummy.o dummy.c
+&gt; In file included from /usr/src/linux-2.4/include/linux/wait.h:19,
+&gt;                  from /usr/src/linux-2.4/include/linux/fs.h:12,
+&gt;                  from /usr/src/linux-2.4/include/linux/capability.h:17,
+&gt;                  from /usr/src/linux-2.4/include/linux/binfmts.h:5,
+&gt;                  from /usr/src/linux-2.4/include/linux/sched.h:9,
+&gt;                  from /usr/src/linux-2.4/include/linux/skbuff.h:19,
+&gt;                  from /usr/src/linux-2.4/include/linux/netdevice.h:143,
+&gt;                  from dummy.c:36:
+&gt; /usr/src/linux-2.4/include/asm/processor.h:248: warning: `EISA_bus'
+&gt; redefined
+&gt; /usr/src/linux-2.4/include/linux/modules/i386_ksyms.ver:68: warning:
+&gt; this is the location of the previous definition
+&gt; In file included from dummy.c:34:
+&gt; /usr/src/linux-2.4/include/linux/module.h:173: nondigits in number and
+&gt; not hexadecimal
+&gt; /usr/src/linux-2.4/include/linux/module.h:173: nondigits in number and
+&gt; not hexadecimal
+&gt; /usr/src/linux-2.4/include/linux/module.h:173: nondigits in number and
+&gt; not hexadecimal
+&gt; /usr/src/linux-2.4/include/linux/module.h:173: nondigits in number and
+&gt; not hexadecimal
+&gt; /usr/src/linux-2.4/include/linux/module.h:173: parse error before
+&gt; `62dada05'
+&gt; /usr/src/linux-2.4/include/linux/module.h:173:
+&gt; `inter_module_register_R_ver_str' declared as function returning a
+&gt; function
+&gt;
+&gt; --
+&gt;
+&gt; This feels like the compilation has some problems finding the correct
+&gt; headers. But I am perplexed that moving a module (e.g: ne2k-pci) into
+&gt; the kernel for compilation removes the problem!
+&gt;
+&gt; I worked through the kernel how-to to look for hints. Indeed, the only
+&gt; difference in method I can see is that the 'quick-start' bit of the
+&gt; kernel how-to suggests that after compiling the kernel, the box be
+&gt; rebooted with the new kernel before compiling/installing the modules.
+&gt; The APC linux pocket-book, my other tome of refernce, included no such
+&gt; step.
+&gt;
+&gt; In wonderment, I tried this - but succeeded only in having a bad time as
+&gt; the box - lacking many appropriate modules - failed to boot into a
+&gt; useable state.
+&gt;
+&gt; This must work for 10 of thousands of other ppl so I am clearly doing
+&gt; something daft. Any ideas? Why should module compilation be different?
+&gt;
+&gt;  confused module matt
+&gt;
+&gt; --
+&gt; -- Matt Brennan || Vision Systems Ltd || +61 8 8300 4686
+&gt; --
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

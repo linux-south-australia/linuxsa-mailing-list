@@ -1,0 +1,206 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Replacing a dying HDD" -->
+<!-- FromName="'Anthony Symons'" -->
+<!-- FromEmail="ant@sa.pracom.com.au" -->
+<!-- ToName="'Jim O'Halloran'" -->
+<!-- ToEmail="jim@kendle.com.au" -->
+<!-- Date="18 Apr 2002 16:35:23 +0930" -->
+<!-- Id="1019113524.9094.152.camel@ant.internal" -->
+<!-- Reference="C16C7A51BA30D51187EE0000E8D8C99716B261@int-gw.kendle.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Replacing a dying HDD</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  To  : Jim O &lt;<I><A HREF="mailto:jim@kendle.com.au">jim@kendle.com.au</A></I>&gt;
+  Date: 18 Apr 2002 16:35:23 +0930
+</PRE>
+<H1>Re: Replacing a dying HDD</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+1. quick, simple, wastefull way
+
+assuming drive is hda.
+install new drive as hdc or other drive.
+
+dd if=/dev/hda of=/dev/hdc
+
+wait.
+
+You'll get a partition of the same size as what you had. It should be
+bootable. 
+
+2. Better more complex way.
+
+Get a rescue cd.
+
+Install new drive as (say) hdc
+
+boot system
+
+as root: fdisk /dev/hdc 
+make partitions as you want them. (usually a /boot a / and a swap. you
+need to change the type of the swap partition to type linux swap. Keep
+them in the same order as the original drive, else be prepared to have
+to modify /etc/fstab.
+
+I'll assume hda1 is boot hda2 is swap and hda3 is root. This may not be
+the case in your system. Try not to get partitions confused when your
+data is at stake!
+
+Make file systems:
+
+mke2fs /dev/hda1
+mke2fs /dev/hda3
+mkswap /dev/hda2
+
+If your using different file systems, use the appropriate tool for them.
+
+make a temp dir to mount your new drive on, and do so. Same with your
+boot partition:
+
+mkdir /mnt/hdc
+mount /dev/hdc3 /mnt/hdc
+mkdir /mnt/hdc/boot
+mount /dev/hdc1 /mnt/hdc/boot
+
+Use tar to preserve ownership and permissions to transfer partitions.
+Use 1 filesystem flag to stop it recursivly copying itself.
+
+cd /mnt/hdc
+tar -cplf - -C / . | tar -xpvf - 
+
+The first tar will (c) create a tarball, with (p) permission info (which
+is usually the default, but dont count on it) (l) on one file system
+(that a lowercase L, not a 1) (f -) to a file which is stdout. (-C /)
+change to the root directory first. Then . means current directory,
+which due to the -C / will be the root dir.
+
+The second tar will then (x) extract the tarball, with (p) permissions,
+and a (v) verbose file listing so you can see it is working, and (f -)
+from the file stdin. Your allready in the the directory/partition where
+you want it to go, so it'll copy all the data over with permissions.
+
+Then you'll need to do the same for the boot partition. 
+
+cd /mnt/hdc/boot
+tar -cplf - -C /boot . | tar -xpvf - 
+
+You should have this sussed now.
+
+Now umount /mnt/hdc/boot and /mnt/hdc, and shut down your system.
+
+Set up the new drive as hda, and store the old drive 'till your sure it
+worked. Boot off the rescue cd. Make a space to mount the new file
+systems (you need to configure the bootloader). Something like this:
+
+cd /mnt
+mkdir hda
+mount /dev/hda3 hda
+cd hda
+mount /dev/hda1 boot
+
+Now, presuming lilo, do
+
+lilo -r .
+
+You are in the root of your new drive and the -r . tells lilo to use the
+current directory as the root of the system. This puts it all in to
+perspective for lilo since things are mounted abnormally at this stage.
+
+Lilo should list the kernels, and return your prompt. cd back off this
+drive, umount it all and reboot. That should be it.
+
+If your using grub, then it can be a bit more confusing. I'll leave it
+here becase this has turned in to a bit of an epic allready!
+
+Needless to say, all these commands have a man page, and I suggest you
+read them and make sure you understand what your doing before you begin.
+You dont want to get half way and get stuck, although provided you havnt
+accidentally trashed any of your original drive you should be able to
+just go back to where you were.
+
+3. dead easy/non linux way
+
+Get the personal version of norton ghost. Make a boot disk. Run it. Use
+the menu options to clone disk, and select to make the partitions large.
+
+Ant
+
+
+
+On Thu, 2002-04-18 at 16:01, Jim O'Halloran wrote:
+&gt; Hi,
+&gt; 
+&gt; We've got a RedHat 7.1 machine here, which runs a 2.5Gb IDE hard disk.  The
+&gt; disk is starting to make horrible noises, and I suspect that its going to
+&gt; fail soon.  I've got either a 3.2Gb or 4.2Gb replacement hard disk which I
+&gt; can put into the machine.  Is there an easyish way to transfer the entire
+&gt; system onto the new disk?  I'm really not fussed if I end up with only 2.5gb
+&gt; usable on the new disk, as long as I've got everything from the old drive.
+&gt; 
+&gt; Jim.
+&gt; 
+&gt; ---
+&gt; Jim O'Halloran
+&gt; Kendle Computer Services Pty. Ltd.
+&gt; Phone: (08) 8354 1600   (intl. +61-8-8354-1600)
+&gt; Fax: (08) 8354 1900 (intl. +61-8-8354-1900)
+&gt; 
+&gt; It's much easier to stand on the shoulders of
+&gt; giants if they happen to be stackable.
+&gt; 
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+-- 
+Systems Administrator       
+Pracom Ltd.             
++61 8 82029074 -=- +61 402 100 671 
+<A HREF="mailto:anthony.symons@sa.pracom.com.au">anthony.symons@sa.pracom.com.au</A>
+
+PRIVILEGED - PRIVATE AND CONFIDENTIAL
+This electronic mail is solely for the use of the addressee and may
+contain information which is confidential or privileged.
+If you receive this electronic mail in error, please delete it from
+your system immediately and notify the sender by electronic mail or
+using any of the above contact details.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

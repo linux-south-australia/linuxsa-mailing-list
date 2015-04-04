@@ -1,0 +1,93 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: socket mysteries solved" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="O'Connor, Steven" -->
+<!-- ToEmail="Steven.O'Connor@boralenergy.com.au" -->
+<!-- Date="Thu, 18 Mar 1999 13:28:10 +1030 (CST)" -->
+<!-- Id="199903180258.NAA56137@atdot.dotat.org" -->
+<!-- Reference="199903180003.KAA31858@Elizabeth.netcraft.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: socket mysteries solved</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : O'Connor, Steven &lt;<I><A HREF="mailto:Steven.O'Connor@boralenergy.com.au">Steven.O'Connor@boralenergy.com.au</A></I>&gt;
+  Date: Thu, 18 Mar 1999 13:28:10 +1030 (CST)
+</PRE>
+<H1>Re: socket mysteries solved</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+O'Connor, Steven wrote:
+
+ &gt; I missed out the setting of addrlen before calling accept().
+
+I must make a note of that for next time someone asks the same question;
+The example I gave did set addrlen, but I probably should have drawn more
+attention to it.  Sorry 'bout that.
+
+ &gt; I assumed that
+ &gt; because you pass addrlen by ref that the accept call wants to write into the
+ &gt; variable, which it does. It also reads from the variable as well, and
+ &gt; requires it to be setup prior to use .... whoever wrote accept () and
+ &gt; getpeername () must have been on the same drugs that the author of select ()
+ &gt; was on , no doubt.
+
+One reason is to avoid buffer overflows:  The kernel needs to know
+how large the bit of memory you've given it is, otherwise there'd
+be nothing to stop people from handing it, say, a pointer to a char
+instead of a pointer to a sockaddr_in.  The kernel can't find that
+out for itself, so to avoid segfaults and buffer overflow security
+exploits you need to tell it.
+
+The reason it wants to write into the variable is that different 
+address families have different sockaddr structures;  The IPv6 address
+structure is of a different size to a sockaddr_in, which is different
+again from a sockaddr_un (for UNIX-domain sockets), which is different
+again from an IPX socket, etc.  Because you don't necessarily know 
+which family the socket belongs to before you hand it to accept() or
+getpeername() (not 'til you get the "family" field in the sockaddr
+structure) you can't really know ahead of time how many bytes to 
+expect, so the kernel tells you (and uses the value you passed in as an
+upper bound).
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1958-3414 ------------- Fax: +61-8-83034403 -----
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

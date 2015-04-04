@@ -1,0 +1,107 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: linuxsa-digest Digest V00 #385" -->
+<!-- FromName="Michael Neuling" -->
+<!-- FromEmail="mneuling@radlogic.com.au" -->
+<!-- ToName="Ian Hogben" -->
+<!-- ToEmail="ian@safcol.com.au" -->
+<!-- Date="Mon, 24 Jul 2000 09:55:54 +0930" -->
+<!-- Id="m13GW4A-000mU4C@flea.radnet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: linuxsa-digest Digest V00 #385</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Neuling &lt;<I><A HREF="mailto:mneuling@radlogic.com.au">mneuling@radlogic.com.au</A></I>&gt;
+  To  : Ian Hogben &lt;<I><A HREF="mailto:ian@safcol.com.au">ian@safcol.com.au</A></I>&gt;
+  Date: Mon, 24 Jul 2000 09:55:54 +0930
+</PRE>
+<H1>Re: linuxsa-digest Digest V00 #385</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; /*  The possible media types that can be set in options[] are: */
+&gt; static const char * const medianame[] = {
+&gt;     "10baseT", "10base2", "AUI", "100baseTx",
+&gt;     "10baseT-FD", "100baseTx-FD", "100baseT4", "100baseFx",
+&gt;     "100baseFx-FD", "MII 10baseT", "MII 10baseT-FD", "MII",
+&gt;     "10baseT(forced)", "MII 100baseTx", "MII 100baseTx-FD", "MII 100baseT4",
+&gt; };
+&lt;snip&gt;
+&gt; So. It must be a syntax error when I enter the following in conf.modules and
+&gt; nothing happens. Can anyone enlighten me?
+&gt; 
+&gt; options tulip medianame[] = 10baseT(forced)
+
+You can't set medianame directly.  From looking at the driver source
+code you can set it indirectly using the "options" parameter.
+
+Also from the tulip driver (from 2.2.16)
+--
+MODULE_PARM(options, "1-" __MODULE_STRING(MAX_UNITS) "i");
+--
+	/* The lower four bits are the media type. */
+	if (board_idx &gt;= 0  &&  board_idx &lt; MAX_UNITS) {
+		tp-&gt;default_port = options[board_idx] & 15;
+		if ((options[board_idx] & 0x90) || full_duplex[board_idx] &gt; 0)
+			tp-&gt;full_duplex = 1;
+		if (mtu[board_idx] &gt; 0)
+			dev-&gt;mtu = mtu[board_idx];
+	}
+--
+
+I believe you want to set "options" in conf.modules not "medianame".
+Try doing a plain insmod without using conf.modules. ie.
+	
+	insmod options=0x0 tulip
+
+It says that the lower 4 bits of options are the media type and 0
+seems to be the "10baseT" option (although 12 seems to be a 10baseT
+forced option) .  Once you get it running with insmod then you can put
+the parmeters you set in conf.modules.  Check dmesg after you do the
+insmod as this should give you some debug info.
+
+I don't have any tulip ethernet cards in a linux machine handy so I
+cannot run this myself.
+
+Regards,
+Michael
+--
+Michael Neuling                        <A HREF="mailto:mneuling@radlogic.com.au">mneuling@radlogic.com.au</A> (o_ 
+RADLogic Pty Ltd, Adelaide, South Australia ph: +61 8 8373-3990 //\ 
+<A HREF="http://www.radlogic.com.au">http://www.radlogic.com.au</A>                  fx: +61 8 8373-3251 V_/_
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

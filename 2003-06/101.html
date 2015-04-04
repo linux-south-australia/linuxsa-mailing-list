@@ -1,0 +1,123 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Setting the gateway" -->
+<!-- FromName="'Ant'" -->
+<!-- FromEmail="fineales@ozemail.com.au" -->
+<!-- ToName="'Damien Uern'" -->
+<!-- ToEmail="carrigan_2606@optusnet.com.au" -->
+<!-- Date="03 Jun 2003 00:26:10 +0930" -->
+<!-- Id="1054565772.997.16.camel@ant.localdomain" -->
+<!-- Reference="200306022345.54914.carrigan_2606@optusnet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Setting the gateway</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Ant &lt;<I><A HREF="mailto:fineales@ozemail.com.au">fineales@ozemail.com.au</A></I>&gt;
+  To  : Damien Uern &lt;<I><A HREF="mailto:carrigan_2606@optusnet.com.au">carrigan_2606@optusnet.com.au</A></I>&gt;
+  Date: 03 Jun 2003 00:26:10 +0930
+</PRE>
+<H1>Re: Setting the gateway</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, 2003-06-02 at 23:45, Damien Uern wrote:
+&gt; gateway? Can this be done seamlessly? E.g. if ppp0 exists, use that gateway, 
+&gt; otherwise use the eth0 gateway.
+
+I think your theory is a little off here. In a tcp/ip network routing is
+defined by both the IP and the netmask. Then you have gateways to other
+networks, and what is on the other network is also defined by an
+adress/netmask pair. 
+
+So, you dont need a gateway to to access your local network, only a
+default gateway to get out of it.
+
+Example: my home network.I have several workstations on the lan. One of
+these is this desktop, ant. its routing table looks like so:
+
+[<A HREF="mailto:ant@ant">ant@ant</A> ant]$ route
+Kernel IP routing table
+Destination   Gateway   Genmask         Flags Metric Ref    Use Iface
+192.168.2.0   *         255.255.255.0   U     0      0        0 eth0
+127.0.0.0     *         255.0.0.0       U     0      0        0 lo
+default       fa        0.0.0.0         UG    0      0        0 eth0
+
+The first route is my lans address range.192.168.2.x It is on eth0, and
+does not need a gateway as the machine is connected to it directly via
+eth0. Any address in that range can just be sent out eth0 and get there
+without any extra hops.
+
+The next is 127.* - the local loop back.
+
+Then the default route is to the machine fa, which is available on eth0.
+Any other packet thats destination does not match a more specific route
+will get sent to the default gatway. If Im not dialed up, then fa will
+get the packet and send back a host unreachable (as it wont know what to
+do with it). The local lan will still function however.
+
+Now lets take a look at fa's routing table (when not dialed up):
+
+[<A HREF="mailto:ant@fineales">ant@fineales</A> ant]$ route
+Kernel IP routing table
+Destination     Gateway  Genmask         Flags Metric Ref    Use Iface
+192.168.4.0     *        255.255.255.0   U     0      0        0 eth2
+192.168.2.0     *        255.255.255.0   U     0      0        0 eth0
+127.0.0.0       *        255.0.0.0       U     0      0        0 lo
+[<A HREF="mailto:ant@fineales">ant@fineales</A> ant]$
+
+Here we have a wireless network, ethernet network, and local loopback.
+Then we dial up and the default route gets added:
+
+[<A HREF="mailto:ant@fineales">ant@fineales</A> ant]$ route
+Kernel IP routing table
+Destination     Gateway   Genmask         Flags Metric Ref    Use Iface
+tnt4.adl1.da.uu *         255.255.255.255 UH    0      0        0 ppp0
+192.168.4.0     *         255.255.255.0   U     0      0        0 eth2
+192.168.2.0     *         255.255.255.0   U     0      0        0 eth0
+127.0.0.0       *         255.0.0.0       U     0      0        0 lo
+default         tnt4.adl1.da.uu 0.0.0.0   UG    0      0        0 ppp0
+[<A HREF="mailto:ant@fineales">ant@fineales</A> ant]$
+
+So now packets that fineales (fa) doesnt know what to do with will get
+sent out the default gateway. Note the netmask of 0.0.0.0 (eg any
+packet).
+
+I guess in your case this all points to the fact that if you dont have
+an internet connection when you are not dialed up then you probably dont
+need to hard code a default gateway in your config...
+
+Ant
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,116 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="PPP, Dynamic IP, and an IPCHAINS script" -->
+<!-- FromName="Adam J. Sulis" -->
+<!-- FromEmail="asulis@range.on.ca" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 18 Jun 2000 19:39:39 -0400" -->
+<!-- Id="4.3.2.7.0.20000618193806.00ac9590@pop3.sprint.ca" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: PPP, Dynamic IP, and an IPCHAINS script</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adam J. Sulis &lt;<I><A HREF="mailto:asulis@range.on.ca">asulis@range.on.ca</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sun, 18 Jun 2000 19:39:39 -0400
+</PRE>
+<H1>PPP, Dynamic IP, and an IPCHAINS script</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I hope this doesn't transmit in HTML - first email using Eudora (I think I 
+have it all config'd). Sorry if it does, just let me know and I'll fix it.
+
+I have a difficult problem which I hope you may be able to help me with. I 
+have RedHat 6.2's PPPD set up to dial my ISP. My 'ppp-on' script is called 
+from near the top of my init.d/firewall script, giving the ability to bring 
+up the connection, wait 30 seconds to log in, then run the IPCHAINS stuff 
+(which is quite large). By combining the two actions into one script, I am 
+able to control them by one command, 'firewall restart'. I have a crontab 
+script that checks for a valid ppp0 every five minutes. If not found, it 
+restarts the firewall script and all would be fine.
+
+Here is the glitch: Once dialed in, my ppp0 interface is given a dynamic, 
+random IP from the ISP's pool. However, a few lines of code later in the 
+script, my firewall script pre-sets a number of variables, one of which is 
+the external interface IP, "IPADDR". I need to find a way to pass the new 
+IP address to this variable on-the-fly so that IPCHAINS can pick it up and 
+use it. The affected part of the script (trimmed for size) appears at the 
+end of this message.
+
+I considered doing an 'ifconfig ppp0 &gt; /root/ifdump.txt' and then parsing 
+it for the IP and redirecting it into the variable, but that seems messy. 
+It would be nice if I could either export a variable right from pppd or 
+chat, or somehow intercept the IP passing to the kernel and "set" the 
+variable in the system. Is there perhaps a place where the IP is stored, in 
+a text file somewhere?
+
+Any suggestions to get this idea, or any other approach working would be 
+most appreciated. My knowledge is growing, but I sometimes "engineer" 
+myself into a corner.
+
+Thanks in advance,
+
+Adam Sulis
+<A HREF="mailto:asulis@sprint.ca">asulis@sprint.ca</A>
+
+Here is the code section:
+&lt;snip&gt;
+# See how we were called.
+case "$1" in
+   start)
+         echo -n "Starting Firewalling Services: "
+
+# ---------------------------------------------------
+#  Bring up PPP
+#
+/etc/ppp/ppp-on
+sleep 30
+
+# Some definitions for easy maintenance.
+
+# ------------------------------------------------------------------------
+#  EDIT THESE TO SUIT YOUR SYSTEM AND ISP.
+
+EXTERNAL_INTERFACE="ppp0"               # whichever you use
+LOCAL_INTERFACE_1="eth1"                # whichever you use
+LOOPBACK_INTERFACE="lo"
+
+IPADDR="208.164.186.1"
+LOCALNET_1="172.16.1.0/24"              # whatever private range you use
+ANYWHERE="any/0"
+&lt;/snip&gt; 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

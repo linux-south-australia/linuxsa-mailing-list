@@ -1,0 +1,228 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Is this a kernel bug?" -->
+<!-- FromName="Joao Campos" -->
+<!-- FromEmail="jcampos@icat137.icat.fc.ul.pt" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 26 Jul 1999 10:59:35 +0100" -->
+<!-- Id="379C3187.EF8C2AB9@ui.icat.fc.ul.pt" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Is this a kernel bug?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Joao Campos &lt;<I><A HREF="mailto:jcampos@icat137.icat.fc.ul.pt">jcampos@icat137.icat.fc.ul.pt</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 26 Jul 1999 10:59:35 +0100
+</PRE>
+<H1>Is this a kernel bug?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi.
+
+This post follows up my previous ones on "ZIP drive stangeness" and
+"Lock on boot".
+
+I managed to boot properly and now have my system fully opperational.
+I'm trying to understand what went wrong.
+
+What was broken was my mtab file. The boot locked up on mount -f
+something. Somehow mtab didn't got as clean as possible with &gt;/etc/mtab,
+as is done in /etc/rc.d/rc.sysinit. I manually rm /etc/mtab, and then
+&gt;/etc/mtab. After this, it boot up as clean as new;). (thanks Benjamin Close for you valuable contribution to this list)
+
+Now the questions are:
+	How can &gt;/etc/mtab be different from rm /etc/mtab; &gt;/etc/mtab ? It can
+be different because it may be associated to a different inode then it
+was before, but if it is an inode problem, shouldn't it be caught by
+fsck?
+	What has broken mtab, and what was the source of the original problem?
+( I'll include (what I think) the relevant part of /var/log/messages)
+Was this a kernel bug? Was this a smb bug?
+
+Thank you.
+
+
+------- The first strange thing in /var/log/messages --------------
+
+...
+
+Jul 20 14:17:59 hostname kernel: parport0: PC-style at 0x378
+[SPP,ECP,ECPEPP,ECPPS2] 
+Jul 20 14:17:59 hostname kernel: parport0: detected irq 7; use procfs to
+enable interrupt-driven operation. 
+Jul 20 14:17:59 hostname kernel: parport0: no IEEE-1284 device present. 
+Jul 20 14:17:59 hostname kernel: imm: Version 2.03 (for Linux 2.0.0) 
+Jul 20 14:17:59 hostname kernel: imm: Found device at ID 5, Attempting
+to use EPP 32 bit 
+Jul 20 14:17:59 hostname kernel: imm: Communication established with ID
+5 using EPP 32 bit 
+Jul 20 14:17:59 hostname kernel: scsi1 : Iomega VPI2 (imm) interface 
+Jul 20 14:17:59 hostname kernel: scsi : 2 hosts. 
+Jul 20 14:17:59 hostname kernel:   Vendor: IOMEGA    Model: ZIP 100
+PLUS      Rev: J.66 
+Jul 20 14:17:59 hostname kernel:   Type:  
+Direct-Access                      ANSI SCSI revision: 02 
+Jul 20 14:17:59 hostname kernel: Detected scsi removable disk sda at
+scsi1, channel 0, id 5, lun 0 
+Jul 20 14:17:59 hostname kernel: sda : READ CAPACITY failed. 
+Jul 20 14:17:59 hostname kernel: sda : status = 0, message = 00, host =
+0, driver = 28  
+Jul 20 14:17:59 hostname kernel: sda : extended sense code = 2  
+Jul 20 14:17:59 hostname kernel: sda : block size assumed to be 512
+bytes, disk size 1GB.   
+Jul 20 14:17:59 hostname kernel:  sda:scsidisk I/O error: dev 08:00,
+sector 0 
+Jul 20 14:17:59 hostname kernel:  unable to read partition table 
+Jul 20 14:25:01 hostname kernel: autofs: called with bogus options 
+Jul 20 14:28:47 hostname kernel: autofs: called with bogus options 
+Jul 20 14:35:02 hostname kernel: sr0: CDROM not ready.  Make sure there
+is a disc in the drive. 
+Jul 20 14:35:02 hostname kernel: sr0: CDROM not ready.  Make sure there
+is a disc in the drive. 
+Jul 20 14:35:02 hostname kernel: cdrom: open failed. 
+Jul 20 14:35:02 hostname kernel: Device not ready.  Make sure there is a
+disc in the drive. 
+Jul 20 14:36:26 hostname kernel: Disc change detected. 
+Jul 20 14:36:28 hostname kernel: SCSI device sda: hdwr sector= 512
+bytes. Sectors= 196608 [96 MB] [0.1 GB] 
+Jul 20 14:36:28 hostname kernel: sda: Write Protect is off 
+Jul 20 14:36:29 hostname kernel:  sda: sda4 
+Jul 20 14:42:22 hostname kernel: autofs: called with bogus options 
+Jul 20 14:42:46 hostname kernel: autofs: called with bogus options 
+Jul 20 14:50:12 hostname kernel: sr0: disc change detected. 
+
+...
+
+Jul 21 13:19:36 hostname kernel: Disc change detected. 
+Jul 21 13:19:36 hostname kernel: SCSI device sda: hdwr sector= 512
+bytes. Sectors= 196608 [96 MB] [0.1 GB] 
+Jul 21 13:19:36 hostname kernel: sda: Write Protect is off 
+Jul 21 13:19:36 hostname kernel:  sda: sda4 
+
+...
+
+Jul 21 13:24:00 hostname modprobe: can't locate module sound-slot-0
+Jul 21 13:24:00 hostname modprobe: can't locate module sound-service-0-3
+Jul 21 13:24:01 hostname modprobe: can't locate module sound-slot-0
+Jul 21 13:24:01 hostname modprobe: can't locate module sound-service-0-3
+Jul 21 13:24:01 hostname modprobe: can't locate module sound-slot-0
+Jul 21 13:24:01 hostname modprobe: can't locate module sound-service-0-3
+Jul 21 13:24:01 hostname modprobe: can't locate module sound-slot-0
+Jul 21 13:24:01 hostname modprobe: can't locate module sound-service-0-3
+Jul 21 13:24:02 hostname modprobe: can't locate module sound-slot-0
+Jul 21 13:24:02 hostname modprobe: can't locate module sound-service-0-3
+Jul 21 13:24:02 hostname modprobe: can't locate module sound-slot-0
+Jul 21 13:24:03 hostname modprobe: can't locate module sound-service-0-3
+Jul 21 13:24:03 hostname modprobe: can't locate module sound-slot-0
+Jul 21 13:24:03 hostname modprobe: can't locate module sound-service-0-3
+Jul 21 13:24:03 hostname modprobe: can't locate module sound-slot-0
+Jul 21 13:24:03 hostname modprobe: can't locate module sound-service-0-3
+Jul 21 13:24:03 hostname modprobe: can't locate module sound-slot-0
+Jul 21 13:24:03 hostname modprobe: can't locate module sound-service-0-3
+
+...
+
+Jul 21 19:04:52 hostname kernel: autofs: called with bogus options 
+Jul 21 19:04:52 hostname kernel: Disc change detected. 
+Jul 21 19:04:53 hostname kernel: SCSI device sda: hdwr sector= 512
+bytes. Sectors= 196608 [96 MB] [0.1 GB] 
+Jul 21 19:04:53 hostname kernel: sda: Write Protect is off 
+Jul 21 19:04:53 hostname kernel:  sda: sda4 
+Jul 21 19:07:11 hostname kernel: Unable to handle kernel paging request
+at virtual address 10020010 
+Jul 21 19:07:11 hostname kernel: current-&gt;tss.cr3 = 006df000, %cr3 =
+006df000 
+Jul 21 19:07:11 hostname kernel: *pde = 00000000 
+Jul 21 19:07:11 hostname kernel: Oops: 0000 
+Jul 21 19:07:11 hostname kernel: CPU:    0 
+Jul 21 19:07:11 hostname kernel: EIP:   
+0010:[soundlow:sound_unload_lowlevel_drivers_Ra675fda1+114075/1125777] 
+Jul 21 19:07:11 hostname kernel: EFLAGS: 00010246 
+Jul 21 19:07:11 hostname kernel: eax: c57e5980   ebx: 00000000   ecx:
+10020004   edx: c31ffcd8 
+Jul 21 19:07:11 hostname kernel: esi: c31ffcc0   edi: c043f600   ebp:
+c57e59cc   esp: c173df3c 
+Jul 21 19:07:11 hostname kernel: ds: 0018   es: 0018   ss: 0018 
+Jul 21 19:07:11 hostname kernel: Process smbd (pid: 7140, process nr:
+20, stackpage=c173d000) 
+Jul 21 19:07:11 hostname kernel: Stack: c173df88 c8867f1d c31ffcc0
+c31ffcc0 c57e5980 c012afb2 c57e5980 c31ffcc0  
+Jul 21 19:07:11 hostname kernel:        c173df88 00000000 c3c6f00b
+00000001 c012b17a c6037ee0 c173df88 c3c6f000  
+Jul 21 19:07:11 hostname kernel:        c3c6f000 080f5380 bfffe7e4
+c3c6f000 0000000b c282edac c012b26c c3c6f000  
+Jul 21 19:07:11 hostname kernel: Call Trace:
+[soundlow:sound_unload_lowlevel_drivers_Ra675fda1+114377/1125475]
+[real_lookup+74/112] [lookup_dentry+294/496] [__namei+40/88]
+[sys_newstat+14/96] [system_call+52/56]  
+Jul 21 19:07:11 hostname kernel: Code: 83 79 0c 00 75 0f ba 00 e0 ff ff
+21 e2 8b 41 08 39 42 60 75  
+...
+
+------------------- Something related to mount in /var/log/messages
+
+
+Jul 21 19:15:51 hostname kernel: Unable to handle kernel paging request
+at virtual address c88690c8 
+Jul 21 19:15:51 hostname kernel: current-&gt;tss.cr3 = 01b31000, %cr3 =
+01b31000 
+Jul 21 19:15:51 hostname kernel: *pde = 07dd1063 
+Jul 21 19:15:51 hostname kernel: *pte = 00000000 
+Jul 21 19:15:51 hostname kernel: Oops: 0000 
+Jul 21 19:15:51 hostname kernel: CPU:    0 
+Jul 21 19:15:51 hostname kernel: EIP:    0010:[sys_readlink+62/148] 
+Jul 21 19:15:51 hostname kernel: EFLAGS: 00010296 
+Jul 21 19:15:51 hostname kernel: eax: c88690a0   ebx: ffffffea   ecx:
+ffffffff   edx: c0329ed8 
+Jul 21 19:15:51 hostname kernel: esi: c57e5980   edi: c6037ee0   ebp:
+00000ffe   esp: c162dfb8 
+Jul 21 19:15:51 hostname kernel: ds: 0018   es: 0018   ss: 0018 
+Jul 21 19:15:51 hostname kernel: Process mount (pid: 7776, process nr:
+48, stackpage=c162d000) 
+Jul 21 19:15:51 hostname kernel: Stack: 08056a78 bffffc9c c01095a8
+0805df08 bfffdc9c 00000ffe 08056c80 08056a78  
+Jul 21 19:15:51 hostname kernel:        bffffc9c 00000055 0000002b
+0000002b 00000055 400bbe64 00000023 00000287  
+Jul 21 19:15:51 hostname kernel:        bfffdc74 0000002b  
+Jul 21 19:15:51 hostname kernel: Call Trace: [system_call+52/56]  
+Jul 21 19:15:51 hostname kernel: Code: 83 78 28 00 74 3c 8b 47 08 8b 40
+64 85 c0 74 12 8b 40 4c 85  
+
+...
+-- 
+João Campos
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

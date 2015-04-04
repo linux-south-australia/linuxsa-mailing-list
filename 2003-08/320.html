@@ -1,0 +1,134 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: ftp server setup" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'Tek Gear :: Jason'," -->
+<!-- ToEmail="jason@tekgear.net.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 6 Aug 2003 12:47:17 +0930" -->
+<!-- Id="008b01c35bc9$50040260$020120ac@skink" -->
+<!-- Reference="004201c35bc3$55086630$0201a8c0@JASON" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: ftp server setup</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : Tek Gear :: Jason &lt;<I><A HREF="mailto:jason@tekgear.net.au">jason@tekgear.net.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 6 Aug 2003 12:47:17 +0930
+</PRE>
+<H1>RE: ftp server setup</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+OK, things are rather disorganised here, because of the masses of help :)
+
+One thing I just thought of is DNS. If your DNS isn't configured right, it
+can take a few minutes for ftpd to start. Does ftping to localhost actually
+give you an error, or just nothing, and then you kill it?
+
+I've tried to condense things down, so you can get all the relevant info in
+one email... run the following commands as root, and let us know anything
+that isn't as it should be:
+
+* netstat -anp --inet |grep LISTEN
+	should show something listening to port 21
+
+* ps -elf | egrep [ftp|inet]
+	should show one or both of inetd or ftpd
+
+* rpm -qa | grep ftp
+	should show that you have an ftpd installed
+
+* ifconfig -a
+	should show you have eth0 and lo up and correctly configured
+
+* ping localhost
+	should be able to ping localhost
+
+* nmap localhost
+	should list ftp as a service that is open
+
+* telnet localhost 21
+	should connect (won't do anything else sensible)
+
+* ssh localhost
+	assuming you are running sshd, you should be able to ssh to yourself
+successfully
+
+* more /etc/xinetd.d/*ftp*
+	should show that your ftp daemon is not disabled
+	also, should tell you if tcpd is controlling access to this daemon
+
+* chkconfig all
+	not sure how this command is run -- check man page.
+	should show ftp is on in the current runlevel
+
+* runlevel
+	gives you current runlevel
+
+* /etc/init.d/&lt;ftpd&gt; status
+	if you're running it standalone, this tells you if it's running
+
+* /etc/init.d/&lt;ftpd&gt; [re]start
+	if you're running it standalone, this [re]starts it
+
+* /etc/init.d/xinetd status
+	should tell you if inetd's running
+
+* /etc/init.d/xinetd [re]start
+	[re]starts inetd
+
+* grep -i ftp /var/log/messages
+	should list ftpd starting, stopping, and perhaps giving errors
+	may also find /var/log/daemon or /var/log/*ftp* or /var/log/*ftp*/*
+
+* grep -i inetd /var/log/messages
+	should list inetd starting, stopping, and perhaps giving errors
+	you may want to use less and search manually for inetd, as some
+errors are on separate lines...
+
+That's all I can think of for now...
+
+
+rr
+
+-- 
+Richard Russell
+Yellow Goanna P/L
+m: +61 412 827 805
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+w: <A HREF="http://www.yellowgoanna.com">http://www.yellowgoanna.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

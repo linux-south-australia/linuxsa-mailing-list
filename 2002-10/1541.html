@@ -1,0 +1,115 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: NTP Servers" -->
+<!-- FromName="'Daryl Tester'" -->
+<!-- FromEmail="Daryl.Tester@iocane.com.au" -->
+<!-- ToName="'Mcleod, Ian'" -->
+<!-- ToEmail="ian.mcleod@eds.com" -->
+<!-- Date="Wed, 30 Oct 2002 18:30:49 +1030" -->
+<!-- Id="3DBF91B1.A557D2DE@iocane.com.au" -->
+<!-- Reference="B09017B65BC1A54BB0B76202F63DDCCA115969@auntm201" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: NTP Servers</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  To  : Mcleod, Ian &lt;<I><A HREF="mailto:ian.mcleod@eds.com">ian.mcleod@eds.com</A></I>&gt;
+  Date: Wed, 30 Oct 2002 18:30:49 +1030
+</PRE>
+<H1>Re: NTP Servers</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+"Mcleod, Ian" wrote:
+
+&gt; Why is UDP less secure and how does UDP differ from TCP?
+
+"Less secure" is probably not the exact phrase for it, but it
+is much easier to forge UDP traffic than it is for TCP.  TCP
+require the completion of a "3 way handshake" before delivering
+data to the application, and in that three way handshake "secrets"
+are exchanged in order to complete that exchange (on some systems
+guessing the secret is trivial - nmap has a report stating "trivial
+joke", which usually comes back when scanning network devices like
+printer servers).  UDP, being a simple, stateless transport protocol,
+delivers the data immediately to the application to process without
+requiring that set up phase (the data itself may contain
+authentication information, however).
+
+Being trivial to forge, you could easily set the following events
+in motion.  Let's say Mike's just set up NTP on his mail host.
+Let's ignore the fact that he's just published his ntp.conf, but
+we know he's running ntp.  It's easy enough to determine the IP
+address of his mail host, and there's only a small number of NTP
+servers in Australia that he can query anonymously off the net.
+He can't firewall effectively, because he *must* be able to
+communicate with the 'net accessible server.  If we inject packets
+into the network[1] with the destination set to his NTP client
+(/server), the source set to the publicly accessable NTP server,
+and some mischief data that when read by Mike's NTP client causes
+it to explode, then it's game over.
+
+Note that it would probably more difficult to fool with Mike's
+clock, as I believe that there's some bidirectional exchange of
+info (although I could be wrong - been a while since I've looked
+at NTP traffic).  The thing is, while it's easy to inject data
+with forged addresses, getting the data back to your machine is
+a lot more difficult.
+
+&gt; Universal Datagram Protocol (?) is very different? 
+
+User Datagram Protocol.
+
+&gt; Forgive my ignorance here if I am right off - but I would
+&gt; like to know how UDP is less secure and why UDP is used over other protocols
+&gt; at times..
+
+It's a different class of protocol.  TCP has a higer overhead in
+setup and teardown costs, UDP's stateless nature makes it more
+ideal for stuff like DNS and NFS.  Different horses for different
+courses.
+
+
+[1]  Presuming that we can - some networks drop such martian packets.
+
+-- 
+Regards,
+  Daryl Tester,  Software Wrangler and Bit Herder, IOCANE Pty. Ltd.
+
+"Security Alert: Your Computer Is Currently Broadcasting An Internet IP
+ Address.  With This Address, Someone Can Immediately Begin Attacking
+ Your Computer!"  --  One Of Those Profound Dialog Box Adverts.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

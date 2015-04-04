@@ -1,0 +1,110 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Solved! (was: Problems with NFS-mounted root)" -->
+<!-- FromName="'Greg 'groggy' Lehey'" -->
+<!-- FromEmail="grog@lemis.com" -->
+<!-- ToName="'Christopher Yeoh'" -->
+<!-- ToEmail="cyeoh@samba.org" -->
+<!-- Date="Thu, 17 Jul 2003 17:36:49 +0930" -->
+<!-- Id="20030717080649.GF26875@wantadilla.lemis.com" -->
+<!-- Reference="16150.10473.803080.914905@gargle.gargle.HOWL" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Solved! (was: Problems with NFS-mounted root)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Greg  &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  To  : Christopher Yeoh &lt;<I><A HREF="mailto:cyeoh@samba.org">cyeoh@samba.org</A></I>&gt;
+  Date: Thu, 17 Jul 2003 17:36:49 +0930
+</PRE>
+<H1>Solved! (was: Problems with NFS-mounted root)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thursday, 17 July 2003 at 14:41:13 +1000, Chris Yeoh wrote:
+&gt; At 2003/7/17 13:51+0930  Greg 'groggy' Lehey writes:
+&gt;&gt;     timeout 2
+&gt;&gt;
+&gt;&gt;     title Kernel 2.4.21
+&gt;&gt;     root (nd)
+&gt;&gt;     kernel (nd)/tftpboot/diskless/sat-gw/boot/vmlinuz root=/dev/nfs
+&gt;&gt;     nfsroot=192.109.197.82:/tftpboot/diskless/sat-gw ip=dhcp
+&gt;&gt;
+&gt;&gt; Ethereal shows that the kernel doesn't even try to access the NFS
+&gt;&gt; server: there's no traffic at all after the kernel finishes loading.
+&gt;&gt; I'm guessing that it has to be either an error in the grub config file
+&gt;&gt; or in the kernel configuration.  Both are derived from a description
+&gt;&gt; at <A HREF="http://bogmog.sourceforge.net/document_show.php3?doc_id">http://bogmog.sourceforge.net/document_show.php3?doc_id</A>=36.
+&gt;
+&gt; I had the exact same error in setting up an nfsroot box a few months
+&gt; ago.  I can't remember exactly what I did to fix it (there were a few
+&gt; issues along the way - firewalling myself off by accident being one of
+&gt; them :-) but at one stage I gave up using the ip=dhcp (saw some
+&gt; references to that being broken on certain 2.4.x kernels).
+&gt;
+&gt; So I have something like this:
+&gt;
+&gt; kernel (nd)/var/ftpd/vmlinuz-2.4.19-via root=/dev/nfs nfsroot=192.168.1.1:/data/blue_root ip=192.168.1.11:192.168.1.1:192.168.1.1:255.255.255.0:blue:eth0:off vga=0x318
+
+Hah!  One line.  See my example above with two lines.  I removed the
+\n, and now it works.  Thanks.
+
+&gt; If I remember correctly it dhcp's again after loading the kernel and
+&gt; that bit wasn't working. Of course I could be misremembering but it
+&gt; might be worth trying.
+
+DHCP seems to work here.  What looks like being a problem is swap.  As
+sfr pointed out, drivers/block/nbd.c states:
+
+ * Note that you can not swap over this thing, yet. Seems to work but
+ * deadlocks sometimes - you can not swap over TCP in general.
+
+This is only part of the truth.  The original intention of NFS was to
+run diskless clients, and both UNIX System V and derivatives and BSD
+handle swap over NFS.  I'll investigate further.
+
+Greg
+--
+Finger <A HREF="mailto:grog@lemis.com">grog@lemis.com</A> for PGP public key
+See complete headers for address and phone numbers
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.0 (FreeBSD)
+
+iD8DBQE/FlkZIubykFB6QiMRAr8LAJ42W8Ks2z8E5D33jEd3Fr1MQKGdNwCcDmQb
+YDFKulPqW74nbOrIaRwQW1M=
+=NLJ9
+-----END PGP SIGNATURE-----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,178 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Squid Questions" -->
+<!-- FromName="'Vladimir V. Bashkirtsev'" -->
+<!-- FromEmail="mega@konectanet.com.au" -->
+<!-- ToName="'David Lloyd'" -->
+<!-- ToEmail="lloy0076@rebel.net.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 20 Jan 2001 03:30:09 +1030" -->
+<!-- Id="008101c08239$4827f9a0$7aba26cb@konectanet.com.au" -->
+<!-- Reference="3A6774FC.BC250B83@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Squid Questions</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Vladimir V. Bashkirtsev &lt;<I><A HREF="mailto:mega@konectanet.com.au">mega@konectanet.com.au</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 20 Jan 2001 03:30:09 +1030
+</PRE>
+<H1>Re: Squid Questions</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; This system shows some peculiarities:
+&gt;
+&gt; * Squid hijacks 90% (or more) of the memory
+&gt;  - I've tried mempools on and off
+&gt;  - I've tried mempool_limit (some arbitrary number)
+&gt;  - I've reduced/changed the cache_mem size
+&gt;
+&gt; Is it normal for squid to use that much memory? Having looked at the
+&gt; server with only one person using it, the hard disk seems to thrash.
+&gt; I've hazarded a guess that it's swapping out as well as talking to the
+&gt; Squid cache.
+
+#  TAG: cache_mem       (bytes)
+#       NOTE: THIS PARAMETER DOES NOT SPECIFY THE MAXIMUM PROCESS
+#       SIZE.  IT PLACES A LIMIT ON ONE ASPECT OF SQUID'S MEMORY
+#       USAGE.  SQUID USES MEMORY FOR OTHER THINGS AS WELL.
+#       YOUR PROCESS WILL PROBABLY BECOME TWICE OR THREE TIMES
+#       BIGGER THAN THE VALUE YOU PUT HERE
+
+So if you have default 8 MB your squid will be somewhere about 24 MB. But in
+same time:
+
+#       If circumstances require, this limit will be exceeded.
+#       Specifically, if your incoming request rate requires more than
+#       'cache_mem' of memory to hold in-transit objects, Squid will
+#       exceed this limit to satisfy the new requests.  When the load
+#       decreases, blocks will be freed until the high-water mark is
+#       reached.  Thereafter, blocks will be used to store hot
+#       objects.
+
+So how much memory allocated depends on needs of squid and you almost have
+no way to control it.
+
+#  TAG: memory_pools    on|off
+#       If set, Squid will keep pools of allocated (but unused) memory
+#       available for future use.  If memory is a premium on your
+#       system and you believe your malloc library outperforms Squid
+#       routines, disable this.
+
+#  TAG: memory_pools_limit      (bytes)
+#       Used only with memory_pools on:
+#       memory_pools_limit 50 MB
+#
+#       If not set (default) or set to zero, Squid will keep all memory it
+#       can. That is, there will be no limit on the total amount of memory
+#       used for safe-keeping.
+
+mem_pools - just optimization measure. It means that if squid successfully
+allocated some memory (even in excess of cache_mem) it will not be released
+(if no memory_pools_limit) or will be released only overhead over
+memory_pools_limit. So if you wish that Squid will shrink itself after
+serious load set memory_pools off and Squid will try to achieve size of
+cache_mem * 3 or set memory_pools on and memory_pools_limit below cache_mem
+* 3.
+
+Of course it's bad idea to have swap and cache on one physical drive. Data
+will be moved commonly between cache and swap if squid will be low on
+memory.
+
+&gt; * Squid fails to allocate memory
+&gt;  - /var/log/messages contains messages such as:
+&gt;    xmalloc...failed to allocate 4096kbytes
+&gt;    terminated child process
+&gt;    sent sigsegv
+&gt;
+&gt; These probably appear when the server is busy. I'm told they never used
+&gt; to appear (some six months ago) and that the server has gotten
+&gt; inexplicably slow. I've taken down any unnecessary resource users but it
+&gt; is said this server ran faster under its current setup.
+&gt;
+&gt; How much memory does squid allocate?
+
+Look above - memory_pools control which routines will be used by Squid to
+allocate memory. If you will have memory_pools on then Squid will run
+slightly faster.
+
+So for your config
+
+cache_mem 6 MB
+memory_pools on
+memory_pools_limit 20 MB
+
+will be good if you have some other services runnin'. It will run slower
+under heavy load because swap will be involved but if your users will not do
+overload it will run good. Also if you runnin' server as dedicated for Squid
+then it will be good idea to have 128 MB of RAM (or more) and disabled swap
+at all. Simply Squid have no idea where the current object is - in RAM or in
+swap because system hides this info and thus Squid cannot optimize
+interactions with swap. But aware: if you will set memory settings for Squid
+wrong (too high) then some tasks (which started by cron for example) will
+give you "bus error" or "no memory" messages.
+
+&gt; * cache directory
+&gt;  - cache directories range from 00 to (or some such number)
+&gt;  - under these directories are further directories with similar
+&gt; hexadecimal names
+&gt;  - cache data only appears in 00/00
+&gt;
+&gt; I would have expected that Squid would have distributed its cache data
+&gt; more efficiently. There are some 20 or more directories, yet it looks as
+&gt; though it's storing all data in one. Is this normal? Abnormal?
+
+#       cache_dir Type Directory-Name Mbytes Level-1 Level2
+#       'Level-1' is the number of first-level subdirectories which
+#       will be created under the 'Directory'.  The default is 16.
+#
+#       'Level-2' is the number of second-level subdirectories which
+#       will be created under each first-level directory.  The default
+#       is 256.
+
+Squid will create directories accordingly to this setting and then will fill
+every directory with data just one-by-one. When directory will get 255
+objects then Squid start to fill next directory. This setting allow you to
+set how much objects your storage can hold. In default configuration squid
+can get no more than 1044480 objects. It's enough because you will probably
+run out of inodes before you will fill last directory. But when Squid will
+remove some object it will not try to fill that position again until it will
+reach last directory. So storage of Squid works in round-robin manner and I
+consider it as very effective.
+
+Vladimir
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,107 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Timezones and stuff" -->
+<!-- FromName="Adrian Butterworth" -->
+<!-- FromEmail="adrian@econ-outlook.com.au" -->
+<!-- ToName="Steven Bolbot" -->
+<!-- ToEmail="sjb@tne.net.au" -->
+<!-- Date="Wed, 24 Jun 1998 10:48:26 +0930" -->
+<!-- Id="359053E2.6776E833@econ-outlook.com.au" -->
+<!-- Reference="199806221705.CAA04622@storm.lns.ml.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Timezones and stuff</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adrian Butterworth &lt;<I><A HREF="mailto:adrian@econ-outlook.com.au">adrian@econ-outlook.com.au</A></I>&gt;
+  To  : Steven Bolbot &lt;<I><A HREF="mailto:sjb@tne.net.au">sjb@tne.net.au</A></I>&gt;
+  Date: Wed, 24 Jun 1998 10:48:26 +0930
+</PRE>
+<H1>Re: Timezones and stuff</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Steven
+
+always better to set your system clock to UTC/GMT
+I've always found the system faithfully reports local times
+and correctly adjusts for local daylight saving etc.
+Also if you use java, the time conversions seem to require
+UTC (although this may have been because of bugs in the various
+date utils which have only recently been fixed)
+
+I also used to get problems with logged times because of clock drift
+and multiple systems drifting apart. It's surprisingly easy to fix.
+
+To get an accurate time you can call on the Public NTP Secondary
+(stratum 2) Time Server for Australia augean.eleceng.adelaide.edu.au
+to check & set your time on your main server box.
+
+I have a cron script that does this 
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ cat /etc/cron.hourly/adjustTimeFromAugean
+&gt; #!/bin/sh
+&gt; # the system clock can drift from CMOS time
+&gt; # when console messages cause clock interupts to be missed
+&gt; # this routine will reset the system clock to that of
+&gt; # a time server then update the HW clock
+&gt; /usr/bin/rdate  -s augean.eleceng.adelaide.edu.au
+&gt; /usr/sbin/setclock
+
+the reference I have to it states:-
+&gt; 1.augean.eleceng.adelaide.edu.au (129.127.28.4) 
+&gt;      Location: University of Adelaide, South Australia 
+&gt;      Synchronization: NTP secondary (stratum 2), Sun-4/75/Unix 
+&gt;      Service area: AARNet 
+&gt;      Access policy: open access, please send a message to notify 
+&gt;      Contact: <A HREF="mailto:systems@eleceng.adelaide.edu.au">systems@eleceng.adelaide.edu.au</A> 
+
+then from other unix servers on my network I use a similar script
+to sync with grissom (who acts as my local time server)
+
+all the windows boxes also get sync'd through samba.
+The command is
+&gt; net time /set /yes
+
+I execute this using NT logon scripts executed when the windows boxes
+log
+into the domain & pick up their profiles (all courtesy of linux samba
+servers)
+, but if you just run basic samba you can just execute it in the local
+autoexec.bat, or at a dos prompt.
+
+all together this simple setup keeps about 25 machines across 4
+offices within milliseconds of each other and the correct time!
+
+regards
+Adrian
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

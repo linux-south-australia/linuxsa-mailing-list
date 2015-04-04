@@ -1,0 +1,194 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SIOCADDRT: invalid argument (???)" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Tyson LT" -->
+<!-- ToEmail="ua973599@student.adelaide.edu.au" -->
+<!-- Date="Sun, 23 May 1999 15:18:57 +0930 (CST)" -->
+<!-- Id="199905230548.PAA13387@rebel.net.au" -->
+<!-- Reference="37467EAB.A0AB0FFD@student.adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SIOCADDRT: invalid argument (???)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Tyson LT &lt;<I><A HREF="mailto:ua973599@student.adelaide.edu.au">ua973599@student.adelaide.edu.au</A></I>&gt;
+  Date: Sun, 23 May 1999 15:18:57 +0930 (CST)
+</PRE>
+<H1>Re: SIOCADDRT: invalid argument (???)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Tyson LT &lt;<A HREF="mailto:ua973599@student.adelaide.edu.au">ua973599@student.adelaide.edu.au</A>&gt; wrote:
+&gt;&gt; 1. Having fully attempted to resolve the problem before asking for help
+&gt;&gt; on the list.
+&gt;
+&gt; Crap...had it occured to any of you that I did try??? (Why else would I
+&gt; *risk* a post...)
+
+I meant you might try to resolve the problem yourself *in light of the new
+information which you gained from your first question*.
+
+
+
+&gt;    - man -k SIOCADDRT found nothing.
+
+And now you have another tool to add to your repertoire (namely grep in
+the manual pages.)
+
+
+&gt;    - when I ran ALL of the programs mentioned in Redhat's rather
+&gt; (over?) complicated network init-scripts, I couldn't reproduce the error
+&gt; message.
+
+Despite it not being the purpose of this list, allow me to present some
+quite basic thoughts on debugging:  You can't expect to get the same
+results from two different runs of a series of complicated, state changing
+programs, unless you reset the system to it's initial state between runs.
+To put that a little less ambiguously, the state of the networking stack
+is (obviously) changed after running the network initialisation scripts.
+If you get an error message when you first run those scripts, you must not
+expect to get it when you run them the second time.
+
+Here's the single most basic debugging technique: insert trace statements
+into the script.  That's where you take:
+
+  #!/bin/sh
+  ifconfig blah blah
+  route add blah blah blah
+
+and change it to:
+
+  #!/bin/sh
+  echo /etc/network/script1 point 1
+  ifconfig blah blah
+  echo /etc/network/script1 point 2
+  route add blah blah blah
+  echo /etc/network/script1 point 3
+
+Then restart your computer and instead of getting:
+
+  SIOCADDRT: invalid argument
+
+you get:
+
+  /etc/network/script1 point 1
+  /etc/network/script1 point 2
+  /etc/network/script2 point 1
+  /etc/network/script1 point 3
+  /etc/network/script4 point 1
+  /etc/network/script4 point 2
+  /etc/network/script4 point 3
+  SIOCADDRT: invalid argument
+
+The beauty of doing this is that when you subsequently make "a stab in
+the twilight," you give people reason to trust your judgment.  (You also
+give them more information, like the name of the program, and its arguments,
+and the state of the system up to that point.  These *are* the things
+which give people reason to trust your judgment.)
+
+
+&gt; The man page David Newall pointed me to was a kernel programming page, for
+&gt; goodness sake.
+
+Yes, for goodness sake!  That's because it was the right man page.
+
+
+&gt; I think I might cool off trying to persuade my NT-admin friends to try
+&gt; Linux, if this is the case. (I think I might be echoing an old religious
+&gt; war about elitism amongstUnix users here...)
+
+We're not elitist, we just expect people to hold their own hands (or pay
+money to have someone hold their hands for them.) Some people don't want
+to learn anything technical, and for them Win NT might be just the ticket.
+Of course, they'll end up paying for it at every step of the way.  When
+they want to run email: Kaching! goes the cash register; when they want
+to connect exchange email via the Internet: Kaching! again; when they
+want to serve up web pages: Kaching! Kaching!  And even after all that
+Kaching!ing it still won't work quite right.  But at least they'll have
+a GUI to point and click at.  By all means do cool off persuading your
+NT-admin friends to try Linux, it won't be us playing the cash register
+medley.  Kaching!
+
+
+&gt; Call that basic research?
+
+Yes, actually.  It's called "RTFM", which stands for "read the f manual."
+There's nothing advanced about that.
+
+If you don't want to read the whole manual, then use tools to find the
+section you need.  It's easy to perform sophisticated searches in Unix,
+for example for a manual page which mentions "SIOCADDRT" but doesn't
+mention "X.25" unless it also mentions "IP".  Windows doesn't have tools
+nearly as powerful, and even if it did, it's help files aren't have as
+complete.
+
+
+&gt; Please forgive me if I sound a little pissed off, but if you can't stand
+&gt; newbies, then...well I don't know.
+
+Well yes, you do sound pissed off, which is a pity because if you were
+a little less defensive you might notice that you've been getting some
+damned good tuition; and for free.  Try getting an MCSE for free.
+
+
+&gt; I'm also curious about what "Signal 11" means, but I can't find and
+&gt; explanation in the manpages...do I dare ask the masters? I might try
+&gt; somewhere else first.
+
+I wouldn't advise asking, at least not until after doing basic research.
+For the record, I followed the advice you offered, namely man -k, and found
+the answer after just three manual pages.
+
+
+&gt; I think it's a bit sad that some people can set a rather high standard of
+&gt; knowledge on SA's (I presume) only Linux list, which I was previously proud
+&gt; of, but then refuse to split the list when people that know less than them
+&gt; bug them with "dumb" questions.
+
+The problem with splitting the list is that you'd have all the cluefull
+people on one list, and all the clueless people on the other, and then
+the clueless nobody with any clue to learn from.  At least this way you
+are given clue in exchange for occassionally wearing asbestos undies.
+I'd say you're on to a good deal, wouldn't you?
+
+Never forget that you are a member of a community.  If you were an artist
+you wouldn't expect your peers to draw your preliminary sketches for you;
+and you wouldn't expect them to keep giving you paper, pens or paint.
+If they did lend you the odd tin or turps to clean your brushes, you
+probably would be grateful, and you certainly wouldn't abuse them when
+they grumble that you might just go to Eckersley's to buy your own.
+Linux is not so different.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

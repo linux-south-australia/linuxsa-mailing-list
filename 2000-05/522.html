@@ -1,0 +1,185 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Testing Exim" -->
+<!-- FromName="Dan Shearer" -->
+<!-- FromEmail="dan@linuxcare.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 19 May 2000 10:19:48 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.10.10005191019300.12568-100000@localhost.localdomain" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Testing Exim</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@linuxcare.com">dan@linuxcare.com</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Fri, 19 May 2000 10:19:48 +0930 (CST)
+</PRE>
+<H1>Re: Testing Exim</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, 19 May 2000, Martin Whiteside wrote:
+
+&gt; Can anyone help a beginner with testing Exim.  I have created a basic
+&gt; exim.conf with the following code:
+
+This has a number of errors in it and it would never work. I'll give you
+the corrected minimalist file here, and followed by one which builds on
+that to create a useful Internet mail relay host (not an "open" relay,
+which is a very bad thing!). Cut and paste from the email into the
+exim.conf file (or ftp and copy, whatever makes sense for you) otherwise
+you'll get annoying bugs.
+
+Corrected <A HREF="file:">file:</A>
+
+Minimalist Exim 3.x configuration file
+
+     #Main (global) configuration settings
+     # There are no main settings in this example, but the following
+     # 'end' must still appear
+
+     end
+
+     #Transport configuration
+     local_delivery:
+       driver = appendfile
+       file = /var/spool/mail/${local_part}
+     # You may need to alter the previous line depending on your system
+     end
+
+     #Director configuration
+     localuser:
+       driver = localuser
+       transport = local_delivery  
+
+Now start Exim:
+
+   'exim -bd -q10m' should work, ie become a background daemon, and check
+   your delivery queue every 10 minutes.
+
+Now check that Exim is running by telnetting to port 25 (the SMTP port) on
+the Exim host, and typing QUIT followed by return when you see a banner:
+
+telnet x 25
+Trying 192.168.1.1...
+Connected to x.idunno.com.
+Escape character is '^]'.
+220 calulu.shearer.org SMTP Exim 3.12
+QUIT
+221 calulu.shearer.org closing connection
+Connection closed by foreign host.    
+
+Now try a local delivery (from one user to another, using pine or
+something easy like that - don't try with remote Netscapes or anything
+clever yet). It should work, by copying files around in the
+/var/spool/mail/&lt;username&gt; directories.
+
+Now you need to add some more lines to the minimalist config in order
+to have the following features (among others provided by Exim by default):
+
+	* anti-spam features
+	* Internet mail relay
+	* users can automatically forward their email if they wish
+	* copes with mail addresses of the form <A HREF="mailto:username@1.2.3.4">username@1.2.3.4</A> as well
+          as normal <A HREF="mailto:username@dnsaddress">username@dnsaddress</A>
+
+Extended config <A HREF="file:">file:</A>
+
+
+    # Main settings
+
+     host_lookup = 0.0.0.0/0
+     rbl_domains = rbl.maps.vix.com:dul.maps.vix.com:relays.orbs.org
+     never_users = root
+
+     end
+
+     # Transports
+
+     local_delivery:
+       driver = appendfile
+       file = /var/spool/mail/${local_part}
+
+     remote_smtp:
+       driver = smtp    
+
+    end
+
+     # Directors
+
+     local_message:
+       driver = localuser
+       transport = local_delivery
+
+     local_forward:
+       driver = forwardfile
+       file = .forward
+       check_ancestor
+
+     end
+
+     # Routers 
+
+     host_exist:
+       driver = lookuphost
+       transport = remote_smtp
+
+     literal:
+       driver = ipliteral
+       transport = remote_smtp
+
+     end
+
+     # Retry Rules
+     #
+     # Domain               Error       Retries
+
+     *                      *           F,2h,15m; G,16h,1h,1.5; F,4d,8h
+
+     end 
+
+
+Happy mailing.
+
+--
+Dan Shearer
+<A HREF="mailto:dan@linuxcare.com">dan@linuxcare.com</A>
+p: 08 8369 0303
+m: 0411 49 1800
+<A HREF="http://linuxcare.com">http://linuxcare.com</A>
+Linuxcare. Support for the Revolution.
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

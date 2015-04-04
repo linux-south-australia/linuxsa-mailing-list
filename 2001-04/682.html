@@ -1,0 +1,115 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IP Chains / Firewalling" -->
+<!-- FromName="'Andrew Reid'" -->
+<!-- FromEmail="andrew.reid@plug.cx" -->
+<!-- ToName="'Mick Collins'" -->
+<!-- ToEmail="mickwell@bigpond.com" -->
+<!-- Date="22 Apr 2001 13:51:31 +0930" -->
+<!-- Id="987913312.5394.0.camel@percible.plug.cx" -->
+<!-- Reference="001d01c0ca24$36d906c0$0201a8c0@home.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IP Chains / Firewalling</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Reid &lt;<I><A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A></I>&gt;
+  To  : Mick Collins &lt;<I><A HREF="mailto:mickwell@bigpond.com">mickwell@bigpond.com</A></I>&gt;
+  Date: 22 Apr 2001 13:51:31 +0930
+</PRE>
+<H1>Re: IP Chains / Firewalling</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On 21 Apr 2001 23:38:56 +0930, Mick Collins wrote:
+&gt; is there any way that I can forward my icq through my firewall which is
+&gt; running quite nicley atm?
+
+There are two ways that just came to mind. I know for a fact that ICQ
+(or more specifically, the GNOME ICU ICQ Client) works through a
+masqueraded connection -- I do it all the time.
+
+Admitadly, my workstation is allowed to go 'anywhere' and has no
+restrictions on what will be masqueraded for it.
+
+There are a number of protocols that IPChains will masquerade for:
+
+Snippet from `man ipchains`:
+
+"-p, --protocol[!] protocol
+The  protocol  of  the rule or of the packet to check.  The specified
+protocol can be one of tcp, udp, icmp, or all, or it can be a numeric
+value, representing one of these protocols or a different one.  Also a
+protocol name from  /etc/protocols is  allowed.   A  "!"  argument
+before the protocol inverts the test.  The number zero is equivalent to
+all.  Protocol all will match with all protocols and is taken as default
+when this option is omitted.  All may not be used in in  combination
+with the check command."
+
+Try something with a wider scope, eg:
+
+ipchains -A forward -p tcp -s 10.1.1.1/24 -d 0.0.0.0/0 4000 -j MASQ
+ipchains -A forward -p udp -s 10.1.1.1/24 -d 0.0.0.0/0 4000 -j MASQ
+ipchains -A forward -p icmp -s 10.1.1.1/24 -d 0.0.0.0/0 4000 -j MASQ
+
+Note that not specifying the protocol will mean that IPChains will not
+accept the port (4000) after 0.0.0.0/0. This will make IPChains
+masquerade all packets destined for 0.0.0.0/0 on port 4000 using
+protocols TCP, UDP or ICMP.
+
+&gt; Do I need to forward things?  maybe port 4000 needs something to be done to
+&gt; it?
+
+Therein lies the other option. You could possibly install rinetd and
+forward port x on your gateway to icq.mirabilis.com:4000. Then using
+IPChains, setup a redirect. For the purpose of this example, we'll call
+port x 10001
+
+ipchains -A input -s 10.1.1.1/24 -d 0.0.0.0/0 4000 -j REDIRECT 10001
+
+This command will redirect all traffic destined for port 4000 to port
+10001 on your local machine, which is forwarded to
+irc.mirabilis.com:4000.
+
+   - Andrew
+
+-- 
+Andrew Reid                   email: <A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A>
+                              www:   <A HREF="http://www.plug.cx">http://www.plug.cx</A>
+"If ignorance is bliss        phone: +61 401 946 813
+ why aren't there more 
+ happy people?"
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

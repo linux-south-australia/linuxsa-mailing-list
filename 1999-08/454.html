@@ -1,0 +1,132 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="PPP Performance (Some Tips)" -->
+<!-- FromName="David Lloyd" -->
+<!-- FromEmail="lloy0076@senet.com.au" -->
+<!-- ToName="Jesudas Mathew" -->
+<!-- ToEmail="jm@cs.adelaide.edu.au" -->
+<!-- Date="Mon, 23 Aug 1999 23:07:44 +0930" -->
+<!-- Id="37C14EA8.9D4A585C@senet.com.au" -->
+<!-- Reference="199908231258.WAA00593@cairngorm.cs.adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: PPP Performance (Some Tips)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@senet.com.au">lloy0076@senet.com.au</A></I>&gt;
+  To  : Jesudas Mathew &lt;<I><A HREF="mailto:jm@cs.adelaide.edu.au">jm@cs.adelaide.edu.au</A></I>&gt;
+  Date: Mon, 23 Aug 1999 23:07:44 +0930
+</PRE>
+<H1>PPP Performance (Some Tips)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+1) Make sure that under /lib/net there are some modules called:
+
+  bsd_comp.o
+  deflate_comp.o
+
+  ii) Make sure that there's an 
+	alias ppp-compress-21 bsd_comp
+	alias ppp-compress-24 ppp_deflate
+	alias ppp-compress-26 ppp_deflate
+
+	These are lines in /etc/
+
+2) Make sure that /etc/ppp/options file contains
+  deflate 15
+  bsdcomp 15
+
+3) Make sure that under /etc/sysconfig/network-scripts/ifcfg-ppp0
+(substitute the right device number) that the MTU settings are high (I
+set mine to the maximum of 1500)
+
+4) Make sure that you don't have a monolithicly slow kernel. If you
+haven't rebuilt it from scratch (i.e. it's still the same one as under
+the distro you first installed) then *everything* not just ppp will be
+going slow.
+
+  Tips for fast kernels: 
+	Under the [src]/Makefile there are two places that -O2 appear
+		i) You can attempt to take this up to -O3 on a gcc only, although I
+believe that egcs will go up to at least -O6
+		ii) You can read the info pages of gcc under invoking&optimisations
+and turn on other bits and pieces
+	Mine is currently -O5 -ffast-math -fstrict-aliasing
+-fomit-frame-pointer -funroll-loops
+	
+	If you do this don't forget you'll have to do it twice (it appears
+twice in the one Makefile). Be aware though that your kernel will be
+larger and might spill over 1024kB and/or might get a little unstable.
+Mine is as stable as a rock.
+
+	In the [src]/arch/i386/Makefile, change the -mcpu=486 or whatever to
+something like:
+	-march=pentium
+	-march=pentiumpro
+
+	This will compile for that particular architecture. What's the point of
+having a Pentium Pro when you're compiler's building code for a 386?
+
+***
+I take no responsibility whatsoever for the above advice. If you read
+the manuals (info gcc is a god send when you get into the intracacies of
+tweaking optimisations and architecture specifics) you shouldn't bomb
+out. 
+
+Other considerations:
+
+1) I rebuild all my packages by configure & make. This is so I can add
+optimisations to the Makefile and again don't end up running my K6-II as
+an i386.
+
+2) I don't use Netscape to do ftp. It seems to be ineffecient, slow and
+has a nasty tendency to crash about 15kB before EOF. Although it's a CLI
+program, wget is very efficient, easy-to-use and copes well with system
+crashes, server crashes and virtually all other type of disasters.
+
+3) I have a small number of domain names in my hosts file. These are for
+the places I always visit. Not having to use DNS can speed one's
+browsing up immensely.
+
+4) Theoretically one could attempt to rebuild pppd with a heap of
+optimisations. I have never tried this option.
+
+5) I also read (at www.linux.org somewhere) that one can setup Squid to
+squash certain well-known http requests (such as anything starting with
+ads....). Dispensing with banner ads certainly reduces bandwidth.
+
+Anyway....
+
+DAVID LLOYD
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

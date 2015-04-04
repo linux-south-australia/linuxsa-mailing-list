@@ -1,0 +1,137 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Help with pipes..." -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="pschulz@adelaide.on.net" -->
+<!-- Date="Mon, 20 Oct 1997 14:53:40 +0930 (CST)" -->
+<!-- Id="199710200523.OAA02947@rebel.net.au" -->
+<!-- Reference="199710191523.AAA02801@fish.penguin.org.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Help with pipes...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : <A HREF="mailto:pschulz@adelaide.on.net">pschulz@adelaide.on.net</A>
+  Date: Mon, 20 Oct 1997 14:53:40 +0930 (CST)
+</PRE>
+<H1>Re: Help with pipes...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+<A HREF="mailto:pschulz@adelaide.on.net">pschulz@adelaide.on.net</A> said:
+&gt; SO.. any good pipe references out there? (A good 'Nutshell' book?)
+
+[[ David's tutorial follows.  If you already know Unix it will probably
+bore you. ]]
+
+Actually, real Unix on-line manual pages are very good, but I note that
+Linux's manual pages are somewhat missing in the information I was going
+to refer you to.  I was going to refer you to the intro manual pages in
+sections 1 and 2, as well as the sh manual page because, between them,
+they explain how Unix 'works' rather elegantly; particularly with reference
+to the concept of processes and pipelines.  Such a pity that this central
+Unix concept is not covered as well as it deserves to be.  There's probably
+an opportunity to give back to the community here...  
+
+Pipes are easy.  The Unix shells provide mechanisms which you can use them
+to allow you to generate remarkably sophisticated 'programs' out of simple
+components.  We call that a pipeline.  A pipeline is composed of a data
+generator, a series of filters, and a data consumer.  Often that final is
+as simple as displaying the final output on stdout, and sometimes the first
+stage is as simple as reading from stdin.  I think all shells use the "|"
+character to separate each stage of a pipeline.  So:
+
+    data-generator | filter | ... | filter | data-consumer
+
+Each stage of the pipeline runs in parallel, within the limits which the
+system permits.  Hey, look closely, because that last phrase is important.
+Are you on a uni-processor system because if you are, then obviously only
+one process runs at a time, although that point is simply nitpicking.  But
+pipes are buffers capable of holding only finite data.  A process can write
+into a pipe until that pipe is full.  When the pipe is full the process
+writing into it blocks until some of the data already in the pipe has been
+read.  Similarly, a process can read from a pipe until that pipe is empty.
+When it's empty the reading process is blocked until some more data has
+been written into the pipe.
+
+An interesting effect of pipes, which is not immediately obvious, is that
+'record boundaries' can be lost in a pipe.  What I mean: If a program reads
+from the terminal using buffered stream libraries, it will be given data
+one line at a time.  Likewise if it writes to the terminal using buffered
+stream libraries the data will be displayed one line at a time.  But if a
+program writes into a pipe that data will be sent to the pipe one stream
+buffer at a time; that's about 1K of data.  So if your data generator
+'emits' a line of data (using the buffered stream library) to a pipe, the
+data might actually NOT be written immediately, but maybe held in an
+internal buffer (internal the data generator) until there's enough data
+to make it worth sending.
+
+Similarly, the program reading from a pipe might get a partial line from
+the read.  That can cause unintentional effects.  Suppose, for example,
+that the end of your pipeline is reading a list of files and directories
+to delete, and supposing the buffer is five characters long.  If you
+write "/user/john" into the pipe, what comes out could be "/user"  and
+"/john".  Curious, yes?
+
+This buffering effect of the stream libraries might sound like a bad
+thing but it actually gives you performance benefits most of the time.
+If you are writing a program which uses them you should consider how
+buffering will affect your program in a pipeline, but other than that
+I wouldn't be upset about it.  As I said: It's a good thing.
+
+If you are constructing a pipeline (as all true Unix users do every day)
+you should remember the buffering effect which the stream libraries and
+which pipes both introduce.  If your pipeline starts with something which
+reads lines from standard input and then writes variations of those lines
+to standard output, remember that the second stage of the pipeline might
+not receive any input until you have typed a few lines; and then it might
+receive all of those lines in one go!  Here's an example of what I mean
+for you to try:
+
+   awk '{$2="SURPRISE"; for (i=0; i&lt;100; i++) print }' | grep -n SURPRISE
+
+None of this directly answered the original question which really was
+about putting ftp commands into a file.  I think one thing which is worth
+noting (and I believe you have to really read the ftp manual page closely
+to find this out) is that if ftp reads it's input from a terminal (or maybe
+if it writes to a terminal, or maybe either or both; it seems to change
+from Unix to Unix), it tries to "auto-login", which is, it checks your
+.netrc file or it prompts for a user and password.  If you're not on a
+terminal (that is, input or maybe output or maybe either or both is a
+pipe, or regular file, or socket), or if you specify "-n" when you start
+ftp, then you have to use the "user" and "pass" commands in your ftp
+command stream.
+
+Eg: echo -e "user foobie\npass bletch\nput my-file" | ftp -n theirhost
+
+Hope this helps.  And please, don't thank me, just buy Internet access
+from me!  :-) :-)  (<A HREF="http://www.rebel.net.au/rebelnet/">http://www.rebel.net.au/rebelnet/</A>)
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

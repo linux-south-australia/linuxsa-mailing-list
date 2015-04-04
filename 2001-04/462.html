@@ -1,0 +1,121 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="lpr, scripts and faxing" -->
+<!-- FromName="'Brian Marr'" -->
+<!-- FromEmail="sirreg@dove.net.au" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 17 Apr 2001 12:14:37 +0930" -->
+<!-- Id="3ADBAE15.B8A2445F@dove.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: lpr, scripts and faxing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Brian Marr &lt;<I><A HREF="mailto:sirreg@dove.net.au">sirreg@dove.net.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 17 Apr 2001 12:14:37 +0930
+</PRE>
+<H1>lpr, scripts and faxing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Someone may be able to help with a couple of problems
+
+The command lpr -Pfax -J 85xxxxxx filename is working ok on my local
+machine (fax server), with a couple of small exceptions. I can dial my
+other line to check this. If I do not answer, the phone continues to
+ring rather than time out. Similarly if I pick up the phone and then
+hang up the line stays open, and the modem waits indefinitely for the
+fax tone.
+
+Is there a string that will tell the modem to hang up if there is no
+answer ?
+
+Also -from the remote machine the command lpr -Pfax -J 85xxxxxx filename
+stops halfway down the /usr/bin/fax script with...
+
+
+/usr/bin/faxlpr: can't read control file
+
+
+Can anyone say what is happening to the control file here ? The lpr -fax
+mini-howto suggests changing the line cfile='tail -1 lock' to
+cfile='/usr/bin/tail -a lock'....but this has not made any difference.
+
+Brian Marr
+
+============================================================================
+
+# faxlpr : get phone number and user from current cf* file and run fax
+send 
+
+	faxlpr)
+
+	cd $FAXDIR		# the lpr spool directory for printer 'fax'
+	case $? in 0) ;; *) echo "$0: cannot cd to $FAXDIR" ; break ;; esac
+
+	test -r lock
+	case $? in 0) ;; *) echo "$0: can't read lock file" ; break ;; esac
+	
+	cfile=`/usr/bin/tail -1 lock`
+
+	test -r $cfile
+	case $? in 0) ;; *) echo "$0: can't read control file" ; break ;; esac
+
+	cfile=`cat $cfile`
+
+	num=` echo "$cfile" | sed -e /^[^J]/d -e s/.//`
+	host=`echo "$cfile" | sed -e /^[^H]/d -e s/.//`
+	user=`echo "$cfile" | sed -e /^[^P]/d -e s/.//`
+
+	test "$num"
+	case $? in 0) ;; *) echo "$0: can't read phone number" ; break ;; esac
+
+	cat - &gt;&gt; fax$$			# save in a file
+
+	l=`$FAX send "$num" fax$$`
+
+	case $? in
+	0) echo "$l" | mail -s "fax to $num succeeded" $user@$host ;;
+	*) echo "$l" | mail -s "fax to $num failed   " $user@$host ;;
+	esac
+
+	$RM fax$$ fax$$.???
+
+	break 
+	;;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

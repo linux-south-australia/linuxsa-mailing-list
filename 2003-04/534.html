@@ -1,0 +1,172 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Help With Mandrake" -->
+<!-- FromName="'Ryan Verner'" -->
+<!-- FromEmail="xfesty@computeraddictions.com.au" -->
+<!-- ToName="'Peter Langberg'" -->
+<!-- ToEmail="langberg@senet.com.au" -->
+<!-- Date="Thu, 17 Apr 2003 23:30:40 +1000" -->
+<!-- Id="C837EE82-70D8-11D7-8EDC-000393103866@computeraddictions.com.au" -->
+<!-- Reference="002001c304cb$88f11900$0301a8c0@sg2" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Help With Mandrake</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Ryan Verner &lt;<I><A HREF="mailto:xfesty@computeraddictions.com.au">xfesty@computeraddictions.com.au</A></I>&gt;
+  To  : Peter Langberg &lt;<I><A HREF="mailto:langberg@senet.com.au">langberg@senet.com.au</A></I>&gt;
+  Date: Thu, 17 Apr 2003 23:30:40 +1000
+</PRE>
+<H1>Re: Help With Mandrake</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+On Thursday, April 17, 2003, at 08:24 PM, Peter Langberg wrote:
+
+&gt; in the crontab file every 10mins and are using a script made by atomic
+&gt; (magazine)
+
+That's why it doesn't work &lt;G&gt;.
+
+R
+
+&gt;  
+&gt;  
+&gt; #!/bin/sh
+&gt; #
+&gt; # Monthlystats script version 1.1.
+&gt; #
+&gt; # This is a simple script to tally the input/output totals of a
+&gt; # network card in megabytes, resetting on monthly boundaries, to
+&gt; # be passed onto MRTG for total throughput history graphing.
+&gt; #
+&gt; # Useful for keeping track of current and past broadband usage to
+&gt; # help stay under the ISP's cap.
+&gt; #
+&gt; # This script takes the card to monitor as argument and returns
+&gt; # the current total values. It keeps one non-growing log file in
+&gt; # order to build ongoing totals, and another to list completed
+&gt; # months. The script has reset protection in that if the server is
+&gt; # reset, or the /proc stats reset, it will simply pick up where it
+&gt; # left off. Free free to upgade kernels without resetting your stats!
+&gt; #
+&gt; # Should be used in conjuction with the Atomic MRTG configuration
+&gt; # file to graph total throughput statistics over time.
+&gt; #
+&gt; # Ashton Mills
+&gt; # Written for the Atomic Uber-Linux box guide,
+&gt; # Issue 21 of Atomic, Oct 2002.
+&gt; #
+&gt;
+&gt; NIC=$1
+&gt; LOG="/var/log/$NIC-totals.log"
+&gt; TOTALS_LOG="/var/log/$NIC-Monthly-Totals.log"
+&gt;
+&gt; IN_ETH=`echo $(cat /proc/net/dev |grep $NIC |cut -d : -f2 |awk '{print 
+&gt; $1}') / 1048576 |bc`
+&gt; OUT_ETH=`echo $(cat /proc/net/dev |grep $NIC |cut -d : -f2 |awk 
+&gt; '{print $9}') / 1048576 |bc`
+&gt; RESET=`date |awk '{print $2}'`
+&gt;
+&gt; if [ -s $LOG ]; then
+&gt;      IN_LOG=`cat $LOG |awk '{print $1}'`
+&gt;      OUT_LOG=`cat $LOG |awk '{print $2}'`
+&gt;      RESET_IN_LOG=`cat $LOG |awk '{print $3}'`
+&gt;      RESET_OUT_LOG=`cat $LOG |awk '{print $4}'`
+&gt;      MONTH_LOG=`cat $LOG |awk '{print $5}'`
+&gt; else
+&gt;      RESET_IN_LOG=0; RESET_OUT_LOG=0; IN_LOG=0
+&gt;      MONTH_LOG=$RESET
+&gt; fi
+&gt;
+&gt; if [ `expr $IN_ETH + $RESET_IN_LOG` -lt $IN_LOG ]; 
+&gt; then     RESET_IN_LOG=$IN_LOG; fi
+&gt; if [ `expr $OUT_ETH + $RESET_OUT_LOG` -lt $OUT_LOG ]; then 
+&gt; RESET_OUT_LOG=$OUT_LOG; fi
+&gt;      
+&gt; IN_ETH=`expr $IN_ETH + $RESET_IN_LOG`
+&gt; OUT_ETH=`expr $OUT_ETH + $RESET_OUT_LOG`
+&gt;
+&gt; echo $IN_ETH
+&gt; echo $OUT_ETH
+&gt;
+&gt; if [ $RESET != $MONTH_LOG ]; then
+&gt;      echo "$(date |awk '{print $6}') $MONTH_LOG -- IN: $IN_ETH 
+&gt; MBs OUT: $OUT_ETH MBs" &gt;&gt; $TOTALS_LOG
+&gt;      RESET_IN_LOG=$RESET_IN_LOG - $IN_ETH
+&gt;      RESET_OUT_LOG=$RESET_OUT_LOG - $OUT_ETH
+&gt;      IN_ETH="0"
+&gt;      OUT_ETH="0"
+&gt; fi
+&gt;
+&gt; echo $IN_ETH $OUT_ETH $RESET_IN_LOG $RESET_OUT_LOG $RESET &gt; $LOG
+&gt;
+&gt;  
+&gt; Sorry if its long,
+&gt;  
+&gt;
+&gt; I'm using MRTG - mrtg-2.9.22-1mdk.i586.rpm
+&gt;
+&gt; and it is all installed in /var/www/html/mrtg and running on the 
+&gt; apache websever, but no graphs show, I know that there is defiantly 
+&gt; traffic going through,
+&gt;
+&gt; your help is greatly appreciated
+&gt;
+&gt; Ben Langberg
+&gt;
+&gt;
+
+- -- -
+Ryan Verner &lt;<A HREF="mailto:xfesty@computeraddictions.com.au">xfesty@computeraddictions.com.au</A>&gt;
+PGP: 5819 DE5D B5AE 9381 7E60  5B4C 45CC 64DF D3CC EB07
+
+ICQ: 76626240                   IRC: xf / irc.oublinet.net
+PH: +61 418 186 604             EQ: Mummer (Bard), Tholuxe
+
+In the beginning the Universe was created. This has made a lot of
+people very angry and has been widely regarded as a bad move.
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.0.7 (Darwin)
+
+iD8DBQE+nqyDRcxk39PM6wcRAqvOAJ9XeZdiEgztRug2oOb8Tchd3xErawCcC0GC
+otPSUJv6cqyGSDVEhP4aLKc=
+=BwE4
+-----END PGP SIGNATURE-----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

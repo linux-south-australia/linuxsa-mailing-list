@@ -1,0 +1,199 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Setting up a gateway" -->
+<!-- FromName="'Damien Uern'" -->
+<!-- FromEmail="carrigan_2606@optusnet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="brendan@grossman.id.au" -->
+<!-- Date="Sat, 4 Oct 2003 16:33:31 +0930" -->
+<!-- Id="200310041414.36715.carrigan_2606@optusnet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Setting up a gateway</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Damien Uern &lt;<I><A HREF="mailto:carrigan_2606@optusnet.com.au">carrigan_2606@optusnet.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:brendan@grossman.id.au">brendan@grossman.id.au</A></I>&gt;
+  Date: Sat, 4 Oct 2003 16:33:31 +0930
+</PRE>
+<H1>Re: Setting up a gateway</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I used this script when I had red hat 6.2 (linux kernel 2.2) and it served me 
+well for over 2 years on a 486dx266), I now use IPCOP:
+
+  #!/bin/sh
+  #
+  # rc.firewall - Initial SIMPLE IP Masquerade test for 2.1.x and 2.2.x 
+kernels using IPCHAINS
+  #
+  # Load all required IP MASQ modules
+  #
+  #   NOTE:  Only load the IP MASQ modules you need.  All current IP MASQ 
+modules
+  #          are shown below but are commented out from loading.
+
+  # Needed to initially load modules
+  #
+  /sbin/depmod -a
+
+  # Supports the proper masquerading of FTP file transfers using the PORT 
+method
+  #
+  /sbin/modprobe ip_masq_ftp
+
+  # Supports the masquerading of RealAudio over UDP.  Without this module,
+  #       RealAudio WILL function but in TCP mode.  This can cause a reduction
+  #       in sound quality
+  #
+  /sbin/modprobe ip_masq_raudio
+
+  # Supports the masquerading of IRC DCC file transfers
+  #
+  /sbin/modprobe ip_masq_irc
+
+
+  # Supports the masquerading of Quake and QuakeWorld by default.  This 
+modules is
+  #   for for multiple users behind the Linux MASQ server.  If you are going 
+to play
+  #   Quake I, II, and III, use the second example.
+  #
+  #   NOTE:  If you get ERRORs loading the QUAKE module, you are running an 
+old
+  #   -----  kernel that has bugs in it.  Please upgrade to the newest kernel.
+  #
+  #Quake I / QuakeWorld (ports 26000 and 27000)
+  #/sbin/modprobe ip_masq_quake
+  #
+  #Quake I/II/III / QuakeWorld (ports 26000, 27000, 27910, 27960)
+  /sbin/modprobe ip_masq_quake 26000,27000,27910,27960
+
+
+  # Supports the masquerading of the CuSeeme video conferencing software
+  #
+  #/sbin/modprobe ip_masq_cuseeme
+
+  #Supports the masquerading of the VDO-live video conferencing software
+  #
+  #/sbin/modprobe ip_masq_vdolive
+
+
+  #CRITICAL:  Enable IP forwarding since it is disabled by default since
+  #
+  #           Redhat Users:  you may try changing the options in 
+/etc/sysconfig/network from:
+  #
+  #                       FORWARD_IPV4=false
+  #                             to
+  #                       FORWARD_IPV4=true
+  #
+  echo "1" &gt; /proc/sys/net/ipv4/ip_forward
+
+
+  #CRITICAL:  Enable automatic IP defragmenting since it is disabled by 
+default in 2.2.x
+  # kernels
+  #
+  #           This used to be a compile-time option but the behavior was 
+changed in 2.2.12
+  #
+  echo "1" &gt; /proc/sys/net/ipv4/ip_always_defrag
+
+
+  # Dynamic IP users:
+  #
+  #   If you get your IP address dynamically from SLIP, PPP, or DHCP, enable 
+this following
+  #       option.  This enables dynamic-ip address hacking in IP MASQ, making 
+the life
+  #       with Diald and similar programs much easier.
+  #
+  echo "1" &gt; /proc/sys/net/ipv4/ip_dynaddr
+
+
+  # Enable the LooseUDP patch which some Internet-based games require
+  #
+  #  If you are trying to get an Internet game to work through your IP MASQ 
+box,
+  #  and you have set it up to the best of your ability without it working, 
+try
+  #  enabling this option (delete the "#" character).  This option is disabled
+  #  by default due to possible internal machine UDP port scanning
+  #  vunerabilities.
+  #
+  #echo "1" &gt; /proc/sys/net/ipv4/ip_masq_udp_dloose
+
+
+  # MASQ timeouts
+  #
+  #   2 hrs timeout for TCP session timeouts
+  #  10 sec timeout for traffic after the TCP/IP "FIN" packet is received
+  #  160 sec timeout for UDP traffic (Important for MASQ'ed ICQ users)
+  #
+  /sbin/ipchains -M -S 7200 10 160
+
+
+  # DHCP:  For people who receive their external IP address from either DHCP 
+or BOOTP
+  #        such as ADSL or Cablemodem users, it is necessary to use the 
+following
+  #        before the deny command.  The "bootp_client_net_if_name" should be 
+replaced
+  #        the name of the link that the DHCP/BOOTP server will put an address 
+on to?
+  #        This will be something like "eth0", "eth1", etc.
+  #
+  #        This example is currently commented out.
+  #
+  #
+  #/sbin/ipchains -A input -j ACCEPT -i bootp_clients_net_if_name -s 0/0 67 -d 
+0/0 68 -p udp
+
+  # Enable simple IP forwarding and Masquerading
+  #
+  #  NOTE:  The following is an example for an internal LAN address in the 
+192.168.0.x
+  #         network with a 255.255.255.0 or a "24" bit subnet mask.
+  #
+  #         Please change this network number and subnet mask to match your 
+internal LAN setup
+  #
+  /sbin/ipchains -P forward DENY
+  /sbin/ipchains -A forward -s 192.168.0.0/24 -j MASQ
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

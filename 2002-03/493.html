@@ -1,0 +1,138 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: [OT] SAMBA PROBLEMS" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="rsharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="dmdeflui@subcorp.com.au" -->
+<!-- Date="Fri, 15 Mar 2002 18:11:54 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0203151804430.4706-100000@ns.aus.com" -->
+<!-- Reference="56724A15634EB64799DAE208614C4C03496CB9@snowball.asc.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: [OT] SAMBA PROBLEMS</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:dmdeflui@subcorp.com.au">dmdeflui@subcorp.com.au</A></I>&gt;
+  Date: Fri, 15 Mar 2002 18:11:54 +1030 (CST)
+</PRE>
+<H1>Re: [OT] SAMBA PROBLEMS</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, 15 Mar 2002 <A HREF="mailto:dmdeflui@subcorp.com.au">dmdeflui@subcorp.com.au</A> wrote:
+
+&gt; Guys,
+&gt; 
+&gt; I don't know if this is the right place to ask this question but I am using
+&gt; Redhat 6.2 Linux and Samba 2.2.1a. 
+
+<A HREF="mailto:samba-technical@samba.org">samba-technical@samba.org</A> might be a better place.
+
+&gt;        We have Windows NT Workstations and 2000
+&gt; servers with which we need to talk to.  (Note:  Can't upgrade to Redhat 7.2
+&gt; or Samba 2.2.2 due to company requirements at least for a few more months.)
+
+OK, Win2K and WinNT. So, the Samba server is a PDC? BTW, 2.2.3a or so is 
+the latest, and maybe it will be 2.2.4 next week.
+
+&gt; I have a problem with a user who is trying to write to a folder called
+&gt; "qcp_docs" whilst logged in as a user "cmsdocs" to the Redhat 6.2 Linux box
+&gt; called SERVER1.
+
+OK.
+
+&gt; The linux directory permissions are 775 for both the cmsdocs and qcp_docs
+&gt; directories.
+
+This is a good start.
+
+&gt; The cmsdocs user is a member of the qcp_docs group (and visa versa but only
+&gt; temporary - I am hoping to remove this requirement (the major user logons
+&gt; have a group of the same name as their user logon).  All folders have the
+&gt; user logon owning the directory and files but the group of the files and
+&gt; folder belongs to a user called webmaster - this cannot be changed due to
+&gt; software requirements on the server.
+
+Hmmm, this should allow what you want.
+
+&gt; The cms_docs user still cannot write to the qcp_docs user's folder, so since
+&gt; the qcp_docs user's account is not being used by the intended user yet, we
+&gt; decided to set up a couple of .bat files to allow the user to swap from
+&gt; qcp_docs to cmsdocs accounts from their PC to copy their html (converted
+&gt; from word) documents.
+&gt; 
+&gt; The swap from qcp_docs using the following commands works fine:
+&gt; 
+&gt; net use \\SERVER1\IPC$ &lt;\\SERVER1\IPC$&gt;  /delete
+&gt; net use \\SERVER1\CMSDOCS &lt;\\SERVER1\CMSDOCS&gt;  /delete
+&gt; net use \\SERVER1\IPC$ &lt;\\SERVER1\IPC$&gt;  /delete
+&gt; net use \\SERVER1\QCP_DOCS &lt;\\SERVER1\QCP_DOCS&gt;  "passwdgoeshere"
+&gt; /user:qcp_docs
+
+Hmmm, I don't believe you can actually delete IPC$. It is not a share that 
+shows up normally, and in anycase, WinNT and Win2K machines keep a 
+connection open for MSRPC, which leads to:
+
+&gt; Unfortunately, the moment the second .bat file is run to set the user logon
+&gt; back to cms_docs using the following commands:
+&gt; 
+&gt; net use \\SERVER1\IPC$ &lt;\\SERVER1\IPC$&gt;  /delete
+&gt; net use \\SERVER1\QCP_DOCS &lt;\\SERVER1\QCP_DOCS&gt;  /delete
+&gt; net use \\SERVER1\IPC$ &lt;\\SERVER1\IPC$&gt;  /delete
+&gt; net use \\SERVER1\CMSDOCS &lt;\\SERVER1\CMSDOCS&gt;  "passwdgoeshere"
+&gt; /user:cmsdocs
+&gt; 
+&gt; The user gets the error:
+&gt; System error 1219 has occurred.
+&gt; The credentials supplied conflict with an existing set of credentials.
+
+Well, or course they do, since the request goes over the same connection 
+that the client has open ...
+
+&gt; Has anyone else had this kind of problem?
+
+Why don't you add 'debug level = 10' and make sure that your log file is 
+something like /var/log/samba/log.%m in the global section above and then 
+try accessing the directory as user cmsdocs or whatever and see what goes 
+in the log files.
+
+
+Regards
+-----
+Richard Sharpe, <A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A>, <A HREF="mailto:rsharpe@samba.org">rsharpe@samba.org</A>, 
+<A HREF="mailto:sharpe@ethereal.com">sharpe@ethereal.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

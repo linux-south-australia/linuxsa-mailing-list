@@ -1,0 +1,111 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Procedure for RHL9 - tuning TCP for fast WAN networks" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 14 May 2003 11:47:57 +0930" -->
+<!-- Id="3EC1A755.6030800@aarnet.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Procedure for RHL9 - tuning TCP for fast WAN networks</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 14 May 2003 11:47:57 +0930
+</PRE>
+<H1>Procedure for RHL9 - tuning TCP for fast WAN networks</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+
+Hope someone finds this useful.
+
+                   TUNING TCP FOR FAST ETHERNET WAN
+                          (Red Hat Linux 9)
+
+The Linux kernel isn't tuned for long-haul rates of 100-500Mbps, so it
+performs sub-optimally on AARNet and other big pipe networks.
+
+Edit
+
+  /etc/sysctl.conf
+    # Increase socket buffer size
+    net.core.rmem_max = 8388608
+    net.core.wmem_max = 8388608
+    net.core.rmem_default = 131072
+    net.core.wmem_default = 131072
+    # Alter TCP buffer size autotuning parameters
+    net.ipv4.tcp_rmem = 4096 87380 8388608
+    net.ipv4.tcp_wmem = 4096 65536 8388608
+    net.ipv4.tcp_mem = 8388608 8388608 8388608
+    # Alter receive interface buffer
+    net.core.netdev_max_backlog = 2500
+
+Rather than reboot, install changes using
+
+  # sysctl -p
+
+Add a file
+
+  /sbin/ifup-local
+    #!/bin/sh
+    if [ -n "${1}" ]
+    then
+      if [ -x /sbin/ifconfig ]
+      then
+        /sbin/ifconfig "${1}" txqueuelen 1000
+      fi
+    else
+      exit 1
+    fi
+
+  # chmod u=rwx,go=rx ifup-local
+
+For immeidate effect also say
+
+  ifconfig eth0 txqueuelen 1000
+
+
+NOTES
+
+The script could be improved to only set long queue lengths on fast
+interfaces.  This could be tricky as supposedly slow link type such as
+PPP might be a "PPP over gigabit ethernet" tunnel or something else
+bizaare.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

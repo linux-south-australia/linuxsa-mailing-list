@@ -1,0 +1,222 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: my first DOS attack" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Tue, 5 Sep 2000 08:31:40 +0930" -->
+<!-- Id="20000905083140.A7710@atdot.dotat.org" -->
+<!-- Reference="20000905023410.B10714@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: my first DOS attack</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Tue, 5 Sep 2000 08:31:40 +0930
+</PRE>
+<H1>Re: my first DOS attack</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, Sep 05, 2000 at 02:34:10AM +0930, Alan Kennington wrote:
+
+ &gt; That's all good value.
+ &gt; But I'm not quite certain that you have the same picture of
+ &gt; the scenario that I have.
+    [ ... ]
+ &gt; Scenario 1:
+ &gt; I'm in Strasbourg with my laptop accessing my home web site over
+ &gt; the client company's LAN and Internet access.
+ &gt; I have some 4 machines which I want to access for various reasons.
+ &gt; Once I'm "in" to one of my machines, I'm certain that I'm me.
+
+That's fine -- So why did you say that one of the main advantages of
+rsh and rlogin was that if someone broke through your firewall and
+sniffed your network traffic, they wouldn't be able to see your password?
+
+You can't have your cake and eat it too.
+
+What I see from this message is that you're quite happy to sacrifice
+virtually all of your security for a bit of convenience (i.e.: you don't
+want to need to type a passphrase).  I don't have a problem with that;
+It just seems to render a lot of the other security stuff you often talk
+about quite pointless.
+
+ &gt; &gt; No.  It is an attack which forges packets so that they appear to come
+ &gt; &gt; from "trusted" IP addresses.
+ &gt; 
+ &gt; This is fine from attacker to victim.
+ &gt; But the victim traditionally replies with the destination IP
+ &gt; address equal to the source address of the client's packets.
+ &gt; The attacker, in order to get those reply packets, must either
+ &gt; be on the same LAN as me (e.g. a shared office with disreputable
+ &gt; co-workers), or else be on the same LAN as the destination host
+ &gt; (or some other less credible alternatives).
+
+The attacker does not need to see the reply packets.  They will have
+previously knocked-out the IP address listed in your .rhosts/hosts.equiv
+by SYN-flooding it, so they can use its IP address as the source of the
+attack without getting RST packets.
+
+Also keep in mind that you originally brought this up in the context
+of someone who had already broken into your firewall and who was sniffing
+your packets, so even if there was a requirement to view the backchannel
+that'd definitely be possible.
+
+ &gt; The attacker must be pretty clever to trick my computers into sending 
+ &gt; IP packets to an address which is _not_ written in the client
+ &gt; IP packet source-IP field.
+
+They don't need to do that.  
+
+ &gt; &gt; The attack method is well known, and has been for many years.  There
+ &gt; &gt; was a very long and drawn out thread on it started by Tsotumo
+ &gt; &gt; Shimomura in comp.unix.security in 1996 or thereabouts;  It's also
+ &gt; &gt; one of the reasons why so much effort has been invested into selecting
+ &gt; &gt; difficult-to-guess seed sequence numbers in TCP implementations 
+ &gt; &gt; since that time.
+ &gt; 
+ &gt; I remember overhearing some people discussing this kind of attack
+ &gt; around about that time.
+ &gt; I know that TCP uses (or used to use) the time of day to choose
+ &gt; the initial sequence number, apparently as a way of avoiding the
+ &gt; possibility of packets from different sessions to the same port
+ &gt; getting confused - in case of link failure etc.
+
+That's not actually why it does it at all, but I'm pleased you're 
+vaguely familiar with the attack.
+
+ &gt; I can see that an attacker, if able to guess the precise 32-bit
+ &gt; sequence number, could maintain a credible sequence of packet
+ &gt; _transmissions_ to the server host to maintain the communication.
+ &gt; But they still could not receive the packets from the victim
+ &gt; (server) host. Thus they could.....
+
+They don't need to.  They need to forge a SYN packet to initiate the
+connection to port 514;  Your server will send a SYN-ACK with an initial
+sequence number in it, but if they've guessed the "next" initial sequence
+number they don't need to read it (if they can read it the attack is 
+simpler, but it's by no means mandatory to sniff your network).  Therefore,
+the attacker can safely assume that the SYN-ACK has been transmitted, and
+continue the attack without actually having seen it.
+
+So, then they forge the ACK that matches the SYN-ACK, with the correct
+sequence number.  If they've guessed correctly, they now have a connection.
+They don't need to know whether they've guessed correctly, because
+they can work that out by observing whether the rest of the attack is
+successful, so they don't need to see any replies to this packet.
+
+Then they forge a final packet which contains RSH authentication stuff
+(essentially the username at their end - forged - and the username they're
+trying to login as).  The server will see then use that info to check a
+.rhosts file to see if the connection should be permitted;  If the 
+usernames are right and the source IP address is right, you're in (and
+we know they're right because they've been forged!)
+
+The final part of that final packet contains the rsh equivalent of:
+
+     echo + + &gt; $HOME/.rhosts
+
+That'll be executed by the server;  Once that has been carried out, there
+is no longer any need whatsoever to continue to forge packets, because 
+any user on any host on the Internet is now permitted to login to that
+account.
+
+So - By forging three packets and guessing a sequence number (which isn't
+hard, it's pseudo-random in a 32-bit keyspace) the attacker has broken 
+in without needing to sniff a single packet.  If it sounds hard, don't 
+worry becaus there are perl scripts which automate it;  The whole process
+from initial SYN-probing to get the sequence numbers through to the arrival
+of the first "#" prompt takes about ten seconds.
+
+This stuff is old news.  Anyone who makes use of .rhosts files quite 
+probably deserves what they get;  It's a scandal that rlogin and rsh
+are still enabled by default in the vast majority of UNIX installations.
+
+ &gt; This is really terrific. I've been using mail attachments for
+ &gt; transfers over the net. This is going to change my life!
+ &gt; The problem is that "scp" requires my passphrase, which is
+ &gt; no good at all for makefile and script use.
+ 
+The passphrase is optional.  If you're happy with the security of 
+the client, you can generate a key pair which isn't passphrase 
+protected.
+
+ &gt; I.e. the passphrase is not required.
+ &gt; So the "private" key _can_ be unencrypted!!
+ 
+Yes, but you'd have to be very confident about your firewall to run it
+like that (and your previous message indicated that you weren't necessarily
+happy with your firewall, because you wanted to keep cleartext passwords
+off your LAN).
+
+ &gt; I must say that I can't see myself going to so much effort.
+ &gt; I think that my recommendation to Robyn remains:
+ &gt; If you have several machines which are safely behind a firewall,
+ &gt; then all things considered, it's better to use .rhosts than
+ &gt; to type passwords for every file copy and login.
+
+I don't understand why you'd say that.  The vulnerabilities have been
+known for about a decade;  They've been well-publicized for about half
+that time.  The protocol is broken by design.
+
+If you're making use of .rhosts files then most of the rest of your 
+security efforts are probably a waste of time -- If an attacker breaks
+a single machine on your network, *ALL* of the others will be compromised
+in very short order.  It's not even like there's any doubt in the matter.
+
+This is bad advice, Alan.  You're telling someone that it's fine to 
+sacrifice all of their security (and it really is all of it - A single
+.rhosts file can let someone break root!) for the convenience of having
+to type a few less passwords.  It's ludicrous!
+
+With ssh-agent you only need to type the passphrase once per session
+anyway, so I don't really understand what massive gains there are to be
+had in exchange for the complete and total abdication of security 
+you're recommending that Robyn undertakes.
+
+ &gt; And if "rcp" and "rlogin" are firewalled out, the above
+ &gt; sequence-number-guessing attack won't work anyway.
+
+So are you worried about passwords in the clear on the LAN or aren't you?
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

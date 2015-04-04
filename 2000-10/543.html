@@ -1,0 +1,142 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: HD Management: RAID, LVM, ReiserFS and Coda etc" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="Mark Phillips <mark@ist.flinders.edu.au>, Linux SA" -->
+<!-- ToEmail="mark@ist.flinders.edu.au" -->
+<!-- Date="Mon, 16 Oct 2000 18:24:57 +0900" -->
+<!-- Id="3.0.6.32.20001016182457.00b37920@203.16.214.248" -->
+<!-- Reference="20001007143815.U12027@destiny.ist.flinders.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: HD Management: RAID, LVM, ReiserFS and Coda etc</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : Mark Phillips &lt;mark@ist.flinders.edu.au&gt;, Linux SA &lt;<I><A HREF="mailto:mark@ist.flinders.edu.au">mark@ist.flinders.edu.au</A></I>&gt;
+  Date: Mon, 16 Oct 2000 18:24:57 +0900
+</PRE>
+<H1>Re: HD Management: RAID, LVM, ReiserFS and Coda etc</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 02:38 PM 10/7/00 +0930, Mark Phillips wrote:
+&gt;I'm thinking of buying one of the new IBM Deskstar 7200 RPM ATA/100
+&gt;hard drives, and this has got me thinking about the best way of
+&gt;managing it.
+&gt;
+&gt;I am thinking that if I got a 20 or 30 meg drive, I would have room to
+&gt;spare, so why not introduce some redundancy to allow for error
+
+Wow, you must be frugal with space ... :-)
+
+&gt;checking and correction.  That is, rather than having to do backups,
+&gt;wouldn't it be nice if the filesystem did it implicitly in some way.
+&gt;
+&gt;As I understand it, RAID does this in some crude way.  That is, you
+&gt;can do disk mirroring.  And I understand you could probably divide a
+&gt;single disk into two partitions and do partition mirroring.  Is this
+&gt;right?  
+
+While drives are very reliable these days, by using partition mirroring,
+you have achieved nothing. If the disk goes, you have lost the lot ...
+
+&gt;          Alternatively, aren't their other versions of RAID which allow
+&gt;different levels of redundancy than mirroring --- ie instead of a
+&gt;ratio of 2:1, you could have 5:4 or something?
+
+RAID 4/5 allows you to use three or more drives, where one drive is used to
+provide parity for all the other drives, so you can tollerate the loss of
+one drive from the set. RAID 4 uses a single drive for parity, and it thus
+becomes a bottleneck, while RAID 5 spreads the parity out across all the
+drives, eliminating the bottleneck. However, it still requires more IO on
+writes, as you have to compute and write the parity.
+
+&gt;Is RAID of any use with a single disk, using multiple partitions?
+
+No use at all! If the drive goes, you have lost the lot.
+
+&gt;There is also LVM (Linux Volume Management I think it stands for)
+&gt;which allows you to have virtual volumes.  I believe it allows more
+&gt;flexibility than RAID, but I'm not sure if it does redundancy stuff.
+
+LVM allows you to add to your storage, but does not seem to support any
+mirroring as yet.
+
+&gt;One problem with RAID redundancy, is that although it allows you to
+&gt;survive a disk crash, it doesn't check for corruption of data.
+&gt;Presumably you could combine RAID with something like ReiserFS or
+&gt;ext3.  Anyone have any comments about this, or the stability of
+&gt;ReiserFS etc?
+
+Well, a RAID 5 system can tollerate the loss of one drive, and your data is
+still intact. However, if your system crashes with unflushed buffers, then
+you will need to repair the file system. ReiserFS is a journalling file
+system with a number of other advantages, and appears to be very stable.
+However, I have not used it, but will do so soon.
+
+&gt;The other possibility is the use of Coda.  The main advantage of coda
+&gt;is that it is designed to work well with a laptop.  If I want have my
+&gt;laptop and main computer share the same file system, Coda can do this.
+&gt;If I take my laptop away for a while, and then later reconnect it to
+&gt;my network, Coda will syncronize the file systems for me.
+&gt;
+&gt;So.  My main problem is that there seem to be lots of interrelated
+&gt;technologies out there, and I'm still trying to come to grips with how
+&gt;they all work and interrelate, and how stable they each are, and what
+&gt;solutions are best.  I just thought I'd send out this email to get
+&gt;some feedback and people's ideas etc.
+
+For the average home user, there is probably not a lot of reason to do so.
+
+&gt;Cheers,
+&gt;
+&gt;Mark.
+&gt;
+&gt;-- 
+&gt;_/~~~~~~~~\___/~~~~~~\____________________________________________________
+&gt;____/~~\_____/~~\__/~~\__________________________Mark_Phillips____________
+&gt;____/~~\_____/~~\<A HREF="mailto:________________________________mark@ist.flinders.edu.au_">________________________________mark@ist.flinders.edu.au_</A>
+&gt;____/~~\HE___/~~\__/~~\APTAIN_____________________________________________
+&gt;____/~~\______/~~~~~~\____________________________________________________
+&gt;__________________________________________________________________________
+&gt;        "They told me I was gullible ... and I believed them!" 
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

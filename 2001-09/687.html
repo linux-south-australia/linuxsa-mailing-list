@@ -1,0 +1,191 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Help with Asus A7VL-VM - vga setup" -->
+<!-- FromName="'Tyson Lloyd Thwaites'" -->
+<!-- FromEmail="tysonlt@webmedia.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 25 Sep 2001 09:42:45 +0930" -->
+<!-- Id="003b01c14556$cddfe130$0a5e08cb@webmedia.com.au" -->
+<!-- Reference="3BAC4125.4030903@fornax.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Help with Asus A7VL-VM - vga setup</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Tyson Lloyd Thwaites &lt;<I><A HREF="mailto:tysonlt@webmedia.com.au">tysonlt@webmedia.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 25 Sep 2001 09:42:45 +0930
+</PRE>
+<H1>RE: Help with Asus A7VL-VM - vga setup</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I took Andrew's advice and upgraded to 7.1, and made some steps forward, but
+still the same problem.
+
+Once nice thing was that scanpci actually says it found an "S3 SavagePro
+Km133", which is the proper spec for the card. On 6.2 it only found a
+generic S3. So we are getting closer!
+
+It turns out that the card was being detected by X all along - it find an S3
+generic with 64k video ram or something pathetic...the problem is,
+therefore, that I can't convince it to start with a proper screen
+resolution. XF86Setup (which doesn't come on 7.1...grr) could start it up in
+320x204, but when I use a config file made by Xconfigurator, X doesn't find
+any valid modes at all.
+
+So is my problem with the mode timings? Should I try to build some modelines
+by hand (which I don't mind, if I am told how), or is it better to try and
+get X to detect my card properly and automatically pick the right ones?
+
+Cheers,
+
+Tyson Lloyd Thwaites
+
+&gt; -----Original Message-----
+&gt; From: Andrew Hill [mailto:<A HREF="mailto:list@fornax.net">list@fornax.net</A>]
+&gt; Sent: Saturday, September 22, 2001 5:14 PM
+&gt; To: Tyson Lloyd Thwaites
+&gt; Cc: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; Subject: Re: Help with Asus A7VL-VM - vga setup
+&gt;
+&gt;
+&gt; Tyson Lloyd Thwaites wrote:
+&gt;
+&gt; &gt; It uses the VIA
+&gt; &gt; KL133 chipset, and has integrated SavagePro vga. I am using
+&gt; RH6.2. (I tried
+&gt; &gt; RH7.1, but had no more luck, and I don't like it :)
+&gt;
+&gt;
+&gt; Ah, but RH7.1 comes with XFree86 4.0.3, which is much nicer than the
+&gt; 3.3.6 version that comes with RH6.2! :-) I'd strongly recommend the
+&gt; upgrade to the newer version of XFree86, if you can cope with
+&gt; RH7.1 Once
+&gt; you start getting over the little differences from 6.2, it starts to
+&gt; feel like home again :-) (But hey, stick with 6.2 if you're
+&gt; happy with
+&gt; it [clap your hands?])
+&gt;
+&gt;
+&gt; &gt; A Linux X server (SVGA) actually comes on the CD (nice
+&gt; surprise!), but it
+&gt; &gt; seems to make no difference. Xconfigurator fails to detect
+&gt; the card, but I
+&gt; &gt; tell it to use to use the SVGA server, with 16Mb, etc etc.
+&gt;
+&gt;
+&gt; Note that <A HREF="http://www.xfree86.org/current/Status28.html">http://www.xfree86.org/current/Status28.html</A>#28 lists the
+&gt; current S3 chipsets that are supported, and the SavagePro isn't
+&gt; specifically listed, but at a guess, in XFree86 3.3.6 you'd
+&gt; want to try
+&gt; the s3_savage driver (not really sure, never used one of those cards
+&gt; before). Set that in the Device section of your XF86Config
+&gt; file, and see
+&gt; how it goes. I also generally find leaving the driver to
+&gt; decide how much
+&gt; RAM is on the video card works better.
+&gt;
+&gt; However, that said, if it's still not finding the video card, you can
+&gt; try setting the BusID in the Device section to tell X where the card
+&gt; "is". For example, when I do 'scanpci' I get the following (snipped):
+&gt;
+&gt; pci bus 0x0 cardnum 0x08 function 0x0000: vendor 0x121a device 0x0005
+&gt;   3Dfx Interactive Voodoo3
+&gt;
+&gt; pci bus 0x1 cardnum 0x00 function 0x0000: vendor 0x10de device 0x0028
+&gt;   NVidia Riva TNT2
+&gt;
+&gt; As a result, I have the following in XF86Config:
+&gt;
+&gt; Section "Device"
+&gt;      Identifier  "TNT2"
+&gt;      Driver      "nv"
+&gt;      BusID       "PCI:1:0:0"
+&gt; EndSection
+&gt;
+&gt; Section "Device"
+&gt;      Identifier  "Voodoo3"
+&gt;      Driver      "tdfx"
+&gt;      BusID       "PCI:0:8:0"
+&gt; EndSection
+&gt;
+&gt; That way, X finds that Voodoo3 card when it normally only
+&gt; finds my TNT2
+&gt; card. YMMV.
+&gt;
+&gt; &gt; I would love to get this working. I would be happy to just
+&gt; use the virge,
+&gt; &gt; though X is a *tiny bit 'fuzzy' (or is that just X?).
+&gt;
+&gt;
+&gt; I've had a similar problem with two different video cards in the past
+&gt; that were "fuzzy," and the way that I solved the problem was
+&gt; to remove
+&gt; all the ModeLine settings from the Monitor section(s) of your
+&gt; XF86Config
+&gt; file, and let X sort it all out by probing the video card (Make sure
+&gt; your monitor H & V rate settings are right, of course!). I've
+&gt; also found
+&gt; that having the DPMS turned on (if your card/monitor support it) also
+&gt; helps. Add the line
+&gt;
+&gt;    Options "dpms"
+&gt;
+&gt; to your Monitor section. Beats me why that should make a
+&gt; difference, but
+&gt; it did. *shrug*
+&gt;
+&gt; &gt; Any experience or advice would be *greatly appreciated!
+&gt;
+&gt;
+&gt; Well, there's my experiences. Hope it's of use :-)
+&gt;
+&gt; Cheers,
+&gt;
+&gt; --
+&gt; Andrew Hill
+&gt; "RAID - Don't believe the hype." -- 2001-09-22
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on
+&gt; irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as
+&gt; the subject
+&gt;
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

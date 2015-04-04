@@ -1,0 +1,164 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Data security - any thoughts?" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'jonathan soong'" -->
+<!-- ToEmail="jon.soong@imvs.sa.gov.au" -->
+<!-- Date="Fri, 21 Feb 2003 10:53:56 +1030" -->
+<!-- Id="3E55719C.1000102@aarnet.edu.au" -->
+<!-- Reference="3E540B52.6070603@imvs.sa.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Data security - any thoughts?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : jonathan soong &lt;<I><A HREF="mailto:jon.soong@imvs.sa.gov.au">jon.soong@imvs.sa.gov.au</A></I>&gt;
+  Date: Fri, 21 Feb 2003 10:53:56 +1030
+</PRE>
+<H1>Re: Data security - any thoughts?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+jonathan soong wrote:
+&gt; This is a general question about how to secure data on a DMZ.
+&gt; 
+&gt; I am currently implementing a system that will need to keep patient's 
+&gt; private information on a webserver ready for download.
+&gt; 
+&gt; I was planning on keeping it on the disk encrypted and only decrypting 
+&gt; it when it was downloaded - i would ssh the files to the machine and GPG 
+&gt; them up as they were sent to the machine, then i would decrypt them as 
+&gt; they were requested over the web.
+&gt; 
+&gt; I know that this is not secure as the keys will have to be kept on the 
+&gt; same machine. i.e. anyone with Root access will be able to get the files ..
+&gt; 
+&gt; However, i can't think of a better way to do it - encrypting the data 
+&gt; isn't really much of a security measure here - it will just make it 
+&gt; slightly harder for anyone who gained access to to read the files...
+&gt; 
+&gt; 
+&gt; Has anyone got any other ideas on how this could be done?
+
+The usual answer here is to use cryptography from end to end.
+
+That is, encrypt the information on the machine before you
+upload it to the webserver.  Easiest to use public key
+encryption -- for each of the doctors that can read the
+file encrypt it with their public key; encrypt it with
+the uploader's public key; sign it with the uploader's
+private key; and overwrite then delete the plaintext file.
+
+Then doctors download the files, as per usual.  They then
+run GPG each time they want to look at the files, supplying
+the pass phrase that allows them to retrieve their private
+key from the local disk.
+
+To keep key management sane, run a public keyserver on
+the same machine as the web server.
+
+This gets you:
+
+  - you don't care if your web server gets hacked
+
+     - you know they could read any of the files
+     - you know they couldn't alter any of the files
+     - you don't know if anything files were deleted.
+     - you need to check that the keyserver still gives
+       truthfull answers
+
+  - you don't care if the doctor's machine gets stolen
+    or hacked.
+
+     - which will require some discipline from the
+       doctors to run GPG each time.  There's some
+       nice GPG front ends and key proxies which you
+       should look at to make the user experience of
+       using GPG nice enough so that doctors don't
+       simply keep stuff as plain text.
+
+  - you don't care if the uploaders machine gets stolen
+    or hacked.
+
+The private keys are all stored well away from the webserver,
+and are protected by passwords.  There's no drama issuing
+another private/public keypair should that be necessary.
+
+Note that key issuing is arse-about.  The *doctor* generates
+the private key, public key and revocation certificate.  They
+write the public key and revocation certificate to diskette and
+get this to you (snail mail would be adequate).  You then
+put the public key on the keyserver and the revocation certificate
+in your safe (you want this for when a doctor leaves the system).
+
+You could alter the key distibution scheme to be more centralised,
+but then you're shipping private keys about and an error would
+compromise the system.
+
+As you can see, you need to look at security as an entire
+system.  I'd suggest that a risk analysis might even show
+higher odds of a doctor's PC being stolen then the webserver
+being hacked.
+
+Jonathan, if you want more of an explanation then give
+me a call.
+
+Regards,
+glen
+
+David Newell wrote:
+&gt; A one-time key system might avoid the problem you've identified, though.
+&gt; Intercepting a one-time key is less disastrous than intercepting a more
+&gt; permanent key (provided the algorithm to generate said key isn't too
+&gt; predictable).
+
+David, the key distibution problem with very large one-time
+keys is worse than distributing much shorter longer-lived keys.
+You need to send the doctor a new floppy disk of key material
+for each 1.44MB of data they download.
+
+So you're more likely to have a key interception.  Then you just
+use that key to do a XOR with the data files until you find
+a data file that appears in ASCII.
+
+One-time keys are really only useful for small amounts
+of data (eg: a codeword from a espionage agent).
+
+-- 
+  Glen Turner                (08) 8303 3936 or +61 8 8303 3936
+  Australian Academic and Research Network   www.aarnet.edu.au
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

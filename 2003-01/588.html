@@ -1,0 +1,103 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Static Routes RH8.0" -->
+<!-- FromName="'Sean Burford'" -->
+<!-- FromEmail="sean.burford@adelaide.edu.au" -->
+<!-- ToName="'Steve Sloan'" -->
+<!-- ToEmail="steve@lansol.com.au" -->
+<!-- Date="15 Jan 2003 09:40:21 +1030" -->
+<!-- Id="1042585821.31389.98.camel@explo.its.adelaide.edu.au" -->
+<!-- Reference="3E229DCB.40309@lansol.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Static Routes RH8.0</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Sean Burford &lt;<I><A HREF="mailto:sean.burford@adelaide.edu.au">sean.burford@adelaide.edu.au</A></I>&gt;
+  To  : Steve Sloan &lt;<I><A HREF="mailto:steve@lansol.com.au">steve@lansol.com.au</A></I>&gt;
+  Date: 15 Jan 2003 09:40:21 +1030
+</PRE>
+<H1>Re: Static Routes RH8.0</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+On Mon, 2003-01-13 at 21:36, Steve Sloan wrote:
+&gt; Just been trying to add some static routes to two RH8.0 boxes.
+&gt; In the past I have always added the routes to the 
+&gt; /etc/sysconfig/static-routes file and never had a problem.
+&gt; Now for some reason the network service seems to ignore everything in 
+&gt; that file.
+
+Redhat 8.0 initialises static routes in the same was as Redhat 7.2. 
+I've had a quick look through the scripts and here's what I came up
+with.  Don't expect any real insights.
+
+A valid /etc/sysconfig/static-routes file looks like this:
+any net 10.0.0.0 netmask 255.0.0.0 reject
+eth0 host 10.0.0.1
+
+If you are setting a static route without a specific interface (like the
+first line above):
+- Make sure that the line begins with the lowercase word 'any'
+- Try running the command: /sbin/route add -&lt;args&gt;
+    where args is everything from the line except 'any'
+Non interface specific static routes have to begin with the word "any",
+in lower case.  They are initialised from `/etc/init.d/network start`.
+
+If you are setting a static route on a specific interface (like the
+second line above), make sure that:
+- The device (eg eth0) is not an alias (eg eth0:1)
+- Make sure that NO_ALIASROUTING is set to no in /etc/sysconfig/network
+- cp ifcfg0-eth0 to ifcfg-eth0:0, and set ONBOOT to no
+- Try running the command: /sbin/route add -&lt;args&gt; &lt;device&gt;
+    where args is everything from the line except device.
+Interface specific routes have to begin with the name of the device, eg
+"eth0".  They are initialised from
+/etc/sysconfig/network-scripts/ifup-aliases in function new_interface()
+if $NO_ALIASROUTING is not set to "yes".  ifup-aliases is only invoked
+by ifup-post if the device is not an alias (does not contain a colon
+(:)).  ifup-post is called by ifup.
+
+Send me your /etc/sysconfig/static-routes, /etc/sysconfig/network and
+/etc/sysconfig/network-scripts/ifcfg-* files if you still have problems.
+
+-- 
+Sean Burford
+08 8303 4135
+Systems Specialist
+Adelaide University
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

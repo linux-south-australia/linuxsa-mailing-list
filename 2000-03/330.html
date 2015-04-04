@@ -1,0 +1,130 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SAMBA question" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="Galdes, Andrew (PIRSA)" -->
+<!-- ToEmail="Galdes.Andrew@saugov.sa.gov.au" -->
+<!-- Date="Wed, 15 Mar 2000 17:55:12 +1030" -->
+<!-- Id="38CF3AD8.F6133819@aarnet.edu.au" -->
+<!-- Reference="9D224DF97E24D311A1CE00805F8B868673F48A@SAGEMSA0012" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SAMBA question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Galdes, Andrew (PIRSA) &lt;<I><A HREF="mailto:Galdes.Andrew@saugov.sa.gov.au">Galdes.Andrew@saugov.sa.gov.au</A></I>&gt;
+  Date: Wed, 15 Mar 2000 17:55:12 +1030
+</PRE>
+<H1>Re: SAMBA question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+"Galdes, Andrew (PIRSA)" wrote:
+&gt; 
+&gt; ...and a /tmp direcotry for public access
+
+Hopefully you're not sharing *the* /tmp directory.  Any Samba
+guest user could then remotely exploit a /tmp race bug in an
+application.
+
+
+&gt; First, why does it take so long to boot the linux box. It hangs (for 5
+&gt; minutes and more) on OPENMAIL, HTTPD and SMB. i guess i can just stop them
+&gt; from loading at start-up, but should this happen?
+
+This is typical of DNS being unavailable as the machine boots.
+
+Assuming you're not using DHCP (because if you do, all this magic
+is done for you, that's why network administrators love it so).
+
+Have a look in /etc/resolv.conf and use "dig @" to ensure that
+each of the IP addresses listed there is a working nameserver
+and are returning consistent results.
+
+  search aarnet.edu.au
+  nameserver 126.1.1.10
+  nameserver 126.2.2.20
+
+    The exact IP addresses will be provided by your site sysadm.
+
+  dig @126.1.1.10 bush.aarnet.edu.au
+  ANSWER
+  10.0.0.1 ... bush.aarnet.edu.au
+
+Your machine should be listed in /etc/hosts
+
+  127.0.0.1 localhost.localdomain localhost
+  10.0.0.1  bush.aarnet.edu.au bush
+
+And /etc/nsswitch.conf should say:
+
+  hosts: files dns
+
+Since you're in a corporate environment, you should really
+be using DHCP.  Just let your network administrator know that
+you are running a server (and they'll than make sure it gets
+the same IP address each time you boot).
+
+
+&gt; Second, Since the win95 boxes aren't logging-on (as such) to the linux box
+&gt; (not loggin to NT) should the win95 boxes be able to change their passwords
+&gt; to the linux box. eg can fred change his password to access his shares on
+&gt; the linux box?
+
+This gets confusing as there are four passwords for one person:
+their Windows 95 logon password, their Windows 95 share password,
+their Samba password and their Linux password.
+
+The Windows 95 machines are logging onto the Samba share on the
+Linux box.
+
+The Windows 95 share password and the Samba password must match.
+
+The Windows 95 share password defaults to the Windows 95 password
+[this is certainly true of NT, and I think, of 95]
+
+The Samba password is usually held in the file /etc/smbpasswd and
+maintained by the smbpasswd utility.  You can do some tricky stuff
+to either use the person's Linux password (but you need to send
+cleartext passwords for this) or maintain /etc/smbpasswd in sync
+with the person's Linux password (install /lib/security/pam_smbpass.so).
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ Earth is a single point of failure
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

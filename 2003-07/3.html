@@ -1,0 +1,367 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: (Clarification) Re: Some Proposals for a Linux of The Future (tm) :)" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'Adam Smith','LinuxSA'" -->
+<!-- ToEmail="linuxsa@bugman.cx,linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 1 Jul 2003 01:44:36 +0930" -->
+<!-- Id="000401c33f22$c55bc6b0$020120ac@skink" -->
+<!-- Reference="20030630145155.GA1548@bugman.cx" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: (Clarification) Re: Some Proposals for a Linux of The Future (tm) :)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : Adam Smith &lt;<I><A HREF="mailto:linuxsa@bugman.cx">linuxsa@bugman.cx</A></I>&gt;<BR>        LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 1 Jul 2003 01:44:36 +0930
+</PRE>
+<H1>RE: (Clarification) Re: Some Proposals for a Linux of The Future (tm) :)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; On Mon, Jun 30, 2003 at 11:18:13PM +0930, Damien Uern said:
+&gt; &gt; Hello,
+&gt; 
+&gt; Well Hi there!
+
+/me nods at Adam and Damien...
+
+&gt; &gt; The separation of Administrator-modified configuration 
+&gt; files and the 
+&gt; &gt; default
+&gt; &gt; files installed by the system makes sense to me. But having 
+&gt; it in two totally 
+&gt; &gt; different locations doesn't, e.g. "/etc and 
+&gt; /usr/local/etc". Forgetting about 
+&gt; &gt; Unix history for a moment and stepping outside of the box, 
+&gt; if you were to 
+&gt; &gt; design the filestructure from scratch, where would you 
+&gt; place these two 
+&gt; &gt; directories?
+
+Well, really, the config files are there because the programs are there...
+ie: /etc refers to programs that are based in / or /usr (that is, /bin and
+/usr/bin) -- ie the OS's programs; whereas /usr/local/etc refers to programs
+that are based in /usr/local (such as those in /usr/local/bin) ... That
+makes sense -- particularly if you want the flexibility of having a shared
+/usr/local (or even /usr) over multiple machines (which is common). I guess
+it depends whether you think it's important to differentiate between the
+OS's files and the additional files...
+
+&gt; 
+&gt; Because it's the history of Unix that has held it together as 
+&gt; a scalable operating system for so long.
+
+... which is a very good point, but doesn't mean there isn't a better way,
+just that the better way is going to have to be significantly better before
+it is trusted.
+
+&gt; 
+&gt; And it makes logical sense to me.
+&gt; 
+&gt; /etc for your basic system config files that come with your 
+&gt; operating system,
+&gt; 
+&gt; /usr/local/etc for all the additional stuff you've added to 
+&gt; the system that doesn't come as part of the underlying model. 
+&gt;  'man hier' and look up /usr/local.
+&gt; 
+&gt; I agree that it can be sometimes confusing, for example:
+&gt; 
+&gt; /etc/named/named.conf
+&gt; /usr/local/etc/dhcpd.conf
+&gt; 
+&gt; (Yes -- both services are fundamental to most networks, and 
+&gt; while named.conf is a file and a service included with a 
+&gt; generic install, dhcpd.conf is not, because it's installed, 
+&gt; in freebsd's case, from the ports.
+
+IMHO, as much as possible in FreeBSD's case should be moved to ports. To my
+way of thinking, whenever there is a choice of ways of doing something, even
+if it's essential to the operating system, it should be in /usr/local... eg
+sendmail shouldn't be part of the base install, even though you do need an
+MTA for a proper OS. That's just me though... :)
+
+&gt; 
+&gt; &gt; So here are my revised goals:
+&gt; &gt; 
+&gt; &gt; 1. Design a logical directory structure within the /etc directory.
+&gt; &gt;    - it must be fairly simple for somebody to look through that 
+&gt; &gt; directory to
+&gt; &gt; find something without resorting to "locate" or "find".
+&gt; 
+&gt; How?
+&gt; 
+&gt; Any sort of mixing together of basic configuration files and 
+&gt; configs for additional modules would take away the principles 
+&gt; of the logical structure that Unix has today.  The same 
+&gt; principle exists right now for /bin and /usr/local/bin.  
+&gt; Should we change that aswell?  /bin is for programs that need 
+&gt; to be run in multi or single user mode, and /usr/local/bin is 
+&gt; used for binaries for added on programs (because that's 
+&gt; generally what your /usr partition is for.)
+
+Here's some samples from debian's man hier (re-ordered to suit me...):
+
+       /      This is the root  directory.   This  is  where  the
+              whole tree starts.
+
+       /bin   This  directory  contains executable programs which
+              are needed in single user mode  and  to  bring  the
+              system up or repair it.
+
+       /sbin  Like /bin, this directory holds commands needed  to
+              boot the system, but which are usually not executed
+              by normal users.
+
+       /etc   Contains configuration files which are local to the
+              machine.  Some larger software packages, like  X11,
+              can  have  their  own  subdirectories  below  /etc.
+              Site-wide configuration files may be placed here or
+              in  /usr/etc.  Nevertheless, programs should always
+              look for these files in /etc and you may have links
+              for these files to /usr/etc.
+
+       /usr   This directory is usually mounted from  a  seperate
+              partition.  It should hold only sharable, read-only
+              data, so that it can be mounted by various machines
+              running Linux.
+
+       /usr/bin
+              This is the primary directory for  executable  pro-
+              grams.   Most  programs  executed  by  normal users
+              which are not needed for booting or  for  repairing
+              the  system  and  which  are  not installed locally
+              should be placed in this directory.
+
+       /usr/sbin
+              This directory contains program binaries for system
+              admininstration which are  not  essential  for  the
+              boot  process,  for  mounting  /usr,  or for system
+              repair.
+
+       /usr/etc
+              Site-wide configuration files to be shared  between
+              several  machines  may be stored in this directory.
+              However, commands  should  always  reference  those
+              files  using  the /etc directory.  Links from files
+              in /etc should point to the  appropriate  files  in
+              /usr/etc.
+
+       /usr/local
+              This  is where programs which are local to the site
+              typically go.
+
+This is actually quite logical. In practice, it doesn't always work this
+way, but in theory, it's good. I note that on my debian box, there is almost
+nothing in /usr/local at all (76k, in fact -- and only one file, the rest
+directories)... FreeBSD, of course, has a different policy...
+
+Note the stated purpose of most of these distinctions is not so much so that
+people can make distinctions between different programs and their
+configurations, but so that they can be network mounted, and shared between
+multiple machines quite easily. The idea is that you could have a bunch of
+different machines with /, /boot, /var and /tmp local, and mount /usr from a
+server somewhere. /usr could be read-only, and would have programs installed
+(in this case) from the debian repository on it. You could share this
+between a number of similar machines. /usr/local is the same, but contains
+programs that are not part of the base OS, and instead are compiled locally
+by the sysadmin. Again, you would often share this between multiple
+machines. /usr/share is even more shareable, as it is read-only and
+platform-independant. This means that /etc would hold config for that
+machine, and /usr/etc (which is rarely used, and doesn't even exist on my
+machine) and /usr/local/etc would hold configs for multiple machines, to
+ease administration.
+
+Basically, this whole thing, which is somewhat ugly and complex, is designed
+to make life easy for large installations. It's less of an issue now that
+there are package managers and large hard drives, but there is some real
+sense behind it, and the advantages of this setup need to be fully
+understood before changing it... The thing is, that these advantages don't
+mean a thing in the home user or even small office setup. When you have 30
+servers (or even 30 linux desktops), this system becomes a valuable
+management tool. It certainly takes some time to get your head around it,
+and perhaps the value of it isn't obvious until you've been in a situation
+where it is valuable...
+
+&gt; 
+&gt; It is only poor coding by some developers that make things 
+&gt; inconsistent, or a user's customized personal preference (for 
+&gt; example, some users like to store their applications in 
+&gt; completely seperatated directories, including all data, 
+&gt; config files and libraries.)
+
+... combined with the fact that different OS's tend to have different
+systems. Solaris, Debian, RedHat and FreeBSD are all significantly
+different, as James Leone pointed out.
+
+&gt; 
+&gt; &gt; 2. Design a unified configuration file format.
+&gt; &gt;   - This format must be simple enough to be easily understood by 
+&gt; &gt; somebody
+&gt; &gt; without them having to refer to a manual
+
+&lt;snip&gt;
+
+Of course, the reason why things are the way they are is historic. I'm sure
+may of these files could be significantly redesigned, with great benefits in
+readability. However, the problem would be the legacy -- of software using
+the old syntax, of configurations in the old syntax, and of people used to
+the old syntax. I, for one, wouldn't want to be using any new syntax for
+(say) httpd.conf, unless it was going to be shared by all the Apaches that I
+use on different platforms... Some files (eg zone files for named) are
+actually part of a protocol standard. These files need to be that way
+because that's how they get transported over the internet to many different
+OS's...
+
+&gt; &gt;   - All configuration files will have a common extension so 
+&gt; they can 
+&gt; &gt; easily be
+&gt; &gt; seen as such (e.g: .conf).
+&gt; 
+&gt; There are a few exceptions to this, but you'll probably find 
+&gt; that most programs already use a .conf extension, and of 
+&gt; those that aren't -- sloppy programming, most likely.
+
+I thought they were easily seen as configuration files because they were in
+/etc ...
+
+Also, what happens when you have multiple config files for the same
+program... eg cups has mime.types and mime.convs ... I guess you could
+rename them all to mime.types.conf etc... but that looks klumsy to me.
+
+&lt;snip&gt;
+
+&gt; &gt; I believe something like this could be done if it is managed in 
+&gt; &gt; stages:
+&gt; &gt; 
+&gt; &gt; 1) Discourage hard-coding paths to configuration files so that 
+&gt; &gt; configuration
+&gt; &gt; files can be placed wherever the user pleases.
+&gt; 
+&gt; Above, you wanted a logical and consistent system that 
+&gt; allowed us to not have to use tools like find and locate.  
+&gt; Now you say you want us to be able to put our configuration 
+&gt; files anywhere we choose?
+
+I'm not sure I follow what Damien is saying here either...
+
+&gt; 
+&gt; &gt; Application accesses these files through a library "say libetc, or 
+&gt; &gt; libconfig".
+&gt; 
+&gt; So that when we're on a slow link we have to use annoying 
+&gt; tools that slow us down.
+
+I think he's talking about when the application wants to read the config
+programatically. The link speed woulnd't affect this. You could still use
+the same text editor when you are editing them.
+
+&gt; 
+&gt; &gt; 3) Create layout file format and sample application that 
+&gt; can parse the 
+&gt; &gt; etc
+&gt; &gt; tree and provide a GUI for config files that have an 
+&gt; accompanying layout 
+&gt; &gt; file.
+&gt; 
+&gt; I think Microsoft have tried this a few times, and they got 
+&gt; their Registry Editor which is a most friendly application to 
+&gt; get your head around, not to mention navigate.
+
+And then there's linuxconf... :)
+
+I think what Damien's suggesting is similar to Regedit, but rather than
+using a single binary database, use a structured set of text files in a
+human-readable format.
+
+&lt;snip&gt;
+
+&gt; &gt; 4) ???
+&gt; 
+&gt; ???
+&gt; 
+&gt; &gt; 5) Profit!! :)
+&gt; 
+&gt; !
+
+It's based on the underpants gnomes' business plan:
+
+<A HREF="http://www.fool.com/news/foth/2001/foth011108.htm">http://www.fool.com/news/foth/2001/foth011108.htm</A>
+
+
+&gt; 
+&gt; &gt; Somewhere in those stages the layout of the /etc directory and the 
+&gt; &gt; format of
+&gt; &gt; the configuration/layout files should be attempted to be 
+&gt; made a standard 
+&gt; &gt; (LSB) so as to encourage people to follow it.
+&gt; &gt; 
+&gt; &gt; For all those that say "the current system is fine once you 
+&gt; know it", 
+&gt; &gt; I say
+&gt; &gt; how does that make the current system the best possible? 
+&gt; How can we make 
+&gt; &gt; progress if we stay stationary? (and if you say "if it aint 
+&gt; broke don't fix 
+&gt; &gt; it", I'm going to scream :) It *IS* broke :)
+&gt; 
+&gt; Because it is scalable, and it makes logical sense.  Of all 
+&gt; of the things you've described, it seems that it's only the 
+&gt; application developers who are breaking the rules of where 
+&gt; files should belong, and how they are laid out. Maybe you 
+&gt; should explain to them the importance of a logical file system?
+&gt; 
+&gt; I agree to some of what you have said, but certainly not all of it.
+
+I'm with you both!
+
+Perhaps... there are two things going on here. There's the sysadmin's *nix,
+and there's the home user and small office *nix... For sysadmins, the
+complexity of the config system is an advantage, and worth the price of
+learning. For the home user, it's a disavantage, and a PITA.
+
+rr
+
+
+-- 
+Richard Russell
+Yellow Goanna P/L
+m: +61 412 827 805
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+w: <A HREF="http://www.yellowgoanna.com">http://www.yellowgoanna.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

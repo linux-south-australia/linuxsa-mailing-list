@@ -1,0 +1,121 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: ypserv" -->
+<!-- FromName="Andrew Whyte" -->
+<!-- FromEmail="andrew.whyte@netregistry.au.com" -->
+<!-- ToName="Andreja Zivkovic" -->
+<!-- ToEmail="andy@zt.zivkotech.net.au" -->
+<!-- Date="Mon, 08 Nov 1999 08:20:05 +1100" -->
+<!-- Id="3825ED05.B8ABA35@netregistry.au.com" -->
+<!-- Reference="NDBBLJDGGLMJNFHJNPDCKEIDCAAA.andy@zivkotech.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: ypserv</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Whyte &lt;<I><A HREF="mailto:andrew.whyte@netregistry.au.com">andrew.whyte@netregistry.au.com</A></I>&gt;
+  To  : Andreja Zivkovic &lt;<I><A HREF="mailto:andy@zt.zivkotech.net.au">andy@zt.zivkotech.net.au</A></I>&gt;
+  Date: Mon, 08 Nov 1999 08:20:05 +1100
+</PRE>
+<H1>Re: ypserv</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Andreja Zivkovic wrote:
+&gt; 
+&gt; Hi,
+&gt; 
+&gt; Last night I was playing around a bit with my LAN, and decided to give a
+&gt; shot at using NIS (so all computers have the same user names/passwords).
+&gt; Anyway, all went well (i hope) with the help of the NIS HOWTO, but I just
+&gt; realised that the ypserv processes are taking up all the idle time of the
+&gt; processor.
+&gt; 
+&gt; Is this normal (i don't see why it would be)? What could be possible
+&gt; problems?
+
+Erm, no it's not normal :)
+
+&gt; The server is on a P133, running RH 6.0, but with a few rpms from the 6.1
+&gt; CD. I updated the ypserv, ypbind and yp-tools packages, as well as glibc and
+&gt; libc (and quite a few others, but I don't they have anything to do with
+&gt; NIS).
+
+I have a set of 5 machines running NIS on RH6.0 just fine, so there should be no
+real problems with it.
+
+&gt; Also, when setting it up, /var/yp/Makefile looked for a /etc/gshadow (and
+&gt; /etc/group) to make the groups database, however, gshadow doesn't exist on
+&gt; my system. I ended up copying group to gshadow, and it works, but I don't
+&gt; know if this is a good solution. Finally, it looked for a /etc/netgroups
+&gt; file, for some reason, and that file didn't exist. I did a touch
+&gt; /etc/netgroups, and now the yp Makefile completes successfully, but I don't
+&gt; know if that file is important.
+&gt; 
+
+You are supposed to change the Makefile in /var/yp so that it only serves up the
+nis maps you want.
+
+have a look in /etc/nsswitch.conf for a start, this will set the search order for your info,
+on the server and slaves you'll need to have passwd, and group set to 'files nis' (or nisplus if you used that)
+
+you can happily (read: SHOULD) comment out lines refering to Shadow passwords and group files, if your system
+isn't running shadowed.
+
+You can also, of course set up NIS to just serve Password/Group info and not host maps. (a good idea since DNS is better).
+So again, comment out all the lines to do with hots, and networks and stuff. You just want passwd/group lines.
+
+Now have a look at /var/yp/Makefile, you need to modify the "all:" line to include only the options you want, again passwd and
+group. (unless you are after hosts etc, which is pointless.)
+
+There are also some other settings you should do, NOPUSH=true if you only have one NIS server, i.e. no slave servers or
+"repeaters".  This is most likely your case. and MINUID, MINGID these will set from which UID and GID in the server passwd/group
+files to serve via the nis maps.  You don't want to be serving root's account or other accounts that
+may be required by the system if NIS was to fail.
+
+anyway, I hope some of that is usefull, good luck with it :)
+
+
+oh, and remember to always change your password with yppasswd even on the server once you're running a NIS domain.
+Or you'll modify passwords incorrectly, and you can cause nis to hang ;-) (this isn't a linux trait, it does it on Solaris too)
+
+
+
+-- 
+Andrew Whyte
+Senior System Administrator
+_____________________________________________
+NetRegistry     <A HREF="http://www.netregistry.au.com">http://www.netregistry.au.com</A>
+Tel: +61 2 9699 6099  |  Fax: +61 2 9699 6088
+PO Box 2088   Sydney   NSW   1043   Australia
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

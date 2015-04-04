@@ -1,0 +1,143 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: X Refreshing" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="" -->
+<!-- ToEmail="dt@picknowl.com.au" -->
+<!-- Date="Sun, 28 Nov 1999 02:11:39 +1030" -->
+<!-- Id="199911271541.CAA20731@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: X Refreshing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : <A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A>
+  Date: Sun, 28 Nov 1999 02:11:39 +1030
+</PRE>
+<H1>Re: X Refreshing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Perhaps I could add a couple of facts that aren't necessarily
+known to everyone. If you know this stuff, please ignore.
+
+Each application, as _is_ well-known opens a TCP connection
+to the X server. The application software generally talks
+to a widget layer, which talks to an Xlib layer, which
+generates X commands/data via the single TCP connection.
+If the application has not requested for redrawing to
+be done from a server-side save-cache, then the X server
+will send an instruction by the TCP connection to the
+application to redraw stuff on the screen.
+
+Now if the application is written in either a threaded fashion
+_or_ a well-designed event-handling fashion (using select() and
+quantization of CPU intensive tasks, then this re-draw command
+can be taken care of before the CPU intensive stuff is complete.
+From memory the Xlib library does have a function which
+returns to you the socket which is used for the TCP connection.
+I assume that any widget set will provide this also.
+The purpose of this is so that you can multiplex the handling
+of multiple I/O events on various sockets etc.
+
+There are facilities in Xlib etc. to look ahead in the event queue
+to find events of a particular category, e.g. re-draw events.
+
+But it seems to me that there's nothing you can do about
+a program that does not respond well to re-draw events.
+The facilities _are_ there for the good programmer.
+I remember that in the Palm Developer's Forum, Palm made
+a request that programmers please do something informative
+when an application is getting CPU intensive, because it just
+annoys users so much when they don't see any response for 
+a long time.
+
+I think Star Office is just particularly bad because it
+uses so much memory. Right now I've got SO on a 64 MB RAM laptop:
+
+==================================================================
+  PID USER     PRI  NI  SIZE  RSS SHARE STAT  LIB %CPU %MEM   TIME COMMAND
+  903 akenning   5   5 31748  17M 13120 S N     0  0.0 27.6   2:52 soffice.bin
+  911 akenning   0   0 31748  17M 13120 S       0  0.0 27.6   0:00 soffice.bin
+  912 akenning   0   0 31748  17M 13120 S       0  0.0 27.6   0:00 soffice.bin
+  913 akenning   0   0 31748  17M 13120 S       0  0.0 27.6   0:02 soffice.bin
+  914 akenning   0   0 31748  17M 13120 S       0  0.0 27.6   0:00 soffice.bin
+  915 akenning   0   0 31748  17M 13120 S       0  0.0 27.6   0:00 soffice.bin
+  916 akenning   0   0 31748  17M 13120 S       0  0.0 27.6   0:00 soffice.bin
+  917 akenning   0   0 31748  17M 13120 S       0  0.0 27.6   0:00 soffice.bin
+  918 akenning   0   0 31748  17M 13120 S       0  0.0 27.6   0:00 soffice.bin
+  919 akenning   0   0 31748  17M 13120 S       0  0.0 27.6   0:00 soffice.bin
+  920 akenning   0   0 31748  17M 13120 S       0  0.0 27.6   0:00 soffice.bin
+  922 akenning   0   0 31748  17M 13120 S       0  0.0 27.6   0:00 soffice.bin
+  931 akenning   0   0 31748  17M 13120 S       0  0.0 27.6   0:00 soffice.bin
+  932 akenning   9   9 31748  17M 13120 S N     0  0.0 27.6   0:00 soffice.bin
+  933 akenning  10  10 31748  17M 13120 S N     0  0.0 27.6   0:00 soffice.bin
+ 3098 akenning   0   0 31748  17M 13120 S       0  0.0 27.6   0:00 soffice.bin
+==================================================================
+
+I think you could say that this is a multi-threaded program.
+It uses the HWP facility (Heavy-Weight Processes).
+
+I've got another copy of SO running on my 128 MB RAM K6-2/400:
+
+==================================================================
+  PID USER     PRI  NI  SIZE  RSS SHARE STAT  LIB %CPU %MEM   TIME COMMAND
+ 1059 root       0   0 57920  50M  2828 S       0  0.4 40.4 199:09 X
+ 6528 akenning   0   0 85880  36M  7800 S       0  0.8 29.3  16:39 netscape
+10359 akenning  20  19 13360  13M   308 R N     0 93.3 10.4  3608m setiathome
+ 4707 akenning   0   0 23168 7584  4916 S       0  0.0  5.9  47:04 soffice.bi
+ 4717 akenning   0   0 23168 7584  4916 S       0  0.0  5.9   0:00 soffice.bi
+ 4718 akenning   0   0 23168 7584  4916 S       0  0.0  5.9   0:00 soffice.bi
+ 4719 akenning   1   0 23168 7584  4916 S       0  1.9  5.9  96:40 soffice.bi
+ 4720 akenning   0   0 23168 7584  4916 S       0  0.0  5.9   0:00 soffice.bi
+ 4721 akenning   0   0 23168 7584  4916 S       0  0.0  5.9   0:00 soffice.bi
+ 4722 akenning   0   0 23168 7584  4916 S       0  0.0  5.9   0:00 soffice.bi
+ 4723 akenning   0   0 23168 7584  4916 S       0  0.0  5.9   0:00 soffice.bi
+ 4724 akenning   0   0 23168 7584  4916 S       0  0.0  5.9   0:00 soffice.bi
+ 4725 akenning   0   0 23168 7584  4916 S       0  0.0  5.9   0:00 soffice.bi
+ 4726 akenning   0   0 23168 7584  4916 S       0  0.0  5.9   0:00 soffice.bi
+ 4727 akenning   0   0 23168 7584  4916 S       0  0.0  5.9   0:00 soffice.bi
+ 4728 akenning   0   0 23168 7584  4916 S       0  0.0  5.9   0:00 soffice.bi
+18001 akenning   0   0 23168 7584  4916 S       0  0.0  5.9   0:00 soffice.bi
+==================================================================
+
+Strange that on a machine with twide the memory, it uses much less.
+
+Just wanted to write a quick note in passing....
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

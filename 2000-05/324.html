@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: A Small Perl Question..." -->
+<!-- FromName="Robert Wuttke" -->
+<!-- FromEmail="robert.wuttke@disc.com.au" -->
+<!-- ToName="MWP" <hirm@chariot.net.au>, "Andrew Hill" -->
+<!-- ToEmail="hirm@chariot.net.au" -->
+<!-- Date="Fri, 12 May 2000 14:10:42 +0930" -->
+<!-- Id="009301bfbbcc$3affd330$2f000045@disc.com.au" -->
+<!-- Reference="000f01bfbb60$c91c68c0$0201a8c0@comp" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: A Small Perl Question...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Robert Wuttke &lt;<I><A HREF="mailto:robert.wuttke@disc.com.au">robert.wuttke@disc.com.au</A></I>&gt;
+  To  : MWP" &lt;hirm@chariot.net.au&gt;, "Andrew Hill &lt;<I><A HREF="mailto:hirm@chariot.net.au">hirm@chariot.net.au</A></I>&gt;
+  Date: Fri, 12 May 2000 14:10:42 +0930
+</PRE>
+<H1>Re: A Small Perl Question...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Knowing bugger all about perl, I would say you are up the creek without a
+paddle. Your problem is this
+
+When you first set $out the interpreter evaluates the expression you gave it
+(including the variable $text) and creates memory to store this.
+
+If you then redefine $text and print $out, you are printing out that data
+that $out was originally pointing to as the interpreter has not re-evaluated
+$out to change the value it put into the string from the original $text.
+
+If you don't want to re-evaluate the whole $out expression, then neither
+will the compiler. It only knows the old version. Unless you want some it to
+magically know what you want it to do, ie Interpreter, I am redifining
+$text, and things that use it should be re-evaluated, noting of course that
+the interpreter will need to be rebuilt with the ability to remember which
+variables are used to build any other variable, and as part of the
+evaluation process, do the rebinding of the values.
+
+An analogy, You have give a builder a plan. You change the plan with the
+architect and don't give the new plan to the builder, what does the builder
+build, certainly not the new plan. You have to give the builder the new
+plan, ie it has to be re-evaluated.
+
+The quickest was I can see (and the sloppiest) is:
+
+$text="hello";
+$out="text: $text 1234";
+print "$out\n";
+$text="goodbye";
+$out="text: $text 1234";  --&gt; this causes $out to be re-evaluated.
+print "$out\n";
+
+As others have pointed out there are nicer ways to do this, like create a
+sub to do the work and call the sub.
+
+Have fun
+
+Rob.
+
+----- Original Message -----
+From: "MWP" &lt;<A HREF="mailto:hirm@chariot.net.au">hirm@chariot.net.au</A>&gt;
+To: "Andrew Hill" &lt;<A HREF="mailto:list@fornax.net">list@fornax.net</A>&gt;
+Cc: "linuxsa" &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Sent: Friday, May 12, 2000 1:42 PM
+Subject: Re: A Small Perl Question...
+
+
+&gt; Hi...
+&gt; Thanks to everyone for replying.
+&gt;
+&gt; The problem with the ways youve said it can be done is that im going to
+use
+&gt; it for large blocks of HTML for a web script.
+&gt; So I only want to have the line that defines $out once.
+&gt;
+&gt; Thanks,
+&gt;  MWP
+&gt;
+&gt;
+&gt; &gt; MWP wrote:
+&gt; &gt; &gt; I would like the result to be:
+&gt; &gt; &gt; text: hello 1234
+&gt; &gt; &gt; text: goodbye 1234
+&gt; &gt;
+&gt; &gt; How about:
+&gt; &gt; -------------------------------
+&gt; &gt; #!/usr/bin/perl
+&gt; &gt;
+&gt; &gt; $text="hello";
+&gt; &gt; &out($text);
+&gt; &gt; $text="goodbye";
+&gt; &gt; &out($text);
+&gt; &gt;
+&gt; &gt; sub out {
+&gt; &gt;   my $out;
+&gt; &gt;   my $in;
+&gt; &gt;   $in=$_[0];
+&gt; &gt;   $out="text: $in 1234";
+&gt; &gt;   print "$out\n";
+&gt; &gt; }
+&gt; &gt; -------------------------------
+&gt; &gt;
+&gt; &gt; Cheers,
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt;
+&gt; &gt; Andrew Hill
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on
+irc.linux.org.au
+&gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt;
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

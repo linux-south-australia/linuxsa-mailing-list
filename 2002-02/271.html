@@ -1,0 +1,179 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="changed to 2.4.16 - problems with PPP and USB" -->
+<!-- FromName="'Dan Kortschak'" -->
+<!-- FromEmail="dan.kortschak@adelaide.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 10 Feb 2002 11:28:02 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0202101117020.452-100000@sunya.molecular-biosciences.adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: changed to 2.4.16 - problems with PPP and USB</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Kortschak &lt;<I><A HREF="mailto:dan.kortschak@adelaide.edu.au">dan.kortschak@adelaide.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 10 Feb 2002 11:28:02 +1030 (CST)
+</PRE>
+<H1>changed to 2.4.16 - problems with PPP and USB</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi All, I've just shifted my potato to 2.4.16 and am having problems
+getting PPP or USB storage to work. The modules loaded are the same (as
+far as it goes) as I have with 2.2.19. I've looked around as much as I can
+to find what might be causing the problem, to no avail. The relevant
+details (I hope) are below (roughly split according to either PPP or USB
+problem).
+
+PPP:
+I have no idea what to do here - is there something that 2.4.x does
+differently with the serial connection for PPP?
+
+USB:
+The appropriate USB modules are loaded and the /proc/bus/usb has the right
+details for drivers and devices, but it still doesn't seem to recognise
+/dev/sda4 as a block device (according to the documentation I've looked at
+and the fuzzy memories I have when I used to run the 2.3 USB backport this
+should work).
+
+
+thanks for any help
+Dan Kortschak
+
+# lsmod
+Module                  Size  Used by    Tainted: P 
+ppp_deflate            44840   0 (unused)
+ppp_generic            24328   0 [ppp_deflate]
+slhc                    4992   0 [ppp_generic]
+ipx                    21772   0
+appletalk              25268   0
+usb-storage            47720   0
+binfmt_misc             8004   1
+vfat                   11984   0
+smbfs                  40704   0 (unused)
+nfsd                   77808   0 (unused)
+lockd                  54760   0 [nfsd]
+sunrpc                 71876   0 [nfsd lockd]
+msdos                   6384   0 (unused)
+fat                    35852   0 [vfat msdos]
+
+# wvdial
+--&gt; WvDial: Internet dialer version 1.41
+--&gt; Cannot open /dev/ttyS0: Input/output error
+
+# ll /dev/ttyS0
+crw-r-----    1 root     dialout    4,  64 Feb 10 10:47 /dev/ttyS0
+
+# cat /proc/bus/usb/devices 
+T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
+B:  Alloc=247/900 us (27%), #Int=  3, #Iso=  0
+D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=0000 ProdID=0000 Rev= 0.00
+S:  Product=USB OHCI Root Hub
+S:  SerialNumber=c7813000
+C:* #Ifs= 1 Cfg#= 1 Atr=40 MxPwr=  0mA
+I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
+E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
+T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+D:  Ver= 1.00 Cls=00(&gt;ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=059b ProdID=0001 Rev= 1.00
+S:  Manufacturer=Iomega
+S:  Product=USB Zip 100
+S:  SerialNumber=0000000000F4E9C6
+C:* #Ifs= 1 Cfg#= 1 Atr=40 MxPwr=  0mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=08(stor.) Sub=06 Prot=50 Driver=usb-storage
+E:  Ad=01(O) Atr=02(Bulk) MxPS=  64 Ivl=  0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=  0ms
+E:  Ad=83(I) Atr=03(Int.) MxPS=   2 Ivl= 32ms
+T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  3 Spd=12  MxCh= 4
+D:  Ver= 1.00 Cls=09(hub  ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=0409 ProdID=55ab Rev= 1.00
+C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
+E:  Ad=81(I) Atr=03(Int.) MxPS=   1 Ivl=255ms
+T:  Bus=01 Lev=02 Prnt=03 Port=00 Cnt=01 Dev#=  4 Spd=1.5 MxCh= 0
+D:  Ver= 1.00 Cls=00(&gt;ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=05ac ProdID=0201 Rev= 1.01
+S:  Manufacturer=Alps Electric?M2452
+S:  Product=M2452
+C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=01 Driver=keyboard
+E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl= 10ms
+T:  Bus=01 Lev=02 Prnt=03 Port=01 Cnt=02 Dev#=  5 Spd=1.5 MxCh= 0
+D:  Ver= 1.10 Cls=00(&gt;ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=046d ProdID=c001 Rev= 4.00
+S:  Manufacturer=Logitech
+S:  Product=USB Mouse
+C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr= 50mA
+I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=02 Driver=usb_mouse
+E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl= 10ms
+
+# cat /proc/bus/usb/drivers 
+         usbdevfs
+         hub
+         usb_mouse
+         keyboard
+         usb-storage
+
+# mount -t vfat /dev/sda4 /zip
+mount: /dev/sda4 is not a valid block device
+
+# dpkg -l ppp modutils kernel-image-2.4.16-newpmac
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Installed/Config-files/Unpacked/Failed-config/Half-installed
+|/ Err?=(none)/Hold/Reinst-required/X=both-problems (Status,Err: uppercase=bad)
+||/ Name           Version        Description
++++-==============-==============-============================================
+ii  ppp            2.4.1.uus-1    Point-to-Point Protocol (PPP) daemon.
+ii  modutils       2.4.11-1       Linux module utilities.
+ii  kernel-image-2 2.4.16-1.1     Linux kernel binary image for new Power Maci
+
+-- 
+_____________________________________________________________   .`.`o     
+                                                         o| ,\__ `./`r
+  Dan Kortschak   mailto:<A HREF="mailto:dan.kortschak@adelaide.edu.au">dan.kortschak@adelaide.edu.au</A>   &lt;\/    \_O&gt; O    
+                                                          "|`...'.\
+  Before you criticise a man, try to walk a mile in his    `      :\
+  shoes. Then, if he doesn't like what you have to say,           : \ 
+  you'll be a mile away, and you'll have his shoes.               :  \
+
+By replying to this email you implicitly accept that your response may
+be forwarded to other recipients.
+Permission is granted for fair use reproduction.
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

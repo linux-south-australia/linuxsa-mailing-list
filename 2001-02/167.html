@@ -1,0 +1,128 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Mounting/unmounting query" -->
+<!-- FromName="'Daryl Tester'" -->
+<!-- FromEmail="Daryl.Tester@iocane.com.au" -->
+<!-- ToName="'Paul Malcolm Bailey'" -->
+<!-- ToEmail="pmbailey@senet.com.au" -->
+<!-- Date="Wed, 7 Feb 2001 14:23:43 +1030" -->
+<!-- Id="002901c090b9$a5cc40f0$0a01a8c0@iocane.com.au" -->
+<!-- Reference="3A7D503F.4F2A86FB@senet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Mounting/unmounting query</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  To  : Paul Malcolm Bailey &lt;<I><A HREF="mailto:pmbailey@senet.com.au">pmbailey@senet.com.au</A></I>&gt;
+  Date: Wed, 7 Feb 2001 14:23:43 +1030
+</PRE>
+<H1>Re: Mounting/unmounting query</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+"Paul Malcolm Bailey" &lt;<A HREF="mailto:pmbailey@senet.com.au">pmbailey@senet.com.au</A>&gt; wrote:
+
+&gt; &gt; &gt; WARNING:  check time reached, running e2fsck is recommended
+&gt;
+&gt; (This message came up after the "autorun" messages come up, BTW.)
+
+I don't know what you're running, so this is meaningless to me.  Does it
+come
+up when it's trying to mount the file system in question?
+
+&gt;&gt; If you use the -F option to shutdown, it touches a flag in the root
+filesystem
+&gt;&gt; that the boot scripts check for, and force a filesystem check on
+ReBoot[tm].
+&gt;&gt;
+&gt;&gt; "shutdown -Fr now" can be your friend (unless people are still logged in
+:-).
+
+&gt; OK.  I found that "shutdown -Fh now" is *also* valid (i.e. it's not just
+&gt; reboot-specific),
+
+The first paragraph I wrote (and quoted above) states that -F is the option,
+and
+how that affects the process of booting.  You need to (re-)boot in order for
+the
+boot scripts to pick up the existance of whatever file it touches in /
+(forcefsck?)
+to force the fsck.  "It's not just reboot-specific" is semantic nit-picking.
+
+&gt; The warning comes up while the kernel is still booting, despite the fact
+&gt; that during the init process the filesystems (all ext2) on each of the
+&gt; three partitions gets checked.
+
+Clarification:  the kernel has booted before init runs (perhaps minus some
+modules and dynamic configuration).  "the init process" does not check the
+file systems, it runs programs from inittab dependant on the run level the
+machine has been booted to.  Coincidently, the boot script lives there,
+which,
+incidently, checks filesystems, but their relation to init is the same as
+when
+you run "ls" - they're all children of process 1.
+
+&gt; Maybe fsck is running and the system warning only gets turned off if
+&gt; e2fsck runs?
+
+fsck is a front end to e2fsck (and other fsck's, depending on the file
+system
+type).  e2efsck should be reseting the "Last checked" attribute on the file
+system in question when it runs to successful completion.  It sounds like
+that for whatever reason, that attribute isn't being reset.
+
+&gt; Or maybe there's something about running e2fsck manually that's
+&gt; different from the way init calls it?
+
+No.
+
+&gt; Or something.
+
+Firstly, you're not mounting a CDROM at bootup, are you?
+
+If not, determine which file system it's complaining about.
+Then, post the results of this to the list:
+
+for FS in `mount | awk '$5 == "ext2" { print $1}'`; do
+    echo ${FS}:
+    dumpe2fs ${FS} 2&gt; /dev/null | egrep '(time|M.* count|heck)'
+    echo
+done
+
+
+Regards,
+  Daryl Tester
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

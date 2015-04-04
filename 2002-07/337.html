@@ -1,0 +1,124 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: [Kinda OT] Corporate Backup Systems" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'Adam Smith'" -->
+<!-- ToEmail="adam.smith@sageautomation.com" -->
+<!-- Date="Fri, 12 Jul 2002 11:01:06 +0930" -->
+<!-- Id="20020712110106.E23285@yellowgoanna.com" -->
+<!-- Reference="00ba01c228a9$36e53410$c700a8c0@bugman" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: [Kinda OT] Corporate Backup Systems</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : Adam Smith &lt;<I><A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A></I>&gt;
+  Date: Fri, 12 Jul 2002 11:01:06 +0930
+</PRE>
+<H1>Re: [Kinda OT] Corporate Backup Systems</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, Jul 11, 2002 at 04:34:35PM +0930, Adam Smith wrote:
+&lt;snip&gt;
+
+&gt; Any directions?  I'm going in pretty blind here, and by the end of it
+&gt; I'd love to come out all sweet, rosy and happy.
+
+My thoughts are that the best option is having separate systems for on
+and offsite backup...
+
+You can reasonably easily use cp -al and rsync and a few scripts that
+have been previously discussed to keep multiple online copies of your
+data on a live filesystem, and then keep tapes for real backups...
+
+The basic idea is:
+
+/data # all your data
+
+/backup # the backup tree
+/backup/&lt;datestamp&gt; #the daily/fortnightly etc backups.
+
+set up /backup/&lt;today&gt; by doing a cp -a on /data
+
+on a daily basis, run:
+
+cp -al /backup/&lt;yesterday&gt; /backup/&lt;today&gt;
+
+and then 
+
+rsync /data /backup/&lt;today&gt;
+
+This will keep daily online backups, with all inodes correct etc, and
+permissions, etc as well... It will not waste too much space, as the
+cp -al uses hardlinks for files, and rsync only creates new files when
+data is changed, so there will only be one copy of each unchanged
+file. Obviously, this doesn't work for large files with small changes
+(eg databases), but for most user stuff, is fine...
+
+export /backup as read-only to users, and then it's reasonably easy
+for them to get their old files without having write access and
+breaking their own backups.
+
+Regularly rm -rf old backup directories, keeping only what you want --
+eg archived monthlies for a year, weeklies for three months, and
+dailies for a month...
+
+This is easy to do overnight, and as it's all disk-based, the backup
+window will be less of a problem than with tape.
+
+Of course, you will still want off-site backups, but as these are for
+archival and disaster recovery only, and not regular file retrival,
+you don't need to worry too much about how convenient the access is.
+And, as you can back up from the backup directory on disk, you don't
+need to worry about speed... You also may decide that you don't need
+to worry about keeping archives, in which case, you only need keep a
+few rotations of tapes (or whatever)...
+
+Another possiblity, if you have fast, cheap networking, is to partner
+with a similar organisation, and use rsync over a network to do
+offsite backups for each other...
+
+rr
+
+-- 
+Richard Russell
+Yellow Goanna P/L
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+m: +61 412 827 805
+f: +61 8 8462 2362
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,118 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: window lock-up -- keyboard input fails" -->
+<!-- FromName="'Greg 'groggy' Lehey'" -->
+<!-- FromEmail="grog@lemis.com" -->
+<!-- ToName="'Alan Kennington'" -->
+<!-- ToEmail="ak1.linuxsa@topology.org" -->
+<!-- Date="Sun, 17 Aug 2003 11:54:07 +0930" -->
+<!-- Id="20030817022407.GL15411@wantadilla.lemis.com" -->
+<!-- Reference="20030817114227.A4099@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: window lock-up -- keyboard input fails</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Greg  &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:ak1.linuxsa@topology.org">ak1.linuxsa@topology.org</A></I>&gt;
+  Date: Sun, 17 Aug 2003 11:54:07 +0930
+</PRE>
+<H1>Re: window lock-up -- keyboard input fails</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sunday, 17 August 2003 at 11:42:27 +0930, Alan Kennington wrote:
+&gt; This is a recurrent problem I've had for years now:
+&gt;
+&gt; 1.	I open a text window such an xterm or some other console window.
+&gt; 	It doesn't seem to depend on which brand of window it is.
+&gt;
+&gt; 2.	I run "tail -f logfile" in the window. This includes various
+&gt; 	system error message files, web log files, procmail log files
+&gt; 	and so forth.
+&gt;
+&gt; 3.	From time to time, I hit the return key a couple of times
+&gt; 	to make a visual gap in the text so that I can see what I have
+&gt; 	already read and what is new.
+&gt;
+&gt; 4.	After a few days, all keyboard input to the window ceases to
+&gt; 	have any effect. The output from "tail" continues completely
+&gt; 	as normal. But even if I hit control-C, control-Z etc., or
+&gt; 	even ~. in ssh etc., there's absolutely no response.
+&gt; 	So I have to just clsoe the X window and start again.
+&gt;
+&gt; Does anyone happen to know what could make this happen or how to fix
+&gt; it?
+
+No, but you might be able to track it down.  Try running 
+
+  stty &lt; /dev/pts/3 -a
+
+(assuming the window in question is /dev/pts/3) from another xterm
+window to see what the settings are.  You should also be able to set
+them that way, but Linux doesn't seem to let me do it:
+
+  # stty -a &lt;/dev/pts/3 intr ^J
+  stty: when specifying an output style, modes may not be set
+
+Still, it might give you some idea what's going wrong.  It's a good
+idea to save a copy of the state when it's running normally, so you
+can see what's changed.
+
+&gt; My first thought was that the "tail" program was experiencing some
+&gt; sort of buffer blockage on standard input. But that is almost
+&gt; certainly not the problem. Signals from the keyboard would surely
+&gt; clear that.
+
+You can also try killing the process with an appropriate signal:
+
+  $ ps aux|grep tail
+  grog     13749  0.0  0.3  1476  556 pts/4    S    11:51   0:00 tail -f /var/log/
+  grog     13759  0.0  0.3  1388  476 pts/3    S    11:52   0:00 grep tail
+  $ kill -SIGINT 13749
+
+Greg
+--
+Finger <A HREF="mailto:grog@lemis.com">grog@lemis.com</A> for PGP public key
+See complete headers for address and phone numbers
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.0 (FreeBSD)
+
+iD8DBQE/PudHIubykFB6QiMRAkilAJwKvLFRaWVlTDJPgQw5a7zsg1AyQwCfahM2
+A7Wk0bjeSQMqPKHL6wQdYvE=
+=ubZE
+-----END PGP SIGNATURE-----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,134 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Simple problem...." -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="MWP" -->
+<!-- ToEmail="hirm@chariot.net.au" -->
+<!-- Date="Sat, 9 Oct 1999 01:58:40 +0930 (CST)" -->
+<!-- Id="199910081628.BAA24620@atdot.dotat.org" -->
+<!-- Reference="003b01bf10be$ed57ad00$0201a8c0@comp" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Simple problem....</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : MWP &lt;<I><A HREF="mailto:hirm@chariot.net.au">hirm@chariot.net.au</A></I>&gt;
+  Date: Sat, 9 Oct 1999 01:58:40 +0930 (CST)
+</PRE>
+<H1>Re: Simple problem....</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+MWP wrote:
+
+ &gt; The problem is that this doesnt work:
+ &gt; for i in `ls`; do mpg123 $i -w `echo $i | tr ".mp3" ".wav"`; done
+
+There are a couple of problems with this.  
+
+Firstly, you're better off saying "for i in *" instead of "for i in `ls`".
+Secondly, you should think about replacing your "tr" command with
+"sed -e 's/\.mp3$/.wav/'" -- The tr command you've provided will
+translate *ALL* the m's in its input into w's, the p's into a's and
+the 3's into v's.  I suspect this isn't what you want; it'll translate
+a filename like "mark newton's mpeg file.mp3" into
+"wark newton's waeg file.wav".  I think you'll agree that this sucks
+:-)
+
+ &gt; The problem is that the files im trying to play with here have spaces in
+ &gt; thier files names and "for" keeps splitting up each word in a file name into
+ &gt; a separate command.
+
+Unlikely.  It's more likely that for is seeing a sequence of random 
+words on its command line (deposited there by the `ls`) as per usual,
+and it's stepping through the words one by one just like it's supposed
+to do.
+
+The difference between "for i in `ls`" and "for i in *" is a bit
+subtle.  Suppose I run that command in a directory which contains
+filenames called "hard rockin mp3 file.mp3" and "sucky mp3 file.mp3".
+The `ls` syntax will cause the output of the ls command to be
+deposited on the "for" commandline, so the "for" commandline will
+behave as if you'd typed:
+
+     for i in hard rockin mp3 file.mp3 sucky mp3 file.mp3
+     do 
+       ...
+     done
+
+The problem with this is that "hard", "rockin", "mp3", "file.mp3",
+"sucky", "mp3", and "file.mp3" are all separate tokens, so $i will
+take on the value of each one in turn.  What you really want is to
+have the whole lot of them globbed together into the same filename...
+
+... which is precisely what the * syntax does.  On a shell command
+line, "*" does wildcard expansion.  Each filename that results from
+the * expansion will behave as if it was enclosed in quotes, so 
+the "for i in *" expression will behave as if you'd executed:
+
+     for i in 'hard rockin mp3 file.mp3' 'sucky mp3 file.mp3'
+     do
+       ...
+     done
+
+So first time 'round the loop, $i has the value "hard rockin mp3 file.mp3",
+which is exactly what you want.
+
+So, to summarise, rewrite your command like this:
+
+    for i in *
+    do
+        mpg123 $i -w `echo $i | sed -e 's/\.mp3$/.wav/'`
+    done
+
+... or perhaps simpler:
+
+    for i in *
+    do 
+        mpg123 $i -w `basename $i .mp3`.wav
+    done
+
+... which uses the basename(1) command, which is intended to do 
+filename suffix identification and rewriting.
+
+Hope that helps,
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

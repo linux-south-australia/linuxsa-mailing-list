@@ -1,0 +1,93 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Kernel buffering" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="rsharpe@ns.aus.com" -->
+<!-- ToName="'Matthew Geddes'" -->
+<!-- ToEmail="mgeddes@tellurian.com.au" -->
+<!-- Date="Fri, 22 Nov 2002 15:39:34 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0211221537000.10905-100000@ns.aus.com" -->
+<!-- Reference="20021122033437.GG19573@hilarious.tellurian.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Kernel buffering</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A></I>&gt;
+  To  : Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  Date: Fri, 22 Nov 2002 15:39:34 +1030 (CST)
+</PRE>
+<H1>Re: Kernel buffering</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, 22 Nov 2002, Matthew Geddes wrote:
+
+&gt; Hi all,
+&gt; 
+&gt; I have a kernel module which has a bunch of data-gathering functions that are
+&gt; each triggered by in-kernel events (such as a particular system call). The
+&gt; kernel module is attached to a registered /dev entry (works with or without
+&gt; devfs) and I can read from that entry using a userland program.
+&gt; 
+&gt; The problem I have is that on a "busy" system my cruddy, fixed-size buffer is
+&gt; not up to the job when it comes to receiving a bunch of data and caching it
+&gt; until the userland program gets around to reading from the device.
+&gt; 
+&gt; Does anyone have any suggestions for how I could either:
+&gt; 
+&gt;  * Get data from kernel land to user land without having to buffer it
+&gt;    myself or
+&gt;  * Safely create a dynamic buffer without the fear of bringing my system
+&gt;    when a bunch of data comes in
+
+Couple of suggestions:
+
+1. signal the application that the data is ready to pick up.
+
+2. Have the application call into the kernel via a syscall, and only 
+return when either the buffer is full, or a timeout occurs. Here you would 
+want two buffers, and the syscall would provide a userland buffer that the 
+kernel should fill when the data is ready. So, when the primary buffer 
+fills, flip them, copy the full buffer to userland, call wakeone or 
+wakeup on the waiting process, and then return.
+
+Might work.
+
+Regards
+-----
+Richard Sharpe, rsharpe[at]ns.aus.com, rsharpe[at]samba.org, 
+sharpe[at]ethereal.com, <A HREF="http://www.richardsharpe.com">http://www.richardsharpe.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,244 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Clever things with a Linux Quake server." -->
+<!-- FromName="Adrian Butterworth" -->
+<!-- FromEmail="adrian@econ-outlook.com.au" -->
+<!-- ToName="Dave Lawrence" -->
+<!-- ToEmail="philaw@camtech.net.au" -->
+<!-- Date="Fri, 07 Aug 1998 02:59:56 +0930" -->
+<!-- Id="35C9E814.BA75FEDF@econ-outlook.com.au" -->
+<!-- Reference="35C97FD4.D8158A1C@camtech.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Clever things with a Linux Quake server.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adrian Butterworth &lt;<I><A HREF="mailto:adrian@econ-outlook.com.au">adrian@econ-outlook.com.au</A></I>&gt;
+  To  : Dave Lawrence &lt;<I><A HREF="mailto:philaw@camtech.net.au">philaw@camtech.net.au</A></I>&gt;
+  Date: Fri, 07 Aug 1998 02:59:56 +0930
+</PRE>
+<H1>Re: Clever things with a Linux Quake server.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Dave
+If you want the real easy way, Justin's suggestion is
+the way to go. 
+
+But if you want the real thing its not too hard to set
+up an intranet domain called "intranet" and it is good practice
+for the next step of setting up a real internet domain.
+
+to set up the intranet domain you need to:
+. check you have a name server daemon running
+. create 2 new files:
+  /var/named/pz/intranet, 
+  /var/named/pz/192.168.5
+. make some minor changes to:
+  /etc/named.boot,  
+  /etc/sysconfig/network, &
+  /etc/resolv.conf 
+. restart the nameserver
+
+The following configuration files will work fine
+and can be easily edited for your names.
+
+I'll try to focus on how to do it rather than how it works.
+
+Regards
+
+Adrian
+
+
+Redhat & others run bind as a caching name server
+out of the box. This makes things real easy for us.
+bind runs as "named".
+you can check its running by  
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ ps ax|grep named
+&gt;  285  ?  S    0:00 named
+&gt;  3316  p1 S    0:00 grep named
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$
+here grissom is running named as process 285
+If not, if you run redhat/rpm's you can:
+check its installed 
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ rpm -q bind
+&gt; bind-4.9.7-1
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$
+if not installed the current rpm packages are
+bind-4.9.7-1.i386.rpm & 
+bind-utils-4.9.7-1.i386.rpm
+check it's been told to start
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ chkconfig --list named
+&gt; named 0:off 1:off 2:off 3:on 4:on 5:on 6:off
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$
+here grissom starts named at run levels 3, 4 & 5
+
+First - you've already got a network,but is does it
+use legit intranet numbers? Best get it right now.
+To run an intranet (non allocated IP's) you should use
+addresses that are reserved for non internet use!
+This will prevent routing problems when you are
+connected to the internet.
+For small intranets (&lt;254 hosts per LAN) I like
+192.168.???.???. which are 256 class C networks 
+each of which has 256 addresses reserved for this purpose
+10.1.???.??? is also available for larger intranets
+
+In this case I used 192.168.5.x  where x is the host number.
+note: only 1-254 can be used for hosts 0 & 255 are reserved
+
+the following are real files for a server called
+"socrates" who also answers to aliases of : 
+mail, mailhost, loghost, samba,  dhcp, and gateway.
+on this LAN there are also aprox. 20 win95 boxes.
+only one windows box "teach" is named, although all could be.
+
+[<A HREF="mailto:root@socrates">root@socrates</A> adrian]# cat /var/named/pz/192.168.5
+@       IN      SOA     socrates.intranet. root.socrates.intranet. (
+                        1998072200      ; Serial
+                        28800           ; Refresh
+                        7200            ; Retry
+                        604800          ; Expire
+                        86400)          ; Minimum TTL
+                NS      socrates.intranet.
+1               PTR     socrates.intranet.
+101             PTR     teach.intranet           ;the teachers windows
+box
+[<A HREF="mailto:root@socrates">root@socrates</A> adrian]# cat /var/named/pz/intranet
+@       IN      SOA     socrates.intranet. root.socrates.intranet. (
+                        1998062222                      ; Serial
+                        28800                           ; Refresh      
+8 hours
+                        7200                            ; Retry        
+2 hours
+                        604800                          ; Expire       
+7 days
+                        86400                           ; Minimum TTL  
+1 day
+                        )
+                NS      socrates.intranet.
+                MX      10 socrates.intranet.   ; primary mail exchange
+socrates        A       192.168.5.1
+teach           A       192.168.5.101           ;the teachers windows
+box
+;
+;standard names
+;
+mail            CNAME   socrates
+mailhost        CNAME   socrates
+loghost         CNAME   socrates
+localhost       A       127.0.0.1
+;
+;others aliases
+;
+samba           CNAME   socrates
+dhcp            CNAME   socrates
+gateway         CNAME   socrates
+;
+[<A HREF="mailto:root@socrates">root@socrates</A> adrian]# cat /etc/named.boot
+;
+; nameserver config, caching plus simple intranet
+;
+directory                               /var/named
+cache      .                            named.ca
+primary    0.0.127.in-addr.arpa         named.local
+primary    intranet                     pz/intranet
+primary    5.168.192.in-addr.arpa       pz/192.168.5
+[<A HREF="mailto:root@socrates">root@socrates</A> adrian]# cat /etc/sysconfig/network
+NETWORKING=yes
+FORWARD_IPV4=yes
+HOSTNAME=socrates.intranet
+DOMAINNAME=intranet
+GATEWAY=
+GATEWAYDEV=
+[<A HREF="mailto:root@socrates">root@socrates</A> adrian]# cat /etc/resolv.conf
+search  intranet
+nameserver 127.0.0.1
+[<A HREF="mailto:root@socrates">root@socrates</A> adrian]#
+
+notes:
+1. You need to be root to do this stuff
+2. every full stop is absolutely critical, adding or
+   dropping a full stop is the most common mistake!
+3. replace socrates with the name of  the machine you
+   are running it on
+4. replace teach with the name & number of one of your
+   other computers. you can add more matched pairs of 
+   A and PTR records in their respective files for more
+   computers -  the "101  PTR  teach.intranet"  
+   matches the  "teach A  192.168.5.101"
+5. "quake   CNAME   socrates"    would create an alias
+   for socrates so you could connect to "quake.intranet"
+   or just quake if you have "intranet" set in your 
+   domain suffix searchlist (a windows TCP/IP DNS property)
+   or "search intranet" in /etc/resolv.conf for linux boxes
+6. finally don't forget to tell other machines who the
+   nameserver is to use it! (another windows TCP/IP DNS property)
+   or "nameserver 192.168.5.1" in /etc/resolv.conf for linux boxes
+
+To get your nameserver to reread the new config files:
+[<A HREF="mailto:root@socrates">root@socrates</A> adrian]# killall -HUP named
+[<A HREF="mailto:root@socrates">root@socrates</A> adrian]#
+
+To check this loaded ok
+[<A HREF="mailto:root@socrates">root@socrates</A> adrian]# tail /var/log/messages
+....
+Aug  7 01:04:53 socrates named[886]: reloading nameserver
+Aug  7 01:04:53 socrates named[886]: primary zone "intranet" loaded
+(serial 1998
+062222)
+Aug  7 01:04:53 socrates named[886]: primary zone
+"5.168.192.in-addr.arpa" loade
+d (serial 1998072200)
+Aug  7 01:04:53 socrates named[886]: Ready to answer queries.
+Aug  7 01:23:47 socrates named[886]: reloading nameserver
+Aug  7 01:23:47 socrates named[886]: Ready to answer queries.
+[<A HREF="mailto:root@socrates">root@socrates</A> adrian]#
+
+to test its working
+[<A HREF="mailto:root@socrates">root@socrates</A> adrian]# nslookup socrates.intranet
+Server:  localhost
+Address:  127.0.0.1
+
+Name:    socrates.intranet
+Address:  192.168.5.1
+
+[<A HREF="mailto:root@socrates">root@socrates</A> adrian]# nslookup 192.168.5.1
+Server:  localhost
+Address:  127.0.0.1
+
+Name:    socrates.intranet
+Address:  192.168.5.1
+
+[<A HREF="mailto:root@socrates">root@socrates</A> adrian]#
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,418 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="[OT] SAMBA PROBLEMS" -->
+<!-- FromName="" -->
+<!-- FromEmail="dmdeflui@subcorp.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 15 Mar 2002 14:57:29 +1030" -->
+<!-- Id="56724A15634EB64799DAE208614C4C03496CB9@snowball.asc.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: [OT] SAMBA PROBLEMS</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: &lt;<I><A HREF="mailto:dmdeflui@subcorp.com.au">dmdeflui@subcorp.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 15 Mar 2002 14:57:29 +1030
+</PRE>
+<H1>[OT] SAMBA PROBLEMS</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+This message is in MIME format. Since your mail reader does not understand
+this format, some or all of this message may not be legible.
+
+------_=_NextPart_001_01C1CBD9.B7C75400
+Content-Type: text/plain;
+	charset="iso-8859-1"
+
+Guys,
+
+I don't know if this is the right place to ask this question but I am using
+Redhat 6.2 Linux and Samba 2.2.1a.  We have Windows NT Workstations and 2000
+servers with which we need to talk to.  (Note:  Can't upgrade to Redhat 7.2
+or Samba 2.2.2 due to company requirements at least for a few more months.)
+
+I have a problem with a user who is trying to write to a folder called
+"qcp_docs" whilst logged in as a user "cmsdocs" to the Redhat 6.2 Linux box
+called SERVER1.
+
+The linux directory permissions are 775 for both the cmsdocs and qcp_docs
+directories.
+
+The cmsdocs user is a member of the qcp_docs group (and visa versa but only
+temporary - I am hoping to remove this requirement (the major user logons
+have a group of the same name as their user logon).  All folders have the
+user logon owning the directory and files but the group of the files and
+folder belongs to a user called webmaster - this cannot be changed due to
+software requirements on the server.
+
+The cms_docs user still cannot write to the qcp_docs user's folder, so since
+the qcp_docs user's account is not being used by the intended user yet, we
+decided to set up a couple of .bat files to allow the user to swap from
+qcp_docs to cmsdocs accounts from their PC to copy their html (converted
+from word) documents.
+
+The swap from qcp_docs using the following commands works fine:
+
+net use \\SERVER1\IPC$ &lt;\\SERVER1\IPC$&gt;  /delete
+net use \\SERVER1\CMSDOCS &lt;\\SERVER1\CMSDOCS&gt;  /delete
+net use \\SERVER1\IPC$ &lt;\\SERVER1\IPC$&gt;  /delete
+net use \\SERVER1\QCP_DOCS &lt;\\SERVER1\QCP_DOCS&gt;  "passwdgoeshere"
+/user:qcp_docs
+
+Unfortunately, the moment the second .bat file is run to set the user logon
+back to cms_docs using the following commands:
+
+net use \\SERVER1\IPC$ &lt;\\SERVER1\IPC$&gt;  /delete
+net use \\SERVER1\QCP_DOCS &lt;\\SERVER1\QCP_DOCS&gt;  /delete
+net use \\SERVER1\IPC$ &lt;\\SERVER1\IPC$&gt;  /delete
+net use \\SERVER1\CMSDOCS &lt;\\SERVER1\CMSDOCS&gt;  "passwdgoeshere"
+/user:cmsdocs
+
+The user gets the error:
+System error 1219 has occurred.
+The credentials supplied conflict with an existing set of credentials.
+
+Has anyone else had this kind of problem?
+
+Below is an extract of my smb.conf file - removing unrelated users and their
+folders:
+
+# Samba config file created using SWAT
+# from w-asc-osb-0844.asc.com.au (69.10.152.99)
+# Date: 2001/10/16 13:58:21
+
+# Global parameters
+[global]
+	workgroup = SAMBA
+	netbios name = SERVER1
+	server string = Windows NT Server clone
+	log file = /var/log/samba/log.%m
+	max log size = 0
+	socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192
+	domain master = Yes
+	dns proxy = No
+	valid users = webmaster,root,cmsdocs,qcp_docs
+	write list = webmaster,root,cmsdocs,qcp_docs
+	hosts allow = 69.10. 69.20. 69.30. 69.40. 69.50.
+
+[homes]
+	comment = Home Directories
+	writeable = Yes
+	browseable = No
+
+[printers]
+	comment = All Printers
+	path = /var/spool/samba
+	printable = Yes
+	browseable = No
+
+[cmsdocs]
+	comment = cmsdocs
+	path = /home/httpd/html/asc_web/cms_docs
+	username = cmsdocs
+	valid users = webmaster,root,cmsdocs,qcp_docs
+	write list = webmaster,root,cmsdocs,qcp_docs
+
+[qcp_docs]
+	comment = qcp_docs
+	path = /home/httpd/html/asc-e/qcp/qcp_docs
+	invalid users = newsletter,finance,sscc,irc
+	valid users = webmaster,root,qcp_docs,cmsdocs
+	write list = webmaster,root,qcp_docs,cmsdocs
+	writeable = Yes
+
+Regards,
+Desiree M. de Fluiter
+Database Administrator
+Australian Submarine Corporation Pty Ltd
+Mersey Road
+Outer Harbor  SA  5018
+Australia
+Telephone: 	+61 08 8348 7724
+Fax:		+61 08 8348 7001
+
+Dew knot trussed yore spell chequer two fined awl yore mistakes." - Brendan
+Hills
+
+This e-mail and any files transmitted with it are confidential and are
+intended solely for the use of the individual or entity to whom they are
+addressed. If you are not the intended recipient or the person responsible
+for delivering the e-mail to the intended recipient, be advised that you
+have received this e-mail in error and that any use, dissemination,
+forwarding, printing or copying of this e-mail is strictly prohibited. If
+you have received this e-mail in error, please notify us immediately by
+return e-mail and delete this message.
+
+
+------_=_NextPart_001_01C1CBD9.B7C75400
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN"&gt;
+&lt;HTML&gt;
+&lt;HEAD&gt;
+&lt;META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Diso-8859-1"&gt;
+&lt;META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
+5.5.2653.12"&gt;
+&lt;TITLE&gt;[OT] SAMBA PROBLEMS&lt;/TITLE&gt;
+&lt;/HEAD&gt;
+&lt;BODY&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;Guys,&lt;/FONT&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;I don't know if this is the right =
+place to ask this question but I am using Redhat 6.2 Linux and Samba =
+2.2.1a.&nbsp; We have Windows NT Workstations and 2000 servers with =
+which we need to talk to.&nbsp; (Note:&nbsp; Can't upgrade to Redhat =
+7.2 or Samba 2.2.2 due to company requirements at least for a few more =
+months.)&lt;/FONT&gt;&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;I have a problem with a user who is =
+trying to write to a folder called &quot;qcp_docs&quot; whilst logged =
+in as a user &quot;cmsdocs&quot; to the Redhat 6.2 Linux box called =
+SERVER1.&lt;/FONT&gt;&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;The linux directory permissions are =
+775 for both the cmsdocs and qcp_docs directories.&lt;/FONT&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;The cmsdocs user is a member of the =
+qcp_docs group (and visa versa but only temporary - I am hoping to =
+remove this requirement (the major user logons have a group of the same =
+name as their user logon).&nbsp; All folders have the user logon owning =
+the directory and files but the group of the files and folder belongs =
+to a user called webmaster - this cannot be changed due to software =
+requirements on the server.&lt;/FONT&gt;&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;The cms_docs user still cannot write =
+to the qcp_docs user's folder, so since the qcp_docs user's account is =
+not being used by the intended user yet, we decided to set up a couple =
+of .bat files to allow the user to swap from qcp_docs to cmsdocs =
+accounts from their PC to copy their html (converted from word) =
+documents.&lt;/FONT&gt;&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;The swap from qcp_docs using the =
+following commands works fine:&lt;/FONT&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;net use&lt;/FONT&gt; &lt;A =
+HREF=3D"\\SERVER1\IPC$"&gt;&lt;U&gt;&lt;FONT COLOR=3D"#0000FF" SIZE=3D2 =
+FACE=3D"Arial"&gt;\\SERVER1\IPC$&lt;/FONT&gt;&lt;/U&gt;&lt;/A&gt;&lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt; /delete&lt;/FONT&gt;
+&lt;BR&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;net use&lt;/FONT&gt; &lt;A =
+HREF=3D"\\SERVER1\CMSDOCS"&gt;&lt;U&gt;&lt;FONT COLOR=3D"#0000FF" SIZE=3D2 =
+FACE=3D"Arial"&gt;\\SERVER1\CMSDOCS&lt;/FONT&gt;&lt;/U&gt;&lt;/A&gt;&lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt; /delete&lt;/FONT&gt;
+&lt;BR&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;net use&lt;/FONT&gt; &lt;A =
+HREF=3D"\\SERVER1\IPC$"&gt;&lt;U&gt;&lt;FONT COLOR=3D"#0000FF" SIZE=3D2 =
+FACE=3D"Arial"&gt;\\SERVER1\IPC$&lt;/FONT&gt;&lt;/U&gt;&lt;/A&gt;&lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt; /delete&lt;/FONT&gt;
+&lt;BR&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;net use&lt;/FONT&gt; &lt;A =
+HREF=3D"\\SERVER1\QCP_DOCS"&gt;&lt;U&gt;&lt;FONT COLOR=3D"#0000FF" SIZE=3D2 =
+FACE=3D"Arial"&gt;\\SERVER1\QCP_DOCS&lt;/FONT&gt;&lt;/U&gt;&lt;/A&gt;&lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt; &quot;passwdgoeshere&quot; /user:qcp_docs&lt;/FONT&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;Unfortunately, the moment the second =
+.bat file is run to set the user logon back to cms_docs using the =
+following commands:&lt;/FONT&gt;&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;net use&lt;/FONT&gt; &lt;A =
+HREF=3D"\\SERVER1\IPC$"&gt;&lt;U&gt;&lt;FONT COLOR=3D"#0000FF" SIZE=3D2 =
+FACE=3D"Arial"&gt;\\SERVER1\IPC$&lt;/FONT&gt;&lt;/U&gt;&lt;/A&gt;&lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt; /delete&lt;/FONT&gt;
+&lt;BR&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;net use&lt;/FONT&gt; &lt;A =
+HREF=3D"\\SERVER1\QCP_DOCS"&gt;&lt;U&gt;&lt;FONT COLOR=3D"#0000FF" SIZE=3D2 =
+FACE=3D"Arial"&gt;\\SERVER1\QCP_DOCS&lt;/FONT&gt;&lt;/U&gt;&lt;/A&gt;&lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt; /delete&lt;/FONT&gt;
+&lt;BR&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;net use&lt;/FONT&gt; &lt;A =
+HREF=3D"\\SERVER1\IPC$"&gt;&lt;U&gt;&lt;FONT COLOR=3D"#0000FF" SIZE=3D2 =
+FACE=3D"Arial"&gt;\\SERVER1\IPC$&lt;/FONT&gt;&lt;/U&gt;&lt;/A&gt;&lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt; /delete&lt;/FONT&gt;
+&lt;BR&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;net use&lt;/FONT&gt; &lt;A =
+HREF=3D"\\SERVER1\CMSDOCS"&gt;&lt;U&gt;&lt;FONT COLOR=3D"#0000FF" SIZE=3D2 =
+FACE=3D"Arial"&gt;\\SERVER1\CMSDOCS&lt;/FONT&gt;&lt;/U&gt;&lt;/A&gt;&lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt; &quot;passwdgoeshere&quot; /user:cmsdocs&lt;/FONT&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;The user gets the error:&lt;/FONT&gt;
+&lt;BR&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;System error 1219 has =
+occurred.&lt;/FONT&gt;
+&lt;BR&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;The credentials supplied conflict =
+with an existing set of credentials.&lt;/FONT&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;Has anyone else had this kind of =
+problem?&lt;/FONT&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;Below is an extract of my smb.conf =
+file - removing unrelated users and their folders:&lt;/FONT&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;# Samba config file created using =
+SWAT&lt;/FONT&gt;
+&lt;BR&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;# from w-asc-osb-0844.asc.com.au =
+(69.10.152.99)&lt;/FONT&gt;
+&lt;BR&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;# Date: 2001/10/16 13:58:21&lt;/FONT&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;# Global parameters&lt;/FONT&gt;
+&lt;BR&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;[global]&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;workgroup =3D SAMBA&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;netbios name =3D&lt;/FONT&gt; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;SERVER1&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;server string =3D Windows NT Server clone&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;log file =3D /var/log/samba/log.%m&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;max log size =3D 0&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;socket options =3D TCP_NODELAY SO_RCVBUF=3D8192 =
+SO_SNDBUF=3D8192&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;domain master =3D Yes&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;dns proxy =3D No&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;valid users =3D&lt;/FONT&gt; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;webmaster,&lt;/FONT&gt;&lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;root,cmsdocs&lt;/FONT&gt;&lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;,&lt;/FONT&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;qcp_docs&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;write list =3D&lt;/FONT&gt; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;webmaster,&lt;/FONT&gt;&lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;root,cmsdocs,qcp_docs&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;hosts allow =3D 69.10. 69.20. 69.30. 69.40. =
+69.50.&lt;/FONT&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;[homes]&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;comment =3D Home Directories&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;writeable =3D Yes&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;browseable =3D No&lt;/FONT&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;[printers]&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;comment =3D All Printers&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;path =3D /var/spool/samba&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;printable =3D Yes&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;browseable =3D No&lt;/FONT&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;[cmsdocs]&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;comment =3D cmsdocs&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;path =3D /home/httpd/html/asc_web/cms_docs&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;username =3D cmsdocs&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;valid users =3D webmaster,root,cmsdocs,qcp_docs&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;write list =3D webmaster,root,cmsdocs,qcp_docs&lt;/FONT&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;[qcp_docs]&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;comment =3D qcp_docs&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;path =3D /home/httpd/html/asc-e/qcp/qcp_docs&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;invalid users =3D newsletter,finance,sscc,irc&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;valid users =3D webmaster,root,qcp_docs,cmsdocs&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;write list =3D webmaster,root,qcp_docs,cmsdocs&lt;/FONT&gt;
+&lt;BR&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;FONT SIZE=3D2 =
+FACE=3D"Arial"&gt;writeable =3D Yes&lt;/FONT&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;B&gt;&lt;FONT COLOR=3D"#0000FF" SIZE=3D2 FACE=3D"Comic Sans =
+MS"&gt;Regards,&lt;/FONT&gt;&lt;/B&gt;
+&lt;BR&gt;&lt;B&gt;&lt;FONT FACE=3D"Comic Sans MS"&gt;Desiree M. de Fluiter&lt;/FONT&gt;&lt;/B&gt;
+&lt;BR&gt;&lt;B&gt;&lt;I&gt;&lt;FONT COLOR=3D"#FF0000" SIZE=3D2 FACE=3D"Comic Sans =
+MS"&gt;Database Administrator&lt;/FONT&gt;&lt;/I&gt;&lt;/B&gt;
+&lt;BR&gt;&lt;B&gt;&lt;I&gt;&lt;FONT COLOR=3D"#008080" SIZE=3D1 FACE=3D"Comic Sans =
+MS"&gt;Australian Submarine Corporation Pty Ltd&lt;/FONT&gt;&lt;/I&gt;&lt;/B&gt;
+&lt;BR&gt;&lt;B&gt;&lt;I&gt;&lt;FONT COLOR=3D"#008080" SIZE=3D1 FACE=3D"Comic Sans =
+MS"&gt;Mersey Road&lt;/FONT&gt;&lt;/I&gt;&lt;/B&gt;
+&lt;BR&gt;&lt;B&gt;&lt;I&gt;&lt;FONT COLOR=3D"#008080" SIZE=3D1 FACE=3D"Comic Sans MS"&gt;Outer =
+Harbor&nbsp; SA&nbsp; 5018&lt;/FONT&gt;&lt;/I&gt;&lt;/B&gt;
+&lt;BR&gt;&lt;B&gt;&lt;I&gt;&lt;FONT COLOR=3D"#008080" SIZE=3D1 FACE=3D"Comic Sans =
+MS"&gt;Australia&lt;/FONT&gt;&lt;/I&gt;&lt;/B&gt;
+&lt;BR&gt;&lt;B&gt;&lt;I&gt;&lt;FONT COLOR=3D"#008080" SIZE=3D1 FACE=3D"Comic Sans =
+MS"&gt;Telephone: &nbsp;&nbsp;&nbsp;&nbsp; +61 08 8348 7724&lt;/FONT&gt;&lt;/I&gt;&lt;/B&gt;
+&lt;BR&gt;&lt;B&gt;&lt;I&gt;&lt;FONT COLOR=3D"#008080" SIZE=3D1 FACE=3D"Comic Sans =
+MS"&gt;Fax:&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
++61 08 8348 7001&lt;/FONT&gt;&lt;/I&gt;&lt;/B&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;I&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;Dew knot trussed yore spell chequer =
+two fined awl yore mistakes." - Brendan Hills&lt;/FONT&gt;&lt;/I&gt;
+&lt;/P&gt;
+
+&lt;P&gt;&lt;FONT SIZE=3D2 FACE=3D"Arial"&gt;This e-mail and any files transmitted =
+with it are confidential and are intended solely for the use of the =
+individual or entity to whom they are addressed. If you are not the =
+intended recipient or the person responsible for delivering the e-mail =
+to the intended recipient, be advised that you have received this =
+e-mail in error and that any use, dissemination, forwarding, printing =
+or copying of this e-mail is strictly prohibited. If you have received =
+this e-mail in error, please notify us immediately by return e-mail and =
+delete this message.&lt;/FONT&gt;&lt;/P&gt;
+
+&lt;/BODY&gt;
+&lt;/HTML&gt;
+------_=_NextPart_001_01C1CBD9.B7C75400--
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

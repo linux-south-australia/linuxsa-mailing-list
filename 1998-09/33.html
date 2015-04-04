@@ -1,0 +1,162 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Socket timeout question" -->
+<!-- FromName="Mark Pulford" -->
+<!-- FromEmail="mark@kyne.com.au" -->
+<!-- ToName="LinuxSA mailing list" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 2 Sep 1998 16:48:06 +0930 (CST)" -->
+<!-- Id="Pine.LNX.3.96.980902162552.8224A-100000@hamster.kyne.com.au" -->
+<!-- Reference="9FEECB26069DD111B0FB0060B057FD43799060@SBNTEX1" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Socket timeout question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Pulford &lt;<I><A HREF="mailto:mark@kyne.com.au">mark@kyne.com.au</A></I>&gt;
+  To  : LinuxSA mailing list &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 2 Sep 1998 16:48:06 +0930 (CST)
+</PRE>
+<H1>Re: Socket timeout question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 2 Sep 1998, O'CONNOR, Steve wrote:
+
+&gt; - My question is - what options can you fiddle with (in setsockopt()
+&gt; ???) to reduce this timeout time down to something much smaller than a
+&gt; minute or so. The machines in question are all on the same length of
+&gt; 100mbps wire, so it either will connect or wont connect in no time at
+&gt; all.
+
+#include &lt;sys/time.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;errno.h&gt;
+
+int do_connect(int fd,struct sockaddr *remote, int len,
+               struct timeval *timeout, int *err)
+{
+        int saveflags,ret,back_err;
+        fd_set fd_w;
+
+        saveflags=fcntl(fd,F_GETFL,0);
+        if(saveflags&lt;0) {
+                perror("fcntl1");
+                *err=errno;
+                return -1;
+        }
+
+        /* Set non blocking */
+        if(fcntl(fd,F_SETFL,saveflags|O_NONBLOCK)&lt;0) {
+                perror("fcntl2");
+                *err=errno;
+                return -1;
+        }
+
+        /* This will return immediately */
+        *err=connect(fd,remote,len);
+	back_err=errno;
+
+	/* restore flags */
+        if(fcntl(fd,F_SETFL,saveflags)&lt;0) {
+                perror("fcntl3");
+                *err=errno;
+                return -1;
+        }
+
+        /* return unless the connection was successful or the connect is
+           still in progress. */
+        if(*err&lt;0 && back_err!=EINPROGRESS) {
+                perror("connect");
+                *err=errno;
+                return -1;
+        }
+
+        FD_ZERO(&fd_w);
+        FD_SET(fd,&fd_w);
+
+        *err=select(FD_SETSIZE,NULL,&fd_w,NULL,timeout);
+        if(*err&lt;0) {
+                perror("select");
+                *err=errno;
+                return -1;
+        }
+
+        /* 0 means it timeout out & no fds changed */
+        if(*err==0) {
+                close(fd);
+                *err=ETIMEDOUT;
+                return -1;
+        }
+
+        /* Get the return code from the connect */
+        len=sizeof(ret);
+        *err=getsockopt(fd,SOL_SOCKET,SO_ERROR,&ret,&len);
+        if(*err&lt;0) {
+                perror("getsockopt");
+                *err=errno;
+                return -1;
+        }
+
+        /* ret=0 means success, otherwise it contains the errno */
+        if(ret) {
+                *err=ret;
+                return -1;
+        }
+
+        *err=0;
+        return 0;
+}
+
+-----------------------------
+
+There are several ways to do what you want.
+- fork() off processes to do the work. 
+- use select() & non blocking IO like above 
+- Use setsockopt().
+
+Setsockopt doesn't parallelize well. You still need to combine it with
+threads, fork, or non blocking IO to get a decent result. If you are going
+to be connecting to many hosts it would be much faster to do the
+connections in parallel than do them in sequence.
+
+The above example shows how to do a non blocking connect. To parallelize
+it you would select on all your sockets at once instead of doing it one at
+a time.
+
+Regards,
+Mark
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,127 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: comp sci question: fast status mask handling" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="Tom Dunstan" -->
+<!-- ToEmail="tommyd@senet.com.au" -->
+<!-- Date="Mon, 7 Aug 2000 16:26:00 +0930" -->
+<!-- Id="20000807162600.A17916@dog.topology.org" -->
+<!-- Reference="398E5A26.ED2240EE@senet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: comp sci question: fast status mask handling</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : Tom Dunstan &lt;<I><A HREF="mailto:tommyd@senet.com.au">tommyd@senet.com.au</A></I>&gt;
+  Date: Mon, 7 Aug 2000 16:26:00 +0930
+</PRE>
+<H1>Re: comp sci question: fast status mask handling</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Aug 07, 2000 at 04:11:42PM +0930, Tom Dunstan wrote:
+&gt; 
+&gt; I assume since you are going to these lengths that the singnals that you
+&gt; are processing are more evenly distributed than just getting a couple of
+&gt; common ones, in which case you could just put tests in the form of a
+&gt; case statement or whatever with the most common ones at the top.
+
+Yes, that's an attractive option.
+There are generally one or two very urgent events to handle,
+and the rest are more relaxed.
+
+So I could do something like:
+
+if (status & mask1) {
+    // Deal with urgent condition 1.
+    status &= ~mask1;
+    if (!status)
+	return;
+    }
+if (status & mask2) {
+    // Deal with less urgent condition 2.
+    status &= ~mask2;
+    if (!status)
+	return;
+    }
+if (status & mask3) {
+    // Deal with even less urgent condition 3.
+    status &= ~mask3;
+    if (!status)
+	return;
+    }
+etc. etc.
+
+Then the nth condition handling code is preceded by n
+AND/test/jump commands.
+This would just require some analysis of the events which
+are most urgent.
+
+As you are suggesting, if the urgency and/or frequency of
+events is unknown a priori or if the urgency/frequency are
+evenly distributed, then the jump table would be faster.
+A good example of this would be a select() event handler,
+monitoring 50 TCP connections in an un-forked process, where
+all I/O events are a-priori equal.
+
+I think that as an exercise, I'll try the jump-table approach
+in my device driver.
+The resulting code would not be more incomprehensible than
+a lexical analyser state machine....
+
+Cheers,
+Alan Kennington.
+
+=====================================================
+PS.  Unrelated topic....
+I bought Star Office 5.2 over the net from www.sun.com
+last Sunday morning, and it arrived 5 days later, namely
+last Friday. Together with postage, it comes to about A$100
+or more. Not cheap!
+But it does have a couple of manuals: 
+16-page Binary Code License
+72-page installation guide
+490-page user manual
+1 CD-ROM
+And I did want to express my solidarity with their plan
+to open-source the code.
+
+I haven't had the time to install it yet.
+But the manual looks about as useful as the typical
+manuals from a certain evil empire.
+Ah, the CD contains versions for 
+Solaris 2.5.1, 2.6, Solaris 7 and 8 for Sparc and Intel,
+linux, and windows 95/98/2000/NT.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

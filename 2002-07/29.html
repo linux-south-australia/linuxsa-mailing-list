@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba Tuning" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="rsharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="Matthew.Cook@tekelek.com.au" -->
+<!-- Date="Tue, 2 Jul 2002 10:37:30 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0207021022040.2821-100000@ns.aus.com" -->
+<!-- Reference="OFA2447C13.E9FEF771-ONE9256BE9.007DB23E-E9256BE9.007F7252@LocalDomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba Tuning</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:Matthew.Cook@tekelek.com.au">Matthew.Cook@tekelek.com.au</A></I>&gt;
+  Date: Tue, 2 Jul 2002 10:37:30 +0930 (CST)
+</PRE>
+<H1>Re: Samba Tuning</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, 2 Jul 2002 <A HREF="mailto:Matthew.Cook@tekelek.com.au">Matthew.Cook@tekelek.com.au</A> wrote:
+
+&gt; Hi All,
+&gt; 
+&gt; I have some unexplained Samba questions I was hoping someone might be able
+&gt; to point out what I have missed.
+&gt; 
+&gt; - What would be the typical sustained download speed on a 100Mbit LAN ?
+
+What an interesting question. Every block of data being read or written 
+has to take two trips between kernel space and user space. If you are 
+reading, smbd has to read it from disk and then has to write it to the 
+socket. Thus, there is quite a bit of copying going on. 
+
+However, you should be able to achieve something like 75% or so of the max 
+atainable at 100Mb/s (around 10MB/s).
+
+Unlike FTP, the SMB protocol is a request/response protocol, so a client 
+has to wait for a response to every write before it can send another 
+request, and it has to wait for the data from every read before it can 
+send another request.
+
+Secondly, Windows does lots of funny things on the wire, and unless you 
+write some special programs, you have to wait for the data to hit the 
+disk (buffers) before you ask for more, so it might not even be capable of 
+driving a 100Mb/s link to saturation.
+
+I have recently committed some code that does allow you do generate CIFS 
+load, called cifs-load-gen, that will allow you to explore these things.
+
+Also, different file system deliver different performance. John Terpstra 
+presented a paper at a recent conf that demonstrates that ext2 performs 
+better than ext3, for example.
+
+&gt; - Why does smbd only grab 50% cpu if the machine is essentially idle ?
+
+You are dealing with essentially a single thread. If the client is not 
+issuing the requests fast enought, then it will not be able to grab all 
+the CPU, Also, it may be that it does not require 100% of the CPU to keep 
+a 100Mb/s link saturated. That is only 10MB/s, and even with the three or 
+four copies that are required, it is only 40MB/s the CPU is ask to move.
+
+&gt; - What priority level does smbd run at ?
+
+Dunno.
+
+&gt; - How does one squeeze more speed out of it.
+
+Make sure the server is the bottleneck first. You can do this by grabbing 
+a packet trace and looking at the delay between one request completing and 
+the next one issuing.
+
+If the server is not the bottleneck, get a faster client. If the server is 
+the bottleneck, you need to determine if it is IO that is the problem, but 
+an idle CPU suggests it is waiting for IO. If that is the case, use a RAID 
+system or something like that.
+
+You can also use the load generator to check what the system is capable 
+of. Tests I did last year with 750MHz Duron with 1GB running either 2.4.7 
+or FreeBSD 4.4 suggests that it takes about 10 clients running netbench 
+to saturate a 100Mb/s link. The load generator can get you reading or 
+writing files, and that may allow you to go hell for leather.
+
+&gt; The basic senario is I have a small SOHO consisting of a linux file server
+&gt; (Slackware 8.0+samba) which serves  2 desktops and a laptop
+&gt; (Win98se&Win2K).   The sustained file download speed from the linux box on
+&gt; any machine is 1.5-5.5M byte per second, but it changes depending
+&gt; day/time/orientation of the moon, there is no consistancy.   I have
+&gt; verified that the network layer is 100%, there are no IP errors and the
+&gt; timing is consistant across all boxes.   I have read James doco and fixed
+&gt; the slow browsing problems under win2k (see James we are using it !)   I am
+&gt; not running samba as a PDC (yet) so it is configured as the master browser
+&gt; and to "win" browser elections.
+&gt; 
+&gt; The linux box is a Celleron 600 on a VIA motherboard (no body laugh) with
+&gt; 3Com Ethernet card (3C905B), there are a couple of big ATA100 drives on a
+&gt; measly ATA66 controller (fixed next pay cheque).   I cannot see why the
+&gt; performance of samba varies so much from day to day.   It should be noted
+&gt; that I have never seen smbd take more than 50% of the cpu (via top) which
+&gt; roughly equates to my 5Mbytes per second peak, but it is fustrating to see
+&gt; the smbd load requirement drop to 11% (1Mbyte/s out) with 80%+ of idle time
+&gt; when transfering 2Gb files !
+&gt; 
+&gt; I am sure it is a samba/os/config problem and not a network hardware
+&gt; problem (those I can fix !).   I can email config files if required.
+&gt; 
+&gt; Regards
+&gt; 
+&gt; Matthew
+&gt; 
+&gt; 
+&gt; 
+&gt; 
+
+-- 
+Regards
+-----
+Richard Sharpe, <A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A>, <A HREF="mailto:rsharpe@samba.org">rsharpe@samba.org</A>, 
+<A HREF="mailto:sharpe@ethereal.com">sharpe@ethereal.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

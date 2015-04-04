@@ -1,0 +1,167 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Apache + PHP4" -->
+<!-- FromName="'Tarek Heiland'" -->
+<!-- FromEmail="tarek@bakas.com.au" -->
+<!-- ToName="'md@picknowl.com.au','Tim Riley'," -->
+<!-- ToEmail="md@picknowl.com.au,tr@rebel.net.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 2 Jan 2001 18:40:21 +1030" -->
+<!-- Id="55FC8B9A5F40D3119B460090278A30311F5936@ADELAIDENEW1" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Apache + PHP4</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Tarek Heiland &lt;<I><A HREF="mailto:tarek@bakas.com.au">tarek@bakas.com.au</A></I>&gt;
+  To  : md@picknowl.com.au &lt;<I><A HREF="mailto:md@picknowl.com.au">md@picknowl.com.au</A></I>&gt;<BR>        Tim Riley &lt;<I><A HREF="mailto:tr@rebel.net.au">tr@rebel.net.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 2 Jan 2001 18:40:21 +1030
+</PRE>
+<H1>RE: Apache + PHP4</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+PHP4 + apache works fine under Redhat (6.x).
+
+httpd.conf lines for PHP4 if correctly installed as per PHP4 instructions
+are:
+
+  AddType application/x-httpd-php .php
+  AddType application/x-httpd-php-source .phps
+
+you may also find it useful to add
+
+DirectoryIndex index.php 
+
+or similar to allow php pages to become default.
+
+I would suggest downloading the latest apache and both the latest and
+penultimate PHP4 versions. Then follow the php4 install instructions in the
+readme EXACTLY. If you do you woudln't be having the prob's. There is in
+fact a comment about the .so file you are mentioning.
+
+TRICK: if you plan on ever using both the CGI and the module version of
+php4. (I.e. for CGI-handler or as I sometimes do as a crude and dirty script
+language) install the earlier version of php4 completely first as both
+module and standalone. Then repeat with the latest version over the top.
+This seems to reliably fix an intermittent file not found issue which can
+bugger you up for hours and to which their appears to be no good solution
+that I have found after days trawling the web.
+
+As to userdir's - compile apache with suexec - this allows you to run
+scripts/pages as other users instead of your public web user. This can help
+having to bastardise permissions to have things work. Note that there are
+very stringent permission requirements that MUST be met before suexec will
+work. (Note however if you ever have to run scripts that require uid's &lt;
+suexec cutoff you will need to then utilise sudo to break this limitation,
+although you can seriously compromise security doing this). 
+
+Hope this helps
+
+Tarek
+
+-----Original Message-----
+From: MRD [mailto:<A HREF="mailto:md@picknowl.com.au">md@picknowl.com.au</A>]
+Sent: Sunday, 24 December 2000 13:20 
+To: Tim Riley; <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+Subject: RE: Apache + PHP4
+
+
+
+
+-----Original Message-----
+From: Tim Riley [mailto:<A HREF="mailto:tr@rebel.net.au">tr@rebel.net.au</A>]
+Sent: Saturday, 23 December 2000 8:44 PM
+To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+Subject: Apache + PHP4
+
+Hi again folks, (* what about adaptive?))?
+
+
+
+I have run into a some problems lately, trying to configure Apache.  They
+are listed below, and if anyone could shed some light on them for me, it
+would be much appreciated :)
+
+The system is Conectiva 6.0, which (afaik) goes about things in a Red Hat
+sort of manner.
+
+1) httpd.conf has the UserDir module loaded and added, and the UserDir is
+specified as www.  However, I could not initially view any of the files on
+my $HOME/www.  Some people in #linuxhelp suggested that it is neccessary
+in Red hat to chmod 0755 $HOME and $HOME/www for this to work.  It did,
+but it seems like a workaround, as now any user can view the contents of
+my entire home directory - is there a more elegant way to a chieve a
+working userdir setup?
+
+2) I have the php4 and mod_php4 packages installed on this machine.
+httpd.conf has this line:
+LoadModule php4_module        modules/libphp4.so
+
+which was originally commented out.  However, in the AddModule section,
+there is no commented line to add libphp4..c (using a .c in place of the
+.so of the module file seems to be the done thing.).  There is an
+#AddModule mod_php4.c line, but I have no mod_php4.so in the modules/
+directory.  Putting an AddModule libphp4.c results in this error upon
+starting httpd:
+
+Starting httpd: Syntax error on line 328 of /etc/httpd/conf/httpd.conf:
+Cannot add module via name 'libphp4.c': not in list of loaded modules
+
+Whenever I try to access a PHP script (that was previous working in
+Slackware), I receive a "this file is of type application/x-http-php... do
+you want to view or save to disk" so it musn't be being parsed by the
+server (which is pretty obvious, since the module isn't being added or
+loaded or sometihng).
+
+Does anyone know how to load or add the php module correctly?  Has anyone
+done it on a Red Hat box?
+
+Thankyou very much for your help.
+
+Cheers,
+
+Tim Riley
+
+--
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

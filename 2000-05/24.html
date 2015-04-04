@@ -1,0 +1,113 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Writing to input on a tty port" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Chor Goh" -->
+<!-- ToEmail="cgoh@mmal.com.au" -->
+<!-- Date="Mon, 1 May 2000 16:16:46 +0930" -->
+<!-- Id="20000501161646.A49942@atdot.dotat.org" -->
+<!-- Reference="0005019571.AA957155219@mmalhq01.mmal.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Writing to input on a tty port</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Chor Goh &lt;<I><A HREF="mailto:cgoh@mmal.com.au">cgoh@mmal.com.au</A></I>&gt;
+  Date: Mon, 1 May 2000 16:16:46 +0930
+</PRE>
+<H1>Re: Writing to input on a tty port</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, May 01, 2000 at 01:56:25PM +0930, Chor Goh wrote:
+
+ &gt;   I have an application A listening on port P for information. 
+ &gt; Eventually the port will be serviced by a modem, so I don't have the
+ &gt; option of using sockets. If port P is a terminal device and information
+ &gt; is typed in at the keyboard, it works fine.  However, if information
+ &gt; is sent from a remote source R to port P, application A fails to read it.
+ &gt; I suspect that because the input and output queues on the terminal
+ &gt; device are separate entities,
+
+No, they aren't.  I think what's more likely is that you are attempting
+to read character-by-character from an input source which is line-buffered
+(ttys are line-buffered by default, sockets/pipes aren't).
+
+You need to put the tty into raw or cbreak mode to do what you want to
+do.  To do that, use ioctl() to disable the termios ICANON c_lflag:
+
+     struct termios t;
+
+     if (ioctl(ttyfd, TIOCGETA, &t) == -1) {
+	 /* error processing - can't get struct termios */
+     }
+
+     t.c_lflag ~= ICANON;
+
+     if (ioctl(ttyfd, TIOCSETA, &t) == -1) {
+	 /* error processing: can't set struct termios */
+     }
+
+Following the above, the file descriptor addressed as "ttyfd" should be
+character-buffered (assuming it's a tty device -- You'll probably get
+the ioctl() calls failing with EINVAL or ENOTSUPP if it isn't).
+
+You'll probably also want to turn off echo (otherwise you'll confuse
+modems by echoing their "OK", "CONNECT" and "ERROR" responses back at
+them);  change the t.c_flag line above to the following to accomplish
+that at the same time:
+
+     t.c_lflag ~= (ICANON | ECHO);
+
+As a final alternative, termios(7) provides a cfsetraw() function
+which does all the things necessary to set a tty into "raw" mode:  To
+use it, replace the t.c_lflag line with:
+
+     cfmakeraw(&t);
+
+cfmakeraw() alters a termios structure so that all values which affect
+input and output processing are stripped out;  applications will simply
+see a raw data stream.  That isn't always what you want, though:  Often
+when talking to modems you actually *want* some output processing, such
+as the bits which cause outgoing LF's into CR/LF's.  I'm not sure if
+cfmakeraw() is really what you're going to want.
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

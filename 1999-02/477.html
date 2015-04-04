@@ -1,0 +1,204 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: sharing via samba" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="jamz@boman.com" -->
+<!-- Date="Tue, 23 Feb 1999 15:42:06 +1000" -->
+<!-- Id="" -->
+<!-- Reference="000201be5e3c$4d14a580$0101000a@pii" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: sharing via samba</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:jamz@boman.com">jamz@boman.com</A>
+  Date: Tue, 23 Feb 1999 15:42:06 +1000
+</PRE>
+<H1>RE: sharing via samba</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+At 10:12 AM 2/23/99 +1030, jamz wrote:
+&gt;Howdy,
+&gt;
+&gt;	I have also experienced this problem.  I realise that if browsing with
+&gt;SAMBA didn't work with Win98 someone would know by now, so it is probably a
+&gt;simple configuration issue somehwere in the smb.conf.  However, I have
+&gt;experienced the problem and while I was taking a look at it I found some
+&gt;interesting stuff.  The problem was even though you open up all the security
+&gt;in your smb.conf your Win98 and NT4 boxes continue to ask for passwords and
+&gt;even if you correctly enter the password, still no go.  However on a Win95
+&gt;OSR2 machine it works...
+&gt;and here is what I found:
+&gt;
+&gt;I am using a straight off the CD not fiddled with redhat 5.2, I have not
+&gt;edited the smb.conf file and am using the '\\server\username' share.
+&gt;
+&gt;A packet filter between the Win95 OSR2 machine reveals the order of events:
+&gt;
+&gt;Win95 box sends NBT session request
+&gt;Samba sends positive session responce
+&gt;Win95 box lists the Dialects it is able to speak (0-5)and says it would like
+&gt;NT LM 0.12 (No.5)
+&gt;Samba accepts and selects dialect 5 (NT LM 0.12)
+&gt;Win95 sends session setup with username and password in CLEARTEXT!
+&gt;All sorts of things happen now Tree connects and filsystem info packets..
+&gt;and the connection is successful
+&gt;
+&gt;
+&gt;The same situation, same untouched server.. but with win98
+&gt;
+&gt;Win98 box sends NBT session request
+&gt;Samba sends positive session responce
+&gt;Win98 box lists the Dialects it is able to speak (0-5)and says it would like
+&gt;NT LM 0.12 (No.5)
+&gt;Samba accepts and selects dialect 5 (NT LM 0.12)
+&gt;Win98 sends session setup with username but at the same position where the
+&gt;CLEARTEXT PASSWORD was in the Win95 frame now is just "USERNAME DOMAIN"
+&gt;
+&gt;I assume this so that samba can initiate validating the user's domain
+&gt;security token with the PDC.
+&gt;Even though the USERNAME and DOMAIN details are correct and the password for
+&gt;the account is the same on the PDC as it is on the Linux box the session
+&gt;still fails.
+
+By default, Windows NT sp3 (I think) and Win 98 send encrypted passwords,
+or don't like plaintext passwords. There is a registry setting to have them
+send plaintext passwords again. Look in /usr/doc/samba/docs for some
+registry setting files.
+
+Alternatively, implement encrypted passwords on your Samba server.
+
+&gt;Im thinking that you probably need to mess about with the new settings in
+&gt;Samba that deal with making validations via a NT PDC, or perhaps turning
+&gt;DOMAIN validation off on the Win98 client.
+&gt;
+&gt;NT4 sessions to samba in this way also fail with a similar packet structure,
+&gt;and the error is returned on the NT4 client - "The account is not authorized
+&gt;to log in from this station"
+&gt;
+&gt;The fact that OSR2 sends cleartext to Samba is fairly interesting! But what
+&gt;more would you expect.
+&gt;
+&gt;	Jamz.
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;Jamz Boman B.Sc (cis), MCP
+&gt;
+&gt;<A HREF="mailto:Jamz@Boman.com">Jamz@Boman.com</A>
+&gt;
+&gt;PGP Public Key available at <A HREF="http://jamz.boman.com/pgp.htm">http://jamz.boman.com/pgp.htm</A>
+&gt;
+&gt;Eat one live toad the first thing in the morning and
+&gt;nothing worse will happen to you the rest of the day.
+&gt;
+&gt;
+&gt;
+&gt;&gt; -----Original Message-----
+&gt;&gt; From: Andreja Zivkovic [<A HREF="mailto:zivkotech">mailto:zivkotech</A>@ozemail.com.au]
+&gt;&gt; Sent: Monday, 22 February 1999 17:47
+&gt;&gt; To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt;&gt; Subject: sharing via samba
+&gt;&gt;
+&gt;&gt;
+&gt;&gt; Hi,
+&gt;&gt;
+&gt;&gt; I'm starting to think there's something wrong with my
+&gt;&gt; computers. As the
+&gt;&gt; subject suggests, I'm having problems trying to share via samba.
+&gt;&gt;
+&gt;&gt; The problem is as follows:
+&gt;&gt; On my win98 box, i go to network neighborhood and the Linux
+&gt;&gt; box's netbios
+&gt;&gt; name is listed. I try to open it, but it asks me for a
+&gt;&gt; password. I would
+&gt;&gt; like to make it so you don't need any password and doesn't
+&gt;&gt; even ask you for
+&gt;&gt; any, like sharing via Win98, but I don't know how to do this.
+&gt;&gt;
+&gt;&gt; In the smb.conf file, I have the line "guest account =
+&gt;&gt; guest". On my Win98
+&gt;&gt; box, the login name is pii. I added the users pii and guest
+&gt;&gt; on the linux
+&gt;&gt; box, and made the password the same. When i am prompted for
+&gt;&gt; the password, I
+&gt;&gt; first tried just pressing enter, hoping it would be no
+&gt;&gt; password (and use the
+&gt;&gt; guest account), but it told me the password is incorrect. I
+&gt;&gt; tried entering
+&gt;&gt; the password that I set as pii's and guest's password, but that says
+&gt;&gt; password incorrect. What have I done wrong?
+&gt;&gt;
+&gt;&gt;
+&gt;&gt; Thanks,
+&gt;&gt; Andy
+&gt;&gt;
+&gt;&gt; PS. I recieved one e-mail from someone asking me to mail them with any
+&gt;&gt; success from the questions from the e-mail called "a few
+&gt;&gt; things". Well, i
+&gt;&gt; stupidly lost the e-mail address, so I don't know who to
+&gt;&gt; reply to. to that
+&gt;&gt; person and anyone interested: I am keeping a web page (at
+&gt;&gt; <A HREF="http://www.ozemail.com.au/~zivkotech/bilisili/linux/">http://www.ozemail.com.au/~zivkotech/bilisili/linux/</A> ) with details of
+&gt;&gt; everything I achive in linux. You can look at that for how I
+&gt;&gt; 'fixed' the
+&gt;&gt; 'problems', or e-mail me again and I promise not to lose your
+&gt;&gt; e-mail address
+&gt;&gt; again ;)
+&gt;&gt;
+&gt;&gt; --
+&gt;&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt;&gt; To unsubscribe from the LinuxSA list:
+&gt;&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as
+&gt;&gt; the subject
+&gt;&gt;
+&gt;
+&gt;Attachment Converted: "C:\docs\Eudora-recvd\Jamz Boman (Netbridge)
+(E-mail).vcf"
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>, NIC-Handle:RJS96
+NS Computer Software and Services P/L, 
+Ph: +61-8-8281-0063, FAX: +61-8-8250-2080, 
+Samba (Team member), Linux, Apache, Digital UNIX, AIX, C, ...
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,106 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Timezones and stuff" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Don Collins" -->
+<!-- ToEmail="doncol@george.mdt.net.au" -->
+<!-- Date="Wed, 24 Jun 1998 13:57:18 +0930 (CST)" -->
+<!-- Id="199806240427.NAA21107@rebel.net.au" -->
+<!-- Reference="358FBF54.3A5BF757@mail.mdt.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Timezones and stuff</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Don Collins &lt;<I><A HREF="mailto:doncol@george.mdt.net.au">doncol@george.mdt.net.au</A></I>&gt;
+  Date: Wed, 24 Jun 1998 13:57:18 +0930 (CST)
+</PRE>
+<H1>Re: Timezones and stuff</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; This one's been bugging me as well.  If I run `netdate` it shows up as time
+&gt; relative to GMT, but a `date` shows the actual time.
+
+Unix systems maintain time of day using an interrupt driven counter.
+They do not use the hardware real time clock, other than to initialise
+the value of that counter.  This counter is the "Unix clock".
+
+The Unix clock counts seconds since Midnight, January 1, 1970 and is
+maintained in UTC (also known as GMT).  Hence, at 9:30am on January 1,
+1970 (Adelaide time), the Unix clock would read 0.
+
+The Unix clock only runs at UTC.  Some Unixes understand that the
+hardware real time clock might run in a different timezone, and take
+that into account, but the Unix clock is always UTC.  Programs which
+display the time in a format like "Wed Jun 24 13:55:07 CST 1998" do so
+by converting the Unix clock using the ctime libary calls.  With these
+calls you have more or less two options: You can display in UTC, or you
+can display in "local time".  Conversion to "local time" relies on an
+environment variable, "TZ".  This environment variable describes the
+"local" timezone, but note it can be different from process to process.
+
+The TZ variable originally descibed the timezone as the timezone mnemonic,
+followed by the number of hours west of GMT, and optionally ending with
+the mnemonic used during daylight saving.  The TZ variable for Adelaide,
+then, could be CST-9:30CST, meaning that we are 9.5 hours east of
+Greenwich, and that daylight saving does apply during the summer months.
+This usage of TZ is still supported, and if you want to try it:
+
+        linux% TZ=WST-7:00wst date
+	Wed Jun 24 11:25:07 WST 1998
+
+will display the current time in Perth.
+
+
+Two "recent" changes are: The inclusion of milisecond accuracy to the
+Unix clock, which affects approximately nothing of what I've said;
+and customisable timezone rules, which permit accurate description of
+timezone changes (such as for daylight saving.)  These rules describe
+minute details for a specific timezone.  They are compiled using zic,
+and the TZ environment variable names the file for your local timezone.
+Hence:
+
+	linux% TZ=Europe/Moscow date
+	Wed Jun 24 08:25:07 MSD 1998
+
+If you don't have a TZ environment variable defined the system will use
+some "local default", which obviously would have been installed when you
+setup your Unix.
+
+So finally!, and in summary, a time displayed in GMT is the same time as
+for CST, the difference is the decision on whether or not to display in
+local time.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

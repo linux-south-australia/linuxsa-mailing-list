@@ -1,0 +1,140 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="corrupt rpm db/apt?" -->
+<!-- FromName="'Ben Williams'" -->
+<!-- FromEmail="benw@webmedia.com.au" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 03 Sep 2003 10:11:07 +0930" -->
+<!-- Id="3F5538A3.7060206@webmedia.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: corrupt rpm db/apt?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Ben Williams &lt;<I><A HREF="mailto:benw@webmedia.com.au">benw@webmedia.com.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 03 Sep 2003 10:11:07 +0930
+</PRE>
+<H1>corrupt rpm db/apt?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+howdy all,
+
+i've got a RH8.0 box sitting quietly in the corner serving up samba 
+shares to my network. i've been keeping it up to date via up2date with a 
+RHN Demo subscription, and using apt-get.
+
+i've had some hassles on this box with the RPM database becoming 
+corrupted, after some hangs using rpm (i've had to kill -9 rpm 
+processes, and `rpm --rebuilddb && db_verify Packages` to repair the db, 
+a few times). this has *seemed* to go well, but, now i am getting 
+strange errors from apt:
+
+------------------------------
+[<A HREF="mailto:root@tigermoth">root@tigermoth</A> root]# apt-get update
+&lt;snip progress & success messages - no problems reported.&gt;
+[<A HREF="mailto:root@tigermoth">root@tigermoth</A> root]# apt-get upgrade
+Reading Package Lists... Done
+Building Dependency Tree... Done
+You might want to run `apt-get -f install' to correct these.
+The following packages have unmet dependencies:
+   XFree86-Xnest: Depends: XFree86 (= 4.2.1) but it is not installable
+   XFree86-Xvfb: Depends: XFree86 (= 4.2.1) but it is not installable
+   XFree86-tools: Depends: XFree86 but it is not installable
+   XFree86-twm: Depends: XFree86 but it is not installable
+   XFree86-xdm: Depends: XFree86 (= 4.2.1) but it is not installable
+   Xtest: Depends: XFree86 (&gt;= 4.2.0) but it is not installable
+   gnome-print: PreDepends: XFree86 but it is not installable
+   lesstif: Depends: XFree86 but it is not installable
+   libgnomeprint: PreDepends: XFree86 but it is not installable
+   xinitrc: Depends: XFree86 but it is not installable
+E: Unmet dependencies. Try using -f.
+[<A HREF="mailto:root@tigermoth">root@tigermoth</A> root]# rpm -qa | grep -E 
+'(XFree86-Xnest|XFree86-Xvfb|XFree86-tools|XFree86-twm|XFree86-xdm|Xtest|gnome-print|lesstif|libgnomeprint|xinitrc)'
+lesstif-0.93.18-5
+libgnomeprint-1.116.0-2
+Xtest-2.0-1
+XFree86-twm-4.2.1-21
+lesstif-devel-0.93.18-5
+XFree86-Xvfb-4.2.1-21
+libgnomeprint15-0.35-8
+XFree86-xdm-4.2.1-21
+gnome-print-0.35-8
+gnome-print-devel-0.35-8
+XFree86-tools-4.2.1-21
+XFree86-Xnest-4.2.1-21
+libgnomeprintui-1.116.0-1
+xinitrc-3.31-1
+[<A HREF="mailto:root@tigermoth">root@tigermoth</A> root]# rpm -q XFree86
+XFree86-4.2.1-21
+------------------------------
+
+so, apt *seems* to be complaining that XFree86-4.2.1 is not installable, 
+  but it is already installed!
+
+does anyone have any idea how to fix this? i've tried:
+
+------------------------------
+[<A HREF="mailto:root@tigermoth">root@tigermoth</A> root]# apt-get -f install --simulate
+Reading Package Lists... Done
+Building Dependency Tree... Done
+Correcting dependencies... Done
+The following packages will be REMOVED:
+   Guppi-devel XFree86-Xnest XFree86-Xvfb XFree86-tools XFree86-twm 
+XFree86-xdm Xtest eog evolution gdm gedit glade2 gnome-print
+   gnome-print-devel gnucash gnumeric gtkhtml gtkhtml-devel kcharselect 
+kdeaddons-kate kdeaddons-kicker kdeaddons-knewsticker
+   kdeaddons-konqueror kdeartwork kdeartwork-screensavers kdebase 
+kdebase-devel kdeutils-laptop kdf klprfax lesstif lesstif-devel
+   libgnomeprint libgnomeprintui mrproject nautilus penzilla-bookmarks 
+xinitrc
+0 packages upgraded, 0 newly installed, 38 removed and 7 not upgraded.
+------------------------------
+
+however, i don't really want to remove all those packages, as i use X 
+remotely on that box sometimes. i had the thought that i could remove 
+those packages and re-install them; i'd really rather not waste the 
+bandwidth tho.
+
+thanks, if you're still reading after all that! ;-)
+
+  - Ben
+--
+"Everybody generalizes from one example. At least, I do."
+  - Steven Brust [dreamcafe.com]
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

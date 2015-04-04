@@ -1,0 +1,84 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="SOLUTION: ENOBUFFS on Socket" -->
+<!-- FromName="'Davis, Harvey'" -->
+<!-- FromEmail="Harvey.Davis@dsto.defence.gov.au" -->
+<!-- ToName="'linuxsa@linuxsa.org.au'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 25 Jun 2001 10:26:47 +0930" -->
+<!-- Id="DB0C881A51F5D311999F0090274DD43702E56EC8@salex003.dsto.defence.gov.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: SOLUTION: ENOBUFFS on Socket</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Davis, Harvey &lt;<I><A HREF="mailto:Harvey.Davis@dsto.defence.gov.au">Harvey.Davis@dsto.defence.gov.au</A></I>&gt;
+  To  : linuxsa@linuxsa.org.au &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 25 Jun 2001 10:26:47 +0930
+</PRE>
+<H1>SOLUTION: ENOBUFFS on Socket</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Guys
+
+Thanks for all your help on the ENOBUFFS issue.
+
+The problem was repeated calls to connect. It seems that connect calls (even
+ones that fail) consume resources. Repeated calling of connect (on a
+non-blocking socket) awaiting success ends up totally consuming some
+internal resource and an ENOBUFFS(105) is issued.
+
+I was using connect to poll for when a machine was up, getting a connection
+refused many times and then eventually an ENOBUFFS.
+
+Unfortunately I am not sure how to solve this problem when getting
+connectioon refused (when the server is unavailable) other then backing off
+with a sleep() for increasing time periods. The man pages describes a
+solution for an EINPROGRESS error but iits not relevent to this case.
+
+NOTE FYI: The machines are coming up at roughly the same time (give or take
+about 5 secs) as part of a distributed application for performin signal
+processing for data coming through from a surface wave radar. The problem
+arises due to the fact cthat the client generally comes up faster then the
+server.
+
+If any one has any ideas please forward them on.
+
+Thanks
+
+Harv 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

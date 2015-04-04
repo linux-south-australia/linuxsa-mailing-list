@@ -1,0 +1,95 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Socket programming question" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="O'Connor, Steven" -->
+<!-- ToEmail="Steven.O'Connor@boralenergy.com.au" -->
+<!-- Date="Wed, 17 Mar 1999 09:45:45 +1030 (CST)" -->
+<!-- Id="199903162315.JAA46280@atdot.dotat.org" -->
+<!-- Reference="199903162308.JAA31565@Elizabeth.netcraft.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Socket programming question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : O'Connor, Steven &lt;<I><A HREF="mailto:Steven.O'Connor@boralenergy.com.au">Steven.O'Connor@boralenergy.com.au</A></I>&gt;
+  Date: Wed, 17 Mar 1999 09:45:45 +1030 (CST)
+</PRE>
+<H1>Re: Socket programming question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+O'Connor, Steven wrote:
+
+ &gt; Another dumb coding question :
+ &gt; When you are writing a server socket, upon accept()'ing the incoming
+ &gt; connection, is there some trick to reliably getting the caller's IP address
+ &gt; and port number ?
+
+Two ways.  As you note, accept() should give it to you:
+
+   struct sockaddr_in sa;
+   int sa_len = sizeof(sa);
+
+   [ ... ]
+
+   newfd = accept(listenfd, (struct sockaddr *)&sa, &sa_len);
+
+Sometimes people forget to pass sa_len by reference, which either makes
+the code segfault or return bogus info.  Have you done this?  Also
+be sure to pass "sa" by reference, otherwise accept() will most likely
+see a null pointer ('cos the bit of memory in the argument vector
+which would normally contain a pointer would instead contain your
+zero-initialized sockaddr_in structure, which will look like a null
+pointer 'cos it's faull of zeros).  If you pass sa as a null pointer
+accept() won't bother filling it in, so that might be a bit of
+a showstopper.
+
+Secondly, there's a getpeername() call:
+
+   struct sockaddr_in sa;
+   int sa_len = sizeof(sa);
+
+   getpeername(socket, (struct sockaddr *)&sa, &sa_len);
+
+The same rules for sa and sa_len apply here.
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1958-3414 ------------- Fax: +61-8-83034403 -----
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

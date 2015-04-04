@@ -1,0 +1,147 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="more (lowish impact) SuSE 7.1 woe+travail" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 3 Apr 2001 16:05:00 +0930" -->
+<!-- Id="20010403160500.A418@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: more (lowish impact) SuSE 7.1 woe+travail</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 3 Apr 2001 16:05:00 +0930
+</PRE>
+<H1>more (lowish impact) SuSE 7.1 woe+travail</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Here's a minor saga in getting some basic things working
+on SuSE 7.1. I'm just trying to get this thing to do
+some firewalling and some web serving.
+(They _are_ compatible, and in fact, it's difficult to do
+otherwise if you use the iptables REDIRECT thing to
+do your virtual hosting, which is my wont.)
+
+1.	I install SuSE 7.1 on a vanilla AMD K-2/500 box.
+2.	I port my old ipfwadm script to iptables.
+3.	I think I'd like to use my old favourite
+	text editor to speed things up (ludwig),
+	which needs p2c (to convert pascal to C) to
+	compile. So....
+4.	I install p2c off the distribution disks, and
+	add a couple of other things off the disks
+	while I'm at it, including maybe some Apache modules.
+5.	The firewall script (492 lines including comments)
+	is ready to go and be tested with the Apache server.
+	But....
+6.	The server isn't running any more.
+	So I try 
+	    cd /etc/rc.d
+	    ./apache start
+	and get:
+
+Starting httpd [ SuSEHelp SSL PHP3 mod_perl contrib backhand ]
+see /var/log/httpd/rcapache.log for details
+
+	and the file /var/log/httpd/rcapache.log contains:
+
+Syntax error on line 199 of /etc/httpd/httpd.conf:
+Cannot load /usr/lib/apache/libphp3.so into server: shared object not open
+
+	and the file /etc/httpd/httpd.conf near line 199 contains:
+
+     198 &lt;IfDefine PHP&gt;
+     199 LoadModule php3_module /usr/lib/apache/libphp3.so
+     200 &lt;/IfDefine&gt;
+     201 &lt;IfDefine PHP4&gt;
+     202 LoadModule php4_module /usr/lib/apache/libphp4.so
+     203 &lt;/IfDefine&gt;         
+
+	and so forth. And the file /usr/lib/apache/libphp3.so
+	seems to exist:
+
+-rwxr-xr-x    1 root     root      1556196 Jan 26 04:12 /usr/lib/apache/libphp3.so
+
+------------------------------------------------------------
+Problems:
+-	No way is that line
+
+LoadModule php3_module /usr/lib/apache/libphp3.so
+	
+	a syntax error. I've spent a few hours looking at this
+	line, and I cannot believe it is a syntax error.
+	It is not a syntax error in any of the other 
+	Apache configuration files I use, nor was it a syntax
+	error 24 hours ago.
+
+-	Secondly, I have no idea what the second error line means:
+
+Cannot load /usr/lib/apache/libphp3.so into server: shared object not open
+
+	Despite deep meditation and optimal breathing, and despite a 
+	reasonable night's sleep on it, I just can't understand it.
+	Nor can I find documentation of it in the standard
+	documents.
+
+------------------------------------------------------------
+Question:
+
+Does anyone know what that error line really means?
+
+Cannot load /usr/lib/apache/libphp3.so into server: shared object not open
+
+The "ld" manual doesn't seem to clarify it.
+The file is clearly readable.
+
+And I can't see how any change I made could have upset Apache.
+
+If I can't figure this out by rational analysis, I'm going to have to just
+install all of Apache, PHP, PostgreSQL etc. etc. from source, and hope
+that it works after that. But I'd prefer a rational-analytical approach.
+
+Cheers,
+Alan Kennington.
+
+PS. The Apache version is:
+
+Server version: Apache/1.3.14 (Unix)  (SuSE/Linux)
+Server built:   Jan 19 2001 14:00:47 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

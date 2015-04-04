@@ -1,0 +1,115 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="OpenSSH problems with linux, esp. RH 5.2" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 29 Nov 1999 04:35:48 +1030" -->
+<!-- Id="199911281805.EAA29245@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: OpenSSH problems with linux, esp. RH 5.2</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 29 Nov 1999 04:35:48 +1030
+</PRE>
+<H1>OpenSSH problems with linux, esp. RH 5.2</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Has anyone else had these problems with OpenSSH?
+
+1.	The less serious problem is that 
+	OpenSSL gets installed into subdirectories
+	of /usr/local/ssl, and OpenSSH expects
+	to see this software in standard
+	places, like /usr/lib and /usr/include.
+	This can be fixed by 3 symbolic links.
+	I've already done this on three machines.
+
+2.	The more serious problem is that the RH 5.2
+	PAM (The Pluggable Authentication Module thing,
+	which I find very unpleasant at the best of
+	times). I get the SSH daemon to respond okay
+	to my SSH client, but then it can't get
+	the PAM thing to work. The message in the log
+	file (/var/log/messages) is:
+
+Nov 29 03:45:31 dog sshd[28753]: log: Connection from 203.38.148.53 port 1090
+Nov 29 03:46:08 dog sshd[28753]: log: RSA authentication for akenning accepted.
+Nov 29 03:46:08 dog sshd[28753]: log: PAM rejected by account configuration: User account has expired
+Nov 29 03:46:43 dog sshd[28753]: fatal: Connection closed by remote host.
+Nov 29 03:46:43 dog sshd[28753]: log: Cannot close PAM session: System error
+
+The problem appears to be that there is _no_ shadow file
+by default in RH 5.2. Therefore PAM doesn't know
+anything about account expiry. So it assumes that 
+the account has "expired".
+Problem is that ordinary telnet and rlogin
+work fine. And even if I change the password
+a couple of times, I still get the same
+symptoms.
+
+On the client side, I get this sort of thing:
+
+=============================================
+tiger:akenning&gt; ssh dog.topology.org
+Enter passphrase for RSA key '<A HREF="mailto:akenning@dog">akenning@dog</A>':
+<A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>'s password:
+Permission denied, please try again.
+<A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>'s password:
+Permission denied, please try again.
+<A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>'s password:
+Permission denied.
+============================================
+
+I entered (invisible) correct passwords here.
+
+Everything works absolutely perfectly with
+SuSE 6.2 as the server for the SSH daemon.
+But SuSE 6.2 uses an /etc/shadow file!
+
+Can anyone give me any clues before I get
+stuck into yet another couple of days of
+wasted creativity trying to work out why
+this stuff doesn't work as it should?
+Has anyone got OpenSSH going with RH 5.2 at all?
+Or even just with a system without shadow file?
+
+Thanks in advance,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

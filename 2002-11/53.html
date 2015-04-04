@@ -1,0 +1,136 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Automagic kernel compilation" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="LINUXCPA@netscape.net" -->
+<!-- ToName="'LINUXSA'" -->
+<!-- ToEmail="LINUXSA@linuxsa.org.au" -->
+<!-- Date="Fri, 01 Nov 2002 10:56:30 -0800" -->
+<!-- Id="3DC2CE5E.90502@netscape.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Automagic kernel compilation</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:LINUXCPA@netscape.net">LINUXCPA@netscape.net</A></I>&gt;
+  To  : LINUXSA &lt;<I><A HREF="mailto:LINUXSA@linuxsa.org.au">LINUXSA@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 01 Nov 2002 10:56:30 -0800
+</PRE>
+<H1>Automagic kernel compilation</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I am working on this too. This is what I have so far.
+
+My netware client requires that IPX be set to Y in the kernel.
+
+
+*******************************************
+
+#! /bin/sh
+VERSION="0.4"
+
+clear
+echo "############################################"
+echo ""
+echo " Automagic Kernel Compilation Utility for Debian"
+echo ""
+echo "############################################"
+echo "This script will apt get the packages you need to compile"
+echo "your kernel with a graphical user interface. This should"
+echo "get the kernel source and headers for 2.4.14. it will also"
+echo "install Tkwish, bzip and create some symbolic links and compile."
+echo "your kernel. Please mount all drives that are booted by lilo"
+echo "and edit /etc/lilo.cong before you start. This script performs"
+echo "make dep, make clean & make bzlilo. If you are using a "
+echo "partitioned drive, there is potential for disruption of your"
+echo "bootloader. If you are not sure, ask before launch."
+echo "YOU HAVE BEEN WARNED."
+echo "FURTHER THIS IS ALPHA SOFTWARE"
+echo "IT HAS NOT BEEN TESTED YET AND IS RISKY TO"
+echo "RUN WITHOUT CAREFUL EXAMINATION AND."
+echo "AN UNDERSTANDING OF THE PROCESS INVOLVED"
+echo "YOU HAVE BEEN WARNED."
+
+
+# User must be logged in as root.
+if [ "`whoami`" != "root" ]; then
+    echo -e "\nYou must be logged in as root to run this setup."
+    exit 1
+fi
+
+# Activate apt-get if not so far
+    echo "Activate apt-get"
+        echo -en "\nDo you wish to use apt-get for the first time?[y/n]: "
+    read YN
+    if [ $YN = "y" -o $YN = "Y" ]
+        then
+        apt-get update
+    fi
+
+
+#Install Kernel Sources
+    echo "You need the kernel sources"
+    echo -en "\nDo you wish to apt-get the kernel sources?[y/n]: "
+    read YN
+    if [ $YN = "y" -o $YN = "Y" ]
+        then
+        apt-get install kernel-source-2.4.14
+        cd /usr/src/
+        bzip2 -d kernel-source-2.4.14.tar.bz2
+        tar -xf kernel-source-2.4.14.tar
+        ln -s kernel-source-2.4.14 linux
+        apt-get upgrade
+        apt-get install wish
+        apt-get install tk8.3
+        apt-get install gcc
+        cd linux
+        make xconfig
+        make dep
+        make clean
+        make bzlilo
+    fi
+
+echo "############################################"
+echo " Kernel Configuration for IPX Complete"
+echo "############################################"
+echo "  Check the setup.log file for error messages"
+
+echo " Setup complete..." &gt;&gt; setup.log
+
+exit
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

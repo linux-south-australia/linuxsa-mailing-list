@@ -1,0 +1,185 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: thi has me stumped" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="David Newall" -->
+<!-- ToEmail="davidn@rebel.net.au" -->
+<!-- Date="Mon, 10 May 1999 18:44:39 +0930 (CST)" -->
+<!-- Id="199905100914.SAA17648@atdot.dotat.org" -->
+<!-- Reference="199905100759.RAA17391@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: thi has me stumped</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  Date: Mon, 10 May 1999 18:44:39 +0930 (CST)
+</PRE>
+<H1>Re: thi has me stumped</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+David Newall wrote:
+
+ &gt; 1. int main(argc, argv) int argc; char **argv; and
+ &gt; 2. int main(argc, argv, envp) int argc; char **argv, **envp;
+ &gt; The first of these translates to:
+ &gt;  int main(int argc, char **argv);
+ &gt; 
+ &gt; The second form may now be deprecated. 
+
+I certainly hope not!  It's  part of the standard UNIX environment.
+
+In traditional UNIX systems, the number of parameters you give to
+a function doesn't really make any difference, as long as you provide
+the minimum number established in the prototype:  Parameters are
+pushed onto the stack in reverse order, then the top of the stack
+is designated the first parameter, the second-from-the-top is the
+second parameter, and so on.  On an architecture that uses registers
+instead of stack frames for parameter passing, the principle is 
+the same, you just substitute the terminology.
+
+So if you have a routine which expects two parameters and you give
+it three (or eighty :-) nobody really cares, you just end up with
+a whole pile of unused parameters cluttering up your stack space.
+
+Five points to anyone who can come up with a method of dynamic
+memory allocation with resource tracking based on pushing unused
+parameters onto the stack &lt;grin&gt;
+
+Anyway, on with the story...
+
+ &gt; "void main( void)" is not a
+ &gt; supported option and apparently this is important. 
+
+Actually, void main(void) *is* a supported option, because under
+ANSI C main() is permitted to have a void return type and because
+the C runtime doesn't actually give a toss about your prototype 
+anyway (because it can't see it;  it just jumps to whatever address
+is mapped to "main" in the symbol table and hopes for the best).
+
+One thing to remember is that crt0 doesn't actually have the faintest
+idea about what prototype you've given to the various functions in the
+object files you're linking against it, it just sees a collection of
+entry points exported by a symbol table.
+
+So crt0 will say "use _main as the entrypoint"[1], and the linker will
+look at your object file symbol tables, find out the address of 
+_main, and substitute it in the quoted sentance above.  That process
+is invisible to crt0, which is why it doesn't care what type of 
+function main really is, or whether it's a function at all.  There's
+a famous winner in the annual IOCCC competition which was a C "hello,
+world" program that looked like this:
+
+const int main[] = {
+  /*
+   * comma-separated 16-bit hexadecimal, octal and caracter 
+   * representations of a Hello, world program written in VAX
+   * and PDP-11 machine code.
+   */
+};
+
+Compile that and you end up with a block of memory containing the
+stuff you've initialized the array with and a symbol table containing
+"_main" and the address of that block of memory;  When you link that
+object file against crt0.o all it really wants is the address of
+_main, which it gets without caring about the fact that it's the
+address of an array, not a function.
+
+So what happens if you declare main as "void main(void)"?  Well,
+crt0 expects to call "main(int ac, char **av, char **ep)", i.e.:
+a function with one integer parameter and two pointer (32-bit words
+on x86) parameters.  It pushes them onto the stack then jumps into
+main(), but main() never actually uses the parameters that have been
+shoved onto its stack.  Does crt0 care?  Nope.  Does it still work?
+Yup (it should, anyway.  If pain persists, see your physician).
+
+ &gt;   void crt(int argc, char *argv[]) {
+ &gt;     exit(main(argc, argv));
+ &gt;   }
+ &gt; 
+ &gt; What happens if you define main as a void?  Apparently the program bombs
+ &gt; on return. 
+
+The original poster didn't say it bombed;  he just said he got no output.
+
+Again, think about it on the register level:  If you're using a compiler
+and runtime which provides return values in registers, a return from a 
+void function will just mean that the register containing the return
+value is either zero or uninitialized, so you'll get a 0 exit status or
+a random exit status from the code fragment above.
+
+If you're using an application architecture which uses the stack for
+returning values from functions, the prototype of the called function
+can make a difference:  If crt0 expects to find, say, a 32 bit int
+on the stack after main() returns, it'll get whatever random cruft
+was underneath the stack at the time if the function that has been
+called is actually void (and therefore not writing anything to the
+stack).
+
+So, you get a kinda-random return value;  but crt0 should be able
+to figure that out, because you can see how much data the routine
+you've called has left for you on the stack by working out the
+difference between the current stack pointer and the stack pointer
+you saved away before you called the function in the first place.
+One would hope that crt0 does something like that!
+
+Take note, though:  Even if it doesn't, that won't stop the 
+fflush() from happening!  It'll just mean the exit status is
+an undefined value.  Go back to your pseudo-code definition of
+exit() and you'll see that the file handle flushes happen regardless
+of the parameter passed-in to exit().
+
+So, have I answered the original question?  Nope! :-)
+
+Perhaps we could get further if the original poster could try
+a few things:  
+
+Firstly, what happens if he terminates main() with "exit(0)"?
+
+Secondly, what happens if he defines main() as "int main(void)"
+instead of "void main(void)"?
+
+   - mark
+
+
+[1] on an ELF system, leading underscores aren't used.  I'm a 
+    traditionalist, sue me :-)
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

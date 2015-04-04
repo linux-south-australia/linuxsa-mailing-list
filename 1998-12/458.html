@@ -1,0 +1,125 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: pppd goes mad!" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="Mark Newton" -->
+<!-- ToEmail="newton@atdot.dotat.org" -->
+<!-- Date="Tue, 22 Dec 1998 23:47:29 +1030" -->
+<!-- Id="199812221317.XAA10015@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: pppd goes mad!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  Date: Tue, 22 Dec 1998 23:47:29 +1030
+</PRE>
+<H1>Re: pppd goes mad!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Mark,
+
+I'll conclude this thread now. (At least I'll try.)
+My thanks to everybody for not complaining about it.
+
+&gt;  &gt; I.e. a process waiting for packets will only be able to receive a
+&gt;  &gt; packet every 10 mS. That's why the packet arrivals in
+&gt;  &gt; my example TCP dump were spaced by multiples of 10 mS.
+&gt;
+&gt; Yuk.  I knew the Linux TCP/IP code was pretty awful but I didn't
+&gt; think it was that awful.  I wonder if it's actually possible to 
+&gt; think of a worse way to implement it?
+&gt;
+&gt; Ironic question, of course.  We all know that version 1 was a worse
+&gt; way to implement it. :-)
+
+When I thought about this awful way of doing Internet packet RX
+inthe kernel for a bit longer, I realised that it was not that bad.
+If you have two processes time-sharing, they will generally only get their
+quantum each (10 mS) in some sort of weighted round robin fashion.
+So generally you don't expect a normal user process to be real-time.
+They get to wake up every 10 mS if they're lucky. If there's a
+superblock sync going on, a process could be blocked out for
+a much longer time.
+
+So if net driver RX packets are collected by the kernel every 10 mS,
+that can't be so bad -- because 10 mS is the interval between
+context swaps anyway.
+
+The net device cannot wake up the waiting process, because it doesn't
+know which one it is. The IP stack has to work it out. The IP stack
+is called in linux each 10 mS to collect _all_ of the RX pakcets
+of _all_ of the net devices, and what better time to collect them
+than during a context swap!
+
+If a process is woken up for each RX packet, then should it 
+immediately be woken up? Even for a char device driver, a wakeup
+on RX of an event only puts the receiving process onto the 
+_read-to-run_ list for consideration at the next context swap.
+
+So the way linux does net RX events is pretty much the best of all
+worlds, unless you want real-time user processes like solaris!!!!
+
+[No need to respond to all of this.....]
+
+&gt;  &gt; One possibility is that the packet-received interrupt might not
+&gt;  &gt; be activated in the modem card, but it might have a "watchdog"
+&gt;  &gt; timer that wakes it up every 9 seconds.
+&gt;
+&gt; Your modem card doesn't have a "packet received" interrupt:  Your 
+&gt; modem is a UART, nothing more.  It interrupts when it finishes 
+&gt; receiving (or sending) *characters*.  It knows nothing about "packets",
+&gt; that's the PPP network device driver's job.
+
+this is an excellent point, which I had not brought into play in
+my thinking. But this does not change my principal hypothesis -- 
+that
+the modem is holding onto heaps of bytes and then only passing them on to
+the kernel after a certain amount of time.
+The amount heald must be about 64 * 9 * 8 bits, plus PPP overheads.
+that's about 600 bytes or 5000 bits.
+
+Next time the problem arises (now that I've got rid of it by re-booting
+pppd), I'll do a ping with double the size packets.
+If that halves the time for the modem (or whatever) to release the bytes,
+then I know that it is a modem thing -- because of what you said,
+that the modem is a purely byte-oriented device and has no knowledge of
+packets.
+
+Cheers,
+Alan Kennington.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Setting up a router..." -->
+<!-- FromName="David Lloyd" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="Andrew Williss" -->
+<!-- ToEmail="bigwill@riverland.net.au" -->
+<!-- Date="Thu, 20 Jul 2000 23:01:35 +0930" -->
+<!-- Id="3976FF37.29FF48E4@rebel.net.au" -->
+<!-- Reference="3976F65F.CD3C31F8@riverland.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Setting up a router...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : Andrew Williss &lt;<I><A HREF="mailto:bigwill@riverland.net.au">bigwill@riverland.net.au</A></I>&gt;
+  Date: Thu, 20 Jul 2000 23:01:35 +0930
+</PRE>
+<H1>Re: Setting up a router...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Andrew!
+
+&gt; Now the linux box.
+&gt; 
+&gt; I have set the Linux machine as follows...
+&gt; IP is 10.0.0.1
+&gt; subnet mask is 255.255.255.0
+
+&lt;useless advice&gt;
+WHEN WINDOWS 9X IS INVOLVED UNDER NO CIRCUMSTANCES ASSIGN ANY MACHINE
+THE .1 ADDRESS.
+
+I know it sounds idiotic, but WankDoze performs such odd things as:
+
+* refusing to provide NetBios services
+* refusing to access WINS service
+* not seeing it as a "TCP/IP" valid address
+
+In addition, if you see something called "TCP/IP DIALUP" or similar in
+the Windows machine, try temporarily removing it.
+&lt;/useless advice&gt;
+
+NOW for the hearty stuff:
+
+What you need to do is setup an appropriate forwarding firewall to get
+the Windows machine speaking to the Internet. Essentially, you have to
+create a script to manipulate the firewall rules (see the firewall HOWTO
+in /usr/doc/HOWTO or at <A HREF="http://www.linuxdoc.org/">http://www.linuxdoc.org/</A>). Your firewall will
+look similar to this:
+
+--
+#! /bin/bash
+# chkconfig: 345 5 5
+
+case "$1":
+start)
+# First we flush all rules
+ipchains -F
+
+# Set default policy - not necessary
+# because it's accept
+ipchains -P forward ACCEPT
+iphchains -P input ACCEPT
+ipchains -P output ACCEPT
+
+# Convince the machine to forward packets
+echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+
+# Masquerade the packets
+ipchains -A forward -s eth+ -d any/0 -i ppp+ -j MASQ
+;;
+
+stop)
+iphains -F
+;;
+
+*)
+echo "Usage firewall {start|stop}"
+;;
+esac
+--
+
+Copy that to a file, let's call it "firewall", as root.
+Use chmod to make it executable: eg chmod 700 firewall OR chmod a-rwx
+firewall; chmod u+rwx firewall
+Execute it like "./firewall start"
+It should run silently
+
+NOW try pinging the outside world from the Windows Box.
+
+You need to run this script once every time you start your computer. The
+easiest way to do this is to run it at start time. Once you are
+satisfied with the way the script works and that the firewall is
+forwarding the packets successfully, copy it to /etc/rc.d/init.d. Then
+add it to the chkconfig database:
+
+chkconfig --add firewall
+
+Then start it in levels 3 and 5:
+
+chkconfig --level 35 firewall on
+
+It should start automatically at each boot up now.
+
+FURTHER INFORMATION
+I advise you to look at:
+
+man ipchains
+man chkconfig
+/usr/doc/HOWTO/ (find the one about IP Masquerading)
+man telinit
+
+Essentially, you need to "masquerade" the Windows Box's address using
+ipchains. Its address 10.0.0.5 does not exist on the Internet.
+
+DAVID
+-- 
+To the thirsty I shall give water without price
+ From the fountain of the water of life
+ He who conquers shall have his heritage
+ And I shall be his God and he shall be my son
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

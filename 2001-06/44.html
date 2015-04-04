@@ -1,0 +1,137 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: kapm-idled?" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'Tim Fairchild'" -->
+<!-- ToEmail="tim_fairchild@bigpond.com" -->
+<!-- Date="Fri, 1 Jun 2001 15:11:03 +0930" -->
+<!-- Id="20010601151103.A18195@dog.topology.org" -->
+<!-- Reference="01060114534701.01349@shiva.home" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: kapm-idled?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : Tim Fairchild &lt;<I><A HREF="mailto:tim_fairchild@bigpond.com">tim_fairchild@bigpond.com</A></I>&gt;
+  Date: Fri, 1 Jun 2001 15:11:03 +0930
+</PRE>
+<H1>Re: kapm-idled?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, Jun 01, 2001 at 02:53:47PM -0400, Tim Fairchild wrote:
+&gt; 
+&gt; I've been looking in the docs to no avail, but what exactly is the kapm-idled 
+&gt; process?  Not sure what it does, but it seems to chew large chunks of cpu 
+&gt; when the pc is sitting there doing apparently nothing.
+&gt; 
+&gt; running MDK8.0 kernel 2.4.3
+
+
+Tim,
+
+I don't know.
+But it's on SuSE 7.1 too, and "apm" has to do with
+power management.
+Even though the price is not niced, it does get out of the way when
+you run pretty much anything else - probably because the
+kernel scheduling algorithm thinks that a process that uses 60% of
+CPU cycles probably deserves a low dynamic priority.
+
+Likewise, I can't find any documentation on the thing.
+On the other hand, I found this in my
+/usr/share/doc/packages/kapm/README <A HREF="file:">file:</A>
+
+======================================================
+  KAPM is a docking KDE utility that allows you to monitor your laptop's
+  battery status and perform other APM (advanced power management)
+  tasks.  
+======================================================
+
+Methinks this has nothing to do with it though.
+
+Since kapm-idled runs as process number 3, and kswapd runs at 4,
+the k must mean kernel.
+So a reading of the "init" sources should reveal all.
+
+  PID USER     PRI  NI  SIZE  RSS SHARE STAT %CPU %MEM   TIME COMMAND 
+    1 root       8   0    76   64    44 S     0.0  0.0   0:04 init
+    2 root       9   0     0    0     0 SW    0.0  0.0   0:00 keventd
+    3 root      20   0     0    0     0 SW   36.7  0.0 25376m kapm-idled
+    4 root       9   0     0    0     0 SW    0.0  0.0   3:16 kswapd
+    5 root       9   0     0    0     0 SW    0.0  0.0   0:00 kreclaimd
+    6 root       9   0     0    0     0 SW    0.0  0.0   1:04 bdflush
+    7 root       9   0     0    0     0 SW    0.0  0.0   1:10 kupdated
+    8 root      -1 -20     0    0     0 SW&lt;   0.0  0.0   0:00 mdrecoveryd
+    9 root       9   0     0    0     0 SW    0.0  0.0   0:00 kreiserfsd        
+
+The /usr/src/linux/Documentation/pm.txt gives little enlightenment
+on this, although you would expect it to.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+I've found it.
+It's in /usr/src/linux/arch/i386/kernel/apm.c
+
+=====================================================
+static int apm(void *unused)
+{
+        unsigned short  bx;
+        unsigned short  cx;
+        unsigned short  dx;
+        int             error;
+        char *          power_stat;
+        char *          bat_stat;
+
+        kapmd_running = 1;
+
+        daemonize();
+
+        strcpy(current-&gt;comm, "kapm-idled");
+        sigfillset(&current-&gt;blocked);
+        current-&gt;tty = NULL;    /* get rid of controlling tty */         
+[....]
+=====================================================
+
+So it _is_ in the kernel.
+Now the only question is how to control the thing.
+But it's obvious why the kapm-idled doesn't appear
+as an executable anywhere. It's just copied to the
+command line area by the process itself.
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

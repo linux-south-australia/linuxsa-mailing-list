@@ -1,0 +1,158 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PAP authentication and PPP" -->
+<!-- FromName="John Spence" -->
+<!-- FromEmail="jspence@newave.net.au" -->
+<!-- ToName="Bruce Moffatt" -->
+<!-- ToEmail="brucem@melb.cpr.itg.telstra.com.au" -->
+<!-- Date="Thu, 27 Nov 1997 14:47:02 +1030" -->
+<!-- Id="347ef410.1679023@liz" -->
+<!-- Reference="199711270350.OAA14483@melb137.melb.cpr.itg.telecom.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PAP authentication and PPP</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: John Spence &lt;<I><A HREF="mailto:jspence@newave.net.au">jspence@newave.net.au</A></I>&gt;
+  To  : Bruce Moffatt &lt;<I><A HREF="mailto:brucem@melb.cpr.itg.telstra.com.au">brucem@melb.cpr.itg.telstra.com.au</A></I>&gt;
+  Date: Thu, 27 Nov 1997 14:47:02 +1030
+</PRE>
+<H1>Re: PAP authentication and PPP</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt;The new ISP expects that login/passwd authentication
+&gt;is done after pppd is started, using PAP, if I unnerstand
+&gt;things. The setup I was using passed the login name and
+&gt;passwd to the dialed up service on prompts, then started
+&gt;ppp.
+
+Hi Bruce.  I've just undergone the same trauma.  After wading through
+the PPP-Howto and the ISP-Hookup-Howto I finally made a successful
+connect.  So this might or might not work for your situation.
+
+*** WARNING***: This works for me at the moment but I don't completely
+understand all of the changes I made. 
+
+
+This is the file executed from the command line which I called
+"/etc/ppp/isp-on" and executed as "isp-on &".  Alter the "username" to
+your logon name.
+---------------------------------------------------
+exec pppd connect \
+  'chat -v -f /etc/ppp/ispscript' \
+  -detach crtscts modem defaultroute \
+  user username \
+  /dev/ttyS1 38400
+
+
+
+This is the "/etc/ppp/ispscript" file referenced in the above file
+---------------------------------------------------------
+       TIMEOUT 5
+       "" ATZ
+       OK ATDT83015600
+       ABORT "NO CARRIER"
+       ABORT BUSY
+       ABORT "NO DIALTONE"
+       ABORT WAITING
+       TIMEOUT 45
+       CONNECT ""
+       TIMEOUT 5
+
+
+this is the modified /etc/ppp/pap-secrets file, substitute your logon
+name for "username" and your password for "userpassword"
+----------------------------------------------
+# Secrets for authentication using PAP
+# client	server	secret			IP addresses
+username         *       userpassword
+
+
+
+This is my /etc/ppp/options  file
+---------------------------------
+/dev/cua1
+38400
+mtu 1500
+mru 1500
+lock
+asyncmap 0
+crtscts
+noipdefault
+defaultroute
+
+
+your /etc/resolv.conf should look something like this with your ISPs
+domain names substituted for the  ???.???.???.???lines
+-----------------------------------------------------
+domain your.isp.domain
+nameserver ???.???.???.???
+nameserver ???.???.???.???
+
+
+This is the file i used to quit the connection when I was finished.
+BTW: this file came straight out of the docs for PPP and was called
+ppp-off
+-------------------------------------------------------------------
+#!/bin/sh
+######################################################################
+#
+# Determine the device to be terminated.
+#
+if [ "$1" = "" ]; then
+	DEVICE=ppp0
+else
+	DEVICE=$1
+fi
+
+######################################################################
+#
+# If the ppp0 pid file is present then the program is running. Stop
+it.
+if [ -r /var/run/$DEVICE.pid ]; then
+        kill -INT `cat /var/run/$DEVICE.pid`
+#
+# If the kill did not work then there is no process running for this
+# pid. It may also mean that the lock file will be left. You may wish
+# to delete the lock file at the same time.
+        if [ ! "$?" = "0" ]; then
+                rm -f /var/run/$DEVICE.pid
+                echo "ERROR: Removed stale pid file"
+                exit 1
+        fi
+#
+# Success. Let pppd clean up its own junk.
+        echo "PPP link to $DEVICE terminated."
+        exit 0
+fi
+#
+# The ppp process is not running for ppp0
+echo "ERROR: PPP link is not active on $DEVICE"
+exit 1
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

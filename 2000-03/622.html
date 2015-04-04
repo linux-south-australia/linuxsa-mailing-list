@@ -1,0 +1,141 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="weird ppp problem" -->
+<!-- FromName="Ian Hogben" -->
+<!-- FromEmail="ian@safcol.com.au" -->
+<!-- ToName="Linuxsa" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 26 Mar 2000 12:42:55 +0930" -->
+<!-- Id="NDBBJCENILPHMJMEFMGNAEDDCEAA.ian@safcol.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: weird ppp problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Ian Hogben &lt;<I><A HREF="mailto:ian@safcol.com.au">ian@safcol.com.au</A></I>&gt;
+  To  : Linuxsa &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 26 Mar 2000 12:42:55 +0930
+</PRE>
+<H1>weird ppp problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hello, all:
+
+I am having some fun and games with a ppp link I am trying to set up. I am
+basically migrating everything from one box to another, including the
+configuration of ppp. I figured the easiest way to achieve this is to just
+copy all the /etc/ppp files to the new machine, and everything should be
+hunky-dory. It isn't. Although every file was copied, when I run the ppp-on
+script different things happen on the two machines. After setting logging
+options in syslog, I found that it seems that someone is asking for CHAP
+with the new PC, and for PAP with the old PC. I don't get it...
+
+a) I'll send a more full log if anyone wants
+b) It looks like the config files all work okay, since it's sending the
+correct username/password and stuff. So why is one of them wanting CHAP?
+c) My options file in both machines says "refuse-chap".
+d) Ideas welcome.
+
+OLD Client (some selected stuff from the log):
+Mar 26 11:50:38 old-servername pppd[11936]: rcvd [LCP ConfReq id=0x85
+&lt;asyncmap 0xa0000&gt; &lt;auth pap&gt; &lt;magic 0xed031ca2&gt; &lt;pcomp&gt; &lt;accomp&gt; &lt; 11 04 05
+f4&gt; &lt; 13 07 01 35 32 30 30&gt;]
+Mar 26 11:50:38 old-servername pppd[11936]: rcvd [LCP ConfReq id=0x86 &lt;auth
+pap&gt; &lt;magic 0xed031ca2&gt; &lt;pcomp&gt; &lt;accomp&gt;]
+Mar 26 11:50:38 old-servername pppd[11936]: sent [LCP ConfAck id=0x86 &lt;auth
+pap&gt; &lt;magic 0xed031ca2&gt; &lt;pcomp&gt; &lt;accomp&gt;]
+Mar 26 11:50:42 old-servername pppd[11936]: sent [LCP ConfAck id=0x88 &lt;auth
+pap&gt; &lt;magic 0xed032c0b&gt; &lt;pcomp&gt; &lt;accomp&gt;]
+Mar 26 11:50:42 old-servername pppd[11936]: sent [PAP AuthReq id=0x1
+user="foo" password="foo"]
+Mar 26 11:50:43 old-servername pppd[11936]: rcvd [PAP AuthAck id=0x1 ""]
+Mar 26 11:50:43 old-servername pppd[11936]: Remote message:
+Mar 26 11:50:43 old-servername pppd[11936]: sent [IPCP ConfReq id=0x1 &lt;addr
+x.x.x.x&gt;]
+
+NEW Client (similar stuff selected):
+Mar 26 11:44:50 new-servername pppd[13287]: rcvd [LCP ConfReq id=0x23
+&lt;asyncmap 0xa0000&gt; &lt;auth pap&gt; &lt;magic 0xecfc0699&gt; &lt;pcomp&gt; &lt;accomp&gt; &lt; 11 04 05
+f4&gt; &lt; 13 07 01 35 32 30 30&gt;]
+Mar 26 11:44:50 new-servername pppd[13287]: sent [LCP ConfRej id=0x23
+&lt;asyncmap 0xa0000&gt; &lt; 11 04 05 f4&gt; &lt; 13 07 01 35 32 30 30&gt;]
+Mar 26 11:44:50 new-servername pppd[13287]: rcvd [LCP ConfReq id=0x24 &lt;auth
+pap&gt; &lt;magic 0xecfc0699&gt; &lt;pcomp&gt; &lt;accomp&gt;]
+Mar 26 11:44:50 new-servername pppd[13287]: sent [LCP ConfAck id=0x24 &lt;auth
+pap&gt; &lt;magic 0xecfc0699&gt; &lt;pcomp&gt; &lt;accomp&gt;]
+Mar 26 11:44:51 new-servername pppd[13287]: sent [LCP ConfReq id=0x1 &lt;auth
+chap MD5&gt; &lt;magic 0xf18077f2&gt; &lt;pcomp&gt; &lt;accomp&gt;]
+Mar 26 11:44:54 new-servername pppd[13287]: sent [LCP ConfReq id=0x1 &lt;auth
+chap MD5&gt; &lt;magic 0xf18077f2&gt; &lt;pcomp&gt; &lt;accomp&gt;]
+Mar 26 11:44:54 new-servername pppd[13287]: rcvd [LCP ConfReq id=0x25
+&lt;asyncmap 0xa0000&gt; &lt;auth pap&gt; &lt;magic 0xecfc15e6&gt; &lt;pcomp&gt; &lt;accomp&gt; &lt; 11 04 05
+f4&gt; &lt; 13 07 01 35 32 30 30&gt;]
+Mar 26 11:44:54 new-servername pppd[13287]: sent [LCP ConfRej id=0x25
+&lt;asyncmap 0xa0000&gt; &lt; 11 04 05 f4&gt; &lt; 13 07 01 35 32 30 30&gt;]
+Mar 26 11:44:54 new-servername pppd[13287]: rcvd [LCP ConfAck id=0x1 &lt;auth
+chap MD5&gt; &lt;magic 0xf18077f2&gt; &lt;pcomp&gt; &lt;accomp&gt;]
+Mar 26 11:44:54 new-servername pppd[13287]: rcvd [LCP ConfReq id=0x26 &lt;auth
+pap&gt; &lt;magic 0xecfc15e6&gt; &lt;pcomp&gt; &lt;accomp&gt;]
+Mar 26 11:44:54 new-servername pppd[13287]: sent [LCP ConfAck id=0x26 &lt;auth
+pap&gt; &lt;magic 0xecfc15e6&gt; &lt;pcomp&gt; &lt;accomp&gt;]
+Mar 26 11:44:54 new-servername pppd[13287]: sent [CHAP Challenge id=0x1
+&lt;5e3d8ed20f9fdb89e0b314cee9570f98f46dbf1a1e93367c4deb4da50dadc45adb74b55353f
+d555ededfaea9ada79154a39d4b5cfd&gt;, name = "foo"]
+Mar 26 11:44:54 new-servername pppd[13287]: sent [PAP AuthReq id=0x1
+user="foo" password="foo"]
+Mar 26 11:44:54 new-servername pppd[13287]: rcvd [CHAP Response id=0x1
+&lt;9fe46a6e22484de761a55d92fa792045&gt;, name = "5200"]
+Mar 26 11:44:54 new-servername pppd[13287]: Warning - secret file
+/etc/ppp/chap-secrets has world and/or group access
+Mar 26 11:44:54 new-servername pppd[13287]: No CHAP secret found for
+authenticating 5200
+Mar 26 11:44:54 new-servername pppd[13287]: sent [CHAP Failure id=0x1 "I
+don't like you.  Go 'way."]
+Mar 26 11:44:54 new-servername pppd[13287]: CHAP peer authentication failed
+for remote host 5200
+Mar 26 11:44:54 new-servername pppd[13287]: sent [LCP TermReq id=0x2
+"Authentication failed"]
+
+
+-+-+-+-+-+-+-+-+-+-
+Ian Hogben | Safcol Australia
+
+<A HREF="mailto:ian">mailto:ian</A>@safcol.com.au | fon:(08)82821082 | fax:(08)82821099
+-+-+-+-+-+-+-+-+-+-
+ Computer Zen:
+  The Tao that is seen
+  Is not the true Tao, until
+  You bring fresh toner.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

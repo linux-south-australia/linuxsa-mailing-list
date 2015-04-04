@@ -1,0 +1,109 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: comp sci question: fast status mask handling" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="LouisKriek" -->
+<!-- ToEmail="LouisKriek@bigpond.com.au" -->
+<!-- Date="Sun, 6 Aug 2000 17:16:23 +0930" -->
+<!-- Id="20000806171623.A8986@dog.topology.org" -->
+<!-- Reference="000001bfff73$f212bf20$0d5736cb@louis" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: comp sci question: fast status mask handling</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LouisKriek &lt;<I><A HREF="mailto:LouisKriek@bigpond.com.au">LouisKriek@bigpond.com.au</A></I>&gt;
+  Date: Sun, 6 Aug 2000 17:16:23 +0930
+</PRE>
+<H1>Re: comp sci question: fast status mask handling</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, Aug 06, 2000 at 04:30:03PM +0930, LouisKriek wrote:
+
+&gt; Perhaps ...
+&gt; Archive site <A HREF="http://www.ctc-control.com/mhonarc/maillist.html">http://www.ctc-control.com/mhonarc/maillist.html</A>
+&gt; Date: 31 July 2000
+&gt; Author: Steve Cliff
+&gt; Title: Re Math Equation
+&gt; ...might(?) be talking on the same topic. The idea of "Sorting" seemed
+&gt; a novel approach.
+
+Ah yes, I found the item in question at
+<A HREF="http://www.control.com/control_com/962135006/index_html">http://www.control.com/control_com/962135006/index_html</A>#965227486
+
+That binary search idea reminds me of the 
+OSS Pascal compiler for the Atari ST
+in 1985, which had optimisation options for switch-statements,
+where you could tell the compiler at which case-counts the compiler
+would change between different algorithms.
+I think that for very large case-sets, the code would involve a
+binary search.
+
+I had thought of binary search myself, but I thought this would be a
+bit slow too. And untidy.
+
+But now I think there is a good compromise:
+
+I break up the 32 bits into 4 chunks of 8 bits.
+For each 8-bit submask, I have a computed-goto - i.e. a
+table of 256 pointers to event handlers.
+This would not be quite as untidy as it sounds.
+
+Hmmm.
+I think the optimal algorithm might be:
+
+A.	Split 32 bits into 4 8-bit chunks.
+B.	For each chunk, use the
+	x = status ^ (status & (status - 1))
+	rule to extract 1-bit masks.
+C.	Use a 256-pointer table for the 1-bit masks.
+
+This requires 4 256-pointer tables. A mere 4 kBytes.
+
+Step A is a sort of binary search.
+I might right a little tool to automatically generate the
+jump-tables.
+
+In my case, it is worth the bother because I've got
+a device driver which loses 98% of received packets.
+Obviously I need to do some optimisation here.
+
+I won't ask the obvious question as to how you just happen
+to have a relevant link to this arcane topic handy.
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

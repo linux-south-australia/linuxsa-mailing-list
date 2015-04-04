@@ -1,0 +1,89 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Splitting a variable length file" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="Don Collins" -->
+<!-- ToEmail="doncol@mail.mdt.net.au" -->
+<!-- Date="Wed, 15 Mar 2000 00:02:10 +1030" -->
+<!-- Id="38CE3F5A.113CC993@aarnet.edu.au" -->
+<!-- Reference="38CE0B4F.20D8DA8A@mail.mdt.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Splitting a variable length file</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Don Collins &lt;<I><A HREF="mailto:doncol@mail.mdt.net.au">doncol@mail.mdt.net.au</A></I>&gt;
+  Date: Wed, 15 Mar 2000 00:02:10 +1030
+</PRE>
+<H1>Re: Splitting a variable length file</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Don Collins wrote:
+
+  tail -43 big &gt; second
+
+Do some sanity checking, files should have content
+
+  if [ -z second -o -z big ]
+  then
+    echo "$0: whoops" 1&gt;&2
+    exit 1
+  fi
+
+Next run "ls" twice to get the size of "big" and "second"
+and extract the file sizes 
+
+  bigsize=`ls -l big | awk '{ print $5}'`
+  secondsize=`ls -l second | awk '{ print $5}'`
+
+Subtract the file sizes using the shell's "let" command
+
+  let firstsize=$bigsize-$secondsize
+
+Run "dd" to copy bytes from "bigfile" into "first".
+
+  if [ $firstsize -gt 0 ]
+  then
+    dd if=big of=first bs=1 count=$firstsize
+  fi
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ Earth is a single point of failure
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

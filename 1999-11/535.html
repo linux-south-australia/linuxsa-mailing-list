@@ -1,0 +1,139 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Apache (Only Want One)" -->
+<!-- FromName="Andrew Speer" -->
+<!-- FromEmail="andrew.speer@isolutions.com.au" -->
+<!-- ToName="lloy0076@senet.com.au, linuxsa" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 25 Nov 1999 14:01:09 +1030" -->
+<!-- Id="" -->
+<!-- Reference="383C77D6.DF77FE1B@senet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Apache (Only Want One)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Speer &lt;<I><A HREF="mailto:andrew.speer@isolutions.com.au">andrew.speer@isolutions.com.au</A></I>&gt;
+  To  : lloy0076@senet.com.au, linuxsa &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 25 Nov 1999 14:01:09 +1030
+</PRE>
+<H1>Re: Apache (Only Want One)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+As Toby Corkindale noted, two processes is normal when running Apache as a
+daemon. If (for some reason)
+your *really* only want one process, you could start it in single process
+mode from "init". Edit "/etc/inittab" to
+look something like this:
+
+#  Single user web server
+#
+ht:3:respawn:/usr/sbin/httpd -X
+
+The "-X" tells apache not to fork any child processes, and not to detach
+from the controlling terminal. If you
+are going to do this permanently, make sure you turn off the /etc/rc.d
+startup script for Apache:
+
+/etc/rc.d/init/httpd stop  # Stop any current httpd servers
+chkconfig httpd off   #  Disable the rc.d script for httpd
+
+And tell init about the line you added to inittab via:
+
+killall -HUP init
+
+You should now only have a single httpd process running. If you ever need to
+restart Apache completely (as
+opposed to sending it a HUP signal), just
+
+killall httpd
+
+Will kill the running process, which init will then respawn
+
+
+One of the downsides to this is that if you ever muck up something in the
+httpd.conf file (eg incorrect command/syntax or something), and restart
+httpd then httpd will start, then stop with an error message. But init has
+the "respawn" param, so it will restart httpd again - then again etc until
+it finally gives up and you get a message (via syslog) that:
+
+init: Id "ht" respawning too fast: disabled for 5 minutes
+
+To see the message that is causing problem, just try and start apache
+manually from your terminal
+
+httpd -X
+
+And you should see an error message, giving you some clue as to what is
+wrong. Correct it and do a
+
+killall -HUP init
+
+and init will respawn apache again.
+
+
+Hope this helps,
+
+Andrew Speer
+<A HREF="mailto:andrew.speer@isolutions.com.au">andrew.speer@isolutions.com.au</A>
+
+P.S. I find the above method useful for testing the performance of my Apache
+handlers. You can benchmark
+how many replies you are getting from the web server/second without having
+to worry about the impact of
+child httpd processes being spawned etc.
+
+
+----- Original Message -----
+From: lloy0076 &lt;<A HREF="mailto:lloy0076@senet.com.au">lloy0076@senet.com.au</A>&gt;
+To: linuxsa &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Sent: Thursday, November 25, 1999 10:12 AM
+Subject: Apache (Only Want One)
+
+
+
+[snip]
+&gt;
+&gt; Because only *I* access this particular Apache daemon I really only need
+&gt; one, hence the Min and Max and Start values. However, Apache always
+&gt; starts two processes (ps -aux tells me this). How do I force it to have
+&gt; only one?
+&gt;
+&gt; DAVID
+&gt; (incidentally my version is Apache 1.3.3 from the O'Reilly Definitive
+&gt; Guide)
+&gt;
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

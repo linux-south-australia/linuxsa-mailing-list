@@ -1,0 +1,148 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Vanishing SMB mount point" -->
+<!-- FromName="Nick Morrison" -->
+<!-- FromEmail="nickm@ior.org.au" -->
+<!-- ToName="linuxsa" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 9 Aug 1999 13:16:55 +0930" -->
+<!-- Id="000801bee219$d330c0c0$023a10ac@nickm.ior.org.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Vanishing SMB mount point</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Nick Morrison &lt;<I><A HREF="mailto:nickm@ior.org.au">nickm@ior.org.au</A></I>&gt;
+  To  : linuxsa &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 9 Aug 1999 13:16:55 +0930
+</PRE>
+<H1>Vanishing SMB mount point</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hello.
+
+I have a directory called
+
+  /mnt/nickm.ior.org.au/download
+
+I typed this command:
+
+  smbmount //nickm/download /mnt/nickm.ior.org.au/download
+
+I received this output:
+
+  Added interface ip=172.16.57.3 bcast=172.16.63.255 nmask=255.255.248.0
+  Got a positive name query response from 172.16.1.54 ( 172.16.58.2 )
+  Password:
+
+I typed my password, and the share, //nickm/download, which is located on a
+windows box, was mounted in the /mnt/nickm.ior.org.au/download directory as
+expected.  I could access the files there properly and everything was just
+rosy.
+
+I have installed logwatch, which put a script in /etc/cron.hourly that
+checks free space using df and a perl script.  df started reporting an
+error, and over the weekend send me about 70 hourly emails saying "df:
+/mnt/nickm.ior.org.au/download: Input/output error"
+
+When I went to /mnt/nickm.ior.org.au/, and typed ls -la, I got this:
+(dir='ls -la --color')
+
+  [<A HREF="mailto:root@health">root@health</A> nickm.ior.org.au]# dir
+  ls: download: Input/output error
+  total 4
+  drwxr-xr-x   5 root     root         1024 Jul 15 11:10 .
+  drwxr-xr-x   5 root     root         1024 Oct 10  1998 ..
+  drwxr-xr-x   2 root     root         1024 Jul 15 11:10 a
+  drwxr-xr-x   2 root     root         1024 Jul 15 11:10 c
+
+So I did this:
+
+  [<A HREF="mailto:root@health">root@health</A> nickm.ior.org.au]# umount download
+  [<A HREF="mailto:root@health">root@health</A> nickm.ior.org.au]# dir
+  total 5
+  drwxr-xr-x   5 root     root         1024 Jul 15 11:10 .
+  drwxr-xr-x   5 root     root         1024 Oct 10  1998 ..
+  drwxr-xr-x   2 root     root         1024 Jul 15 11:10 a
+  drwxr-xr-x   2 root     root         1024 Jul 15 11:10 c
+  drwxr-xr-x   2 root     root         1024 Jul 15 11:10 download
+  [<A HREF="mailto:root@health">root@health</A> nickm.ior.org.au]# smbmount //nickm/download download/
+  Added interface ip=172.16.57.3 bcast=172.16.63.255 nmask=255.255.248.0
+  Got a positive name query response from 172.16.1.54 ( 172.16.58.2 )
+  Password:
+  [<A HREF="mailto:root@health">root@health</A> nickm.ior.org.au]# dir
+  total 4
+  drwxr-xr-x   5 root     root         1024 Jul 15 11:10 .
+  drwxr-xr-x   5 root     root         1024 Oct 10  1998 ..
+  drwxr-xr-x   2 root     root         1024 Jul 15 11:10 a
+  drwxr-xr-x   2 root     root         1024 Jul 15 11:10 c
+  drwxr-xr-x   1 root     root          512 Feb 11 08:14 download
+
+It came back!
+
+I'm a bit unsure as to what caused the problem.  Has anybody had the problem
+before?
+
+  [<A HREF="mailto:root@health">root@health</A> nickm.ior.org.au]# rpm -q samba
+  samba-2.0.5a-19990721
+
+I think it's the latest version..  and it's not a beta.
+
+So!  Can anyone shed some light on this for me?  Maybe help with what causes
+the problem?
+
+I'm guessing that the windows machine went down over the weekend, and
+perhaps samba lost the connection or something..  but it's a strange way to
+show it :(
+
+Coffee time for me.
+
+
+--
+Nick Morrison
+Systems Administrator
+IOR Health Benefits South Australia
+GPO Box 480
+Adelaide, SA 5001
+--
+Phone:  +61 8 8231 5230
+Mobile: +61 4 1128 7601
+Fax:    +61 8 8231 5221
+E-mail: <A HREF="mailto:nickm@ior.org.au">nickm@ior.org.au</A>
+
+
+boy, n:
+	A noise with dirt on it.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

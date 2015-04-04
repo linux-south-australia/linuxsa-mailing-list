@@ -1,0 +1,109 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: window lock-up -- keyboard input fails" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="ak1.linuxsa@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 22 Aug 2003 16:50:48 +0930" -->
+<!-- Id="20030822165048.A10161@dog.topology.org" -->
+<!-- Reference="20030817034232.GR15411@wantadilla.lemis.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: window lock-up -- keyboard input fails</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak1.linuxsa@topology.org">ak1.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 22 Aug 2003 16:50:48 +0930
+</PRE>
+<H1>Re: window lock-up -- keyboard input fails</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, Aug 17, 2003 at 01:12:32PM +0930, Greg 'groggy' Lehey wrote:
+&gt; On Sunday, 17 August 2003 at 12:22:55 +0930, Alan Kennington wrote:
+&gt; &gt; On Sun, Aug 17, 2003 at 11:54:07AM +0930, Greg 'groggy' Lehey wrote:
+&gt; &gt;&gt;
+&gt; &gt;&gt; No, but you might be able to track it down.  Try running
+&gt; &gt;&gt;
+&gt; &gt;&gt;   stty &lt; /dev/pts/3 -a
+&gt; &gt;&gt;
+[...]
+
+&gt; &gt; The problem nearly always occurs when doing an "ssh" from a workstation
+&gt; &gt; to a server. There are two "pts" objects involved.
+&gt; &gt; So which of the ttys should I monitor? Presumably both, I suppose.
+&gt; 
+&gt; The one which the tail has open as stdin.
+
+
+Greg,
+
+About that xterm/ssh/tail lock-up thing of 5 days ago, it recurred is it always
+does, and I tried the stty -a on both the ssh client and the ssh server
+machines, and everything was hunky-dory as far as parameters go.  I changed the
+xterm window size on the ssh client machine, and both the "stty -a" outputs
+showed the corresponding change in window dimensions:
+
+<A HREF="mailto:akenning@dog">akenning@dog</A>&gt; stty &lt; /dev/pts/9 -a
+speed 38400 baud; rows 36; columns 166; line = 0;
+[...]
+
+The rows and columns responded correctly.  So I assume this means that ssh is
+passing through at least some control messages from the xterm window containing
+the ssh client to the child process of sshd on the ssh server machine.
+
+However, as usual, all control-Z, contorl-C, CR, and other input from the xterm
+window did not reach the running "tail" process on the ssh server machine. The
+output from "tail" continued as normal.
+
+So then I did a "kill -15" on the "tail" process, and it dutifully died
+and the tcsh process on the ssh server machine not only sprang back to life -
+it also output all of the CR characters which I had sent in the meantime.
+So my CR characters (or LF or whatever) must have been locked up in some
+buffer somewhere, and that's why "tail" was not responding.
+
+So I'm still mystified as to where the characters are being buffered, and how I
+can re-start that buffer from the ssh client machine.  In this case, I had to
+use a separate process in a separate xterm window to kill off the "tail"
+process on the remote machine.
+
+By the way, I always try control-Q in these situations, just in case I had
+hit control-S by accident. So that's not the problem.
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

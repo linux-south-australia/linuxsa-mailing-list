@@ -1,0 +1,114 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: patching kernels(?)" -->
+<!-- FromName="Benjamin Close" -->
+<!-- FromEmail="linux@senet.com.au" -->
+<!-- ToName="Robert Mibus" -->
+<!-- ToEmail="mibus@hallett-cove.schools.sa.edu.au" -->
+<!-- Date="Mon, 22 Feb 1999 20:21:57 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.04.9902222007140.1357-100000@Bytes4u.nodomain.yet" -->
+<!-- Reference="000b01be5e0c$b40382a0$67000064@926_2.hallett-cove.schools.sa.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: patching kernels(?)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Benjamin Close &lt;<I><A HREF="mailto:linux@senet.com.au">linux@senet.com.au</A></I>&gt;
+  To  : Robert Mibus &lt;<I><A HREF="mailto:mibus@hallett-cove.schools.sa.edu.au">mibus@hallett-cove.schools.sa.edu.au</A></I>&gt;
+  Date: Mon, 22 Feb 1999 20:21:57 +1030 (CST)
+</PRE>
+<H1>Re: patching kernels(?)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, 22 Feb 1999, Robert Mibus wrote:
+
+&gt; &gt;Being a good net-citizen (and it's faster) I have down loaded 
+&gt; &gt;the kernel patch from 2.2.0 to 2.2.1, only there are no instructions 
+&gt; &gt;on how to make the 'patch'.
+&gt; &gt;
+&gt; &gt;(man patch talks about a -pnum, but with no explaination of what this
+&gt; &gt;is)
+&gt; &gt;
+&gt; &gt;Q1: where do I put the patch file?
+&gt; &gt;Q2: what command do I use to make the patch? 
+&gt; A1: i guess in /usr/src
+&gt; A2: cd /usr/src; patch &lt; kernel-2.2.1.patch
+&gt; [or whatever the patch is called]
+&gt; 
+&gt; if not, try /usr/src/linux instead of /usr/src.
+&gt; 
+
+Put the file in /usr/src/linux and type: scripts/patch-kernel
+
+This will run a kernel script to patch the kernel and also clean up any
+rejects. (it runs patch -p1 &lt; patchfile)
+The great thing about this script is that it works with compressed patches
+as well.
+
+Then copy your config file (.config) somewhere safe and run: make mrproper
+Copy back your back config file and run: make oldconfig
+This updates the config file for any new changes and prompts you if
+anything has changed. All done!
+
+&gt; &gt;Also, parallel ports seem to be disabled by default in the 
+&gt; &gt;2.2.0 and 2.2.1 kernel configurations,  and it seems that very little
+&gt; &gt;can be compiled into the kernel before i get complaints about it 
+&gt; &gt;being too large (at the make zImage stage).
+&gt; 
+&gt; do a 'make bzImage' instead.
+
+You should use modules more!
+Although bzImage will make the kernel still, it uses more memory for data
+allocation. Modules are much better solution.
+
+Simply answer Y to all module questions under Loadable module support.
+Then anything that you don't use continually such as CDROM drive can be M
+instead of Y and automatically loaded when required.
+
+To complete the module setup. Add 
+
+*/5 * * * * root /sbin/rmmod -a
+
+in /etc/crontab
+
+Which automatically removes unused modules after 5 minutes.
+
+Cheers,
+
+--
+
+* Benjamin Close
+* <A HREF="mailto:Benjsc@senet.com.au">Benjsc@senet.com.au</A>
+* Web Page: <A HREF="http://users.senet.com.au/~benjsc">http://users.senet.com.au/~benjsc</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,162 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="comp sci question: fast status mask handling" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 6 Aug 2000 14:30:01 +0930" -->
+<!-- Id="20000806143001.A8666@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: comp sci question: fast status mask handling</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 6 Aug 2000 14:30:01 +0930
+</PRE>
+<H1>comp sci question: fast status mask handling</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Longish Comp Sci question.
+
+While working on a linux-ATM driver, I've come across a little
+comp sci question which is fairly general.
+
+Quite often, you get a signal or interrupt accompanied by
+a status mask. In this case, I have a 32-bit mask, in which
+13 independent status bits might be set.
+(In select-returns for unix I/O, you get potentially very large
+arrays of status bits indeed, into the hundreds or thousands.)
+
+One way to handle this is
+
+==========================================================
+typedef unsigned long u32;
+
+void interrupt_handler(u32 status) {
+    if (status & MASK1) {
+	// handle event 1.
+	}
+    if (status & MASK2) {
+	// handle event 2.
+	}
+    // ....
+    if (status & MASK31) {
+	// handle event 31.
+	}
+    }
+==========================================================
+
+Usually there are at most one or two conditions that would
+be set. So this takes 32 tests to find 1 or 2 events.
+When you're handling the arrival of ATM cells once every 2.7 uS,
+you can't afford to waste this much time.
+
+So I thought I would do this:
+[Option A is a technique which I won't show here, because it
+doesn't raise the comp sci question. But it uses an a priori
+guess at the relative probabilities and urgencies of each
+event type.]
+
+Option B:
+
+==========================================================
+void interrupt_handler(u32 status) {
+    while (status) {
+	// Pick out the right-most event.
+        u32 x = status ^ (status & (status - 1));
+
+	// Handle the single event in "x".
+	// ....
+
+	status ^= ~x;
+	}
+    }
+==========================================================
+
+Now after the single right most bit in "status" has been
+extracted as "x", I have a 32-bit word which contains a
+unique bit. Now how do I call the right piece of code to 
+handle this?
+
+I can't do a switch on 0x80000000, 0x40000000... 0x00000001,
+because that would make things take even longer than the
+original slow code.
+I can't do a computed goto, because the range of "x" is
+now from 1 to 0x80000000.
+I.e. I can't just do a table lookup.
+
+One possibility is I take the OR of the 8-bit bytes of "x"
+and use a 256-table lookup, and then test to see which
+byte the event-bit was set in.
+That also sounds a little clumsy.
+
+What I really need is a hash algorithm which maps
+the set of all 1-bit masks to a 5-bit integer.
+I.e. I need a function to give me the _position_ of
+the bit, given the 1-bit bit-mask.
+
+I can sort of think of something:
+
+u32 y1 = (x | (x &gt;&gt; 8) | (x &gt;&gt; 16) | (x &gt;&gt; 24)) & 0xff;
+u32 y2 = (x | (x &gt;&gt; 9) | (x &gt;&gt; 18) | (x &gt;&gt; 27)) & 0x1ff;
+u32 y = y1 | y2;
+
+Then I use a 9-bit look-up on this.
+I think that y should contain two set bits which uniquely
+(but redundantly) identify the original set bit in "x".
+Then I just need a 512-byte table lookup.
+
+But this seems a bit slow too.
+
+==========================================================
+QUESTION:       
+Does anyone know of a really fast algorithm to return the
+bit position of a 32-bit word which is known to have
+only one set bit?
+
+Cheers,
+Alan Kennington.
+
+PS. The CDC 6400 mainframe in 1972 used to have an assembly
+language instruction to count the number of bits in a 60-bit
+word. It took 68 cycles for a 10 MHz clock.
+If the number of set bits is small, the above
+algorithm using x & (x - 1) is much quicker.
+I sometimes wonder if this is a generally known fact.
+But this _is_ Sunday. The day of idle musing.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

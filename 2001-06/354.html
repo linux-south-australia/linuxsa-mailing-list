@@ -1,0 +1,129 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Small Window Sizes, repeater latency, and Ethernet over Fiber ..." -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 8 Jun 2001 23:15:43 +0930" -->
+<!-- Id="20010608231543.A2867@dog.topology.org" -->
+<!-- Reference="3.0.6.32.20010606201316.00f317e0@10.0.2.1" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Small Window Sizes, repeater latency, and Ethernet over Fiber ...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 8 Jun 2001 23:15:43 +0930
+</PRE>
+<H1>Re: Small Window Sizes, repeater latency, and Ethernet over Fiber ...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Jun 06, 2001 at 08:13:16PM +0900, Richard Sharpe wrote:
+&gt; 
+&gt; Assuming TCP, and given that some Windows clients (NT SP1 at least, and
+&gt; maybe more) use a window size of 8192 bytes or thereabouts, and there are
+&gt; often a lot of ethernet hops, they could be right. Eg,
+&gt; 
+&gt; 
+&gt; [Node]----[Hub]----[Router]----[Enet to fiber]---[router]---[hub]---[Node]
+&gt;                                 link frm telco
+&gt; 
+&gt; If this were 10MB/s Ethernet, we have 6 hops over Ethernet plus the fiber
+&gt; link from end-to-end, for a min of at least 8mS end to end latency and a
+&gt; round-trip-time of at least 12mS (ack's can be smaller).
+
+Richard,
+
+Maybe the most convenient way of viewing the dealy-bandwidth thing is this:
+
+max bit-rate &lt;= window / round-trip-time.
+
+More generally, bit-rate = min(line rate, window/round-trip-time).
+
+In this case, you get for the ridiculously low 8k window:
+8192*8/0.012 = 5461333 bits/sec
+for the 12 mS round trip.
+
+This way you don't have to know the line rate in order to knwo the limit
+on bit-rate caused by the window.
+
+So at 32 kByte window,
+32768*8/0.012 = 21,845,333 bits/sec.
+
+So bit-rate = min ( line-rate, 21.8 Mbits/sec ).
+
+&gt; But, a window of 8192 bytes will take about 6.6mS to fill up, after which
+&gt; we have to wait for ACKs to come back before we can send any more. Thus we
+&gt; waste almost 50% of the available throughput, and can only achieve about
+&gt; 5Mb/s. If the latency is any worse, then the throughput for any TCP
+&gt; connection going over the link above would be worse as well. Simple
+&gt; solution is to increase the window size. Linux uses a window of 32k, and we
+&gt; could go up to 64k without using the window scale option. 100Mb/s operation
+&gt; makes it worse. (We can use the delay-bandwidth product to estimate the
+&gt; minimum window size we need.)
+
+It's a trivial rearrangement that I'm suggesting, but I just find it makes
+it clearer for me.
+I.e. I make the bit-rate the dependent variable rather than the window size.
+
+&gt; 2. What are the latencies of hubs and switches (in store-and-forward mode)
+&gt; and routers. Experience suggest that Cisco 3600s add very little, and that
+&gt; switch latency should be lower than link latency.
+
+I don't have much of a clue on this.
+But.... suppose a router at least reassembles an entire packet
+before sending it off on its way.
+This is fairly reasonable, although it's only the packet header that
+really requires to be reassembled.
+But if the whole packet, e.g. 1500 Bytes is reassembled, then that's
+1500 Bytes off your window size every time you get a hop.
+For, say, 20 hops round trip, that's 30 kbytes. So your whole delay
+budget may be used up entirely in packet reassembly time.
+I'm pretty sure that linux boxes definitely _do_ incur this delay.
+If Cisco router latency is much less than 1500 Bytes / line-rate,
+then clearly they're just reassembling packet headers.
+If they're just doing the header reassembly, and then on-sending
+the packet immediately, then you should get, obviously about
+20 bytes (or 40 bytes for TCP reassembly too) of latency per hop.
+That shouldn't affect the window budget much.
+
+Just a few musings....
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

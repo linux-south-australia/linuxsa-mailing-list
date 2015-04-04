@@ -1,0 +1,99 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Messages file" -->
+<!-- FromName="'Vladimir V. Bashkirtsev'" -->
+<!-- FromEmail="mega@konectanet.com.au" -->
+<!-- ToName="'David Lloyd'" -->
+<!-- ToEmail="lloy0076@rebel.net.au,martin@safcol.com.au" -->
+<!-- Date="Wed, 17 Jan 2001 12:57:04 +1030" -->
+<!-- Id="008f01c0802c$fb8e57a0$7aba26cb@konectanet.com.au" -->
+<!-- Reference="FGEFIJAGPBKMLNKMFKJPEECDCDAA.martin@safcol.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Messages file</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Vladimir V. Bashkirtsev &lt;<I><A HREF="mailto:mega@konectanet.com.au">mega@konectanet.com.au</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:martin@safcol.com.au">martin@safcol.com.au</A></I>&gt;
+  Date: Wed, 17 Jan 2001 12:57:04 +1030
+</PRE>
+<H1>Re: Messages file</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; A lame server is a server that has delegation for a domain but is not
+&gt; authoritive for that domain. In other words, when I lookup an address I
+&gt; am referred to that server. But it's "lame" because I may or may not be
+&gt; able to get the address I require...
+&gt;
+&gt; According to the Cricket and Locust Book (O'Reilly's BIND Book) there's
+&gt; not much you can do about this unless it's one of your own domains. You
+&gt; could forward said message to the owner of the domain but even for what
+&gt; I do I get plenty of these messages.
+
+There one exception which I know in BIND 8 (and it mostly used) which can
+help to reduce number of these messages. For example if you have zone
+
+foo.com.    IN SOA ns.foo.com. hostmaster.foo.com { numbers }
+                 IN NS ns.foo.com.
+                 IN NS ns1.foo.com.
+                 IN A 1.2.3.4
+ns              IN A 2.3.4.5
+
+and this domain is delegated correctly but ns1.foo.com failed to update zone
+(as usually it happens - different SOA :) then you will get
+"non-authoritative" from ns.foo.com , ns1.foo.com and from all root servers
+(because they say truth all the time). But if you will do:
+
+# nslookup -q=A foo.com ns.myisp.com
+
+you will get address without any warnings. You will get "non-authoritative"
+only when zone will expire - usually one week. System administrators have
+alot of time to fix zone problems before it will complaint.
+
+But in same time
+
+# nslookup -q=A ns.foo.com ns.myisp.com
+
+will give you "non-authoritative" and lead you to ns.foo.com or ns1.foo.com
+which will say the same thing.
+
+So if you will have forwarder it will not complain for most queries and
+dramatically reduce number of these messages.
+
+Regards,
+Vladimir
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

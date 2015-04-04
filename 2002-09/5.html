@@ -1,0 +1,153 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="[Fwd: [Xbox-linux] SuSE 8 on the Xbox]" -->
+<!-- FromName="'Anthony Symons'" -->
+<!-- FromEmail="ant@sa.pracom.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="02 Sep 2002 09:09:28 +0930" -->
+<!-- Id="1030923568.27928.299.camel@ant.internal" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: [Fwd: [Xbox-linux] SuSE 8 on the Xbox]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 02 Sep 2002 09:09:28 +0930
+</PRE>
+<H1>[Fwd: [Xbox-linux] SuSE 8 on the Xbox]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Maybe of interest...
+
+He says in the next post "oops gotta set the date" :)
+
+Ant
+
+-----Forwarded Message-----
+
+From: Michael Steil &lt;<A HREF="mailto:mist@c64.org">mist@c64.org</A>&gt;
+To: <A HREF="mailto:Xbox-linux-devel@lists.sourceforge.net">Xbox-linux-devel@lists.sourceforge.net</A>
+Subject: [Xbox-linux] SuSE 8 on the Xbox
+Date: 12 Sep 1990 15:01:01 +0200
+
+Hello everyone!
+
+Standard Linux distributions *do* work on the Xbox, with minimal 
+modifications. I am writing this email in KMail on... MY XBOX!
+No, not in X-Window, not on TV. I'm acessing KDE using X forwarding. But SuSE 
+Linux has been booted from the Xbox hard disk, and it's running KDE.
+
+How did I do it?
+I put my 10 GB Xbox hard disk into a standard PC (Duron 700, VIA KT-133, 
+usb-uhci, Riva128, Sound Blaster PCI) using the hot-swap method and booted 
+the SuSE 8 installation CD. The Xbox hard disk is unused from track 15534 on, 
+so I created a 128 MB swap partition /dev/hda1 starting at track 15534, and a 
+1.7 GB root partition /dev/hda2 in ReiserFS format. I could safely create a 
+PC-like partition table, because the first sector of the Xbox hard disk is 
+unused.
+Then I did a standard installation ("with Office"). When the installation 
+program wanted to reboot, I had to re-unlock the HD by doing the hot-swap 
+trick again. I configured the network card (an Intel EtherExpress Pro) to 
+match my local network.
+Then I put the hard disk back into the Xbox and copied and booted Linux with 
+the new command-line-aware XBE bootloader, the standard SuSE kernel with 
+pci.c exchanged (no further changes) and the standard SuSE initrd that loads 
+reiserfs.o and continues booting from hard disk. The kernel command line is 
+of course "root=/dev/hda2".
+SuSE booted, the network of course did not come up (wrong driver), the sound 
+settings generated a "failed" by the init script, and the init script 
+/etc/rc.d/hwscan crashed the machine (is it because of the PCI bug?). So I 
+connected the Xbox hard disk to the PC again, booted the installation on the 
+PC, disabled hwscan, installed the SuSE 8 RPM for nForce (nvnet.o etc.) and 
+changed /etc/modules.conf: I disabled the PC network and autio settings and 
+enabled the four lines for the nForce chipset that are already in that file 
+(but disabled). Additionally, I set the standard runlevel in /etc/inittab to 
+3, so that X did not start.
+When I booted SuSE on the Xbox again, I saw the login prompt, and the Xbox 
+could be pinged. I ssh'ed into the Xbox, did
+export DISPLAY=192.168.0.1:0
+startkde
+after starting an "empty" X Server on the Linux PC (running Mandrake 8.2) and 
+doing "xhost +xbox", and voila, KDE was running on the Xbox. Because I had 
+set up the name server and the standard gateway correctly during the 
+installation already, the Xbox was immediately ready for the Internet.
+
+Speed
+The speed is somewhere between okay and excellent. Of course there is no X 
+Server running on the Xbox at the moment, so this saves quite some RAM. But 
+I'm in a full KDE envorinment and even StarOffice is running in the 
+background.
+
+Why SuSE?
+I only had the current versions of Mandrake and SuSE here, and I don't have a 
+broadband internet connection, so that I could download any other 
+distributions. I tried Mandrake first, starting with root mounted as NFS, and 
+with its own partition later. Too bad Mandrake is very pedantic about module 
+versions, and there's something wrong with the compiler, so I was unable to 
+run a kernel based on the Mandrake-patched 2.4.18 sources that loads nvnet.o. 
+And without a Mandrake kernel, the kernel modules on hard disk would not 
+load. So I tried SuSE, which made a lot less problems. If there are any 
+Mandrake experts out there, I would still like to try Mandrake, too!
+
+USB? X?
+USB does not work because of an interrupt conflict with the non-existant 
+keyboard controller. Milosch has fixed this bug in this bug already by 
+replacing the standard keyboard driver with a dummy keyboard driver, but I 
+tried to use a kernel with as few modifications as possible, to be as 
+compatible to the original SuSE kernel as possible. I'll try that next.
+When trying to start X Window, the Xbox crashes. X Window is still configured 
+for my Riva128 in the PC. The X Server probably writes somewhere into the 64 
+MB framebuffer of the Riva card, overwriting system memory. I'll try 
+replacing the X config file to match the framebuffer settings.
+
+What's next?
+I'd like to see Windows 95 in VMware now. ;-)
+
+  Michael
+
+
+-------------------------------------------------------
+This sf.net email is sponsored by: OSDN - Tired of that same old
+cell phone?  Get a new here for FREE!
+https://www.inphonic.com/r.asp?r_______________________________________________
+Xbox-linux-devel mailing list
+<A HREF="mailto:Xbox-linux-devel@lists.sourceforge.net">Xbox-linux-devel@lists.sourceforge.net</A>
+https://lists.sourceforge.net/lists/listinfo/xbox-linux-devel
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,157 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="serial port clashes" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 26 Jul 2000 21:34:36 +0930" -->
+<!-- Id="20000726213436.A6747@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: serial port clashes</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 26 Jul 2000 21:34:36 +0930
+</PRE>
+<H1>serial port clashes</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Here's a curious problem which I can't solve (after several
+hours of trying).
+
+I wanted to be able to log in to a linux box through
+Com2 (ttyS1). So I added the line
+
+S1:23:respawn:/sbin/agetty -L ttyS1 9600 vt320
+
+to my /etc/inittab file.
+On ttyS0 (Com1) I have a mouse.
+On ttyS3, I have an internal modem!
+(There's no spare port for an external modem, in case
+that's what you're going to suggest.)
+
+But whenever I have the getty program running, I can't 
+get the "wvdial" program to do anything with the ppp connection.
+I can't set up the connection.
+
+In fact, from a virtual terminal (xterm) I get
+
+===================================================
+hamster /root# wvdial
+--&gt; WvDial: Internet dialer version 1.41
+--&gt; Initializing modem.
+--&gt; Sending: ATZ
+--&gt; Sending: ATQ0
+--&gt; Re-Sending: ATZ
+--&gt; Modem not responding.
+hamster /root#
+===================================================
+
+On the other hand, if I use the VT320 connected to Com2
+to log in as root and run "wvdial", it actually finds a modem,
+and dials, and then fails after a minute or so, saying that it's
+getting no response from the PPP server.
+
+But If I remove the ttyS1 line from /etc/inittab and run
+"kill -HUP 1", everything is fine again.
+Except that now I can't log in on Com2 to do my kernel debugging work.
+
+The IRQ table shows:
+
+==================================================
+           CPU0
+  0:     110078          XT-PIC  timer
+  1:       3507          XT-PIC  keyboard
+  2:          0          XT-PIC  cascade
+  3:      16581          XT-PIC  serial
+  4:       8044          XT-PIC  serial
+  8:          2          XT-PIC  rtc  
+[...]
+==================================================
+
+The "dmesg" contains:
+
+==================================================
+Serial driver version 5.01 (2000-05-29) with MANY_PORTS SHARE_IRQ SERIAL_PCI ISAPNP enabled
+ttyS00 at 0x03f8 (irq = 4) is a 16550A
+ttyS01 at 0x02f8 (irq = 3) is a 16550A
+ttyS03 at 0x02e8 (irq = 3) is a 16550A 
+==================================================
+
+I thought the IRQ sharing should be fine.
+Maybe that isn't the problem. I don't know.
+
+By the way, the successful "wvdial" run (which permitted me to send
+this e-mail!) was:
+
+=================================================
+hamster /etc# wvdial
+--&gt; WvDial: Internet dialer version 1.41
+--&gt; Initializing modem.
+--&gt; Sending: ATZ
+ATZ
+OK
+--&gt; Sending: ATQ0 V1 E1 S0=0 &C1 &D2
+ATQ0 V1 E1 S0=0 &C1 &D2
+OK
+--&gt; Modem initialized.
+[...]
+=================================================
+
+My best guess is that "agetty" is somehow typing up the IRQ 3
+in some way.
+
+Any clues much appreciated.
+
+Cheers,
+Alan Kennington.
+
+PS. Considering all the excitement over the Yopy, I think
+people should be even more excited over the iPAQ H3600.
+
+<A HREF="http://www.handhelds.org/Compaq/iPAQH3600/Pictures/index.html">http://www.handhelds.org/Compaq/iPAQH3600/Pictures/index.html</A>
+
+especially this sort of picture:
+
+<A HREF="http://www.handhelds.org/Compaq/iPAQH3600/Pictures/JGHand7.jpg">http://www.handhelds.org/Compaq/iPAQH3600/Pictures/JGHand7.jpg</A>
+
+But I read somewhere that the H3600 is not for export out of
+the USA.
+
+Why is this so?
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

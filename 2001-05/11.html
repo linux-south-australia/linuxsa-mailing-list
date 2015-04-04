@@ -1,0 +1,171 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Help with tape drive messages" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'bmonten'" -->
+<!-- ToEmail="bmonten@adelaide.on.net" -->
+<!-- Date="Tue, 01 May 2001 11:57:34 +0930" -->
+<!-- Id="3AEE1F16.2EF5252@aarnet.edu.au" -->
+<!-- Reference="004001c0d1d1$513e95c0$6d0000c0@berger" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Help with tape drive messages</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : bmonten &lt;<I><A HREF="mailto:bmonten@adelaide.on.net">bmonten@adelaide.on.net</A></I>&gt;
+  Date: Tue, 01 May 2001 11:57:34 +0930
+</PRE>
+<H1>Re: Help with tape drive messages</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+bmonten wrote:
+&gt; 
+&gt; Reasonably often (not always), tape operations cause the following messages:
+&gt; 
+&gt; Apr 30 09:47:31 barton kernel: ncr53c895-0: SCSI parity error detected: SCR1=65 DBC=50000000 STAT1=f
+
+This is the original fault.  Parity on SCSI is done with a seperate signal,
+so something is genuinely broken.
+
+The only sane thing for the software to do is to print out as
+much info as possible and to reset the SCSI bus.  This happens
+here:
+
+&gt; Apr 30 09:47:31 barton kernel: ncr53c895-0:4: ERROR (81:0) (8-0-0) (28/77) @ (mem fa3ee1b8:ffffffff).
+&gt; Apr 30 09:47:31 barton kernel: ncr53c895-0: regdump: da 00 00 77 47 28 04 07 84 08 84 00 80 00 0f 02.
+&gt; Apr 30 09:47:31 barton kernel: ncr53c895-0: have to clear fifos.
+&gt; Apr 30 09:47:31 barton kernel: ncr53c895-0: restart (scsi reset).
+&gt; Apr 30 09:47:31 barton kernel: ncr53c895-0: Downloading SCSI SCRIPTS.
+&gt; Apr 30 09:47:31 barton kernel: ncr53c895-0-&lt;4,*&gt;: FAST-5 SCSI 4.0 MB/s (250 ns, offset 8)
+
+Now the tape drive is half way through a tape and has got a
+bus reset.  So it complains about that:
+
+&gt; Apr 30 09:47:31 barton kernel: st0: Error with sense data: [valid=0] Info fld=0x0, Current st09:00: sense key Unit Attention
+&gt; Apr 30 09:47:31 barton kernel: Additional sense indicates Power on, reset, or bus device reset occurred
+
+&gt; Is anyone aware of any settings/configurations which may be
+&gt; causing this, or a way to fix it ?
+
+Bus width, length and termination.  The Adaptec site
+or the SCSI FAQ has a good description of all of these.
+
+Your controller is Fast Wide SCSI2 at 40Mbps (Ultra SCSI2),
+so the rules are:
+
+ - the terminators must be Active Terminators not
+   Passive (or standard) Terminators.
+
+ - the total bus length must be under 150cm, this
+   includes cabling within the boxes.
+
+ - units should be spaced 30cm or more apart
+
+ - use real SCSI cables (not Centronics printer cables)
+   of one type (ribbon or cable).  No ribbon cable outside
+   the chassis.
+
+ - devices that are not fast wide need to come at the end
+   of the bus.
+
+Now it looks to me that you want to set up the following
+
+  Disk1 --- Disk0 --- Controller === Tape
+
+where --- is ribbon cable inside the chassis and
+=== is SCSI cable outside the chassis.  To do this
+you must:
+ - disable the termination on the Controller (on by default)
+ - disable the termination on Disk0 (off by default)
+ - enable the termination on Disk1 (off by default)
+ - enable the termination on Tape (off by Default)
+
+If there is no "enable termination" jumper on the disk
+or tape, then you must put an Active Terminator in the
+empty SCSI connector.
+
+In short, you are trying to establish a bus with
+Active Terminators at both ends only:
+
+  AT - Disk1 --- Disk0 --- Controller === Tape = AT
+
+whereas most controllers come pre-configured for
+
+  Disk0 with inbuilt AT --- Controller with inbuilt AT
+
+so you need to re-jig the termination to suit.
+
+It would be very useful is you could post some diagrams
+of your SCSI bus.  For example:
+
+&gt; PHYSICAL:
+&gt;    Disk1 with inbuild AT ---15cm--- Disk0 ---15cm---&gt;&gt;
+&gt;    &lt;&lt;--- Controller (AT disabled) ===80cm=== Tape === External AT
+&gt; 
+&gt; PROTOCOL:
+&gt;   ID   Media          Protocol      Device
+&gt;    0   Disk0        Fast wide 40   /dev/sd0
+&gt;    1   Disk1        Fast wide 40   /dev/sdb
+&gt;    6   Tape         Fast wide 40   /dev/st0
+&gt;    7   Controller   Fast wide 40   ncr53c895-0
+
+&gt; I've had the same problem with two different tape drives on
+&gt; two different Proliants with two different cards.
+
+So it's probably a misunderstanding of the SCSI requirements
+then.  They *are* complex and you are much better off simply
+putting only devices of the same type on the bus.
+
+&gt; We've tried the 'official' channels, but run up against
+&gt; the old finger-point scenario ("Run the diagnostics.
+&gt; If they run OK, it's not our problem.")
+
+Basically this is the job for the "systems integrator"
+to sort out.  If you are doing that task yourself then
+get used to the finger pointing.  Most suppliers can
+barely afford to sell you the device, and if there's
+not much margin in the sale then they can't give you
+much help.
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

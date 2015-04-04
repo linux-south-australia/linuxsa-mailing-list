@@ -1,0 +1,119 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Automated FTP" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="linuxsa" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 3 Jul 1998 16:51:25 +0930 (CST)" -->
+<!-- Id="199807030721.QAA01756@rebel.net.au" -->
+<!-- Reference="B0000183914@pc1650.isa.mim.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Automated FTP</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : linuxsa &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 3 Jul 1998 16:51:25 +0930 (CST)
+</PRE>
+<H1>Re: Automated FTP</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+My experience is that using ftp for program-to-program file transfers is
+not the best use of the tools available.  Unix provides a much better
+solution.  I see several disadvantages with <A HREF="ftp:">ftp:</A>
+
+ 1. Owing to clock drift, the receiving machine cannot know exactly when 
+    the incoming file will arrive, so it must poll at various times to
+    see if the file has arrived.  This is a waste of resources.
+
+ 2. There is a delay (on average it's half the poll interval) between
+    the data being sent and it being available on the remote system.
+    This can be most disconcerting for people checking the remote system,
+    when they find that data, which they know has been entered, is not
+    available on the remote system.
+
+ 3. The transfer might fail for some reason, such as a network problem,
+    and so you are obliged to determine some mechanism to retransmit the
+    file at a later date.
+
+ 4. The possibility exists that the receiving machine might poll while
+    the file is in transit, and therefore it might process a partial file.
+    You are therefore obliged to determine some mechanism to work around
+    this possibility.
+
+ 5. If the receiving machine fails to poll between two successive transfers,
+    and if you use a static filename (e.g. if you always send the /tmp/data)
+    you will lose data.
+
+All of these issues are solvable, but you should not need to solve them.
+There is, in my opinion and my wide experience, a ready made solution that
+suffers none of these problems.  This solution is to use email.  Remember
+that you can send mail to a program (e.g. .forward to "| myprogram", or
+similar use of /etc/aliases).  Use of email means:
+
+ 1. You don't have to poll.
+
+ 2. The data is processed immediately upon being received.
+
+ 3. Transient delivery faults are handled automatically by the mail system.
+
+ 4. Assuming you trust your mail system, each file sent will be received,
+    so you won't ever lose data or try to process a file which is still
+    in-transit.
+
+On top of this, well constructed Unix programs are often filters, so that
+the system logically looks like this:
+
+   generate-data | transmit-data | receive-data | consume-data
+
+Since the email message is provided to the receiving program as standard
+input, it fits very nicely into this (standard) model.  Note that the
+actual sequence would be:
+
+  generate-data | mail <A HREF="mailto:program@remote.hosts">program@remote.hosts</A>
+
+and in program's .forward
+
+  "| consume-data"
+
+
+I strongly urge everyone to take advantage of this tool, which seem so
+much more appropriate to me than does ftp.
+
+As a final comment, I pass on to you what some wit (name now forgotten)
+once said:  "Every program at MIT will evolve until it can read mail."
+There is more than a grain of truth in this thought.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

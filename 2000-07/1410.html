@@ -1,0 +1,143 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Directory listing bash script" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="Paul Malcolm Bailey <pmbailey@senet.com.au>, linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 26 Jul 2000 14:00:00 +0900" -->
+<!-- Id="3.0.6.32.20000726140000.00a1c440@203.16.214.248" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Directory listing bash script</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:Paul Malcolm Bailey <pmbailey@senet.com.au>">Paul Malcolm Bailey <pmbailey@senet.com.au></A>, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Wed, 26 Jul 2000 14:00:00 +0900
+</PRE>
+<H1>Re: Directory listing bash script</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 11:30 AM 7/26/00 +0930, Paul Malcolm Bailey wrote:
+&gt;Hi.
+&gt;
+&gt;Linux newbie here.
+&gt;
+&gt;Yep, it's more directory stuff with bash.
+&gt;
+&gt;However, this time I'm reporting success.  I wanted to have a script
+&gt;that listed out hidden directories and counted them (also including the
+&gt;non-hidden directories too).
+&gt;
+&gt;It wasn't that easy, and for that reason alone I'm posting the code to
+&gt;the list so other newbies maybe don't have to spend hours and hours
+&gt;struggling with commands and switches to list hidden directories.
+&gt;
+&gt;Here it is:
+&gt;
+&gt;
+&gt;#!/bin/sh
+&gt;echo
+&gt;num=0
+&gt;hid=0
+&gt;for somevar in $(ls); do
+
+                ^^^^^   This is not portable. It is a bashism. Use `ls` ...
+                        unless you need nesting.
+
+&gt;  if [ -d $somevar ]
+&gt;    then
+&gt;      echo "$somevar/"
+&gt;      num=$[num+1]
+&gt;  fi
+&gt;done
+&gt;if let $[$num &gt; 0]; then
+&gt;  echo;
+&gt;fi
+&gt;for anothervar in $(ls -ad .[a-zA-Z0-9]*); do
+
+Ummm, what was wrong with:
+
+  shopt -s dotglob
+  for f in *; do
+
+Which will pick up all files, including hidden files. However, 'shopt' may
+be nonportable as well :-)
+
+Also, using $(...), like `...`, will not correctly handle files with spaces
+in their names.
+
+&gt;  if [ -d $anothervar ]
+&gt;    then
+&gt;      echo -e "$anothervar/\t[hidden]"
+&gt;      num=$[num+1]
+&gt;      hid=$[hid+1]
+&gt;  fi
+&gt;done
+&gt;if let $[$hid &gt; 0]; then
+&gt;  echo;
+&gt;fi
+&gt;echo -e "($num directories, $hid hidden)\n"
+&gt;exit 0
+&gt;
+&gt;
+&gt;The other reason for posting this to the list is to confirm one thing: 
+&gt;is it true that to make a hidden file or directory, all you have to do
+&gt;is prefix the file name or directory name with a full-stop?  I mean, I
+&gt;guessed that was the way things worked and so I've coded based on that
+&gt;guess ... but I just wanted to check, y'know?
+
+Yes, that is true ...
+
+&gt;R,
+&gt;
+&gt;Paul.
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Contributing author, SAMS Teach Yourself Samba in 24 Hours
+Author, Special Edition, Using Samba
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

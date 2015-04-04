@@ -1,0 +1,241 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Melissa ID creator?" -->
+<!-- FromName="Mark Smith" -->
+<!-- FromEmail="marks@senet.com.au" -->
+<!-- ToName="Robert Wuttke" -->
+<!-- ToEmail="robert.wuttke@disc.com.au" -->
+<!-- Date="Thu, 01 Apr 1999 21:23:05 +0930" -->
+<!-- Id="37035E21.CBA6E71C@senet.com.au" -->
+<!-- Reference="010701be7c15$f0ca4da0$9d000045@robert.disc.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Melissa ID creator?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Smith &lt;<I><A HREF="mailto:marks@senet.com.au">marks@senet.com.au</A></I>&gt;
+  To  : Robert Wuttke &lt;<I><A HREF="mailto:robert.wuttke@disc.com.au">robert.wuttke@disc.com.au</A></I>&gt;
+  Date: Thu, 01 Apr 1999 21:23:05 +0930
+</PRE>
+<H1>Re: Melissa ID creator?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Another ity bity protocol called "ARP" or the address resolution
+protocol uses the MAC address of your ethercard - it is just a bit more
+important than DHCP and BOOTP. It is used to resolve a destination IP
+address on the "current" subnet to its corresponding ethernet address.
+Without ARP, IP would not work over ethernet, unless you specified
+static mappings between IP address and MAC addresses.
+
+You are right though, playing with the MAC address of a network card can
+cause havic on the network.
+
+Every single layer three (network layer) protocol, such as IP, IPX, DDP
+(Appletalk), Xerox XNS, DECNET, IPv6 that can run over IEEE 802.3 /
+Ethernet uses the MAC address, in various different ways to deliver a
+packet from one node to another node on the current (possibly bridged /
+switched) ethernet segment.
+
+The 48 bit address of a ethernet card should be world wide unique,
+however, this does not mean we could use it instead of the IP address
+for a few reasons (if I understand your question) :
+
+* Ethernet is a LAN technology - it cannot be used in a WAN. Other
+technologies are more appropriate for WAN connections (although I was
+just reading today about a new standard called 1000BaseZX - Gigabit
+ethernet running over fibre with a maximum distance of 90Km (Thats right
+90 000 meters !))
+
+* There are other datalink layer technologies which do not use IEEE MAC
+addresses eg Apple Local Talk, ATM etc.
+
+* The IP layer is used to "abstract" the differences between all the
+varied and different network layer protocols. IP hides the differences
+between all the data link layer technologies, and presents single
+unreliable datagram service to the Transport layer protocols eg.
+TCP/UDP. The IP address represents a location, independent of the
+datalink layer technology used to communicate with it. eg. You can't
+look at an IP address and guess whether the device it is allocated to is
+using ATM, Ethernet, Token Ring, sneaker net, local talk, HDLC, PPP etc.
+
+* The MAC address space is "flat" and is also issued randomly (by any
+body off the street buying a NIC) ie. just like mobile phone numbers.
+You cannot look at the first digit(s) of a MAC address, and say where it
+is located. Therefore, you cannot get the benefits of grouping together
+devices and summarising them. If MAC addresses were used instead of Ip
+addresses, all the routers in the Internet would have to know where the
+MAC address was located (ie. in what direction) so that it could send
+packets to it. We group IP addresses together in the route tables by
+using Network and subnet addresses. Also, IP addresses are allocated in
+an orderly, controlled manner to ensure optimal routing occurs.
+
+* Actually, as long as the MAC address is unique on the datalink layer
+segment it is operating on, it doesn't have to be unique world wide. It
+is just convenient to have the MAC address identify the vendor, and a
+unique number, so that you can buy and ethernet card, and not have to
+worry whether you have another ether card on your datalink layer segment
+with the same MAC address.
+
+Interestingly, it would appear that the 48 bits allocated for MAC
+addresses hasn't been big enough, and IEEE have created a new 64 bit
+long version called EUI-64. This will (in general) be used in IPv6 to
+identify hosts. For devices which do not have either an EUI-64 or a IEEE
+MAC address which can be converted to EUI-64, a sys admin can assign a
+EUI-64 compatible identifier. 
+
+Just because you can change the MAC address of your card, doesn't mean
+that it changes all the time. You are right that DHCP and BOOTP do use
+the MAC address of the card to identify the node and allocate the
+address. You can stuff up the IP address allocation process by changing
+your MAC address during the allocation process. Suprising how much we
+trust people not to change their MAC address and cause trouble (and most
+of the time they either don't know how, or don't bother). If you are
+really interested in how BOOTP works, which would then also show how
+changing the MAC address would affect it, read RFC951 (found on
+www.ietf.org), which is the official protocol specification (you could
+read the RFC for DHCP, but it is "just" an extension of BOOTP, but a lot
+more complicated).
+
+Have a look at
+<A HREF="http://www.rootshell.com/archive-j457nxiqi3gq59dv/199711/arp_fun.txt">http://www.rootshell.com/archive-j457nxiqi3gq59dv/199711/arp_fun.txt</A> to
+see what "fun" you can have by playing with MAC addresses and ARPs.
+
+Regards,
+Mark.
+
+
+Robert Wuttke wrote:
+&gt; 
+&gt; Could somebody then tell me how DHCP or BOOTP can work if the mac address of
+&gt; a NIC can change. The IP address is bound to the TCP/IP stack of the
+&gt; computer, not the MAC address, this is used at the Data Link Layer (on the
+&gt; NIC itself). DHCP and BOOTP require that the MAC address be sent to them via
+&gt; a broadcast packet, which returns a packet via to the broadcasting MAC
+&gt; address for configuring the TCP/IP stack. Woe behold a network admin that
+&gt; has a person who decides, "Hmm let's change the MAC address on this card"
+&gt; and they use the MAC address of another machine currently existing on this
+&gt; network, where does the DHCP/BOOTP response go to ? Does it configure both
+&gt; machines to the same address, name, etc ??
+&gt; 
+&gt; This makes no sense. The MAC is supposedly unique across the planet, exactly
+&gt; for this purpose. Image two machines on the internet with the same MAC
+&gt; address. Note that packets travelling across a network are based on the MAC
+&gt; address. Remember an IP address identifies a machine not a NIC, to prove
+&gt; this 127.0.0.1 is loopback, there is no physical NIC, the data link layer
+&gt; reads the MAC address from the packet, this is unwrapped for the ip address
+&gt; and then this is unwrapped for the protocol port that the packet is bound
+&gt; for. The IP address is convenient for us to read, ie 32 bit, the mac address
+&gt; is significantly bigger (can remember exactly, I think it's 48 bits).
+&gt; 
+&gt; I have never heard of an application talking directly to the network using
+&gt; the MAC address, come-on even IP (generally considered the lowest layer you
+&gt; can program on) uses IP addresses (hmmm, hence the name I suppose). The only
+&gt; thing that I know of that uses MAC addresses is DHCP and BOOTP.
+&gt; 
+&gt; Rob.
+&gt; 
+&gt; -----Original Message-----
+&gt; From: Glen Turner &lt;<A HREF="mailto:glen.turner@adelaide.edu.au">glen.turner@adelaide.edu.au</A>&gt;
+&gt; To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A> &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+&gt; Date: Thursday, 1 April 1999 16:14
+&gt; Subject: Re: Melissa ID creator?
+&gt; 
+&gt; &gt;&gt; If it is based on MAC address then it might be useful.  Unfortunately
+&gt; &gt;&gt; MAC addresses can be
+&gt; &gt;&gt;
+&gt; &gt;&gt; a Changed on some chipsets
+&gt; &gt;&gt; I beleive the LANCE chipset can change it's MAC address.
+&gt; &gt;
+&gt; &gt;All chipsets can change their MAC address, although some
+&gt; &gt;will only let you do so during an initialisation sequence.
+&gt; &gt;
+&gt; &gt;It has to be this way -- it is desirable for some applications
+&gt; &gt;for the MAC address to belong to the machine and interface,
+&gt; &gt;not the NIC.  An example is redundant chipsets.  Another
+&gt; &gt;example is DECnet hosts, where changing the MAC address
+&gt; &gt;changes the DECnet address (and DECnet addresses should
+&gt; &gt;be static).
+&gt; &gt;
+&gt; &gt;These are unusual applications, but no chipset designer
+&gt; &gt;is going to forego a part of a market, as it is impossible
+&gt; &gt;to predict how important that market component might become
+&gt; &gt;during the chipset's lifetime.
+&gt; &gt;
+&gt; &gt;A good example if the handling of an obscure ethernet
+&gt; &gt;feature called multicast.  The DEC Tulip chipset
+&gt; &gt;handles this well, the LANCE chipset middlingly,
+&gt; &gt;and the earlier Intel chipsets poorly.  So what
+&gt; &gt;chipset will you find in the multimedia-oriented
+&gt; &gt;computers?
+&gt; &gt;
+&gt; &gt;
+&gt; &gt;&gt; b Not assigned from the appropriate authority.
+&gt; &gt;&gt; Cheap network cards do-not alway map to a
+&gt; &gt;&gt; vendor who has paid?? for their identifiers.
+&gt; &gt;
+&gt; &gt;Unlikely.  Most manufacturers of cheap cards purchase
+&gt; &gt;the ID ROMs from a third party.  The first three octets
+&gt; &gt;of the MAC address may belong to that third party.
+&gt; &gt;So cheap cards often look as if they pinched address
+&gt; &gt;space from, say, Intel.
+&gt; &gt;
+&gt; &gt;
+&gt; &gt;&gt; So it would be interesting to see what it turns out to be.
+&gt; &gt;
+&gt; &gt;Given that it is a virus, there is every chance that the
+&gt; &gt;MAC address is that of the sender, not of the originator of
+&gt; &gt;the document.
+&gt; &gt;
+&gt; &gt;--
+&gt; &gt; Glen Turner                               Network Specialist
+&gt; &gt; Tel: (08) 8303 3936          Information Technology Services
+&gt; &gt; Fax: (08) 8303 4400         The University of Adelaide  5005
+&gt; &gt; Email: <A HREF="mailto:glen.turner@adelaide.edu.au">glen.turner@adelaide.edu.au</A>           South Australia
+&gt; &gt;
+&gt; &gt;--
+&gt; &gt;Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; &gt;To unsubscribe from the LinuxSA list:
+&gt; &gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt;
+&gt; &gt;
+&gt; 
+&gt; --
+&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+--
+| Mark Smith | email: <A HREF="mailto:marks">mailto:marks</A>@senet.com.au
+| "IP Over Everything" - Vint Cerf.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

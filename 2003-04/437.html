@@ -1,0 +1,116 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="CBQ - Class Based Queuing" -->
+<!-- FromName="'Matt Pearce'" -->
+<!-- FromEmail="linux@mattpearce.org" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 15 Apr 2003 21:07:17 +0930" -->
+<!-- Id="000401c30343$615098f0$0300000a@p4" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: CBQ - Class Based Queuing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matt Pearce &lt;<I><A HREF="mailto:linux@mattpearce.org">linux@mattpearce.org</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 15 Apr 2003 21:07:17 +0930
+</PRE>
+<H1>CBQ - Class Based Queuing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Guy's and Gal's
+
+I'm wondering if anyone has had any success in using CBQ on their Linux Box,
+here's what I'm trying to achieve:
+
+I have a 512/128 ADSL Link, I would like to Limit the rate throughput to
+enable a decent QoS ping time (specifically under 100ms) whilst downloading
+(either on my Linux Box or Windows PC (using Squid)
+
+I am currently achieving minimal or no success in obtaining anything like
+the results as suggested on various websites (see below)
+
+I have had some success with the following command :
+
+/sbin/tc qdisc add dev eth0 root tbf rate 57Kbit latency 50ms burst 1540 - I
+do however still see large ping spikes, I have tried various combinations of
+lower throughput and latency settings.
+
+Here's what I'm trying with the CBQ script and Config <A HREF="file:">file:</A>
+
+I am using the CBQ script which utilises the "tc" command, my configuration
+file is:
+
+DEVICE=eth0,100Mbit,1Mbit
+RATE=450Kbit
+WEIGHT=4Kbit
+PRIO=5
+RULE=10.0.0.0/24
+
+When I compile my configuration file (/etc/rc.d/init.d/cbq compile) it shows
+the following config to be loaded at execution:
+
+tc qdisc del dev eth0 root
+tc qdisc add dev eth0 root handle 1 cbq bandwidth 100Mbit avpkt 1000 cell 8
+tc class change dev eth0 root cbq weight 1Mbit allot 1514
+
+tc class add dev eth0 parent 1: classid 1:f cbq bandwidth 100Mbit rate
+450Kbit weight 4Kbit prio 5 allot 1514 cell 8 maxburst 20 avpkt 1000 bounded
+tc qdisc add dev eth0 parent 1:f handle f tbf rate 450Kbit buffer 10Kb/8
+limit 15Kb mtu 1500
+tc filter add dev eth0 parent 1:0 protocol ip prio 100 u32 match ip dst
+10.0.0.0/24 classid 1:f
+
+Points of reference:
+<A HREF="http://lartc.org/howto/lartc.ratelimit.single.html">http://lartc.org/howto/lartc.ratelimit.single.html</A>
+<A HREF="http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/Adv-Ro">http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/Adv-Ro</A>
+uting-HOWTO.html#s8
+
+My network configuration:
+
+Router (10.0.0.138) (Alcatel Speed Touch Pro)
+Switch
+Linux Box (10.0.0.3) - Redhat 9.0
+Windows Box (10.0.0.3) (XP)
+
+Both use default gateway of 10.0.0.138
+
+Many thanks in advance.
+
+Matt Pearce
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

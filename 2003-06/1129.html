@@ -1,0 +1,217 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Some Proposals for a Linux of The Future (tm) :)" -->
+<!-- FromName="'Damien Uern'" -->
+<!-- FromEmail="carrigan_2606@optusnet.com.au" -->
+<!-- ToName="'James Leone','Richard Russell'" -->
+<!-- ToEmail="jleone@pacbell.net,richard@yellowgoanna.com" -->
+<!-- Date="Sun, 29 Jun 2003 13:21:14 +0930" -->
+<!-- Id="200306291321.14904.carrigan_2606@optusnet.com.au" -->
+<!-- Reference="3EFDF3C1.1080106@pacbell.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Some Proposals for a Linux of The Future (tm) :)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Damien Uern &lt;<I><A HREF="mailto:carrigan_2606@optusnet.com.au">carrigan_2606@optusnet.com.au</A></I>&gt;
+  To  : James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;<BR>        Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  Date: Sun, 29 Jun 2003 13:21:14 +0930
+</PRE>
+<H1>Re: Some Proposals for a Linux of The Future (tm) :)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&lt;SNIP&gt;
+&gt; &gt;Why would you want private variables in a config file in the first place?
+&gt; &gt; I can't think of any instance where a current config file has real
+&gt; &gt;non-user-modifiable information...
+&gt;
+&gt; Then I would have...
+&gt;
+&gt;                          /config/user/joe
+&gt;                          /config/user/jack
+&gt;                         /config/user/name-of-user
+&gt;                          /config/admiin
+&gt;
+&gt; instead of...
+&gt;
+&gt;                          /config
+
+No I don't want to move user configs out of $HOME because it makes 
+administration harder. Often the /home partition is NFS mounted (or at my 
+Uni, /home/$USER is automounted via NFS on the file server whenever you 
+login). Having user configs on the local machine smells like how Windows2k 
+does it ("Documents and Settings/$USER"), which I don't like at all.
+
+The reason I was talking about private variables is to ease the clutter of the 
+GUI (by not having too many options displayed by default), and also to allow 
+the application to store information about itself that is not really meant to 
+be modified by a user (e.g. paths shouldn't need to be changed). e.g. look at 
+xcdroast.conf:
+
+#
+# X-CD-Roast V0.98alpha10 Configuration-File
+#
+# Automatically created by the X-CD-Roast-Setup
+# Don't edit! (Unless you REALLY know what you are doing)
+#
+...
+
+This warning was my reason for wanting private areas, perhaps other programs 
+are similar?
+
+I like your idea about keeping the boot scripts in /boot... but I think we 
+should keep /etc as radical changes will never be accepted by anybody :) 
+(though my suggestion is a pretty radical change, perhaps keeping /etc will 
+make people still feel at home). That's why you see people trying to redesign 
+the Linux filesystem layout and not getting a whole lot of support. People 
+seem to want difficult to type names with capitals and spaces in them, which 
+is no good for doing things via the command line, who wants to type
+
+$ cd Documents\ and\ Settings/
+
+Making sure to get the capital letters correct, etc..
+
+I don't think typing
+
+$ cd /etc/system/services/samba
+$ vi smb.conf
+
+is too much. However tools could be created to ease this. I said in an earlier 
+email that libetc would be capable of searching the /etc tree for config 
+files (either via cache, or search-path just like the linker does when 
+linking to libraries). Tools could be created that use libetc to make finding 
+configuration files easier, e.g.:
+
+$ cfgedit smb.conf
+
+here cfgedit parses the /etc tree and finds smb.conf, then it opens it up in 
+the configured default editor (vi probably, but anything else could be set, 
+pico even).
+
+But because the system is now "smart" and managed by software, you could use 
+aliases so you could simply type:
+
+$ cfgedit samba
+
+This is more oriented to what you really want to do, and that is edit the 
+configuration for the samba service. This is even easier than the current 
+system where you would type:
+
+$ vi /etc/samba/smb.conf
+
+That requires knowledge of where samba is and what it calls it's configuration 
+file. Relying on this is no good because everything is stored hap-hazardly 
+throughout the /etc directory. If you wanted to edit proftpd, you would type:
+
+$ vi /etc/proftpd.conf
+
+So why doesn't proftpd have it's own directory?
+
+What if you want to edit xdm?
+
+$ vi /etc/X11/xdm/xdm-config
+
+The naming convention for the file isn't even consistent!
+
+Maybe you could have other tools for managing the configuration files, e.g:
+
+$ cfgfind samba
+
+returns the path to the samba config file
+
+$ cfgbackup
+
+backs up the current configuration state of the system, perhaps in /etc/backup
+
+$ cfgrestore
+
+restores the last backed up configuration
+
+$ cfgdeploy [config] &lt;HOST&gt;
+
+synchronises the configuration of this server with HOST, over ssh (where the 
+optional option "config" is the name of a configuration, e.g. "cfgdeploy 
+samba 192.168.0.3" will synchronise the configuration of samba with host 
+192.168.0.3 - it may even have an option to restart/start/stop the service on 
+that host in the one command).
+
+etc etc
+
+Cheers,
+
+Damien
+
+&gt;
+&gt; With /config/user/username being writeable by $username
+&gt;
+&gt; You want this because you want users and administrators to know that
+&gt; configuration files are ALWAYS in the same place.
+&gt;
+&gt; &gt;Have you seen debconf?
+&gt;
+&gt; I want uniformity....
+&gt;
+&gt; &gt;Whatever format you want to use (I'll choose XML here),
+&gt;
+&gt; My uneducated comment is this: when I think of XML I think of Open
+&gt; Office, and when I think of Open Office, I think slow...
+&gt;
+&gt; &gt;the idea would be
+&gt; &gt;that the config files would override the defaults. IE if you copied the
+&gt; &gt;default file verbatim, you would get a perfectly valid config file, with
+&gt; &gt;default settings. Likewise, if you removed the config file entirely, or
+&gt; &gt; had an empty one, the system would just use the defaults.
+&gt;
+&gt; Two comments:
+&gt;
+&gt; The first is...if its "Unix" I would think the program should not
+&gt; function without a configuration file, because the program should lack
+&gt; configuration information alltogether.
+&gt;
+&gt; But I like the idea.
+&gt;
+&gt; What annoys me about all of the security crap going around is that it
+&gt; renders the default setups unusable. Like that cups web browser thing.
+&gt; Making the user log in as root wasn't good enough, they had to make the
+&gt; web browser only accessible by the local user - which makes their work
+&gt; rather pointless - most distributions supply a print set up wizzard, so
+&gt; the only use for the cups web page is to use it remotely.
+&gt;
+&gt; And that being so fundamental, the instructions for correcting the
+&gt; problem should be clear and easy to find and in BOLD TYPE.
+&gt;
+&gt; James Leone
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

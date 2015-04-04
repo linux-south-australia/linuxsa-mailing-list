@@ -1,0 +1,127 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: ext3 - please help" -->
+<!-- FromName="'Daniel Smon'" -->
+<!-- FromEmail="dsmon@internode.on.net" -->
+<!-- ToName="'Linux SA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 19 Jan 2003 14:32:48 +1030" -->
+<!-- Id="20030119143248.732e0654.dsmon@internode.on.net" -->
+<!-- Reference="20030119143831.04b03b11.guru255@bigpond.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: ext3 - please help</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Smon &lt;<I><A HREF="mailto:dsmon@internode.on.net">dsmon@internode.on.net</A></I>&gt;
+  To  : Linux SA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 19 Jan 2003 14:32:48 +1030
+</PRE>
+<H1>Re: ext3 - please help</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, 19 Jan 2003 14:38:31 +1030
+Luke (GuruFF) &lt;<A HREF="mailto:guru255@bigpond.com">guru255@bigpond.com</A>&gt; wrote:
+
+&gt; Hi.
+&gt; 	Question is silly but important for me.
+&gt; 	I have following hda structure
+&gt; 	hda
+&gt; 	 hda1	ext2
+&gt; 	 hda2*	ext3
+&gt; 	 hda3	swap
+&gt; 	 hda4	extended
+&gt; 	  hda5	ext3.
+&gt; 	
+&gt; 	I want to resize hda5, and create hda6 which will be another
+&gt; 	extended with fat32 on it to install windiw$.
+&gt; 	
+&gt; 	I wouldlike to konw, 
+&gt; 	1. how safety it is to resize ext3 partition ? 
+&gt; 		(will depend how much i will backup - i have limited space)
+
+I dont think you can resize it using fdisk (not 100% sure), but i think parted will do it.
+
+As for the safety, you'd want to back it up to be sure. Most likely everything will be fine, but especially if this is your first time playing with these sorts of things, i'd recommend backing it all up, just to be sure.
+
+&gt; 	2. if i will resize extended, and create new partition using free
+&gt; 		sectors, the new partition will be extended as well ??
+&gt; 		(sorry i have never ever used fdisk, and i would like
+&gt; 		to do it excatly right)
+
+Yes, it will be extended aswell. This is because you have already reached the limit of 4 primary partitions (hda4 is counted as a primary partition). The wind0ze partition would be hda6.
+
+But i don't think you can boot windows from a logical drive in an extended partition. GRUB may be able to do it with its chainloader command, but i'm not sure. You may want to rearrange the partitions so you can install wind0ze on a primary partition.
+
+&gt; 	3. assuming that i created hda6 with fat32, and installed win on it,
+&gt; 		how to restore boot loader (grub), or if there is any way
+&gt; 		to prevent loosing it...
+
+You can install GRUB onto a floppy disk quite easily. Then just boot from the floppy and reinstall grub into your MBR
+
+To install grub onto a floppy just 
+mkfs -t ext2 /dev/fd0
+mount -t ext2 /dev/fd0 /mnt/floppy
+cp /boot/grub/stage1 /mnt/floppy
+cp /boot/grub/stage2 /mnt/floppy
+umount /mnt/floppy
+
+then run "grub" and type the following at the grub prompt
+root (fd0)
+setup (fd0)
+quit
+
+Replace /mnt/floppy with wherever you mount your floppy ofcourse (/floppy on a debian system i think)
+
+Once you boot from your floppy, you can reinstall GRUB into you're MBR by typing
+
+root (hd0,1)
+setup (hd0)
+configfile /boot/grub/grub.conf
+(or /boot/grub/menu.lst depending again on your distro)
+
+After the configfile line, you should immediately be greeted by you're usual GRUB menu. The "root (hd0,1)" line tells grub which partition is to be read. i assumed hd0,1 which is hda2 as you have indicated above.
+
+The above *should* work, but is untested. At the very least it should point you in the right direction :)
+Good luck :)
+
+--
+
+Daniel Smon
+
+ICQ: 34242839
+e-mail: <A HREF="mailto:dsmon@iprimus.com.au">dsmon@iprimus.com.au</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

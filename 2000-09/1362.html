@@ -1,0 +1,115 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Strange IPCHAINS Behaviour" -->
+<!-- FromName="David Lloyd" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 30 Sep 2000 03:02:35 +0930" -->
+<!-- Id="39D4D233.EB334333@rebel.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Strange IPCHAINS Behaviour</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sat, 30 Sep 2000 03:02:35 +0930
+</PRE>
+<H1>Strange IPCHAINS Behaviour</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I had some problems getting IPCHAINS to behave itself:
+
+* computer was an older i468 with a default RedHat 6.2 installation
+
+My first odd behaviour was:
+
+* ipchains -F
+ - dumped the rules but not the policy
+
+This caused me to be wholly suspicious of ipchains itself - if it
+doesn't reset the policy (to the default ACCEPT state), what else isn't
+working?
+
+In addition:
+
+* I had a default inputDENY, outputDENY, forwardDENY policy
+ - I allowed everything on the localhost interface lo for all three
+chains
+ - I had set /proc/net/ipv4/ip_forward to 1
+ - I had allowed a syn connection out to any web server
+ - I had allowed a ack connection back [terminology may be bad here]
+  --&gt;
+  ipchains -A output -p tcp -i ppp+ -s ${MYIP} ${UNPRIVPORTS} -d any/0
+80 -j ACCEPT
+  ipchains -A input -p tcp -i ppp+ -s any/0 80 -d ${MYIP} ${UNPRIVPORTS}
+! -y -j ACCEPT
+ - I had allowed DNS
+ - I had added:
+  --&gt; ipchains -A forward -i ppp+ -s ${LAN_ADDRESS_IN_CIDR} -j MASQ
+
+* allowed DNS with various rules
+* localhost (i.e. the 486) could see the internet and use lynx to
+connect
+* the other machines on the network - Windows 9X machines - that could
+ping the localhost (firewall) machine, couldn't speak to the outside web
+servers but seemed to be able to resolve domain names
+
+Conceptually I had:
+
+* denied EVERYTHING
+* allowed DNS
+* allowed HTTP
+* masqueraded my LAN network
+
+I've done this before and it worked. I have thought about this and:
+
+* Windows is performing sillies (from what I looked at, it looked like
+it would behave itself, and when I reset all the rules to ALLOW and
+performed the MASQ command by itself, it could see the Internet)
+* Linux is broken
+
+I'd be inclined to say Linux is broken...at least the -F flag doesn't
+work as documented....any ideas on this? 
+
+DL
+I had thought that I h
+-- 
+When you are far away, I dream of the horizon
+My words fail, yet I know that you are with me
+My moon, upon my soul you still shine
+My sun, it is you I still see...
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

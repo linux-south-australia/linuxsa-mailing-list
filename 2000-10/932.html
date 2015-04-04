@@ -1,0 +1,102 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Sun 3/60 booting via tftp" -->
+<!-- FromName="David de Groot" -->
+<!-- FromEmail="david@viking.org.au" -->
+<!-- ToName="LinuxSA Mailing List" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 28 Oct 2000 21:11:44 +0930" -->
+<!-- Id="1648235158.20001028211144@viking.org.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Sun 3/60 booting via tftp</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David de Groot &lt;<I><A HREF="mailto:david@viking.org.au">david@viking.org.au</A></I>&gt;
+  To  : LinuxSA Mailing List &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 28 Oct 2000 21:11:44 +0930
+</PRE>
+<H1>Sun 3/60 booting via tftp</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+So I have this Sun 3/60 here (it lives! well sorta)
+I'd  like  to boot it... but there seems to be a problem with the boot
+tape, so I figure, I'll boot it off my Linux server.
+
+After  determining that it needed an entry in the RARP table to get an
+IP, and then that it wanted to use tftp to retrieve the boot file...
+I  tracked down a NetBSD boot file and placed it in /tftpboot (as this
+is where the tftp server is supposedly configured to look).
+
+I  then  created  a symlink to netboot (the boot file) called C0A80003
+(as  this  is the IP addr of the sun box in hex, as recommended by the
+NetBSD install FAQ).
+
+Of  course, it doesn't work. For some reason the server (eric) replies
+with an icmp: error (see below).
+
+Obviously I haven't configured something quite right... any ideas?
+
+(possibly  relevant  info:   eric  is  multihomed,  it  has  two  eth
+interfaces, the second one (eth1) is the 192.168.0 network, ie the one
+the sun lives on.  Dunno if this would have a bearing on tftpd or not)
+
+Log of attempted network boot (taken with: tcpdump -i eth1) follows:
+
+20:59:39.771432 rarp who-is 8:0:20:0:62:b1 tell 8:0:20:0:62:b1
+20:59:39.771490 rarp reply 8:0:20:0:62:b1 at sun360.viking.home
+20:59:39.964210 sun360.viking.home.ndm-server &gt; eric.viking.home.t<A HREF="ftp:">ftp:</A> 17 RRQ "C0A80003"
+20:59:39.964436 eric.viking.home &gt; sun360.viking.home: icmp: eric.viking.home udp port tftp unreachable [tos 0xc0] 
+20:59:43.960006 sun360.viking.home.ndm-server &gt; eric.viking.home.t<A HREF="ftp:">ftp:</A> 17 RRQ "C0A80003"
+20:59:43.960181 eric.viking.home &gt; sun360.viking.home: icmp: eric.viking.home udp port tftp unreachable [tos 0xc0] 
+20:59:44.956811 arp who-has sun360.viking.home tell eric.viking.home (0:60:8c:f4:2a:90)
+20:59:44.957388 arp reply sun360.viking.home is-at 8:0:20:0:62:b1 (0:60:8c:f4:2a:90)
+20:59:47.960081 sun360.viking.home.ndm-server &gt; eric.viking.home.t<A HREF="ftp:">ftp:</A> 17 RRQ "C0A80003"
+20:59:47.960226 eric.viking.home &gt; sun360.viking.home: icmp: eric.viking.home udp port tftp unreachable [tos 0xc0] 
+20:59:51.960174 sun360.viking.home.ndm-server &gt; eric.viking.home.t<A HREF="ftp:">ftp:</A> 17 RRQ "C0A80003"
+20:59:51.960317 eric.viking.home &gt; sun360.viking.home: icmp: eric.viking.home udp port tftp unreachable [tos 0xc0] 
+20:59:55.960277 sun360.viking.home.ndm-server &gt; eric.viking.home.t<A HREF="ftp:">ftp:</A> 17 RRQ "C0A80003"
+20:59:55.960407 eric.viking.home &gt; sun360.viking.home: icmp: eric.viking.home udp port tftp unreachable [tos 0xc0] 
+20:59:56.103809 sun360.viking.home.ndm-server &gt; 255.255.255.255.t<A HREF="ftp:">ftp:</A> 17 RRQ "C0A80003"
+21:00:00.100327 sun360.viking.home.ndm-server &gt; 255.255.255.255.t<A HREF="ftp:">ftp:</A> 17 RRQ "C0A80003"
+21:00:08.100455 sun360.viking.home.ndm-server &gt; 255.255.255.255.t<A HREF="ftp:">ftp:</A> 17 RRQ "C0A80003"
+  
+
+David
+-- 
+David de Groot                          <A HREF="mailto:david">mailto:david</A>@viking.org.au
+<A HREF="http://vikings.penguinpowered.com">http://vikings.penguinpowered.com</A>
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

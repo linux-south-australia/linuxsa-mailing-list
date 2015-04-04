@@ -1,0 +1,188 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Sendmail and LDAP (was RE: <OFF TOPIC> - HTML)" -->
+<!-- FromName="Andrew Speer" -->
+<!-- FromEmail="andrew.speer@isolutions.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="nickm@bhwb.nsw.gov.au" -->
+<!-- Date="Fri, 10 Mar 2000 15:37:06 +1030" -->
+<!-- Id="" -->
+<!-- Reference="000801bf8a41$42a54d20$4201010a@it.bhwb.local" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Sendmail and LDAP (was RE: &lt;OFF TOPIC&gt; - HTML)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Speer &lt;<I><A HREF="mailto:andrew.speer@isolutions.com.au">andrew.speer@isolutions.com.au</A></I>&gt;
+  To  : <A HREF="mailto:nickm@bhwb.nsw.gov.au">nickm@bhwb.nsw.gov.au</A>
+  Date: Fri, 10 Mar 2000 15:37:06 +1030
+</PRE>
+<H1>Sendmail and LDAP (was RE: &lt;OFF TOPIC&gt; - HTML)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+----- Original Message -----
+From: Nick Morrison &lt;<A HREF="mailto:nickm@bhwb.nsw.gov.au">nickm@bhwb.nsw.gov.au</A>&gt;
+Subject: RE: &lt;OFF TOPIC&gt; - HTML
+
+
+&gt;
+&gt; The Exchange admin needs to install a unix box with Sendmail and LDAP.
+&gt;
+&gt; ;)
+&gt;
+&gt; Out of interest - has anyone succesfully set up a near-complete MS
+&gt; Exchange replacement using LDAP?  I've heard it's possible, but where-
+&gt; ever I look, people just say "yes it's possible" without helping me
+&gt; out too much..  is there an LDAP-Exchange-HOWTO?
+&gt;
+&gt; Have fun, everyone.  I know I am.  Heaps of it.
+&gt;
+&gt; Nick Morrison
+&gt; <A HREF="mailto:nickm@bhwb.nsw.gov.au">nickm@bhwb.nsw.gov.au</A>
+&gt;
+
+Nick,
+
+My experience from implementing LDAP with Sendmail and Outlook is that LDAP
+is one method of providing a "corporate wide" Address book. One of the
+limitations of Outlook Express (and full Outlook w/out an Exchange server)
+is the lack of a "Global" address book.
+
+I believe you can have a shared personal address book (eg point the personal
+address book path to a server share), but this has fairly obvious, severe
+limitations with regard to updating etc.
+
+Although LDAP is much more than a simple address book service, this is
+pretty much all Outlook uses it for (I welcome correction on this point).
+Netscape seems to use it (optionally) as a more complete information
+repository, but I seem to recall that the OpenLDAP server needs to be
+patched to work 100% with Netscape clients for profiles etc.
+
+LDAP/Outlook as a global address book has limitations also though. When the
+user clicks "Address Book" (all references from here on in for Outlook
+Express (OE), but should be similar to Outlook 98/2000 with Internet and
+LDAP connectors), this shows them their personal address book. If the LDAP
+server and Outlook client are set up correctly they can then click "Search"
+and search for a user, which will display the results in a small window.
+
+They can then do two things with the search results.
+
+1 .. Send mail to one of the search results, by right clicking and selecting
+"Send Mail" (or similar). This does just that - adds the email address of
+the selected search result into the "To:" field of the email address, and
+then allows them to compose and send the email.
+
+It does not add the user to the address book, and if at a later stage the
+user wishes to send another email to the same person, they must repeat the
+above procedure (Address Book-&gt;Search-&gt;Send)
+
+
+2 .. The user can add the LDAP search results to their address book. This
+option fills in the local Address book with all the LDAP attributes that are
+applicable to the address book (eg Email, Name, Address, Fax number, Company
+etc etc)
+
+The user can then select this person from their address book at any time and
+send them an email. The *big* downside with this is that there is no address
+book synchronisation. If the LDAP server attributes change (eg the persons
+phone number, or worse, email address) the end users Address Book is not
+updated, so eventually the information in the local address book may go
+stale. An LDAP search and "re-add" will update it, but how often is a user
+going to do that.
+
+One solutions to the above problem would be a program that queried the LDAP
+server at PC startup for changed entries (based on various criteria, and
+with commonsense bandwidth and search minimisation techniques), then updated
+the users address book to reflect this.
+
+I personally think this would be a reasonable solution for a small to medium
+business, as it would allow a synchronised "global address book" with a
+fairly competent (no flames please !) email client - Outlook Express. This
+would be a good starting point for a small email system, which could then be
+expanded to bigger and better things if and as required.
+
+There is a company that made a windows product called "Address Magic", which
+translated a between a whole lot of email address book formats. One
+conversion was LDIF (LDAP Data Interchange Format ?) to OE Address book. I
+approached them to see if they would make a non-interactive version of their
+software to do what I suggested above.
+
+They were enthusiastic, but would only do it if I could guarantee a minimum
+number of purchases. I could not convince my client at the time to proceed
+(chicken and egg deal: Client - "We will only pay if it works." Developer -
+"We wont make it unless you pay"), so the concept flopped.
+
+Hmmm, where were we after all that ? Yes, LDAP is OK, and part of the
+solution, but does not really in my opinion make a "near complete MS
+Exchange replacement".
+
+For one thing, (full) Outlook-Exchange provides the following features which
+are arguably difficult to emulate with Sendmail/IMAP/LDAP:
+
+1 ..  Multiple global address books with individual and mailing-list (group
+entries).
+
+2 .. True shared calendaring, with the ability to look at others free/busy
+times.
+
+3 .. Vacation Auto-Reply and email forwarding.
+
+4 .. Delegation of various mail tasks to others (eg open Inbox as read-only,
+allow secretary to schedule meetings etc).
+
+5 .. Public shared folders (OK, maybe you can do this with IMAP !)
+
+6 .. GUI Admin tools
+
+7 .. Server based mail routing rules.
+
+I did not mean the above list to be inflammatory, and I will concede that
+some of the above points are irrelevant in some situations (6..GUI admin),
+or can be done to some extent with other tools (7..procmail). However a lot
+of the above features are important in a medium to large user setting.
+
+If this is the case for you, have a look at HP OpenMail. It runs on Linux
+and there is a free (although unsupported) license for up to 50 users.
+Otherwise it is roughly $US50 per mailbox. It supports full Outlook clients
+(via MAPI, fairly well from me experience), CCMail, Lotus Notes clients (no
+experience with the last two), plus standard POP/IMAP clients.
+
+Good luck with your project though, and please let the list know how you go,
+and what you find.
+
+Regards,
+
+Andrew Speer
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

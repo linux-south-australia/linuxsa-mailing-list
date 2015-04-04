@@ -1,0 +1,105 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Directory listing bash script" -->
+<!-- FromName="Andrew Burrow" -->
+<!-- FromEmail="alburrow@cs.adelaide.edu.au" -->
+<!-- ToName="Richard Sharpe" -->
+<!-- ToEmail="sharpe@ns.aus.com" -->
+<!-- Date="Thu, 27 Jul 2000 17:18:11 +0930" -->
+<!-- Id="200007270748.RAA05437@radon.cs.adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Directory listing bash script</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Burrow &lt;<I><A HREF="mailto:alburrow@cs.adelaide.edu.au">alburrow@cs.adelaide.edu.au</A></I>&gt;
+  To  : Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  Date: Thu, 27 Jul 2000 17:18:11 +0930
+</PRE>
+<H1>Re: Directory listing bash script</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Sorry to get into this discussion late, but this point is relatively
+important:
+
+
+The "for" loop mechanism _is_ a pain, and quotes often make no
+difference.  It _will_ pull the argument apart into words separated by
+characters from the environment variable "$IFS".
+
+&gt; At 12:52 PM 7/26/00 +0930, Russell, Richard (DEH) wrote:
+&gt; &gt; ahh -- but what if you want to do something more complex, such as
+&gt; &gt; a find or something?
+&gt; 
+&gt; OK, I had suggested 'for f in *' rather than 'for f in `ls`'.
+&gt; 
+&gt; If you need to use find, and I can agree that there will be times when you
+&gt; want to, then you might want to add a -fprintf {} format or whatever to
+&gt; your find command and put quoted around the names.
+
+Try this...
+
+    for f in $(echo '"this contains whitespace and" "this" "does not"') ; do
+        echo $f
+    done
+
+Surprisingly you will get
+
+    "this
+    contains
+    whitespace
+    and"
+    "this"
+    "does
+    not"
+
+So, using the "-fprintf" option in "find" will not help one whit.
+Ignoring for the moment the problem of newlines, you can get around a
+fair bit of this by restricting yourself to line by line operations such
+as "sed" and "grep".  Eventually you will have to resort to a gruesome
+hack involving the shell command "read".  Even then the problem of
+newlines still looms.
+
+
+One promising solution might be to change the value of IFS, so that it
+does not look for whitespace but some other separator.  Then "-fprintf"
+would help.  But what other ASCII character is illegal in file names?
+
+
+Any other thoughts, that still use the shell ;-)
+
+
+Andrew
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

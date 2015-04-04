@@ -1,0 +1,327 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="re:gcc quick question [long]" -->
+<!-- FromName="Darren Gawley" -->
+<!-- FromEmail="dg@cs.adelaide.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="bra369@pp.molsci.csiro.au, linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 13 Jul 2000 18:44:10 +0930" -->
+<!-- Id="396D8862.657DACBA@cs.adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: re:gcc quick question [long]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Darren Gawley &lt;<I><A HREF="mailto:dg@cs.adelaide.edu.au">dg@cs.adelaide.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:bra369@pp.molsci.csiro.au">bra369@pp.molsci.csiro.au</A>, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Thu, 13 Jul 2000 18:44:10 +0930
+</PRE>
+<H1>re:gcc quick question [long]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Kim (+ list)
+
+&gt; the code was written here, but i get anoying message when i try to link it
+&gt; [<A HREF="mailto:kim@bakunin">kim@bakunin</A> ~/scorer_original]$ g++ -lm scorer.o protein.o ligand.o
+&gt; interact.o -o scorer
+&gt; ligand.o(.data+0x0): multiple definition of `fp_lig'
+&gt; scorer.o(.data+0x0): first defined here
+&gt; collect2: ld returned 1 exit status
+&gt; 
+&gt; the fp lig is declared and used in both the scorer.c and the ligand.c. It
+&gt; used to be in the header but this caused probelms so i moved it to the
+&gt; code where it was used.
+
+Your main problem, I think, is that you should be using header files, 
+and iron out the problems, rather than hack it with multiple 
+declarations.  
+
+It is important to think about the semantics of what you want; do 
+you want just one variable (accessed by both .c files), or two sepeartae
+varaibles which happen to be called the same name?  In other words
+do you want the ligand.c code to see changes in fp_lig made by
+code in scorer.c, or do you want them to each have their own copy.
+
+Basically if you want seperate variables called the same name
+you need the static reserved word.  If you want only one
+variable accessed from many .c files you need to use extern.
+
+I'm assuming that you want only one instance (i.e. a change to one
+is reflected in a change to the other):
+ 
+&gt; this code will run as is, but how does one force the g++ linker to ignore
+&gt; multiple definitions?
+
+The answer is to change your code so it is unambigious to 
+the linker.  You should declare your fp_lig symbol with the extern 
+in all but _one_ of your .c files, for example:
+
+in ligand.c:
+int fp_lig;
+
+in scorer.c
+extern int fp_lig;
+
+
+I'll assume you have a setup similar to this small example:
+
+//main.cc
+#include &lt;stdio.h&gt;
+
+int symbol;
+
+void increment(void);
+
+int main(int argc, char* argv)
+{
+    symbol = 0;
+    increment();
+    printf("symbol == %d\n", symbol);
+
+    return 0;
+}
+
+//other.cc
+int symbol;
+
+void increment(void)
+{
+    ++symbol;
+}
+
+then quite rightly when you compile the linker complains that
+it has two symbols called the same name:
+
+linux:dizzy ~/linking &gt; g++ main.cc other.cc
+/tmp/ccMF1POk.o(.bss+0x0): multiple definition of `symbol'
+/tmp/ccHtxczL.o(.bss+0x0): first defined here
+collect2: ld returned 1 exit status
+
+
+If you change int symbol to extern int symbol in other.cc then
+everything
+is ok:
+linux:dizzy ~/linking &gt; g++ main.cc other.cc
+linux:dizzy ~/linking &gt; ./a.out 
+symbol == 1
+
+See how the ++symbol on other.cc has caused the value
+printed from main.cc to be 1.
+
+You can see what is going on by using nm:
+linux:dizzy ~/linking &gt; nm -C main.o other.o
+
+main.o:
+00000000 ? __FRAME_BEGIN__
+         U increment(void)
+00000000 T main
+         U printf
+00000000 B symbol
+
+other.o:
+00000000 ? __FRAME_BEGIN__
+00000000 T increment(void)
+         U symbol
+
+see how 'symbol' is defined as B in main.o (B means it's in the BSS
+section, 
+so it's a real symbol), and as 'U' in other.o (U means undefined in
+terms
+of this object file).  btw the -C option to nm tells it to demangle
+the symbol names (a technical c++ ism).
+
+This is a bit of a hack.  A much better solution is to use header files,
+but you need to be very careful in doing so.  Here is a fist go,
+maybe this is what was causing problems before.
+
+//header.hh
+int symbol.h
+void increment(void);
+
+//other.cc
+#include "header.hh"
+void increment(void)
+{
+    ++symbol;
+}
+
+
+//main.cc
+#include "header.hh"
+
+int main(...
+  &lt;as before&gt;
+
+This is no good, because whenever gcc sees #include it simply
+inserts the text into the file at that point
+
+linux:dizzy ~/linking &gt; g++ main.cc other.cc
+/tmp/cc0gCIXV.o(.bss+0x0): multiple definition of `symbol'
+/tmp/ccWR6r2X.o(.bss+0x0): first defined here
+collect2: ld returned 1 exit status
+
+
+One typical problem is that when you do a #include, the compiler inserts
+the text from the relevant header file in place.  So when you compile
+the
+two source files including the same header, you have the same problem as 
+before; the same symbol defined twice.  You can see this clearly by
+using
+the -E flag to gcc:
+
+linux:dizzy ~/linking &gt; gcc -E other.cc
+# 1 "other.cc"
+
+# 1 "header.hh" 1
+
+int symbol;
+
+void increment(void);
+
+# 2 "other.cc" 2
+
+
+extern int symbol;
+
+void increment(void)
+{
+    ++symbol;
+}
+
+-E tells gcc to stop after the preprocessor stage so you can see what
+the compiler is really looking at as input.  This version of the header
+file therefore has exactly the same problem as before in terms of two
+definition of the same symbol.
+
+You should _awlays_ put a check at the top of header files for multiple
+includes.  this makes sure that the preprocess will only insert one
+copy of the code into compilation.
+//header.hh
+#ifndef _header_
+#define _header_
+
+int symbol;
+void increment(void);
+
+#endif
+
+This won't fix your problem however, because there is still a problem
+at link time.  The best thing to do is to write a new .cc file and
+put the variable in there, and have extern in your header file,
+like this:
+
+//header.hh
+#ifndef _header_
+#define _header_
+extern int symbol;
+void increment(void);
+#endif
+
+//header.cc
+int symbol;
+
+//other.cc
+#include "hedaer.hh"
+void increment(void) { ++symbol; }
+
+//main.cc
+#incude &lt;stdio.h&gt;
+#include "header.hh"
+int main(...
+  &lt;as before&gt;
+
+This compiles and runs fine, if you want there to be only one acutal
+variable.  If you want two seperate variables (so which other.cc
+increments
+symbol it updates it's own local copy) you need the static keywoard.
+
+You no longer need header.cc to provide space for the variable, and 
+header.hh should change like this:
+//header.hh
+static int symbol;
+void increment(void);
+
+The static keywoard in C (and C++) is a little tricky in this
+context.  When a static variable is defined _inside a function_
+it means that there "is only one instance".  So if you have
+void foo(void) 
+{
+    static int x = 0;
+    printf("%d ", ++x);
+}
+
+and call it multiple times you will get the output 1 2 3 4 5, 
+the value is "saved" between calls.  But when you define a 
+variable in public scope (outside a function) then static
+means "keep it local"
+
+so if you have
+//other.cc
+static int symbol;
+void increment(void) { ++symbol; }
+
+
+//main.cc
+static int symbol;
+void increment(void);
+
+int main() {
+    symbol = 0;
+    increment();
+    printf("%d\n", symbol);
+    return 0;
+}
+
+and compile and run, you will get 0 as output.  The ++symbol in
+increment applys to its local copy only.
+
+I apoligise to the length of this message...
+
+Cheers,
+
+DG.
+
+
+
+
+-- 
+-------------------------------------------------------------------------
+Darren Gawley                                      
+<A HREF="mailto:dg@cs.adelaide.edu.au">dg@cs.adelaide.edu.au</A>
+Dept. of Computer Science                           phone: (08) 8303
+6197
+University of Adelaide                                fax: (08) 8303
+4366
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

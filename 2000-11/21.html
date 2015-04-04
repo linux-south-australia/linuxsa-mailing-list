@@ -1,0 +1,133 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: .bashrc and Debian 2.2" -->
+<!-- FromName="'Andrew Burrow'" -->
+<!-- FromEmail="alburrow@cs.adelaide.edu.au" -->
+<!-- ToName="'John Kennison'" -->
+<!-- ToEmail="marjon@mindless.com" -->
+<!-- Date="Wed, 01 Nov 2000 09:13:53 +1030" -->
+<!-- Id="200010312243.e9VMhsZ18623@radon.cs.adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: .bashrc and Debian 2.2</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Burrow &lt;<I><A HREF="mailto:alburrow@cs.adelaide.edu.au">alburrow@cs.adelaide.edu.au</A></I>&gt;
+  To  : John Kennison &lt;<I><A HREF="mailto:marjon@mindless.com">marjon@mindless.com</A></I>&gt;
+  Date: Wed, 01 Nov 2000 09:13:53 +1030
+</PRE>
+<H1>Re: .bashrc and Debian 2.2</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+RE: sourcing of .bashrc file.
+
+
+&gt; I have a few alias set up in .bashrc under my home directory however they do
+&gt; not load on boot. If you open an xterm or that the settings are detected, but
+&gt; if I want them to work at the plain console I must manualy 'source ~/.bashrc'
+&gt; which is an inconvience to say the least.  
+
+Sometime ago I answered a similiar question on this, so you may find
+something interesting in the mailling list archives.
+
+The gist of it is that bash has some surprising policy wrt sourcing
+these files.  In particular, there is a strange mixture between the
+cases of login/non-login and interactive/non-interactive shell.  You
+can _just_ work it out if you pour over the man page ;-).
+
+Basically, .bashrc is sourced by an interactive shell, but not by a
+login-shell.  Therefore your login profile should source .bashrc if it
+is interactive.  RedHat have _hacked_ around this forever, by setting
+ENV to point to .bashrc, which causes it to be loaded even by
+non-interactive shells.
+
+
+Here is the outline of my solution:
+
+  +	In "~/.bash_profile": at the end of the script I sense whether
+	the shell is interactive and source the resources as appropriate
+
+
+# Get aliases and functions.
+# 
+# This is a strange peculiarity of the shell.  During a login shell
+# the resources are never read, even if the shell is interactive.
+# Therefore we test whether the PS1 variable is set to determine if
+# the shell is an interactive login shell --- not an uncommon
+# occurrence.
+
+if [ "${PS1:-NONE}" != "NONE" ] ; then
+    if [ -f ~/.bashrc ]; then
+        . ~/.bashrc
+    elif [ -f /etc/bash.bashrc ]; then
+        . /etc/bash.bashrc
+    fi
+fi
+
+
+  +	In "~/.bashrc" I load the system wide resources.  
+
+
+# Source global aliases and functions.
+
+if [ -f /etc/bash.bashrc ]; then
+    . /etc/bash.bashrc
+fi
+
+
+
+OK. Looking at this again maybe it would be better if I sourced
+"/etc/bash.bashrc" in "/etc/profile", in the same way as above, and then
+load the personal resources in "~/.bash_profile" ---- whatever.
+
+
+&gt; On a similar note, in /etc/ I have a file called "bash.bashrc" which
+&gt; claims to the system-wide default .bashrc file. Is this the correct
+&gt; name for the file??  It just seems to be a different naming convention
+&gt; to the /etc/profile file.
+
+Given that you should source these files from the profiles, I
+think that you could call it slarty bartfast if you wished ;-).
+Maybe the man page says something, though I don't recall.
+
+
+
+Cheers,
+
+
+Andrew
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

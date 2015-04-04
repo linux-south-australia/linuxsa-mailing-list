@@ -1,0 +1,168 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: xwindows template" -->
+<!-- FromName="Dave Lawrence" -->
+<!-- FromEmail="philaw@camtech.net.au" -->
+<!-- ToName="Evan Bourlotos" -->
+<!-- ToEmail="evan@cs.adelaide.edu.au" -->
+<!-- Date="Thu, 16 Mar 2000 00:15:44 +1030" -->
+<!-- Id="38CF9408.1B0B2C29@camtech.net.au" -->
+<!-- Reference="3.0.5.32.20000315115100.0090b950@chook.cs.adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: xwindows template</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dave Lawrence &lt;<I><A HREF="mailto:philaw@camtech.net.au">philaw@camtech.net.au</A></I>&gt;
+  To  : Evan Bourlotos &lt;<I><A HREF="mailto:evan@cs.adelaide.edu.au">evan@cs.adelaide.edu.au</A></I>&gt;
+  Date: Thu, 16 Mar 2000 00:15:44 +1030
+</PRE>
+<H1>Re: xwindows template</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Hi all,
+&gt; I was wondering if anyone has any basic or simple source code c/c++ which
+&gt; will open xwindow display something and close it.
+
+I've included below such a program. To compile it you have to link it
+against the X11 libraries (ie "gcc xwin.c -L/usr/X11R6/lib -lX11") and
+perhaps the nsl and socket libraries if you're on Solaris (the bastards
+don't link against them by default)
+
+The gist is:
+
+open connection to X server
+make your X Resources (Windows, graphics contexts)
+EVENT LOOP
+     Manipulate resources
+     Handle events
+     Send them off to the X server to draw.
+END LOOP
+close connection.
+
+After making the window, I put a getchar() in there, so that you have to
+press a key before XFlush() is called (and the window is actually
+mapped). This is just to demonstrate how the Xlib queues are buffered,
+which caused me no end of trouble when I was starting out.
+
+The O'Rielly Xlib programming manual collection is available in the Barr
+Smith library. If you want a "real" X windows program, I've written a
+multiplayer network game featuring Tux, the Beastie and a few other
+characters called XTux.
+
+The web page is <A HREF="http://xtux.sourceforge.net">http://xtux.sourceforge.net</A>
+
+Toolkits are your friend. The only reason you should use Xlib is because
+you are writing a graphics library or are a naive games programmer :)
+
+Dave Lawrence
+
+------------------------------------------------
+
+#include &lt;X11/Xlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;math.h&gt;
+
+/* Win dimensions */
+#define WIN_W 200
+#define WIN_H 200
+
+Display *display;
+Window win;
+GC gc;
+int screen;
+
+void draw_something(void)
+{
+    
+    XSetForeground(display, gc, WhitePixel(display, screen));
+    XFillRectangle(display, win, gc, 16, 16, 32, 32);
+    XDrawLine(display, win, gc, WIN_W, 0, 0, WIN_H);
+    /* Anything using GC will now be Black */
+    XSetForeground(display, gc, BlackPixel(display, screen));
+    XDrawLine(display, win, gc, 16, 16, 48, 48);
+    XFlush(display);
+
+}
+
+
+void event_loop(void)
+{
+   XEvent event;
+
+   while( 1 ) {
+       if( XPending(display) ) {
+           XNextEvent(display, &event);
+           if( event.type == GraphicsExpose || event.type == Expose ) {
+               draw_something();
+           } else if( event.type == ButtonPress ) {
+               XCloseDisplay(display);
+               exit(EXIT_SUCCESS);
+           }
+       } else
+           sleep(1); /* Not very good response time.... */
+   }
+
+}
+
+int main(void)
+{
+    Window root;
+    int depth;
+
+    if( (display = XOpenDisplay(NULL)) == NULL) {
+        fprintf(stderr, "Error: Can't open display.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    screen = DefaultScreen(display);
+    depth = DefaultDepth(display, screen);
+
+    root = RootWindow(display, screen);
+    win = XCreateSimpleWindow(display, root, 0, 0, WIN_W, WIN_H, 0, 0,
+0);
+    gc = XCreateGC(display, win, 0, NULL);
+
+    /* Button press will close window, exposure will redraw */
+    XSelectInput(display, win, ButtonPressMask | ExposureMask);
+    XMapRaised(display, win);
+
+    getchar(); /* Press a key */
+    XFlush(display);
+
+    event_loop();
+
+}
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

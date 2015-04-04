@@ -1,0 +1,225 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Recording radio at set schedules - mpeg compression on the fly" -->
+<!-- FromName="'Toby Corkindale'" -->
+<!-- FromEmail="tjcorkin@sa.pracom.com.au" -->
+<!-- ToName="'Aristotle'" -->
+<!-- ToEmail="aristotle@ihug.com.au" -->
+<!-- Date="Tue, 15 Jan 2002 00:58:07 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0201150056270.14737-100000@localhost.localdomain" -->
+<!-- Reference="3C42B052.6030108@ihug.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Recording radio at set schedules - mpeg compression on the fly</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@sa.pracom.com.au">tjcorkin@sa.pracom.com.au</A></I>&gt;
+  To  : Aristotle &lt;<I><A HREF="mailto:aristotle@ihug.com.au">aristotle@ihug.com.au</A></I>&gt;
+  Date: Tue, 15 Jan 2002 00:58:07 +1030 (CST)
+</PRE>
+<H1>Re: Recording radio at set schedules - mpeg compression on the fly</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, 14 Jan 2002, Aristotle wrote:
+
+&gt; Thanks!
+&gt;
+&gt; The lame options are certainly helpful - it would be handy to preset to
+&gt; AM or FM sound quality (mono / lower sampling rate for AM) which would
+&gt; mean that I could record at about or even less than 10MB per half our of
+&gt; AM radio programming - something like 30 hrs of archives per CD - that's
+&gt; great.
+
+yes, u can adjust or make your own presets i believe?
+
+Even if not, you can just specify all the options directly instead of using
+a preset. just makes the command line longer so i used the quick way in my
+example ;)
+
+&gt;
+&gt; I don't suppose I need to run the output through a lowpass filter to
+&gt; ensure that if I use AM quality sampling that quantisation error
+&gt; (harshness) does not occur.
+
+lame includes optional low pass filtering. the radio preset probably turns
+it on (the help for the option will show you), otherwise you cna manually
+add the option.
+
+
+&gt;
+&gt; So for now I can just plug my walkman in - trick is that I think battery
+&gt; powered radios pick up less interference - otherwise a aerial hanging
+&gt; out the window may do the trick - and insulate the bit hanging inside
+&gt; the window from interference somehow?
+&gt;
+&gt; I would like to eventually write a front end so that a months worth of
+&gt; programming can be scheduled in.  Another friend had the idea of pulling
+&gt; scheduling information of the Net automatically and searching /
+&gt; scheduling automatically although I think that would be incredibly
+&gt; difficult to do.
+
+cron and at are both powerful tools.
+
+&gt;
+&gt; I have been looking around for good radio cards for a PC that can be
+&gt; programmed with Linux - any ideas?  Or can I just build one - and
+&gt; perhaps put in short wave also?
+
+not sure on this, sorry.
+
+&gt;
+&gt; Toby Corkindale wrote:
+&gt;
+&gt; &gt; Hmm,
+&gt; &gt;
+&gt; &gt; You could us "at" to set the time when it records easily enough.
+&gt; &gt; at 5 am
+&gt; &gt;
+&gt; &gt;&gt;recordradio.pl
+&gt; &gt;&gt;
+&gt; &gt; ^D
+&gt; &gt;
+&gt; &gt; at 6 am
+&gt; &gt;
+&gt; &gt;&gt;stoprecording
+&gt; &gt;&gt;
+&gt; &gt; ^D
+&gt; &gt;
+&gt; &gt; etc
+&gt; &gt;
+&gt; &gt; you'd then make the recordradio.pl script do something like
+&gt; &gt;
+&gt; &gt; #!/usr/bin/perl
+&gt; &gt;
+&gt; &gt; # record your PID so you can stop it later..
+&gt; &gt; open(FOO, "/var/run/radio.pid");
+&gt; &gt; print FOO "$$\n";
+&gt; &gt; close(FOO);
+&gt; &gt;
+&gt; &gt; # Record from line in to mpeg
+&gt; &gt; print "Recording to output.mp3..\n";
+&gt; &gt; # i'm guessing at the rec stuff, i haven't actualy tried it myself
+&gt; &gt; # the lame options are for the fm radio preset, plus VBR mode enable.
+&gt; &gt; system("rec --rate=44100 -t wav --size=w - | lame --preset fm --quiet
+&gt; &gt; -v - output.mp3");
+&gt; &gt; print "Recording has aborted for some reason.\n";
+&gt; &gt; # remove the pid file
+&gt; &gt; unlink("/var/run/radio.pid");
+&gt; &gt; exit;
+&gt; &gt;
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; The stoprecording script would just need to be a bash script that does:
+&gt; &gt; kill `cat /var/run/radio.pid`
+&gt; &gt;
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; i haven't tried this, but give it a go and see if it works.. I was thinking
+&gt; &gt; about this exact situation last week, because some ppl i know do a show on
+&gt; &gt; sunday mornings that i'd like to record, but am not in the mood at 9am!
+&gt; &gt; Unfortunately my radio reception when its next to the computer prevented me
+&gt; &gt; from actually trying out the stuff..
+&gt; &gt;
+&gt; &gt; Hope this helps, and if you debug it and get it working, please post back to
+&gt; &gt; the list..
+&gt; &gt;
+&gt; &gt; -Toby
+&gt; &gt;
+&gt; &gt; On Sun, 13 Jan 2002, Aristotle wrote:
+&gt; &gt;
+&gt; &gt;
+&gt; &gt;&gt;Hi people,
+&gt; &gt;&gt;
+&gt; &gt;&gt;I would like to set up my Mandrake 8.1 box to record the radio and mpeg
+&gt; &gt;&gt;compress it to set directories / dynamically updated filenames (by date)
+&gt; &gt;&gt;at set times - so for example I can record a show of Radio National at
+&gt; &gt;&gt;5am or whatever.
+&gt; &gt;&gt;
+&gt; &gt;&gt;I figure I can plug a radio in the line in port on the soundcard and
+&gt; &gt;&gt;then pipe that to a mpeg compression application somehow although I have
+&gt; &gt;&gt;no idea how.
+&gt; &gt;&gt;
+&gt; &gt;&gt;If anyone is aware of a project already started up for this I would be
+&gt; &gt;&gt;appreciative to be pointed in the right direction - or if anyone is able
+&gt; &gt;&gt;to help me I would be happy.  Even if someone would like to come around
+&gt; &gt;&gt;one day and I will shout some pizza / beer / etc to sit down and nut
+&gt; &gt;&gt;this and some other Linux things out I would be very appreciative.
+&gt; &gt;&gt;
+&gt; &gt;&gt;It would be handy to extend this to a radio / tv card to record set
+&gt; &gt;&gt;programs - and just set up a monthly schedule.
+&gt; &gt;&gt;
+&gt; &gt;&gt;Would it be one day possible to route this through voice recognition
+&gt; &gt;&gt;software to keep an eye out for interesting topics - say listening for
+&gt; &gt;&gt;'Afghanistan' on talk back radio or something - I jnow this is
+&gt; &gt;&gt;far-fetched but I thought I would ask anyhow.
+&gt; &gt;&gt;
+&gt; &gt;&gt;I am about to re-commence studies at Flinders University in politics
+&gt; &gt;&gt;(international relations) and a tool like this would be immensely
+&gt; &gt;&gt;helpful.  Perhaps later we can develop it to a point where other
+&gt; &gt;&gt;students / universities would find such a tool to be useful also -
+&gt; &gt;&gt;another way to get Linux on the map.
+&gt; &gt;&gt;
+&gt; &gt;&gt;Thanks in advance!!!
+&gt; &gt;&gt;
+&gt; &gt;&gt;
+&gt; &gt;&gt;
+&gt; &gt;
+&gt;
+&gt;
+&gt;
+
+-- 
+ Toby Corkindale
+ UNIX Developer, Core Tech R&D
+ Technology SA, Pracom Ltd
+ 288 Glen Osmond Road
+ Fullarton,	5063
+ South Australia
+ Tel: +61 8 8202 9075
+ Fax: +61 8 8202 9001
+ mailto:<A HREF="mailto:Toby.Corkindale@sa.pracom.com.au">Toby.Corkindale@sa.pracom.com.au</A>
+ <A HREF="http://www.sa.pracom.com.au/">http://www.sa.pracom.com.au/</A>
+
+                  PRIVILEGED - PRIVATE AND CONFIDENTIAL
+
+   Privileged/Confidential Information may be contained in this message.
+   If you are not the addressee indicated in this message, you may not
+   copy or deliver this message to anyone.  In such case, you should
+   destroy this message and notify the sender by reply email. Opinions,
+   conclusions and other information in this message that do not relate
+   to the official business of this organisation shall be understood as
+   neither given nor endorsed by it.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

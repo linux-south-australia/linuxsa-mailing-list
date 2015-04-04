@@ -1,0 +1,129 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Code Red warming up again" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 6 Aug 2001 00:09:19 +0930" -->
+<!-- Id="20010806000919.A23214@dog.topology.org" -->
+<!-- Reference="Pine.LNX.4.10.10108052252580.30725-100000@sandwich.home.lyppard.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Code Red warming up again</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 6 Aug 2001 00:09:19 +0930
+</PRE>
+<H1>Re: Code Red warming up again</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, Aug 05, 2001 at 11:00:25PM +0930, michael wrote:
+&gt; New strain:
+&gt; 
+&gt; 203.250.77.96 - - [05/Aug/2001:22:31:02 +0930] "GET
+&gt; /default.ida?XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+&gt; [snip]
+&gt; %u8190%u00c3%u0003%u8b00%u531b%u53ff%u0078%u0000%u00=a
+&gt; HTTP/1.0" 404 205
+&gt; 
+&gt; Copycat or error?:
+&gt; 
+&gt; 203.45.135.107 - - [05/Aug/2001:22:05:53 +0930]
+&gt; "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+&gt; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX%u9090%u6858
+&gt; %ucbd3%u7801%u9090%u6858%ucbd3%u7801%u9090%u6858%ucbd3%u7801
+&gt; %u9090%u9090%u8190%u00c3%u0003%u8b00%u531b%u53ff%u0078%u0000%u00=a
+&gt; HTTP/1.1" 400 -
+&gt; 
+
+
+Now here's something odd.
+The old N-strain always seems to get a 400-error:
+
+62.110.203.219 - - [05/Aug/2001:19:50:44 +0930] "GET /default.ida?NNNNNNNNNNNNNN
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN%u9090%u6858%ucbd3%u7801%u9090
+%u6858%ucbd3%u7801%u9090%u6858%ucbd3%u7801%u9090%u9090%u8190%u00c3%u0003%u8b00%u
+531b%u53ff%u0078%u0000%u00=a  HTTP/1.0" 400 327 "-" 
+
+According to this:
+<A HREF="http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html">http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html</A>#sec6.1.1
+the 400 means "Bad Request", which sounds fair enough.
+
+But the almost identical X-strain almost always gives a 404-code:
+
+203.247.201.100 - - [05/Aug/2001:20:08:33 +0930] "GET /default.ida?XXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX%u9090%u6858%ucbd3%u7801%u909
+0%u6858%ucbd3%u7801%u9090%u6858%ucbd3%u7801%u9090%u9090%u8190%u00c3%u0003%u8b00%
+u531b%u53ff%u0078%u0000%u00=a  HTTP/1.0" 404 1203 "-" 
+
+Everything's the same except that the X replaces the N.
+But maybe there's some significant different in the rest of
+the request (which is a few kBytes, I think).
+
+Now the _really_ odd thing is this.
+It looks like if the X-variant arrives often enough, my
+Apache server returns a 200-code:
+
+ns1.radcomp.com.au - - [05/Aug/2001:19:40:30 +0930] "GET /default.ida?XXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX%u9090%u6858%ucbd3%u7801%u
+9090%u6858%ucbd3%u7801%u9090%u6858%ucbd3%u7801%u9090%u9090%u8190%u00c3%u0003%u8b
+00%u531b%u53ff%u0078%u0000%u00=a  HTTP/1.0" 404 1203 "-"
+ns1.radcomp.com.au - - [05/Aug/2001:19:42:12 +0930] "GET /default.ida?XXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX%u9090%u6858%ucbd3%u7801%u
+9090%u6858%ucbd3%u7801%u9090%u6858%ucbd3%u7801%u9090%u9090%u8190%u00c3%u0003%u8b
+00%u531b%u53ff%u0078%u0000%u00=a  HTTP/1.0" 200 - "-" 
+
+And the field after the 200-code is a hyphen!
+I hope this doesn't mean that my Apache server is
+actually cooperating with the worm to do something bad.
+I don't believe that, but when I see that 200-code, it makes me
+a little nervous. Hopefully there's no strain out there that
+does linux too!
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,119 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: pppd reconnect script" -->
+<!-- FromName="'Jake Hawkes'" -->
+<!-- FromEmail="jake@infinitylimited.net" -->
+<!-- ToName="'Michael Kratz'" -->
+<!-- ToEmail="michael_kratz@hotmail.com" -->
+<!-- Date="Sun, 25 Feb 2001 00:24:32 +0000" -->
+<!-- Id="3A9850C0.AE969701@infinitylimited.net" -->
+<!-- Reference="F56OLZCHusMjQHtMFau0001b5d8@hotmail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: pppd reconnect script</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  To  : Michael Kratz &lt;<I><A HREF="mailto:michael_kratz@hotmail.com">michael_kratz@hotmail.com</A></I>&gt;
+  Date: Sun, 25 Feb 2001 00:24:32 +0000
+</PRE>
+<H1>Re: pppd reconnect script</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Michael Kratz wrote:
+&gt; 
+&gt; Hi all,
+&gt; 
+&gt; Does anyone have any handy little scripts that for example ping the next hop
+&gt; router on ppp connection and when it detects the connection is lost,
+
+from man ping:
+
+     -c count
+             Stop after sending (and receiving) exactly count
+ECHO_RESPONSE
+             packets. The special case of no packet received after count
+pack­
+             ets are sent causes termination also (the remote host or
+gateway
+             is unreachable).
+and..
+
+     If ping does not receive any reply packets at all it will exit with
+code
+     1.  On error it exits with code 2. Otherwise it exits with code 0.
+This
+     makes it possible to use the exit code to see if a host is alive or
+not.
+
+so...
+
+#!/bin/bash          
+ping -c1 1.1.1.1
+
+STATUS=$? 
+      
+echo "$STATUS returned"
+          
+case $STATUS in
+    0)
+        echo "next host in route alive"
+        ;;
+    1)
+        echo "no packets returned"
+        ;;
+    2)
+        echo "there was an error"
+        ;;
+    *)
+        echo "I dunno"
+esac
+
+should be enough to start.
+
+you might want to put "ifup ppp0" in the case(1), since I just found
+this: 
+
+$&gt; ifup ppp0
+ppp0 already up, initiating redial
+
+
+which caused the connection to drop (pppd dies) and redialed
+--
+Jake Hawkes B.Eng, (CSE)
+
+A crayon can take you to more places than a Starship can. - Guinan
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

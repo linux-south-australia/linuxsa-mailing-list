@@ -1,0 +1,110 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="cgi prob." -->
+<!-- FromName="BlackAdder" -->
+<!-- FromEmail="daved@uq.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 23 Apr 2000 10:38:07 +0930" -->
+<!-- Id="NDBBKMODALNKOFILJMEKAEMFCDAA.daved@uq.net.au" -->
+<!-- Reference="20000423100602.A326@ozemail.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: cgi prob.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: BlackAdder &lt;<I><A HREF="mailto:daved@uq.net.au">daved@uq.net.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sun, 23 Apr 2000 10:38:07 +0930
+</PRE>
+<H1>cgi prob.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi guys,
+
+Well I've puddled around with this problem for some hours now and I'm at my
+wits end.
+I'm probably just being a twonk or something, but here's the problem:
+
+I have a cgi script on my webserver that checks the access-log for httpd and
+reformats it a bit before displaying the results as an html file.
+
+The problem is, although the script "loads" the webpage, it doesn't run the
+script to build the webpage. Thus, I want to know is, why isn't it working?
+What stupid thing have I done/overlooked?
+
+(see scripts included below)
+
+Thanks,
+Dave.
+
+
+[http_access.cgi]--------------------------------------------------
+#!/bin/sh
+
+rm -f /home/httpd/html/checkaccess.html
+/bin/sh build_access
+echo Location:  <A HREF="http://eric.viking.org.au/checkaccess.html">http://eric.viking.org.au/checkaccess.html</A>
+echo
+-------------------------------------------------------------------
+
+[build_access]-----------------------------------------------------
+#!/bin/sh
+
+rm -f /home/httpd/html/checkaccess.html
+touch /home/httpd/html/checkaccess.html
+echo '&lt;HTML&gt;&lt;HEAD&gt;&lt;META http-equiv="Pragma"
+content="no-cache"&gt;&lt;/HEAD&gt;&lt;BODY&gt;' &gt; /home/httpd/html/checkaccess.html
+echo '&lt;H1&gt;Machine access to eric.viking.org.au&lt;/H1&gt;' &gt;&gt;
+/home/httpd/html/checkaccess.html
+echo '&lt;p&gt;' &gt;&gt; /home/httpd/html/checkaccess.html
+date &gt;&gt; /home/httpd/html/checkaccess.html
+echo '&lt;p&gt;' &gt;&gt; /home/httpd/html/checkaccess.html
+/bin/sh ./ha.sh
+cat /tmp/ha.txt | awk -f ha.awk &gt;&gt; /home/httpd/html/checkaccess.html
+-------------------------------------------------------------------
+
+[ha.sh]------------------------------------------------------------
+#!/bin/sh
+
+cat /var/log/httpd/access_log | cut -d " " -f 1 | sort | uniq \
+&gt; /tmp/ha.txt
+
+cat /tmp/ha.txt | nslookup &gt; /tmp/hanames.txt
+-------------------------------------------------------------------
+
+[ha.awk]-----------------------------------------------------------
+{ printf("%s &lt;br&gt;\n", $1) }
+-------------------------------------------------------------------
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

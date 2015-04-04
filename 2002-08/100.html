@@ -1,0 +1,232 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba slow" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="rsharpe@ns.aus.com" -->
+<!-- ToName="'Brian Marr'" -->
+<!-- ToEmail="cabernet@internode.on.net" -->
+<!-- Date="Mon, 5 Aug 2002 16:36:32 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0208051634420.3423-100000@ns.aus.com" -->
+<!-- Reference="200208051628.48259.cabernet@internode.on.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba slow</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A></I>&gt;
+  To  : Brian Marr &lt;<I><A HREF="mailto:cabernet@internode.on.net">cabernet@internode.on.net</A></I>&gt;
+  Date: Mon, 5 Aug 2002 16:36:32 +0930 (CST)
+</PRE>
+<H1>Re: Samba slow</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, 5 Aug 2002, Brian Marr wrote:
+
+&gt; I am using Version 2.2.3a-64 for both server & client- VMware running on Suse 
+&gt; 8.0. I enclose some results of testparm that I don't understand and a longish
+&gt; Smb.conf file. I have made a couple of small changes to this. An alteration to 
+&gt; the TCP_NODELAY line and introduced the 40GB share.
+
+Upgrade to a later version. There was a recent problem with OpLock breaks 
+being deferred under some circumstances causing OpLock break timeouts and 
+problems. These problems are fixed in 2.2.6 (soon to be released :-).
+ 
+&gt; Brian Marr
+&gt; =================================
+&gt; 
+&gt; Testparm is showing......
+&gt;  browseable = Yes
+&gt;         blocking locks = Yes
+&gt;         fake oplocks = No
+&gt;         locking = Yes
+&gt;         oplocks = Yes
+&gt;         level2 oplocks = Yes
+&gt;         oplock contention limit = 2
+&gt;         posix locking = Yes
+&gt;         strict locking = No
+&gt;         share modes = Yes
+&gt; =================================
+&gt; 
+&gt; # /etc/samba/smb.conf ist the main samba configuration file. Cf. the
+&gt; # manual page of smb.conf and the included documantation in
+&gt; # /usr/share/doc/packages/samba in order to understand the options
+&gt; # listed here and many more features.
+&gt; #
+&gt; # Lines in this example which starts with ; and # are ignored comment
+&gt; # ones. # indicates a comment and ; a deactivated example line.
+&gt; #
+&gt; # We suggest to use the command 'testparm' after any changes you made.
+&gt; #
+&gt; # Copyright (c) 1999 - 2001 SuSE GmbH Nuernberg, Germany.
+&gt; #
+&gt; # Please send bugfixes or comments to <A HREF="mailto:feedback@suse.de.">feedback@suse.de.</A>
+&gt; #
+&gt; [global]
+&gt; 	workgroup = KID
+&gt; 	os level = 2
+&gt; 
+&gt; 	security = user
+&gt; 	encrypt passwords = Yes
+&gt; 	guest account = Nobody
+&gt; 	map to guest = Bad User
+&gt; # This tells samba to use the file smbusers for user mapping.
+&gt; ;	username map = /etc/samba/smbusers
+&gt; 
+&gt; # This tells samba to write log files per machine.
+&gt; ;	log file = /var/log/samba/%m
+&gt; # This sets an alternate log level. Default is 2.
+&gt; ;	log level = 3
+&gt; 
+&gt; # Uncomment the following, if you want to use an existing NT-Server to
+&gt; # authenticate users, but don't forget that you also have to create them
+&gt; # locally!
+&gt; ;	security = server
+&gt; ;	password server = 192.168.1.10
+&gt; 
+&gt; 	printing = LPRNG
+&gt; 	printcap name = /etc/printcap
+&gt; 	load printers = Yes
+&gt; 
+&gt; # These settings are a suggestion for a local network. Cf. section
+&gt; # 'socket options' in the man page of smb.conf and socket(7).
+&gt; #	socket options = SO_KEEPALIVE IPTOS_LOWDELAY TCP_NODELAY
+&gt; 	socket options = TCP_NODELAY
+&gt; 
+&gt; # Uncomment this, if you want to integrate your server
+&gt; # into an existing net e.g. with NT-WS to prevent nettraffic
+&gt; ;	local master = No
+&gt; 
+&gt; # Please uncomment the following entry and replace the ip number and
+&gt; # netmask with the values of your network interface configuration.
+&gt; ;	interfaces = 192.168.1.1/255.255.255.0
+&gt; 
+&gt; # If you want Samba to act as a wins server, please set
+&gt; # 'wins support' to yes.
+&gt; 	wins support = No
+&gt; 
+&gt; # If you want Samba to use an existing wins server, please uncomment the
+&gt; # following line and replace the dummy with the wins server's ip number.
+&gt; ;	wins server = 192.168.1.1
+&gt; 
+&gt; # Set these two parameters to your DOS code page and appropriate UNIX
+&gt; # character set. These values are for west European languages (Latin-9)
+&gt; # UNIX character and MS-DOS Latin 1 code page.
+&gt; 	character set = ISO8859-15
+&gt; 	client code page = 850
+&gt; 
+&gt; # This is a simple measure against Nimba Worm. Cf. README.Win32-Viruses
+&gt; 	veto files = /*.eml/*.nws/riched20.dll/*.{*}/
+&gt; 
+&gt; # Do you wan't samba to act as a logon-server for your windows 95/98
+&gt; # clients, so uncomment the following:
+&gt; 	domain logons = Yes
+&gt; 	domain master = Yes
+&gt; # For a specific logon script per user
+&gt; ;	logon script = %U.bat
+&gt; # For a specific logon script per machine
+&gt; ;	logon script = %m.bat
+&gt; 
+&gt; # Where to store the logon scripts.
+&gt; ;[netlogon]
+&gt; ;	comment = Network Logon Service
+&gt; ;	path = /var/lib/samba/netlogon
+&gt; 
+&gt; # Where profiles of Windows 9x systems are stored.
+&gt; # First example for a centralized place.
+&gt; ;	logon home = \\%L\profiles\%U
+&gt; # Second example for a subdirectory of the users home.
+&gt; ;	logon home = \\%L\%U\profile
+&gt; # Where profiles of Windows NT systems are stored.
+&gt; ;	logon path = \\%L\profiles\%U
+&gt; 
+&gt; # Extra share for profiles. Default is the home of the user.
+&gt; ;[profiles]
+&gt; ;	comment = Network Profiles Service
+&gt; ;	path = /var/lib/samba/profiles
+&gt; ;	browseable = No
+&gt; 
+&gt; [homes]
+&gt; 	comment = Home Directories
+&gt; 	read only = No
+&gt; 	create mask = 0640
+&gt; 	directory mask = 0750
+&gt; 	browseable = No
+&gt; 
+&gt; [40GB]
+&gt; 	comment = Drawings
+&gt; 	read only = No
+&gt; #	create mask = 0640
+&gt; #	directory mask = 0750
+&gt; 	browseable = yes
+&gt; 	path = /data3/home/gringo/CAD
+&gt; 
+&gt; # The following share gives all users access to the Server's CD drive,
+&gt; # assuming it is mounted under /media/cdrom. To enable this share,
+&gt; # please remove the semicolons before the lines
+&gt; ;[cdrom]
+&gt; ;	comment = Linux CD-ROM
+&gt; ;	path = /media/cdrom
+&gt; ;	locking = No
+&gt; 
+&gt; [printers]
+&gt; 	comment = All Printers
+&gt; 	path = /var/tmp
+&gt; 	create mask = 0600
+&gt; 	printable = Yes
+&gt; 	browseable = No
+&gt; 
+&gt; 
+&gt; 
+&gt; On Monday 05 August 2002 14:13, you wrote:
+&gt; &gt; did u have oplocks set to yes, and sharing the file with more than one
+&gt; &gt; client ?
+&gt; &gt;
+&gt; &gt; can you post your smb.conf ?
+&gt; &gt;
+&gt; &gt; cheers
+&gt; &gt; R
+&gt; &gt;
+&gt; &gt; _________________________________________________________________
+&gt; &gt; Chat with friends online, try MSN Messenger: <A HREF="http://messenger.msn.com">http://messenger.msn.com</A>
+&gt; 
+&gt; 
+
+-- 
+Regards
+-----
+Richard Sharpe, <A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A>, <A HREF="mailto:rsharpe@samba.org">rsharpe@samba.org</A>, 
+<A HREF="mailto:sharpe@ethereal.com">sharpe@ethereal.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

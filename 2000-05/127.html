@@ -1,0 +1,164 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: who to setup scsi CDW?" -->
+<!-- FromName="Jason Nunn" -->
+<!-- FromEmail="jsno@downunder.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 4 May 2000 23:43:15 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.04.10005042341290.1450-100000@berkeley.localnet" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: who to setup scsi CDW?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jason Nunn &lt;<I><A HREF="mailto:jsno@downunder.net.au">jsno@downunder.net.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Thu, 4 May 2000 23:43:15 +0930 (CST)
+</PRE>
+<H1>Re: who to setup scsi CDW?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+hello Dmitri,
+
+Dmitri Voronenko &lt;<A HREF="mailto:evorend@torrens.tafe.sa.edu.au">evorend@torrens.tafe.sa.edu.au</A>&gt; writes:
+
+&gt; hello.
+&gt; does any one know who to setup scsi cdw in mandrake linux?
+
+
+find out what scsi controller you have, compile the appropriate module/or
+recompile your kernel, you'll need to get/compile a few other bits a
+pieces.
+
+i don't know what kernel you have, i'm using 2.2.14, so i'll just show you
+how mine is setup.
+
+this is the modules i have loaded for both reading CD's as a block device,
+and writing to them as character device. most of them I have configured to
+be autoloading whenever i go to use the devices, but, as not to confuse
+the matter, you can just "insmod" them.
+
+berkeley/lib/modules/2.2.14/scsi# lsmod
+Module                  Size  Used by
+aic7xxx               112028   1
+
+              low level SCSI driver that talks to my 7800 series SCSI card
+
+sr_mod                 16136   1  (autoclean)
+scsi_mod               50872   3  [sg sr_mod aic7xxx]
+
+              mezziane SCSI device modules
+
+cdrom                  13368   0  (autoclean) [sr_mod]
+
+     top level module that handle the CDROM as a block device
+
+sg                     11928   0  (unused)
+
+     the CD-R module that handles the CDROM and a writable character device
+
+isofs                  16408   1  (autoclean)   the ISO 9660 filesystem module
+
+
+Nb/ you probably only need sg.o and the SCSI driver to do burning
+
+
+once you have the modules loaded etc, you next have to find out what /dev/
+file is assoicated with your device, here is mine.
+
+reading:
+
+brw-rw----   1 root     disk      11,   0 May  6  1998 /dev/scd0
+lrwxrwxrwx   1 root     root            4 Jul  3  1999 /dev/cdrom -&gt; scd0
+
+writing:
+
+crw-r--r--   1 root     root      21,   0 Aug 15  1999 /dev/sga
+lrwxrwxrwx   1 root     root            3 Aug 15  1999 /dev/cdwriter -&gt;sga
+
+a good way to tell is dump the /proc/devices file and have at look at what
+MAJOR numbers the modules have-
+
+Character devices:
+.
+.
+ 21 sg
+.
+.
+
+Block devices:
+.
+.
+ 11 sr
+.
+.
+
+
+and the log files will hint the minor number... once you have a major
+number and a minor number, you can match up the /dev/ special file.
+
+if they don't exist, create them, for example-
+
+mknod /dev/cdrom b 11 0
+mknod /dev/cdr   c 21 0
+
+
+verify that it's all working, by sticking a CD into your cdrom, and
+mounting it (this will test the controller software and block device
+drivers are in good order)
+
+then grab some CDR software. I use cdrecord (1.6.1). it's boxy, but it's
+goood.
+
+first off i create a CD fs:
+
+/opt/schily/bin/mkisofs -a -A Nov99 -l -R -o cd.image -sysid jsno -v cdrom
+
+"cdrom" is a directory off my ~ directory. in cdrom i have the stuff i
+want to write.
+
+
+and then i do the actual roasting... ;)
+
+/opt/schily/bin/cdrecord -v speed=4 dev=/dev/cdwriter cd.image
+
+
+happy roasting ;)
+
+
+--
+Jason Nunn- Darwin, Northern Territory-  www.downunder.net.au/~jsno
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

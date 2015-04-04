@@ -1,0 +1,198 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Notes for configuring TFTP server on RHL9" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="linuxcpa@netscape.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="glen.turner@aarnet.edu.au" -->
+<!-- Date="Wed, 07 May 2003 09:58:00 -0700" -->
+<!-- Id="3EB93B18.6010601@netscape.net" -->
+<!-- Reference="3EB8A865.1050702@aarnet.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Notes for configuring TFTP server on RHL9</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:linuxcpa@netscape.net">linuxcpa@netscape.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  Date: Wed, 07 May 2003 09:58:00 -0700
+</PRE>
+<H1>Re: Notes for configuring TFTP server on RHL9</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+<A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A> wrote:
+
+&gt;
+&gt; These might be of use to people.  If not today, then when someone
+&gt; trawls the list archive.
+
+Thank You Glen Turner! :-)
+
+James Leone
+
+
+&gt;------------------------------------------------------------------------
+&gt;
+&gt;
+&gt;
+&gt;              CONFIGURING TFTP SERVER ON RED HAT LINUX 9
+&gt;
+&gt;
+&gt;The configuration of this TFTP server is optimised for recording
+&gt;network equipment configuration files (such as those from Cisco
+&gt;routers).  The out-of-the-box RHL configuration is optimised for
+&gt;serving boot images.
+&gt;
+&gt;
+&gt;INSTALL SOFTWARE
+&gt;
+&gt;Install TFTP server (in.tftpd)
+&gt;
+&gt;  # rpm -ivh tftp-server-0.32-4.i386.rpm
+&gt;
+&gt;Install TFTP client (tftp).  Not really needed but useful for testing.
+&gt;
+&gt;  # rpm -ivh tftp-0.32-4.i386.rpm
+&gt;
+&gt;
+&gt;CONFIGURE TCP WRAPPER
+&gt;
+&gt;Configure TCP Wrapper so that TFTP access can only occur from router
+&gt;adminstrative VLAN (in our case this has addresses in 10.255.0.0/16).
+&gt;
+&gt;  Alter /etc/hosts.deny
+&gt;    ALL: ALL
+&gt;
+&gt;  Alter /etc/hosts.allow
+&gt;    # Anything from IPv4 or IPv6 localhost
+&gt;    ALL: 127.0.0.0/255.0.0.0
+&gt;    ALL: [::1]/128
+&gt;
+&gt;    # TFTP from routers
+&gt;    in.tftpd: 10.255.0.0/255.255.0.0
+&gt;
+&gt;
+&gt;MODIFY CONFIGURATION TO ALLOW EASY FILE CREATION
+&gt;
+&gt;By default files must be manually created before they can be written
+&gt;to using TFTP, for example
+&gt;
+&gt;  # cd /tftpboot
+&gt;  # (umask 111; touch example.txt)
+&gt;
+&gt;wheras we wish to be able to remotely create files.
+&gt;
+&gt;  Alter /etc/xinetd.d/tftp
+&gt;    server_args = -s /tftpboot -c -p -u tftp -U 117 -v
+&gt;
+&gt;The umask 117 prevents users not in the "tftp" group from reading
+&gt;remotely created files.  Since router configurations contain passwords
+&gt;this is advisable.  Nothing prevents other routers (or even a Linux
+&gt;box with an interface in the router administrative VLAN) from remotely
+&gt;accessing the files, so it's not fantastic security.
+&gt;
+&gt;
+&gt;CREATE TFTP USER
+&gt;
+&gt; [ This is for a local user.  It's better if the TFTP user and group
+&gt;   are created in NIS+, LDAP or whatever so that UIDs/GIDs are
+&gt;   consistent across machines.  This is particularly as the "tftp" user
+&gt;   will own files and we want to move them between machines (by NFS or
+&gt;   tape) correctly. ]
+&gt;
+&gt;  # groupadd -r tftp
+&gt;  # grep tftp /etc/group
+&gt;
+&gt;Note the created GID.  With luck this can will be free to be used as
+&gt;the UID, in our case 101.
+&gt;
+&gt;  # useradd -r -c 'Trival file transfer' -d /tftpboot -g tftp -s /sbin/nologin -u 101 tftp
+&gt;
+&gt;
+&gt;PLACE USERS THAT CAN LOCALLY WRITE TFTP FILES INTO TFTP GROUP
+&gt;
+&gt;  Alter /etc/group  [or NIS+, or LDAP, ...]
+&gt;    t<A HREF="ftp:x:101:root,example">ftp:x:101:root,example</A>
+&gt;
+&gt;Users will need to restart sessions before new group membership is
+&gt;visible (use the "id" commnd to see current group membership).
+&gt;
+&gt;
+&gt;CREATE TFTP DIRECTORY
+&gt;
+&gt;  # cd /
+&gt;  # mkdir /tftpboot
+&gt;  # chown t<A HREF="ftp:tftp">ftp:tftp</A> /tftpboot
+&gt;  # chmod u=rwx,g=rwxs,o= /tftpboot
+&gt;
+&gt;
+&gt;LOAD NEW XINETD CONFIGURATION
+&gt;
+&gt;To make a configuration change come into effect
+&gt;
+&gt;  # killall in.tftpd
+&gt;  # /sbin/service xinetd reload
+&gt;
+&gt;
+&gt;TEST
+&gt;
+&gt;From another machine with a TFTP client
+&gt;
+&gt;  $ cd /etc
+&gt;  $ tftp exampleserver
+&gt;  tftp&gt; ascii
+&gt;  tftp&gt; put /etc/issue
+&gt;  Sent 56 bytes in 0.0 seconds
+&gt;  tftp&gt; quit
+&gt;
+&gt;Examine the created file on the TFTP server
+&gt;
+&gt;  $ ls -l /tftpboot/issue
+&gt;  -rw-rw----  1  tftp tftp  53  Jan 1 01:23  /tftpboot/issue
+&gt;
+&gt;
+&gt;
+&gt;Glen Turner, AARNet
+&gt;2003-05-07
+&gt;  
+&gt;
+
+-- 
+Your favorite stores, helpful shopping tools and great gift ideas. 
+Experience the convenience of buying online with <A HREF="mailto:Shop@Netscape">Shop@Netscape</A>! 
+<A HREF="http://shopnow.netscape.com/">http://shopnow.netscape.com/</A>
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,217 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: CVS, SSH, secure, chroot etc" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'jonathan soong','Andrew Reid'" -->
+<!-- ToEmail="jon.soong@imvs.sa.gov.au,andrew.reid@plug.cx" -->
+<!-- Date="Fri, 23 May 2003 12:31:02 +0930" -->
+<!-- Id="00bd01c320d7$8c32e8f0$020120ac@skink" -->
+<!-- Reference="3ECD8CA0.90405@imvs.sa.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: CVS, SSH, secure, chroot etc</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : jonathan soong &lt;<I><A HREF="mailto:jon.soong@imvs.sa.gov.au">jon.soong@imvs.sa.gov.au</A></I>&gt;<BR>        Andrew Reid &lt;<I><A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A></I>&gt;
+  Date: Fri, 23 May 2003 12:31:02 +0930
+</PRE>
+<H1>RE: CVS, SSH, secure, chroot etc</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Jon,
+
+One thing I just noticed with this is that you may need to restrict
+which ports they can forward. There appears to be another config option
+that can go in authorized_keys, permitopen -- see the sshd(8) man page.
+
+rr
+
+-- 
+Richard Russell
+Yellow Goanna P/L
+m: +61 412 827 805
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+w: <A HREF="http://www.yellowgoanna.com">http://www.yellowgoanna.com</A>
+
+&gt; -----Original Message-----
+&gt; From: jonathan soong [mailto:<A HREF="mailto:jon.soong@imvs.sa.gov.au">jon.soong@imvs.sa.gov.au</A>] 
+&gt; Sent: Friday, 23 May 2003 12:21 PM
+&gt; To: Andrew Reid
+&gt; Cc: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; Subject: Re: CVS, SSH, secure, chroot etc
+&gt; 
+&gt; 
+&gt; thanks for the suggestion Andrew, i did have a look there.
+&gt; 
+&gt; In the end i've done it another way.
+&gt; 
+&gt; SECURE CVS without multiple unix accounts
+&gt; 
+&gt; 1. make user 'cvsd'  who has r/w access to the CVS repository 
+&gt; 2. set 'cvsd's shell to /bin/bash (or some proper shell) in 
+&gt; /etc/passwd 3. set 'cvsd's password to * in /etc/shadow 4. 
+&gt; have all developers who are using the CVS generate an ssh key 
+&gt; ('ssh-keygen -t dsa') and send you the public key
+&gt; 5. put an entry in 'cvsd's /home/cvsd/.ssh/authorized_keys2 file that 
+&gt; looks like:
+&gt;     command="/usr/bin/sleep 3h" ssh-dss ASDFASDFAKdjkjidf8+... == 
+&gt; <A HREF="mailto:jon@here.com">jon@here.com</A>
+&gt;     // this forces the 'command' to be executed as soon as the person 
+&gt; logs in
+&gt; 
+&gt; Now only those developers who have sent you keys will be able 
+&gt; to login 
+&gt; (passwordless) to the CVS machine and will be automatically 
+&gt; be dumped to 
+&gt; sleep for 3 hours - this will keep the ssh port forward open.
+&gt; 
+&gt; Now i can securely use CVS's pserver user management, without 
+&gt; multiple 
+&gt; unix users.
+&gt; 
+&gt; Anyone have any thoughts on the security implications of forcing the 
+&gt; users to execute 'sleep 3h'
+&gt; e.g. can this be broken by sending weird signals?
+&gt; 
+&gt; Cheers,
+&gt; 
+&gt; Jon
+&gt; 
+&gt; 
+&gt; Andrew Reid wrote:
+&gt; 
+&gt; &gt;On Thu, 2003-05-22 at 12:54, jonathan soong wrote:
+&gt; &gt;
+&gt; &gt;  
+&gt; &gt;
+&gt; &gt;&gt; &gt;&gt;The Problem:
+&gt; &gt;&gt;CVS on a public server, that we want external developers to 
+&gt; be able to
+&gt; &gt;&gt;access - securely.
+&gt; &gt;&gt;    
+&gt; &gt;&gt;
+&gt; &gt;
+&gt; &gt;You know about SourceForge, right? They run one of the 
+&gt; biggest public 
+&gt; &gt;CVS servers going around, and they give secure access to developers 
+&gt; &gt;through SSH.
+&gt; &gt;
+&gt; &gt;  
+&gt; &gt;
+&gt; &gt;&gt; &gt;&gt;Conditions:
+&gt; &gt;&gt;_Cannot_ have multiple shell accounts on the machine.
+&gt; &gt;&gt;    
+&gt; &gt;&gt;
+&gt; &gt;
+&gt; &gt;Is this a security thing? You can tie the account down such 
+&gt; that it can 
+&gt; &gt;only execute CVS and SSH.
+&gt; &gt;
+&gt; &gt;  
+&gt; &gt;
+&gt; &gt;&gt;Must have read/write access on the machine
+&gt; &gt;&gt;
+&gt; &gt;&gt; &gt;&gt;Current Thinking:
+&gt; &gt;&gt;1. Chroot CVS. - (done)
+&gt; &gt;&gt;2. Use pserver, but somehow secure it - (working on..)
+&gt; &gt;&gt;    I have setup pserver, and will use pserver's user management to
+&gt; &gt;&gt;avoid lots of shell accounts.
+&gt; &gt;&gt;    I want to use an ssh tunnel to protect pserver's passwords.
+&gt; &gt;&gt;    
+&gt; &gt;&gt;
+&gt; &gt;
+&gt; &gt;But there's the thing -- you'll need local accounts (or something PAM
+&gt; &gt;compatible) for users to be able to SSH in.
+&gt; &gt;
+&gt; &gt;I'd be having a look at the way SourceForge have done it and 
+&gt; seeing if 
+&gt; &gt;you can apply similar principles to your setup.
+&gt; &gt;
+&gt; &gt;  
+&gt; &gt;
+&gt; &gt;&gt;    Hence, i want users to be able to create an ssh tunnel into my
+&gt; &gt;&gt;machine with a public password.
+&gt; &gt;&gt;    (i.e. a generic account, which can't do anything - once on the 
+&gt; &gt;&gt;machine, i want the users to be
+&gt; &gt;&gt;    forced to login via pserver's authentication and be 
+&gt; restricted to 
+&gt; &gt;&gt;cvs commands).
+&gt; &gt;&gt;    
+&gt; &gt;&gt;
+&gt; &gt;
+&gt; &gt;See, this is where I don't see why you'd bother. All this 
+&gt; achieves is 
+&gt; &gt;secure transmission of the CVS data. Why not just take the 
+&gt; extra step 
+&gt; &gt;and use SSH alone for doing CVS? It's not that hard to setup -- I'd 
+&gt; &gt;argue that it's easier to setup than pserver.
+&gt; &gt;
+&gt; &gt;You're already going to be going to some lengths to secure 
+&gt; the account 
+&gt; &gt;and limit it to SSH/CVS. It'd be just as easy (if not easier) to 
+&gt; &gt;continue along that line.
+&gt; &gt;
+&gt; &gt;[ ... ]
+&gt; &gt;
+&gt; &gt;  
+&gt; &gt;
+&gt; &gt;&gt;    Anyone have any  thoughts about this? Am i missing something 
+&gt; &gt;&gt;glaring
+&gt; &gt;&gt;obvious.
+&gt; &gt;&gt;    
+&gt; &gt;&gt;
+&gt; &gt;
+&gt; &gt;I feel you're making the situation harder than it needs to 
+&gt; be. Have a 
+&gt; &gt;look at the way SourceForge provide developer access and see 
+&gt; if that's 
+&gt; &gt;got any merit for your situation.
+&gt; &gt;
+&gt; &gt;   - andrew
+&gt; &gt;
+&gt; &gt;  
+&gt; &gt;
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on 
+&gt; irc.freenode.net To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as 
+&gt; the subject
+&gt; 
+&gt; 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,142 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: linuxsa-digest Digest V00 #370" -->
+<!-- FromName="Geoffrey D. Bennett" -->
+<!-- FromEmail="g@netcraft.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="newton@atdot.dotat.org" -->
+<!-- Date="Thu, 20 Jul 2000 17:18:00 +0930 (CST)" -->
+<!-- Id="200007200748.RAA02688@Kara.netcraft.com.au" -->
+<!-- Reference="200007200420.NAA07335@Elizabeth.netcraft.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: linuxsa-digest Digest V00 #370</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Geoffrey D. Bennett &lt;<I><A HREF="mailto:g@netcraft.com.au">g@netcraft.com.au</A></I>&gt;
+  To  : <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+  Date: Thu, 20 Jul 2000 17:18:00 +0930 (CST)
+</PRE>
+<H1>Re: linuxsa-digest Digest V00 #370</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Use the "serial" attribute when you create the table:
+&gt; 
+&gt;    create table foo (
+&gt;       id serial,
+&gt;       some_random_value varchar(16)
+&gt;    );
+&gt; 
+&gt; The "id" field will autoincrement when you insert rows.
+&gt; 
+&gt; A warning, though:  If you use pg_dump to dump the table, then restore
+&gt; it back, the state of the serial number is not maintained:  After 
+&gt; the restore creates the table, the serial number will be initialized
+&gt; to 0, which means your inserts will fail because they attempt to create
+&gt; duplicate keys.  This "feature" sucks so badly that words fail me.
+
+That's not true (at least not when I've been watching)...
+
+% createdb test
+% psql test
+test=&gt;    create table foo (
+test-&gt;       id serial,
+test-&gt;       some_random_value varchar(16)
+test-&gt;    );
+test=&gt; insert into foo (some_random_value) values ('blah');
+test=&gt; insert into foo (some_random_value) values ('blah 2');
+EOFt=&gt; 
+% pg_dump test &gt; test.dump
+% destroydb test
+% createdb test
+% grep foo_id_seq test.dump
+CREATE SEQUENCE "foo_id_seq" start 2 increment 1 maxvalue 2147483647 minvalue 1  cache 1 ;
+SELECT nextval ('"foo_id_seq"');
+[...]
+% psql test &lt; test.dump &&gt; /dev/null
+% psql test
+test=&gt; insert into foo (some_random_value) values ('blah 3');
+INSERT 1634144 1
+test=&gt; select * from foo;
+id|some_random_value
+--+-----------------
+ 1|blah             
+ 2|blah 2           
+ 3|blah 3           
+
+The above was with PostgreSQL 6.5.3.  I just checked a pg_dump done
+from 6.3.2, and it had the same 'CREATE SEQUENCE ... start 100 ...'
+bit in it (although I did create those sequences with create sequence
+instead of with the serial type originally).
+
+&gt; You can work around it by writing a bit of perl to parse the pg_dump
+&gt; output and reinstate table rows via INSERT statements instead of 
+&gt; the COPY FROM STDIN command pg_dump writes out.
+
+Andrew Hill suggested:
+
+&gt;   CREATE SEQUENCE "autoSeq";
+&gt;   CREATE TABLE "someTable" (
+&gt;         "autoNumber"    int4    PRIMARY KEY
+&gt;                                 DEFAULT nextval('autoSeq'),
+&gt;         "moreFields"    text
+&gt;   );
+
+I believe that internally SERIAL is identical to doing the above,
+which is why the pg_dump does work correctly, and why a DROP/CREATE of
+the table using 'serial' will fail (you need to drop the sequence that
+was implicitly created as well).
+
+That's also why I prefer creating the sequence explicitly; it means
+that I can rearrange a table's structure like this, and there's no
+funny stuff to worry about with any sequences:
+
+CREATE TABLE someTable_new (
+  [all the fields from SomeTable]
+  [perhaps with a small alteration or something]
+);
+INSERT INTO someTable_new SELECT * FROM someTable;
+DROP TABLE someTable;
+CREATE TABLE someTable (
+  [all the fields in someTable]
+);
+INSERT INTO someTable SELECT * FROM someTable_new;
+DROP TABLE someTable_new;
+
+Regards,
+-- 
+Geoffrey D. Bennett, RHCE, RHCX               <A HREF="mailto:geoffrey@netcraft.com.au">geoffrey@netcraft.com.au</A>
+Senior Systems Engineer           <A HREF="http://www.netcraft.com.au/geoffrey/">http://www.netcraft.com.au/geoffrey/</A>
+NetCraft Australia Pty Ltd           <A HREF="http://www.netcraft.com.au/linux/">http://www.netcraft.com.au/linux/</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

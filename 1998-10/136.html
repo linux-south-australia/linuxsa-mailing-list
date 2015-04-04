@@ -1,0 +1,289 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SB - AWE setup help...YES PLEASE!!!" -->
+<!-- FromName="Phil Nitschke" -->
+<!-- FromEmail="phil@caemrad.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="17 Oct 1998 10:32:49 +0930" -->
+<!-- Id="wq90igroee.fsf@toby.caemrad.com.au" -->
+<!-- Reference="001601bdf6b9$4e91c2c0$64656464@hiro" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SB - AWE setup help...YES PLEASE!!!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Phil Nitschke &lt;<I><A HREF="mailto:phil@caemrad.com.au">phil@caemrad.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: 17 Oct 1998 10:32:49 +0930
+</PRE>
+<H1>Re: SB - AWE setup help...YES PLEASE!!!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt;&gt;&gt;&gt;&gt; "TLT" == Tyson LT &lt;<A HREF="mailto:tlt@smug.adelaide.edu.au">tlt@smug.adelaide.edu.au</A>&gt; writes:
+
+  &gt;&gt; I have a similar card (SB AWE32 PnP), and it took quite a few
+  &gt;&gt; steps to &lt;SNIP&gt;  If anyone is interested, I could post the full
+  &gt;&gt; instructions of what I did.
+
+  TLT&gt; Yes please! that would be great. I'm having similar problems
+  TLT&gt; with my AWE32 PnP.(Can't find sound module etc etc)
+
+OK, but first a few caveats.  In the initial post, Simon Bruce talked
+about `sndconfig'.  I don't really know anything about this (RedHat)
+tool, since my system runs the Debian GNU/Linux distribution, but I
+guess it probably recompiles and installs the sound module(s) for you,
+assuming your kernel is built ready for sound to be loaded as a
+module.  What I describe below ignores this utility, and gets sound
+working `from first principles'.
+
+Secondly, YMMV == "your mileage may vary".  Two systems are rarely
+ever the same, so what worked for me might not work for you.
+
+Thirdly, getting sound working always involves compiling the kernel
+(or at least the modules used by the kernel), since the sound module
+must be told what I/O ports to use, &etc.  So you need all the latest
+kernel source installed.  Don't be frightened to recompile the kernel;
+it can have many benefits and it is quite straight forward (if you can
+follow instructions).
+
+So here goes:
+
+0/. Read all the HOWTO's, etc.  The best one for SB AWE is the "Sound
+    Blaster AWE 32/64 HOWTO" by Marcus Brinkmann.
+
+1/. You need to configure PnP boards _before_ the kernel loads the
+    sound module, which can be done as follows:
+
+    a/. get ISAPnP from <A HREF="http://www.roestock.demon.co.uk/isapnptools/index.html">http://www.roestock.demon.co.uk/isapnptools/index.html</A>
+        (or from your most convenient distribution).
+
+    b/. Run ISAPnP once to produce a configuration file, which can
+        then be edited and placed in /etc/isapnp.conf
+	 - #&gt; pnpdump &gt; /etc/isapnp.conf
+         - Check the output for a known bug where it doesn't always
+           find all the Wavetable ports... on mine it found:
+              (IO 0 (BASE 0x0620)) 
+           but not 
+              (IO 1 (BASE 0x0A20)) or (IO 2 (BASE 0x0E20))
+
+         - Maybe the bug has been fixed by now; YMMV.
+
+	 - This is what mine looks like:
+
+	  <A HREF="mailto:phil@toby">phil@toby</A>|~&lt;103&gt; grep -v ^# /etc/isapnp.conf 
+
+	  (ISOLATE)
+	  (IDENTIFY-FORMAT "ISAPnP (hacked by Phil): Board %b details:\n Vendor %v, S/N %s. Identity %8 %7 %6 %5 %4 %3 %2 %1 %0\n")
+	  (IDENTIFY *)
+	  (CONFIGURE CTL009c/302077 (LD 0
+	    (INT 0 (IRQ 5 (MODE +E)))
+	    (DMA 0 (CHANNEL 1))
+	    (DMA 1 (CHANNEL 5))
+	    (IO 0 (BASE 0x0220))
+	    (IO 1 (BASE 0x0330))
+	    (IO 2 (BASE 0x0388))
+	    (ACT Y)
+	  ))
+
+	  (CONFIGURE CTL009c/302077 (LD 1
+	    (IO 0 (BASE 0x0200))
+	    (ACT Y)
+	  ))
+
+	  (CONFIGURE CTL009c/302077 (LD 2
+	    (IO 0 (BASE 0x0620))
+	    (IO 1 (BASE 0x0A20))
+	    (IO 2 (BASE 0x0E20))
+	    (ACT Y)
+	  ))
+
+	  (CONFIGURE CTL009c/302077 (LD 3
+	    (INT 0 (IRQ 10 (MODE +E)))
+	    (IO 0 (BASE 0x0168))
+	    (IO 1 (BASE 0x036e))
+	    (ACT Y)
+	  ))
+
+	  (WAITFORKEY)
+
+     c/. Add a short script in /etc/init.d (or whatever directory your
+         system uses) as follows:
+                #! /bin/sh
+                # /etc/init.d/isapnp: configure Plug and Play boards
+
+                test -x /sbin/isapnp || exit 0
+                if [ -r /etc/isapnp.conf ]; then
+                    /sbin/isapnp /etc/isapnp.conf
+                fi
+                exit 0
+
+         This MUST run before the sound module is loaded, so when
+         building the kernel, the sound must be a _module_
+         (i.e. loaded on demand, not compiled into the kernel).
+
+	 If you have a very recent BIOS, it might be able to
+         initialise the PnP boards before loading the kernel, in which
+         case you don't need ISAPnP.
+
+    If your board is not Plug-n-Pray, ignore the above!
+
+2/. Sound drivers.   When I built my kernel, I got hold of the
+    latest OSS/Free3.8 Sound Driver, rather than the default one that
+    came with the kernel.  (<A HREF="http://www.4front-tech.com/ossfree">http://www.4front-tech.com/ossfree</A>)
+    This driver replaced the contents of /usr/src/linux/drivers/sound
+    (I'm not saying that it _has_ to be done that way, but that is how
+    I did it.)
+
+3/. I also got Iwai's low-level driver module for AWE support from 
+    <A HREF="http://bahamut.mm.t.u-tokyo.ac.jp/~iwai/awedrv/">http://bahamut.mm.t.u-tokyo.ac.jp/~iwai/awedrv/</A>  This forms the
+    basis for /usr/src/linux/drivers/sound/lowlevel, and is designed
+    to work with the OSS/Free sound driver.
+
+4/. Configure your kernel...  This is what I used.  (I emphasise: YMMV!)
+        CONFIG_SOUND=m
+        # CONFIG_PAS is not set
+        CONFIG_SB=y
+        CONFIG_ADLIB=y
+        # CONFIG_GUS is not set
+        # CONFIG_MPU401 is not set
+        # CONFIG_PSS is not set
+        # CONFIG_GUS16 is not set
+        # CONFIG_GUSMAX is not set
+        # CONFIG_MSS is not set
+        # CONFIG_SSCAPE is not set
+        # CONFIG_TRIX is not set
+        # CONFIG_MAD16 is not set
+        # CONFIG_CS4232 is not set
+        # CONFIG_MAUI is not set
+        # CONFIG_OPL3SA1 is not set
+        # CONFIG_SOFTOSS is not set
+        CONFIG_YM3812=y
+        SBC_BASE=220
+        SBC_IRQ=5
+        SBC_DMA=1
+        SB_DMA2=5
+        SB_MPU_BASE=330
+        #
+        # Enter -1 to the following question if you have something else such as SB16/32.
+        #
+        SB_MPU_IRQ=-1
+        CONFIG_LOWLEVEL_SOUND=y
+        # CONFIG_ACI_MIXER is not set
+        CONFIG_AWE32_SYNTH=y
+        # CONFIG_AEDSP16 is not set
+
+5/. Build and install the kernel and modules.  You need to ensure that
+    nothing will load the sound module at boot time (before the `init'
+    scripts have run).  Once rebooted, you will need to load the sound
+    module.  This can be done manually using `insmod', or automagically
+    using `kerneld' (I guess `kerneld' is not Debian-specific).
+
+6/. Once the sound module has been loaded, type this (as root):
+       #&gt; cat /dev/sndstat
+
+    Which should get you something that looks like this:
+
+	    OSS/Free3.8s9-980302 (Thu Aug 20 22:44:12 CST 1998 root,
+	    Linux toby 2.0.35 #1 Fri Jul 31 01:03:15 CST 1998 i586 unknown)
+	    Load type: Driver loaded as a module.
+	    Kernel: Linux toby 2.0.35 #2 Thu Aug 20 22:46:28 CST 1998 i586
+	    Config options: 0
+
+	    Installed drivers: 
+	    Type 1: OPL-2/OPL-3 FM
+	    Type 26: MPU-401 (UART)
+	    Type 2: Sound Blaster
+	    Type 29: Sound Blaster PnP
+	    Type 7: SB MPU-401
+
+	    Card config: 
+	    Sound Blaster at 0x220 irq 5 drq 1,5
+	    SB MPU-401 at 0x330 irq 5 drq 0
+	    OPL-2/OPL-3 FM at 0x388 drq 0
+
+	    Audio devices:
+	    0: Sound Blaster 16 (4.16)
+
+	    Synth devices:
+	    0: Yamaha OPL-3
+	    1: AWE32-0.4.2 (RAM2048k)
+
+	    Midi devices:
+	    0: Sound Blaster 16
+
+	    Timers:
+	    0: System clock
+
+	    Mixers:
+	    0: Sound Blaster
+	    1: AWE32 Equalizer
+
+    Any device that has parenthesis () around it is not working.
+
+7/. Make sure /dev/dsp and /dev/audio exist, etc and that you're a
+    member of the audio group, or change the permissions.  Some examples:
+      crw-rw-rw-   1 root     audio     14,   4 Jun  1  1997 /dev/audio
+      crw-rw----   1 root     audio     14,  20 Jun  1  1997 /dev/audio1
+      crw-rw-rw-   1 root     audio     14,   3 Jun  1  1997 /dev/dsp
+      crw-rw----   1 root     audio     14,  19 Jun  1  1997 /dev/dsp1
+      crw-rw-rw-   1 root     audio     14,   2 Jun  1  1997 /dev/midi00
+      crw-rw----   1 root     audio     14,  18 Jun  1  1997 /dev/midi01
+      crw-rw----   1 root     audio     14,  34 Jun  1  1997 /dev/midi02
+      crw-rw----   1 root     audio     14,  50 Jun  1  1997 /dev/midi03
+      crw-rw-rw-   1 root     audio     14,   0 Jun  1  1997 /dev/mixer
+      crw-rw----   1 root     audio     14,  16 Jun  1  1997 /dev/mixer1
+      crw-rw----   1 root     audio     14,  17 Jun  1  1997 /dev/patmgr0
+      crw-rw----   1 root     audio     14,  33 Jun  1  1997 /dev/patmgr1
+      crw-rw-rw-   1 root     audio     14,   1 Jun  1  1997 /dev/sequencer
+      crw-rw----   1 root     audio     14,   8 Jun  1  1997 /dev/sequencer2
+      crw-rw----   1 root     audio     14,   6 Jun  1  1997 /dev/sndstat
+
+      <A HREF="mailto:phil@toby">phil@toby</A>|~&lt;102&gt; groups phil
+      phil : dialout fax voice cdrom floppy audio users ...
+
+8/. You need to read Iwai's instructions to load sound fonts if you
+    want to use the AWE stuff.
+    
+Easy, huh?
+
+  TLT&gt; One thing I'm curious about is that when I first installed
+  TLT&gt; Redhat5.1, sndconfig found and set up my soundcard fine...I
+  TLT&gt; wonder why it worked then but can't find the module now...
+
+Ask a RH guru.
+
+-- 
+Phil
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

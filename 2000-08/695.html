@@ -1,0 +1,123 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba - Trusts  & Routed Network browsing" -->
+<!-- FromName="Matthew Geddes" -->
+<!-- FromEmail="mgeddes@xavier.sa.edu.au" -->
+<!-- ToName="John Davey" -->
+<!-- ToEmail="john@davey.netyp.com" -->
+<!-- Date="Mon, 21 Aug 2000 16:23:34 +0930" -->
+<!-- Id="39A0D1EE.CD46F2DD@xavier.sa.edu.au" -->
+<!-- Reference="001e01c00b1f$c1a7b860$02001eac@davey.netyp.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba - Trusts  & Routed Network browsing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@xavier.sa.edu.au">mgeddes@xavier.sa.edu.au</A></I>&gt;
+  To  : John Davey &lt;<I><A HREF="mailto:john@davey.netyp.com">john@davey.netyp.com</A></I>&gt;
+  Date: Mon, 21 Aug 2000 16:23:34 +0930
+</PRE>
+<H1>Re: Samba - Trusts  & Routed Network browsing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+John Davey wrote:
+
+&gt; 
+&gt; Admin Domain                        Management Domain
+&gt; -----------------                 ------------------
+&gt; |Admin  Network |                 | Management Net  |
+&gt; |192.168.1.0/24 |                 | 192.168.2.0/24  |
+&gt; |               |                 |                 |
+&gt; -----------------                 -------------------
+&gt;        |                                  |
+&gt;        |  Trust                    Trust  |
+&gt;        +--&gt;----------+    +------------&lt;--+
+&gt;                      |    |
+&gt;                         Users Domain
+&gt;   ------------------------------------------------
+&gt;   |   Users PDC -- 192.168.200.254/24  (BOW)     |
+&gt;   |      ||                                      |
+&gt;   |      |+Other server -- 192.168.200.253/24    |
+&gt;   |      |                                       |
+&gt;   |   ........................................   |
+&gt;   |      |                                       |
+&gt;   |     Samba Server -- 10.10.10.1  (ARROW)      |
+&gt;   |                                              |
+&gt;   ------------------------------------------------
+
+I take it that the only workstation trust account for \\ARROW is on
+\\BOW.
+
+&gt; C:\&gt; net view 10.10.10.1
+&gt; System error 53
+&gt; Network path no found
+&gt; 
+&gt; This occurs for all systems in the Users domain but it works correctly for
+&gt; all the Parent Domains.
+
+It's looking like some kind of corrupt WINS database (which happens far
+too regularly). Have a look to see if it all matches up. You could also
+try adding static WINS entries into the database to see if that
+overcomes your problem.
+
+How do the WINS entries for ARROW get to the other Domain controllers?
+Are they running WINS?
+Is there WINS replication?
+
+
+&gt; 
+&gt; Now I suspect that it is a WINS/BROWSER issue because the Samba(ARROW) box
+&gt; is the only one in its subnet (No NT boxes) 
+
+Yes. It is looking like WINS/Browse list stuff. Perhaps Richard Sharpe
+can point out the problem?
+
+You could also try setting local, preferred and domain master to yes and
+setting the os level to 1. This way, it will become the master of all it
+needs to and lose really badly in the elections against everything else.
+You could combine this with the 'remote browse sync' option (I think
+that's what it is - I haven't been playing with Stable Samba much
+lately).
+
+
+hope it helps,
+Matt
+
+-- 
+
+Matthew Geddes
+Network Manager
+Xavier College
+Gawler, SA
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,223 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Linux Installation Problems" -->
+<!-- FromName="Matthew Geddes" -->
+<!-- FromEmail="mgeddes@xavier.sa.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 10 Jan 2000 11:15:11 +1030" -->
+<!-- Id="38792B96.3B2438C3@xavier.sa.edu.au" -->
+<!-- Reference="38791ad8.41ae.0@camtech.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Linux Installation Problems</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@xavier.sa.edu.au">mgeddes@xavier.sa.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 10 Jan 2000 11:15:11 +1030
+</PRE>
+<H1>Re: Linux Installation Problems</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Hi,
+&gt;
+
+Hi,
+
+&gt;
+&gt; I recently bought the revised edition of Linux pocketbook which includes 3 cds,
+&gt; one of which contains Red Hat 6.0 to be installed on the PC.
+
+Congratulations ;-)
+
+
+&gt; I followed the
+&gt; installation procedures but have run into a bit of trouble. I have installed
+&gt; it such that I have the choice of running either Win98 or Linux as my operating
+&gt; system.
+&gt;
+
+Always good for those who are new to Linux.
+
+
+&gt;
+&gt; The problem I have encountered is that I am unable to get the sound working
+&gt; when I am running on the Linux operating system (it works fine when runningwin98).
+&gt;  As instructed in the booklet I have enabled sound as one of the services that
+&gt; starts up when Linux boots. The sound card that is installed in my PC is Sound
+&gt; Blaster16.
+&gt;
+
+Try opening up an xterm or some form of console screen and type:
+
+    sndconfig
+
+This is a quick program written by RedHat Software to detect and install your sound
+card. It should find the Sound Blaster 16 without any hassles. The only problem you
+may have is sndconfig complaining about your kernel not supporting modules. The
+kernel is the core part of any operating system. With systems like Linux and even
+FreeBSD, you have the option of including only what you need. For example, if you
+don't have a network, you don't have to include support for networking. This means
+there you can tailor your operating system exactly to your needs.
+
+If sndconfig does complain about the lack of module support, you will need to
+recompile your kernel. You do not need to know how to program to do this. You will,
+however, need to have a few things installed.
+
+    egcs
+    bin-utils
+    glibc-devel
+    kernel-source
+    kernel-headers and
+    make
+
+You may not have these installed (and if I have forgotten something you need, someone
+else on this list will surely point it out). This is the hardest part for beginners
+to get. You will find the rpms in the RedHat/RPMS directory on the CD. To install you
+can use
+
+    rpm -i [packagename]
+
+where packagename is the file name of the package (eg egcs-1.1.2-12-i386.rpm). You
+may also be able to use something like gnorpm (a graphical version of rpm), but I am
+unfamiliar with it myself.
+
+Once you have successfully installed these packages, open up another terminal window
+and if you aren't logged in as root, do so with:
+
+    su root
+
+and typing in the root password.
+
+then type:
+
+    cd /usr/src/linux
+
+which changes to the directory containing the linux source. If you are running
+X-Windows type:
+
+    make xconfig
+
+Or if that doesn't work, type:
+
+    make menuconfig
+
+This is the bit where you select what is in your new kernel. Be sure to read the help
+screens, as you can render your system unbootable. You probably won't need things
+like ISDN or the like, so you can disable them.
+
+You will want to include a lot of stuff as modules (that's the 'M' option), as this
+makes your kernel smaller and less resource hungry. Be sure to keep basic things in
+the kernel statically though (that's the '*' option). It will take a while, but take
+your time.
+
+once you have done this, you will want to quit the program (saving your changes, of
+course!) and type:
+
+    make dep clean modules modules_install ; depmod -a
+
+and you will want to add some lines to a file called lilo.conf in the /etc directory
+(you can use the editor gedit). You will need to be logged in as the root user.Yours
+will look very similar to the following.
+
+boot=/dev/hda
+map=/boot/map
+install=/boot/boot.b
+prompt
+timeout=50
+image=/boot/vmlinuz
+        label=Linux
+        root=/dev/hda3
+        initrd=/boot/initrd-2.2.5-22.img
+        read-only
+other=/dev/hda1
+        label=Win95
+        table=/dev/hda
+
+You will want to add the new lines in before the first image line. The lines I added
+were:
+
+image=/vmlinuz
+        label=Linux
+        root=/dev/hda3
+        initrd=/boot/initrd-2.2.5-22.img
+        read-only
+
+You will notice that they are almost identical to the first image line. The only
+difference is the image= bit. Once you have added these lines, change the *original*
+label= line to say label = linuxOLD
+
+This allows you to boot your system from the original configuration if you did some
+thing wrong.
+
+Now, finally, you go back to the terminal window you had open (this bit will take a
+while) and type
+
+    make zlilo
+
+(still from the linux source directory) and when you see the
+
+    Added Linux*
+    Added LinuxOLD
+    Added dos
+
+Or whatever, and you are done.
+
+The next time you reboot (this is one of the very few things you need to restart your
+computer for), you can run sndtool again and live happily ever after.
+
+
+&gt;
+&gt;
+&gt; Another problem is that I wish for the option of being able to shut down my
+&gt; computer entirely after a Linux session, however I only have the options of
+&gt; rebooting or halting the system when I log out. Hence I am forced to reboot
+&gt; the computer, choose to load Windows and then shut down from there. Is there
+&gt; a way of getting around this so that I can include shut down as one of my log
+&gt; out options in Linux?
+&gt;
+
+Try the 'halt' option. It may ask you for a password. If you reboot, you can safely
+switch off you computer when it is going through the self-test, before Windows or
+Linux is started.
+
+
+There are linuxsa meetings (check the linuxsa web site for details), there was talk
+of there being meetings / parts of meetings specifically for very-beginners. If you
+are interested, E-Mail the list, as I am sure it would happen if enough people were
+interested.
+
+I hope some of this help, I know it can seem pretty difficult, but if you read what
+Linux is telling you and don't just rush into things, you rarely go wrong. If you
+installed the Documentation, it's in /usr/doc (you can use something like the gedit
+text editor to view it). You will want to look through /usr/doc/HOWTO.
+
+Matt
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

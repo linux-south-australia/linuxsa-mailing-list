@@ -1,0 +1,107 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="making a faster system" -->
+<!-- FromName="Andreja Zivkovic" -->
+<!-- FromEmail="andy@zt.zivkotech.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 15 Jan 2000 12:48:16 +1030" -->
+<!-- Id="NDBBLGMFILMBOEMELBAOMEBDCBAA.andy@zivkotech.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: making a faster system</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andreja Zivkovic &lt;<I><A HREF="mailto:andy@zt.zivkotech.net.au">andy@zt.zivkotech.net.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sat, 15 Jan 2000 12:48:16 +1030
+</PRE>
+<H1>making a faster system</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+A thread similar to this was around before, but I don't keep every message
+posted, and I couldn't find it in the archives (mainly because they're
+grouped in months, and I don't know which month of which year the thread was
+in).
+
+Anyway, I recently decided I needed something interesting to do, so I
+thought, why use binaries made for a i386 (I use RedHat 6.1), when I have a
+PII? I decided to go straight into trying this, before finding out how to
+really achieve this. Firstly, I'd like advice on how to do it, and if what I
+already tried is good enough, then why I couldn't get glibc to compile.
+
+Firstly, I'd like some advice. I like RPMs a lot. It lets me
+uninstall/upgrade packages without me having to keep a log for each package,
+trying to remember where every file it contains was installed. Some
+programs' Makefile lets you do a 'make uninstall', but not all do, and in
+the past, I haven't kept the source for what I've used. Also, I don't know
+how to write rpm spec files (looking through them, it doesn't look too hard,
+but the major problem, in my opinion, is that I'd have to separately compile
+the program, find every file the program uses, then use that info to build
+the spec file, so I can compile it again).
+
+What I tried was copy /usr/lib/rpm/rpmrc to /root/.rpmrc and add the line
+'optflags:
+i686 -O5 -ffast-math -funroll-loops -fomit-frame-pointer -march=pentiumpro -
+mcpu=pentiumpro'
+(it's on the same line in the file, but I'm sure that the above line will be
+cut at around 80 characters).
+and I used 'rpm --rebuild --target=i686 &lt;rpm source&gt;' to build it. Compiling
+some programs (ypbind comes to mind), these flags were used, so I figure,
+they should be built for a i686 CPU and optimised.
+
+Is this the right way to make optimised programs for the i686, or do I need
+to get PentiumGCC and use that? Since PentiumGCC is a patch to GCC, I think
+I should be able to use the egcs source rpm to make a PentiumGCC rpm. Will
+that work? :)
+
+If what I'm doing is good enough, why can't I compile glibc? First of all,
+it ignored the compiler flags I defined in .rpmrc, and secondly when it runs
+the configure script, it complains that my kernel headers are too old. It
+needs kernel headers &gt;= 2.0.10, but RH6.1 comes with kernel 2.2.12 (yes, the
+kernel-headers was installed, and I even installed kernel-source). I even
+tried using the headers from linux-2.3.33, and I got the same error (headers
+too old). This only happened if I gave rpm the --target i686 argument. If I
+didn't do that, configure would work, but it would set the build platform as
+i386-redhat-linux-gnu, instead of i686-redhat-linux-gnu. If I manually ran
+the configure script with the same arguments as rpm tried, it worked, but I
+didn't set the same shell variables (CCFLAGS, etc).
+
+does compiling things like glibc (and other libraries) and egcs with
+optimisation flags actually help, or should I only bother optimising the
+'end' applications?
+
+Finally, does anyone know if I rebuild every package for the i686 and make a
+CD with a i686 directory instead of the i386, will the install program
+automagically work?
+
+thanks in advance for all the help,
+Andy
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,176 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="W2K & Samba issues" -->
+<!-- FromName="'Freeman, Peter (ERHS)'" -->
+<!-- FromEmail="Freeman.Peter@saugov.sa.gov.au" -->
+<!-- ToName="'LinuxSA (E-mail)'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 18 Jul 2001 13:52:47 +0930" -->
+<!-- Id="3390FF2B0DE0D21183B30008C70D751A08A7FFC9@sagemsg0003.sagemsmrd01.sa.gov.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: W2K & Samba issues</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Freeman, Peter (ERHS) &lt;<I><A HREF="mailto:Freeman.Peter@saugov.sa.gov.au">Freeman.Peter@saugov.sa.gov.au</A></I>&gt;
+  To  : LinuxSA (E-mail) &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 18 Jul 2001 13:52:47 +0930
+</PRE>
+<H1>W2K & Samba issues</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I'm having some hassles with Windows 2000 at present which I cant
+nail to a specific cause, my gut feeling is that it's related to
+the W2K SP2 & Samba hassles, but not convinced until I upgrade to 
+Samba 2.2. (this weekend's project :o)
+Just running the scenario past the list to see if any ideas come up.
+
+W2K is the workstation OS, running with SP2.
+Single PDC is NT 4, SP6a
+Separate server running Samba 2.0.7 (slap fingers for not upgrading yet, i
+know)
+The Samba machine is a member of the NT domain etc etc (see smb.conf)
+
+Basically all drives are mapped to the Samba machine during logon.
+At present all workstations run Win95 & we're about to u/g to W2K.
+As part of that I'm implementing roaming profiles, and for space reasons,
+they need to be stored on the Samba box.  The profile path is set in 
+the user properties on the NT server & points to \\SambaPC\profiles\username
+
+Everything goes ok until the profile is cached locally on the W2K 
+workstation.  It then denies access to the C:\Documents and Settings\&lt;user&gt;
+directory, spits out an error, then loads the default profile.
+Interestingly, when you view the security on the local profile, instead
+of a username listed, the user's SID is there.
+
+It seems that somewhere in the profile download process that the userid
+gets trashed & the W2K client has no idea who owns the directory, therefore
+the profile fails.
+
+The ideal situation would be logging into Samba as the PDC, but that won't
+be
+happening for obvious reasons, most of which i don't agree with but life's
+like
+that.
+
+I was under the impression that the W2K/Samba problems only occurred if
+Samba
+was the PDC, which isnt the case here.  Correct me if I'm wrong.
+
+Thanks
+
+
+Here's the relevant bits of smb.conf, never mind the 777 mask on the
+profile share, i was trying everything ;o)
+-------------------------------------------------------
+[global]
+	client code page = 950
+	workgroup = PLOHSDOM
+	netbios name = PTLC_FILES
+	server string = File Storage
+	interfaces = 127.0.0.1 10.x.x.x/255.255.255.0
+	bind interfaces only = Yes
+	security = DOMAIN
+	encrypt passwords = Yes
+	password server = PLOHSU01
+	username map = /etc/smbusers.map
+	log file = /var/log/samba/log.%m
+	max log size = 50
+	name resolve order = bcast lmhosts wins
+	os level = 33
+	local master = No
+	dns proxy = No
+	guest account = public
+	guest ok = Yes
+	hosts allow = 127.0.0.1 x.x.x.x/255.255.255.0
+	strict locking = Yes
+
+&lt;snip other shares&gt;
+
+[homes]
+	comment = Home Folder for User: %U
+	path = /storage/users/%U/files
+	admin users = @itstaff
+	write list = @itstaff
+	writeable = Yes
+	create mask = 0700
+	force create mode = 0700
+	directory mask = 0700
+	force directory mode = 0700
+	guest ok = No
+	browseable = No
+
+[Profiles]
+	comment = Roaming Profile Storage
+	path = /storage/profiles
+	admin users = @itstaff
+	write list = @users, @itstaff
+	writeable = Yes
+	create mask = 0777
+	force create mode = 0777
+	directory mask = 0777
+	force directory mode = 0777
+	inherit permissions = Yes
+	guest ok = No
+	browseable = No
+
+
+------------------------------------------------------------
+ Peter Freeman
+ Computing Support Officer
+ Eyre Regional Health Service
+ 
+ C/- Port Lincoln Health Services
+ Oxford Terrace
+ PORT LINCOLN SA 5606
+ 
+ Office Ph: 61 8 8682 0904 
+ Office Fax: 61 8 8682 5590
+ Mobile Ph:  0417 814 749
+
+ Email: <A HREF="mailto:freeman.peter@saugov.sa.gov.au">freeman.peter@saugov.sa.gov.au</A>
+ 
+------------------------------------------------------------
+Information contained in this email may be confidential and
+may also be the subject of legal professional privilege or 
+public interest immunity.
+If you are not the intended recipient, any use, disclosure
+or copying of this email is unauthorized.
+If you have received this email in error, please notify the 
+sender immediately.
+------------------------------------------------------------
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

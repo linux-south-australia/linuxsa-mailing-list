@@ -1,0 +1,126 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Divide and seg fault.." -->
+<!-- FromName="Toby Corkindale" -->
+<!-- FromEmail="tjcorkin@steadycom.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 19 Apr 1999 01:56:16 +0000" -->
+<!-- Id="371A8D40.A04C1994@steadycom.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Divide and seg fault..</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@steadycom.com.au">tjcorkin@steadycom.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 19 Apr 1999 01:56:16 +0000
+</PRE>
+<H1>Divide and seg fault..</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Heyas
+Lately I've been trying to put linux onto the last 2gb of a 10gb drive.
+I've taken care to make sure the linux partition that i'm booting from
+starts on a cylinder number lower than 1024, but even before I get to
+booting I keep hitting serious errors.
+Using a redhat or turbolinux install disk, I find that if I partition my
+drive such that the last cylinder is in use, then when I save the
+partition table, the partition table is trashed.
+I have to resort to sfdisk to fix it. cfdisk, fdisk, diskdruid won't
+load the corrupt table, and the kernel sometimes hangs on bootup when
+trying to read it.
+
+But I fixed all that, and made a partition set that works fine, albeit
+by simpling ignoring the final cylinder, and the 8mb it represents. ;(
+When trying to install from a Linux CD, onto the newly created
+partition, i few packages install, and then one will randomly fail, and
+the install program crashes dies...Sometimes I can reboot out, usually I
+can't. No good reason is given.
+(The partition is formatted fine, including the badblocks check. No
+errors found.)
+
+I put a 2gb drive into the same machine, and attempting to reformat the
+partition and then mount it. Reformatting worked fine, as usual.
+Attempting to mount the partition resulted in the following kernel dump!
+(2.2.5 kernel version, on a pentium 2)
+ 
+ [<A HREF="mailto:root@penfold">root@penfold</A> /mnt]# mount /dev/hda5 new
+ divide error: 0000
+ CPU:    0
+ EIP:    0010:[&lt;c013ce82&gt;]
+ EFLAGS: 00010246
+ eax: 0019bd07   ebx: 00002000   ecx: 0019bd07   edx: 00000000
+ esi: c31f0c00   edi: c3190e00   ebp: 00000000   esp: c33a1ec4
+ ds: 0018   es: 0018   ss: 0018
+ Process mount (pid: 469, process nr: 35, stackpage=c33a1000)
+ Stack: c01dd324 00000305 00000305 c01d0305 00000001 c31b9000 00000000
+00000001
+        c0126766 c3190e00 00000000 00000000 ffffffea c31d1060 00000305
+00000305
+        c0126bbb 00000305 c01bb31d 00000000 00000000 00000000 c3187650
+c0ed0305
+ Call Trace: [&lt;c01d0305&gt;] [&lt;c0126766&gt;] [&lt;c0126bbb&gt;] [&lt;c01bb31d&gt;]
+[&lt;c01bb31d&gt;] [&lt;c012708a&gt;] &lt;c01bb31d&gt;]
+        [&lt;c0108848&gt;]
+ Code: f7 f5 89 c3 89 5f 68 8b 47 64 8d 4c 18 ff 89 c8 31 d2 f7 77
+ Segmentation fault
+ [<A HREF="mailto:root@penfold">root@penfold</A> /mnt]#
+-------------- 
+Here's the output from fdisk for the curious:
+ Output from fdisk /dev/hda:
+ Command (m for help): p
+ 
+ Disk /dev/hda: 255 heads, 63 sectors, 1245 cylinders
+ Units = cylinders of 16065 * 512 bytes
+ 
+    Device Boot    Start       End    Blocks   Id  System
+ /dev/hda1   *         1      1020   8193118+   b  Win95 FAT32
+ /dev/hda2          1021      1244   1799280    5  Extended
+ /dev/hda5          1021      1230   1686793+  83  Linux native
+ /dev/hda6          1231      1244    112423+  82  Linux swap
+
+
+I'll try stuff again with kernel 2.2.6 now that it's out, but this
+appears to be a pretty major die, since RH5.2 uses kernel 2.0.36, and
+turbolinux was 2.2.3 or 4 I think...
+Has anyone else seen this kind of problems?
+
+Toby
+
+
+-- 
+..Veni, Vidi, VC++. (I came, I saw, I kludged)
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

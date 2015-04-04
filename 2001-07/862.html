@@ -1,0 +1,168 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Bash help" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richardrussell@internode.on.net" -->
+<!-- ToName="'Tim Riley'," -->
+<!-- ToEmail="tr@rebel.net.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 17 Jul 2001 18:38:50 +0930" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Bash help</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richardrussell@internode.on.net">richardrussell@internode.on.net</A></I>&gt;
+  To  : Tim Riley &lt;<I><A HREF="mailto:tr@rebel.net.au">tr@rebel.net.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 17 Jul 2001 18:38:50 +0930
+</PRE>
+<H1>RE: Bash help</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; I've been making some modifications to a tool called protopkg, which
+&gt; takes source code and makes a slackware package from it.  My first job
+&gt; has been to make it read from one build file, instead of three.
+
+first question: why? I would have thought that there may be a reason why
+it's in three files (perhaps because putting it in one simply won't work...
+but more likely because you want to share some of these files around, but
+not all of them -- three files may be the most logical way to arrange the
+code.)
+
+&gt; Previously, it had a 'prototype' file, in which there was certain
+&gt; variables, as well as package specific compile() and install()
+&gt; functions.  The other files it could use were 'sources' and 'rules.'  In
+&gt; each of these files, there were various lines of text in between two
+&gt; flags, in the following format:
+&gt;
+&gt; flag:
+&gt; text
+&gt; text
+&gt; text
+&gt; :flag
+
+what type of text? Is this bash commands, environment variable settings, or
+some other config settings?
+
+&gt; There is a read_rules() function that extracts the information between
+&gt; the flag name passed to it as an argument.  This is it below:
+
+where? in the prototype file?
+
+&gt;
+&gt; read_rules() {
+&gt;    sed -e '/^#/d' -e '/^$/d' | sed -n "/^${1}:/,/^:${1}$/p" |
+&gt;    grep -Fv "${1}:" | grep -Fv ":${1}" | sed -e "s/^[ \t]*//"
+&gt; }
+
+ok, in playing around with this, I think that the read_rules() function just
+reads the stuff between the flags, and prints it to stdout, right?
+
+&gt; So, in order to combine all three files into one, I made another set of
+&gt; flags to encapsulate that which was originally alone in the 'protopkg'
+&gt; file (flag name is 'package') and then appended the other two files to
+&gt; it.
+
+ok, so it (the (new, modified) prototype file?) looks like:
+
+---------------
+#!/bin/bash
+
+&lt;bash program with read_rules function defined&gt;
+
+...
+
+package:
+flag:
+text
+text
+:flag
+
+anotherflag:
+text
+text
+:anotherflag
+:package
+
+-------------
+
+right?
+
+&gt; The problem starts here.  Originally, the entire prototype file was
+&gt; sourced, which was OK since it contained only Bash stuff.  However, now
+&gt; it doesn't, so I want to use the read_rules() function to just source
+&gt; the stuff in between the 'package' flags.  My failed attempt is below.
+
+This code (below) is from the new prototype file, right? or are you running
+it in your interactive shell (afaik, there's no reason to source something
+in a script...)?
+
+&gt;
+&gt;      # This dumps it to a file called source.  So close!  But I want it
+&gt;      # read *internally*
+&gt;
+&gt;      read_rules "package" &lt; prototype &gt; source
+&gt;      . ./source
+&gt;      rm source
+&gt;
+&gt;      # WHAT A CRUDDY HACK.
+&gt;      # Originally, it just used `. ./prototype` to source the whole
+&gt;      # file.
+&gt;
+&gt; Every other attempt I have made, I cannot get it to do anything but dump
+&gt; the stuff between the package flags to stdout.
+
+so the above does what you want, but you don't like it?
+
+show us the skeleton of the file you are running, marked with which bits are
+from what file...
+
+&gt;
+&gt; So, all you bash wizards out there, am I missing something?  Or is there
+&gt; a better way of approaching the whole situation?
+
+personally, I'd suggest rethinking your reasons for making it one file -- it
+sounds to me as if there are good reasons for it being separate, as one
+seems to be config, the other, a script...
+
+However, if you are still wanting to go further down this garden path, try
+looking at "here documents" in man bash... I think that they may be better
+than the phunky flag mechanism... (although I can't see how you can "source"
+a here document, at least not without a fair bit of frobbing about...)
+
+rr
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

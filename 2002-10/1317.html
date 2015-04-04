@@ -1,0 +1,346 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Portable server-side Java rare-to-impossible [LONG]" -->
+<!-- FromName="'Dan Shearer'" -->
+<!-- FromEmail="dan@tellurian.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 24 Oct 2002 09:40:25 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0210240925510.14221-100000@calulu.shearer.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Portable server-side Java rare-to-impossible [LONG]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 24 Oct 2002 09:40:25 +0930 (CST)
+</PRE>
+<H1>Portable server-side Java rare-to-impossible [LONG]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+In preparation for the LinuxSA talk on s390 the other month I thought I'd
+demonstrate a genuine web application in a simulated environment. Being a
+tinkerer, I decided rather than install PHPNuke or something I'd pretend I
+was doing a software engineering application and dummy up something in
+server-side Java. There are so many tools labelled 'enterprise' and
+'corporate' and so forth that of course it would all be possible. I would
+then get the experience of hooking these tools together even if I only
+wrote 100 lines of code.
+
+So, for the first time I seriously looked at the Jakarta project.
+
+I eventually abandoned the task due to lack of time, astonished to find
+that portable server-side Java is still extremely difficult.
+
+The following message written at the time for LinuxSA (and then lost for a
+few weeks :) documents why I maintain that a lot of server-side Java is
+not portable to many Linux platforms beause there is no satisfactory
+execution environment, directly related to Sun's Java licensing problems.  
+It also explains why I think Jakarta Turbine+Velocity is the only portable
+server-side Java framework that I've found.
+
+I know there are some genuine Java experts here. Do please educate me!
+
+--
+Dan Shearer
+Open Source Manager
+Mob: +61 411 49 1800
+Tel: +61 8 8130 3104
+<A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A>
+
+
+---------- Forwarded message ----------
+Date: Fri, 30 Aug 2002 08:47:58 +0930 (CST)
+From: Dan Shearer &lt;<A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A>&gt;
+Subject: Terror in Jakarta, Part I [LONG]
+
+
+Or, preparation for writing a web/database application using Java
+servlets. Or, round-about preparation for a LinuxSA talk on a completely
+different topic. Dedicated to all those who who go to jakarta.apache.org
+and get terribly confused especially if they are looking for portable
+software.
+
+This document is a map of my experiences, not a HOWTO.
+
+If you aren't interested in server-side Java on Linux or BSD, stop reading
+right now.
+
+There may not be a part II.
+
+Summary Summary
+---------------
+
+If you stick to the shallow end where all the other nice i386 people are
+then server-side Java will work for you, even Sun's closed-source JVM will
+work. And you might have good reason never to use Perl again.
+
+Summary
+-------
+
+But.. finding a portable Linux server-side Java engine looks complicated,
+this is just an illusion. It is much worse than that. This is mostly
+because of the long-standing problems with Java on free platforms. In
+addition the documentation in the land of server-side Java worthy of a
+true technocrat. You can't understand it unless you know exactly what they
+are talking about, at which point you don't need the documentation anyway.
+But it is better than nothing, and worth the price :-) And so you might
+have good reason to never use anything but Perl again.
+
+Background
+----------
+
+About 5 years ago I had to help analyse webpage generation tools for
+someone, and concluded that Java Servlets were better suited to
+traditional software engineering than Perl/CGI. As part of this I did a
+bit of Java Servlet writing. I learned that after a fair bit of mindless
+repeating of basic constructs in what seemed to be the Servlet way you can
+do some powerful things. Ok, so servlets were a better way forward for
+people building a business on pumping out websites. Which I wasn't, so I
+promptly forgot all about them. 
+
+From then on, every time I wanted a web application (not very often at
+all) I knocked something up in Perl or sometimes PHP. I've done some XML,
+but not for the web. I tend to do operating systems and infrastructure or
+whole-system technology things rather than apps. So I forgot Java Servlets
+even more.
+
+Then in 2002 I wanted to write a demonstration database-driven website.
+For once I thought I'd do it neatly and cleanly even if it was just a
+simple thing that could just as well be done using any langauge.
+
+I did the same analysis again and concluded that despite all that Perl has
+to offer now -- and Perl::Mason works well, with a brilliant persistance
+model, I've been modifying RT 2.1 a bit along with some other subscribers
+to this list -- if I was pretending my little demo was a software
+engineering project intended to produce code that could be reused in many
+places, starting with Servlets would be better than Perl. One of the
+reasons is that the separation of software layers is better documented,
+which is not surprising because Java is a lot more corporate than Perl.
+
+I also concluded that PHP simply wasn't in the running, because with PHP
+presentation is inextricably mingled with application logic in ways which
+are not good for a large, complex and well-designed project. PHP would
+have been more than adequete for the job and much quicker though, in fact
+if I had chosen PHP the job would have been finished in less time that it
+took to write this document :-) Such is the life of a dabbler.
+
+Thrashing Around
+----------------
+
+Like most people I was aware of the Jakarta project over at apache.org,
+and that Sun donated some code to Jakarta which is now the reference port
+of the Java Servlet specification. So off I went to jakarta.apache.org.
+There's six "frameworks and engines" to choose from, and five "server
+applications". Not to mention twelve XML packages. Oops! What happened to
+the good old days when you just needed Jserve and a JVM (and hours to wait
+for each execution?)
+
+The servlet engine is easy, that's Tomcat. But Turbine seems to be an
+application framework where a lot of preliminary work has been done with
+servelets for the basic things every dynamic website needs. So I thought
+right, Turbine it is. Little did I know.
+
+Anyway, I thought I'd install Turbine under Debian 3.0 with other OSs to
+follow if that worked. Under Debian that's
+
+   apt-get install turbine
+
+which worked perfectly. The dependencies required a JVM of couse, and I
+didn't have one so apt installed gij, which surprised me. Is gij really
+ready for use? After some poking around I discovered that gij is regarded
+as a minor part of gcj, or at least hardly worthy of any documentation.
+See http://gcc.gnu.org/onlinedocs/gcc-3.1/gcj for the manual describing
+gcj. Since servlets don't exercise the biggest missing part of the
+classpath reimplementation included with gcj (anything to do with graphics
+such as AWT and Swing) it seems Turbine runs perfectly with gij.
+
+That's good, because apart from anything else gij appears to be among the
+slimmest jvm available for mainstream OSs, and quite fast. Java/XML
+libraries also came with Turbine, which seems a fairly obvious thing to
+provide.
+
+Now to try it out. Started reading the docs... whoops. No way. Guess what,
+when the Apache project says at
+http://jakarta.apache.org/turbine/index.html:
+
+   Turbine is a servlet based framework that allows experienced Java
+   developers to quickly build secure web applications.
+
+they actually mean something quite different along the lines of "Turbine
+is a templating engine that you use if you want JavaServer Pages"
+Unfortunately I never noticed that this is what they say about Turbine on
+the main Jakarta page.
+
+So, if I'm going to use Turbine then I won't be using the Servlet API.
+Which is ok, because under servlets you have to have a printf statement
+for every line of HTML. With JSP (built on JavaBeans) you just call Java
+Classes from certain special tags built into static HTML page. Raw servlet
+code:
+
+	out.println("<HTML>");
+	out.println("<HEAD><TITLE>Bom Dia"</TITLE></HEAD>");
+	out.println("<BODY>");
+	if (whatever complicated logic you like) {
+		out.println("Bom Dia");
+	}
+	out.println("</BODY></HTML>");
+
+The servlet container handles all the CGI-like things for you. If you've
+done a little of this years ago, like me, this is what Sun's Jserv lets
+you do. It isn't CGI, so some problems with CGI don't exist, but the
+concepts are very similar. There's plenty of hard work required, which is
+why so many things have been built on top of it in the Jakarta project.
+
+Raw JSP code (modified from Sun's JSP userguide, with a couple of bits
+missing):
+
+	<%@ page import="hello.NameHandler" %>
+	<jsp:useBean id="mybean" scope="page" class="hello.NameHandler" />
+	<jsp:setProperty name="mybean" property="*" />
+	<html>
+	<head><title>Bom Dia</title></head>
+	<%@ include file="myfancyheader.html" %>
+	<body>
+		<%if ( request.getParameter("username") != null ) {%>
+			<P>You are logged in!</P>
+		<% } %>
+	</body>
+	</html>
+	
+ought to be really familiar to Perl::Mason programmers or ASP programmers.
+JSP also involves quite a bit of work, and it is easy to write bad
+applications which conflate the user interface and application logic.
+
+Anyway, curious to see what tools are available these days to build on top
+of Servlets to save me all those printfs - besides JSP - I tried to
+install Tomcat:
+
+	apt-get install tomcat4 tomcat4-webapps
+
+(Note for Debian users: don't try apt-get install tomcat, instead of
+diverting to tomcat4 it complains that it can't find anything. That's a
+minor package naming problem in Debian, now fixed since _I think_ since
+mentioning it to the maintainer.)
+
+But that won't work. Why? Because I'm running Debian on an Alpha
+architecture, and the Debian Tomcat package requires a full JVM, and this
+doesn't exist for the Alpha/Linux architecture. There are some binaries at
+http://www.support.compaq.com/alpha-tools/software.html that are alleged
+to work (ok, they do work), but I'm not too keen for reasons as follows.
+So much for write-once-run-anywhere <snort> ! This is a direct consequence
+of Java being released under a closed source license, see
+http://www.dwheeler.com/java-imp.html. The Blackdown project is working on
+improving multiplatform support at
+http://www.blackdown.org/java-linux/ports.html but currently only do i386,
+ppc, s390 and ARM. And besides, they can't release open source code since
+they have agreed to Sun's licensing conditions. My eventual target
+platform is s390 but with no guarantee as to version updates due to
+licensing, I can't use any version of Sun's JDK. The current version isn't
+even available for s390, and some parts of the Jakarta project require it.
+
+Ok, back to Turbine. Does it or does it not actually have servlets
+underneath? Seems unlikely given that it doesn't need a JVM and doesn't
+depend on Tomcat, but apache.org's description indicates it does. Looking
+at http://jakarta.apache.org/turbine/turbine-3/apidocs/overview-tree.html,
+and
+http://jakarta.apache.org/turbine/turbine-3/xref/org/apache/turbine/Turbine.html
+which says at the top:
+
+	/* Turbine is the main servlet for the entire system. It is
+	<code>final</code> because you should <i>not</i> ever need to
+	subclass this servlet. */
+
+it looks like gcj is really all that is required for Servlets after
+all. Its about time to start testing.
+
+Hmm, as a side-note, ever heard of the Walt Disney company? The people
+that want permission to hack your personal computer without warning at any
+time just in case you might be infringing copyright law in some country or
+other? They do opensource, a philosophy that many feel is aimed at
+stopping them get such access :-) I'm completely overloaded with SSJ
+technologies so I won't even look at it but
+http://opensource.go.com/TeaServlet/index.html has all the gory details.
+Aparently they invented it to handle the big problems they had on Disney's
+websites. Its a funny old world.
+
+Enter David Bullock from the LinuxSA list. He does Java websites for a
+living. His advice for a newbie wanting a quick start? Use www.pajes.org.
+And given the description:
+
+   A large portion of any Web based application development requires a
+   great deal of HTML coding. PAJES is a 100% Java, standards based, Open
+   Source Servlet Presentation Framework for generating HTML without
+   having to embed HTML tags within your Java code, and without having to
+   embed any Java or other non-HTML instructions within your HTML
+   documents.
+
+it is exactly what I'm looking for! Hang on, no it isn't. Looking at the
+architecture docs:
+
+   The only prerequisite is the 2.2 or later servlet API, which is
+   supported by almost all application servers, webservers and webserver
+   servlet plug-ins.
+
+and
+ 
+   Make sure you have Java 2 installed on the machine that will run the
+   demonstration (Java 2 Standard Edition runtime is fine). You can
+   download the Java 2 environment free from Sun Micrososystems
+   (www.javasoft.com/products). 
+
+which as previously discussed is a very nonportable approach, rather a
+shame for a language intended to be extremely portable.
+
+Back to Turbine. The more I browse through the code (not the docs, which
+I don't find very helpful) the less it seems designed to interact with the
+world. It does seem to save some effort in writing things that do produce
+output though not necessarily specific to HTML. But I notice that another
+Jakarta project called Velocity is built on Turbine and seems to be a
+general approach for content generation with servlets. 
+
+	apt-cache search velocity 
+
+returns no results, so it isn't packaged for Debian. But 
+
+	$ wget http://jakarta.apache.org/.../velocity-1.3.1-rc2.tar.gz
+	$ tar zxvf velocity-1.3.1-rc2.tar.gz ; cd velocity-1.3.1-rc2
+	$ ls *jar 
+        velocity-1.3.1-rc2.jar  velocity-dep-1.3.1-rc2.jar
+	   :
+           :
+
+Not finished yet :-)
+
+
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

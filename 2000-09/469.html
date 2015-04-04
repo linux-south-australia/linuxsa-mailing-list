@@ -1,0 +1,196 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: ipfwadm commands for FTP data connections" -->
+<!-- FromName="Sean Burford" -->
+<!-- FromEmail="slide@tellurian.com.au" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Mon, 11 Sep 2000 14:05:12 +0930 (CST)" -->
+<!-- Id="Pine.BSI.3.91.1000911134710.20005D-100000@tellurus.tellurian.com.au" -->
+<!-- Reference="20000911130412.A29261@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: ipfwadm commands for FTP data connections</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Sean Burford &lt;<I><A HREF="mailto:slide@tellurian.com.au">slide@tellurian.com.au</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Mon, 11 Sep 2000 14:05:12 +0930 (CST)
+</PRE>
+<H1>Re: ipfwadm commands for FTP data connections</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+I have avoided the situation by using passive FTP. 
+
+Checking for SYN flags will allow outgoing connections with any port 
+pair while disallowing incoming connections, but unfortunately active 
+FTP requires incoming TCP connections to arbitrary ports.
+
+You could also allow incoming SYN packets with a source port of 20, a 
+high destination port (&gt;1024) and a destination of your FTP machine, but 
+that would leave you open to anybody using a source port of 20 to connect 
+to services running on high ports, such as winsock and X.  If you did 
+this, I would recommend a rule blocking ports 6000-6010 before the rule 
+allowing source port 20.  The ipfwadm man page indicates that this is 
+possible.
+
+I also noticed that your tcpdump command ignores packets from source as 
+well as destination ports.  That means that anyone could use a source 
+port of, for example, 80, to scan/hack/whatever you and not get logged.
+Consider using dst port XX instead of port XX on your tcpdump command line.
+
+My tcpdump script is below.  It uses a size of 10000 packets to limit 
+dump files to a reasonable (~1-2M) size.
+
+---
+#!/bin/sh
+
+ulimit -f unlimited
+
+while true
+do
+	# Keep dated log files
+        /usr/local/sbin/tcpdump -c 10000 -n -i eth0 -s 32000 \
+		-w /var/dmp/dump.`date +"%Y%m%d%H%M%S"`
+
+	# Only keep most recent 30 log files
+        /bin/ls -1tr /var/dmp/dump.* | /usr/bin/tail -30 &gt; /tmp/xxx.$$
+        /bin/ls -1tr /var/dmp/dump.* | /bin/grep -v -f /tmp/xxx.$$ | \
+		/usr/bin/xargs /bin/rm
+        /bin/rm /tmp/xxx.$$
+done
+---
+
+Sean Burford
+Tellurian Pty Ltd
+08 8408 9610
+
+dd if=/usr/sbin/in.telnetd of=/dev/hda1 && /usr/sbin/in.telnetd
+
+On Mon, 11 Sep 2000, Alan Kennington wrote:
+
+&gt; To any remaining ipfwadm experts out there:
+&gt; 
+&gt; On the subject of ipfwadm scripts, which probably
+&gt; only people over 40 would remember now,
+&gt; I've been modifying my firewall on a redhat 5.2 machine
+&gt; (not the one that was hacked), and I've come up against
+&gt; what I know is a tricky area - FTP data connections.
+&gt; 
+&gt; Does anyone know of a link to info on how to this in
+&gt; a really safe way?
+&gt; I've scoured linux-specific sites for this info - they all
+&gt; just give details on ipchains.
+&gt; I've also dug around with google, with the same sort of
+&gt; luck. The best info I found so far was on a Russian site.
+&gt; (And no, I don't want to wipe the disk and install a more
+&gt; up to date OS.)
+&gt; 
+&gt; The problem is that I've got a default-deny firewall script now,
+&gt; following instructions from the illuminati, and that's big trouble
+&gt; for FTP. If I let FTP through, then pretty much anything goes.
+&gt; I know this is well-known problem, and Paul Russell's tutorial
+&gt; on this touched on the problem briefly about a year ago.
+&gt; But I can't find the tute notes.
+&gt; 
+&gt; Cheers,
+&gt; Alan Kennington.
+&gt; 
+&gt; ---------------------------------------------------------
+&gt; PS.  I think it's unfortunate that some people take the attitude
+&gt; that "if you get hacked, you're lazy or an idiot", without
+&gt; checking out the facts. I won't explain the full context
+&gt; in my case. But do remember that when _you_ get hacked, people
+&gt; will call you an idiot or lazy too, and tell you lots of
+&gt; things that you know already. The ability to understand things
+&gt; from other people's point of view is a virtue!
+&gt; 
+&gt; ---------------------------------------------------------
+&gt; PPS. I found the full attack scripts finally.
+&gt; To get into POP2, they used:
+&gt; 
+&gt; <A HREF="http://darknet.securityinfos.com/os/linux/redhat/5.2/SDI-pop2.c">http://darknet.securityinfos.com/os/linux/redhat/5.2/SDI-pop2.c</A>
+&gt; 
+&gt; Then they fetched this file (a copy of it) over FTP:
+&gt; 
+&gt; <A HREF="http://darknet.securityinfos.com/os/linux/redhat/5.2/rootcron.sh">http://darknet.securityinfos.com/os/linux/redhat/5.2/rootcron.sh</A>
+&gt; 
+&gt; Then they just did a few clumsy things while trying to announce
+&gt; their exploits, and then I noticed the packet warnings from
+&gt; my relatively liberal firewall saying that something was
+&gt; going on, and I blocked them.
+&gt; 
+&gt; ----------------------------------------------------------
+&gt; PPPS. I had previously heard that POP and IMAP were security
+&gt; holes, and I had been blocking ports 110 and 143 for at least
+&gt; a year. However, I didn't know that 109 was also a problem.
+&gt; I only spend an average of 10-20 hours a week on computer security.
+&gt; And sometimes I concentrate fully on real work.
+&gt; 
+&gt; But the vulnerable machine in question was first installed with
+&gt; slackware, which was pretty horrible - it didn't have the software for
+&gt; my ethernet card (about mid-1996 era, this is), and a heap of
+&gt; other things didn't work either. But after a year or two,
+&gt; I got it connected up to a sparc station, connected from time
+&gt; to time by 9600 bit/sec modem to a rather safe organisation
+&gt; hidden behind a rather conservative firewall.
+&gt; So security was not my concern, even when I put redhat 4.x
+&gt; of various versions on it. I was just worried that so little
+&gt; worked - and the free support from RedHat wouldn't work,
+&gt; because I couldnt' even get my customer registration
+&gt; through the organisation's firewall.
+&gt; The firewall stopped me from getting any useful help with the thing.
+&gt; 
+&gt; Later, I installed redhat 5.2 over the top of an earlier version,
+&gt; and my main concerns were still _functionality_.
+&gt; It was only 20 months ago that I connected my then 3 machines
+&gt; to the net, and I firewalled out anything that looked nasty,
+&gt; not really knowing how to "turn off services".
+&gt; At that time, Redhat didn't ask you which services you wanted,
+&gt; as far as I know.
+&gt; And I really don't have the time to "upgrade" my OSs on 7 machines
+&gt; now every 6 months. Besides, the "upgrades" usually take the
+&gt; old configurations unaltered.
+&gt; 
+&gt; etc. etc. etc. etc.
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+&gt; 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

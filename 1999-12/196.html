@@ -1,0 +1,145 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="FW: Corel Linux and 3com 509..." -->
+<!-- FromName="Sulis, Adam" -->
+<!-- FromEmail="SULISA@tc.gc.ca" -->
+<!-- ToName="'linuxsa@linuxsa.org.au'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 9 Dec 1999 15:00:21 -0500" -->
+<!-- Id="35D8B2779488D211ACED00805F57E9120264E5D0@TC1S008.tc.gc.ca" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: FW: Corel Linux and 3com 509...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Sulis, Adam &lt;<I><A HREF="mailto:SULISA@tc.gc.ca">SULISA@tc.gc.ca</A></I>&gt;
+  To  : 'linuxsa@linuxsa.org.au' &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 9 Dec 1999 15:00:21 -0500
+</PRE>
+<H1>FW: Corel Linux and 3com 509...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I have a 3c509B configured under Corel Linux. Sorry it took so long, I just
+got around to doing it now. If you want the short answer, start at step 6,
+otherwise, read on from 1... and let me know if this helps!
+
+1. Ensure the card is not set to PNP. Using 3c5x9cfg.exe from 3COM, turn off
+PNP and set the card to something safe. (most people I know like adress:300,
+IRQ 10)
+
+2. Reboot into Linux. I chose to boot using Corel-Console Mode to watch the
+process. As usual, you'll get the SIOADDR or whatever errors. Get a text
+session up.
+
+3. Run modconf. Get into the networking part, scroll down to 3c509. Notice
+there is no plus-sign next to it, so it's not activated in the kernel. Hit
+enter on it and activate it. When it asks for parameters, I ignored it. It
+grabbed the card right away.
+
+4. Run ifconfig. Only the LO should be running at this point. type:
+"ifconfig eth0 1.2.3.1 netmask 255.255.255.0 up" (use your own settings)
+
+5. Now run ifconfig. the ETH0 interface should be up. You can now ping it
+from another box. Now all we have to do is ensure that it stays running
+after a reboot...
+
+6. VI /etc/init.d/network  In here, change the IP info accordingly. If your
+subnet address is 255.255.255.0 like mine, then your info could look like
+this:
+
+IP Address: 1.2.3.1
+Subnet mask: 255.255.255.0
+Gateway: 1.2.3.1 (for now)
+Broadcast: 1.2.3.255
+Network: 1.2.3.0
+
+These variables are fed into the line at the bottom of the file. The best
+way to set it up really, is to remove the variables, and enter the data
+directly in. If you ever want to use another NIC, you'll have to enter it
+manually anyway. So the abbreviated line for me could be:
+	ifconfig eth0 1.2.3.1 netmask 255.255.255.0 gateway 1.2.3.6
+&lt;--the gateway that I'll be using
+
+7. Lastly, this won't work if the box thinks you want to use DHCP instead.
+So, VI /etc/dhcpc/config and change the entry: IFACE=eth0  to  IFACE=none.
+
+Done. Reboot whenever you are ready to test it.
+
+
+
+
+&gt; Adam J. Sulis, CET, MCP, CNA
+&gt; Workstation Management, Technical Support
+&gt; Administration des postes de travail, Soutien technique
+&gt; Tel: (613) 998 0722
+&gt; <A HREF="mailto:sulisa@tc.gc.ca">sulisa@tc.gc.ca</A>
+&gt; 
+&gt; 
+&gt; 
+&gt; 
+&gt; 
+&gt; ----------
+&gt; From: 	Mike Andrew[SMTP:<A HREF="mailto:mikero@norfolk.nf">mikero@norfolk.nf</A>]
+&gt; Sent: 	Friday, December 03, 1999 6:24 PM
+&gt; To: 	<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; Subject: 	Re: Corel Linux and 3com 509...
+&gt; 
+&gt; On Sat, 04 Dec 1999, Jo Christer Øiongen wrote:
+&gt; &gt; Hello!
+&gt; &gt; 
+&gt; &gt; Here's a unstructured and confused question, full of typos. Have anybody
+&gt; 
+&gt; 
+&gt; &lt;snip&gt;
+&gt; &gt; network without the NIC working!) I've tried to load the 3c509.o module 
+&gt; &gt; into the kernel with out any help.. 
+&gt; &lt;snip&gt;
+&gt; 
+&gt; I don't know Corel-Linux specifically. Do the basics using modprobe (not
+&gt; insmod) and examine the messages in /var/log/messages. It could be
+&gt; something as simple as pnp not being set up correctly. If your card is an
+&gt; ISA go to the site below and sort that basic problem out first.
+&gt; 
+&gt;  --
+&gt; <A HREF="http://users.nf/linux/">http://users.nf/linux/</A>
+&gt; StepByStep submissions: <A HREF="mailto:mikero@norfolk.nf">mikero@norfolk.nf</A>
+&gt; 
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,118 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: LT Winmodem!!!!! EEK!" -->
+<!-- FromName="'Mark Newton'" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="'Tim Fairchild'" -->
+<!-- ToEmail="amosf@mrbean.net.au" -->
+<!-- Date="Mon, 6 Nov 2000 13:20:55 +1030" -->
+<!-- Id="20001106132055.D72270@atdot.dotat.org" -->
+<!-- Reference="Pine.LNX.4.21.0011060754510.8158-100000@shiva.home" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: LT Winmodem!!!!! EEK!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Tim Fairchild &lt;<I><A HREF="mailto:amosf@mrbean.net.au">amosf@mrbean.net.au</A></I>&gt;
+  Date: Mon, 6 Nov 2000 13:20:55 +1030
+</PRE>
+<H1>Re: LT Winmodem!!!!! EEK!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Nov 06, 2000 at 08:06:11AM +1000, Tim Fairchild wrote:
+
+ &gt; Perhaps modern PC's have too many 'cpus'. Surely the main CPU could be
+ &gt; doing a lot more of the work instead of haveing other chips to take the
+ &gt; work away and make it sit there idle all day... Like sticking fancy chips
+ &gt; on video cards and all the rest...
+
+No, not true. 
+
+The reason graphics cards use dedicated CPUs isn't exclusively about the
+grunt of the main processor (although that's a factor).  Graphics boards 
+have their own CPUs because the processing power needs to be close to the
+memory in order for the CPU to manipulate items stored there.
+
+Consider what happens when a main processor accesses video memory:  In
+order to manipulate a word in video RAM, the CPU needs to negotiate with
+the PCI bus controller to access the bus, then it needs to fetch the 
+word over the bus (which is probably running at a lowly 33 or 66 MHz), 
+then it needs to perform its operation, then it needs to write the word
+back, which involves an additional transaction with the PCI bus controller,
+and an additional traversal of the low-speed PCI bus.
+
+If DMA is being used to access the word the story is potentially worse
+for small transactions:  The CPU says to the video card (via the PCI bus
+controller and the bus), "Please transfer the word at address X into main
+system RAM at address Y."  The video card would then do all the bits which
+I've described in the previous paragraph to get the word into RAM.  The CPU
+would then need to fetch the word from RAM to work on it, then arrange 
+another DMA transfer to send it back.
+
+Contrast that to the approach which includes a CPU on the graphics board.
+The main system CPU would upload programs implementing graphics primitives
+to memory used by the graphics board's CPU, then it can send the graphics
+board CPU messages (across the PCI bus) like, "Apply a texture to the sphere
+I'll get you to draw in a few microseconds...".  The pixel-bashing required
+to draw a texture on a sphere potentially represents millions of pixel
+manipulations -- But when the CPU which is carrying out those manipulations
+is connected to graphics memory by, say, a 1 GHz bus (for example) instead of
+a 33 MHz PCI bus, those manipulations can be carried out much, much faster,
+because the data is being made to the processor with so much less delay --
+and the main CPU can be put to better tasks (like, say, decoding MP3s :-)
+while the graphics card is working on the textures.
+
+The other win it gives is the ability to improve the performance of the
+device at a later date by altering the firmware loaded on the card.  Found
+a more efficient way to draw textures?  Fine - Implement the firmware, 
+upload it to the card, and the main CPU doesn't need to do anything
+differently to make texturing faster for /all/ applications which use the
+device.
+
+The same goes for mass storage controllers, network cards, sound cards,
+modems, and almost anything else you can plug in to your computer:  Most
+cards have some kind of dedicated on-board processing power, and the CPU
+communicates with them in a way which is very similar to RPC.  Much more
+efficient.
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

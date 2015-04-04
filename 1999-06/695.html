@@ -1,0 +1,134 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Linux Users IDs and NT" -->
+<!-- FromName="" -->
+<!-- FromEmail="mtippett@ticons.com.au" -->
+<!-- ToName="Alex Garner" -->
+<!-- ToEmail="alex@garner.cx" -->
+<!-- Date="Wed, 30 Jun 1999 16:54:02 +0930 (CST)" -->
+<!-- Id="199906300724.QAA08779@matt.ticons.com.au" -->
+<!-- Reference="4.1.19990630155556.009813e0@mail.garner.cx" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Linux Users IDs and NT</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: <A HREF="mailto:mtippett@ticons.com.au">mtippett@ticons.com.au</A>
+  To  : Alex Garner &lt;<I><A HREF="mailto:alex@garner.cx">alex@garner.cx</A></I>&gt;
+  Date: Wed, 30 Jun 1999 16:54:02 +0930 (CST)
+</PRE>
+<H1>Re: Linux Users IDs and NT</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Wander over to your /usr/doc/samba-xxx directory (if you rpm'ed it), or
+&gt; even better look at the docs that come with the tar ball. There are a whole
+&gt; lot of .txt docs and they all answer your questions in much detail (from
+&gt; memory). You'll have to do a lot of reading and wading, but I recommend you
+&gt; do anyway, because it gives you an insight into how powerful and cool samba
+&gt; really is.
+
+Been there done that.  There is a really cool document that covers everthing
+about joining a domain... That is going fine.  It mentions that one of the
+shortcomings is that there is no easy way to synchronise the unix usernames
+that are used for file ownership/permissions on the samba server to those on
+the NT server.  It does say that the author (Jeremy Allison - IIRC) has been
+playing with some ideas on the autogeneration of usernames under unix under
+the control of NT.
+
+&gt; I believe there is actually a way you can just get samba to auth from an NT
+&gt; domain controller, but don't quote me on that.
+&gt; synchronise the unix usernames
+
+I am already doing that...  To describe in a diagram the way things are done.
+
+
+        ----------------&gt;       ----- Auth
+Client  ====  Linux      NT     ===== File
+                &lt;--------
+
+The way things work (roughly) is that the client opens a file service on
+the Linux box.  Authentication is passed back to the NT domain controller.
+If the auth is valid the connection is allowed and the data is written
+to disk *AS THE AUTHENTICATED USER*.   Hence a mapping of NT usernames to
+userids must be managed.  The user *must* have a userid that files can
+be written under on the Linux box.
+
+Now since the accounts are managed on the NT system we have to keep Linux
+synchronised with the NT box.  So the three apparent options are...
+
+	1) On the fly creation - if the account doesn't exist create it
+		within samba.
+
+	2) Manual management - Always manage it on both systems.  Bleark!
+
+	3) Synchronise on occasions - When an account is created trigger
+		the synchronisation of the accounts on the Linux box.
+
+Of these 1 and 3 are the most suitable.  3 is the option that gives you
+most control.  1 is the easiest to manage.
+
+Now we have a solution :).
+
+I did get an email from <A HREF="mailto:jerry@eng.auburn.edu">jerry@eng.auburn.edu</A>, who gave me the following 
+information.  This is precisely what I want.  All I need to do now is get
+the administrators to run a small batch program to dump the group and user
+lists on the Linux Server which can be configured to synchronise whenever 
+the file changes.
+
+Thanks all for your help.
+
+======================================
+Matt,
+
+I wrote three Perl scripts to illustrate this for a chapter in 
+min and Richard's book (chapter 12).  You can download the 
+latest version of these via FTP from
+        ftp.eng.auburn.edu/pub/cartegw/samba/domain_member_scripts.tar.gz
+
+Let me know if you find them useful or have suggestions 
+for improvement.
+
+Cheers,
+jerry
+======================================
+
+Cheers, and thanks again...
+
+Matt
+
+-- 
++----[ Matthew Tippett    +61 416 006 047    <A HREF="mailto:mtippett@ticons.com.au">mtippett@ticons.com.au</A> ]----+
+| Tippett Information Consulting Pty Ltd  ]-[  <A HREF="http://www.ticons.com.au/">http://www.ticons.com.au/</A> |
++-----[ Linux and Open Source Development, Consulting and Support ]------+
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,180 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: LVM and Software RAID (was: Re: New hdd installation)" -->
+<!-- FromName="'Anthony Symons'" -->
+<!-- FromEmail="ant@sa.pracom.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 20 Apr 2001 11:47:59 +0930" -->
+<!-- Id="3ADF9C57.EA0B1099@sa.pracom.com.au" -->
+<!-- Reference="20010418094756.A18897@atdot.dotat.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: LVM and Software RAID (was: Re: New hdd installation)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 20 Apr 2001 11:47:59 +0930
+</PRE>
+<H1>Re: LVM and Software RAID (was: Re: New hdd installation)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+What about mylex raid cards? Personally I wouldnt use anything else.
+They are well supported under linux becuase mylex provide free hardware
+for the guy who writes the linux drivers, and give him the specs. It has
+a decent text mode interface in the firmware which works well for me and
+is quite configurable. Under linux it has quite a decent stats screen
+(see below) and has a device you can pipe commands in to for rebuilding
+etc. I have a small cron job that checks its status and emails me if its
+not OK with all the info about the array.
+
+I once jumped a scsi drive incorrectly and hot swapped it in (wanted to
+try the hot swapability that its meant to have) but 'cos the id was
+wrong one of the other drives dropped out. Server kept going, all was
+well. I removed the new drive, issued the command to rebuild the drive
+that was then out of sync and it did it all in the background
+transperent to users.
+
+When I tryed software raid (granted this was old versions, and I belive
+its much more stable now) the install worked fine, and it ran well, but
+when I pulled a drive out with the machine running (simulates a failed
+drive) it died (cant remember if it was a panic or what, was a few
+months ago) and I was unable to rebuild the drive. 
+
+I have 2 servers with these raid card, and would highly recommend them
+to those people who are spending someone elses money (they are probably
+a bit costly for home users).
+
+Heres an example of the interface for those who havnt had a chance to
+use one:
+
+[<A HREF="mailto:ant@flanders">ant@flanders</A> rd]$ ls -al
+total 0
+dr-xr-xr-x   3 root     root            0 Apr 20 10:44 .
+dr-xr-xr-x 106 root     root            0 Apr  5 18:24 ..
+dr-xr-xr-x   2 root     root            0 Apr 20 10:44 c0
+-r--r--r--   1 root     root            0 Apr 20 10:44 status
+[<A HREF="mailto:ant@flanders">ant@flanders</A> rd]$ pwd
+/proc/rd
+[<A HREF="mailto:ant@flanders">ant@flanders</A> rd]$ cat status 
+OK
+[<A HREF="mailto:ant@flanders">ant@flanders</A> rd]$ cd c0
+[<A HREF="mailto:ant@flanders">ant@flanders</A> c0]$ ls
+current_status  initial_status  user_command
+[<A HREF="mailto:ant@flanders">ant@flanders</A> c0]$ cat current_status 
+***** DAC960 RAID Driver Version 2.4.10 of 1 February 2001 *****
+Copyright 1998-2001 by Leonard N. Zubkoff &lt;<A HREF="mailto:lnz@dandelion.com">lnz@dandelion.com</A>&gt;
+Configuring Mylex DAC960PTL1 PCI RAID Controller
+  Firmware Version: 4.07-0-29, Channels: 1, Memory Size: 8MB
+  PCI Bus: 0, Device: 20, Function: 1, I/O Address: Unassigned
+  PCI Address: 0xFE000000 mapped at 0xD0800000, IRQ Channel: 5
+  Controller Queue Depth: 124, Maximum Blocks per Command: 128
+  Driver Queue Depth: 123, Scatter/Gather Limit: 33 of 33 Segments
+  Stripe Size: 64KB, Segment Size: 8KB, BIOS Geometry: 128/32
+  Physical Devices:
+    0:0  Vendor: IBM       Model: DPSS-318350N      Revision: S80D
+         Serial Number:         ZE0D1823
+         Disk Status: Online, 35842048 blocks
+    0:1  Vendor: IBM       Model: DPSS-318350N      Revision: S80D
+         Serial Number:         ZE0C4707
+         Disk Status: Online, 35842048 blocks
+    0:2  Vendor: FUJITSU   Model: MAH3182MP         Revision: 0114
+         Serial Number:     50012131
+         Disk Status: Online, 35700736 blocks
+    0:4  Vendor: IBM       Model: DDYS-T36950N      Revision: S93E
+         Serial Number:         TFFET251
+         Disk Status: Online, 71686144 blocks
+  Logical Drives:
+    /dev/rd/c0d0: RAID-5, Online, 71401472 blocks, Write Thru
+    /dev/rd/c0d1: RAID-7, Online, 71686144 blocks, Write Thru
+  No Rebuild or Consistency Check in Progress
+
+[<A HREF="mailto:root@flanders">root@flanders</A> c0]# cat /etc/cron.daily/raid_check.sh 
+#!/bin/bash
+
+RAID_STATUS=`cat /proc/rd/status`
+
+if [ ! $RAID_STATUS = "OK" ] ; then
+	RAID_STATUS_DETAILED=`cat /proc/rd/c0/current_status`
+	echo -e
+"to:<A HREF="mailto:hardware@foghorn.internal">hardware@foghorn.internal</A>\nfrom:<A HREF="mailto:RAID@flanders">RAID@flanders</A>\nsubject:[FLANDERS]
+CRITICAL RAID PROBLEM!\n$RAID_STATUS_DETAILED" | /usr/sbin/sendmail -t
+fi
+
+Ant
+
+Greg Lehey wrote:
+&gt; 
+&gt; On Thursday, 19 April 2001 at 17:11:17 +0900, Richard Sharpe wrote:
+&gt; &gt; At 04:56 PM 4/19/01 +0930, michael wrote:
+&gt; &gt;
+&gt; &gt;&gt; What I offerred was not a summary at all. It was an opinion. I'm happy to
+&gt; &gt;&gt; change it, what evidence do you have that software raid is superior to
+&gt; &gt;&gt; hardware raid? Are you talking about systems that are real world loaded,
+&gt; &gt;&gt; with cpu being used for things other than managing the disk?
+&gt; &gt;
+&gt; &gt; My experience with hardware and software raid suggests that there are lots
+&gt; &gt; of circumstances where software RAID is superior.
+&gt; 
+&gt; One point you didn't make is that the management interface for
+&gt; hardware RAID is often much worse than the interface for software
+&gt; RAID.  This doesn't have to be that way, but most boxes come with
+&gt; Microsoft-based management tools which don't interface well with UNIX.
+&gt; 
+&gt; Greg
+&gt; --
+&gt; Finger <A HREF="mailto:grog@lemis.com">grog@lemis.com</A> for PGP public key
+&gt; See complete headers for address and phone numbers
+&gt; 
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+Systems Administrator       
+Pracom Ltd.             
++61 8 82029074 -=- +61 402 100 671 
+<A HREF="mailto:anthony.symons@sa.pracom.com.au">anthony.symons@sa.pracom.com.au</A>
+
+PRIVILEGED - PRIVATE AND CONFIDENTIAL
+This electronic mail is solely for the use of the addressee and may
+contain information which is confidential or privileged.
+If you receive this electronic mail in error, please delete it from
+your system immediately and notify the sender by electronic mail or
+using any of the above contact details.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

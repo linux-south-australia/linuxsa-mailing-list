@@ -1,0 +1,213 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Firewalling & cbq/sfq" -->
+<!-- FromName="'Toby Corkindale'" -->
+<!-- FromEmail="tjcorkin@sa.pracom.com.au" -->
+<!-- ToName="'Alan Kennington'" -->
+<!-- ToEmail="akenning@topology.org" -->
+<!-- Date="Fri, 18 May 2001 16:34:55 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0105181619340.24092-100000@localhost.localdomain" -->
+<!-- Reference="20010518160853.B31976@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Firewalling & cbq/sfq</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@sa.pracom.com.au">tjcorkin@sa.pracom.com.au</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  Date: Fri, 18 May 2001 16:34:55 +0930 (CST)
+</PRE>
+<H1>Re: Firewalling & cbq/sfq</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, 18 May 2001, Alan Kennington wrote:
+
+&gt; On Fri, May 18, 2001 at 10:52:38AM +0930, Toby Corkindale wrote:
+&gt; &gt; 
+&gt; &gt; I've been attempting to setup stochastic fairness queues (SFQ) as a
+&gt; &gt; sub-discipline of the class-based queueing scheduler (CBQ) to limit
+&gt; &gt; bandwidth used by internal masqueraded users (housemates) downloading thru
+&gt; &gt; an external link.
+&gt; 
+&gt; Toby,
+&gt; 
+&gt; I don't recall there ever having been discussion of the linux traffic control
+&gt; in the linuxSA mailing list.
+&gt; For that topic, I subscribe to <A HREF="mailto:diffserv-general@lists.sourceforge.net">diffserv-general@lists.sourceforge.net</A>,
+&gt; which is theoretically limited to diffserv questions, but which seems
+&gt; to range fairly widely over tc questions.
+
+Ah ok.. I might give some other lists a try then.. 
+I'll have another hit at the stuff over the weekend, and see how I go.
+
+&gt; 
+&gt; &gt; using "iptables -t mangle -L -v" i can see that packets are not matching the
+&gt; &gt; rules I setup. Can anyone suggest what rules are appropriate to match
+&gt; &gt; packets coming in on a ppp interface, and leaving thru the eth interface,
+&gt; &gt; after being de-masqueraded..
+&gt; 
+&gt; Without seeing your -L -v outputs, it's not easy to interpret what's
+&gt; going wrong. Although I am often criticised for the garrulity of my posts,
+&gt; that's better than having to eke out the details via a dialogue
+&gt; of many posts on-list. Better to post one hundred-line explanation of
+&gt; a problem than a dialogue of 5 posts elucidating the problem!
+
+Indeed.. I'll endeavour to check this stuff out from home, and post a few
+logs to work with them.
+CUrrently things (according to iptraf) look fine on the eth0 and ppp0
+devices.. on the ppp0 side its all heading to the external IP of the
+gateway, and on the eth0 side you get
+external_web_site_addy--&gt;internal_users_box_addy.. I wuold have thought the
+rule saying 'all non-local IPs get marked' should have worked.. The only
+thing i'm wondering is that maybe at the point where the mangle table is
+called is that the source IP has been changed to be that of the
+gateway.. although iptraf and tcpdump deny this.
+
+I'll try using the u32 packet classifier instead and see how I go, since i
+guess that occurs at a different stage.
+
+&gt; 
+&gt; &gt; The rules I have tried are using the mangle table (present in OUTPUT and
+&gt; &gt; PREROUTING):
+&gt; &gt; eg:
+&gt; &gt; -t mangle -I PREROUTING -d users_ip -i ppp0 -j MARK --set-mark 1
+&gt; &gt; 
+&gt; &gt; and
+&gt; &gt; 
+&gt; &gt; -t mangle -I OUTPUT -d users_ip -s ! gateways_internal_ip -j MARK --set-mark
+&gt; &gt; 1
+&gt; 
+&gt; This is just a hunch, but are you escaping the ! character?
+&gt; It seems too obvious to mention. So no one else will mention it!
+&gt; Are you running this in a csh or sh shell script?
+
+it's a sh script, and what i typed above wasn't copy and pasted from my
+actual shell script, unfortunately. (but i've typed it enuf times i know its
+right, albeit with the IPs replaced)
+When i do the iptables -t mangle -L -n -v, I can see that the rule does have
+a ! in front of it, so i believe it's getting thru.
+
+Good call thou - i certainly hadn't thought of that!
+
+&gt; 
+&gt; &gt; (users ip is of form 192.168.x.x, dialup IP is something like 203.x.x.x,
+&gt; &gt; gateways_internal_ip would be 192.168.1.4 in this case..)
+&gt; 
+&gt; Do you have any NAT that might change destination IP address?
+
+Yes... internal IPs are masqueraded before passing out thru the gateway..
+So, external traffic looks like
+203.1.2.3 -&gt; 203.6.7.8
+internal traffic looks like
+203.1.2.3 -&gt; 192.168.4.5
+
+
+
+&gt; Can you run tcpdump to see whether there are packets coming out
+&gt; in the right subnet etc.?
+
+*nods* That appears to be right, i can check packets off various of the
+internal machines, and things seem fine.. data's definately getting thru,
+its just not going via the queues.. (checking the pkt count on the queues,
+they are always zero.. plus the speeds aren't bounded)
+
+&gt; 
+&gt; &gt; if i setup a rule on output and remove the -s ! gateways_int_ip, then it
+&gt; &gt; matches all packets to the destination, but putting that rule back in stops
+&gt; &gt; matching again..
+&gt; 
+&gt; The shell special-character ! could possibly explain this.
+&gt; 
+&gt; &gt; A second question, for Alan Kennington.. (I hope this hasn't already been
+&gt; &gt; discussed, i haven't checked any archives)
+&gt; &gt; Whereabouts did you get the statistics for the statement that any online
+&gt; &gt; server is potentially cracked five times every hour?
+&gt; 
+&gt; My own 3 IP subnets are my primary source of evidence.
+&gt; And other people have confirmed that they get probed that often too.
+&gt; Of course, you have to set up your firewall to at least log all
+&gt; probes. Otherwise you won't see them.
+&gt; The rates change according to the time of week, time of day,
+&gt; and special events, such as 4 May for chinese hackers.
+&gt; Some people seem to be in regions of IP number space which
+&gt; don't get so many hack attempts though.
+&gt; And I think that masny people just don't have sensitive logging set-ups
+&gt; for all the probes. So they just see very little of what's
+&gt; going on out there.
+&gt; 
+&gt; I'll just summarise 2001 May 4 (things got hotter in the couple days after
+&gt; May 4 actually).
+
+&lt;SNIP&gt;
+
+&gt; Well, that's a tiny sample.
+&gt; It's tiring to write this all out.
+
+Thanks for the info ;)
+
+&gt; The above amounts to only about 2 probes per hour.
+&gt; But it's highly variable.
+&gt; So some hours it is 5 or more probes in one hour,
+&gt; and sometimes you go a whole hour without a (visible) probe.
+&gt; I would say it averages 2/hour on an average day.
+&gt; It all depends on whether the students are on holiday or not.
+&gt; 
+&gt; Cheers,
+&gt; Alan Kennington.
+&gt; 
+
+-- 
+ Toby Corkindale
+ UNIX Developer, Core Tech R&D
+ Technology SA, Pracom Ltd
+ 288 Glen Osmond Road
+ Fullarton,	5063
+ South Australia
+ Tel: +61 8 8202 9075
+ Fax: +61 8 8202 9001
+ mailto:<A HREF="mailto:Toby.Corkindale@sa.pracom.com.au">Toby.Corkindale@sa.pracom.com.au</A>
+ <A HREF="http://www.sa.pracom.com.au/">http://www.sa.pracom.com.au/</A>
+
+                  PRIVILEGED - PRIVATE AND CONFIDENTIAL
+
+   Privileged/Confidential Information may be contained in this message.
+   If you are not the addressee indicated in this message, you may not 
+   copy or deliver this message to anyone.  In such case, you should   
+   destroy this message and notify the sender by reply email. Opinions,
+   conclusions and other information in this message that do not relate
+   to the official business of this organisation shall be understood as
+   neither given nor endorsed by it.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

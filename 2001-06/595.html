@@ -1,0 +1,146 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Backup using FTP" -->
+<!-- FromName="'Mark Brown'" -->
+<!-- FromEmail="mark@complex.psych.adelaide.edu.au" -->
+<!-- ToName="'Mark Phillips'" -->
+<!-- ToEmail="mark@austrics.com.au" -->
+<!-- Date="Tue, 19 Jun 2001 11:17:40 +0930 (CST)" -->
+<!-- Id="200106190147.LAA10835@complex.psych.adelaide.edu.au" -->
+<!-- Reference="3B2EA589.C4BE3DA8@austrics.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Backup using FTP</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Brown &lt;<I><A HREF="mailto:mark@complex.psych.adelaide.edu.au">mark@complex.psych.adelaide.edu.au</A></I>&gt;
+  To  : Mark Phillips &lt;<I><A HREF="mailto:mark@austrics.com.au">mark@austrics.com.au</A></I>&gt;
+  Date: Tue, 19 Jun 2001 11:17:40 +0930 (CST)
+</PRE>
+<H1>Re: Backup using FTP</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; I'm not sure I can help you with piping into ftp but as far as scripting
+&gt; something...
+&gt; 
+&gt; I have found "lftp" to be a rather good ftp program.  Interactively it is
+&gt; great, and
+&gt; according to the man page you can script via "lftp -c &lt;command&gt;".  So, I
+&gt; suspect what
+&gt; you would write would be:
+&gt; 
+&gt; tar czf ~/tmp/tmpbackup.tar.gz &lt;files&gt;
+&gt; lftp -c "put ~tmp/tmpbackup.tar.gz" -u &lt;user&gt;,&lt;password&gt; &lt;server&gt;
+&gt; rm ~/tmp/tmpbackup.tar.gz
+&gt; Actually, I've just tried it and that middle line doesn't work for some
+&gt; reason, it
+&gt; comes back with a prompt.  Anyone know how this can be fixed?
+
+
+The middle line should be something like
+
+lftp -e "put ~tmp/tmpbackup.tar.gz ; exit" -u &lt;user&gt;,&lt;password&gt; &lt;server&gt;
+
+if you really want to avoid a local file
+
+mkfifo ~/tmp/tmpbackup.tar.gz
+tar czf - &lt;files&gt; &gt; ~/tmp/tmpbackup.tar.gz &
+lftp -e "put ~tmp/tmpbackup.tar.gz ; exit" -u &lt;user&gt;,&lt;password&gt; &lt;server&gt;
+
+should work
+
+
+&gt; 
+&gt; Cheers,
+&gt; 
+&gt; Mark.
+&gt; 
+&gt; David Drury wrote:
+&gt; 
+&gt; &gt; Hey there, I was wondering what script options I have for backing up via
+&gt; &gt; FTP.
+&gt; &gt;
+&gt; &gt; I have a linux box needing backup and a netware server with the backup
+&gt; &gt; device in it (running unix services).
+&gt; &gt;
+&gt; &gt; I'd like to do something like
+&gt; &gt;
+&gt; &gt; tar czf - &lt;files&gt; | ftp server backupfile.tar.gz
+&gt; &gt;
+&gt; &gt; But can't find anything in the man pages about this. I know NCFTP has a
+&gt; &gt; config file that'll store usernames and passwords which will be usefull,
+&gt; &gt; but there is still the problem of piping.
+&gt; &gt;
+&gt; &gt; If this can't be done. Can someone make alternae suggestions for file
+&gt; &gt; transfer that don't involve mounting the netware volumes, or putting the
+&gt; &gt; backup device in the linux box. Neither of which are options.
+&gt; &gt;
+&gt; &gt; cya
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; David Drury
+&gt; &gt;    _______________________________________
+&gt; &gt;    \ <A HREF="mailto:ua914299@teaching.cs.adelaide.edu.au">ua914299@teaching.cs.adelaide.edu.au</A> \
+&gt; &gt;     \    <A HREF="mailto:idavid@smug.adelaide.edu.au">idavid@smug.adelaide.edu.au</A>       \                __________ |
+&gt; &gt;      \     Adelaide University Union        \        / \___-=O`/|O`/___|
+&gt; &gt;       \        IT Co-ordinator.              \_______\        / | /     )
+&gt; &gt;       /    Student Machine User Group        /      `/-==__ _/__|/__=--|
+&gt; &gt;      /       Systems Administrator.         /         *      \  |      |
+&gt; &gt;     /   "Cogito cogito ergo cogito sum."   /                  (o)
+&gt; &gt;    /______________________________________/
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+
+
+-- 
+Mark.
+
+   _-_|\    Mark Brown
+  /     \   Psychology Dept
+  \_.-*_/   University of Adelaide
+       v    South Australia, 5005
+            Phone:  +61 8 303 3181
+            Fax:    +61 8 303 3770
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

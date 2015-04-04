@@ -1,0 +1,75 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: system write(2) call bounds checking" -->
+<!-- FromName="Daryl Tester" -->
+<!-- FromEmail="dt@picknowl.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="akenning@dog.topology.org, linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 19 Jun 2000 11:58:44 +0930" -->
+<!-- Id="394D855C.A9B1603C@picknowl.com.au" -->
+<!-- Reference="20000618203635.A26531@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: system write(2) call bounds checking</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  To  : <A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 19 Jun 2000 11:58:44 +0930
+</PRE>
+<H1>Re: system write(2) call bounds checking</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Daryl Tester wrote:
+
+&gt; As Dan Shearer has just pointed out, something unusual is happening in
+&gt; the land of Oz.
+
+I looked further into the kernel source code.  The "/dev/null" driver
+(located in char/mem.c) returns the count, regardless (and surprisingly,
+that's all it does :-).  The drivers return a negative code which maps
+onto errno; if you happen to pass a negative count to /dev/null, it will
+return that (and the mapping function will write the positive value of
+that to errno, and return the value of -1).  It certainly appears to be
+the driver's responsibility to check the arguments, so, Alan, I think
+your ATM driver (as well as /dev/null :-) is broken.
+
+I'm still trying to figure out how the block driver fops maps to the
+correct device driver (eg, in my case, scsi/aic7xxx), but I'll leave
+that for a rainy day ...
+
+
+Regards,
+  Daryl Tester
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

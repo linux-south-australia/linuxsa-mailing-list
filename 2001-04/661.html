@@ -1,0 +1,154 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="socket programming - connection refused from recvfrom call" -->
+<!-- FromName="'John Lehmann'" -->
+<!-- FromEmail="jplehmann@home.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 20 Apr 2001 13:03:06 -0500" -->
+<!-- Id="00e001c0c9c4$27251ad0$0200a8c0@asus2k" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: socket programming - connection refused from recvfrom call</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: John Lehmann &lt;<I><A HREF="mailto:jplehmann@home.com">jplehmann@home.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 20 Apr 2001 13:03:06 -0500
+</PRE>
+<H1>socket programming - connection refused from recvfrom call</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hello,
+
+At the bottom of the message is some code that runs fine on Solaris but is
+having problems on redhat 6.
+
+All I'm doing is creating a socket, binding it, sending a message to port
+5000 and the trying to receive a message on port X (specified in the command
+line).
+
+I would expect that if X is not 5000, the program execution would block at
+the recvfrom and wait until a message arrives, however i get the error
+connection refused. (if you take out the send, the receive does block as
+expected)  On solaris, this code works as expected though.
+
+Thanks for the help,
+John
+
+
+#include &lt;sys/socket.h&gt; // basic socket definitions
+#include &lt;sys/types.h&gt; // basic system data types
+#include &lt;sys/stat.h&gt; // for S_xxx file mode constants
+#include &lt;netinet/in.h&gt; // sockaddr_in{} and other Internet defns
+#include &lt;arpa/inet.h&gt; // inet(3) functions
+#include &lt;stdlib.h&gt;
+#include &lt;iostream.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;strings.h&gt;  // for convenience
+#include &lt;errno.h&gt;
+#include &lt;string.h&gt;
+
+
+
+int main( int argc, char** argv ) {
+ if ( argc &lt; 2 )
+  return -1;
+
+ int sockfd;
+ struct sockaddr_in sock_addr;
+
+ int my_port = atoi( argv[1] );
+
+ // setup the address struct for the receive socket
+ bzero( &sock_addr, sizeof(sock_addr) );
+ sock_addr.sin_family  = AF_INET;
+ sock_addr.sin_port   = htons( my_port );
+ sock_addr.sin_addr.s_addr = htonl( INADDR_ANY );
+
+ // get the receive socket file descriptor
+ if ( ( sockfd = socket( AF_INET, SOCK_DGRAM, 0 ) ) &lt; 0 ) {
+  cout &lt;&lt; "BufferedSocket: Error on call to socket()" &lt;&lt; endl;
+  exit( 1 );
+ }
+
+ // bind the receive socket
+ if( ( bind( sockfd, (struct sockaddr *) &sock_addr, sizeof(sock_addr) ) ) &lt;
+0 ) {
+  cout &lt;&lt; "BufferedSocket: Error on call to bind()" &lt;&lt; endl;
+  exit( 1 );
+ }
+
+ cout &lt;&lt; " my port is " &lt;&lt; my_port &lt;&lt; endl;
+
+ // the address structure for the send message
+ struct sockaddr_in send_addr;
+
+ // prepare the return message
+ bzero( &send_addr, sizeof(send_addr) );  // memset() can also be used
+ send_addr.sin_family = AF_INET;
+ send_addr.sin_port   = htons( 5000 );
+   if ( inet_pton( AF_INET, "127.0.0.1", &send_addr.sin_addr ) &lt;= 0 ) {
+  cout &lt;&lt; "BufferedSocket: inet_pton() error for " &lt;&lt; endl;
+  exit( 1 );
+ }
+
+ char buff[] = "This is a string";
+
+ // send the buffer
+
+ int sent_amt =  sendto( sockfd, buff, 5, 0, (struct sockaddr * )
+&send_addr, sizeof( send_addr ) );
+
+
+ char recv_buffer[100];
+
+errno = 0;
+ int bytes_to_read = recvfrom( sockfd, recv_buffer, sizeof(recv_buffer), 0,
+         NULL, NULL );
+
+ cout &lt;&lt; strerror(errno) &lt;&lt;endl;
+
+ cout &lt;&lt; " received " &lt;&lt; bytes_to_read &lt;&lt; endl;
+
+
+
+}
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

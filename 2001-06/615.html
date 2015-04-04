@@ -1,0 +1,254 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Serial console" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 19 Jun 2001 17:04:34 +0930" -->
+<!-- Id="3B2F008A.1FBAC0D5@aarnet.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Serial console</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 19 Jun 2001 17:04:34 +0930
+</PRE>
+<H1>Serial console</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+
+Copy of an internal procedure that addresses an FAQ.  Enjoy.
+
+             Serial console on PCs for Red Hat Linux 7.1
+
+
+CREATE FALLBACK PLAN
+
+Type
+
+  uname -r
+  2.4.2-2
+
+and then use the returned value to creat a boot diskette
+
+  mkbootdisk --device /dev/fd0 2.4.2-2
+
+
+CONFIGURE LILO
+
+LILO is the Linux Boot Loader.  We configure it to use the serial
+port.  We also configure it to pass arguments to the kernel to
+instruct it to use the serial port for the console.
+
+Alter /etc/lilo.conf to add these lines at the beginning
+of the file
+
+  serial=0,9600n8
+  timeout=100
+  restricted
+  password=aarnet
+
+And remove this line
+
+  message=/boot/message
+
+For each "image" entry add the line
+
+  append="console=tty0 console=ttyS0,9600n8"
+
+For example
+
+  image=/boot/vmlinuz-2.4.2-2
+	label=linux
+	read-only
+	root=...
+        initrd=...
+
+becomes
+
+  image=/boot/vmlinuz-2.4.2-2
+	label=linux
+	read-only
+	root=...
+        initrd=...
+        append="console=tty0 console=ttyS0,9600n8"
+
+Run
+
+  chmod u=rw,g=,o= /etc/lilo.conf
+  /sbin/lilo
+
+
+STOP PROCESSES INTERFERING WITH SERIAL PORT
+
+Alter /etc/sysconfig/kudzu from
+
+  SAFE=no
+
+to
+
+  SAFE=yes
+
+
+RUN A GETTY ON THE SERIAL PORT
+
+
+Is mgetty installed?
+
+  rpm -q mgetty
+
+Get the mgetty program
+
+  ftp mirror.aarnet.edu.au
+  User: anonymous
+  Password:
+  cd /pub/linux/redhat/redhat-7.1/en/os/i386/RedHat/RPMS
+  bin
+  get mgetty-1.1.25-2.i386.rpm
+  quit
+
+And install it
+
+  rpm -ivh mgetty-1.1.25-2.i386.rpm
+
+Edit /etc/inittab to add the line
+
+  s0:12345:respawn:/sbin/mgetty -b -r -s 9600 ttyS0
+
+
+ALLOW ROOT LOGIN FROM SERIAL CONSOLE
+
+Edit /etc/securetyy to add the line
+
+  ttyS0
+
+
+CHANGE INIT LEVEL TO TEXTUAL
+
+Edit /etc/inittab finding the line
+
+  id:5:initdefault:
+
+and altering it to
+
+  id:3:initdefault:
+
+
+REBOOT
+
+  shutdown -r now
+
+
+VERIFY CONSOLE OPERATION
+
+Plug RS-232 breakout box into serial port.  Tx lights should flash
+during reboot.
+
+
+NOTES
+
+It is important that DCD work correctly.  A null modem cable that
+pulls DCD permanently high gives no escape when an application locks
+up on a serial console user.  For a null modem, the wiring should be
+
+   DCD  -----+------------------  DTR
+             |
+   DSR  -----+
+
+In addition to the data lines
+
+   TxD  ------------------------  RxD
+
+   RxD  ------------------------  TxD
+
+and the handshaking lines
+
+   CTS  ------------------------  RTS
+
+   RTS  ------------------------  CTS
+
+The terminal server should also be able to be reset from the PC.
+
+   DTR  ------------------+-----  DCD
+                          |
+                          +-----  DSR
+   
+
+For a real modem use a standard RS-232 cable.  These Hayes AT commands
+are a good start at configuring the modem.
+
+  AT &F
+  AT S0=1 &K3 &D3 &C1 Q1 &W
+
+You also need to find the ATB or equivalent command
+to set the link to the PC to a constant 9600bps.
+
+
+For the Async lines of the Cisco 2511 the wiring is:
+
+  2511                      PC
+  RJ45                    9 pin D
+
+   CTS 1 ---------------- 7 RTS
+
+   DCD 2 ---------------- 4 DTR
+
+   RxD 3 ---------------- 3 TxD
+
+  SGnd 4 ------------+
+                     +--- 5 SGnd
+  SGnd 5 ------------+
+
+   TxD 6 ---------------- 2 RxD
+
+   DTR 7 ------------+--- 1 DCD
+                     |
+                     +--- 6 DSR
+
+   RTS 8 ---------------- 8 CTS
+
+                    nc -- 9 RI
+
+These crossovers can be accomplished in the backshell of a RJ45
+female/9pin D female connector.  AARNet can provide such connectors if
+required.
+
+Glen
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,180 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="proftpd not letting me in" -->
+<!-- FromName="'Luke Vanderfluit'" -->
+<!-- FromEmail="luke@chipcity.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 30 Jun 2002 13:39:47 +0930" -->
+<!-- Id="02063013394701.07152@bench.chipcity.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: proftpd not letting me in</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Luke Vanderfluit &lt;<I><A HREF="mailto:luke@chipcity.com.au">luke@chipcity.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 30 Jun 2002 13:39:47 +0930
+</PRE>
+<H1>proftpd not letting me in</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+I'm trying to get proftpd to allow users to log in to their home directories
+
+I'm using the following proftpd.conf <A HREF="file:">file:</A>
+
+####################
+# This is a basic ProFTPD configuration file (rename it to
+# 'proftpd.conf' for actual use.  It establishes a single server
+# and a single anonymous login.  It assumes that you have a user/group
+# "nobody" and "ftp" for normal operation and anon.
+
+ServerName                      "cargo.comstech.com"
+ServerType                      standalone
+DefaultServer                   on
+
+DefaultRoot ~ 
+#users,!admin
+# Port 21 is the standard FTP port.
+Port                            21
+# Umask 022 is a good standard umask to prevent new dirs and files
+# from being group and world writable.
+Umask                           022
+
+# To prevent DoS attacks, set the maximum number of child processes
+# to 30.  If you need to allow more than 30 concurrent connections
+# at once, simply increase this value.  Note that this ONLY works
+# in standalone mode, in inetd mode you should use an inetd server
+# that allows you to limit maximum number of processes per service
+# (such as xinetd)
+MaxInstances                    30
+
+# Set the user and group that the server normally runs at.
+User                            ftp
+Group                           ftp
+
+# Normally, we want files to be overwriteable.
+&lt;Directory /*&gt;
+  AllowOverwrite                on
+&lt;/Directory&gt;
+
+# A basic anonymous configuration, no upload directories.
+&lt;Anonymous ~ftp&gt;
+  User                          ftp
+  Group                         ftp
+  # We want clients to be able to login with "anonymous" as well as "ftp"
+  UserAlias                     anonymous ftp
+
+  # Limit the maximum number of anonymous logins
+  MaxClients                    10
+
+  # We want 'welcome.msg' displayed at login, and '.message' displayed
+  # in each newly chdired directory.
+  DisplayLogin                  welcome.msg
+  DisplayFirstChdir             .message
+
+  # Limit WRITE everywhere in the anonymous chroot
+  &lt;Limit WRITE&gt;
+    DenyAll
+  &lt;/Limit&gt;
+&lt;/Anonymous&gt;
+####################################
+
+I've run it from the command line with the following command:
+
+'/usr/local/sbin/proftpd -d9 -n -c /etc/proftpd.conf &'
+
+and got the following debugging output
+############################################
+cargo.comstech.com - 
+cargo.comstech.com - Config for cargo.comstech.com:
+cargo.comstech.com - ~ftp/
+cargo.comstech.com -  Limit
+cargo.comstech.com -   DenyAll
+cargo.comstech.com -  UserName
+cargo.comstech.com -  GroupName
+cargo.comstech.com -  UserAlias
+cargo.comstech.com -  MaxClients
+cargo.comstech.com -  DisplayLogin
+cargo.comstech.com -  DisplayFirstChdir
+cargo.comstech.com -  Umask
+cargo.comstech.com - /*
+cargo.comstech.com -  AllowOverwrite
+cargo.comstech.com -  Umask
+cargo.comstech.com - DefaultServer
+cargo.comstech.com - DefaultRoot
+cargo.comstech.com - Umask
+cargo.comstech.com - User
+cargo.comstech.com - UserName
+cargo.comstech.com - Group
+cargo.comstech.com - GroupName
+[<A HREF="mailto:root@cargo">root@cargo</A> sbin]# cargo.comstech.com - ProFTPD 1.2.4 (release) (built Tue 
+Mar 19 12:03:27 CST 2002) standalone mode STARTUP
+cargo.comstech.com (150.101.72.145[150.101.72.145]) - connected - local  : 
+150.101.72.134:21
+cargo.comstech.com (150.101.72.145[150.101.72.145]) - connected - remote : 
+150.101.72.145:1119
+cargo.comstech.com (150.101.72.145[150.101.72.145]) - FTP session opened.
+cargo.comstech.com (150.101.72.145[150.101.72.145]) - dispatching PRE_CMD 
+command 'USER amca' to mod_core
+cargo.comstech.com (150.101.72.145[150.101.72.145]) - dispatching PRE_CMD 
+command 'USER amca' to mod_auth
+cargo.comstech.com (150.101.72.145[150.101.72.145]) - dispatching CMD command 
+'USER amca' to mod_auth
+cargo.comstech.com (150.101.72.145[150.101.72.145]) - dispatching PRE_CMD 
+command 'PASS (hidden)' to mod_core
+cargo.comstech.com (150.101.72.145[150.101.72.145]) - dispatching PRE_CMD 
+command 'PASS (hidden)' to mod_auth
+cargo.comstech.com (150.101.72.145[150.101.72.145]) - dispatching CMD command 
+'PASS (hidden)' to mod_auth
+cargo.comstech.com (150.101.72.145[150.101.72.145]) - USER amca (Login 
+failed): Invalid shell.
+
+#################################
+I can only get the client connection established if I change the /etc/passwd 
+file to '/bin/bash' instead of '/bin/false'
+Is there any way I can get the connections happening without giving all the 
+users '/bin/bash' in the /etc/passwd file?
+
+Thanks,
+-- 
+Luke Vanderfluit
+Phone: 08 8556 6112
+Mobile: 0421 276 282
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

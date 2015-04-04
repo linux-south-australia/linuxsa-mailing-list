@@ -1,0 +1,158 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PS2 mouse problem - 1 second polling apparently" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="ak.linuxsa@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 25 Feb 2003 23:18:44 +1030" -->
+<!-- Id="20030225231844.A8715@dog.topology.org" -->
+<!-- Reference="20030225114324.GA230@Gromit" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PS2 mouse problem - 1 second polling apparently</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 25 Feb 2003 23:18:44 +1030
+</PRE>
+<H1>Re: PS2 mouse problem - 1 second polling apparently</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Warning - technical stuff ahead!
+For genuine nerds only....
+
+----------------------------------------------------
+On Tue, Feb 25, 2003 at 10:13:24PM +1030, Richard wrote:
+&gt; On Tue, Feb 25, 2003 at 08:55:35PM +1030, Alan Kennington wrote:
+&gt; &gt; dingo:~ # cat /proc/interrupts
+&gt; &gt;  12:   14157495          XT-PIC  eth1, PS/2 Mouse
+&gt; &gt; So eth1 (a local LAN, actually 100 Mbits/sec crossover cable)
+&gt; &gt; has the same interrupt as the PS/2 mouse.
+&gt; &gt; I wouldn't be at all surprised if that's causing the problem.
+&gt; 
+[...]
+&gt; 
+&gt; Meeces will not share interrupts with other devices nicely, so the eth1 needs
+&gt; to use another one.
+
+
+Richard,
+
+That's very interesting.
+I thought that it would have been the "eth1" driver that 
+was to blame since it is first
+in the list of devices waiting for IRQ and it is the mouse which is
+suffering, not the network card.
+
+The relevant ethernet card driver uses SHIRQ as a
+parameter to permit IRQ sharing when calling request_irq, and in the file
+/usr/src/linux/include/asm-i386/keyboard.h
+there's this:
+
+=========================================================
+#define KEYBOARD_IRQ                    1 
+
+/* ... */
+
+#define kbd_request_irq(handler) request_irq(KEYBOARD_IRQ, handler, 0, \
+                                             "keyboard", NULL)          
+
+/* ... */
+
+#define AUX_IRQ 12
+
+#define aux_request_irq(hand, dev_id)                                   \
+        request_irq(AUX_IRQ, hand, SA_SHIRQ, "PS/2 Mouse", dev_id)       
+=========================================================
+
+So the keyboard does share its IRQ, in theory at least.
+The above functions are used in the file
+/usr/src/linux/drivers/char/pc_keyb.c to request the IRQs.
+The keyboard IRQ is not shared however.
+
+As I understand it, the idea is that multiple device drivers
+waiting for a shared IRQ are offered the interrupt until one of the
+drivers indicates that it has been serviced.
+(Or maybe they all get a go at it, I forget.)
+Then once a second, there's some sort of watchdog-type "process" in
+the kernel which wakes up device drivers for some reason, and
+that's what I'm seeing - this watchdog activity.
+
+So in my case, my mouse driver is just not being offered the interrupt
+when it should be, and that could only be if the ethernet driver
+is falsely indicating that the interrupt is serviced.
+
+Well now I've check the file
+/usr/src/linux/arch/i386/kernel/irq.c
+and the function handle_IRQ_event() shows clearly a for-loop which
+does not take any notice of what an interrupt handler says about
+the interrupt being serviced. This is confirmed by reading the
+ethernet driver /usr/src/linux/drivers/net/8139too.c also.
+There are no actions in the 8139 handler which affect anything but the
+PCI network card.
+
+Here's the irq.c code for invoking irq handlers:
+
+-----------------------------------------------------
+        do {
+                status |= action-&gt;flags;
+                action-&gt;handler(irq, action-&gt;dev_id, regs);
+                action = action-&gt;next;
+        } while (action);    
+-----------------------------------------------------
+
+
+Therefore there are no logical circumstances that I can see where the
+ethernet driver could deprive the PS/2 handler of the interrupt call.
+
+I'm pretty certain you're right about the PS/2 mouse driver
+not being good at sharing the IRQ, but I just can't see it logically
+in the source code.
+
+It's odd that my uname -a command gives me:
+Linux dingo 2.4.0-4GB #1 Wed Jan 24 15:55:09 GMT 2001 i586 unknown
+
+but /usr/src/linux points to /usr/src/linux-2.4.5.
+I assume there's no difference in the driver source there.
+
+Can you give me any clues as to where in the PS/2 mouse code
+I might look to find the cause of the problem?
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

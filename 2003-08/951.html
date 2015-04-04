@@ -1,0 +1,129 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="NTLM but still got pop-ups /w IE  ?" -->
+<!-- FromName="'Arief Kurniawan'" -->
+<!-- FromEmail="ariefk@centrin.net.id" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 17 Aug 2003 08:07:36 +0800" -->
+<!-- Id="5.1.0.14.0.20030817080651.00a90b58@mail.centrin.net.id" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: NTLM but still got pop-ups /w IE  ?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Arief Kurniawan &lt;<I><A HREF="mailto:ariefk@centrin.net.id">ariefk@centrin.net.id</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 17 Aug 2003 08:07:36 +0800
+</PRE>
+<H1>NTLM but still got pop-ups /w IE  ?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Here's the situation, currently I got this :
+- Samba 2.2.8a installed.
+- Squid 2.5 Stable 3 running well configured with :
+./configure --sysconfdir=/etc/squid --enable-poll --enable-snmp 
+--enable-auth="ntlm,basic" --enable-basic-auth-helpers="winbind" 
+--enable-external-acl-helpers="winbind_group,wbinfo_group" 
+--enable-ntlm-auth-helpers="winbind"
+
+Squid without authentication running well. But when authenticated, the 
+pop-up asking Username & password always shows up even with IE 6.0.
+Something else I missed ?
+
+
+Regards,
+
+Arief K
+
+----------------- squid.conf -------------------------
+
+acl QUERY urlpath_regex cgi-bin \?
+no_cache deny QUERY
+
+cache_dir ufs /var/cache/squid 100 16 256
+
+#auth_param basic children 5
+#auth_param basic realm Squid proxy-caching web server
+#auth_param basic credentialsttl 2 hours
+
+auth_param ntlm program /usr/local/squid/libexec/wb_ntlmauth
+auth_param ntlm children 5
+auth_param ntlm max_challenge_reuses 0
+auth_param ntlm max_challenge_lifetime 2 minutes
+
+auth_param basic program /usr/local/squid/libexec/wb_auth
+auth_param basic children 5
+auth_param basic realm Squid proxy-caching web server
+auth_param basic credentialsttl 2 hours
+
+refresh_pattern ^<A HREF="ftp:">ftp:</A>		1440	20%	10080
+refresh_pattern ^<A HREF="gopher:">gopher:</A>	1440	0%	1440
+refresh_pattern .		0	20%	4320
+
+acl AuthorizedUsers proxy_auth REQUIRED
+acl all src 0.0.0.0/0.0.0.0
+acl manager proto cache_object
+acl localhost src 127.0.0.1/255.255.255.255
+acl to_localhost dst 127.0.0.0/8
+acl SSL_ports port 443 563
+acl Safe_ports port 80			# http
+acl Safe_ports port 21			# ftp
+acl Safe_ports port 443 563		# https, snews
+acl Safe_ports port 70			# gopher
+acl Safe_ports port 210			# wais
+acl Safe_ports port 1025-65535	# unregistered ports
+acl Safe_ports port 280			# http-mgmt
+acl Safe_ports port 488			# gss-http
+acl Safe_ports port 591			# filemaker
+acl Safe_ports port 777			# multiling http
+acl CONNECT method CONNECT
+
+http_access allow all AuthorizedUsers
+http_access allow manager localhost
+http_access deny manager
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports
+http_access deny all
+
+visible_hostname h07mis12
+
+http_reply_access allow all
+icp_access allow all
+
+coredump_dir /var/cache 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

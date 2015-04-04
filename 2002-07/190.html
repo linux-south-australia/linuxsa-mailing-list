@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Calculating Netmask Values" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="rsharpe@ns.aus.com" -->
+<!-- ToName="'Andrew Pullin'" -->
+<!-- ToEmail="andrew@hotspurbgc.com.au" -->
+<!-- Date="Sun, 7 Jul 2002 15:41:47 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0207071524200.5009-100000@ns.aus.com" -->
+<!-- Reference="002201c2250b$d17a0ce0$c2de26cb@hotspurbgc.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Calculating Netmask Values</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A></I>&gt;
+  To  : Andrew Pullin &lt;<I><A HREF="mailto:andrew@hotspurbgc.com.au">andrew@hotspurbgc.com.au</A></I>&gt;
+  Date: Sun, 7 Jul 2002 15:41:47 +0930 (CST)
+</PRE>
+<H1>Re: Calculating Netmask Values</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, 7 Jul 2002, Andrew Pullin wrote:
+
+&gt; Hi All,
+&gt; Setting up network device eth0
+&gt; doneSetting up IPv6 network interface (no address)done
+&gt; Setting up routing (using /etc/route.conf)
+&gt; Error while excuting:
+&gt;     /sbin/route add -net 203.XX.YYY.193 netmask 255.255.0.0
+
+That network address is bogus, so I will assume that it is a type. You 
+probably meant ...YYY.192
+
+Network addresses are all 0's in the host portion.
+
+&gt; gw 203.XX.YYY.193 dev eth0
+&gt;     route: netmask doesn't match route address
+&gt; 
+&gt; Setting up routingfailed
+&gt; 
+
+[snip]
+
+&gt; here who might have run into this problem - How do you
+&gt; calculate a Netmask? Any suggestions as to why the route
+&gt; command doesn't work for other resons would also be
+&gt; appreciated.
+
+Typically, you don't calculate a netmask, someone gives it to you. You 
+only calculate a netmask when you subnet a network you already have.
+
+You need to know how many bits have been set aside for hosts in your 
+network, and then you can work from there.
+
+If for example, you have 7 host bits, ie 128 host numbers minus 2 (or 3 
+:-) you look at it like this:
+
+   AAA.BBB.CCC.xbbbbbb
+
+Where A, B, and C are Decimal digits, x is a bit specified by someone 
+else, and b are bits under your control.
+
+The netmask serves to tell the network where the bits you control start 
+and the bit it 'owns' ends, in a sense. The netmask is anded with an 
+address to separate out the network number and host portion of an address.
+
+So, the netmask for the above is:
+
+  255.255.255.10000000
+  AAA.BBB.CCC.xbbbbbbb
+
+By using ANDs or NEG and AND, you can separate out the two fields.
+
+Now, the value of that 1 above is 128, so the netmask is 255.255.255.128. 
+You can move bit-wise in either direction by adding or subtracting the 
+next lowest or highest power of two.
+
+Thus, if you had 6 bits for the host address, you want a netmask of:
+
+  255.255.255.11000000
+  AAA.BBB.CCC.xxbbbbbb
+
+or 255.255.255.192, since that second bit above is worth 64.
+
+Here is a handy chart:
+
+  Bit 7 = 128
+  Bit 6 =  64
+  Bit 5 =  32
+  Bit 4 =  16
+  Bit 3 =   8
+  Bit 2 =   4
+  Bit 1 =   2
+  Bit 0 =   1
+
+But also,
+
+  8 bits for host: Netmask 0
+  7 bits for host: Netmask 128
+  6 bits for host: Netmask 192 (128 + 64)
+  5 bits for host: Netmask 224 (128 + 64 + 32)
+  4 bits for host: Netmask 240 (128 + 64 + 32 + you guessed it, 32)
+  3 bits for host: Netmask 248
+  2 bits for host: Netmask 252
+  1 bit for host:  Netmask 254
+
+You can extend these in the other direction as well. 
+
+Finally, I mentioned minus 2 (or 3) above. This comes about because some 
+numbers are unusable.
+
+A host address of all 0's is the network number, while a host address of 
+all 1's is the broadcast address, and you need a router as well in most 
+cases. So, you get two (or three) less addresses to play with. Also, a 
+netmask of 254 in the last byte is useless (why?).
+
+Regards
+-----
+Richard Sharpe, <A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A>, <A HREF="mailto:rsharpe@samba.org">rsharpe@samba.org</A>, 
+<A HREF="mailto:sharpe@ethereal.com">sharpe@ethereal.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

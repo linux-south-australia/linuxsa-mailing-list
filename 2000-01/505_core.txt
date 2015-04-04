@@ -1,0 +1,264 @@
+
+
+
+File Formats                                              core(4)
+
+
+
+NAME
+     core - core image file
+
+DESCRIPTION
+     The operating system writes out a core image  of  a  process
+     when  it  is  terminated due to the receipt of some signals.
+     The core  image  is  called  core  and  is  written  in  the
+     process's  working  directory  (provided  it  can be; normal
+     access controls apply).  A process with an effective user ID
+     different  from  the  real  user  ID will not produce a core
+     image.
+
+     The core file contains all the process information pertinent
+     to  debugging:   contents  of  hardware  registers,  process
+     status, and process data.  The format  of  a  core  file  is
+     object file specific.
+
+     For ELF executable programs (see a.out(4)),  the  core  file
+     generated  is  also  an ELF file, containing ELF program and
+     file headers.  The e_type field in the file header has  type
+     ET_CORE.   The  program  header  contains an entry for every
+     segment that was part of the process address space,  includ-
+     ing  shared  library segments.  The contents of the writable
+     segments are also part of the core image.
+
+     The program header of an ELF core file also contains entries
+     for  two NOTE segments, each containing several note entries
+     as described below.  The note entry  header  and  core  file
+     note type (n_type) definitions are contained in <sys/elf.h>.
+     The first NOTE segment exists for binary compatibility  with
+     old  programs that deal with core files.  It contains struc-
+     tures defined in <sys/old_procfs.h>.   New  programs  should
+     recognize  and  skip this NOTE segment, advancing instead to
+     the new NOTE segment.  The old NOTE segment will be  deleted
+     from core files in a future release.
+
+     The old NOTE segment contains the following  entries.   Each
+     has  entry name "CORE" and presents the contents of a system
+     structure:
+
+     prpsinfo_t
+          n_type:  NT_PRPSINFO.  This entry contains  information
+          of  interest  to  the  ps(1)  command,  such as process
+          status, CPU usage, "nice" value, controlling  terminal,
+          user-ID, process-ID, the name of the executable, and so
+          forth.   The  prpsinfo_t  structure   is   defined   in
+          <sys/old_procfs.h>.
+
+     char array
+          n_type:  NT_PLATFORM.  This  entry  contains  a  string
+          describing  the specific model of the hardware platform
+          on which this core file was created.  This  information
+
+
+
+SunOS 5.6           Last change: 17 Jul 1996                    1
+
+
+
+
+
+
+File Formats                                              core(4)
+
+
+
+          is the same as provided by sysinfo(2) when invoked with
+          the command SI_PLATFORM.
+
+     auxv_t array
+          n_type:  NT_AUXV.  This entry  contains  the  array  of
+          auxv_t structures that was passed by the operating sys-
+          tem as startup information to the dynamic linker.  Aux-
+          iliary vector information is defined in <sys/auxv.h>.
+
+     Following these entries, for each _l_i_g_h_t-_w_e_i_g_h_t _p_r_o_c_e_s_s (LWP)
+     in  the process, the old NOTE segment contains an entry with
+     a  prstatus_t  structure,  plus   other   optionally-present
+     entries describing the LWP, as follows:
+
+     prstatus_t
+          n_type:  NT_PRSTATUS.  This structure  contains  things
+          of  interest  to  a debugger from the operating system,
+          such as the  general  registers,  signal  dispositions,
+          state,  reason  for stopping, process-ID, and so forth.
+          The    prstatus_t    structure    is     defined     in
+          <sys/old_procfs.h>.
+
+     prfpregset_t
+          n_type:  NT_PRFPREG.  This entry is present only if the
+          LWP  used the floating-point hardware.  It contains the
+          floating-point registers.  The  prfpregset_t  structure
+          is defined in <sys/old_procfs.h>.
+
+     gwindows_t
+          n_type:  NT_GWINDOWS.  This entry is present only on  a
+          SPARC  machine  and  only  if  the system was unable to
+          flush all of the register windows  to  the  stack.   It
+          contains  all  of  the unspilled register windows.  The
+          gwindows_t structure is defined in <sys/regset.h>.
+
+     prxregset_t
+          n_type:  NT_PRXREG.  This entry is present only if  the
+          machine  has  extra  register state associated with it.
+          It contains the extra register state.  The  prxregset_t
+          structure is defined in <sys/old_procfs.h>.
+
+     The new NOTE segment contains the following  entries.   Each
+     has  entry name "CORE" and presents the contents of a system
+     structure:
+
+     psinfo_t
+          n_type:  NT_PSINFO.  This structure  contains  informa-
+          tion  of interest to the ps(1) command, such as process
+          status, CPU usage, "nice" value, controlling  terminal,
+          user-ID, process-ID, the name of the executable, and so
+          forth.   The   psinfo_t   structure   is   defined   in
+          <sys/procfs.h>.
+
+
+
+SunOS 5.6           Last change: 17 Jul 1996                    2
+
+
+
+
+
+
+File Formats                                              core(4)
+
+
+
+     pstatus_t
+          n_type:  NT_PSTATUS.  This structure contains things of
+          interest  to a debugger from the operating system, such
+          as pending signals, state, process-ID,  and  so  forth.
+          The pstatus_t structure is defined in <sys/procfs.h>.
+
+     char array
+          n_type:  NT_PLATFORM.  This  entry  contains  a  string
+          describing  the specific model of the hardware platform
+          on which this core file was created.  This  information
+          is the same as provided by sysinfo(2) when invoked with
+          the command SI_PLATFORM.
+
+     auxv_t array
+          n_type:  NT_AUXV.  This entry  contains  the  array  of
+          auxv_t structures that was passed by the operating sys-
+          tem as startup information to the dynamic linker.  Aux-
+          iliary vector information is defined in <sys/auxv.h>.
+
+     Following these entries, for each LWP in  the  process,  the
+     new NOTE segment contains an entry with an lwpsinfo_t struc-
+     ture plus an entry with an lwpstatus_t structure, plus other
+     optionally-present entries describing the LWP, as follows:
+
+     lwpsinfo_t
+          n_type:  NT_LWPSINFO.  This structure contains informa-
+          tion  of  interest  to  the  ps(1) command, such as LWP
+          status, CPU usage, "nice" value, LWP-ID, and so  forth.
+          The lwpsinfo_t structure is defined in <sys/procfs.h>.
+
+     lwpstatus_t
+          n_type:  NT_LWPSTATUS.  This structure contains  things
+          of  interest  to  a debugger from the operating system,
+          such as  the  general  registers,  the  floating  point
+          registers,  state,  reason for stopping, LWP-ID, and so
+          forth.   The  lwpstatus_t  structure  is   defined   in
+          <sys/procfs.h>.
+
+     gwindows_t
+          n_type:  NT_GWINDOWS.  This entry is present only on  a
+          SPARC  machine  and  only  if  the system was unable to
+          flush all of the register windows  to  the  stack.   It
+          contains  all  of  the unspilled register windows.  The
+          gwindows_t structure is defined in <sys/regset.h>.
+
+     prxregset_t
+          n_type:  NT_PRXREG.  This entry is present only if  the
+          machine  has  extra  register state associated with it.
+          It contains the extra register state.  The  prxregset_t
+          structure is defined in <sys/old_procfs.h>.
+
+
+
+
+
+SunOS 5.6           Last change: 17 Jul 1996                    3
+
+
+
+
+
+
+File Formats                                              core(4)
+
+
+
+     The size of the core file created by a process may  be  con-
+     trolled by the user (see getrlimit(2)).
+
+SEE ALSO
+     adb(1), gcore(1), ps(1), crash(1M), getrlimit(2), setuid(2),
+     sysinfo(2), elf(3E), a.out(4), proc(4), signal(5)
+
+     _A_N_S_I _C _P_r_o_g_r_a_m_m_e_r'_s _G_u_i_d_e
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SunOS 5.6           Last change: 17 Jul 1996                    4
+
+
+

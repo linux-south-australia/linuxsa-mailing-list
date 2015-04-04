@@ -1,0 +1,219 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: windows keyboard question" -->
+<!-- FromName="Andrew Burrow" -->
+<!-- FromEmail="alburrow@cs.adelaide.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="lloy0076@rebel.net.au" -->
+<!-- Date="Fri, 18 Feb 2000 13:25:50 +1030" -->
+<!-- Id="200002180255.NAA21683@krypton.cs.adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: windows keyboard question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Burrow &lt;<I><A HREF="mailto:alburrow@cs.adelaide.edu.au">alburrow@cs.adelaide.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A>
+  Date: Fri, 18 Feb 2000 13:25:50 +1030
+</PRE>
+<H1>Re: windows keyboard question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; 2) SOMEONE ELSE HAS DONE IT...LOOK HERE OR THIS IS THE MANUAL
+&gt; 
+&gt; I want to map the lovely Windows Keys to something useful (such as
+&gt; opening the main gnome panel, or maybe switching desktops). Anyone ever
+&gt; got this working or where I'd look to find out how to get it working?
+
+I have done this for my own machine.  A few years ago I started
+binding ALT-mouse events in fvwm so that I could treat the entire
+window as if it was the titlebar by holding down the ALT key.  (I
+never thought it would catch on so I didn't bother telling many people
+about my idea ;-)  However, I was never very happy about stealing the
+ALT key from the application.  So recently I worked out how to bind
+the windows logo and menu keys to take over these functions.
+
+
+The trick has two parts, one is a deepish hack into XFree86 and the
+other is the obvious window manager configuration.
+
+
+  1.	XFree86 and the win logo key.
+
+	In the /etc/XF86Config file there is a "Keyboard" section
+	about which the XF86Config(4/5) man page will tell you a
+	little.  There is a "preferred method of specifying the
+	keyboard configuration" which involves rules, model, layout,
+	variant and options settings.  I decided to tackle this,
+	ultimately by inspecting the configuration files.  Here is my
+	"Keyboard" section
+
+
+# **********************************************************************
+# Keyboard section
+#
+#   - Keyboard input device, parameters and some default keyboard
+#     mapping options.
+# **********************************************************************
+
+Section "Keyboard"
+
+    Protocol	"Standard"
+
+# Specify which keyboard LEDs can be user-controlled (eg, with xset(1))
+
+    Xleds	3
+
+# To customise the XKB settings to suit your keyboard, modify the
+# lines below (which are the defaults).  For example, for a non-U.S.
+# keyboard, you will probably want to use:
+#    XkbModel    "pc102"
+# If you have a US Microsoft Natural keyboard, you can use:
+#    XkbModel    "microsoft"
+#
+# Then to change the language, change the Layout setting.
+# For example, a german layout can be obtained with:
+#    XkbLayout   "de"
+# or:
+#    XkbLayout   "de"
+#    XkbVariant  "nodeadkeys"
+#
+# If you'd like to switch the positions of your capslock and
+# control keys, use:
+#    XkbOptions  "ctrl:swapcaps"
+#
+# See the files under "/usr/X11R6/lib/X11/xkb".
+
+    XkbKeycodes	"xfree86"
+    XkbTypes	"complete"
+    XkbCompat	"complete"
+    XkbSymbols	"us(pc104win)"
+    XkbGeometry	"pc(pc104)"
+
+EndSection
+
+
+	the line of interest is the XkbSymbols entry.  It binds the win
+	logo and menu keys in an accesible way through the "pc104win"
+	designator.  For this I edited the
+	/usr/X11R6/lib/X11/xkb/symbols/us" to contain the following
+	additional section 
+
+
+// put Win keys on the "logo" keys
+//
+// The problem with "us(pc104)" is that it conflicts with the earlier
+// practice for 101 keyboards.  Previously, &lt;LALT&gt; and &lt;RALT&gt; had played
+// the joint role of Alt and Meta.  By once again dividing these roles
+// between two pairs of keys, "us(pc104)" results in arbitrary
+// assignment of the metafication between the "alt" and "logo" keys.  It
+// also wastes the new keys.  The solution is to assign the "Hyper_L" and 
+// "Hyper_R" keysyms to the "logo" keys, and assign these keysyms to
+// "Mod4". 
+
+xkb_symbols "pc104win" {
+    include "us(generic101)"
+    key &lt;LALT&gt; {	[	Alt_L,	Meta_L		]	};
+    key &lt;RALT&gt; {	[	Alt_R,	Meta_R		]	};
+    key &lt;LWIN&gt; {	[	Hyper_L			]	};
+    key &lt;RWIN&gt; {	[	Hyper_R			]	};
+    key &lt;MENU&gt; {	[	Menu			]	};
+
+    // begin modifier mappings
+    modifier_map Mod1   { Alt_L, Alt_R, Meta_L, Meta_R };
+    modifier_map Mod4   { Hyper_L, Hyper_R };
+};
+
+
+
+  2.	Using the new keys in your window manager.
+
+	This is the easy bit, but it will depend on your WM of choice.
+	I personally prefer a very minimal fvwm2 without all those
+	ridiculous menus et al, because I prefer to think of the desktop
+	as ... well a desktop.  I launch applications from bash
+	and use the window manager to organise the running/iconified
+	windows on the screen.  Therefore, I bound the win logo
+	metafication so that conceptually it makes windows "opaque"
+	i.e., the mouse behaviour on the window the same as the mouse
+	behaviour on the titlebar.
+
+	For example, this is how to get the hyper key in fvwm and fvwm2
+	(and probably a few other WMs based on fvwm):
+
+
+# Window Bindings
+# The mouse button with Modifier-4 (Win95 "logo" keys) gives the title
+# bar behaviour.
+#     Button	Context Modifi	Function
+Mouse 1		W       4       Function Raise-or-Move-or-Iconify
+Mouse 2		W       4       Move
+Mouse 3		W       4       Lower
+
+
+
+  3.	Did I mention readline.
+
+	Maybe it was just me but I found the metafication in RedHat 6.0
+	pretty crazy.  In X it was one thing, and on the console it was
+	something else.  The above fix went someway towards solving this
+	problem by making good 'ole "ALT" do all the real metafication
+	work in bash and emacs, while "Win LOGO" picked up the role in
+	window management.  Much of the problem was because of the way
+	meta was being assigned by X.
+
+	However, I thought also remembered changing some readline
+	settings somewhere --- actually I think I just deleted the
+	supplied ~/.inputrc.  It seems to be OK for me in RedHat 6.1 as
+	there are no relevant changes against the "setup" and "etcskel"
+	packages. 
+
+
+
+
+Cheers,
+
+
+
+Andrew
+
+
+
+--
+  + Department of Computer Science,                 "There is no fate that
+         University of Adelaide,                      cannot be surmounted
+         Adelaide SA 5005, Australia                             by scorn."
+  + <A HREF="mailto:alburrow@cs.adelaide.edu.au">alburrow@cs.adelaide.edu.au</A>                               Albert Camus
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

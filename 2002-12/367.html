@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Database migration" -->
+<!-- FromName="'Jake Hawkes'" -->
+<!-- FromEmail="jakehawkes2001@yahoo.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 6 Dec 2002 22:30:39 -0800 (PST)" -->
+<!-- Id="20021207063039.51804.qmail@web41208.mail.yahoo.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Database migration</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jakehawkes2001@yahoo.com">jakehawkes2001@yahoo.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 6 Dec 2002 22:30:39 -0800 (PST)
+</PRE>
+<H1>Re: Database migration</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; &gt; Sybase can do this - very well actually.  Can I brag a bit?
+&gt; &gt;
+&gt; &gt;  dbid  dbname         segmap dlog size      sizemb notused devname      phyname
+&gt; &gt;
+&gt; &gt;  ----- -------------- ------ ---- --------- ------ ------- ------------ -----------------
+&gt; &gt;      9 event               3 data   1024000   2000    667  xisdata4     /dev/rxisdata4
+&gt; &gt;
+&gt; &gt;      9 event               3 data   1024000   2000    948  xisdata5     /dev/rxisdata5
+&gt;
+&gt; Out of curiosity, can it write to files as well as physical volumes?
+
+yep.  we use a file (/tempdb/tempdb) for the tempdb (see that coming? :)) and in ibm land, it gets
+its own little section of the shark.  this way, you get benifet of the shark's cacheing, which is
+unreal (like 96% read IIRC)
+
+&gt;
+&gt; &gt; Out biggest DB by far: EFM  103997.0 MB
+&gt;
+&gt; &lt;DSWar brewing&gt;
+&gt;
+&gt; One of our clients has a 1.7 TB filesystem that takes roughly 20 hours
+&gt; to back up to 3 LTO drives (it gets backed up once a week); it would
+
+thats big, but does it accept 10,000 rows an hour as input? this input then goes through about 7
+tables before coming to rest in the main storage table...
+
+&gt; &gt; We are using IBM AIX (blech)
+&gt;
+&gt; I don't mind AIX - it's reasonably orthogonal in its non-standard Unix
+&gt; command set (e.g. the disk management stuff), you can grow a JFS without
+&gt; taking it offline (for HP it's a value added product), and tweak a lot
+&gt; of its kernel settings without a reboot.
+
+
+let me qualify.  the admin side is _unreal_.  I love it.  the FS is amazing, smit is not too
+painfull, and interoperability (sp?) with other IBM gear rocks.
+
+For me, I spend most of my days tracking down inconsistancies in the C libraries.  Like deciding
+which malloc to use.  or finding out that IBM has a different idea of what a shared library is,
+i.e. its not.  upgrading a .so should not require a recompile IMHO.
+
+&gt; &gt; The Shark as it is known (<A HREF="http://www.storage.ibm.com/">http://www.storage.ibm.com/</A>) is amazing.
+&gt;
+&gt; Especially its fin.  :-)
+
+especially the fin.  and apparently, this is the hardest thing to get out of them.  the sysop at
+my client has a mini fin on his monitor, because he has $10 million of IBM gear :)
+
+
+&gt;  The above client is in the process of having
+&gt; one installed on their S390, and from the flight deck the protuding fin
+&gt; is quite impressive.  I wonder if IBM include that in their physical
+&gt; specs?
+
+S390.  where does that stack up against the F80?  We have F80's S80's an S78 (dog) and an F50.
+
+&gt; &gt;&gt;  SQL Server is built on Sybase, IIRC (either that or Ingres; I get the two confused),
+&gt;
+&gt; &gt; stolen is the right word there.
+&gt;
+&gt; Kind of goes without saying.  Microsoft have pulled this same stunt with
+&gt; Spyglass (Internet Explorer) and a similar one with STAC (disk compression),
+&gt; as well as other products.  Up until 7.0 you could still use Sybase's Unix
+&gt; ODBC drivers to talk to SQL Server.
+
+whats more - in sybase open/client API you can write RPCs, which in MSSQL with a little deft
+wrapper, you've the DLL equivalent.  Everything is _exactly_ the same.  Made porting our product
+to MSSQL quite easy actually :)
+
+&gt;  If Microsoft can't acquire the company
+&gt; to get into the marketspace (and thus own it outright), they'll "partner"
+&gt; with the company until they've acquired the key technology and/or knowledge,
+&gt; then it's "Bon Voyage" as they puncture the partner's floaties.
+
+or even worse.  anyone out there who knows MIDI and the Amiga probably has heard of bars and pipes
+professional which was quite simply the best thing ever ever ever.  MS bought it and shelved it. 
+no more versions, no porting, no support and no more downloads (I'm happy to say that this is not
+true any more - <A HREF="http://www.amigau.com/c-music/barsandpipes.htm">http://www.amigau.com/c-music/barsandpipes.htm</A>)
+
+
+&gt; Andrew,  if your reading this, I just remembered one thing against SQL Server -
+&gt; you can't run multiple instances of the database on one server.  If you buy
+&gt; a grunty machine, and then decide to do a migration to a later version of
+&gt; Sybase, then you'll need another machine to port to, rather that use any
+&gt; spare capacity that your existing machine may have (plus CAL costs, etc.).
+
+Sybase rocks for this.  5 dataservers on 6 CPUS works best for us :)
+
+
+
+=====
+Jacob Hawkes, B. Eng (CSE)
+<A HREF="mailto:jakehawkes2001@yahoo.com">jakehawkes2001@yahoo.com</A>
+<A HREF="http://www.infinitylimited.net/">http://www.infinitylimited.net/</A>
+
+__________________________________________________
+Do you Yahoo!?
+Yahoo! Mail Plus - Powerful. Affordable. Sign up now.
+<A HREF="http://mailplus.yahoo.com">http://mailplus.yahoo.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,137 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: [OT] raw-disks && cooked-disks ?" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Wilkinson,Alex'" -->
+<!-- ToEmail="Alex.Wilkinson@dsto.defence.gov.au" -->
+<!-- Date="Thu, 21 Feb 2002 16:18:03 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.44.0202211537590.17095-100000@bush.aarnet.adelaide.edu.au" -->
+<!-- Reference="20020221122803.J81347-100000@squirm.dsto.defence.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: [OT] raw-disks && cooked-disks ?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Wilkinson,Alex &lt;<I><A HREF="mailto:Alex.Wilkinson@dsto.defence.gov.au">Alex.Wilkinson@dsto.defence.gov.au</A></I>&gt;
+  Date: Thu, 21 Feb 2002 16:18:03 +1030 (CST)
+</PRE>
+<H1>Re: [OT] raw-disks && cooked-disks ?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, 21 Feb 2002, Wilkinson,Alex wrote:
+&gt; What I don't know and find confusing is the difference between mkfs on either a
+&gt; raw disk or a cooked disk.
+
+Traditional UNIXen have
+ - a raw device.  Byte 0 is the first byte on the disk.
+ - a cooked device, better thought of as a 'formatted' device.  Byte 0
+   is the first byte on the device that is available to user data.
+
+Think of a tape drive with a compulsory tape label.  Writing to byte 0 of
+the raw tape device will overwrite the first byte of the label, but
+writing to byte 0 of the cooked tape device will write to the first byte
+after the label (that is, the first byte of user data).
+
+So we use the cooked device name as input to applications like 'tar', as
+we are writing user data.  But we use the raw device name as input to
+'label', as we are writing the tape's system data.
+
+For disks the distinction gets fuzzier.  After all you access disks by
+filename, not by byte offset.  But you can see how 'mkfs', with its need
+to write superblocks and i-nodes and all sorts of other system stuff,
+needs the raw device name.
+
+Linux broke with the UNIXen tradition and did away with raw devices.  
+After all, as we noticed they aren't really needed for using disks and
+Linux was a IBM PC based operating system without an old-fashioned
+compulsory-label tape drive in sight.  So when you use mkfs on Linux you
+give the name of the cooked device.
+
+It turns out that not needing raw devices is only sort-of-true.  
+User-space filesystems need access to the raw disk device, just like
+kernel filesystems have.  And databases like Oracle work fastest when they
+use their own filesystem.  So later Linux did add raw devices, but in a
+completely different way to all other UNIXen.  Ouch.
+
+&gt; Why does mkfs only work /dev/rdsk/... on IRIX but on others it can
+&gt; work with /dev/dsk/...?
+
+Because this is such a common error and the distinction between raw
+devices and cooked devices is so minor for disks that the program should
+really accept either name and format the disk.  Anything else is just
+pedantic.
+
+&gt; I know that raw disks are character devices and cooked disks are block
+&gt; devices and that by running mkfs on a disk we are creating the
+&gt; a fs with a specfic block size and layout etc...
+
+Whoa.  Devices are classified into character or block.  Think of it as:
+Character devices can only be accessed serially (read character 1, read
+character 2).  With Block devices any block can be retrieved (give me
+block 10 now, without reading block 1,2,3,...,7,8,9 first).
+
+*Access methods* in UNIX are cooked or raw.  In traditional UNIXen the
+access method is indicated by which device you use.  This isn't the only
+alternative: Linux uses an ioctl() directive to set the access method; on
+IBM mainframes you link in differing I/O libraries; VMS has a whole raft
+of access methods, you select the one you want when you OPEN the file.
+
+&gt; But I would have thought you could only create a fs on a character disk ?
+
+You can create a filesystem on blocked or character devices.  Blocked
+devices such as disks are by far the most common in these times.  But
+newer tape technologies are formatted with a filesystem and accessed
+by filename just like disks are.
+
+The Linux kernel has really good filesystem support.  Almost anything that
+can be named can be turned into a filesystem.  smbfs and NFS are
+filesystems that send bytes over a network rather than access disk. davfs
+can be used to access web sites.  Linux itself has a filesystem that is
+used to access the kernel's confguration and counters (procfs, which is
+usually mounted at /proc).
+
+So the filesystem these days isn't really thought of as being restricted
+to any device type.
+
+-- 
+Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

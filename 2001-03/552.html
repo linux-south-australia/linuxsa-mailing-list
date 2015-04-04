@@ -1,0 +1,104 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Perl script/setuid" -->
+<!-- FromName="'Vladimir V. Bashkirtsev'" -->
+<!-- FromEmail="mega@konectanet.com.au" -->
+<!-- ToName="'Martin de Koning'" -->
+<!-- ToEmail="m1d2k3@camtech.net.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 17 Mar 2001 16:58:14 +1030" -->
+<!-- Id="009201c0aeab$72878aa0$7aba26cb@konectanet.com.au" -->
+<!-- Reference="20010317203933.6f9f6f9c.m1d2k3@camtech.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Perl script/setuid</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Vladimir V. Bashkirtsev &lt;<I><A HREF="mailto:mega@konectanet.com.au">mega@konectanet.com.au</A></I>&gt;
+  To  : Martin de Koning &lt;<I><A HREF="mailto:m1d2k3@camtech.net.au">m1d2k3@camtech.net.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 17 Mar 2001 16:58:14 +1030
+</PRE>
+<H1>Re: Perl script/setuid</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Working on a script for easy ppp on/off in perl:
+&gt;
+&gt; #!/usr/bin/perl -w
+&gt; # PPP connect/disconnect script in Perl.
+&gt; # Written badly by Martin de Koning
+&gt;
+&gt; print "PPP Connect/Disconnect Script\n" ;
+&gt;
+&gt; if ( -e "/var/run/ppp0.pid") {
+&gt; print "Ending current connection\n";
+&gt; `killall -INT pppd` ;
+&gt;
+&gt; exit;
+&gt; }
+&gt; else {
+&gt; print "Creating PPP connection\n";
+&gt; `pppd connect "chat -f /etc/ppp/camtech-chat\n"`;
+&gt;
+&gt; exit;
+&gt; }
+&gt;
+&gt; I want to be able to run it from all user accounts:
+&gt; [<A HREF="mailto:root@lister">root@lister</A> ppp]# ls -l ppp-connect
+&gt; -rwsr-xr-x    1 root     root          350 Mar 17 19:59 ppp-connect
+&gt;
+&gt; However, when running it from a non-root account I get this (This is with
+ppp0 up or down for that matter):
+&gt; [<A HREF="mailto:mdk@lister">mdk@lister</A> ppp]$ ./ppp-connect
+&gt; PPP Connect/Disconnect Script
+&gt; Ending current connection
+&gt; Insecure $ENV{PATH} while running setuid at ./ppp-connect line 9.
+&gt;
+&gt; With the permissions I've set, the script should run with root permissions
+and therefore everything it calls should be called root permissions right? I
+know it's not the best security wise, but I should be able to do this I
+think. What do I have to change?
+
+When perl starts suid scripts script it actually starts suidperl which is
+security wrapper which checks security of script itself. Additional security
+checks just because script started by normal user but it runs with
+privilegies of superuser and user can have bad things in mind.
+
+In your case it compalins to insecurlity of killall. Will you be happy if
+your script will have chance to sent command like "kill -9 1" when normal
+user will launch it? :) Such usage destroys the purpose of linux security...
+
+Vladimir
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

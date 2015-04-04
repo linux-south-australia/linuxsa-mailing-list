@@ -1,0 +1,181 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Laptop install" -->
+<!-- FromName="Mark Smith" -->
+<!-- FromEmail="marks@senet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 13 Jan 1998 15:20:59 +1030" -->
+<!-- Id="34BAF2B3.5B9136F8@senet.com.au" -->
+<!-- Reference="513F50C4743FD111B41100805FB4E82D01151F@itwhy-msg01.itwhy.bhp.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Laptop install</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Smith &lt;<I><A HREF="mailto:marks@senet.com.au">marks@senet.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Tue, 13 Jan 1998 15:20:59 +1030
+</PRE>
+<H1>Re: Laptop install</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On a small network eg 2 nodes, with no gateway / router, do not set a
+gateway at all.
+
+Everything will work if you are just sending traffic between each
+machine on the LAN, but if you want to use PPP to connect one of the
+macines to the Net, adding specifying a gateway on your network when
+their isn't one will _really_ stuff up your ppp.
+
+When you use ppp it adds a default route (0.0.0.0) to out to your
+internet supplier. This default route is used to send traffic with an
+unknown destination (ie IP address) to a device (ie gateway/router) that
+will hopefully know how to forward the packet on to the final
+destination.
+
+You can use "netstat -rn" to see your route table. 
+
+Here is mine, while I am dialed into the net :
+
+Destination     Gateway         Genmask         Flags   MSS Window  irtt
+Iface
+203.56.239.7    0.0.0.0         255.255.255.255 UH     1500 0          0
+ppp0
+10.0.1.0        0.0.0.0         255.255.255.0   U      1500 0          0
+eth0
+127.0.0.0       0.0.0.0         255.0.0.0       U      3584 0          0
+lo
+0.0.0.0         203.56.239.7    0.0.0.0         UG     1500 0          0
+ppp0
+
+
+Any packets I send to an ip address with the values 10.0.1.1 to
+10.0.1.255, will be sent out the ethernet card "eth0".
+
+Any packets I send to an ip adress with the values 127.0.0.1 to
+127.255.255.254 will be sent out the loopback interface ie back to
+myself.
+
+Any other packets with any other IP address will match the default route
+(0.0.0.0) and will be sent to the 203.56.239.7 device, which is the dial
+in  box at my ISP, via the ppp0 port. Hopefully, this dial in server
+will know how to send my packets further on their way (which it usually
+does :-) ).
+
+When PPP is not running, there is no default route ie no 0.0.0.0 entry,
+which means that I can only send traffic to the 10.0.1.x and 127.x.x.x
+networks. If I try to send somewhere else, I will immediately get a
+"destination unreachable" message on my screen.
+
+Also note that the 203.56.239.7 entry also disappears when I am not
+dialed in.
+
+BTW, this behaviour (ie. of adding a default route when PPP is
+connected, and removing it when it isn't), is switched on in  your
+/etc/ppp/options file with the option "defaultroute".
+
+
+PS : If you want to use IP mascerading (I can't remember how to speel it
+:-) ) over your LAN, like Geoffrey did a few meetings ago, there are a
+few more things to consider.
+
+HTH,
+mark.
+
+
+Johnson, Brandon BR wrote:
+&gt; 
+&gt; On small networks it may also beneficial if you don't have a gateway
+&gt; (router) and you have all of the hosts on your network in your
+&gt; /etc/hosts file, to set the default gateway to the machines address. For
+&gt; example: Machine address 10.0.0.1 therefore the gateway setting should
+&gt; also be set at 10.0.0.1
+&gt; 
+&gt; Regards,
+&gt; Brandon Johnson
+&gt; 
+&gt; &gt; ----------
+&gt; &gt; From:         Ismail Ibrahim
+&gt; &gt; &lt;<A HREF="mailto:mi-mi@sbs.itc.usm.my">mi-mi@sbs.itc.usm.my</A>&gt;[SMTP:<A HREF="mailto:mi-mi@sbs.itc.usm.my">mi-mi@sbs.itc.usm.my</A>]
+&gt; &gt; Sent:         Monday, January 12, 1998 11:40 PM
+&gt; &gt; To:   Paul OBrien
+&gt; &gt; Cc:   <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; &gt; Subject:      Re: Laptop install
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; Paul,
+&gt; &gt; On Sun, 11 Jan 1998, you wrote:
+&gt; &gt;
+&gt; &gt; &gt; OK I did just that and here are the results
+&gt; &gt; &gt; #ifconfig
+&gt; &gt;       [lo snipped]
+&gt; &gt; &gt; eth0    Link encap:Ethernet HWaddr 00:80:C8:86:7E:D9
+&gt; &gt; &gt;         inet addr:10.0.2.15 Bcast:10.0.2.255 Mask:255.255.255.0
+&gt; &gt; &gt;         UP BROADCAST LOOPBACK RUNNING MTU:1500 Metric:1
+&gt; &gt; &gt;         RX packets:0 errors:0 dropped:0 overruns:0
+&gt; &gt; &gt;         TX packets:0 errors:0 dropped:0 overruns:0
+&gt; &gt; &gt;         Interrupt:5 Base address:0x300
+&gt; &gt;
+&gt; &gt; Your ifconfig looks OK, but since you are setting up a LAN, make sure
+&gt; &gt; you've got the network and gateway addresses right.
+&gt; &gt; Perhaps, for the local IP address you're using, network
+&gt; &gt; address=10.0.2.0
+&gt; &gt; and gateway=10.0.2.1 (ie address of your hub).
+&gt; &gt;
+&gt; &gt; &gt; #cat /proc/net/dev
+&gt; &gt; &gt; Inter-|    Receive                 |   Transmit
+&gt; &gt; &gt;  face |packets errs drop fifo frame|packets errs drop fifo colls
+&gt; &gt; carrier
+&gt; &gt; &gt;     lo:     34    0    0    0    0       34    0    0    0     0
+&gt; &gt; 0
+&gt; &gt; &gt;   eth0:      0    0    0    0    0        0    0    0    0     0
+&gt; &gt; 0
+&gt; &gt;
+&gt; &gt; Shows you're not getting anything thru eth0. Maybe if you can sort out
+&gt; &gt;
+&gt; &gt; the addresses first.
+&gt; &gt;
+&gt; &gt; See also Don's posting.
+&gt; &gt;
+&gt; &gt; Cheers,
+&gt; &gt; - mael -
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the
+&gt; &gt; subject
+&gt; &gt;
+&gt; 
+&gt; --
+&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

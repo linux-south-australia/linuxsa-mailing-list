@@ -1,0 +1,285 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: how to register a name server" -->
+<!-- FromName="lloy0076" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="omegasys@adam.com.au" -->
+<!-- Date="Thu, 06 Apr 2000 07:47:08 +0930" -->
+<!-- Id="38EBBB64.E3EA6F99@rebel.net.au" -->
+<!-- Reference="38e9b013.d0.0@adam.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: how to register a name server</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: lloy0076 &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : <A HREF="mailto:omegasys@adam.com.au">omegasys@adam.com.au</A>
+  Date: Thu, 06 Apr 2000 07:47:08 +0930
+</PRE>
+<H1>Re: how to register a name server</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Jeremy!
+
+&gt; If I decide to build a web/email server, and have it connnected to the internet
+&gt; permenantly via a 56k modem, am I able to host a www.something.whatever site
+&gt; on this server through the modem linux if I have a static IP ??
+
+Yes. Actually there's nothing stopping you from hosting one on a
+non-static IP, it's just that noone would know where to find it :-P
+
+&gt; If so, during the domain name registration, which server is the Primary and
+&gt; Secondry DNS servers : mine or my ISPs ???
+
+If you can convince your ISP or anyone else with a name server to act as
+a secondary server for you then that is the secondary DNS IP address.
+Nonetheless, most of the time the secondary DNS address is another one
+of your OWN IP numbers pointing at a machine set up as a Secondary DNS
+Server (see below).
+
+&gt; How do I have it so when somebody
+&gt; goes to my www.something.whatever site in their browser it finds my server ....
+&gt; and how is it when somebody sends an email to <A HREF="mailto:me@something.whatever">me@something.whatever</A>, it gets
+&gt; to my server ???
+
+You run a Dynamic Name Server such as BIND or Microsoft's DNS Service
+(:-)).
+
+Without going into super-technicalities of name servers here's a run
+down:
+
+1) Eventually the root servers or another server points a DNS query at
+your own DNS server
+
+How does this happen?
+
+The domain name space is organised in a hierachy similar to the file
+system itself. There's the root servers, then servers underneath it,
+then servers underneath the servers...in a DNS name like
+www.senet.com.au the hierachy is:
+
+[root server] = not often specified but it always exists
+[au server] = one of the Australian root servers
+[com server] = one of the Australian com servers (Australian becase it's
+to the left of the au and root, get it]
+[senet's server] = this is the server that will tell you the "correct"
+address
+
+If a server cannot find either:
+
+* the actual address
+* the next server address in the hierachy
+
+You'll get a DNS lookup failed. For example, there's no such domain as
+www.senet.cim.au. The root server will return an Australian root
+server's address, but there's no such domain under that as "cim" so it
+returns a fail. Get it?
+
+Hyper simplified, if I lookup www.netcraft.com.au, my resolver (the
+thing that does DNS queries) could go about it like this:
+
+i) Ask the ROOT name server (for au)
+
+It says "I don't know the exact address" but the "com.au" might
+
+ii) Ask au for a domain name called "com"
+
+It says "Aha....I have an address for com"
+
+ii) Ask "root-&gt;au-&gt;com" (for netcraft)
+
+It says "Aha....I have an address for netcraft"
+
+iii) Ask "root-&gt;au-&gt;com-&gt;netcraft" (for www)
+
+It says "Aha...I have an address for www"
+
+***
+
+And voila...I've found the correct IP address. Essentially resolving a
+DNS query (getting 203.11.90.1 out of www.senet.com.au or 203.20.69.66
+out of www.rebel.net.au) is a case of recursively looking down a
+hierachy until you either find what you want. If you DON'T find what you
+want it can be for one of two reasons:
+
+* somewhere your request timed out significantly enough for your
+resolver to conclude that you're not going to get an answer
+
+* a name server along the line stated that it can't find what you're
+looking for
+
+In my experience the first is highly unlikely...most modern resolvers
+and systems wait around long enough for some DNS server to reply "That
+doesn't exist...you're looking for a name that doesn't exist".
+
+You should be aware that your own resolver and any DNS server can
+"cache" various names. This speeds the process up. For example, if you
+constantly are looking up *.*.com.au then you more than likely already
+have the Australian com server's address cached...why?
+
+* it makes it faster - you don't have to send a DNS query to the root
+server, then to the AU root server[s]
+* it reduces network traffice - this is a Good Thing [tm]; the Internet
+is already slow enough
+
+Now that I've vaguely explained how DNS works, let's look at the servers
+themselves.
+
+DNS SERVERS
+
+Put simply a DNS server translates nice domain names like
+www.netcraft.com.au into IP addresses.
+
+A DNS stores a number of different types of records, common ones include
+[I am going to use BIND's terminology seeing this is a Linux list]:
+
+SOA
+
+Start of Authority Records. These administrivial records contain such
+things as who to contact if you have a glitch with the web-site, the
+postmaster and other bits and pieces (consult BIND'S docs).
+
+A records
+
+Address records. These map a name to an IP address.
+
+eg.
+
+www.senet.com.au IN A 203.11.90.1
+
+(incidentally the IN says that it's an Internet Style Address)
+
+
+CNAME records
+
+These are essentially like aliases (alii??). So I could say:
+
+mail.senet.com.au IN CNAME www.senet.com.au
+
+Which really says, once you've gotten this far look up the address of
+www.senet.com.au which is 203.11.90.1
+
+
+MX records
+
+These are mail exchange records. They point to your mail server[s].
+These records are slightly more complex than the previous two. An
+example being:
+
+www.senet.com.au IN MX 10 mail.senet.com.au
+
+Says that mail.senet.com.au is a mail server for www.senet.com.au at
+preference 10. The preference exists because you can have multiple mail
+exchange records and your mail program will select which one to send to
+with these values. Explanations of exactly how are beyond this e-mail.
+
+
+PTR records
+
+These are reverse map addresses. They reverse map. An example is:
+
+1.90.11.203.in-addr.arpa. IN PTR www.senet.com.au
+
+First thing to note is that the IP addresses are essentially reversed
+(203.11.90.1 goes to 1.90.11.203) and that there is a special domain
+(in-adddr.arpa) which maps ALL registered reverse mappings. Just be
+aware that these exist....
+
+
+SO...I hope this answers some very basic questions. When you consult
+BIND'S documentation you'll find you can do lots of wonderful things
+like:
+
+1) Set up multiple db (BIND config files)
+
+If you managed 100 IP addresses and 200 DNS names, then your
+configuration file could easily extend past 500 lines...finding one
+thing in this could be like finding a needle in a haystack...and DNS,
+being numbers, is prone to accidentally typing things like 204.11.90.1
+(instead of 203...) and then suddenly and inexplicably not working...
+
+
+2) Log huge amounts of information
+
+Why? Because you can and because it can be the only way to work out why
+something isn't working...or you might suspect your DNS server has been
+cracked/hacked....
+
+
+PRIMARY OR SECONDARY
+
+Here comes a fantastic simplification. Primary and secondary servers can
+both service a DNS query. However, PRIMARY servers, at least under BIND,
+read your configuration files to set themselves up. SECONDARY servers
+transfer the information from a primary server. So why not have two
+Primary Servers?
+
+It's easier to maintain ONE server's configuration rather than trying to
+maintain five supposedly exactly the same configurations. IE,
+administratively it's much, much less work.
+
+There's no technical requirement to run more than one name server
+although the registration authorities (or maybe even one of the RFC's)
+might require you to do so. Running two name servers at least is
+recommended primarily so you have peace of mind or you can easily
+administer the two servers (you can work on one of them...even turn it
+off and DNS will still work).
+
+
+Anyway, enough of my ranting. 
+
+DISCLAIMER
+
+I don't represent this information to be 100% technically accurate, only
+enough to give sufficient detail to interest someone to at least pick up
+a book like "DNS AND BIND" by O'Reilly and vaguely understand the
+writing contained therein. If I receive a bucket load of requests to
+make this more formal, I'll LateX it and submit it as a "tip" to the
+web-site....
+
+DAVID LLOYD 
+&gt; If anybody is familiar with this entire process and doesn't mind explaining
+&gt; it to me, or pointing me in the right direction, any help would be very much
+&gt; appreciated.
+&gt; 
+&gt; --
+&gt; Jeremy
+
+-- 
+The Linux C Mailing Lists Have Moved
+  <A HREF="mailto:linuxCprogramming-request">mailto:linuxCprogramming-request</A>@i-docs.net?subject=subscribe
+The Linux C++ Mailing Lists Have Moved
+  <A HREF="mailto:tuxCPProgramming-request">mailto:tuxCPProgramming-request</A>@i-docs.net?subject=subscribe
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

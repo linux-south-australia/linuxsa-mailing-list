@@ -1,0 +1,179 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: linux and sunos.4.1.3 sharing a subnet" -->
+<!-- FromName="Mark Smith" -->
+<!-- FromEmail="marks@senet.com.au" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Fri, 11 Dec 1998 21:09:33 +1030" -->
+<!-- Id="3670F664.ADFC1DB0@senet.com.au" -->
+<!-- Reference="199812110912.TAA01760@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: linux and sunos.4.1.3 sharing a subnet</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Smith &lt;<I><A HREF="mailto:marks@senet.com.au">marks@senet.com.au</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Fri, 11 Dec 1998 21:09:33 +1030
+</PRE>
+<H1>Re: linux and sunos.4.1.3 sharing a subnet</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Alan,
+
+Off the top of my head, a few things / work arounds you could try (some
+may not be very elegant, but might get you out of a squeeze).  :
+
+1) Apparently, a quirk of most (if not all) Unix TCP/IP stacks is that if
+you set your default route gateway to be your *own* IP
+address ie. the address of the interface, then *all* foreign (ie. outside
+the box) destinations are considered to be on the local subnet, forcing an
+ARP request for the MAC address of the intended destination.  Your linux
+boxes would hear the ARPs and reply with their MAC address. Once in the
+local ARP table, your sunos box will talk directly to the linux boxes,
+using the default route to determine the interface. I haven't tried this
+(on Linux or Sunos), but Cabletron have convinced Microsoft to add this
+quirk into NT / Dhcp server to suit the Cabletron L3 switching technique,
+which tends to indicate it is a common quirk.
+
+The problem with this method is however, when your destination is a real
+"remote" destination ie. on the other side of a router. You will need to
+set up the router to perform Proxy ARP for real "remote" destinations.
+
+2) You could create host routes for each of your linux boxes. Of course,
+you will need a host route for each linux box.
+
+3) It appears that your problem is the "route" command, not the kernel /
+ip routing itself. You could run gated, which will automatically add
+routes into the table for interfaces discovered when it startes. As an
+added bonus, you can play with dynamic routing. I have had the same sort
+of issue with trying to add supernets to the Linux routing table using the
+route command ... gated however does not have any trouble adding routes
+with "odd" masks to the kernel route table.
+
+4) Actually, as a variant of (1) which is more I think is better (ie. it
+is not taking advantage of a quirk), as you suggest you could stick your
+255.255.255.0 entry in, and then, when you want to access the other
+15/16ths of the Class C, set up the router to do Proxy ARP. One thing to
+be make sure to do is to keep the most significant 4 bits of your sunos
+node address the same as the linux boxes subnet address.
+
+eg.
+
+Sunos
+~~~~~
+IP Address 192.168.5.18
+SM 255.255.255.0
+Node Address bits (0001 0010)
+
+Route 192.168.5.0 mask 255.255.255.0
+
+When Sunos wants to send to 192.168.5.19, it will match on 192.168.5.0 and
+send it out the ethernet interface.
+
+Linux box 1
+~~~~~~~~~
+IP Address 192.168.5.19
+SM 255.255.255.240
+Subnet Address Bits (0001)
+Node Address (00011)
+
+Route 192.168.5.16 mask 255.255.255.240
+
+When Linux box 1 sends back to 192.168.5.18, it will think that
+192.168.5.19 is on subnet 16, match the 192.168.5.16/28 route  and send it
+out the ethernet interface back to the sunos box.
+
+This method would allow you to also use a default route (which is always
+good to have up your sleeve).
+
+I would be interested to see how you go with any of the above suggestions.
+
+HTH,
+Mark.
+
+
+Alan Kennington wrote:
+
+&gt; To ifconfig+route+netstat experts:
+&gt;
+&gt; My problem:
+&gt; I have two machines with linux at home, and one sparc station,
+&gt; all on the same subnet. This is a 28-subnet. I.e. the
+&gt; mask is 255.255.255.240.
+&gt; The linux "ifconfig" and "route" commands permit me to
+&gt; use subnets by specifying the appropriate netmask.
+&gt; The SunOS 4.1.3 "route" command does _not_ permit me to
+&gt; specify a netmask, although the "ifconfig" does permit it.
+&gt;
+&gt; The result is that I have some quirky behaviour on my net, not
+&gt; to mention lack of functioning of various routing functions
+&gt; and e-mail etc. etc.
+&gt;
+&gt; My question:
+&gt; Do I really have to abandon my intention to use subnetting of
+&gt; my C-class network, so that the broadcast addresses match up etc.?
+&gt; Or is there some way of making a SunOS 4.1.3 routing table
+&gt; recognise netmasks via some C-level function or something?
+&gt; I keep seeing these "who" packets directed to incompatible
+&gt; broadcast addresses.
+&gt; [I think this is really more a sunos question than a linux
+&gt; question, but it must have been encountered by people
+&gt; who have combined the two types of operating system.]
+&gt;
+&gt; Clearly I could just put all nodes on the network on
+&gt; the 255.255.255.0 netmask. But this would not be
+&gt; the "right" thing. One day, I might want to talk to the
+&gt; other 15/16 of the C-class net.
+&gt;
+&gt; Another question:
+&gt; COuld I just configure all of the host-to-host links
+&gt; in the 3-host network as pointopoint links over ethernet?
+&gt; That sounds probably even more dodgy.
+&gt;
+&gt; Cheers, and thanks in advance for any info,
+&gt; Alan Kennington.
+&gt;
+&gt; --
+&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+--
+| Mark Smith | email: <A HREF="mailto:marks">mailto:marks</A>@senet.com.au
+| "IP Over Everything" - Vint Cerf.
+
+
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

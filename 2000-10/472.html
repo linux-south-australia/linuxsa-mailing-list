@@ -1,0 +1,152 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Kppp problems RH6.2" -->
+<!-- FromName="Jose, Andrew" -->
+<!-- FromEmail="andrew.jose@dsto.defence.gov.au" -->
+<!-- ToName="'Darryl Ross'" <dross@syc.asn.au>, "'LinuxSA'" <linuxsa@linuxsa.org.au>, "'sharpe@ns.aus.com'" -->
+<!-- ToEmail="dross@syc.asn.au" -->
+<!-- Date="Fri, 13 Oct 2000 14:47:43 +0930" -->
+<!-- Id="DB0C881A51F5D311999F0090274DD437011AD65F@salex003.dsto.defence.gov.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Kppp problems RH6.2</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jose, Andrew &lt;<I><A HREF="mailto:andrew.jose@dsto.defence.gov.au">andrew.jose@dsto.defence.gov.au</A></I>&gt;
+  To  : 'Darryl Ross'" &lt;dross@syc.asn.au&gt;, "'LinuxSA'" &lt;linuxsa@linuxsa.org.au&gt;, "'sharpe@ns.aus.com' &lt;<I><A HREF="mailto:dross@syc.asn.au">dross@syc.asn.au</A></I>&gt;
+  Date: Fri, 13 Oct 2000 14:47:43 +0930
+</PRE>
+<H1>RE: Kppp problems RH6.2</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Thanks Darryl, 
+I can't ping anything by name or IP, but my username/password is accepted
+(as far as I know) because it doesn't reject them. The details box says I am
+connected at x.xkbps and also says I have sent and recievd some bytes,
+although small.
+
+I use all the same settings/hardware on my Win98 box and don't have any
+problems. I assume it is something I have not setup within Kppp or Linux.
+
+Andrew
+
+
+
+-----Original Message-----
+From: Darryl Ross [<A HREF="mailto:dross">mailto:dross</A>@syc.asn.au]
+Sent: Friday, October 13, 2000 1:47 PM
+To: 'Richard Sharpe'; Jose, Andrew; '<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>'
+Cc: '<A HREF="mailto:jason@rebel.net.au">jason@rebel.net.au</A>'
+Subject: RE: Kppp problems RH6.2
+
+
+On Thursday, October 12, 2000 8:49 PM, Richard Sharpe 
+[SMTP:<A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>] wrote:
+&gt; At 12:27 PM 10/13/00 +0930, Jose, Andrew wrote:
+&gt; &gt;OK, have checked the routing, but not sure what to look for. Can anyone 
+help
+&gt; &gt;me with this!!!
+&gt; &gt;Below is the output of /sbin/ifconfig:
+&gt; &gt;
+&gt; &gt;lo     Link encap:Local Loopback
+&gt; &gt;       inet addr:127.0.0.1  Mask:255.0.0.0
+&gt; &gt;       UP LOOPBACK RUNNING  MTU:3924  Metric:1
+&gt; &gt;       RX packets:18 errors:0 dropped:0 overruns:0 frame:0
+&gt; &gt;       TX packets:18 errors:0 dropped:0 overruns:0 carrier:0
+&gt; &gt;       collisions:0 txqueuelen:0
+&gt; &gt;
+&gt; &gt;ppp0   Link encap:Point-to-Point Protocol
+&gt; &gt;       inet addr:203.38.195.1  P-t-P:203.24.77.241 Mask:255.255.255.255
+&gt;
+&gt; Why are both ends of the link in different networks? Things kinda don't
+&gt; work under these circumstances ... IIRC
+
+That is not actually a problem, as long as remote machines know to route 
+your IP to the machine at the other end of your ppp link. It only needs to 
+be in the same network if the remote end wants to use 'proxyarp'. This is 
+the output of one of our ppp links (in this case to the commonwealth 
+government). As you can see, they are on completely different networks:
+
+ppp5      Link encap:Point-to-Point Protocol
+          inet addr:165.12.40.43  P-t-P:144.130.45.225 
+ Mask:255.255.255.255
+          UP POINTOPOINT RUNNING NOARP MULTICAST  MTU:1500  Metric:1
+          RX packets:11880 errors:255 dropped:0 overruns:0 frame:255
+          TX packets:10456 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:10
+
+You have a route to the remote machine and you have a defaultroute pointing 
+to that machine, so routing is correct.
+
+&gt; &gt;&gt;&gt; I have just configured my Linux RH6.2 box to dialup my ISP.
+&gt; &gt;&gt;&gt; Have added all the DNS info, ph number, etc. Upon connecting
+&gt; &gt;it does all the usual stuff, dials, answers, connects.  My problem
+&gt; &gt;is that although I am connected (details show IP addresses for
+&gt; &gt;remote and local computers, transfer of data in each direction -
+&gt; &gt;although small) I can't actually access anything. I can't ping any
+&gt; &gt;known machine, not even the said remote host.
+
+Can you ping yourself using IP addresses, not names? What about the remote 
+machine using the IP address (you didn't say whether you tried the IP 
+address, or the dns name)
+
+ping 203.38.195.1
+ping 203.24.77.241
+
+If you can ping the remote machine, can you ping a machine on the Internet 
+by IP address? IE, try pinging 203.15.24.22 (a machine I administer which I 
+know is up and running). Does that work. If that does work, then I would 
+guess that your DNS is not set up correctly.
+
+If you can ping yourself, but you can't ping the remote host, or any other 
+host, then perhaps there is a problem with the remote server not routing 
+correctly? Talking to the administrator of the remote machine while you 
+connect can sometimes help, as they will be able to tell you whether they 
+are accepting your username or not, and if routing is being set up 
+correctly.
+
+DR
+
+
+--
+
+Darryl Ross
+Network and Systems Administrator
+Service to Youth Council, Inc
+<A HREF="http://www.syc.asn.au/">http://www.syc.asn.au/</A>
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

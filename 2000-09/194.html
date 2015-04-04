@@ -1,0 +1,170 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Security in Linux (related to my first DOS attack)" -->
+<!-- FromName="David Lloyd" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="Michael Kratz" -->
+<!-- ToEmail="michael_kratz@hotmail.com" -->
+<!-- Date="Wed, 06 Sep 2000 10:52:25 +0930" -->
+<!-- Id="39B59C51.ACADAE58@rebel.net.au" -->
+<!-- Reference="F104b6KZmcK8r6beUzm000077a9@hotmail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Security in Linux (related to my first DOS attack)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : Michael Kratz &lt;<I><A HREF="mailto:michael_kratz@hotmail.com">michael_kratz@hotmail.com</A></I>&gt;
+  Date: Wed, 06 Sep 2000 10:52:25 +0930
+</PRE>
+<H1>Re: Security in Linux (related to my first DOS attack)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Michael:
+
+&gt; I haven't posted to the list for a while my linux box is running fine at the
+&gt; moment and I am learning new things every day. Hey I even went out an bought
+&gt; SAMS teach yourself SAMBA in 24 hours (Great book Richard) well it works, by
+
+Richard is about to release "Special Edition Using Samba" - I have
+actually seen an edition in The Bookshelf
+(<A HREF="http://www.thebookshelf.com.au/">http://www.thebookshelf.com.au/</A>) in town as well. You can find it on
+Amazon too (<A HREF="http://www.amazon.com.au/">http://www.amazon.com.au/</A>).
+
+&gt; I am concerned about the security of my linux box...
+
+Aren't we all?
+
+&gt; basically I am using IPFWADM, setup by a fellow linux user at the
+&gt; installfest for me. It is set to deny all, but allows communications on
+
+That implies that you're using a kernel version which is lower than
+2.2.X. Any particular reason why? Or do you mean ipchains?
+
+&gt; certain ports and 1 to 1024 from inside the LAN to outside the LAN but
+&gt; NOTHING IS ALLOWED IN, only traffic that leaves. All services are turned off
+&gt; except for http, telnet and ftp, I think. (Where do I find this??)
+
+You find what services are being run in two ways:
+
+1) Check /etc/inetd.conf
+ - the format is relatively easy to work out for yourself, just remember
+anything beginning with a hash is a comment
+ - telnet and ftp are classically called in.telnetd and in.ftpd although
+there's no reason you couldn't have them renamed to telnetoo or
+wotever...
+
+2) Look at what is actually running in a particular run level
+ - check /etc/rc.d/rc#.d if you're running a System V setup (RedHat,
+Linux, Suse etc)
+ - anything that starts with an "S" gets started
+ - httpd is classically started from setup
+ - alternatively, do "ps ax &gt; log" and read the resulting log to find
+out what is actually running
+
+&gt; Telnet is set to allow in only from my IP address range on the LAN which are
+&gt; internet routable Telstra IP's. FTP is the same.
+
+Internet routable IP's. I presume this means I could contact the IP's
+over the internet if I knew their number. Whilst telnet on a LAN is
+relatively secure, personally I believe SSH with password protected
+public encryption is the most secure. Furthermore, in my reading of
+SSH's rather lengthy manual pages, that even if you do fall back to
+user/password authentication that the passwords themselves are
+encrypted.
+
+&gt; The server is acting as a
+&gt; webserver on standard port 80.
+
+If you're concerned about security - or maybe just curious - setup
+apache to log who is getting what from your web server. I'd suggest if
+you do that you use logrotate (should be installed by default, read the
+man pages etc) to handle your logs because even on a local, personal
+only web server the logs would grow like crazy!
+
+&gt; I telnet into the machine from the LAN
+&gt; regularly to configure things. I dont need to worry about security on the
+&gt; LAN, it is only small, 5-6 users, and none of them have any idea about linux
+&gt; or telnet.
+
+And Santa comes from the sahara desert :-P
+
+What if you employed someone like me who happens to know what you are
+running? They might be employed as the shoe shiner, hence you wouldn't
+even know they knew about Linux or telnet...and what if
+they....ok....I'm getting carried away. Just because the current people
+don't know, doesn't mean that will stay the same way forever. Besides,
+eventually if your setup grows you'll need other people to know because
+you won't be able to handle all the work by yourself.
+
+&gt; The server is also using Sendmail 8.9.3 for email. It is the primary MX. I
+&gt; am using telstras secondary MX. Mail cannot be accessed from outside the
+&gt; LAN, only inside from the ip addresss range that I have from telstra.
+
+Update Sendmail to the latest one. Because it is one of the most popular
+MTA (mail transport agents), crackers do take a lot of notice of it.
+They have found bugs/security flaws before (<A HREF="http://www.sendmail.org">http://www.sendmail.org</A>).
+This doesn't mean that SendMail is insecure in itself - in any case bug
+fixes tend to turn up within a day or even less for major security
+dramas - it just means that people seem to pick on it because there's
+more "cases" to attempt to crack...
+
+&gt; What I want to know is whether this sounds secure or not? I am really on
+&gt; edge about security, because if someone does manage to muck up my server, I
+&gt; am afraid that either I will not even realise that they are doing it or I
+&gt; won't be able to fix it and will be left without a website!!!
+
+There is a program called logwatch. It used to be enabled in a RedHat
+box by default at 4AM. You might try a program called "FreeVeracity"
+(<A HREF="http://www.freeveracity.org/">http://www.freeveracity.org/</A>) or Saint or Tripwire...take a wander to
+(<A HREF="http://freshmeat.net">http://freshmeat.net</A>) and lookup "security" and see what you turn up.
+
+&gt; p.s. I also update my website from an external source the way that I do this
+&gt; is to ring up and ask my colleague to run pcANYWHERE for me, it gets left
+&gt; running all night on a private telephone number on a computer with the
+&gt; monitor turned off. Doesn't matter whether it is turned on anyway. I dial up
+&gt; to that machine login, file transfer the webpages to that machine, then copy
+&gt; across the microsoft network into the www directory on the server. From that
+&gt; machine using pcANYWHERE.
+
+That sounds hideously complex...I don't know the security issues with
+pcAnywhere in any terrible detail....
+
+DL
+-- 
+The Linux C and C++ Home Pages:
+ * <A HREF="http://www.rebel.net.au/~lloy0076/linux_c_programming/index.html">http://www.rebel.net.au/~lloy0076/linux_c_programming/index.html</A>
+ ( *** fw.tellurian.com.au can't find f!@#k.com: Non-existent
+host/domain )
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

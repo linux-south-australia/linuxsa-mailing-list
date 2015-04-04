@@ -1,0 +1,111 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="gateway modem connect/sudo" -->
+<!-- FromName="'Ben Williams'" -->
+<!-- FromEmail="benw@webmedia.com.au" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 17 Apr 2003 14:42:48 +0930" -->
+<!-- Id="3E9E37D0.2000203@webmedia.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: gateway modem connect/sudo</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Ben Williams &lt;<I><A HREF="mailto:benw@webmedia.com.au">benw@webmedia.com.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 17 Apr 2003 14:42:48 +0930
+</PRE>
+<H1>gateway modem connect/sudo</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+howdy all,
+
+i've set up a redhat 8.0 box at home, and patched it all up (150mb of 
+rpms via up2date!). as well as some other stuff, i want to use this box 
+as a gateway to my internal machine(s)[1].
+
+i've setup the modem, i can connect with 'ifup ppp0', and following the 
+Masquerading-Simple-HOWTO[2], i used the simple firewalling stuff from 
+there to turn on NAT & forwarding and secure the connection - this works 
+perfectly. i then put all this stuff into a bash script 
+(/usr/bin/connect) so i can manually log in to the box, type 'connect' 
+and it connects to my ISP and turns on forwarding etc. lovely!
+
+the next step was to make it so that normal users can do this. i added 
+entries to /etc/sudoers to allow them to run the needed commands 
+(iptables, ifup, echo, modprobe), without needing a password. lovely! i 
+can log in as myself (benw) and type 'connect' and it almost all comes 
+up as it should - the only problem lies in this line in the script:
+
+sudo echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+
+to turn on packet forwarding. when i run the script as myself (benw), i 
+get the following error:
+
+/usr/bin/connect: line 9: /proc/sys/net/ipv4/ip_forward: Permission denied
+
+the file looks like this from the outside:
+
+-rw-r--r--    1 root     root            0 Apr 17 14:14 
+/proc/sys/net/ipv4/ip_forward
+
+my line in the sudoers file looks like:
+
+benw    ALL = NOPASSWD: /sbin/iptables,/sbin/ifup,/bin/echo,/sbin/modprobe
+
+any ideas?
+
+(the next step in the project is to make it very easy for people to 
+connect from the other machine(s) - like double-click-on-the-desktop 
+easy. i figure i can do this by using something like putty to ssh in 
+with a preset key pair (no password required) and set the user's shell 
+to /usr/bin/connect; thus it should (i hope) log them in, execute that 
+script, and disconnect them when the script exits, leaving the 
+connection up and running. maybe i should make a user called "dial" or 
+"connect" or something for this.)
+
+  - Ben
+
+--
+"Never attribute to malice that which can be adequately explained by 
+stupidity."
+(&lt;<A HREF="http://www.tuxedo.org/~esr/jargon/html/entry/Hanlon">http://www.tuxedo.org/~esr/jargon/html/entry/Hanlon</A>'s-Razor.html&gt;)
+
+[1] one at the moment, but hopefully more later!
+[2] <A HREF="http://www.tldp.org/HOWTO/Masquerading-Simple-HOWTO/">http://www.tldp.org/HOWTO/Masquerading-Simple-HOWTO/</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

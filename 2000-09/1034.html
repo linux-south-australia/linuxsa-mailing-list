@@ -1,0 +1,184 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Intellimouse Under FreeBSD" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Benjamin Close" -->
+<!-- ToEmail="linux@senet.com.au" -->
+<!-- Date="Fri, 22 Sep 2000 08:58:07 +0930" -->
+<!-- Id="20000922085806.D20971@atdot.dotat.org" -->
+<!-- Reference="Pine.BSF.4.21.0009220033410.807-100000@bytes4u.nodomain.yet" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Intellimouse Under FreeBSD</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Benjamin Close &lt;<I><A HREF="mailto:linux@senet.com.au">linux@senet.com.au</A></I>&gt;
+  Date: Fri, 22 Sep 2000 08:58:07 +0930
+</PRE>
+<H1>Re: Intellimouse Under FreeBSD</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, Sep 22, 2000 at 12:36:49AM +0930, Benjamin Close wrote:
+
+ &gt; Has anyone got the Microsoft Intellimouse working with the wheel under
+ &gt; FreeBSD. I'm using it as a USB mouse but whilst I can get it working with
+ &gt; the wheel, a switch back to the console from X renders the rodent
+ &gt; useless. Any ideas? ( No puns about don't switch to console :)
+
+I have the Logitech FirstMouse+ working, which is another wheel mouse 
+which uses the IntelliMouse wire protocol, so it should be fairly similar.
+
+Run moused like this:
+
+      moused -p /dev/psm0 -t auto
+
+(i.e.: listen to the PS/2 mouse port on /dev/psm0, set the mouse type
+to "auto", which will use PnP to work out what it is).  moused reads
+virtually any mouse protocol, converts it to something kinda-sorta-almost
+like MouseSystems, and writes the translated events to /dev/sysmouse for
+applications to read (which is multiplexible, so you can have lots of 
+applications reading the mouse on lots of different virtual consoles at
+the same time).
+
+You can make moused run with those options at boot-time by putting the
+following into /etc/rc.conf:
+
+    moused_enable="YES"
+
+That's all -- The rest of the options are the defaults anyway (consult
+/etc/defaults/rc.conf if you don't believe me).
+
+In your XF86Config, put something like this:
+
+    Section "InputDevice"
+        Identifier  "Mouse0"
+        Driver      "mouse"
+        Option      "Protocol" "Auto"
+        Option      "Device" "/dev/sysmouse"
+        Option      "Buttons" "5"
+        Option      "ZAxisMapping" "4 5"
+    EndSection
+ 
+i.e.: monitor /dev/sysmouse for an unspecified mouse type.  Even though
+the mouse has 3 buttons, pretend it has 5, where button-4 events are 
+generated as a result of pushing the wheel up, and button-5 events come
+from pulling the wheel down.  This allows applications which don't
+understand the Z axis (e.g.: Netscape) to use the wheel.
+
+So, the number of buttons you declare is equal to the number of "real"
+buttons on the mouse, plus 1 for "wheel up" and one for "wheel down".  
+If you have a mouse with 5 buttons and a wheel, you'd tell X it was a 
+7-button mouse, and you'd specify buttons 6 and 7 in the ZAxisMapping
+option.
+
+How do you make an application use the wheel?  It'll vary from app to app.
+Basically, you need to find the X resources which deal with keyboard and
+mouse translations (i.e.: the bits that say, "When the user hits this key,
+go and do this...").
+
+If you look at the Netscape.ad file which comes with Netscape, you'll see a
+definition for a resource called *drawingArea.translations, which says 
+things like:
+
+           &lt;Btn1Down&gt;:                     ArmLink()                       \n\
+           &lt;Btn2Down&gt;:                     ArmLink()                       \n\
+           ~Shift&lt;Btn1Up&gt;:                 ActivateLink()                  \n\
+                  [ ... etc ... ]
+
+Copy the definition for that resource to your ~/.Xdefaults file, then
+apend the following to it:
+
+        ~Shift&lt;Btn4Down&gt;:               LineUp() LineUp() LineUp()      \
+                                        LineUp() LineUp()               \n\
+        ~Shift&lt;Btn5Down&gt;:               LineDown() LineDown() LineDown() \
+                                        LineDown() LineDown()           \n\
+        Shift&lt;Btn4Down&gt;:                PageUp()                        \n\
+        Shift&lt;Btn5Down&gt;:                PageDown()                      \n
+
+i.e.: When Btn4Down events are received without the Shift key pressed,
+call the "LineUp" translation 5 times (so each "click" of the wheel in the
+upwards direction will make a Netscape window, textfield, dialog, whatever
+scroll upwards 5 lines).  When Btn5Down events are received without Shift,
+send LineDown translations.  
+
+When Btn4 (wheel up) and Btn5 (wheel down) events are received *with* the
+Shift key pressed, send PageUp and PageDown translations instead.
+
+Easy, eh?  With the addition of 4 lines you've added wheel functionality
+to an application which hasn't the faintest idea about how to use a mouse
+wheel.
+
+Note that you won't have to do that on some applications, because they
+already grok the Z axis.  Examples that spring to mind are Mozilla, Eterm,
+xmms (which uses the wheel as a volume control).  But when you have an 
+application which ignores the wheel and you think, "y'know, it'd be really
+handy if I could make /this/ happen when I move the wheel..." you actually
+*can* make it happen by editing a few X resources.
+
+The last caveat:  I have found that every now and then the PnP probe
+to find out what kind of mouse I have will actually cause the mouse
+to change protocols (because, of course, PnP doesn't work), which leads
+to the mouse either not moving at all or moving in random directions 
+because the wire protocol being used by moused doesn't match the wire
+protocol used by the mouse.  On the other hand, I've found that XFree86
+always gets it right the *first* time (i.e.: when I start the server from
+scratch it always works, but server resets which occur when I logout will
+occasionally leave the mouse in an indeterminate state).  My workaround
+for that has been to edit /etc/X11/xdm/Xservers, and change the last line
+from:
+
+     :0 local /usr/X11R6/bin/X
+
+to:
+     :0 local /usr/X11R6/bin/X -terminate
+
+... which causes the X server to exit completely whenever a server reset
+occurs (whereupon xdm will immediately restart it, and it'll get the PnP
+probe right because it's the first one after the server has been started,
+and everything will be happy).  
+
+I hate the fact that I need that workaround;  it should "just work". 
+Perhaps XFree86 4.0.2 will fix it :-)
+
+Cheers,
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

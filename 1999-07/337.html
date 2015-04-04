@@ -1,0 +1,129 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Transparent Proxies" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Reynolds, Steve" -->
+<!-- ToEmail="Reynolds.Steve@saugov.sa.gov.au" -->
+<!-- Date="Tue, 13 Jul 1999 12:12:54 +0930 (CST)" -->
+<!-- Id="199907130242.MAA09121@atdot.dotat.org" -->
+<!-- Reference="199907130201.LAA29849@Elizabeth.netcraft.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Transparent Proxies</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Reynolds, Steve &lt;<I><A HREF="mailto:Reynolds.Steve@saugov.sa.gov.au">Reynolds.Steve@saugov.sa.gov.au</A></I>&gt;
+  Date: Tue, 13 Jul 1999 12:12:54 +0930 (CST)
+</PRE>
+<H1>Re: Transparent Proxies</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Reynolds, Steve wrote:
+
+ &gt; Can anybody give me a simple explanation of what transparent proxies are,
+ &gt; and how they work?
+
+Since we have transparent proxies in our machine room upstairs serving
+DAIS (and the rest of the State Government), I have no problem at all
+with answering this.  :-)  I'm going to put my Internode hat on for a 
+moment and switch into "employee of somebody else" mode.
+
+Consider a Squid server:  It accepts HTTP queries on a pre-configured
+port number and responds with a HTTP data stream back to the client.
+That's all very standard, straightforward and mundane, with the downside
+being that users' browsers need to be configured to use it.
+
+
+     USER                        PROXY                     WEBSITE 1.2.3.4
+     GET <A HREF="http://1.2.3.4">http://1.2.3.4</A> --------&gt;
+                                 GET <A HREF="http://1.2.3.4">http://1.2.3.4</A> -----------&gt;
+                                 &lt;---------------------- response: src=1.2.3.4
+     &lt;-------------------------- response: src=PROXY
+
+Now imagine a slightly different setup:  Configure your organization's
+border router so that any traffic for TCP port 80 gets diverted to a
+specific machine.  Install a modified squid server on that machine which
+accepts inbound packets destined for *any* IP address, and sends 
+reply packets with forged source addresses which match the destination
+addresses used in queries.
+
+End users now don't need to configure their browsers:  The routers and
+the modified proxy server do it all for them.
+
+
+    USER                         PROXY                     WEBSITE 1.2.3.4
+    GET <A HREF="http://1.2.3.4">http://1.2.3.4</A> ---------------&gt; blocked at router
+                                        (and diverted to proxy)
+                                 GET <A HREF="http://1.2.3.4">http://1.2.3.4</A> -------------&gt;
+                                 &lt;---------------------- response: src=1.2.3.4
+    &lt;---------------------------forged response from
+                                PROXY: src=1.2.3.4
+
+Believe it or not, it's possible to set this up with NAT and ipfilter/
+ipfwadm/ipchains.
+
+Once the conceptual issues are out of the way, other issues can be
+dealt with as well.  For example, Cisco uses a protocol called WCCP
+(Web Cache Coordination Protocol) to load-balance a farm of
+transparent proxy servers sitting on their own dedicated switched
+ethernet segment.  To avoid having your proxy server turn into a
+bottleneck, you can keep adding WCCP-compliant proxy servers until
+you have "enough" of them.
+
+Transparent proxies *only* deal with HTTP, too, which is a
+simple-enough problem domain to be handled by an embedded system which
+is designed solely and specifically to do HTTP *fast*.  Cisco sell a
+range of 1-RU embedded system based proxy servers which are
+outrageously fast, faster than anything squid could ever hope to
+achieve (our CacheEngine CE-500's upstairs happly saturate a 100baseT
+network, and we have three of them with 36 Gbytes of disk each on a
+switch handling WCCP-distributed HTTP queries).  We end up using a
+squid to cache ftps and the CacheEngine boxes for HTTP.
+
+If you (or anyone else) wants to come in and see the gear and/or ask
+questions, feel free.  We're happy to show-off our facilities to anyone
+who wants to see them, to inspire confidence in the minds of our customers
+and jealousy in the minds of our competitors :-)  Just give us a call
+to organize it.
+
+   - mark
+
+----
+Mark Newton                               Email:  <A HREF="mailto:newton@internode.com.au">newton@internode.com.au</A> (W)
+Network Engineer                          Email:  <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>  (H)
+Internode Systems Pty Ltd                 Desk:   +61-8-82232999
+"Network Man" - Anagram of "Mark Newton"  Mobile: +61-416-202-223
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

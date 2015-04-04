@@ -1,0 +1,308 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IP identifier field for linux UDP/IP equals zero??!" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="ak.linuxsa@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 16 May 2003 09:18:42 +0930" -->
+<!-- Id="20030516091842.A11923@dog.topology.org" -->
+<!-- Reference="3EC3208C.4070905@aarnet.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IP identifier field for linux UDP/IP equals zero??!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 16 May 2003 09:18:42 +0930
+</PRE>
+<H1>Re: IP identifier field for linux UDP/IP equals zero??!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, May 15, 2003 at 02:37:24PM +0930, Glen Turner wrote:
+&gt; 
+&gt; Comments:
+&gt; 
+&gt;   - The IP identifier is not needed if the Do Not Fragment
+&gt;     bit is set.
+&gt; 
+
+Glen,
+
+Are you quoting from a written spec, recommendation or RFC?
+Or is that just oral tradition?
+Maybe you don't need it, but even the best of specs do not necessarily
+explain all uses of all requirements under all circumstances.
+I'm certain you know the nature of the standardisation process - lots
+and lots of discussions and meetings - sometimes even prototyping
+and testing and demonstrations - over many years.
+The result, in my experience, is that often a very complex train of
+thought that led to a feature in a spec/rec/RFC ends up being a
+mere single line without explanation.
+
+(I once wrote several hundred pages of analysis of simulation studies
+for IEEE 802.6 over about a year, and the result was a single line
+in the standard - with about 6 words of comment on its purpose.
+The nice thing, though, was that I defeated IBM's attempt to replace a
+good MAC algorithm with a bad one. It's satisfying to beat IBM.)
+
+Sometimes a spec just says "do this" without giving an extended tutorial
+on how it was decided.
+
+Therefore for the linux community to decide that a field is "not needed"
+just defeats the whole purpose of a spec.
+It's not up to the implementer to toss out stuff that is not obviously
+useful.
+
+&gt;   - If the identifier is not needed then it should either
+&gt;     not be set or should be randomised, as the Identifier
+&gt;     can be used in port scans to discover what processes are
+&gt;     running and this technique can be done without revealing
+&gt;     the address of the scanner.
+&gt; 
+&gt;     Obviously RFC791 couldn't anticipate this.
+&gt; 
+&gt;        &lt;<A HREF="http://ouah.sysdoor.net/newantirez.html&gt">http://ouah.sysdoor.net/newantirez.html&gt</A>;
+
+Then someone should write another RFC to update RFC791.
+If the TOS field can be redefined, then so can the IP ID field.
+And I don't believe that setting the IP ID to zero is necessarily the
+best way to defeat port scans. But I have no knowledge of this particular
+security issue.
+
+&gt;   - The assumption in RFC3095 that Identifer increments
+&gt;     isn't unreasonable.  It's a compression spec, so
+&gt;     a guess at the most likely implementation will give
+&gt;     the best results.  The option negotiation in the spec
+&gt;     leaves room for a future always-zero Identifier.
+&gt;     You might want to submit an Internet Draft requesting
+&gt;     such an option.
+
+RFC 3095 is already frozen in stone, of course. But there are already
+suggestions that the IP-only compression profile which has not yet
+been turned into an RFC should have a special "Static IP-ID" bit,
+which will be used for linux UDP packets.
+It's definitely on the agenda. 
+
+=============================================
+I've found it interesting to follow this discussion in two different
+forums: linuxSA and the ROHC mailing list.
+The contrast has such strong echos of the the 1980s when there were two
+mutually incomprehending universes - the IEEE sort of world
+together with computer scientists and military, versus the Telcos
+as instantiated in CCITT (now ITU-T or something).
+The computers versus communications mind-split is still in existence.
+
+The ROHC crowd (RFC 3095 header compression etc., mobile telephony...)
+seem to mostly think that linux has an "issue" with a faulty IP stack,
+whereas from the computer networks (IETF etc.) perspective, it looks
+like the ROHC crowd have made a blunder.
+In my opinion, they both have. The linux IP stack is wrong and
+the ROHC should have taken linux zero-IP-ID into account.
+They obviously just didn't test a single linux machine during the
+years of developing the spec.
+If only they had had a linux developer like me in the working group!
+
+=============================================
+Here's a little summary of what I found in the ROHC mailing list:
+
+Reply number 1:
+++++++++++++++++++++++++++++++++++++++++++++++
+&gt; Is there an obvious way to solve the problem of the constant value
+&gt; of the IP header Identifier field for UDP/IP from linux boxes?
+
+Constant IP-ID?? It looks to me a faulty implementation (of IP stack)
+which defeats the exact purpose of IP-ID (see RFC 791).
+++++++++++++++++++++++++++++++++++++++++++++++
+
+That's one vote against linux.
+
+Reply number 2 (Actually not a direct reply - just happened to be on the 
+identical topic):
+
+++++++++++++++++++++++++++++++++++++++++++++++
+[...] we also have a sugesstion of how the problem with
+IP-ID = 0 could be solved. IP-ID should not be zero, but we have detected that
++it
+is zero when sending package in a local network. The condition is that both the
+source and destination are members in the same submask-network. The DF-flag is
+also set in the package. Even if this behavior seems to be odd, all the packages
+is correct accoriding to the standard. This have been found in the Linux
+implementation (kernel 2.4.20). Other OS may have the same "problem".
+[...]
+
+IP-ID == 0:
+
+One solution on the IP-ID equal to zero problem is to add a flag (SID) that says
+if the ID-field is static.
+++++++++++++++++++++++++++++++++++++++++++++++
+
+This is sort of half a vote for and half against.
+Score so far: 1.5 against to 0.5 for.
+But this is interesting. He's saying that linux will only do this
+IP-ID = 0 for source/destination on the same LAN. If so, then
+linux will _not_ have problems in reality. But I can't test
+this because I don't have two sites to test ohphone across.
+
+Reply number 3:
+
+++++++++++++++++++++++++++++++++++++++++++++++
+&gt; &gt; Is there an obvious way to solve the problem of the constant value
+&gt; &gt; of the IP header Identifier field for UDP/IP from linux boxes?
+&gt;
+&gt; Constant IP-ID?? It looks to me a faulty implementation (of IP stack)
+&gt; which defeats the exact purpose of IP-ID (see RFC 791).
+&gt;
+I had faced the same problem earlier (check list archives). Since the
+Linux stack behaviour is non standard, I guess its upto the Linux guys
+to fix it.
+++++++++++++++++++++++++++++++++++++++++++++++
+
+This is definitely a vote against linux.
+Score = 2.5 to 0.5, running against linux.
+
+Reply number 4 was from the guy who invented ROHC, as I understand it:
+
+++++++++++++++++++++++++++++++++++++++++++++++
+&gt; IP-ID should not be zero, but we  have detected that it
+&gt; is zero when sending package in a local network. The
+&gt; condition is that both the source and destination are
+&gt; members in the same submask-network. The DF-flag is
+&gt; also set in the package. Even if this behavior seems to be
+&gt; odd, all the packages is correct according to the standard.
+&gt; This have been found in the Linux implementation
+&gt; (kernel 2.4.20). Other OS may have the same "problem".
+
+Thanks for clarifying this. It is thus not really an invalid
+stack implementation, but it is indeed a little bit odd.
+However, this should not be a big problem for scenarios where
+ROHC would actually be implemented, right? It is more of
+a typical "test environment problem".
++++++++++++++++++++++++++++++++++++++++++++++++
+
+He seems to be saying that linux is not noncompliant.
+I'd count this as a vote for linux.
+Score: 2.5 to 1.5, running against linux.
+
+Unfortunately, he seems to be implying that no one in the real world
+is going to use a linux box for audio/video to a G3 phone.  Hmmm...
+
+Reply number 5 is from the inventor again:
+
++++++++++++++++++++++++++++++++++++++++++++++++
+I guess I better correct myself on this statement:
+
+&gt; Thanks for clarifying this. It is thus not really an invalid
+&gt; stack implementation, but it is indeed a little bit odd.
+
+Actually, it can probably be considered an incorrect
+implementation as it would not comply with the rule of
+RFC 791:
+"Thus, the sender must choose the Identifier to be unique
+for the source, destination pair and protocol for the time
+the datagram (or any fragment of it) could be alive in the
+internet."
+
+However, if one considers the purpose of the Identification
+field and the intent with the above text (i.e. the above is
+an obvious consequence of how fragmentation/reassembly is
+defined), one could claim that the Identification is not
+used if DF is set, and that the above text would not apply
+in that case.
+
+Anyway, for us this is not a very big problem. We might want
+to make ROHC handle this case better, but I do not think
+it is a core issue. Neither should we waste our time trying
+to agree on whether there is a Linux error or not.
++++++++++++++++++++++++++++++++++++++++++++++++
+
+Well, now he's cancelled out his vote in favour of linux.
+At the very least, he's cancelled out his pro-linux vote, and
+arguably given his vote entirely against linux. But I'll just
+leave his previous vote in place.
+Current score: 3.5 to 1.5, running against linux.
+
+Reply number 6 from someone else:
+
++++++++++++++++++++++++++++++++++++++++++++++++
+We came across a similar problem when testing the packet formats for the TCP/IP
+profile, e.g. in the following flow carrying HTTP:
+
+45000028454440004006e7e0c176c1b2c176c90b80540050bc2e8cd16e1bbbe45010f53cb9470000
+45000028454540004006e7dfc176c1b2c176c90b80540050bc2e8cd16e1bbbf95010f53cb9320000
+45000028454640004006e7dec176c1b2c176c90b80540050bc2e8cd16e1bc1ad5010f53cb37e0000
+45000028454740004006e7ddc176c1b2c176c90b80540050bc2e8cd16e1bc7615010f53cadca0000
+45000028454840004006e7dcc176c1b2c176c90b80540050bc2e8cd16e1bcd155010f53ca8160000
+45000028454940004006e7dbc176c1b2c176c90b80540050bc2e8cd16e1bd2c95010f53ca2620000
+45000028454a40004006e7dac176c1b2c176c90b80540050bc2e8cd16e1bd8675010f53c9cc40000
+45000028454b40004006e7d9c176c1b2c176c90b80540050bc2e8cd16e1bdb8d5010f53c999e0000
+45000028454c40004006e7d8c176c1b2c176c90b80540050bc2e8cd16e1bdb8d5011f53c999d0000
+4500002800004000ff066e24c176c1b2c176c90b80540050bc2e8cd26e1bdb8e5010f53c999c0000
+        \__/
+         ID
+
+The behaviour of the Linux stack is even weirder in the TCP/IP case than for
+the UDP/IP case, because it chooses to set the IP-ID to 0 for certain packets
+only (typically at the beginning and the end of the flow).
+
+&gt;From the perspective of the IP-only profile, a "perfect" solution to the
++problem
+would therefore require a new packet format which allows the IP-ID to
+occasionally deviate from its expected behaviour. However, I think that this
+would be overkill to solve what is only a minor problem - the proposal to add
+a SID flag to the IR-DYN packet looks like a good idea because it addresses the
+issue at a very low cost.
+++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Well, that really puts the rat among the pigs.
+Linux can't even keep the ID sequence going according to a simple
+increment rule for TCP.
+I would say that this "wierdness" comment is at least half a vote
+against linux. 
+Final score: 4 against linux, 1.5 in favour.
+
+I think the linuxSA votes would be roughly round the reverse of this
+but in about the same proportions. I ain't going to count....
+I've got to go to the fruit/veg shop now.
+Otherwise I'm going to get nightblindness, beri-beri and rickets
+sitting in front of this monitor 16 hours a day.
+
+Cheers and ferrets to all who gave feedback...
+(And hamsters for those kept out of it.)
+
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

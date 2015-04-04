@@ -1,0 +1,153 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="[OT] FreeBSD Nebie eLog V" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 10 Sep 2003 21:50:20 -0700" -->
+<!-- Id="3F5FFF0C.9090700@pacbell.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: [OT] FreeBSD Nebie eLog V</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 10 Sep 2003 21:50:20 -0700
+</PRE>
+<H1>[OT] FreeBSD Nebie eLog V</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+1. Cups:
+
+I had trouble setting up CUPS, but I ran accross this bug report. I followed the fix as outlined, and CUPS worked very well after that.
+
+<A HREF="http://lists.freebsd.org/pipermail/freebsd-ports-bugs/2003-June/006465.html">http://lists.freebsd.org/pipermail/freebsd-ports-bugs/2003-June/006465.html</A>
+
+2. KDM:
+
+I was kindly told by a few people on Linuxsa, that I don't have to use.xsession or .xinitrc in $HOME to start kde, if I set up KDM.
+
+I didn't realize that I had to stop using XDM to enable myself to use KDM. After I figured this out, I set up KDM by editing /usr/X11R6/lib/X11/xdm/Xsetup_0 adding a line that reads: "/usr/local/bin/kdmdesktop". I also had to edit/etc/ttys so that the ttyv8 line reads "ttyv8 "/usr/local/bin/kdm -nodaemon" xterm on secure." I was sure to double check the functionality of X before I enambled KDM by changing the "xterm off" part of the line to read "xterm on."
+
+I also added a background picture with Beastie in it, that comes up at login time. I also changed my wallpaper by searching the net for some Beastie pictures. The OpenBSD picture made it on my desktop, and the deamon overlooking the land made it in KDM. I was also able to add a 
+logo to the login area. The various wallpapers and logo configurations are controled through the KDE Control Center.
+
+
+3. Konica Multifunctional:
+
+As I mentioned before, we got rid of the Gestetner Multifunctional and purchased a Konica. There are actually some similarities between the two machines, so I was able to set up our Konica Multifunctional to deliver scans to my FreeBSD Desk. I used Proftpd just like I did with the Gestetner and SuSE Linux 8.2. 
+
+Basically, you scan a document in the multifunctional scanner, and it will send it to the designated user. The user is configured on the Konica multifunctional as an FTP recipient. The IP number of the FTP server must be identified in the configuration. The Client that receives the scan must have an FTP server setup and running when the Konica sends the scan to the IP address. The FTP server must accept anonymous and passwordless logins. It uses port # 21 as a default, and attempts to log in as "Anonymous." When I tried to ftp to 127.0.0.1, it would allow "anonymous" to log in but not "Anonymous". To get around this, I set up a user called "Anonymous" with a home directory at /home/Anonymous. In SuSE Linux 8.2, I did not have to set up such a user, and that the FTP root was /srv/ftp/. To get Proftpd to behave as I required, I had to edit its configuration file located at /usr/local/etc/proftpd.conf. There was an example proftpd.conf file in /etc, so I used that as a base, renaming it to proftpd.conf and uncommenting the anonymous section of the file. Uncommenting means remove the # signs on the left. I also added a line to tell 
+the server where to put files that are FTP'd in. The line reads: DefaultRoot /home/Anonymous
+
+I then created a method to deliver the scanned files to the user's home directory. I have a shell script in the user's home directory that is triggered every two minutes by cron[1]. To set up the cron job, I went to the shell and typed "crontab -e." I had changed my default editor to Emacs as described above. I added this line that causes cron to launch $HOME/scanner.sh every two minutes: 0-59 * * * * sh /home/james/scanner.sh
+
+* The contents of scanner.sh reads: 
+
+chown james /home/Anonymous/*.*
+chgrp wheel /home/Anonymous/*.*
+cp /home/Anonymous/*.* /home/james/
+rm /home/Anonymous *.*
+
+I had incorrectly set /etc/rc.conf to have a line reading cupsd, and that would produce an email from <A HREF="mailto:cron@localhost">cron@localhost</A> telling me that cupsd was not understood. I should have simply renamed /usr/local/etc/rc.d/cups.sh.example to cups.sh. 
+
+4. Samba III
+
+I set up Samba III, but it looks like guest access has been disabled. I downloaded the Samba III Beta 3 .tar file from Samba.org and saved it in my home directory. I ran gzip -dc samba.tar.gz | tar xvf - at the console line to unzip it in my home sirectory. I then typed ./configure and then make and then make install. It compiled without a problem. The Readme file in $HOME/samba-3.0.0beta3/swat/ is a very good way to get started. Samba is controlled through one configuration file, so I used my smb.conf file from Linux, but modified it to have a different share 
+name. I put samba.conf into /usr/local/samba/lib/. I wanted to have SWAT available, so edited /etc/inetd.conf and added these entries:
+
+# Samba III Entries Below:
+swat stream tcp nowait/400 root 
+/usr/local/samba/sbin/swat swat
+netbios-ssn stream tcp nowait root 
+/usr/local/samba/sbin/smbd smbd
+netbios-ns dgram udp wait root 
+/usr/local/samba/sbin/nmbd nmbd
+
+I was able to see the server, but not the share, as I cound not get authorization as a guest.
+
+
+5. Bochs
+
+Bochs is like Virtual PC, you run a fake computer in your computer, and as a result, you are able to run other operating systems within Unix. In FreeBSD, bochs installed from the ports nicely. 
+
+Bochs is controlled on a single configuration file /usr/local/etc/bochsrc. That's where you specify to bochs where the emulated bios, vgarom, hard disk,floppies, computer speed, megs of ram, and other parts of the emulated computer are. You then either make or use all of these things to run bochs as a simulated computer and document all of this information in /usr/local/etc/bochsrc in a specific format to get it to run.
+
+I creatd a hard disk image that bochs will use a simulated hard drive, and bximage, a part of the bochs package, does that nicely. You have to keep track of the geometry of the disk image, but bximage will tell you that when its made. I made a 250MB Image, and placed it in $home.
+
+To start up Bochs cleanly, I have an icon with the execution command that reads: bochs -qf /usr/local/etc/bochsrc. It basically gets bochs to 
+start up without the configuration screen getting in the way, and with bochs reading the /usr/local/etc/bochsrc configuration file. The vgarom 
+and bios are most difficult to find, but I show that in my /usr/local/etc/bochsrc. My /usr/local/etc/bochsrc reads:
+
+floppya: 1_44="/dev/fd0", status=inserted
+diskc: file="$HOME/dos.img", cyl=1015, heads=16, spt=63
+cdromd: dev=/dev/acd0, status=inserted
+romimage: file=/usr/local/share/bochs/bios/BIOS-bochs-latest,address=0xf0000
+vgaromimage: /usr/local/share/bochs/bios/VGABIOS-elpin-2.40
+megs: 128
+parport1: enable=1, file="bochs.out"
+boot: cdrom
+vga_update_interval: 30000
+keyboard_serial_delay: 20000
+keyboard_paste_delay: 100000
+floppy_command_delay: 50000
+ips: 500000
+mouse: enabled=0
+private_colormap: enabled=0
+i440fxsupport: enabled=0
+time0: 0
+newharddrivesupport: enabled=1
+log: $HOME/bochs.out
+keyboard_mapping: enabled=0, 
+map=/usr/bochs/1.4.1/keymaps/x11-pc-us.map
+keyboard_type: mf
+floppy_bootsig_check: disabled=0
+
+
+Hope that helps!
+
+
+James Leone
+
+
+
+
+[1] Cron starts other programs at predefined intervals.
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,117 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: diff and VERY BIG files" -->
+<!-- FromName="'David Newall'" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="'Vladimir V. Bashkirtsev'" -->
+<!-- ToEmail="mega@konectanet.com.au" -->
+<!-- Date="Mon, 5 Feb 2001 20:32:29 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0102051113340.14779-100000@smart-panel.tellurian.com.au" -->
+<!-- Reference="002a01c08e80$b851caa0$7aba26cb@konectanet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: diff and VERY BIG files</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Vladimir V. Bashkirtsev &lt;<I><A HREF="mailto:mega@konectanet.com.au">mega@konectanet.com.au</A></I>&gt;
+  Date: Mon, 5 Feb 2001 20:32:29 +1030 (CST)
+</PRE>
+<H1>Re: diff and VERY BIG files</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; If I have same files which differs only by extra LF in the end diff
+&gt; tries to load them. So diff not working (or need special options)
+&gt; this way.
+
+I'm having a little difficulty understanding exactly what you mean.
+I think you are saying you have two files like the following:
+
+
+   FILE 1                 FILE 2
+   blah blah blah^J       blah blah blah^J
+   more blah blah^J       more blah blah^J
+   ...                    ...
+   another line^J         another line^J
+                          ^J
+
+These are identical except for an extra line-terminator at the end of
+FILE 2.
+
+On the other hand, perhaps you mean you have two files like this:
+
+   FILE 1                 FILE 2
+   blah blah blah^J       blah blah blah^J
+   ^J                     more blah blah^J
+   more blah blah^J       ...
+   ^J                     another line^J
+   ...
+   ^J
+   another line^J
+   ^J
+
+The first file is the same as the second, but with blank lines, ie
+"extra LF" inserted (after every line).
+
+In the first case the amount of memory needed should be small since the
+files are identical right up to the last byte.  An implementation might
+choose to buffer some part of each file, for example one line, or as much
+as it can, or somewhere in between.  The diff provided with RH7.0 buffers
+8k per file.  (In the first case the memory needed would be about 16K.)
+
+In the second case the two files are very different, and the memory needed
+depends on how diff resynchronises.  If it requires two matching lines
+(in each file) before they are considered to be resynchronised then both
+files must fit in memory.
+
+I suspect that you had two files that were like the second case, above.
+Those files were really very different.  There's nothing "only" about
+an extra LF "on the end" of every line.
+
+
+&gt;&gt; I still would like to know what you did in perl that worked in a case
+&gt;&gt; where diff didn't work.  What was the data?
+&gt;
+&gt; I doing the same thing as diff
+
+Are you really?  You seem to have some uncertainty about what diff does, and
+so I have trouble accepting that you are doing the same thing.  You probably
+meant that you are producing the same output.
+
+Did you the read the manual page and see the options relating to comparing
+large files with scattered small changes?  Did you try them?  What result
+from that?
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

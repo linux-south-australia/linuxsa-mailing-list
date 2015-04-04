@@ -1,0 +1,147 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: OOPS - I've lost my data - Help" -->
+<!-- FromName="Jake Hawkes" -->
+<!-- FromEmail="jake@eclectic.com.au" -->
+<!-- ToName="HAMILTON,John" -->
+<!-- ToEmail="john.hamilton@dewrsb.gov.au" -->
+<!-- Date="Tue, 21 Mar 2000 11:27:59 +1030" -->
+<!-- Id="38D6C917.7B87DB13@eclectic.com.au" -->
+<!-- Reference="200003210024.LAA04119@name-ext.deetya.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: OOPS - I've lost my data - Help</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A></I>&gt;
+  To  : HAMILTON,John &lt;<I><A HREF="mailto:john.hamilton@dewrsb.gov.au">john.hamilton@dewrsb.gov.au</A></I>&gt;
+  Date: Tue, 21 Mar 2000 11:27:59 +1030
+</PRE>
+<H1>Re: OOPS - I've lost my data - Help</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+"HAMILTON,John" wrote:
+&gt; In Winslows Explorer, both logical drives appear as D: and E:, but I cannot
+&gt; read anything from them, I get an error saying drive not accessible...
+&gt; Nothing I do will recover it.
+&gt; I've tried Partition Magic - no use, the partition I want comes up as
+&gt; unknown and I can't do diddly with it.
+&gt; I've tried Ranish Partition Manager - no use, both logical partitions give a
+&gt; 'boot record has invalid data' error (I think that's the message)
+&gt; If you've made it this far then maybe you might be able to suggest a fix for
+&gt; me...
+
+
+reboot into linux, and run fdisk from a command line, you get this:
+[<A HREF="mailto:root@hyper-ig">root@hyper-ig</A> build_unix]# fdisk /dev/hda
+
+Command (m for help): 
+
+enter &gt;p&lt;
+
+i get this:
+isk /dev/hda: 255 heads, 63 sectors, 524 cylinders
+Units = cylinders of 16065 * 512 bytes
+
+   Device Boot    Start       End    Blocks   Id  System
+/dev/hda1   *         1         7     56196   83  Linux
+/dev/hda2           262       523   2104515    5  Extended
+/dev/hda3             8       261   2040255   83  Linux
+/dev/hda5           262       523   2104483+  83  Linux
+
+so here, hda2 is a big partition, and hda5 is the logical one inside it.
+
+you may find that Caldera's installation has re-tagged your windows
+partitions, look in the system column.
+to change the system tag, at the prompt:
+Command (m for help): 
+
+type &gt;t&lt;, you get:
+Partition number (1-x): (where x is some number)
+enter it, I would say &gt;5&lt;, you then get
+Hex code (type L to list codes):
+enter &gt;L&lt;, you get:
+
+ 0  Empty           16  Hidden FAT16    61  SpeedStor       a6 
+OpenBSD        
+ 1  FAT12           17  Hidden HPFS/NTF 63  GNU HURD or Sys a7 
+NeXTSTEP       
+ 2  XENIX root      18  AST Windows swa 64  Novell Netware  b7  BSDI
+fs        
+ 3  XENIX usr       24  NEC DOS         65  Novell Netware  b8  BSDI
+swap      
+ 4  FAT16 &lt;32M      3c  PartitionMagic  70  DiskSecure Mult c1 
+DRDOS/sec (FAT-
+ 5  Extended        40  Venix 80286     75  PC/IX           c4 
+DRDOS/sec (FAT-
+ 6  FAT16           41  PPC PReP Boot   80  Old Minix       c6 
+DRDOS/sec (FAT-
+ 7  HPFS/NTFS       42  SFS             81  Minix / old Lin c7 
+Syrinx         
+ 8  AIX             4d  QNX4.x          82  Linux swap      db  CP/M /
+CTOS / .
+ 9  AIX bootable    4e  QNX4.x 2nd part 83  Linux           e1  DOS
+access     
+ a  OS/2 Boot Manag 4f  QNX4.x 3rd part 84  OS/2 hidden C:  e3  DOS
+R/O        
+ b  Win95 FAT32     50  OnTrack DM      85  Linux extended  e4 
+SpeedStor      
+ c  Win95 FAT32 (LB 51  OnTrack DM6 Aux 86  NTFS volume set eb  BeOS
+fs        
+ e  Win95 FAT16 (LB 52  CP/M            87  NTFS volume set f1 
+SpeedStor      
+ f  Win95 Ext'd (LB 53  OnTrack DM6 Aux 93  Amoeba          f4 
+SpeedStor      
+10  OPUS            54  OnTrackDM6      94  Amoeba BBT      f2  DOS
+secondary  
+11  Hidden FAT12    55  EZ-Drive        a0  IBM Thinkpad hi fe 
+LANstep        
+12  Compaq diagnost 56  Golden Bow      a5  BSD/386         ff 
+BBT            
+14  Hidden FAT16 &lt;3 5c  Priam Edisk    
+Hex code (type L to list codes): 
+enter b,c,e or f (i would guess you want b
+
+then at the prompt:
+Command (m for help): 
+enter &gt;w&lt; to write.
+
+reboot and see.
+
+
+--
+Jake Hawkes, B.Eng (CSE)
+
+"I'm only smart enough to know how stupid I am", Joe Strummer.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

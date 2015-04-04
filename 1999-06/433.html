@@ -1,0 +1,205 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Linux server in a small business LAN (was: Request for ...)" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@adelaide.edu.au" -->
+<!-- ToName="Mike Earnshaw" -->
+<!-- ToEmail="mearnshaw@bigpond.com" -->
+<!-- Date="Wed, 23 Jun 1999 10:41:52 +0000" -->
+<!-- Id="3770B9F0.DC96D339@adelaide.edu.au" -->
+<!-- Reference="000201bebd4e$0aaa8a40$ca99fea9@lancelot" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Linux server in a small business LAN (was: Request for ...)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@adelaide.edu.au">glen.turner@adelaide.edu.au</A></I>&gt;
+  To  : Mike Earnshaw &lt;<I><A HREF="mailto:mearnshaw@bigpond.com">mearnshaw@bigpond.com</A></I>&gt;
+  Date: Wed, 23 Jun 1999 10:41:52 +0000
+</PRE>
+<H1>Re: Linux server in a small business LAN (was: Request for ...)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Mike Earnshaw wrote:
+
+&gt; 1. Both business units should remain autonomous and will eventually have
+&gt; their own domain names through a shared ISDN link. Security is paramount.
+
+Security from each other?  Or from the net?
+
+Linux 2.2 with Rusty's IP chains is a neat solution if you have a
+policy that is "deny every except for the things I know about".
+It does allow denial of service attacks on the server, but
+with an ISDN link I wouldn't get too fussed.
+
+99% of Internet access is DNS, web and e-mail.  Since you have a tiny
+link, run a DNS forwarder (named) and web proxy (squid) on your
+server.  Both of these make solving the security problem simpler.
+
+You can get ETSI ISDN cards for Linux and synchronous serial cards
+(if you are using an ISDN terminal adapter such as the JTEC J1200).
+
+
+&gt; 2. Both business units want to be able to use some kind of group aware
+&gt; scheduling software, so each unit can see what the other is doing and book
+&gt; meetings etc.
+
+Netscape, Corel, Microsoft and Lotus.  All but Microsoft have been making
+noises about Linux support for their entire product range, but I'm not clear
+what is on the ground yet.
+
+It's worth a trawl through the web sites.  For an SME, a web-based
+Perl-scripted program wouldn't have any performance issues and
+could be a lot cheaper.  It's probably out there...
+
+If you do have to spend money, then read "First Things First" or s similar
+time-management book.  I've found the Netscape product to be useful
+for booking shared resources (such as cars and rooms) but useless (and even
+counterproductive) for time management.
+
+&gt; 3. Internal and external email is mandatory - but two domain names are
+&gt; required.
+
+sendmail and cyrus IMAP looks the best combo for e-mail.
+
+Sendmail will present multiple domain names with no problems.
+
+IMAP allows you to store all e-mail on the server and have
+people access it through a good range of e-mail clients:
+Communicator, Outlook, etc.
+
+
+Since you are establishing a LAN, also set up a standard
+PC configuration.  Store data files on the server -- the
+Samba package lets UNIX servers appear as Windows file and
+print servers.  Just setting the "documents" directory
+in MS Office to point to the server is a good start.
+Storing data file on the server doesn't have a huge performance
+impact, but does ensure that people's work is backed-up.
+
+Keep a backup tape offsite.  The simplest way to do this is
+a buddy arrangement with another sysadm. Every week you exchange
+locked money boxes that contain last week's backup tapes and put
+them into your safe.  Some banks offer safety deposit boxes
+that have no access fee.
+
+Do use Samba for printing.  If you are shopping for printers,
+buy a PostScript-capable laser printer with a UTP ethernet
+interface and support for the UNIX LPD protocol.  Try and
+get a duplex (double-sided) printer that isn't too fussy
+about paper gloss and quality.  Start by looking at the
+HP LaserJet series.  Put the recycling bin next to the
+printer.
+
+Move any modems onto the server.  This usually fixes a
+big security hole.
+
+Use the web to share company-wide documentation such as
+leave forms, logos, etc.  The Apache server is a good web
+server.  For each service, put a small "how to" document
+on the web with screen dumps specific to your company.
+Call these "procedures" and you get ISO9002 points :-)
+
+Both Samba and Apache can also be used to share the server
+CD-ROM drive.  I've found this to be very useful when
+companies give out CD-ROMs at presentations, as you can
+put it on the server for the rest of the week rather
+than have it circulate through in-trays.
+
+
+As for performance, you are best off with a single quick
+CPU, lots of memory (say 0.25GB) and multiple hard disks
+to seperate out disk access patterns (/home, /var, swap
+on different disks).  Backup is best done with a seperate
+SCSI card and a SCSI tape drive.  Ultra-SCSI2 drives are
+very nice, but very expensive.  Looking for a motherboard
+with multiple EIDE controllers is usually more price-effective.
+There should be free drive bays and memory slots.
+
+
+For documentation, buy the O'Reilly "sendmail" and
+"bind and dns" books.  One of the LinuxSA members
+is a co-author of "Teach yourself Samba in 24 hours"
+which is good.
+
+
+As for networking.  Use category 5 UTP and ethernet.  Use a good
+but cheap 10/100 switch like a HP or Intel.  Depending
+on pricing, if you can't get 10/100 on every port, then
+get one of the switches that have 24 10baseT ports and
+two 100baseTX ports and plug the server into one of the
+100 ports.  Intel and SMC make good cards.  3Com do too,
+but avoid their early cards.  Special "server" cards
+don't work under Linux.  Try an use the same model card
+in every PC.
+
+Set all ports on all devices to "autonegotiate" speed and
+duplex.  Allocate IP addresses out of 10.10.0.0, and assign
+them to PCs using dhcpd on the server.  Your average PC
+will then work `out-of-the-box', which makes life simpler
+for notebook users.
+
+
+None of the above doesn't mean that there aren't other
+ways.  I've just seen the above done successfully with
+the least number of issues.  For example, Linux 2.2
+does do SMP, but it's newish and has occassional issues.
+Similarly with alternatives to sendmail.
+
+
+All the above is a surprising amount of work.  But what you
+are really doing if shifting work from the PC users to
+the system administrator, and thus gaining economies of scale.
+There are occassionally cultural issues with attempting to
+gain the economies of scale -- not everyone likes being told
+that their PC will be set up in this particular way, or that
+we aren't going to use their particularly favoured software
+package.  When merging two organisations these issues are more
+sensitive.
+
+Finally, try and make computing (and work too!) a fun experience.
+To my mind, that is really the core of the Microsoft/Linux
+cultural divide.
+
+Best of luck,
+glen
+
+[PS: Odd subject line.  I've set it to something more obvious.]
+
+-- 
+ Glen Turner                               Network Specialist
+ Tel: (08) 8303 3936          Information Technology Services
+ Fax: (08) 8303 4400         The University of Adelaide  5005
+ Email: <A HREF="mailto:glen.turner@adelaide.edu.au">glen.turner@adelaide.edu.au</A>           South Australia
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

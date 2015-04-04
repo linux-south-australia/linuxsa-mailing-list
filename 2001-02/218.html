@@ -1,0 +1,111 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RHL NTP procedure (was: Time Server Problems)" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 08 Feb 2001 11:01:27 +1030" -->
+<!-- Id="3A81E8DF.F8FE8602@aarnet.edu.au" -->
+<!-- Reference="HKEMJGGDNENEDGGDCJBBCEGACCAA.richardrussell@mail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RHL NTP procedure (was: Time Server Problems)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 08 Feb 2001 11:01:27 +1030
+</PRE>
+<H1>RHL NTP procedure (was: Time Server Problems)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Since the discussion seems to be going nowhere...
+
+
+Set timezone
+
+  Set timezone pointer
+    cd /etc
+    ln -s ../usr/share/zoneinfo/Australia/Adelaide localtime
+
+  Edit file /etc/sysconfig/clock to say
+    ZONE="Australia/Adelaide"
+    UTC=false
+    ARC=false
+
+Configure NTP
+
+  Set NTP configuration in /etc/ntp.conf.  I use 203.21.37.18, you
+  should use something else.
+    server 203.21.37.18
+    restrict 203.21.37.18 noquery
+    restrict 127.0.0.1
+    restrict default ignore
+    driftfile /etc/ntp/drift
+    broadcastdelay  0.008
+    authenticate no
+
+  Configure a step clock to set time on system start
+    Put IP address into /etc/ntp/step-tickers:
+      203.21.37.18
+
+  Start NTP on system boot
+    chkconfig ntpd on
+
+  Start NTP
+    /etc/init.d/ntpd start
+
+The time will now sync (becuase /etc/ntp/step-tickers causes
+  ntpdate -s -b -p 8 -u 203.21.37.18
+to run during the ntpd init script.
+
+Wait until sync message in log (less than a minute, because you've
+already
+taken the big time step) then write the time to the hardware clock
+  hwclock  --systohc
+
+Recent versions of the Red Hat init scripts run
+  hwclock --systohc
+when halting the machine (see /etc/init.d/halt).
+  
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

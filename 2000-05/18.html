@@ -1,0 +1,149 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Writing to input on a tty port" -->
+<!-- FromName="Chor Goh" -->
+<!-- FromEmail="cgoh@mmal.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 01 May 2000 13:56:25 +0930" -->
+<!-- Id="0005019571.AA957155219@mmalhq01.mmal.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Writing to input on a tty port</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Chor Goh &lt;<I><A HREF="mailto:cgoh@mmal.com.au">cgoh@mmal.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 01 May 2000 13:56:25 +0930
+</PRE>
+<H1>Writing to input on a tty port</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+  I have an application A listening on port P for information.  Eventually the 
+port will be serviced by a modem, so I don't have the option of using sockets.
+If port P is a terminal device and information is typed in at the keyboard, it
+works fine.  However, if information is sent from a remote source R to port P,
+application A fails to read it.
+  I suspect that because the input and output queues on the terminal device are 
+separate entities, R is sending to P's output queue and A is reading from P's
+input queue -- and that is only attached to the keyboard.  What I want is to
+have the remote source R send information to the input queue of port P, not its
+output queue.
+  Currently, I am using a very simple test program (no exception handling) that 
+reads from a source port and writes to a destination port, both passed in at the
+command line:
+
+#include &lt;fcntl.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;termios.h&gt;
+#include &lt;unistd.h&gt;
+#define MAX_MESG_SIZE 256
+
+char *ReadTTY(FILE *fp);
+void WriteTTY(FILE *fp, char *mesg);
+
+int main(int argc, char *argv[])
+{
+  int            destfd, sourcefd, continue;
+  FILE           *dest, *source;
+  char           *mesg;
+  fd_set         fdset;
+  struct termios oldterm, newterm;
+
+  sourcefd = open(argv[1], O_NSHARE|O_RDWR|O_SYNC|O_NOCTTY);
+  destfd   = open(argv[2], O_NSHARE|O_RDWR|O_SYNC|O_NOCTTY);
+  source   = fdopen(sourcefd, "r");
+  dest     = fdopen(destfd, "w");
+  continue = 1;
+
+  tcgetattr(sourcefd, &oldterm);
+  newterm = oldterm;
+  newterm.c_cc[VMIN]  = 1;
+  newterm.c_cc[VTIME] = 0;
+  tcsetattr(sourcefd, TCSANOW, &newterm);
+
+  FD_ZERO(&fdset);
+  FD_SET(sourcefd, &fdset);
+
+  while (continue && select(sourcefd+1, &fdset, NULL, NULL, NULL) != -1)
+  {
+     /* now read characters until 'x' is typed alone on a line */
+     if (strcmp((mesg = ReadTTY(source)), "x") != 0)
+        WriteTTY(destn, mesg);
+     else
+        continue = 0;
+  }
+
+  tcsetattr(sourcefd, TCSANOW, &oldterm);
+  fclose(source);
+  fclose(dest);
+  close(sourcefd);
+  close(destfd);
+
+  return 0;
+}
+
+char *ReadTTY(FILE *fp)
+{
+  static char buf[MAX_MESG_SIZE+1];
+  char        c;
+  int         i;
+
+  memset(buf, '\0', MAX_MESG_SIZE+1);
+  i = 0;
+
+  while ((c = fgetc(fp)) != '\r')
+     buf[i++] = c;
+
+  buf[i] = '\0';
+  return buf;
+}
+
+void WriteTTY(FILE *fp, char *mesg)
+{
+  fputs(mesg, fp);
+  return;
+}
+
+  I am using this test program to listen to port P and write to output O, but 
+whatever I send to P using echo or cat doesn't appear at O.  I have further
+tested chaining several instances of this program together, having it listen to
+R and write to P, listen at P and write to O.  Whatever is typed at R appears at
+P but does not appear at O.
+  I have no experience in programming with ports, so I might be looking for the 
+wrong solution.  I would appreciate any help!
+
+<A HREF="18_cgoh.vcf">cgoh.vcf</A>
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,159 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Lack of SAMBA knowlegde" -->
+<!-- FromName="Nick Morrison" -->
+<!-- FromEmail="nickelodeon@heaps.fully.cx" -->
+<!-- ToName="=?iso-8859-1?Q?Jo_Christer_=D8iongen?= <joco@stavanger.rorhandel.no>, "South Australian Linux User Group (E-post)" -->
+<!-- ToEmail="joco@stavanger.rorhandel.no" -->
+<!-- Date="Thu, 23 Sep 1999 03:25:01 +0930" -->
+<!-- Id="NDBBINEGKLJLHAIJDMEGMEHMCBAA.nickelodeon@heaps.fully.cx" -->
+<!-- Reference="01BF050D.0FC27860.joco@stavanger.rorhandel.no" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Lack of SAMBA knowlegde</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Nick Morrison &lt;<I><A HREF="mailto:nickelodeon@heaps.fully.cx">nickelodeon@heaps.fully.cx</A></I>&gt;
+  To  : =?iso-8859-1?Q?Jo_Christer_=D8iongen?= &lt;joco@stavanger.rorhandel.no&gt;, "South Australian Linux User Group (E-post) &lt;<I><A HREF="mailto:joco@stavanger.rorhandel.no">joco@stavanger.rorhandel.no</A></I>&gt;
+  Date: Thu, 23 Sep 1999 03:25:01 +0930
+</PRE>
+<H1>RE: Lack of SAMBA knowlegde</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi..  [snips everywhere]
+
+&gt; [<A HREF="mailto:root@linux">root@linux</A> /etc]# smbpasswd -j sr00
+&gt;
+&gt; Giving me this response:
+&gt;
+&gt; Unknown parameter encountered: "domain controller"
+&gt; Ignoring unknown parameter "domain controller"
+&gt; cli_net_auth2: Error NT_STATUS_NO_TRUST_SAM_ACCOUNT
+
+can be resolved by "adding" the linux machine to the windows NT domain.
+
+Find the PDC (or BDC), open the server administrator ..  or whatever it's
+called..  and do it.  You may need to remove it from the list first, then
+re-add it..   I know I did..  (I'm sorry..  I've had this exact problem and
+hacked my way through it, but my NT experience is a bit limited :/ ).  Once
+you've done this, you should be able to join the NT domain using
+"smbpasswd -j sr00".
+
+After that's done, it all should work.
+
+Which version of samba are you using?
+
+And the "domain controller" parameter in /etc/smb.conf didn't work for me
+either..  I took it out in the end and it worked without.  You will
+definitely need the "security=domain" parameter tho.
+
+Good luck..  and let us know how you go..
+
+Oh - a very (very) useful parameter in /etc/smb.conf is "add user script" -
+look it up in the man page if you haven't seen it yet.
+__
+Nick Morrison
+<A HREF="mailto:nickelodeon@heaps.fully.cx">nickelodeon@heaps.fully.cx</A>
+<A HREF="http://www.fully.cx/">http://www.fully.cx/</A>
+
+
+&gt; Hello!
+&gt;
+&gt; I've been trying for the last couple of weeks trying to get a Linux box
+&gt; shearing files'n'drives with our NT environment. The thing is that I want
+&gt; to use the Linux box (Redhat 6.0) as an intranet server. I've managed to
+&gt; put Apache on it to act as the web server bur i still need to be able to
+&gt; transfer files on to it from various NTworkstation and NT terminal server
+&gt; clients (Which are all 4.0 with SP4 or higher).
+&gt;
+&gt; So I looked in SAMBA's direction and started working. I downloaded SAMBA
+&gt; 2.0.5a from the Net. I followed the install instructions, refered to the
+&gt; SMB-HOWTO and got it sort of working. My graphical desktop enviroment is
+&gt; GNOME. GNOME has a Samba browser. This browser shows the PDC and the
+&gt; different BDC's and drives that are shared from them. But if I
+&gt; try to enter
+&gt; into these drives the SAMBA browser hangs and I have to kill it.
+&gt;
+&gt; Trying to conect to the Linux from a NT box via Network
+&gt; Neighborhood I can
+&gt; see the printers folder (yes I'm able to print out on the network printer
+&gt; via the PDC) and my own folder in the home directory. But trying
+&gt; to access
+&gt; my folder I get an error message: \\Linux\Jo is not accessible.
+&gt; The network
+&gt; name can not be found.
+&gt;
+&gt; &gt;From the console on the Linux I've tried to do:
+&gt;
+&gt; [<A HREF="mailto:root@linux">root@linux</A> /etc]# smbpasswd -j sr00
+&gt;
+&gt; Giving me this response:
+&gt;
+&gt; Unknown parameter encountered: "domain controller"
+&gt; Ignoring unknown parameter "domain controller"
+&gt; cli_net_auth2: Error NT_STATUS_NO_TRUST_SAM_ACCOUNT
+&gt; cli_nt_setup_creds: auth2 challenge failed
+&gt; modify_trust_password: unable to setup the PDC credentials to
+&gt; machine SR00.
+&gt; Error was : NT_STATUS_NO_TRUST_SAM_ACCOUNT.
+&gt; 1999/09/22 13:55:11 : change_trust_account_password: Failed to change
+&gt; password for domain SR00.
+&gt; Unable to join domain SR00.
+&gt;
+&gt; I also tried:
+&gt;
+&gt; [<A HREF="mailto:root@linux">root@linux</A> /etc]# /usr/local/samba/bin/smbclient -L sr00
+&gt;
+&gt; Ending up with
+&gt;
+&gt; Can't find include file /etc/smb.conf
+&gt; Unknown parameter encountered: "domain controller"
+&gt; Ignoring unknown parameter "domain controller"
+&gt; Added interface ip=192.168.64.223 bcast=192.168.64.255 nmask=255.255.255.0
+&gt; Got a positive name query response from 192.168.64.254 ( 192.168.64.254 )
+&gt; Password:
+&gt; session setup failed: ERRDOS - ERRnoaccess (Access denied.)
+&gt;
+&gt; So what have I (not) done? I should also mayby mention that from Server
+&gt; Manager in NT the Linux box shows as a Windows NT 4.2 Server...
+&gt;
+&gt; TIA
+&gt;
+&gt; Jo
+&gt;
+&gt; --
+&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

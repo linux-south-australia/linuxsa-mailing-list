@@ -1,0 +1,472 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Some Proposals for a Linux of The Future (tm) :)" -->
+<!-- FromName="'Damien Uern'" -->
+<!-- FromEmail="carrigan_2606@optusnet.com.au" -->
+<!-- ToName="'Richard Russell'," -->
+<!-- ToEmail="richard@yellowgoanna.com,linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 28 Jun 2003 18:30:13 +0930" -->
+<!-- Id="200306281830.14042.carrigan_2606@optusnet.com.au" -->
+<!-- Reference="000401c33d1e$fc306890$020120ac@skink" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Some Proposals for a Linux of The Future (tm) :)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Damien Uern &lt;<I><A HREF="mailto:carrigan_2606@optusnet.com.au">carrigan_2606@optusnet.com.au</A></I>&gt;
+  To  : Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 28 Jun 2003 18:30:13 +0930
+</PRE>
+<H1>Re: Some Proposals for a Linux of The Future (tm) :)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Thanks for your comments. I have skimmed through the most recent LSB 
+specification (I don't have download access so I can't do any research atm), 
+and it doesn't seem to specify all that much, perhaps I should look at it 
+again. If they are indeed packaging software for an LSB reference 
+implementation, then this is basically *exactly* what I want. I would love if 
+you could go to the website of a project and download "app-3.2-lsb.i586.rpm" 
+and have it *just work* without farting around with compatibility problems.
+
+The problem with rpm is that dependency issues can be a nightmare (especialy 
+for the newbie). Even with urpmi on Mandrake I still have problems from 
+braindead packages. For example, I installed juk from Textstar's repository, 
+however it wanted to download like 130MB of packages. He had made this 
+package depend on *his* KDE packages, even though I had KDE 3.1 installed and 
+met the requirements of the program. I installed with rpm --nodeps, and it 
+worked fine.
+
+If there was an LSB package of juk, I wouldn't want it to depend on LSB's 
+version of KDE, I would want it to depend on the version of KDE that I have 
+installed, be it installed from a Mandrake package or from some other source. 
+The root of the problem here is that rpm depends on *packages* rather than 
+files. The dependency resolution should see that I have /usr/lib/libqt-3.1.0 
+and say "well that's what I want", and install without complaining.
+
+But what to do if libqt-3.1.0 is missing? It's a 2MB library, do we want the 
+package manager to want to download a 50MB KDE RPM in order to install it? 
+There needs to be more fine-grained dependency resolution. Maybe instead of 
+depending on "kdecore-3.1.2-mdk.i586.rpm", it depends on "kdecore &gt;= 3.1" and 
+whatever package provides that gets installed.
+
+All of these issues and more are goals of the "autopackage" project, 
+www.autopackage.org, and so I am hopeful that the future of installing 
+GNU/Linux software will be much brighter.
+
+--
+
+Anyway, as for my first idea (new etc layout/config stuff), this is the most 
+important IMO. You bring up some good points about the implementation 
+problems of such a standard, and indeed I was thinking of these problems last 
+night.
+
+I think it would be extremely difficult, if not impossible to implement a 
+configuration file syntax that meets my stated goals below (i.e. human 
+readable *and* able to define a GUI). I didn't want to have xml configuration 
+files, because I believe they are very difficult to read. For example:
+
+What is easier to read, this:
+
+      &lt;defaults&gt;
+        &lt;DefaultMenuLanguage&gt;en&lt;/DefaultMenuLanguage&gt;
+        &lt;DefaultAudioLanguage&gt;en&lt;/DefaultAudioLanguage&gt;
+        &lt;DefaultSubtitleLanguage&gt;en&lt;/DefaultSubtitleLanguage&gt;
+        &lt;ParentalCountry&gt;US&lt;/ParentalCountry&gt;
+        &lt;ParentalLevel&gt;15&lt;/ParentalLevel&gt;
+        &lt;PlayerRegion&gt;1&lt;/PlayerRegion&gt;
+      &lt;/defaults&gt;
+
+or this?
+
+[Defaults]
+DefaultMenuLanguage=en
+DefaultAudioLangauge=en
+DefaultSubtitleLanguage=en
+ParentalCountry=US
+ParentalLevel=15
+PlayerRegion=1
+
+
+I think the only solution would be to, as you suggested, have a GUI 
+description file, and have a tool that generates the config file from that. 
+But what's the problem with this? Changes to the config file are lost and one 
+of my design goals are violated (allowing the user to modify the config file 
+without the GUI app treading all over it) - similar to the Linuxconf tool you 
+mentioned.
+
+I was originally thinking that the config file syntax would allow for a lot of 
+interpretation by the GUI program, but I could imagine some rather horrible 
+looking GUI's coming from that. I also wanted the various configuration 
+variables to have types so that the GUI could complain if the user tried to 
+set a variable to an erroneous value (e.g an Integer type being set to a 
+string).
+
+In order to meet design goal of allowing a user to edit the configuration file 
+by hand, prehaps we should borrow some ideas from C++ and OO programming.
+
+What if the layout file describes only the layout and the modifyable variables 
+(i.e. the header file, or class description), and the configuration file 
+contains the values for those variables (the "implementation"). The 
+configuration file should have a syntax such that it can be parsed by a 
+program and modified variables can be updated easily.
+
+The layout file could also borrow some other OO terms, such as "public" and 
+"private" variables, i.e. ones that are for the programs internal use, and 
+others that are meant to be modifyable by the user. Only public variables 
+would be displayed by the GUI.
+
+All possible configuration variables accepted by the program should be 
+described in the layout file. A whole class of variables should be able to be 
+made "private" so that the GUI doesn't display them, but are available to the 
+advanced user should he/she want them. This allows the graphical user 
+interface to be simple and readable without being overloaded with options. It 
+also allows the configuration file to contain data useful for the program 
+internally, but not the user.
+
+Anyway, this will need to be thought of in much more detail...
+
+Another key feature is the fact that the config files can be parsed by a 
+library, and so that is less effort for app developers. Not only do I want 
+the library to parse files, but I want it to take care of opening them. That 
+way, say "samba" doesn't care where the config file is, it asks the library 
+to find and open it - hence the /etc directory can be organised anyway the 
+distributor sees fit, it wont break applications (and wont require 1000 
+symlinks everywhere). I imagine config file lookup would be similar to how 
+libraries are looked up by the linker (i.e. probably maintain a cache, and 
+have a search-path setup. The app using the library could also give libetc 
+hints, such as saying that it is a "service", and so libetc searches the 
+"service" directory first).
+
+*phew*, okay I'm going to go think about what this syntax should look like, 
+starting with the XML produced by QTDesigner. Thanks for the feedback!
+
+Cheers,
+
+Damien
+
+P.S.: The /dev/pts/gui thing is meant for desktop/home user systems, stop 
+thinking like a sysadmin! :) At home, users are their own admins and need 
+hand holding occasionally (and typing "tail -100 /var/log/messages | less" is 
+too much for them).
+
+APPENDIX: 
+
+As for your comment saying that people would say the current system isn't that 
+complex, I'm going by what my /etc directory looks like. Here I see that 
+postfix has it's own directory, but proftpd doesnt, samba has it's own 
+directory, but tmdns doesnt, etc... In the /etc root directory we see config 
+files for things from printers to timezone to mail to boot configuration. 
+None of this directory has any sort of organisation except for the rc.d 
+init.d stuff...
+
+I believe it is broken.
+
+On Sat, 28 Jun 2003 12:12 pm, Richard Russell wrote:
+&gt; &gt; Hey,
+&gt; &gt;
+&gt; &gt; I've been thinking about the various deficiencies in most GNU/Linux
+&gt; &gt; distributions and I would like to detail some of my ideas for
+&gt; &gt; improvement
+&gt; &gt; here for feedback. These are just notes and are by no means
+&gt; &gt; comprehensive, I
+&gt; &gt; plan on writing more detailed papers on some possible
+&gt; &gt; designs/code etc..
+&gt;
+&gt; Interesting ideas...
+&gt;
+&gt; &gt; Anyway here they are:
+&gt; &gt;
+&gt; &gt; 1) Standardised /etc filesystem
+&gt; &gt;
+&gt; &gt; - sane filetree:
+&gt;
+&gt; If your main goal with this point is to make finding files easier, you
+&gt; could do that yourself quite easily, whilst still maintaining compatibility
+&gt; with present Unices -- simply make your tree a set of symlinks to the right
+&gt; files...
+&gt;
+&gt; eg:
+&gt;
+&gt; /etc/system/services/samba/smb.conf -&gt; /etc/samba/smb.conf
+&gt;
+&gt; and so on...
+&gt;
+&gt; However, there will always be some that defy categorisation ... should
+&gt; XDMCP go under services or x11? both? Also, many would claim that the
+&gt; present system isn't particularly complex, and your idea would be adding
+&gt; unneccessary layers of indirection, making it less convenient...
+&gt;
+&gt; &lt;snip&gt;
+&gt;
+&gt; &gt; -Standardised configuration file syntax with the following
+&gt; &gt; design goals:
+&gt;
+&gt; I see only one way that this is possible, and that is to design your new
+&gt; config files with some sort of program that generates the old format from
+&gt; them. ie your XML sendmail config file gets parsed, and a normal
+&gt; sendmail.cf gets generated (perhaps via a sendmail.mc). You (or anyone)
+&gt; will never manage to change the formats that each program uses. It's too
+&gt; complex, there are too many political issues, and not enough advantage.
+&gt;
+&gt; &gt; - Easily human readable and modifyable (so people can edit
+&gt; &gt; with vi if need be)
+&gt; &gt; - Syntax doubles as simple GUI layout guide
+&gt; &gt;     - entire /etc directory tree should be parseable by a GUI program
+&gt; &gt;       so that *all* configuration options for the *entire system* can
+&gt; &gt;       be modified/viewed via a GUI
+&gt;
+&gt; Danger! if people edit with a text editor, then this GUI layout may end up
+&gt; getting awfully botched.
+&gt;
+&gt; &gt;     - A GUI program need not know about say "sendmail"
+&gt; &gt; specifically in  order
+&gt; &gt; to provide a GUI to the user.
+&gt;
+&gt; I see where you're going with this, but what about when there is a feature
+&gt; that exists, but isn't mentioned in the config file? How do you turn it on
+&gt; in the GUI?
+&gt;
+&gt; &gt; - A library (libetc) provided that can parse the /etc
+&gt; &gt; directory tree and the
+&gt; &gt; files within it. This library should be cross platform (e.g. so BSD
+&gt; &gt;   can adopt if it wishes - this includes the structure of the
+&gt; &gt; /etc tree)
+&gt;
+&gt; BSD (or at least FreeBSD) is quite different -- it has /etc and
+&gt; /usr/local/etc for different types of program (base OS stuff and ports) ...
+&gt; It also has a completely different init script system... I doubt making it
+&gt; cross platform will be easy (and I doubt the BSD folk would be interested
+&gt; -- they tend to err on conservatism)
+&gt;
+&gt; &gt; ** See Appendix for a glimpse at the various mish-mash of
+&gt; &gt; configuration styles
+&gt; &gt; and  file locations currently found under /etc
+&gt; &gt;
+&gt; &gt; 2) Unified reference distribution that augments the LSB.
+&gt;
+&gt; This may not be in the best commercial interests of companies like RedHat,
+&gt; where differentiation is essential... However, that said, I don't really
+&gt; see where this usefully differs from the goals of the LSB: "The goal of the
+&gt; LSB is to develop and promote a set of standards that will increase
+&gt; compatability among Linux distributions and enable software applications to
+&gt; run on any compliant system..."
+&gt;
+&gt; &gt; - Not a distribution in the common sense, but a specification for a
+&gt; &gt; distribution.
+&gt;
+&gt; I thought this was basically what the LSB is intended to be...
+&gt;
+&gt; Also, check out <A HREF="http://www.linuxbase.org/impl/">http://www.linuxbase.org/impl/</A> -- it's the "reference
+&gt; implementation", containing everything that is minimal for a LSB-compliant
+&gt; Linux...
+&gt;
+&gt; &gt; - The specification complies with the LSB, but fills in the blanks.
+&gt; &gt;      - This may include: library versions, compiler version,
+&gt; &gt; compile flags
+&gt; &gt;        used, etc
+&gt;
+&gt; Why? Shouldn't this be something for distributors to differentiate their
+&gt; distributions with?
+&gt;
+&gt; &gt; - A repository of packages packaged in a distribution
+&gt; &gt; independent format (e.g.
+&gt; &gt; something  like "autopackage"). These packages should be able
+&gt; &gt; to be installed
+&gt; &gt; painlessly on  "Official Reference Distribution" compliant system.
+&gt;
+&gt; I'm pretty sure LSB is aiming at something like this sort of
+&gt; compatibiltiy...
+&gt;
+&gt; Hmmmm: <A HREF="http://www.linuxbase.org/spec/packaging/lcd/faq/index.html">http://www.linuxbase.org/spec/packaging/lcd/faq/index.html</A>
+&gt;
+&gt; Seems they've decided on a version of RPM, but intend to make it
+&gt; distro-independant...
+&gt;
+&gt; &gt; - "Official Reference Distribution" compliance tested with
+&gt; &gt; software. Software
+&gt; &gt; for this testing  is free and licensed under the GNU GPL.
+&gt;
+&gt; See the reference implementation above...
+&gt;
+&gt; &gt; - Distribution companies can display a logo saying they are
+&gt; &gt; compatibile with
+&gt; &gt; the reference distro  simply by passing the software tests.
+&gt; &gt; No fees are
+&gt; &gt; charged (it is community supported after all).
+&gt;
+&gt; I think LSB intends to do this...
+&gt;
+&gt; &gt; - Documentation repository.
+&gt; &gt;   - This includes:
+&gt; &gt;       - HOWTO's for best programming practices for developing
+&gt; &gt; and deploying
+&gt; &gt;         software on a GNU/Linux system  (e.g. where to store data,
+&gt; &gt;         configuration data, command line options syntax, user
+&gt; &gt; interface guide,
+&gt; &gt;         when to use libraries, packaging, binary
+&gt; &gt; compatibility issues, etc).
+&gt; &gt;       - any other relevant documentation.
+&gt;
+&gt; I thought we had that, in a somewhat less formal form -- www.tldp.org
+&gt;
+&gt; &gt; The goal of this is to provide a consistent and unified
+&gt; &gt; standard for deploying
+&gt; &gt; software on GNU/Linux system without worrying about binary
+&gt; &gt; incompatibility
+&gt; &gt; issues and/or inconsistencies in the filesystem layout. It
+&gt;
+&gt; OK, that is covered by the LSB, I'm quite confident.
+&gt;
+&gt; &gt; also provides
+&gt; &gt; guides to programmers so that hopefully all programs on a
+&gt; &gt; GNU/Linux system
+&gt; &gt; behave in a predictable and consistent manner. Programmers
+&gt; &gt; who's programs
+&gt; &gt; pass the various guideline tests can display an icon on the
+&gt; &gt; webpage for their
+&gt;
+&gt; This is a little different, and I'd be confident that it is pretty much
+&gt; impossible to do. I assume you're talking about something like Apple's
+&gt; Human Interface Guidelines
+&gt; (<A HREF="http://developer.apple.com/documentation/UserExperience/Conceptual/AquaHIG">http://developer.apple.com/documentation/UserExperience/Conceptual/AquaHIG</A>
+&gt;u idelines/index.html)? Religious issues will stop this from ever occurring.
+&gt; Open Source type people appreciate choice, and will dislike having the
+&gt; choices made for them. This isn't to say it wouldn't be a good idea, just
+&gt; that it's impossible :)
+&gt;
+&gt; It's also difficult (and therefore expensive) to test for this kind of
+&gt; thing...
+&gt;
+&gt; That said, I'm pretty sure both KDE and GNOME have their own guidelines...
+&gt;
+&gt; &gt; project. All applications packaged for the "Official
+&gt; &gt; Reference Distribution"
+&gt; &gt; comply with all defined standards.
+&gt; &gt;
+&gt; &gt; 3) Protocol for the underlying system to communicate with the GUI
+&gt;
+&gt; I'm not sure I understand this. Isn't this what X is supposed to be? Hmm...
+&gt; Ah, it seems you're looking for a way to send messages to the user, as
+&gt; opposed to programatically communicating with the GUI... right?
+&gt;
+&gt; &gt; - A device in the /dev filesystem should be available to
+&gt; &gt; facilitate such
+&gt; &gt; communication. I nominate "/dev/pts/gui".
+&gt; &gt; - A process can gain exclusive read access to this file. Text
+&gt; &gt; piped into this
+&gt; &gt; file is of a certain syntax so that it can be parsed and the desktop
+&gt; &gt; environment can provide the user with a suitable notice (such
+&gt; &gt; as a flashing
+&gt; &gt; icon in the system tray, or messagebox).
+&gt;
+&gt; What if there's more than one GUI? Consider boxes that have Xterminals
+&gt; running off them...
+&gt;
+&gt; &gt; - /dev/pts/gui should be owned by the controlling process
+&gt; &gt; (have same uid/gid
+&gt; &gt; as the controlling process). If controlling process lacks sufficient
+&gt; &gt; permissions to be notified of a message, the write to
+&gt; &gt; /dev/pts/gui is denied.
+&gt;
+&gt; The "controlling process" is the GUI itself (or some program within it),
+&gt; right? So if I log in to GNOME, I'd expect there would be some applet that
+&gt; would be reading from this device...
+&gt;
+&gt; &gt; - If there is no controlling process to /dev/pts/gui, the
+&gt; &gt; kernel buffers
+&gt; &gt; messages until there is a controlling process  and then
+&gt; &gt; passes the messages
+&gt; &gt; to it.
+&gt; &gt;
+&gt; &gt; The purpose of this is to provide the user with notification
+&gt; &gt; of certain things
+&gt; &gt; the underlying system is doing that they may need to know about. Such
+&gt; &gt; notifications include hardware detection changes at bootup,
+&gt; &gt; hotplug changes,
+&gt; &gt; system shutdown, etc...
+&gt;
+&gt; I would consider that half the time, users shouldn't want to know -- only
+&gt; the sysadmin wants to know. Email is a good form of communicating this...
+&gt;
+&gt; &gt; APPENDIX:
+&gt; &gt;
+&gt; &gt; The following are small snippets from various configuration
+&gt; &gt; files in my /etc
+&gt; &gt; directory (it details the various syntaxes currently in use):
+&gt;
+&gt; It certainly would appear that all these files could be sensibly expressed
+&gt; in a common format (say XML), and converted to the present formats by some
+&gt; process (say a make command -- but then, shouldn't Makefiles also be in
+&gt; XML... perhaps ant would be better)...
+&gt;
+&gt; However, you would lose quite a lot in doing so. Things like xf86config,
+&gt; apache modules that configure themselves, existing configs, SWAT, and so
+&gt; on. That said, I still think there's something in this, though I don't
+&gt; think it's practical...
+&gt;
+&gt; I would think that if you wanted to do this, you'd be best off taking a
+&gt; look at FreeBSD's config system. They use /etc/rc.conf and
+&gt; /etc/defaults/rc.conf for all the basic config. They are sourced by the rc
+&gt; script prior to execution, and set up a whole lot of variables, controlling
+&gt; whether certain daemons start, and what options to give them.
+&gt;
+&gt; /etc/defaults/rc.conf has all the default settings, and many comments
+&gt; explaining the meaning of everything. It is not intended to be edited.
+&gt;
+&gt; /etc/rc.conf has all the user-controlled settings.
+&gt;
+&gt; Whatever tool you had would need to parse the default file, get comments
+&gt; and defaults, parse the user-controlled file, get the current settings, and
+&gt; write to the user-controlled file. It would then need to generate the real
+&gt; config file from the defaults and user settings. This reminds me of
+&gt; something else...
+&gt;
+&gt; Anyone remember Linuxconf? It was supposed to do this, wasn't it? The most
+&gt; frustrating thing that I recall about that (apart from the bugs) was the
+&gt; way it would rewrite your config files every time you booted or changed
+&gt; anything. You were restricted to making only the configuration changes that
+&gt; it knew how to make, and you were restricted to making them through it, and
+&gt; not editing the config files you know and love. As far as I can tell, it
+&gt; seems to have vanished, and I have not missed it.
+&gt;
+&gt; Now that I've got my mental momentum, this also makes me think of webmin
+&gt; (and cobalt and Qbalt, for that matter)... I wonder how closely they
+&gt; approach this ideal of having a generic tool?
+&gt;
+&gt; Intriguing...
+&gt;
+&gt; rr
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,237 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Hanging problem." -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Andrew Reid'" -->
+<!-- ToEmail="andrew.reid@plug.cx" -->
+<!-- Date="Thu, 24 May 2001 12:17:27 +0930" -->
+<!-- Id="3B0C763F.85A0F280@aarnet.edu.au" -->
+<!-- Reference="Pine.LNX.4.21.0105231104030.802-100000@localhost.localdomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Hanging problem.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Andrew Reid &lt;<I><A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A></I>&gt;
+  Date: Thu, 24 May 2001 12:17:27 +0930
+</PRE>
+<H1>Re: Hanging problem.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Andrew Reid wrote:
+&gt; 
+&gt; On 23 May 2001 11:08:14 +0930, Stephen White wrote:
+&gt; 
+&gt; &gt; Try an FTP. If it exhibits bursty behaviour in the FTP too, check that
+&gt; &gt; the Ethernet ports and the switch ports are all set to full duplex, or
+&gt; &gt; set to half duplex if they're plugged into a hub.
+&gt; 
+&gt; Unless of course, you had a 'switched hub'. They were marketed quite a
+&gt; bit a year or two ago. I believe they provided full duplex.
+
+Quick Ethernet tutorial of duplex and auto negotiation.
+
+
+EQUIPMENT TYPES
+
+Coax and non-switching hubs are half-duplex.  These
+can not do auto negotiation.  Speed is 10.
+
+Switching hubs can be half-duplex or full duplex on each
+port.  These ports can auto-negotiate.  Speeds are 10,
+10/100 or 1000 (or rarely just 100).
+
+NIC cards can be
+ - half duplex with no negotiation capability
+ - full duplex or half duplex with negotiation capability
+Speeds are 10, 10/100, 1000.
+
+Copper cabling for 1000 differs from that used for 10, 100
+and 10/100 so we'll ignore 1000 for now.
+
+
+AUTO NEGOTIATION PROCESS
+
+Auto negotiation is simple
+ - listen for negotiation from other end of wire
+ - if found
+     set duplex to highest common value
+     (full if both NIC and hub port support full)
+     set speed to highest common value
+   else
+     set half duplex (as you are connected to a
+     non-negotiating non-switched hub)
+
+
+DEFAULT SETTINGS
+
+Manufacturers now ship hubs so that out-of-the-box the ports are
+set to
+  auto negotiate: on
+  speed: (negotiate)
+  duplex: (negotiate)
+
+Because some otherwise-smart people don't get autonegotiation,
+Linux makes it hard to set the NIC card to anything other than
+  auto negotiate: on
+  speed: (negotiate)
+  duplex: (negotiate)
+
+
+DEFAULT OPERATION
+
+So you plug the two out-of-the-box devices together and the switch says
+  auto negotiate: on
+  speed: negotiated 100
+  duplex: negotiated full duplex
+and the NIC says
+  auto negotiate: on
+  speed: negotiated 100
+  duplex: negotiated full duplex
+and all is right with the world.
+
+Things continue to be right if you plug that NIC into an old
+non-switching hub, which have
+  auto negotiate: off, can't do it
+  speed: 10 (no other choice)
+  duplex: half (no other choice)
+  SQE: set it off!
+so the NIC decides
+  auto negotiation: on
+  speed: no negotiation heard, so 10 for compatibility
+  duplex: no negotiation heard, so half for compatibility
+
+Similarly, things continue to be right if you have an old
+NIC card
+  auto negotiate: off, can't do it
+  speed: 10
+  duplex: half
+and plug it into the an out-of-the-box switch port
+  auto negotiation: on
+  speed: no negotiation heard, so 10 for compatibility
+  duplex: no negotiation heard, so half for compatibility
+
+And of course, an old card in an old non-switching hub works too.
+Card:
+  auto negotiate: off, can't do it
+  speed: 10
+  duplex: half
+Hub:
+  auto negotiate: off, can't do it
+  speed: 10
+  duplex: half
+
+
+THE COMMON ERROR
+
+The major consequence of all the above is if you set your NIC to
+  auto negotiate: off
+  duplex: full
+and the switch is still set to its default of
+  auto negotiate: on
+  speed: (negotiate)
+  duplex: (negotiate)
+then the switch will guess
+  speed: no negotiation heard, so 10 for compatibility [1]
+  duplex: no negotiation heard, so half duplex for compatibility
+As the duplex settings don't match you will get ethernet
+errors and thus sucky performance.
+
+If you turn off auto negotiate then you must turn off
+auto negotiation at the other end and manually set
+both ends to be identical.
+
+
+THE LESSON
+
+Ethernet settings at both ends *must* be identical,
+this includes the auto negotiate setting.
+
+
+EXCEPTIONS
+
+For some very old switches you need to explicitly turn
+auto-negotiation on, they don't ship with it on out
+of the box.
+
+For some very early 100Mbps cards auto-negogitation doesn't
+work (those cards based on the first revision of the DEC
+Tulip). The simplest solution in this case is to acknowledge
+that the chip design is faulty and bin the card.  Alternatively,
+you can set the NIC to
+  auto negotiate: off
+  speed: 100
+  duplex: full
+and the switch port to
+  auto negotiate: off
+  speed: 100
+  duplex: full
+but you will buy a world of pain if the switch port or
+NIC is ever used for any other connection.
+
+All the above applies to copper.  There is no negotiation
+over fiber, so you may as well set the best throughput
+possible
+  auto negotiation: not available
+  speed: select first of: 1000, 100, 10
+  duplex: select first of: full, half
+  SQE: on for switches, off for non-switched hubs and coax
+remembering that both ends need to have identical settings.
+
+
+THE FUNDAMENTAL LESSON
+
+Turn on auto negotiation AT BOTH ENDS.  Leave it on.  Don't fiddle
+with it.  Don't tamper.  Don't touch the blinkenlights.
+
+
+Hope this helps,
+Glen
+
+ [1] Although the speeds might show as "100" when the NIC card
+     is asked, as ethernet frames are clocked so any card worth
+     its salt will replace a "10" with a "100" if it has acquired
+     that clock rate.
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

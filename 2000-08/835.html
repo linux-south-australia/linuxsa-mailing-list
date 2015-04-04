@@ -1,0 +1,108 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: serial printer" -->
+<!-- FromName="Daryl Tester" -->
+<!-- FromEmail="dt@picknowl.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="ted@instech.com.au" -->
+<!-- Date="Thu, 24 Aug 2000 20:31:37 +0930" -->
+<!-- Id="39A50091.F03B9872@picknowl.com.au" -->
+<!-- Reference="00082419450500.03507@gandalf.instech.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: serial printer</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  To  : <A HREF="mailto:ted@instech.com.au">ted@instech.com.au</A>
+  Date: Thu, 24 Aug 2000 20:31:37 +0930
+</PRE>
+<H1>Re: serial printer</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+ted bullen wrote:
+
+&gt; I know the following...
+&gt; 1. the printer is fine
+&gt; 2. the baud rates are fine, handshaking looks ok (i.e. both are set up
+&gt; for hardware handshaking) etc.
+&gt; 3. The lpd spooling stuff is working properly (i.e. it will spit the relevant
+&gt; file out the relevant serial port)
+&gt; 
+&gt; I suspect the following:
+&gt; _something_ to do with the handshaking...but I'm not sure what.
+
+OK, are you 100% sure that it's enabled for hardware flow control?
+Another point, which control line are you using for hardware flow
+control?
+
+&gt; If I capture a windows98 test page (~200k), and 'cat' it out the relevant
+&gt; serial port, then a small portion of the page (~64k **) gets printed. The linux
+&gt; machine finishes spitting it out the serial port, but the printer sits there
+&gt; with the 'i'm getting serial port info' symbol flashing indefinitely (***)
+
+What does "stty -a &lt; /dev/appropriate_serial_port_here" tell you?
+crtscts, or -crtscts?
+
+&gt; ** the printer input buffer is 64k, and the amount on the page could (perhaps)
+&gt; be 64k in length (guess only - but assuming handshaking ????)
+
+Sounds like it, or it sounds like the printer could be hung waiting for a
+final page eject as well.  Try "/bin/echo -n -e '\012' &gt; /dev/you_know_what"
+
+&gt; I can print text (i.e. test page) but not a binary file.
+
+The serial port may be doing canonical processing (the lp system
+normally takes care of this for you).  I'm not sure if the tty
+ports under Linux retain their settings after the final close,
+but I know that on a lot of other Unices they don't, so if you
+use stty to change the speed or some other setting, the port's
+characteristics are usually reset by the time you get around to
+using cat on it.  In those instances, you have to use some
+cunningness like:
+
+(stty raw; cat &lt; foo.file) &lt; /dev/fnord &gt; /dev/fnord
+
+&gt; What (stupid thing) am I overlooking ???
+
+T'aint stupid; Unix is a little tricky in this area.
+
+
+-- 
+Regards,
+  Daryl Tester
+
+"I saw `cout' being shifted "Hello world" times to the left and
+ stopped right there."   -- Steve Gonedes
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

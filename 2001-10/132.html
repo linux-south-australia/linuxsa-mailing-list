@@ -1,0 +1,136 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="modify a reconnect script to trigger pc speaker beep, how?" -->
+<!-- FromName="'Michael Kratz'" -->
+<!-- FromEmail="michael@kingcc.com.au" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 4 Oct 2001 02:54:16 +0930" -->
+<!-- Id="001901c14c30$3bc015f0$18926596@michael" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: modify a reconnect script to trigger pc speaker beep, how?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Kratz &lt;<I><A HREF="mailto:michael@kingcc.com.au">michael@kingcc.com.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 4 Oct 2001 02:54:16 +0930
+</PRE>
+<H1>modify a reconnect script to trigger pc speaker beep, how?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+I would like to ask if someone can show me what to put into this script to
+make the pc speaker of the machine beep continuously when the modem
+connection is down.
+Someone keeps pulling the plug on the modem deliberately and I want to give
+them the shits by making the pc speaker beep continuously until they plug it
+back in and reconnect the machine. Also I would like to do the same if
+another machine cannot ping this one. ie. so if they pull the power plug on
+this machine another begins beeping because it is not getting ping replies
+from this one. Yes I know this is all very bad but I want to really annoy
+the ones that keep pulling the plug on the modem!!! And there is nothgin
+that I can physically do at the moment... the machines are in Whyalla, I am
+in Normanville, big difference!!!!!
+
+Thanks to anyone devious enough to help me!!!! :)
+
+Michael
+
+---SCRIPT STARTS HERE---
+#!/usr/bin/perl
+#
+# Link monitor Script
+
+#
+# Set Constants
+#
+$SLEEP_INC = 90;
+$RETRIES = 8;
+$mailprog = "/usr/lib/sendmail";
+$CONNECT_SCRIPT = "/usr/sbin/pppd call telstra";
+$LOG_FILE = "/var/log/redial";
+
+# IP Address of ISP server.
+$ISP_IP = "123.123.123.123";
+
+#
+# Initialise Variables.
+#
+$SLEEP_TIME = $SLEEP_INC;
+$ATTEMPTS = 0;
+
+#
+# Main Script.
+#
+do
+{
+
+ sleep $SLEEP_TIME;
+
+ if ( `/sbin/ifconfig | /bin/grep -c $ISP_IP` == 0 ) {
+    sleep 90;
+  if ( `/sbin/ifconfig | /bin/grep -c $ISP_IP` == 0 ) {
+    system ( $CONNECT_SCRIPT );
+    $ATTEMPTS = $ATTEMPTS + 1;
+    $SLEEP_TIME = $SLEEP_TIME + $SLEEP_INC * $ATTEMPTS;
+    system("echo ReDial $ATTEMPTS : `date` &gt;&gt; $LOG_FILE");
+  }
+ } else {
+   $SLEEP_TIME = $SLEEP_INC;
+   $ATTEMPTS = 0;
+  }
+}
+until  $ATTEMPTS == $RETRIES ;
+
+#
+# Mail out advise
+#
+   open( MAIL , "|$mailprog -t");
+
+   print MAIL "To: root\n";
+   print MAIL "From: cron\n";
+   print MAIL "Subject: Link Script Termination\n\n";
+
+   print MAIL "The Linkchecker Script has Ended.\n";
+   print MAIL "Too many call attempts.\n";
+
+   close (MAIL);
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

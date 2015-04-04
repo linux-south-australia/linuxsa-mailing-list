@@ -1,0 +1,285 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Partitioning a Linux system" -->
+<!-- FromName="Alex Garner" -->
+<!-- FromEmail="alex@netcraft.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 17 May 2000 20:25:09 +0930 (CST)" -->
+<!-- Id="200005171055.UAA26043@Kara.netcraft.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Partitioning a Linux system</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alex Garner &lt;<I><A HREF="mailto:alex@netcraft.com.au">alex@netcraft.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Wed, 17 May 2000 20:25:09 +0930 (CST)
+</PRE>
+<H1>Partitioning a Linux system</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+One of the more often asked questions I hear is "How do I partition my
+machine". Usually the answer is "It depends". I have been asked this a
+few times this week, so here is my experience with partitioning Linux
+boxes for various applications over the last few years.
+
+I've been meaning to do this for a while now. I will add this to the
+LinuxSA Tips section, along with any suggestions and improvements.
+
+First of all it helps to know exactly what the file systems are all
+used for and where stuff goes. A good reference for this sort of
+thing is in the Linux Documentation Project's "System Administrator's
+Guide" or SAG. You can find a good bit of info on the file system at
+<A HREF="http://www.tcm.hut.fi/~viu/linux/sag/sag-0.6.2.html/c218.html">http://www.tcm.hut.fi/~viu/linux/sag/sag-0.6.2.html/c218.html</A>
+
+Alternatively, if you have a copy of "A Practical Guide to Linux",
+then check out page 74.
+
+Here is a brief rundown...
+
+/       Root file system. Should just contain /bin, /sbin, /dev,
+        /root,
+        /lib, and /etc.
+/usr    Programmes and source code.
+/var    Variable data, such as spools, man pages, news and mail
+        queues, database data.
+/boot   Boot kernels.
+/home   User data and "stuff".
+/tmp    Temporary file locations
+
+The / file system will never need to be more than 100Meg. Make it
+that.
+
+The /usr file system will vary depending on how big your initial
+installation is and how much extra software you download. For a redhat
+6.2 minimal install you'll be needing about 250 to 300 Meg (typical
+server), and for a full install you need around 1.5 Gig (typical
+workstation). Other distributions will need more or less, but this is
+a good guide. Any extra software you download may also go in this file
+system, so if you are planning installing an office suite or a cad
+package, be aware it that it may go in here.
+
+If you are installing software to build from a tar ball or installing
+software that isn't part of a vendor's distribution, such as an RPM or
+a DEB, you will probably want to install it in the /usr/local file
+system. This file system is usually left untouched by the installation
+or upgrade process of a linux distribution and is ideal for installing
+third party software. If you plan on doing a lot of this, a separate
+partition is a great idea, because if you want to do a re-install
+rather than an upgrade, you can simply tell your distribution not to
+format the /usr/local file system when installing and you will leave
+your third party software in tact. The format of the /usr/local file
+system is almost identical to the / file system.  Handy huh?
+
+/usr/local/bin and /usr/local/sbin are also the correct place to put
+any scripts you may write after you have your system up and running.
+This is preferable to placing them in /usr/bin and /usr/sbin or even
+/bin and /sbin, as these should really be static and left the way the
+distribution intended them. It also makes backing up a system much
+easier if all your locally created scripts are in one convenient
+place.
+
+The /var file system is the most varying file system, hence its name.
+The function of the machine will determine how much you need. For a
+vanilla system, I recommend 400 Meg. This is usually sufficient for a
+workstation. If you are building a proxy server, you will need a
+separate partition, but preferably a separate disk, for
+/var/spool/squid. The same goes for a mail server, except the file
+systems of interest are /var/spool/mqueue and /var/spool/mail. The
+size of /var/spool/mail will depend on how much storage you want for
+user's mailboxes, and the size /var/spool/mqueue will depend on how
+much mail 'in transit' you wish to spool. Mail server's acting as a
+secondary MX might need a lot here.
+
+There are other smaller directories in /var/spool that are of
+interest, so I would recommend a /var/spool of 300 to 500 Meg for any
+server application in conjunction with the /var of 400 Meg. For a
+workstation you may be able to use the 400Meg /var partition to house
+your /var/spool as well, but it may pay to enlarge it a bit.
+
+/var/log, as the name suggests, is the final resting place for logs.
+Once again the size of this will depend on the function of the system,
+but as a general rule it is highly recommended that you have a
+separate /var/log to your /var partition, regardless of the machine's
+function. This way any stray system logs that fill up will have no
+effect on your system other than stopping logging. This goes for both
+servers and workstations alike. If you are running a heavily loaded
+proxy, mail or web server, you will need heaps and heaps of disk space
+here. Fully loaded proxy servers in peering arrangements can easily
+generate hundreds of thousands of bytes of log files an hour. The same
+goes for mail servers. The mail can come in and go out very quickly on
+a fast link, but the log files stay around.  You also don't want a
+slash-dotted web site to fill up your logging directory, so careful
+thought here will pay off in the future.
+
+The /var file system is also often used for the storage of database
+data. /var/db is the file system that is used, and you will need to
+keep this big enough to hold your data. Often a separate fast SCSI
+disk or RAID will make your database much faster. IO is often the
+biggest bottleneck in database systems, and an IDE drive in /var/db
+wont help.
+
+The /boot directory is probably the most useful file system, and often
+the most forgotten. Having your kernels on a separate partition will
+make rescuing a system that has crashed a whole lot easier. This means
+that booting the system and recovering the partitions can be attacked
+as two separate tasks. Having a small /boot in a primary partition is
+also the best cure for the famous "I just installed linux and now all
+I get is 'LI'" LILO installation problems. LILO still has issues with
+hard drive space above 1024 cylinders. A small 20 Meg /boot partition
+as the first primary partition on the system will alleviate this. Some
+distributions, such as redhat, are smart enough to assign
+automatically the first primary partition to /boot for just this
+reason.
+
+/home is where you hang your hat. It is also where you "keep your
+stuff". Files you download, projects, mail, documents, mp3's,
+everything.  This is the equivalent of Windows' "My Documents",
+"C:/download", the desktop, etc. Even if the system is only used by
+you at your desk, and no-one else, you should still have your own home
+directory in the /home file system. Don't be tempted to add partitions
+to the root file system such as /scripts, /downloads, etc. You are
+breaking stuff when you do that. Linux is still a true multiuser
+operating system, even if you are the only person using it. Try to
+keep this in mind when building a partition table. This all starts to
+make sense when you stop logging in as root, and start loggin in as a
+regular user. It never ceases to amaze me how many people run X as
+root. *sigh*.
+
+Many distributions nowadays are geared towards easy and quick upgrades
+and everything has it's place. If you keep you stuff in /home/yourname
+and no-where else, you can be sure that when your next upgrade of
+linux comes, you can just chuck in the CD and hit "upgrade" and your
+Metallica mp3's will still be there when your system comes back
+on-line.
+
+/home is also where the storage filesystem for a file server should
+go. The same is true for web server pages, and ftp server data.
+Obviously if you are building a web server, have a separate
+/home/httpd file system on a nice fast SCSI disk. Same with /home/ftp.
+
+Sometimes it's a great idea to have a separate /tmp directory, because
+temporary files can get out of control. Having /tmp on the same
+partition as the root file system can cause problems if you scan a 60
+Meg picture into a graphics manipulation programme and it decides to
+store it in /tmp.
+
+The only other partition of major interest is the swap partition. It
+is often a good idea to place this in the physical middle of the
+drive. Then the heads have less far to travel to swap out data when
+the system gets loaded. Alternatively you can just throw more memory
+at the problem.
+
+Now I'll give you a few 'real life' examples of servers that I
+maintain, with the host names changed to protect the innocent.
+
+Here is my bog standard workstation. It runs X. It may get used for
+some server functions in the future, so there is lot's of space ready.
+I even have a big block of space hanging of /mnt/tmp, and one day I'm
+sure I'll think of a use for it.
+
+[<A HREF="mailto:alex@Lisa">alex@Lisa</A> alex]$ df
+Filesystem           1k-blocks      Used Available Use% Mounted on
+/dev/hda13               85530     34264     46850  42% /
+/dev/hda1               101089      6802     89068   7% /boot
+/dev/hda6              1517920    154616   1286196  11% /home
+/dev/hda12             2150420        20   2041160   0% /mnt/tmp
+/dev/hda10              248895        27    236018   0% /tmp
+/dev/hda5              2016016   1292380    621224  68% /usr
+/dev/hda7               758936     37592    682792   5% /var
+/dev/hda9               497829       657    471470   0% /var/log
+/dev/hda8               758936       292    720092   0% /var/spool
+
+
+This next beast is a mail server. Note the use of seperate drives for
+critical server filesystems.
+
+[<A HREF="mailto:alex@mail">alex@mail</A> alex]$ df
+Filesystem        1k-blocks      Used Available Use% Mounted on
+/dev/sda12            79941     39339     36474  52% /
+/dev/sda1             21011      5463     14463  27% /boot
+/dev/sda11           701636     43332    622664   7% /home
+/dev/sda9            202031        13    191587   0% /tmp
+/dev/sda5           1210800    456856    692436  40% /usr
+/dev/sda7            496695      7069    463981   2% /var
+/dev/sda6           1009724    197880    760552  21% /var/log
+/dev/sda8            496695       982    470068   0% /var/spool
+/dev/sdb1           4382932    766640   3393648  18% /var/spool/mail
+
+
+Here is a proxy server. Mix of SCSI and IDE.
+
+[<A HREF="mailto:root@proxy">root@proxy</A> /root]# df
+Filesystem        1k-blocks      Used Available Use% Mounted on
+/dev/hda11           101485     28799     67446  30% /
+/dev/hda1             23393      2647     19538  12% /boot
+/dev/hda7            199085      2101    186704   1% /home
+/dev/hda8             81954       985     76737   1% /tmp
+/dev/hda5            809556    170444    597988  22% /usr
+/dev/hda6            199085      4243    184562   2% /var
+/dev/hda10          1611224     10408   1518968   1% /var/log
+/dev/sda1          17654736    354220  16403692   2% /var/spool/squid
+
+
+When partitioning a machine for use, it is always a bad idea to
+install everything into a single / partition. Spend a few minutes
+before installation considering the functions of the machine you are
+building and this will yield a useful and efficient partition table.
+The more often you do it the more of a feel you will get for how much
+space your distribution needs for different tasks. Now that you have
+the above information there is no excuse for poor partitioning, and
+you can help make the world a safer place. Next time you see...
+
+[<A HREF="mailto:lame@nothought">lame@nothought</A> /]$ df
+Fileystem      1k-blocks      Used Available Use% Mounted on
+/dev/hda1       17654736   1354220  15403692   8% /
+
+...you can do something about it!
+
+Cheers
+
+Alex!
+
+-- 
+
+Alex Garner &lt;<A HREF="mailto:alex@netcraft.com.au">alex@netcraft.com.au</A>&gt;
+
+NetCraft Australia
+Phone (08) 8370 3650
+<A HREF="http://www.netcraft.com.au">http://www.netcraft.com.au</A>
+
+"#define QUESTION ((bb) || !(bb)) // Shakespeare."
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

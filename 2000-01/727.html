@@ -1,0 +1,139 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Upgrade or Re-install" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 24 Jan 2000 17:11:38 +1030" -->
+<!-- Id="388BF422.28CBD445@aarnet.edu.au" -->
+<!-- Reference="200001240540.QAA15382@mulder.smug.adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Upgrade or Re-install</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 24 Jan 2000 17:11:38 +1030
+</PRE>
+<H1>Re: Upgrade or Re-install</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; &gt;       I am still running RedHat 5.2 on kernel-2.0.36-0.7
+&gt; &gt; I am going to upgrade to RedHat 6.1  Is it recommended that I reinstall from
+&gt; &gt; scratch or just download the proper rpms and install them and things should
+&gt; &gt; be fine?  
+
+I've also upgraded, but I use a different technique to David.
+
+When I change a config file I place it under RCS control.
+   (umask 007; mkdir RCS)
+   ci fred.conf
+   co fred.conf
+
+   co -l fred.conf
+   vi fred.conf
+   ci -u fred.conf
+
+Before upgrading I remove all the RPM backup files:
+   find / -name "*.rpmnew" -print -exec rm {} \;
+   find / -name "*.rpmold" -print -exec rm {} \;
+
+Then upgrade by booting off the installation floppy/CD for the
+new version and selecting "upgrade".  If you want to do it
+owver then net, download the floopy image and write it to
+disk using "dd" (see www.redhat.com for the instructions in
+the Installation manual).
+
+Now I find the changes
+    find / -name "*.rpmold" -print
+    find / -name "*.rpmnew" -print
+
+RCS will now tell me what the change was
+    rcsdiff fred.conf
+
+and I can decide if I want to keep the change or not.
+
+    To keep it, check in the new file
+        rcs -l fred.conf
+        ci -u fred.conf
+
+    To discard it, back it up, then get back the old version
+       rcs -l fred.conf
+       ci -l fred.conf          &lt;-- save new version
+       co -r1.2 fred.conf       &lt;-- get back old version
+       ci -u fred.conf          &lt;-- make it the current version
+
+The nicest thing about this approach is that if you decide
+a few days later that the new config file was the one you
+wanted, it is in the RCS history and you can fetch it back.
+
+As David notes:
+&gt; This can fall over if you have compiled binaries replaced by RPMS.
+
+which is exactly why it is verboten for RPMs to touch /usr/local
+and exactly why code you compile should be located there.  It
+it just *has* to be located in a specific place, then use a
+symlink into a file in /usr/local/somewhere.  This is also nicely
+self-documenting.
+
+&gt; I visited upgrades.redhat.com and wasn't sure where the
+&gt; rpms would  be in.
+
+There's no such web site.  You are probably thinking about
+updates.redhat.com.  Other manufacturers would call these
+"patches" or "fixes", so the updates are by no means all
+the files you need for an upgrade.
+
+You just want the stock-standard installation directory,
+as in
+  <A HREF="http://mirror.aarnet.edu.au/pub/linux/redhat/redhat-6.1/i386/">http://mirror.aarnet.edu.au/pub/linux/redhat/redhat-6.1/i386/</A>
+or thousand of other mirror sites.
+
+When you are done, apply all the updates (ie: security patches) with:
+  mkdir fred
+  cd fred
+  wget <A HREF="ftp://anonymous:">ftp://anonymous:</A>@mirror.aarnet.edu.au/pub/linux/redhat/updates/6.1/i386/*.rpm
+  wget <A HREF="ftp://anonymous:">ftp://anonymous:</A>@mirror.aarnet.edu.au/pub/linux/redhat/updates/6.1/noarch/*.rpm
+  rpm -Fvh *.rpm
+  rm *.rpm
+  cd ..
+  rmdir fred
+
+You might find it both cheaper and faster to buy a CD, especially
+from a supplier that offers one with all the updates already applied.
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ Earth is a single point of failure
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,907 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Mailscanner" -->
+<!-- FromName="'Brad van Elsen'" -->
+<!-- FromEmail="matagaska@yahoo.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 29 Jan 2004 11:45:36 +1100 (EST)" -->
+<!-- Id="20040129004536.80050.qmail@web21505.mail.yahoo.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Mailscanner</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Brad van Elsen &lt;<I><A HREF="mailto:matagaska@yahoo.com.au">matagaska@yahoo.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 29 Jan 2004 11:45:36 +1100 (EST)
+</PRE>
+<H1>Mailscanner</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+Im running Mandrake 9.1, Heres what happens when I run
+Mailscanner. I have attached the Mailscanner File
+
+
+
+MailScanner
+Can't locate Net/CIDR.pm in @INC (@INC contains:
+/usr/lib/MailScanner
+/usr/lib/perl5/5.8.0/i386-linux-thread-multi
+/usr/lib/perl5/5.8.0
+/usr/lib/perl5/site_perl/5.8.0/i386-linux-thread-multi
+/usr/lib/perl5/site_perl/5.8.0
+/usr/lib/perl5/site_perl
+/usr/lib/perl5/vendor_perl/5.8.0/i386-linux-thread-multi
+/usr/lib/perl5/vendor_perl/5.8.0
+/usr/lib/perl5/vendor_perl . /usr/lib/MailScanner) at
+/usr/lib/MailScanner/MailScanner/Config.pm line 34.
+BEGIN failed--compilation aborted at
+/usr/lib/MailScanner/MailScanner/Config.pm line 34.
+Compilation failed in require at /usr/sbin/MailScanner
+line 42.
+BEGIN failed--compilation aborted at
+/usr/sbin/MailScanner line 42.
+
+<A HREF="http://personals.yahoo.com.au">http://personals.yahoo.com.au</A> - Yahoo! Personals
+New people, new possibilities. FREE for a limited time.
+#!/usr/bin/perl -I/usr/lib/MailScanner
+#
+#   MailScanner - SMTP E-Mail Virus Scanner
+#   Copyright (C) 2002  Julian Field
+#
+#   $Id: mailscanner,v 1.142.2.92 2003/12/02 11:33:01 jkf Exp $
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#   The author, Julian Field, can be contacted by email at
+#      <A HREF="mailto:Jules@JulianField.net">Jules@JulianField.net</A>
+#   or by paper mail at
+#      Julian Field
+#      Dept of Electronics & Computer Science
+#      University of Southampton
+#      Southampton
+#      SO17 1BJ
+#      United Kingdom
+#
+
+
+use strict;
+no strict 'subs';
+use POSIX;
+require 5.005;
+
+use FileHandle;
+use File::Path;
+use IO::Handle;
+use MailScanner::Config;
+use MailScanner::CustomConfig;
+use MailScanner::Lock;
+use MailScanner::Log;
+use MailScanner::Mail;
+use MailScanner::MessageBatch;
+use MailScanner::Quarantine;
+use MailScanner::Queue;
+use MailScanner::RBLs;
+use MailScanner::MCPMessage;
+use MailScanner::Message;
+use MailScanner::MCP;
+use MailScanner::SA;
+# Now done in a require: use MailScanner::Sendmail;
+# Now done in a require: use MailScanner::SMDiskStore;
+use MailScanner::SweepContent;
+use MailScanner::SweepOther;
+use MailScanner::SweepViruses;
+# Now obsolete: use MailScanner::SystemDefs;
+use MailScanner::TNEF;
+use MailScanner::WorkArea;
+use MailScanner;
+
+my $autoinstalled=0;
+# To detect whether we've been auto-configured & installed
+# -- $autoinstalled will be set to 1 if so.
+#@@$autoinstalled=1;
+
+# Needed for Sys::Syslog, as Debian Potato (at least) doesn't
+# appear to have "gethostname" syscall as used (indirectly) by Sys::Syslog
+# So it uses `hostname` instead, which it can't do if PATH is tainted.
+# It's good to have this anyway, although we may need to modify it for
+# other OS when we find that something we need isn't here -- nwp 14/01/02
+$ENV{PATH}="/sbin:/bin:/usr/sbin:/usr/bin";
+
+# We *really* should clear *all* environment bar what we *know* we
+# need here. It will avoid surprises (like bash running BASH_ENV or
+# SpamAssassin using $ENV{HOME} rather than getpwnam to decide where
+# to drop its load.
+
+# Needed for -T:
+delete $ENV{'BASH_ENV'}; # Don't run things on bash startup
+
+# Needed for SpamAssassin:
+delete $ENV{'HOME'};
+
+# Need the parent process to ignore SIGHUP, and catch SIGTERM
+$SIG{'HUP'} = 'IGNORE';
+$SIG{'TERM'} = \&ExitParent;
+
+# Remember to update this before releasing a new version of MailScanner.
+#
+# Version numbering scheme is this:
+# 4   Major release
+# 00  Minor release, incremented for new features and major changes
+# 0   Incremented for bug fixes
+# a1  1st Alpha release
+# Any numbers after a "-" are packaging release numbers. They reflect
+# changes in the packaging, not in the MailScanner code itself.
+#
+# First production release will be 4.00.1.
+#
+$MailScanner::Config::MailScannerVersion = '4.25-14';
+
+# Work out what directory we're in and add it onto the front
+# of the include path so that we can work if we're just chucked
+# any old where in a directory with the modules. Also add
+# ./MailScanner for v4.
+#
+# Also get process name while we're at it.
+#
+my $dir = $0;
+# can't use s/// as it doesn't untaint $dir
+$dir =~ m#^(.*)/([^/]+)$#;
+$dir = $1;
+$MailScanner::Config::MailScannerProcessName = ""; # Avoid 'used only once' warning BS.
+$MailScanner::Config::MailScannerProcessName = $2;
+# Add my directory onto the front of the include path
+unless ($autoinstalled) {
+  unshift @INC, "$dir/MailScanner";
+  unshift @INC, $dir;
+}
+
+# Set umask nice and safe so no-one else can access anything!
+umask 0077;
+
+# Find the mailscanner.conf file, with a default just in case.
+my $ConfFile = $ARGV[0];
+$ConfFile = '/etc/MailScanner/MailScanner.conf' unless $ConfFile;
+
+# Load the MTA modules we need
+my($MTAmod, $MTADSmod);
+# LEOH:if (MailScanner::Config::QuickPeek($ConfFile, 'mta') =~ /exim/i) {
+$_=MailScanner::Config::QuickPeek($ConfFile, 'mta');
+if (/exim/i) {
+  $MTAmod = 'Exim.pm';
+  $MTADSmod = 'EximDiskStore.pm';
+} elsif(/zmailer/i) { # LEOH: Agregado de zmailer
+  $MTAmod = 'ZMailer.pm';
+  $MTADSmod = 'ZMDiskStore.pm';
+} elsif(/postfix/i) {
+  $MTAmod = 'Postfix.pm';
+  $MTADSmod = 'PFDiskStore.pm';
+} else {
+  $MTAmod = 'Sendmail.pm';
+  $MTADSmod = 'SMDiskStore.pm';
+}
+require "MailScanner/$MTAmod";
+require "MailScanner/$MTADSmod";
+
+# Tried to set [u,g]id after writing pid, but then it fails when it re-execs
+# itself. Using the posix calls because I don't want to have to bother to
+# find out what happens when "$&lt; = $uid" fails (i.e. not running as root).
+# This needs to be global so checking functions can all get at them.
+my($uname, $gname, $uid, $gid);
+$uname = MailScanner::Config::QuickPeek($ConfFile, 'runasuser');
+$gname = MailScanner::Config::QuickPeek($ConfFile, 'runasgroup');
+$uid   = $uname?getpwnam($uname):0;
+$gid   = $gname?getgrnam($gname):0;
+
+# Need to find the PidFile before changing uid/gid as its ownership will need
+# to be set to the new uid/gid. It must be created first if necessary.
+# Need     PidFile     to be able to manage pid of parent process
+my $PidFile = MailScanner::Config::QuickPeek($ConfFile, 'pidfile');
+WritePIDFile("MailScanner");
+chown $uid, $gid, $PidFile;
+
+SetUidGid($uid, $gid);
+CheckModuleVersions();
+# Can't do this here, config not read yet: CheckQueuesAreTogether();
+
+#
+# Need MaxChildren to know how many children to fork
+#      Debug       to know whether to terminate
+#      WorkDir     to be able to clean up after killed children
+#
+my $MaxChildren = MailScanner::Config::QuickPeek($ConfFile, 'maxchildren');
+my $Debug       = MailScanner::Config::QuickPeek($ConfFile, 'debug');
+my $WorkDir     = MailScanner::Config::QuickPeek($ConfFile, 'incomingworkdir');
+# FIXME: we should check that the ownership and modes on piddir do not
+# allow random people to do nasty things in there (like create symlinks
+# to critical system files, or create pidfiles that point to critical
+# system processes)
+$Debug = 0 unless $Debug =~ /yes|1/i;
+
+# Give the user their shell back
+ForkDaemon($Debug);
+
+# Only write the parent pid, not the children yet
+WritePIDFile($$);
+
+#
+# Do it only once when debugging.
+#
+if ($Debug) {
+  WorkForHours();
+  print STDERR "Stopping now as you are debugging me.\n";
+  exit 0;
+}
+
+
+#
+# Start forking off child workers.
+#
+
+setpgrp();
+$MaxChildren = 1 if $MaxChildren&lt;1; # You can't have 0 workers
+my $NumberOfChildren = 0;
+my %Children;
+
+for (;;) {
+  while($NumberOfChildren &lt; $MaxChildren) {
+    my $born_pid = fork();
+    if (!defined($born_pid)) {
+      die "Cannot fork off child process, $!";
+    }
+    if ($born_pid == 0) {
+      # I am a child process.
+      # Set up SIGHUP handler and
+      # Run MailScanner for a few hours.
+      WorkForHours();
+      exit 0;
+    }
+    # I am the parent process.
+    $Children{$born_pid} = 1;
+    $NumberOfChildren++;
+    sleep 10;
+  }
+
+  # I have started enough children. Let's wait for one to die...
+  my $dying_pid = wait();
+  my $exitstatus = $?;
+
+  #if ($dying_pid == -1) {
+  #  warn "We haven't got any child processes, which isn't right!, $!";
+  #}
+  if ($dying_pid&gt;0 && !exists($Children{$dying_pid})) {
+    warn "We have just tried to reap a process which wasn't one of ours!, $!";
+  }
+
+  # Knock the dying process off the list and decrement the counter.
+  delete $Children{$dying_pid};
+  $NumberOfChildren--;
+  # Don't have Pid files for children any more
+  # DeletePIDFile($dying_pid);
+
+  if ($exitstatus) {
+    # $? = (exit_status &lt;&lt; 8) | (signal_it_died_from)
+    my $code = $exitstatus &gt;&gt; 8;
+    my $signal = $exitstatus & 0xFF;
+
+    MailScanner::Log::WarnLog("Process did not exit cleanly, returned %d " .
+                              "with signal %d", $code, $signal) if $exitstatus;
+  }
+
+  # Clean up after the dying process in case it left a mess.
+  # If they change the work dir they really will have to stop and re-start.
+  #system($global::rm . " -rf \"$WorkDir/$dying_pid\"")
+  #  if -d "$WorkDir/$dying_pid";
+  rmtree("$WorkDir/$dying_pid", 0, 1) if -d "$WorkDir/$dying_pid";
+}
+
+#if ($Debug) {
+#  print STDERR "Stopping now as you are debugging me.\n";
+#  exit 0;
+#}
+
+print STDERR "Oops, tried to go into Never Never Land!\n";
+exit 1;
+
+#
+#
+#
+#
+#
+# The End
+#
+#
+#
+#
+#
+
+#
+# Start each of the worker processes here.
+# Just run for a few hours and then terminate.
+# If we are debugging, then just run once.
+#
+sub WorkForHours {
+  # Read the configuration file and start logging to syslog/stderr
+  StartLogging($ConfFile);
+
+  # Check the programs listed in SystemDefs.pl as some of them
+  # might be wrong
+  # This is now obsolete as all references to it have been removed
+  #CheckSystemDefs();
+
+  # Setup SIGHUP and SIGTERM handlers
+  $SIG{'HUP'}  = \&ExitChild;
+  $SIG{'TERM'} = 'DEFAULT';
+
+  # Read the configuration file properly
+  MailScanner::Config::Read($ConfFile);
+
+  # Check the home directory exists and is writable,
+  # otherwise SA will fail, as it wants to write Bayes databases and all
+  # sorts of other stuff in the home directory.
+  CheckHomeDir()
+    if MailScanner::Config::Value('spamassassinuserstatedir') eq "";
+
+  # Initialise class variables now we are the right user
+  CheckQueuesAreTogether(); # Can only do this after reading conf file
+  MailScanner::MessageBatch::initialise();
+  MailScanner::MCP::initialise();
+  MailScanner::SA::initialise();
+  MailScanner::TNEF::initialise();
+  # Setup the Sendmail and Sendmail2 variables if they aren't set yet
+  MailScanner::Sendmail::initialise();
+  MailScanner::SweepViruses::initialise(); # Setup Sophos SAVI library
+
+  my $workarea = new MailScanner::WorkArea;
+  my $inqueue  = new MailScanner::Queue(
+                     @{MailScanner::Config::Value('inqueuedir')});
+  my $mta      = new MailScanner::Sendmail;
+  my $quar     = new MailScanner::Quarantine;
+
+  $global::MS = new MailScanner(WorkArea   =&gt; $workarea,
+                                InQueue    =&gt; $inqueue,
+                                MTA        =&gt; $mta,
+                                Quarantine =&gt; $quar);
+
+  # Setup the lock type depending on which MTA we are using
+  MailScanner::Lock::initialise();
+
+  # Clean up the entire outgoing sendmail queue in case I was
+  # killed off half way through processing some messages.
+  # JKF Can't do this easily any more as the outgoing queue dir is the
+  # result of a ruleset.
+  # And I can't work out which class to put it in :-(
+  #my($CleanUpList);
+  #$CleanUpList = $global::MS-&gt;{inq}-&gt;ListWholeQueue(
+  #                 $global::MS-&gt;{inq}-&gt;{dir});
+  #Sendmail::ClearOutQueue($CleanUpList, $Config::OutQueueDir);
+
+  my $batch; # Looks pretty insignificant, doesn't it? :-)
+
+  # Restart periodically, and handle time_t rollover in the year 2038
+  my($StartTime, $RestartTime);
+  $StartTime = time;
+  $RestartTime = $StartTime + MailScanner::Config::Value('restartevery');
+
+  while (time&gt;=$StartTime && time&lt;$RestartTime) {
+    $workarea-&gt;Clear();
+    $batch = new MailScanner::MessageBatch();
+    $global::MS-&gt;{batch} = $batch; # So MailWatch can read the batch properties
+    #print STDERR "Batch is $batch\n";
+
+    # Bail out immediately if we are using the Sophos SAVI library and it
+    # has been updated since the last batch. This has to be done after the
+    # batch has been created since it may sit for minutes/hours in
+    # MailScanner::MessageBatch::new.
+    if (MailScanner::SweepViruses::SAVIUpgraded()) {
+      MailScanner::Log::InfoLog("Sophos SAVI library has been " .
+                                "updated, killing this child");
+      last;
+    }
+    # Also bail out if the ClamAV database has been upgraded
+    if (MailScanner::SweepViruses::ClamUpgraded()) {
+      MailScanner::Log::InfoLog("ClamAV virus database has been " .
+                                "updated, killing this child");
+      last;
+    }
+
+    # Also bail out if the LDAP configuration serial number has changed.
+    if (MailScanner::Config::LDAPUpdated()) {
+      MailScanner::Log::InfoLog("LDAP configuration has changed, " .
+                                "killing this child");
+      last;
+    }
+
+
+    #$batch-&gt;print();
+
+    # Archive untouched incoming messages to directories
+    $batch-&gt;ArchiveToFilesystem();
+
+    # Do the MCP checks
+    $batch-&gt;StartTiming('mcp', 'MCP Checks');
+    $batch-&gt;MCPChecks();
+    $batch-&gt;HandleMCP();
+    $batch-&gt;HandleNonMCP();
+    $batch-&gt;StopTiming('mcp', 'MCP Checks');
+
+    # Do the spam checks
+    $batch-&gt;StartTiming('spam', 'Spam Checks');
+    $batch-&gt;SpamChecks();
+    $batch-&gt;HandleSpam();
+    $batch-&gt;HandleHam();
+    $batch-&gt;StopTiming('spam', 'Spam Checks');
+
+    # Deliver all the messages we are not scanning at all,
+    # and mark them for deletion.
+    # Then purge the deleted messages from disk.
+    $batch-&gt;DeliverUnscanned();
+    $batch-&gt;RemoveDeletedMessages();
+
+    # Extract all the attachments
+    $batch-&gt;StartTiming('virus', 'Virus Scanning');
+    $global::MS-&gt;{work}-&gt;BuildInDirs($batch);
+    $batch-&gt;Explode();
+
+    # Report all the unparsable messages, but don't delete anything
+    $batch-&gt;ReportBadMessages();
+
+    # Build all the MIME entities helper structures
+    $batch-&gt;CreateEntitiesHelpers();
+    #$batch-&gt;PrintNumParts();
+    #$batch-&gt;PrintFilenames();
+
+    # Do the virus scanning
+    $batch-&gt;VirusScan();
+    #$batch-&gt;PrintInfections();
+    $batch-&gt;StopTiming('virus', 'Virus Scanning');
+
+    # Strip the HTML tags out of messages which the spam
+    # settings have asked us to strip.
+    # We want to do this to both messages for which the config
+    # option says we should strip, and for messages for which
+    # the spam actions say we should strip.
+    $batch-&gt;StartTiming('virus_processing', 'Virus Processing');
+    $batch-&gt;StripHTML();
+    $batch-&gt;DisarmHTML();
+
+    #$batch-&gt;PrintInfectedSections();
+
+    # Combine all the infection/problem reports
+    $batch-&gt;CombineReports();
+
+    # Clean all the infections out of the messages
+    $batch-&gt;Clean();
+
+    # Quarantine all the infected attachments
+    $batch-&gt;QuarantineInfections();
+
+    # Encapsulate the messages into message/rfc822 attachments as needed
+    $batch-&gt;Encapsulate();
+
+    # Sign all the uninfected messages
+    $batch-&gt;SignUninfected();
+
+    # Deliver all the uninfected messages
+    # and mark them for deletion
+    $batch-&gt;DeliverUninfected();
+
+    # Delete cleaned messages that are from a local domain if we
+    # aren't delivering cleaned messages from local domains,
+    # by marking them for deletion. This will also stop them being
+    # disinfected, which is fine. Also mark that they still need
+    # relevant warnings/notices to be sent about them.
+    # Then purge the deleted messages from disk.
+    $batch-&gt;DeleteUnwantedCleaned();
+    $batch-&gt;RemoveDeletedMessages();
+
+    # Find all the messages infected with "silent" viruses
+    $batch-&gt;FindSilentInfections();
+
+    # Deliver all the "silent" infected messages
+    # and mark them for deletion
+    $batch-&gt;DeliverOrDeleteSilent();
+
+    # Deliver all the cleaned messages
+    # and mark them for deletion
+    $batch-&gt;DeliverCleaned();
+    $batch-&gt;RemoveDeletedMessages();
+
+    # Warn all the senders of messages with any non-silent infections
+    $batch-&gt;WarnSenders();
+
+    # Warn all the notice recipents about all the viruses
+    $batch-&gt;WarnLocalPostmaster();
+    $batch-&gt;StopTiming('virus_processing', 'Virus Processing');
+
+    # Disinfect all possible messages and deliver to original recipients,
+    # and delete them as we go.
+    $batch-&gt;StartTiming('disinfection', 'Disinfection');
+    $batch-&gt;DisinfectAndDeliver();
+    $batch-&gt;StopTiming('disinfection', 'Disinfection');
+
+    # Do all the time and speed logging
+    $batch-&gt;EndBatch();
+
+    # Look up a configuration parameter as the last thing we do so that the
+    # lookup operation can have side-effects such as logging stats about the
+    # message.
+    $batch-&gt;LastLookup();
+
+    #print STDERR "\n\n3 times are $StartTime " . time . " $RestartTime\n\n\n";
+
+    # Only do 1 batch if debugging
+    last if MailScanner::Config::Value('debug');
+  }
+
+  # Destroy the incoming work dir
+  $global::MS-&gt;{work}-&gt;Destroy();
+
+  # Close down all the user's custom functions
+  MailScanner::Config::EndCustomFunctions();
+
+  # Tear down any LDAP connection
+  MailScanner::Config::DisconnectLDAP();
+
+  MailScanner::Log::InfoLog("MailScanner child dying of old age");
+
+  # Don't want to leave connections to 514/udp open
+  MailScanner::Log::Stop();
+}
+
+
+#
+# SIGHUP handler. Just make the child exit neatly and the parent
+# farmer process will create a new one which will re-read the config.
+#
+sub ExitChild {
+  my($sig) = @_; # Arg is signal name
+  MailScanner::Log::InfoLog("MailScanner child caught a SIG%s", $sig);
+  # Finish off any incoming queue file deletes that were pending
+  MailScanner::SMDiskStore::DoPendingDeletes();
+  # Destroy the incoming work dir
+  $global::MS-&gt;{work}-&gt;Destroy() if $global::MS && $global::MS-&gt;{work};
+  # Close down all the user's custom functions
+  MailScanner::Config::EndCustomFunctions();
+  # Close down logging neatly
+  MailScanner::Log::Stop();
+  exit 0;
+}
+
+
+#
+# SIGTERM handler for parent process.
+# HUP all the children, then commit suicide.
+# Cannot log as no logging in the parent.
+#
+sub ExitParent {
+  my($sig) = @_; # Arg is the signal name
+  my($child, @dirlist);
+
+  #print STDERR "Killing child processes...\n";
+  kill 1, keys %Children;
+  sleep 3; # Give them time to die peacefully
+
+  # Clean up after the dying processes in case they left a mess.
+  foreach $child (keys %Children) {
+    #push @dirlist, "$WorkDir/$child" if -d "$WorkDir/$child";
+    rmtree("$WorkDir/$child", 0, 1) if -d "$WorkDir/$child";
+  }
+
+  #system($global::rm . " -rf \"" . join("\" \"", @dirlist) . "\"")
+  #  if @dirlist;
+
+  exit 0;
+}
+
+
+#
+# Start logging
+#
+sub StartLogging {
+  my($filename) = @_;
+
+  # Create the syslog process name from stripping the conf filename down
+  # to the basename without the extension.
+  my $procname = $filename;
+  $procname =~ s#^.*/##;
+  $procname =~ s#\.conf$##;
+
+  my $logbanner = "MailScanner E-Mail Virus Scanner version " .
+                  $MailScanner::Config::MailScannerVersion . " starting...";
+
+  MailScanner::Log::Configure($logbanner, 'syslog'); #'stderr');
+
+  # Need to know log facility *before* we have read the whole config file!
+  my $facility = MailScanner::Config::QuickPeek($filename, 'syslogfacility');
+
+  MailScanner::Log::Start($procname, $facility);
+}
+
+#
+# Function to harvest dead children
+#
+sub Reaper {
+  1 until waitpid(-1, WNOHANG) == -1;
+  $SIG{'CHLD'} = \&Reaper;  # loathe sysV
+}
+
+#
+# Fork off and become a daemon so they get their shell back
+#
+sub ForkDaemon {
+  my($debug) = @_;
+  if ($debug) {
+    print STDERR "In Debugging mode, not forking...\n";
+    # Get current debugging flag, and invert it:
+    my $current = config MIME::ToolUtils 'DEBUGGING';
+    #config MIME::ToolUtils DEBUGGING =&gt; !$current;
+  } else {
+    $SIG{'CHLD'} = \&Reaper;
+    if (fork==0) {
+      # This child's parent is perl
+      #print STDERR "In the child\n";
+      # Close i/o streams to break connection with tty
+      close(STDIN);
+      close(STDOUT);
+      close(STDERR);
+      # Re-open the stdin, stdout and stderr file descriptors for
+      # sendmail's benefit. Should stop it squawking!
+      open(STDIN,  "&lt;/dev/null");
+      open(STDOUT, "&gt;/dev/null");
+      open(STDERR, "&gt;/dev/null");
+
+      fork && exit 0;
+      # This new grand-child's parent is init
+      #print STDERR "In the grand-child\n";
+      $SIG{'CHLD'} = 'DEFAULT';
+      setsid();
+    } else {
+      #print STDERR "In the parent\n";
+      wait; # Ensure child has exited
+      exit 0;
+    }
+    # This was the old simple code in the 2nd half of the if statement
+    #fork && exit;
+    #setsid();
+  }
+}
+
+
+#
+# Set the current UID and GID if they are non-zero
+#
+#sub SetUidGid {
+#  my($uid, $gid) = @_;
+#
+#  if ($gid) { # Only do this if setting to non-root
+#    #print STDERR "Setting GID to $gid\n";
+#    MailScanner::Log::InfoLog("MailScanner setting GID to $gname ($gid)");
+#    POSIX::setgid($gid) or MailScanner::Log::DieLog("Can't set GID $gid");
+#  }
+#  if ($uid) { # Only do this if setting to non-root
+#    #print STDERR "Setting UID to $uid\n";
+#    MailScanner::Log::InfoLog("MailScanner setting UID to $uname ($uid)");
+#    POSIX::setuid($uid) or MailScanner::Log::DieLog("Can't set UID $uid");
+#  }
+#  $) = $(;
+#  $&gt; = $&lt;;
+#}
+
+sub SetUidGid {
+  my($uid, $gid) = @_;
+
+  if ($gid) { # Only do this if setting to non-root
+    #print STDERR "Setting GID to $gid\n";
+    MailScanner::Log::InfoLog("MailScanner setting GID to $gname ($gid)");
+    # assign in parallel to avoid tripping taint mode on
+    ($(, $)) = ($gid, $gid);
+    $( == $gid && $) == $gid or die "Can't set GID $gid";
+  } else {
+    $) = $(;
+  }
+  if ($uid) { # Only do this if setting to non-root
+    #print STDERR "Setting UID to $uid\n";
+    MailScanner::Log::InfoLog("MailScanner setting UID to $uname ($uid)");
+    # assign in parallel to avoid tripping taint mode on
+    ($&lt;, $&gt;) = ($uid, $uid);
+    $&lt; == $uid && $&gt; == $uid or die "Can't set UID $uid";
+  } else {
+    $&gt; = $&lt;;
+  }
+}
+
+
+#
+# Check the home directory of the user exists and is writable
+#
+sub CheckHomeDir {
+  my $home = (getpwuid($&lt;))[7];
+
+  MailScanner::Log::WarnLog("User's home directory $home does not exist")
+    unless -d $home;
+  unless (-w $home ||
+          (MailScanner::Config::IsSimpleValue('usespamassassin') &&
+           !MailScanner::Config::Value('usespamassassin'))) {
+    MailScanner::Log::WarnLog("User's home directory $home is not writable");
+    MailScanner::Log::WarnLog("You need to set the \"SpamAssassin User " .
+      "State Dir\" to a directory that the \"Run As User\" can write to");
+  }
+}
+
+# This is now obsolete as no references to SystemDefs exist any more.
+##
+## Check all of the programs whose locations are set in SystemDefs.pl
+## as some of them might be wrong, which will cause it to fail very
+## quietly.
+##
+#sub CheckSystemDefs {
+#  my($prog, $errors);
+#  $errors = 0;
+#  foreach $prog ($global::rm, $global::cp, $global::cat, $global::sed) {
+#    next if -x $prog;
+#    MailScanner::Log::WarnLog("The location of %s in SystemDefs.pm is wrong",
+#                              $prog);
+#    $errors++;
+#  }
+#  MailScanner::Log::DieLog("Aborting due to SystemDefs.pm errors") if $errors;
+#}
+
+
+#
+# Check the versions of the MIME and SpamAssassin modules
+#
+sub CheckModuleVersions {
+  my($varname, $module_version);
+
+  # These version numbers are what come in the MIME-tools v5.410 package,
+  # which I (nwp) use.
+  my %mime_required = (
+                       Parser     =&gt; "5.406",
+                       Entity     =&gt; "5.404",
+                       Tools      =&gt; "5.410",
+                       Words      =&gt; "5.404",
+                       Head       =&gt; "5.403",
+                       Decoder    =&gt; "5.403",
+                       Body       =&gt; "5.403",
+  );
+
+  no strict 'refs';
+
+  foreach (keys %mime_required) {
+    $varname = "MIME::". ucfirst lc($_) ."::VERSION";
+    defined $$varname or next;
+    $module_version = $$varname;
+    $module_version &gt;= $mime_required{$_} or
+      MailScanner::Log::DieLog("FATAL: Newer MIME-tools module needed: %s" .
+                               " is only MIME::$_ -- %s required",
+                               $module_version, $mime_required{$_});
+  }
+
+  # And check the SpamAssassin version
+  $varname = "Mail::SpamAssassin::VERSION";
+  MailScanner::Log::DieLog("FATAL: Newer Mail::SpamAssassin module needed: " .
+                           "Mail::SpamAssassin is only %s -- 2.1 required",
+                           $Mail::SpamAssassin::VERSION)
+    if defined $Mail::SpamAssassin::VERSION &&
+       $Mail::SpamAssassin::VERSION&lt;"2.1";
+}
+
+
+#
+# Check the incoming and (default) outgoing queues are on the same filesystem.
+# MailScanner cannot work fast enough if they are in different filesystems.
+#
+#
+# Check the incoming and outgoing queues are on the same device.
+# Can only check the default outgoing queue, but that will be
+# enough for most users.
+#
+sub CheckQueuesAreTogether {
+  my($indevice, $outdevice, @instat, @outstat);
+  my($inuid, $outuid, $ingrp, $outgrp);
+
+  my @inqdirs = @{MailScanner::Config::Value('inqueuedir')};
+  my $outqdir = MailScanner::Config::Value('outqueuedir');
+
+  #MailScanner::Log::WarnLog("Queuedir is %s", $outqdir);
+  MailScanner::Sendmail::CheckQueueIsFlat($outqdir);
+  chdir($outqdir); # This should be the default
+  @outstat = stat('.');
+  ($outdevice, $outuid, $outgrp) = @outstat[0,4,5];
+  MailScanner::Log::DieLog("%s is not owned by user %d !", $outqdir, $uid)
+    if $uid && ($outuid != $uid);
+
+  my($inqdir);
+  foreach $inqdir (@inqdirs) {
+
+    # FIXME: $inqdir is somehow tained: work out why!
+    $inqdir =~ /(.*)/;
+    $inqdir = $1;
+
+    #MailScanner::Log::WarnLog("Inq %s", $inqdir);
+    MailScanner::Sendmail::CheckQueueIsFlat($inqdir);
+    chdir($inqdir);
+    @instat = stat('.');
+    ($indevice, $inuid, $ingrp) = @instat[0,4,5];
+
+    MailScanner::Log::DieLog("%s & %s must be on the same filesystem/" .
+                             "partition!", $inqdir, $outqdir)
+      unless $indevice == $outdevice;
+    MailScanner::Log::DieLog("%s is not owned by user %d !", $inqdir, $uid)
+      if $uid && ($inuid != $uid);
+  }
+}
+
+
+#
+# Create and write a PID file for a given process id
+#
+sub WritePIDFile {
+  my($process) = @_;
+
+  my $pidfh = new FileHandle;
+  $pidfh-&gt;open("&gt;$PidFile")
+    or MailScanner::Log::WarnLog("Cannot write pid file %s, %s", $PidFile, $!);
+  print $pidfh "$process\n";
+  $pidfh-&gt;close();
+}
+
+##
+## Delete the PID file for a given process id
+##
+#sub DeletePIDFile {
+#  my($process) = @_;
+#  unlink("$PidDir/MailScanner.$process");
+#}
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

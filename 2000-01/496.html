@@ -1,0 +1,152 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Partitions" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="Mike Andrew <mikero@norfolk.nf>, linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 13 Jan 2000 21:53:06 +1000" -->
+<!-- Id="" -->
+<!-- Reference="3.0.5.32.20000113155510.00939d70@post.flinders.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Partitions</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:Mike Andrew <mikero@norfolk.nf>">Mike Andrew <mikero@norfolk.nf></A>, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Thu, 13 Jan 2000 21:53:06 +1000
+</PRE>
+<H1>Re: Partitions</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 03:08 AM 1/14/00 +1130, Mike Andrew wrote:
+&gt;From: Brian Astill &lt;<A HREF="mailto:brian.astill@flinders.edu.au">brian.astill@flinders.edu.au</A>&gt;
+&gt;
+&gt;&gt; re our discussion a little while ago, I installed RH6.1 on a drive which
+&gt;&gt; also contained a DOS partition.  Result:
+&gt;&gt; Hdb1 Primary DOS
+&gt;&gt; Hdb2 Primary DOS
+&gt;&gt; Hdb5 Logical Linux Native (/boot)
+&gt;&gt; Hdb6 Logical Linux Native (/)
+&gt;&gt; Hdb7 Logical Linux Swap
+&gt;&gt;
+&gt;&gt; Note that there is no partition labelled 'Extended'
+&gt;&gt; Note that Hdb5 is real - a primary partition in which data is stored.
+&gt;&gt; Note - there are FIVE partitions ??
+&gt;
+&gt;whooo slow down, you're getting some terms mixed up.
+&gt;
+&gt;inviolable rule #1 PRIMARY partitions plural
+&gt;
+&gt;there can only ever be four (4) primary partitions. The location of these
+&gt;partitions on the disk are contained in the first bytes of the first sector
+&gt;of every hard disk and it is called the master boot record (mbr), solely
+&gt;because a bootable binary of some kind can co-exist there in the remaining
+&gt;512 bytes of that sector. They are primary, and there are only (a maximum)
+&gt;of four because that is the physical definition of their location and
+&gt;structure on the disk.
+
+Hmmm, I am sure that you didn't mean the above to sound as confusing as it
+looks.
+
+The first sector of each HD is called the MBR, or master boot record, and
+its structure is as follows:
+
+446 bytes are the master bootstrap.
+ 64 bytes are the four partition table entries as you mention
+  4 bytes are a signature ...
+
+Then there is a boot sector at the first sector of bootable partitions like
+DOS, Windows NT, Win95.  Win98, or FAT 32 partitions have a three sector
+boot record, plus a copy a bit further into the disk ...
+
+&gt;these partitions correspond to hdX1,2,3 and 4, they cannot be called
+&gt;anything else.
+&gt;
+&gt;the fact that hdb4 is not used in your setup is irrelevant. hdb3 (although
+&gt;unlisted) most certainly is. an entry exists in your mbr on hdb for
+&gt;partition 4, it says 'zero bytes' and is ignored.
+&gt;
+&gt;rule # 2 EXTENDED partition - singular
+&gt;
+&gt;one of these 'primary' partitions, and only one, can be instead an
+&gt;'extended' partition. (which is not a partition at all). It points to a
+&gt;location on the disk which contains a linked list of 'logical' partitions.
+&gt;You can have as many logical partitions as you care to endure but the
+&gt;practical limit for linux at least is 16-4 due to the make up of major and
+&gt;minor nodes in /dev directory that point to these partitions.
+
+Hmmm, I just looked at /dev/hda?, and the minor numbers start at 1 and grow
+sequentially to 9 in the case of my system.  I can also see other devices
+with minor numbers up to 175 or so ...
+
+Now I have not looked at the code, but it would seem that IDE minor numbers
+could go all the way up to 255, thus allowing up to /dev/hda255?  Perhaps
+there is some other limit in the code ...
+
+&gt;*any* of the four partitions hda1 through 4 can be an extended 'pseudo
+&gt;partition and is generally indicated as such in listings as
+&gt;
+&gt;&lt;hda2&gt; hda5
+&gt;
+&gt;this syntax says, the first logical partition hda5 is in the extended
+&gt;partition called hda2.
+&gt;
+&gt;rule #3 LOGICAL partitions -many
+&gt;
+&gt;logical partitions start at hdX5 and grow from there.
+&gt;
+&gt;the reason why only one extended partition exists (if it exists at all) is
+&gt;because more than one is silly, it could only ever duplicate the linked
+&gt;chain present in the first one.
+&gt;
+&gt;As for the naming conventions for these 3 partition types, i don't make the
+&gt;rules, and they're confusing, but, by any measurement, the above are the
+&gt;facts.
+&gt;
+&gt;<A HREF="http://users.nf/linux/">http://users.nf/linux/</A> +mirrors
+&gt;StepByStep submissions: <A HREF="mailto:mikero@norfolk.nf">mikero@norfolk.nf</A>
+&gt;
+&gt;
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>, Master Linux Administrator :-),
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Co-author, SAMS Teach Yourself Samba in 24 Hours
+Author: First Australian 5-day, intensive, hands-on Linux SysAdmin course
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

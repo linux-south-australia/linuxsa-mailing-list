@@ -1,0 +1,113 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: /etc/passwd" -->
+<!-- FromName="Daniel Callan" -->
+<!-- FromEmail="dcallan@dataline.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 15 Mar 1999 14:10:10 +1000" -->
+<!-- Id="3.0.32.19990315141006.006b7140@hub.dataline.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: /etc/passwd</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Callan &lt;<I><A HREF="mailto:dcallan@dataline.net.au">dcallan@dataline.net.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 15 Mar 1999 14:10:10 +1000
+</PRE>
+<H1>Re: /etc/passwd</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Daryl,
+
+At 13:57 15/03/99 +1030, Daryl wrote:
+&gt;I'm in the planning stages of writing a C program that I am going to set up
+&gt;as a CGI script and set it up so that I can add, delete and modify users on
+&gt;my RH5.2 system using a web interface and forms. As I see it, I have two
+&gt;options for doing this. Getting my program to directly open the /etc/passwd
+&gt;file and make the modifications, or get my program to call the useradd,
+&gt;userdel or usermod programs as required and pass the arguments to that to
+&gt;make the changes.
+
+I have set up a similar system for our ISP servers and having tried
+both methods (successfully), I would definately suggest calling the
+existing "useradd, usermod, chfn, userdel" commands from the perl/C
+cgi script (which will need root-suid CGI wrappers either way you do it).
+
+The problem with directly writing to the /etc/passwd & /etc/shadow
+files is that you have to do all the work that the aforementioned
+commands were specifically written to do, ie: you have work out the
+next avail UID and roll the "passwd-" & "shadow-" versions of the files,
+lock the files so that nothing else writes/reads them while you have them
+open, etc, etc.
+Generally it's just messy, and all possible runtime errors become
+major tradgedies if they stuff the passwd files.
+
+Alternatively, you can just write a script that pulls the inputs
+from the www form and then runs the following code:
+(encryption section included)
+
+/********************* ADDUSER SECTION ***************************/
+strcpy(pw, password_text); /* copy cleartext password to pw string */
+strcpy(salt,rsalt()); 
+salt[2] = '\0';
+
+sprintf(command, "/usr/sbin/useradd -c\"%s,,,\" -g %s -p%s -m -s %s %s"
+,real_name, newuser_group, crypt(pw,salt), newuser_shell, newuser_username);
+
+result = system(command);
+/*****************************************************************/
+
+The only real prerequisite for this code is that your version of shadow
+suite is new enough for "useradd/usermod" to support the -P (encrypted
+passwd) option.
+
+
+&gt;My problem with the first option is that I have no idea how the passwords
+&gt;are stored in the file, i.e. the "encryption" algorithm. 
+&gt;
+I think the details of this are in the man pages for the shadow suite.
+
+Hope this helps,
+-Daniel
+
+
+_____________________________________________________
+Daniel Callan              |      Dataline Networks |
+<A HREF="mailto:dcallan@dataline.net.au">dcallan@dataline.net.au</A>    |      Qld, Australia    |
+Systems Engineer           |      PH:  07 3356 1444 |
+-----------------------------------------------------
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

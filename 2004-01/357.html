@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Problem in Lex & Yacc program." -->
+<!-- FromName="'Karl Billeter'" -->
+<!-- FromEmail="karl@alphalink.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 8 Jan 2004 11:52:10 +1100" -->
+<!-- Id="20040108005210.GA4761@alphalink.com.au" -->
+<!-- Reference="20040107151300.21840.qmail@webmail17.rediffmail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Problem in Lex & Yacc program.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Karl Billeter &lt;<I><A HREF="mailto:karl@alphalink.com.au">karl@alphalink.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 8 Jan 2004 11:52:10 +1100
+</PRE>
+<H1>Re: Problem in Lex & Yacc program.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Jan 07, 2004 at 03:13:00PM -0000, heman  heman wrote:
+&gt; Hi, 
+&gt;  
+&gt;   I have written an application using lex & yacc. It is a simple 
+...
+&gt; dont know where i have gone wrong. The programs are given below. 
+&gt;  
+&gt; cal.l 
+&gt; ------ 
+&gt;  
+&gt; %{ 
+&gt; #include "global.h" 
+&gt; #include "y.tab.h" 
+&gt; #include &lt;stdlib.h&gt; 
+&gt; %} 
+&gt; white          [ \t]+ 
+&gt; digit          [0-9] 
+&gt; integer          {digit}+ 
+&gt; real          {integer}("."{integer})? 
+&gt; %% 
+&gt; {white}          { } 
+&gt; {real}          {yyval=atof(yytext);  
+
+Try using 'yylval' instead of 'yyval'
+
+&gt;            return (NUMBER);} 
+&gt; "+"          return (PLUS); 
+&gt; "-"          return (MINUS); 
+&gt; "*"          return (TIMES); 
+&gt; "\n"          return (END); 
+&gt;  
+&gt; ------------------------------------------------- 
+&gt; cal.y 
+&gt; ------ 
+&gt;  
+&gt; %{ 
+&gt; #include "global.h" 
+&gt; #include &lt;stdio.h&gt; 
+&gt; #include &lt;stdlib.h&gt; 
+&gt; %} 
+&gt; %token  NUMBER 
+&gt; %token  PLUS MINUS TIMES  
+&gt; %token  END 
+&gt;  
+&gt; %left PLUS MINUS TIMES  
+&gt;  
+&gt; %start Input 
+&gt; %% 
+&gt;  
+&gt; Input: 
+&gt;           |     Input Line 
+&gt;           ; 
+&gt;  
+&gt; Line: 
+&gt;                END 
+&gt;           |     Expression     END   {printf("\n Result: %f",$1);} 
+&gt;           ; 
+&gt;  
+&gt; Expression: 
+&gt;           NUMBER { $$=$1; } 
+&gt;           |     Expression PLUS Expression   { $$=$1+$3;} 
+&gt;           |     Expression MINUS Expression   { $$=$1-$3; } 
+&gt;           |     Expression TIMES Expression   { $$=$1*$3; } 
+&gt;  
+&gt;           ; 
+&gt; %% 
+&gt;  
+&gt; int yyerror(char *s) 
+&gt; { 
+&gt;      printf("%s\n",s); 
+&gt; } 
+&gt;  
+&gt; int main(void) 
+&gt; { 
+&gt;      yyparse(); 
+&gt; } 
+&gt;  
+&gt;  
+&gt; global.h 
+&gt; --------- 
+&gt; #define YYSTYPE  double 
+&gt; extern YYSTYPE  yyval; 
+&gt;  
+&gt;  
+&gt; Result: 
+&gt; ------- 
+&gt; [<A HREF="mailto:root@mycal">root@mycal</A>]# yacc -d cal.y 
+&gt; [<A HREF="mailto:root@mycal">root@mycal</A>]# lex cal.l 
+&gt; [<A HREF="mailto:root@mycal">root@mycal</A>]# gcc -o cal y.tab.c lex.yy.c -lfl 
+&gt; [<A HREF="mailto:root@mycal">root@mycal</A>]# ./cal 
+&gt; 2.3+4.2 
+&gt; Result: 0.000000 
+&gt; [<A HREF="mailto:root@mycal">root@mycal</A>]# 
+&gt;  
+&gt;  
+&gt;    Let know what is the problem and how to solve it. 
+&gt;  
+&gt; Thanx.  
+&gt;  
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

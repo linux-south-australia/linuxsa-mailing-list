@@ -1,0 +1,169 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Automatic Proxy URL" -->
+<!-- FromName="'Brad J'" -->
+<!-- FromEmail="bjones@rebel.net.au" -->
+<!-- ToName="'David Lloyd'" -->
+<!-- ToEmail="lloy0076@adam.com.au" -->
+<!-- Date="Wed, 27 Aug 2003 19:12:31 +0930" -->
+<!-- Id="006001c36c7f$89f81850$5e00a8c0@magicorb" -->
+<!-- Reference="20030824114450.28781562.lloy0076@adam.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Automatic Proxy URL</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Brad J &lt;<I><A HREF="mailto:bjones@rebel.net.au">bjones@rebel.net.au</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:lloy0076@adam.com.au">lloy0076@adam.com.au</A></I>&gt;
+  Date: Wed, 27 Aug 2003 19:12:31 +0930
+</PRE>
+<H1>RE: Automatic Proxy URL</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi david,
+Don't know if you still need information on this, heres some examples ,
+you can use either proxy.pac or wpad.dat (one was microsoft the other
+netscape).
+
+Put the example bewlow from www.is.co.za  in a file name either of the
+above two or both accessible from a webserver, change the bits as
+needed.
+
+You can either put the url for the location of the proxy.pac in ie,
+mozilla or other browers manually, or dhcpd can push it out when a lease
+is assigned the options for isc dhcpd are 
+
+option wpad-curl code 252 = text;
+option wpad-curl "http://change.to.ip.ofwebserver/proxy.pac\000";
+
+I know this works for windows(waits for gagging noises to pass into the
+background :), havent had a bsd or linux based desktop for a while  to
+try it on to see if it works for them.
+
+Hope it helps
+Brad
+
+
+//We (www.is.co.za) run a central cache for our customers that they
+//access through a firewall - thus if they want to connect to their
+intranet
+//system (or anything in their domain at all) they have to connect
+//directly - hence all the "fiddling" to see if they are trying to
+connect
+//to their local domain.
+
+//Replace each occurrence of company.com with your domain name
+//and if you have some kind of intranet system, make sure
+//that you put it's name in place of "internal" below.
+
+//We also assume that your cache is called "cache.company.com", and
+//that it runs on port 8080. Change it down at the bottom.
+
+//(C) Oskar Pearson and the Internet Solution (<A HREF="http://www.is.co.za">http://www.is.co.za</A>)
+
+    function FindProxyForURL(url, host)
+        {
+            //If they have only specified a hostname, go directly.
+            if (isPlainHostName(host))
+                    return "DIRECT";
+
+            //These connect directly if the machine they are trying to
+            //connect to starts with "intranet" - ie http://intranet
+            //Connect  directly if it is intranet.*
+            //If you have another machine that you want them to
+            //access directly, replace "internal*" with that
+            //machine's name
+            if (shExpMatch( host, "intranet*")||
+                            shExpMatch(host, "internal"))
+                return "DIRECT";
+
+            //Connect directly to our domains (NB for Important News)
+            if (dnsDomainIs( host,"company.com")||
+            //If you have another domain that you wish to connect to
+            //directly, put it in here
+                            dnsDomainIs(host,"company.com"))
+                return "DIRECT";
+
+            //So the error message "no such host" will appear through
+the
+            //normal Netscape box - less support queries :)
+            if (!isResolvable(host))
+                    return "DIRECT";
+
+ 		//We only cache http, ftp and gopher
+            if (url.substring(0, 5) == "http:" ||
+                            url.substring(0, 4) == "<A HREF="ftp:">ftp:</A>"||
+                            url.substring(0, 7) == "<A HREF="gopher:">gopher:</A>")
+
+            //Change the ":8080" to the port that your cache
+            //runs on, and "cache.company.com" to the machine that
+            //you run the cache on
+                    return "PROXY 192.168.0.3:3128; DIRECT";
+
+            //We don't cache WAIS
+            if (url.substring(0, 5) == "<A HREF="wais:">wais:</A>")
+                    return "DIRECT";
+
+            else
+                    return "DIRECT";
+        }
+
+
+
+-----Original Message-----
+From: David Lloyd [mailto:<A HREF="mailto:lloy0076@adam.com.au">lloy0076@adam.com.au</A>] 
+Sent: Sunday, 24 August 2003 11:45 AM
+To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+Subject: Automatic Proxy URL
+
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+
+Hi There,
+
+
+Mozilla, Internet Explorer and such have a proxy configuration that
+specifies a particular URL to setup a proxy. I cannot find much
+documentation about what the page loaded should return or how the
+browsers parse that page.
+
+Any hints or links?
+
+DSL
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

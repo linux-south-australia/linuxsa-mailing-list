@@ -1,0 +1,128 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="basic Command line scripting" -->
+<!-- FromName="Jake Hawkes" -->
+<!-- FromEmail="jake@infinitylimited.net" -->
+<!-- ToName="LinuxSA Mailing List" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 31 Mar 2000 17:13:35 +0930" -->
+<!-- Id="38E45727.EBD01BCC@infinitylimited.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: basic Command line scripting</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  To  : LinuxSA Mailing List &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 31 Mar 2000 17:13:35 +0930
+</PRE>
+<H1>basic Command line scripting</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Here is a quick little guid to writting shell scripts on the command
+line. I will be using bash, and note that there are differences between
+the shells.
+
+to invoke bash:
+[<A HREF="mailto:jake@hyper-ig">jake@hyper-ig</A> ~]$ bash
+[<A HREF="mailto:jake@hyper-ig">jake@hyper-ig</A> jake]$
+
+i find the most commonly used command line script I write, is the for
+loop:
+
+$ for i in `ls`; do
+&gt; cat $i
+&gt; done
+
+this first expands everything between the ` and passes the output into
+the foor loop. The for loop will then loop around fro as many times as
+there are items in the list, assigning $i to the next item in the list.
+
+so to do something more usefull (like convert every file in the
+directory using html2ps:
+
+$ for i in `ls *.html`; do
+&gt; html2ps $i
+&gt; done.
+
+Now, what if the program html2ps needs an output filename? ie, you need
+to call html2ps like this:
+
+$ html2ps foo.html foo.ps
+
+then you would need to do some translations:
+
+$ for i in `ls *.html`; do
+&gt; html2ps $i `echo $i | sed s/\.html/\.ps/`
+&gt; done
+
+
+html2ps: the program to run
+$i: the input file
+`echo $i | sed s/\.html/\.ps/': the script to construct the output
+filename
+
+
+to explaion the last bit, we echo $i (in this case a filename like
+foo.html) into sed which translates every instance of ".html" with
+".ps". So foo.html will become foo.ps, which is what we wanted.
+
+the sed syntax is s/string1/string2/
+s: replace strings
+string1: what to replace
+string2: what to replace it with
+
+the '\' in the above example escape the "." which is a special character
+used in pattern matching.
+
+another really cool script that you may need to use later on (if you
+deal withj copyinbg files rom MSDOS infected disks is:
+
+$ for i in `ls`; do
+&gt; mv $i `echo $i | tr [:upper:] [:lower:]`
+&gt; done
+
+which will rename every file in the current directory to lowercase -
+thankyou to Mr Tester for that one many years ago - in fact my first
+every exposure to shell programing.
+
+"Pass on what you have learned...."
+
+... one imaginary minty for the person that can place this quote. 
+--
+Jake Hawkes, B.Eng (CSE)
+
+"I'm only smart enough to know how stupid I am", Joe Strummer.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

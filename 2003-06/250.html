@@ -1,0 +1,150 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Password protect your system" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="ilox@airnet.com.au" -->
+<!-- Date="Thu, 05 Jun 2003 12:46:55 +0930" -->
+<!-- Id="3EDEB627.1090201@aarnet.edu.au" -->
+<!-- Reference="VA.00000967.003ef196@airnet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Password protect your system</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:ilox@airnet.com.au">ilox@airnet.com.au</A></I>&gt;
+  Date: Thu, 05 Jun 2003 12:46:55 +0930
+</PRE>
+<H1>Re: Password protect your system</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Ian Loxton wrote:
+&gt; 1) Can I do a similar thing with GRUB?
+
+Yes.
+
+   $ grub
+
+   grub&gt; md5crypt
+   Password: ********
+   $1$U$JK7xFegdxWH6VuppCUSIb.
+   grub&gt; quit
+
+Now put that string your /boot/grub/menu.lst file,
+before the first "title" line.
+
+   password --md5 $1$U$JK7xFegdxWH6VuppCUSIb.
+
+Now people will need to provide a password before they
+can alter the boot seqeuence in a "title" clause.
+
+If you have a "title" clause which boots into single
+user mode then you should have a line which says "lock"
+immediately after "title".
+
+&gt; 2) If I followed these steps would it really make the system secure 
+&gt; against local hacking?
+
+There's actually a long list of things you need to do to
+make the console secure:
+
+  - Change the BIOS boot order to boot from hard disk
+    first.
+
+  - Add a BIOS configuration change password (and
+    make sure it works, some motherboards need a
+    jumper change).
+
+  - Add a boot loader password.
+
+  - Make the boot loader prompt for a password on
+    booting to single user mode.
+
+  - Disable the "Magic SysRq key".  Add
+       kernel.sysrq = 0
+    to /etc/sysctl.conf
+
+  - Disable any "interactive startup" options.  On
+    RHL alter /etc/sysconfig/init to
+       PROMPT=no
+
+  - Think about appropiate behaviour for Ctrl-Alt-Del
+    and alter /etc/inittab if needed.  Useful choices
+    are to do nothing, reboot or shut down.
+
+  - Think about disabling the Ctrl-Alt-Backspace XWindows
+    restart key (see /etc/X11/XFree86Config).  If you
+    have a locked screen this allows someone to get
+    back to a username/password login prompt.  That
+    might be desired, or might be deeply undesirable.
+
+  - Think about virtual consoles.  You might not want
+    to have these on computer lab machines (it's far
+    too easy to forget to log out of a virtual console
+    session after logging out from another virtual
+    console).  See /etc/inittab.
+
+And of course the BIOS, boot loader and Linux passwords
+all had better be good.
+
+You can probably defeat these measures by opening the
+box.  Fortunately, this is hardest on laptops, which are
+the systems which need the most protection from nasty
+people at the console.
+
+Box openers could simply remove an IDE cables, so that
+the box boots from the next device in the boot order
+list.  Or they could move the "BIOS password enabled"
+jumper. Basically, if people can open the box the game
+is over.
+
+I'm slack, so I normally just put a big mother of a
+cable tie thorugh the loops intended for a padlock
+(you'll find that most "corporate" style machines
+have some way to stop the lid from being opened).
+There are obviously better ways, ranging from
+padlocks to safes, depending on your environment.
+
+-- 
+  Glen Turner         Tel: (08) 8303 3936 or +61 8 8303 3936
+  Network Engineer          Email: <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>
+  Australian Academic & Research Network   www.aarnet.edu.au
+-- 
+  linux.conf.au 2004, Adelaide          lca2004.linux.org.au
+  Main conference 14-17 January 2004   Miniconfs from 12 Jan
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

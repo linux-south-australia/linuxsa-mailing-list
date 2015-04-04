@@ -1,0 +1,166 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: FW: Using lilo with a DDO" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="bugman@icvpn.com, LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 26 Jul 2000 02:03:09 +0900" -->
+<!-- Id="3.0.6.32.20000726020309.00a0e840@203.16.214.248" -->
+<!-- Reference="397D96FC.9BF04C1B@ihug.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: FW: Using lilo with a DDO</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : bugman@icvpn.com, LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 26 Jul 2000 02:03:09 +0900
+</PRE>
+<H1>RE: FW: Using lilo with a DDO</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 11:59 PM 7/25/00 +0930, Adam Smith wrote:
+&gt;Actually I am running Linux on a 4Gb Hard Disk that is not currently in my
+&gt;system. the 10/17Gb drives are FAT32 Windows drives at the moment partitined
+&gt;to 8Gb and 8Gb (because that's all the BIOS can handle without DDO at the
+&gt;moment.
+&gt;
+&gt;So currently it looks like this:
+&gt;
+&gt;10Gb (Partitioned to 8Gb) Primary, running Windows 98
+&gt;17Gb (Partitioned to 8Gb) Secondary, running Windows 98
+&gt;4Gb (Various Linux Partitions) Currently uninstalled, Secondary Master when
+&gt;installed.
+&gt;
+&gt;So i'd like to get the 10 and 17Gb running at full capacity and have the
+&gt;option to still dual boot to Windows and Linux.
+
+The only real problem is loading lilo and vmlinuz. These are loaded using
+the BIOS.  If your BIOS in not capable of EDD, then you must have /boot on
+a partition that resides below cylinder 1024.
+
+If you are using the 4GB disk for that, you have no problems at all.
+
+Once Linux is running, it can access any part of those 10GB and 17GB disks.
+
+It is all a matter of setting up your lilo.conf.
+
+image=/boot/vmlinuz   # This is /dev/hdc
+   root=/dev/hdc1
+   ro
+
+other=/dev/hda1
+   table=/dev/hda
+
+Would be a reasonable setup. 
+
+A stock standard RH6.2 should be able to manage it.
+
+However, if you have a BIOS that does EDD (one since about 1998), then
+Mandrake 7.1 will install a version of LILO that can boot from anywhere on
+a 17GB or 10GB disk, so you could put your root file system on the 2GB
+unused on the 10GB disk.
+
+&gt;I'll have a good read of the HOWTO in the morning, but any other tips would
+&gt;be handy of course :)
+&gt;
+&gt;Adam
+&gt;
+&gt;&gt; -----Original Message-----
+&gt;&gt; From: <A HREF="mailto:michael@new-smtp1.ihug.com.au">michael@new-smtp1.ihug.com.au</A>
+&gt;&gt; [<A HREF="mailto:michael">mailto:michael</A>@new-smtp1.ihug.com.au]On Behalf Of Michael Fewings
+&gt;&gt; Sent: Tuesday, 25 July 2000 11:03
+&gt;&gt; To: <A HREF="mailto:bugman@icvpn.com">bugman@icvpn.com</A>; linuxsa
+&gt;&gt; Subject: Re: FW: Using lilo with a DDO
+&gt;&gt;
+&gt;&gt;
+&gt;&gt; &gt;
+&gt;&gt;
+&gt;&gt;  Adam,
+&gt;&gt;         Have a look at the Mini-HowTo "LargeDisk" by Andries
+&gt;&gt; Brouwer. It is
+&gt;&gt; most illuminating.
+&gt;&gt; I get the impression that you're only running linux on these two
+&gt;&gt; disks, so you
+&gt;&gt; don't need a disk manager at all.
+&gt;&gt; According to this HowTo the 8.4GB limit is imposed only by the
+&gt;&gt; fact that the
+&gt;&gt; kernel must be within the first 1024 cylinders of the disk. You
+&gt;&gt; can fit the
+&gt;&gt; kernel in a 10MB partition, and partition the rest of the disk
+&gt;&gt; how you like.
+&gt;&gt; It also says that linux can handle partitions of 2^32 sectors =&gt;
+&gt;&gt; 2TiB =&gt; 2000GB
+&gt;&gt; (if I'm not mistaken)
+&gt;&gt;     More than enough for you, yeah!
+&gt;&gt;
+&gt;&gt; Read it for yourself - it's very interesting!
+&gt;&gt;
+&gt;&gt; Mind you, I haven't tried to make use of this information to this extent!
+&gt;&gt;
+&gt;&gt; Michael
+&gt;&gt;
+&gt;&gt;
+&gt;&gt; --
+&gt;&gt; Michael (Pop) Fewings   [B.Sc.; Adv.Dip.Comp.Sc.; Cert.Audio Prod.]
+&gt;&gt; Sound Engineer, Tour Manager, Computer Scientist, Geologist
+&gt;&gt; There must be something I can do for you?
+&gt;&gt;
+&gt;&gt;
+&gt;&gt;
+&gt;&gt;
+&gt;&gt; --
+&gt;&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;&gt; To unsubscribe from the LinuxSA list:
+&gt;&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;&gt;
+&gt;&gt;
+&gt;
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Contributing author, SAMS Teach Yourself Samba in 24 Hours
+Author, Special Edition, Using Samba
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

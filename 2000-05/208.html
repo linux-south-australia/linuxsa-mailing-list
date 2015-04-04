@@ -1,0 +1,153 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: zombie shared memory segments??!" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Tue, 9 May 2000 08:45:59 +0930" -->
+<!-- Id="20000509084559.A27184@atdot.dotat.org" -->
+<!-- Reference="20000509065537.A30989@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: zombie shared memory segments??!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Tue, 9 May 2000 08:45:59 +0930
+</PRE>
+<H1>Re: zombie shared memory segments??!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, May 09, 2000 at 06:55:37AM +0918, Alan Kennington wrote:
+
+ &gt; Sorry to harp on about this rather technical topic
+ &gt; (i.e. programming), but....
+ &gt; It's starting to look to me as though when you create a segment
+ &gt; of shared memory in linux, if for any reason you don't get around
+ &gt; to marking the memory as to-be-deleted when the program exits,
+ &gt; then the memory will never be recovered (especially if you don't
+ &gt; know what key was used).
+ 
+"Never" is a rather strong word.
+
+ &gt; This seems to mean that any program which uses shared memory 
+ &gt; (and "top" indicates that essentially _every_ program does
+ &gt; use shared memory) may, if it exits strangely, cause memory
+ &gt; to be irretrievably lost.
+
+Two points:  Yes, almost every program uses shared memory in some
+way (for example, using mmap() to map shared libraries into an 
+executable's address space), but all uses of shared memory don't
+have the problem which you're alluding to.
+
+SysV shared memory segments outlive the processes that created
+them.  To me, this is a huge design wart, but I'm sure some SysV
+people will be able to explain it away.  It's a departure from the
+way that other resources are freed when the process that owns them
+died, though, and can cause confusion like that which you're 
+finding at the moment.
+
+The words "never" and "irretrievably" are where you're going wrong
+at the moment -- The "ipcs" command can list SysV shared memory 
+segments, "ipcrm" can delete shared memory segments which you think
+aren't in use anymore.
+
+Finally, you're not irretrievably losing "memory" when you forget
+to free a shared memory segment, you're losing page table entries
+(like, yeah... who gives a rat's arse?).  If this is a problem for
+you use ipcrm;  in practice it'll only affect you if the unfreed
+segments exceed the system's limit on the maximum number of shared
+memory segments, or the maximum amount of shared memory.
+
+ &gt; This also means that any ordinary user can just run programs
+ &gt; which gobble up shared memory until it's all gone, thereby
+ &gt; hanging the system.
+
+Not so -- Firstly, there are kernel limits on the amount of SysV
+shared memory segments which are smaller than the amount of physical
+RAM, and secondly shared memory is paged-in and paged-out just like
+any other memory:  You seem to be under the misconception that 
+shared memory segments are somehow wired in to physical memory, 
+but I can assure you that they are not.  Assuming your kernel is
+configured appropriately, there's nothing stopping you from allocating
+128 Mbytes of shared memory on a 64 Mbyte system.
+
+And, again, bear in mind that the discussion above only covers SysV
+shared memory.  The BSD shared memory API (mmap(), mprotect(), madvise(),
+etc) works in the way you'd expect a UNIX resource to work, and benefits
+from a much better design (lower system call overhead, automatic
+deallocation, and so on).
+
+ &gt; I can hardly believe that linux (and System V generally)
+ &gt; has been designed with this major vulnerability.
+
+SysV had a lot of crap design go into it -- It's what happens when
+you contrast the results of commercial expedience against the results
+of open-sourced peer review.  If you want to see something worse,
+try looking at the STREAMS/TLI network specification, or the lpsched
+printer system.  Yukko.
+
+ &gt; There seems to be no way to makr shared memory to be re-cycled
+ &gt; when no process is using it, without also making the memory
+ &gt; unusable by further process that do want to use it.
+
+You haven't read enough manuals :-)
+
+ &gt; My questions:
+ &gt; 1.	Is the situation really so chaotic and clumsy
+ &gt; 	as it seems to me?
+ 
+It alsmost never is :-)
+
+ &gt; PS. On the subject of the worm/virus "iloveyou",
+ &gt; what I'd like to know is why people (e.g. reporters)
+ &gt; do not immediately point the finger at Microsoft.
+
+Because Microsoft is so good at muddying the waters.  Bill Gates 
+contributed to this yesterday by releasing a statement calculated
+to capitalize on the irrational hysteria which has built up over
+the ILOVEYOU virus, saying that the world could expect more viruses
+if the company was broken up.
+
+Non-sequiturs make me eat lampshades.
+
+     - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

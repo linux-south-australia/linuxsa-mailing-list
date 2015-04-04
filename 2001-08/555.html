@@ -1,0 +1,97 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: procmailrc re-send recipes SOLVED!" -->
+<!-- FromName="'Daniel Callan'" -->
+<!-- FromEmail="dcallan@wias.net.au" -->
+<!-- ToName="'Anthony Symons'" -->
+<!-- ToEmail="ant@sa.pracom.com.au" -->
+<!-- Date="Tue, 14 Aug 2001 15:30:47 +1000" -->
+<!-- Id="4.3.1.20010814151019.00c13220@mail.wias.net.au" -->
+<!-- Reference="4.3.1.20010813145916.00bfd660@mail.wias.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: procmailrc re-send recipes SOLVED!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Callan &lt;<I><A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A></I>&gt;
+  To  : Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  Date: Tue, 14 Aug 2001 15:30:47 +1000
+</PRE>
+<H1>Re: procmailrc re-send recipes SOLVED!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi All,
+
+Just thought I'd drop a line to mention that I came up with a solution for
+that procmail recipe issue. Basically, I gave up on trying to master the art
+of reg-expressions for procmailrc and used the "* ? $EVAL_PROG" operation
+to run a binary. From there I just wrote my own C prog that did all the 
+decisions
+I could possibly want for local re-send evaluation.
+
+The program that I wrote (and shortsightedly called "checkalias", bummer 
+that is already a OS binary)
+checks if $ENV_TO is either a local username (uid&gt;=500) or listed as an 
+alias within /etc/alises.
+It gives a return value of 1 if it finds neither. (It also takes the 
+aliases file location as a param too
+but that's because the alias file is not actually in /etc/).
+
+The recipe lines I run it from (which is much nicer than the kludgey one I 
+had):
+-----------------------------------------------------------------
+CHECKUSER = /home/master/checkuser
+ALIASFILE = /home/master/mail-alises
+
+:1:
+* ? $CHECKUSER $ALIASFILE $ENV_TO
+! $<A HREF="mailto:ENV_TO@localhost">ENV_TO@localhost</A>
+-----------------------------------------------------------------
+
+And I still have my fallback ( :1e:) line if all goes pear-shaped ;-)
+
+Big thanks to Ant for giving me some ideas, and also for making me
+realise that I wasn't going to find a conventional way of doing it :-)
+
+Cheers,
+-Daniel
+
+Daniel Callan
+<A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A>
+Systems Admin.
+WIAS Aust.
+www.wias.net.au
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

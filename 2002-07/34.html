@@ -1,0 +1,197 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba Tuning" -->
+<!-- FromName="" -->
+<!-- FromEmail="Matthew.Cook@tekelek.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 2 Jul 2002 13:07:11 +0930" -->
+<!-- Id="OF395973EC.B90F0143-ONE9256BEA.000C4F85-E9256BEA.0013A95F@LocalDomain" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba Tuning</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: &lt;<I><A HREF="mailto:Matthew.Cook@tekelek.com.au">Matthew.Cook@tekelek.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 2 Jul 2002 13:07:11 +0930
+</PRE>
+<H1>Re: Samba Tuning</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Thanks all for the Input !
+
+In reply to Richards Comments:
+----------------------------
+
+&gt;However, you should be able to achieve something like 75% or so of the max
+&gt;atainable at 100Mb/s (around 10MB/s).
+
+Yes this was my thoughts exactly, if I can reach a sustained 8-9Mbyte/s I
+would be perfectly happy.  It is just these 2Gb files where I am suffering
+greatly, otherwise you I normally dont notice.
+
+&gt;Secondly, Windows does lots of funny things on the wire, and unless you
+&gt;write some special programs, you have to wait for the data to hit the
+&gt;disk (buffers) before you ask for more, so it might not even be capable of
+&gt;driving a 100Mb/s link to saturation.
+
+I was aware that Win98se is a bit screwy on what comes out the network
+port, I might remove these boxes from the equation and use the Win2k
+box.... jury is still out.
+
+&gt;Make sure the server is the bottleneck first. You can do this by grabbing
+&gt;a packet trace and looking at the delay between one request completing and
+&gt;the next one issuing.
+
+Good Points !  I will see what I can capture with a terminal dump from the
+switch.
+
+&gt;I have recently committed some code that does allow you do generate CIFS
+&gt;load, called cifs-load-gen, that will allow you to explore these things.
+&gt;
+&gt;You can also use the load generator to check what the system is capable
+&gt;of. Tests I did last year with 750MHz Duron with 1GB running either 2.4.7
+&gt;or FreeBSD 4.4 suggests that it takes about 10 clients running netbench
+&gt;to saturate a 100Mb/s link. The load generator can get you reading or
+&gt;writing files, and that may allow you to go hell for leather.
+
+Is thje cifs-load-gen in the current samba code ?  I looked at my version
+and 2.2.0a is probably getting a little stale, have swiped 2.2.5 down from
+the samba site so I will compile this and give it ago.   I have considered
+using FreeBSD 4.5 for the machine but will stick with linux for a little
+longer (learning curve thing).
+
+In Reply to Glen's Comments:
+--------------------------
+&gt;You actually want a fair bit of idle CPU.  If you don't have
+&gt;any idle CPU than Samba will need to wait behind other processes
+&gt;before it gets it's allocation of CPU time.  If the other processes
+&gt;are CPU-bound Samba might end up waiting 0.005s per packet.  The
+&gt;jargon for this is the "run queue length" and some utilities
+&gt;will display that.
+
+Agreed, but with the double buffering of the information through the kernel
+it is a good indication of smbd load on the system.   Richard I think is
+right in that the Win client is possibly not able to generate enough load.
+I think top from memory will sort the processes according to "run queue
+length", will check this out.
+
+&gt;You might find the 'bonnie' disk benchmarking program useful
+&gt;for tracking server bottlenecks.  Look at the 'sequential
+&gt;output - block' figure and the 'random seeks - per sec'
+&gt;figures.
+&gt;
+&gt;Your client I/O traffic will usually be a mix of these, the
+&gt;number of seeks will increase more than proportionately with
+&gt;the number of clients (the more users, the greater the odds
+&gt;that the disk head will need to be moved to satisfy the request).
+
+Will STW and see if I can find this, ideally I would like to monitor the
+Mb/s from the ethernet card but the load placed on the system by these
+packages downgrades performance significantly.  I have tried ethereal,
+iptraf and a couple of others, they typically chew 15-30% of the cpu load
+which is less than ideal for bench marking.   The IPMeter package looks
+very interesting but uses an external BSD box to do the monitoring, haven't
+got that many spare boxes around the place :(
+
+&gt;High-end servers come with 10,000RPM disks, explicitly to get
+&gt;the head movement time down.  This is professional kit, so
+&gt;simply use the fastest disks you can reasonably find (say
+&gt;7200 rather than 5400).
+&gt;
+&gt;If you use IDE then set the hdparm and idebus= settings optimally
+&gt;for your hardware.
+
+Know these commands well, hdparm -T /dev/x gives me 15-17Mbyte/s sequential
+read performance levels on the ATA66 controller from both drives.   Will
+check the random seek performance with bonnie.  Both drives are 7200rpm
+models, I am going to get an ATA100 controller so the benefits of 7200rpm
+should become apparent then.
+
+&gt;Use the ext2 or xfs filesystems.  The others suck for file
+&gt;serving applications, as you would expect from their design
+&gt;goals.
+
+Ext2 is my current choice, Not sure if I trust XFS for this machine yet,
+not a big fan of patching kernals and tools for xfs support.   I still have
+a reasonable ammount of data on this machine that I would prefer not to
+have to reload from backup.
+
+&gt;Make sure you have a fair whack of RAM.  A lot of the user I/O
+&gt;requests should be cachable.  There is also a cache on the disks
+&gt;themselves,  If you are buying more IDE disk, try for a 8MB cache
+&gt;rather than the standard 2MB cache.  Fiddle with the disk pre-
+&gt;fetching parameters to make this cache work best for your I/O
+&gt;mix.
+
+I have stuffed 768Mb of ram in this machine, 512M is the peak physical i
+have seen used.  I am sure it can max it out but haven't observed so yet.
+
+The latest drive is a WD800JB drive, on the ATA66 controller I see a
+2Mbyte/s improvement over the WD400BB drive sequential throughput
+performance. Migrating this to ATA100 I hope to see a bigger performance
+improvement.
+
+&gt;If you have a UPS, consider enabling write caching on the disk.
+&gt;A single-machine UPS will set you back about $200, so this might
+&gt;be a cheap way to improve throughput.
+
+Little 200VA unit attached and write caching already enabled, this gave a
+15% improvement in writes to the box, which now means that up and down are
+very similar in terms of throughput.
+
+&gt;Finally, start a log book and keep the benchmark results in
+&gt;the book.  You'll find them very handy.
+
+A really good piece of advice that one !   I started my log book the day I
+loaded Slackware 8.0 onto the machine the first time.   It is great to take
+one step forward, end up two steps back... read the log book and figure out
+where to go next.
+
+Anyway I will keep plodding along, at least I have a few more ideas where
+to continue looking.   The machine for all its quirks has been extremely
+reliable and stable running linux for the last 18 months, not having much
+say in the hardware when I got the machine (insurance wrangle) was a pain,
+but it seems to have straightened itself out.
+
+Regards
+
+Matthew
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

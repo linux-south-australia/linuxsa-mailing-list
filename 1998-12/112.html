@@ -1,0 +1,101 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: tar on one file system" -->
+<!-- FromName="daedalus" -->
+<!-- FromEmail="jpw001@its.maynick.com.au" -->
+<!-- ToName="Benjamin Close" -->
+<!-- ToEmail="benjsc@senet.com.au" -->
+<!-- Date="Tue, 8 Dec 1998 10:13:29 +1030 (CST)" -->
+<!-- Id="Pine.3.89.9812081050.A19537-0100000@comet" -->
+<!-- Reference="366C5285.EF360C82@senet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: tar on one file system</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: daedalus &lt;<I><A HREF="mailto:jpw001@its.maynick.com.au">jpw001@its.maynick.com.au</A></I>&gt;
+  To  : Benjamin Close &lt;<I><A HREF="mailto:benjsc@senet.com.au">benjsc@senet.com.au</A></I>&gt;
+  Date: Tue, 8 Dec 1998 10:13:29 +1030 (CST)
+</PRE>
+<H1>Re: tar on one file system</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, 8 Dec 1998, Benjamin Close wrote:
+
+&gt; Hi All,
+&gt;     Could someone tell me how to make tar stay in one file system.
+&gt; 
+&gt; Currently I'm using tar -cvplf file dir
+&gt; option -l is meant to keep it in one file system but it doesn't seem to
+&gt; work.
+
+I suggest you use 'find' to create a list of files to archive, piped to tar.
+
+e.g: tar cpvf myarchive.tar `find . -path './dont_tar_me' -prune -o -print`
+
+The find section simply means: go down the directory hierarchy, starting 
+with the current directory, and if the directory matches the pattern 
+'./dont_tar_me' then skip it, otherwise, print it out.
+
+This is used as a backquote string so that this list of files is passed 
+as an argument to tar, which will create an archive called 'myarchive.tar' 
+containing all the files.
+
+&gt; I'm trying to backup my usr partition but it keeps going in to usr/local
+&gt; which is a seperate partition.
+
+I would suggest trying:
+
+cd /usr
+tar cpvf usrarchive.tar `find . -path './local' -prune -o -print`
+
+or alternatively:
+
+cd /
+tar cpvf usrarchive.tar `find /usr -path '/usr/local' -prune -o -print`
+
+depending on how you want to be able to re-extract.
+
+All this info can be gleaned from 'man tar' and 'man find'. In fact, 'man 
+find' has an example of the above usage of find. I love linux doco :).
+
+-- 
++---------------------------+-----------------------------------------+
+|      Justin Warren        | <A HREF="mailto:justin.warren@its.maynick.com.au">justin.warren@its.maynick.com.au</A>        |
+|   Systems Administrator   | <A HREF="mailto:daedalus@progsoc.uts.edu.au">daedalus@progsoc.uts.edu.au</A>             |
+| Mayne Nickless Express IT | <A HREF="http://www.progsoc.uts.edu.au/~daedalus">http://www.progsoc.uts.edu.au/~daedalus</A> |
++---------------------------+-----------------------------------------+
+| Just because you're paranoid doesn't mean they're NOT after you...  |
++---------------------------------------------------------------------+
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

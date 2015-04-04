@@ -1,0 +1,113 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: init process" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="Leah" -->
+<!-- ToEmail="leahchatburn@one.net.au" -->
+<!-- Date="Sat, 26 Aug 2000 21:44:28 +0930" -->
+<!-- Id="39A7B4A4.A159DAFA@aarnet.edu.au" -->
+<!-- Reference="39A784B7.C2F44F4D@one.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: init process</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Leah &lt;<I><A HREF="mailto:leahchatburn@one.net.au">leahchatburn@one.net.au</A></I>&gt;
+  Date: Sat, 26 Aug 2000 21:44:28 +0930
+</PRE>
+<H1>Re: init process</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Leah wrote:
+
+&gt; how is this all s'posed to work? just use linuxconf to hide the pain ?
+&gt; or is the RPM process s'posed to do a little more (install the ypbind
+&gt; package explictly?) ?
+
+Have a look for a HOWTO on the UNIX System V init system.
+
+The executive summary for Red Hat Linux is:
+
+ 1. Each daemon package places a file in /etc/rc.d/init.d/
+    That file accepts "start" and "stop" parameters.  So
+    to start ypbind on demand you say 
+      /etc/rc.d/init.d/ypbind start
+
+ 2. To activate a daemon package so that is automatically
+    started and stopped on boot say:
+
+      chkconfig --add ypbind
+      chkconfig ypbind on
+
+ 3. The chkconfig utility sets up a number of symbolic links
+    in the /etc/rc.d/rc[0-6].d/ directories.  Symbolic links
+    named S00xxxx cause the script
+      /etc/rc.d/init.d/xxxx start
+    to be run.  Symbolic links named K00xxxx cause the script
+      /etc/rc.d/init.d/xxxx stop
+    to be run.
+
+    Symbolic links with names containing 00 are called before
+    those containing 01, and so on for 02, 03, ...  This allows,
+    say, the network to be started before starting YP.
+
+ 4. The directories are numbered /etc/init.d/rc0.d/ through to
+    /etc/init.d/rc6.d/  The numbers are called "run levels".
+    Differing run levels boot the machine for differing purposes:
+       0: halt
+       1: single user mode
+       2: multiuser, no network
+       3: multiuser, no X (a common selection for servers)
+       4: run turnkey system
+       5: multiuser, X (a common selection for workstations)
+       6: reboot
+
+    The default run level is set in /etc/inittab.  You can change
+    the run level without rebooting the machine by using "telinit".
+
+    You can select a non-default run level on boot, say you normally
+    boot into run level 5 but have stuffed the X configuration.  You
+    can boot into the text-only run level 3 by saying at the LILO prompt:
+
+       linux 3
+     
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,96 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="HOWTO use multiple pointers" -->
+<!-- FromName="Dan Shearer" -->
+<!-- FromEmail="dan@tellurian.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 16 Sep 2000 23:47:26 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.10.10009162333320.1714-100000@localhost.localdomain" -->
+<!-- Reference="39C30AFF.DF943AEE@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: HOWTO use multiple pointers</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sat, 16 Sep 2000 23:47:26 +1030 (CST)
+</PRE>
+<H1>HOWTO use multiple pointers</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Like a lot of notebook users I want to use a real keyboard and mouse when
+convenient, or at least a real mouse. This message deals with the mice.
+The combination here is a PS mouse for the built-in twiddlestick thingy,
+and a serial mouse for the external one, when it is plugged in. I don't
+want any reconfiguration when I plug in a mouse, and with suspend mode and
+just short trips away from base one session might last for many days or
+weeks.
+
+gpm makes this easy. Add the following to your /etc/gpm.conf, and the
+init.d/gpm in Debian, Slakware and Red Hat (and many other distributions
+no doubt, but I know that these three use the same file) will set it all
+up for you:
+
+device=/dev/psaux
+responsiveness=
+repeat_type=
+type=ps2
+append="-M -m /dev/ttyS0 -t ms"
+sample_rate= 
+
+The commandline that the init script creates for this will be:
+
+   gpm -m /dev/psaux -t ps2 -M -m /dev/dev/ttyS0 -t ms
+
+This takes advantage of gpm's ability to handle multiple pointers, in this
+case a ps2 protcol ps/2 mouse and an ms protocol serial mouse. But what
+about X Window? 
+
+The -M gpm switch also turns on -R, for relay. In relay mode gpm relays
+all mouse movements through a fifo called /dev/gpmdata, using the
+mousesystems protocol.
+
+So, just set up your XF86Config file to have a pointer on /dev/gpmdata
+with protocol mousesystems (or use XF86Setup to do it in a GUI way) and
+you will have a multi-mouse system.
+
+man gpm.
+
+--
+Dan Shearer
+Open Source Manager
+<A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

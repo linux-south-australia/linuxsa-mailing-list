@@ -1,0 +1,231 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: please recommend sound card with verified linux S/PDIF optical input" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="ak.linuxsa@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 4 May 2003 18:52:09 +0930" -->
+<!-- Id="20030504185209.A28469@dog.topology.org" -->
+<!-- Reference="3EB4C51E.9090604@netscape.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: please recommend sound card with verified linux S/PDIF optical input</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 4 May 2003 18:52:09 +0930
+</PRE>
+<H1>Re: please recommend sound card with verified linux S/PDIF optical input</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, May 04, 2003 at 12:45:34AM -0700, James Leone wrote:
+&gt; 
+&gt; 
+&gt; What changed the tide for me was _not_  using  _alsamixer_  but using 
+&gt;  ----&gt;GTKaumix&lt;----  in SuSE 8.1 (I think you said you had 8.1.) 
+&gt; Assumeing that you use KDE, click on the Alligator face, go to 
+&gt; multimedia and then sound then GTKaumix.  This GUI works. TKaumix works, 
+&gt; I used it in Lindows, but they only have tar files and Debs so its not 
+&gt; worth your time. GTKAumix is on the SuSe 8.1 CD set.  Alsamixer would 
+&gt; not let me simply select the recording channel I wanted by pressing on 
+&gt; the spacebar as instructed.
+
+James,
+
+I didn't find GKaumix on the SuSE 8.1 disks, but there is something called
+"gamix" which is described in the RPM notes as being a GTK audio mixer,
+and it seems to be what you've described.
+Both gamix and alsamixer seem to have no documentation that I can find.
+Nor can I find anything except bits and pieces about aplay, arecord,
+amixer etc. etc.
+So I've downloaded the sources for everything I could find on the ALSA site.
+I'm usually prepared to spend up to 3 days getting something working,
+but this has now been 3 years, and I haven't got one single millisecond
+of sound through that optical S/PDIF interface yet.
+ 
+&gt; Just click on the Rec button for the Vol setting.  Take the microphone 
+&gt; down to zero.  PCM at 15 eliminates any distortion in the recording.
+
+I suspect that mike recording is okay.
+The alsamixer and gamix softwre have two different ways of denying me
+the possibility to use the S/PDIF input, it seems:
+
+The alsamixer does have sliders for:
+IEC958, IEC958 C, IEC 958 A, IEC958 A, IEC958 1
+and two sliders marked "Digital".
+I suspect that among these must be the controls for my optical
+S/PDIF input interface.
+
+However, unlike the MIC, AUX, CD, Line, MIx, Mix Mono sliders, there
+is no "Capture L-R" button to set on top of the digital-looking sliders.
+
+It's just possible that whoever wrote the drivers for this
+particular chipset just didn't get around to programming the
+capture facility for these interfaces.
+
+The gamix tool has a little menu for selecting the capture source,
+and it lists the above ones that alsamixer offers me,
+and not the digital inputs. In fact, gamix doesn't even have
+sliders for the digital inputs at all.
+
+The arecord listing facility gives me this:
+
+==========================================================
+<A HREF="mailto:akenning@hamster">akenning@hamster</A>:~&gt; arecord -l
+card 0: card0 [Yamaha DS-XG PCI (YMF754)], device 0: YMFPCI [YMFPCI]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 0: card0 [Yamaha DS-XG PCI (YMF754)], device 3: YMFPCI - AC'97 [YMFPCI - AC'97]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+==========================================================
+
+So I know that the digital stuff is there on device 3.
+The last two lines of output from "arecord -L" are:
+
+iec958 'cards.pcm.iec958'
+spdif 'cards.pcm.iec958'
+
+This gives me some hope too. It sort of suggests that the ALSA writers
+have some awareness of the S/PDIF interface. But I have no idea how
+to use this info because I can't find documentation.
+Virtually everything I do with the audio software is by guesswork
+and inference. 
+
+But I think that this might be the final or penultimate nail in the coffin:
+
+------------------------------------------------------
+Simple mixer control 'Digital',0
+  Capabilities: cvolume
+  Capture channels: Front Left - Front Right
+  Limits: Capture 0 - 16383
+  Front Left: Capture 16383 [100%]
+  Front Right: Capture 16383 [100%]
+Simple mixer control 'Digital',1
+  Capabilities: cvolume
+  Capture channels: Front Left - Front Right
+  Limits: Capture 0 - 16383
+  Front Left: Capture 16383 [100%]
+  Front Right: Capture 16383 [100%]
+------------------------------------------------------
+
+This output from "amixer" says that the digital interfaces (I think that 0
+means coax and 1 means optical) only have volume capabilities, but
+no "cswitch" capability to turn on capture.
+But then again, these lines are also in the output from "amixer":
+
+------------------------------------------------------
+Simple mixer control 'IEC958',0
+  Capabilities: cvolume pswitch pswitch-joined cswitch cswitch-joined
+  Playback channels: Mono
+  Capture channels: Front Left - Front Right
+  Limits: Capture 0 - 16383
+  Mono: Playback [on]
+  Front Left: Capture 16054 [98%] [off]
+  Front Right: Capture 16054 [98%] [off]
+Simple mixer control 'IEC958 AC97',0
+  Capabilities: pvolume
+  Playback channels: Front Left - Front Right
+  Limits: Playback 0 - 16383
+  Front Left: Playback 16383 [100%]
+  Front Right: Playback 16383 [100%]
+Simple mixer control 'IEC958 AC97',1
+  Capabilities: pvolume
+  Playback channels: Front Left - Front Right
+  Limits: Playback 0 - 16383
+  Front Left: Playback 16383 [100%]
+  Front Right: Playback 16383 [100%]
+Simple mixer control 'IEC958',1
+  Capabilities: cvolume
+  Capture channels: Front Left - Front Right
+  Limits: Capture 0 - 16383
+  Front Left: Capture 14742 [90%]
+  Front Right: Capture 14742 [90%]
+----------------------------------------------------
+
+So there should be a "cswitch" facility for the IEC958,0 thing.
+But I'm just guessing. I have no documentation to explain the above output.
+
+I'm used to reading a couple of thousand pages of technical documentation
+for even fairly ordinary tasks, and I don't expect to understand any
+substantial system or piece of software without reading at least
+a few hundred pages of docs.
+The frustrating thing with this though, it the very sparse amount of
+documentation that I can find on the ALSA site, the linux HOWTO docs,
+the man-manuals, in Google, etc. etc.
+I just hope the source code for ALSA is commented!
+If not, I'm going to have to read a large amount of source just
+to get a few bytes of sound through an interfaces.
+I really can't imagine a Mac user putting in so much effort over
+3 years to get their sound gear set up.
+
+Do you happen to know where the output of "amixer" is documented?
+And what about the mysterious $HOME/.asound file?
+There's a tiny cookbook with snippets and clues here:
+<A HREF="http://www.alsa-project.org/alsa-doc/doc-php/asoundrc.php3">http://www.alsa-project.org/alsa-doc/doc-php/asoundrc.php3</A>
+But none of the many links I've followed from this lead to
+any more details on this mysterious .asoundrc language.
+
+My best guess is that in these last 3 years, the ALSA driver writer
+for my sound card has still not got around to implementing
+digital audio capture.
+So I've got to choose between adding it myself by reading the
+YMF754 chip spec, or cutting my losses and getting an audio
+card with _verified_ optical S/PDIF input capture with the ALSA software.
+I strongly suspect that if I had been using MS-Windows, this
+capability would have been working within 1 hour of getting the
+card home. This is just one of the many sacrifices one has to make
+for the politically principled choice of using linux.
+I'm beginning to think that:
+
+Macs are for artists,
+MS-Windows is for office workers,
+Linux is for engineers and scientists.
+
+Probably everyone should have 3 machines and use the right OS
+for each category of activity.
+I've noticed that Mac users have a raging social life and they're always
+smiling and popular. MS-Windows users have very healthy bank accounts.
+And linux users are glum and obsessive and think they're being
+persecuted and discriminated against - which sounds credible to me.
+But then I'm a glum, obsessive linux user.
+I bet my social life would explode if I had a Mac.
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

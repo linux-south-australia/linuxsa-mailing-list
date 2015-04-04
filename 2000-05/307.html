@@ -1,0 +1,124 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Magic Cookie" -->
+<!-- FromName="Matthew Tippett" -->
+<!-- FromEmail="mtippett@ticons.com.au" -->
+<!-- ToName="John Kennison" -->
+<!-- ToEmail="marjon@mindless.com" -->
+<!-- Date="Fri, 12 May 2000 08:33:44 +0930 (CST)" -->
+<!-- Id="200005112303.IAA17485@matt.ticons.com.au" -->
+<!-- Reference="00051208185200.00505@myhost" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Magic Cookie</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Tippett &lt;<I><A HREF="mailto:mtippett@ticons.com.au">mtippett@ticons.com.au</A></I>&gt;
+  To  : John Kennison &lt;<I><A HREF="mailto:marjon@mindless.com">marjon@mindless.com</A></I>&gt;
+  Date: Fri, 12 May 2000 08:33:44 +0930 (CST)
+</PRE>
+<H1>Re: Magic Cookie</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Whenever I try to run a program that requires X, after typing su to
+&gt; access root privleges (installing programs, setup, etc)... I get the
+&gt; following error message.  
+&gt; 
+&gt; "Xlib: connection to ":0.0" refused by server
+&gt; Xlib: Invalid MIT-MAGIC-COOKIE-1 key
+&gt; Thu May 11 21:29:59 2000 Gtk-WARNING **: cannot open display: :0.0 at (eval 1) line 1." 
+&gt; 
+&gt; I've read something about Magic Cookies and
+&gt; X somewhere before, but if somebody would be able to explain to me or
+&gt; point me in the right direction as to:
+&gt; 
+&gt; 	1) Why this happens? &
+&gt; 	2) How to fix it?
+&gt; 
+&gt; Thankyou in advance....
+
+
+The xauth program manages your .Xauthority file.
+
+So read up on 'xauth', the man page is a bit confusing at times, but 
+when you do understand it you will think 'cool', since in an network
+environment extends access to all systems that share that file..
+
+Basically your application is trying to talk to your X server and using
+a magic cookie as authentication.  The server is effectively saying that
+you are providing the wrong password.
+
+To ensure that X will work for other users do the following (each and 
+every time - since you don't want users automagically having access to
+your screen).
+
+As the user run 'xauth list'.  It will give you at least two lines like
+the following (where the host is your machines name).
+
+ticons.com.au/unix:0  MIT-MAGIC-COOKIE-1  d21f477939f1c373851822be36be51
+ticons.com.au:0  MIT-MAGIC-COOKIE-1  d21f477939f1c373851822be36be1
+
+As the user that you want to give permissions as choose the line 
+that has /unix for :0.0 or the line without for ticons.com.au:0.0 (one
+uses unix domain sockets, the other inet domain.
+
+Issue the command as the other user (root in your case).
+
+xauth add ticons.com.au/unix:0  MIT-MAGIC-COOKIE-1  d21f477939f1c37385182be51
+
+And then X apps should start up quite happily.
+  
+Note that some distributions take on the identity of the PPP link which
+means that X may break.  If 'hostname' gives different answers when you
+are on and offline then you need to do the above, but change the 
+hostname in the 'xauth add'.
+
+If this seems difficult the other option (that is no where near as secure)
+is to issue 
+
+  xhost +ticons.com.au
+
+Which grants based on IP address rather than a token.
+
+Be aware that in an NFS environment, anyone who can pose as a user on any
+machine will also be able to do same thing.  So keep your network 
+environments secure :)
+
+Regards,
+
+Matthew
+-- 
++---[ Matthew Tippett ]-[ Ph:+61 416 006 047 ]-[ Fax:+61 414 000 694 ]---+
++---[ TICons ]-[ <A HREF="mailto:mtippett@ticons.com.au">mtippett@ticons.com.au</A> ]-[ <A HREF="http://www.ticons.com.au/">http://www.ticons.com.au/</A> ]--+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

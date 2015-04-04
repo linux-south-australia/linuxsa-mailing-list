@@ -1,0 +1,137 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: ipchains & www surfing" -->
+<!-- FromName="'Rhett ...'" -->
+<!-- FromEmail="spikkar@hotmail.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="Michael.Neuling@keyworks.com.au" -->
+<!-- Date="Sun, 05 Aug 2001 17:45:15 +1000" -->
+<!-- Id="F175qJrfP6nmGq3MSL200000f7e@hotmail.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: ipchains & www surfing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Rhett ... &lt;<I><A HREF="mailto:spikkar@hotmail.com">spikkar@hotmail.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:Michael.Neuling@keyworks.com.au">Michael.Neuling@keyworks.com.au</A></I>&gt;
+  Date: Sun, 05 Aug 2001 17:45:15 +1000
+</PRE>
+<H1>Re: ipchains & www surfing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Thank you Michael and others for your replies :-)
+
+It seems to be working ok now.
+
+
+Thanks heaps for your help!
+
+~Rhett
+
+--------------------------------------------------
+Rhett                   [email] <A HREF="mailto:rhett@theinbox.org">rhett@theinbox.org</A>
+[url] <A HREF="http://rhett.static.nu/">http://rhett.static.nu/</A>
+[icq] 902602             [msn] <A HREF="mailto:spikkar@hotmail.com">spikkar@hotmail.com</A>
+"...couldN'T shouldN'T wouldN'T..."       -- PaulH
+
+
+
+&gt;From: Michael Neuling &lt;<A HREF="mailto:Michael.Neuling@keyworks.com.au">Michael.Neuling@keyworks.com.au</A>&gt;
+&gt;To: <A HREF="mailto:rhett@theinbox.org">rhett@theinbox.org</A>
+&gt;CC: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt;Subject: Re: ipchains & www surfing
+&gt;Date: Sun, 05 Aug 2001 11:56:00 +0800
+&gt;Received: from [62.70.3.31] by hotmail.com (3.2) with ESMTP id 
+&gt;MHotMailBD360E980070400431E53E46031F13630; Sat, 04 Aug 2001 20:55:05 -0700
+&gt;Received: 5 Aug 2001 03:55:03 -0000
+&gt;Received: 5 Aug 2001 03:55:02 -0000
+&gt;Received: from unknown (HELO visor.qala.com.sg) (210.193.2.43)  by mx1 with 
+&gt;SMTP; 5 Aug 2001 03:55:02 -0000
+&gt;Received: from vodka.keyworks.com.au (dyn15ppp175.qala.com.sg 
+&gt;[210.193.15.175])by visor.qala.com.sg (8.11.3/8.11.3) with ESMTP id 
+&gt;f753soR28429;Sun, 5 Aug 2001 11:54:51 +0800 (SGT)
+&gt;Received: from keyworks.com.au (localhost [127.0.0.1])by 
+&gt;vodka.keyworks.com.au (Postfix) with ESMTPid BF1DB1995C; Sun,  5 Aug 2001 
+&gt;11:56:00 +0800 (SGT)
+&gt;From <A HREF="mailto:mikey@keyworks.com.au">mikey@keyworks.com.au</A> Sat, 04 Aug 2001 20:55:16 -0700
+&gt;Delivered-To: <A HREF="mailto:rhett@theinbox.org">rhett@theinbox.org</A>
+&gt;In-reply-to: Your message of "Fri, 03 Aug 2001 18:56:04 +1000."             
+&gt;&lt;<A HREF="mailto:F76LsxpTljBOh8s4KWi0000023c@hotmail.com">F76LsxpTljBOh8s4KWi0000023c@hotmail.com</A>&gt;
+&gt;Sender: <A HREF="mailto:mikey@keyworks.com.au">mikey@keyworks.com.au</A>
+&gt;Message-Id: &lt;<A HREF="mailto:20010805035600.BF1DB1995C@vodka.keyworks.com.au">20010805035600.BF1DB1995C@vodka.keyworks.com.au</A>&gt;
+&gt;
+&gt; &gt; I had set the default input policy to deny, and was unable to browse...
+&gt; &gt; (connections to other servers just timed out).  Just using telnet to any
+&gt; &gt; other server on port 80 times out.
+&gt; &gt;
+&gt; &gt; I then set the default input policy to ACCEPT, and now all is ok.  
+&gt;However,
+&gt; &gt; I'm a bit concerned about doing this...
+&gt; &gt;
+&gt; &gt; Is there a rule I can add so that the server can surf ok (it will end up
+&gt; &gt; being a proxy), so I can still have the default input rule set to deny?
+&gt;
+&gt;Allow packets back in which are required for web surfing.  ie.  allow
+&gt;packets back in which are destined for ports &gt; 1024 and are not
+&gt;connection packets.  Something like
+&gt;
+&gt;   ipchains -A input -i $EXTIF -p tcp --dport 1024: ! -y -j ACCEPT
+&gt;
+&gt;where $EXTIF is you external interface name.  You might also want to
+&gt;add a rules to allow DNS access and ICMP packets.
+&gt;
+&gt;   ipchains -A input -i $EXTIF -p udp --sport domain --dport 1024: -j 
+&gt;ACCEPT
+&gt;
+&gt;   ipchains -A input -i $EXTIF -p icmp -j ACCEPT
+&gt;
+&gt;These will break other things like active ftp and real player so it's
+&gt;not perfect (infact I haven't even run these commands let alone
+&gt;verified they allow you to surf the web, let alone verified the
+&gt;security of them)
+&gt;
+&gt;Also set your default policy to REJECT, instead of DENY, while
+&gt;debuging as this will send ICMP host unreachable packet and then you
+&gt;won't have to wait for timeouts.
+&gt;
+&gt;Regards,
+&gt;Michael
+
+
+_________________________________________________________________
+Get your FREE download of MSN Explorer at <A HREF="http://explorer.msn.com/intl.asp">http://explorer.msn.com/intl.asp</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

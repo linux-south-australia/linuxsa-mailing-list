@@ -1,0 +1,81 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Does linux cache partition table?" -->
+<!-- FromName="Paul Schulz" -->
+<!-- FromEmail="pauls@caemrad.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 20 Jan 2000 14:55:27 +1030 (CST)" -->
+<!-- Id="200001200425.OAA15604@caemrad.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Does linux cache partition table?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Paul Schulz &lt;<I><A HREF="mailto:pauls@caemrad.com.au">pauls@caemrad.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Thu, 20 Jan 2000 14:55:27 +1030 (CST)
+</PRE>
+<H1>Does linux cache partition table?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Greetings all.. a big thankyou to all those people who helped with
+my last couple of questions, the solutions:
+
+1) in /etc/conf/modules add 'alias parport_lowlevel parport_pc'
+   and reboot (shouldn't need to, but.. just to get everything correct) 
+
+2) mke2fs on /dev/hda7.. this actually worked later that day
+   (see below).  
+
+It seems that the kernal (or something, BIOS? motherboard?) caches the 
+partition table.
+ 
+It was decided to have 128Mb of swap, instead of 64Mb
+So (not being familiar with fips,) /dev/hda6 (64Mb swap) and 
+/dev/hda7 (rest, ext2) needed to be deleted by fdisk and recreated.
+
+In single usermode, just to be safe: 
+
+swapoff /dev/hda6
+fdisk (delete and repartition)
+mkswap /dev/hda6     creates 64Mb swap (why?)
+&lt;reboot&gt;
+swapoff /dev/hda6
+mkswap /dev/hda6     creates 128Mb swap (all is well)
+swapon -a
+swapon -s            [just to check, all looks good]
+
+Anyone know where the patition table is cached?
+This explains my earlier problem, when I couldn't run mke2fs on the
+newly created /dev/hda7.
+
+PaulS
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

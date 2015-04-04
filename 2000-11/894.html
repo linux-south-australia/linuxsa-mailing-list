@@ -1,0 +1,111 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IP-MASQ Help!!!" -->
+<!-- FromName="'Darryl Ross'" -->
+<!-- FromEmail="dross@syc.asn.au" -->
+<!-- ToName="'Tim Fairchild'" -->
+<!-- ToEmail="amosf@mrbean.net.au,LinuxSA@linuxsa.org.au" -->
+<!-- Date="Thu, 23 Nov 2000 00:53:58 +1030" -->
+<!-- Id="007b01c0548f$da283ae0$0464a8c0@wulfz.com" -->
+<!-- Reference="Pine.LNX.4.21.0011222027250.2069-100000@shiva.home" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IP-MASQ Help!!!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Darryl Ross &lt;<I><A HREF="mailto:dross@syc.asn.au">dross@syc.asn.au</A></I>&gt;
+  To  : Tim Fairchild &lt;<I><A HREF="mailto:amosf@mrbean.net.au">amosf@mrbean.net.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:LinuxSA@linuxsa.org.au">LinuxSA@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 23 Nov 2000 00:53:58 +1030
+</PRE>
+<H1>Re: IP-MASQ Help!!!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hey Tim,
+
+First off, you don't need to masquerade the Linux box (192.168.1.1), so you
+can get rid of that. Also, it is normally better to masquerade an entire
+network rather than set it up for each machine.
+
+For a basic NAT setup, try the following commands (As you said, this has
+absolutely ZERO security...):
+
+/sbin/ipchains -F
+/sbin/ipchains -P forward DENY
+/sbin/ipchains -A forward -i eth0 -s 192.168.1.0/24 -s 0.0.0.0/0 -j MASQ
+
+First line flushes all the rules out. Second line sets the default policy
+for the forward chain to DENY and the third allows the internal hosts in the
+network 192.168.1.0 to be masqueraded, as long as the data comes in from
+eth0.
+
+Use DENY instead of REJECT, because if someone tries to portscan you or
+whatever, REJECT lets them know you are there and what they can and cannot
+access, DENY just makes you appear like a black hole, so to speak. By the
+way, the last rule in your forward chain is letting everyone in, despite
+your default policy, so you might want to take it out :)
+
+The routing tables and ifconfig output looks ok. And you said that samba and
+the like is working, so your network is working ok.
+
+Not bashing Windows or anything, but I believe the problem is on your
+Windows box :)  Have you set the default gateway on the windows machine to
+point to your gateway? I haven't used ME, so I can't tell you exactly where
+to find the settings, but under 9x you go to Control Panel, Network, TCP/IP
+(for your lan card) and add in the default gateway pointing to 192.168.1.1.
+
+If that is set correctly, have you got DNS working? Are you pinging hosts by
+name or by IP?? If you are pinging by name, then try IP only. Try running:
+
+/usr/sbin/traceroute -n 203.15.24.22
+
+and let me know what the output is.
+
+Hope this helps a little.
+
+DR
+
+--
+
+Darryl Ross
+Network and System Administrator
+Service to Youth Council, Inc
+<A HREF="http://www.syc.asn.au/">http://www.syc.asn.au/</A>
+
+"Computers are like air conditioners. They work fine until you open
+Windows."
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

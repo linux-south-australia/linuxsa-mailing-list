@@ -1,0 +1,179 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Linux.Conf.Au 2004 FIXIT's - You can run one!" -->
+<!-- FromName="'Dan Shearer'" -->
+<!-- FromEmail="dan@shearer.org" -->
+<!-- ToName="'Glen Turner'" -->
+<!-- ToEmail="glen.turner@aarnet.edu.au" -->
+<!-- Date="Tue, 2 Dec 2003 11:43:17 +1030" -->
+<!-- Id="20031202011317.GM20171@erizo.shearer.org" -->
+<!-- Reference="1070323368.4964.28.camel@andromache" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Linux.Conf.Au 2004 FIXIT's - You can run one!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@shearer.org">dan@shearer.org</A></I>&gt;
+  To  : Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  Date: Tue, 2 Dec 2003 11:43:17 +1030
+</PRE>
+<H1>Re: Linux.Conf.Au 2004 FIXIT's - You can run one!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, Dec 02, 2003 at 10:32:48AM +1030, Glen Turner wrote:
+&gt; On Tue, 2003-12-02 at 06:14, Richard Sharpe wrote:
+&gt; 
+&gt; &gt; &gt; Is it possible to get the user base to perform and report on the tests 
+&gt; &gt; &gt; somehow....? Tap into the varied user base resourse....Maybe on the 
+&gt; &gt; &gt; project web site have a template where software users would have the 
+&gt; &gt; &gt; option of reporting back test data to the project....?   Maybe use a 
+&gt; &gt; &gt; script....or test suite?
+&gt; &gt; 
+&gt; &gt; I think that this is part of the power of the idea. However, an audit of 
+&gt; &gt; the test env used will be needed. Perhaps users would be better off doing 
+&gt; &gt; initial testing to look for bugs with final test runs being done by 
+&gt; &gt; someone like OSDL with the gear.
+&gt; 
+&gt; Hi Richard,
+&gt; 
+&gt; The biggest problem is building the topologies required for
+&gt; testing network-oriented programs.  Linux isn't quite at
+&gt; the stage where you can run a set of VMs interconnected
+&gt; with an arbitrary network.  So even an "automated" set
+&gt; of regression tests still requires purpose-built test
+&gt; scenarios.
+
+The term "network effects" is a euphemism for "we have no idea what will
+happen when you connect many different things together", and this
+describes any reasonable-sized computer system today. Homogeneous
+clusters and carefully controlled groups of public-access machines *can*
+be exceptions. But even these are still at the "I wonder if it will go
+bang if I do this to it?" stage.
+
+I've spent a couple of years working on the testing problem and in terms
+of the sorts of networks people usually deploy there is no general
+solution. The world is messy and computing reflects that. This message
+is a brief summary version, one day I'll publish my paper on the
+topic...
+
+I have concluded that for many environments what is required is
+regression testing of entire systems, not just one particular set of
+programs or protocol suites. I've even got a name for it (a bad one,
+"Multi Machine Agglomorations", but it is the best I've found so far)
+which I implement as networks of mostly virtualised hardware running
+complete OS and application stacks under the control of a single
+program. 
+
+There are several kinds of whole-system virtualisation:
+
+	1. bug-for-bug compatible hardware simulator which boots a
+	complete OS with identical results to booting on real hardware.
+	Nothing relies on any particular piece of underlying host
+	hardware. Slow but very reliable, especially for low-level
+	testing. Eg Bochs, Hercules, Simics.
+
+	2. Hardware virtualisation which relies on a particular piece of
+	underlying hardware to work, but does deliver machine
+	partitioning benefits with virtualisation as well. Generally
+	faster but much less accurate for many reasons and limited in
+	range of hosts it can run on. Eg VMware.
+
+	3. Kind-of hardware virtualisation sufficient to boot an OS.
+	This often involves a small amount of modification to the OS,
+	however for a lot of testing this doesn't matter. Eg User Mode
+	Linux, MacOnLinux.
+
+There are also partitioning schemes such as Linux Vserver or other
+chroot-like systems, but these blur into a multi-process model where so
+many resources are shared that the virtualisation is at the application
+level not the system level.
+
+For testing, advantages of virtualisation include:
+
+	* checkpointing so that machine or network state can be
+	  snapshotted and then used as a base from which regression
+	  testing can start.
+
+	* instrumentation, meaning you have a much better measure of what is
+          going on with the system and more chance of correlating failures with other
+          events. Related to this you can set triggers -- eg "stop the simulation 
+          and snapshot it every thousand files created". If there is a failure
+	  after fifty thousand files you can go back and examine the state of the entire 
+          machine that led up to that failure.
+
+	* Improve hardware/electricity/physical manpower utilisation. Most of
+          the time a modern server computer is nearly idle even when running something
+          like Mozilla tinderbox runs.  However it is easiest to dedicate all the 
+	  hardware to one operating system and that's what usually happens.
+
+	* ability to run tests in parallel on identical hardware simply
+	  by duplicating the virtualised environments. There's nothing
+	  like having your computers in soft copy :-) Let's say I want
+	  to run a regression suite that has 100 tests on a web
+	  application on Apache. Each run of the suite is to take place
+	  on a slightly different host environment: real and virtual
+	  memory varying, system load varying from 0 to 20, network
+	  congestion from 0 to 100%, more and fewer clients connecting
+	  at once. So I set all this up... but then I wonder, what
+	  happens if there are different numbers of CPUs? Easy, just
+	  duplicate all the above and run it all on systems with 1, 2
+	  and 4 CPUs -- mostly done in a couple of cp commands. Hang on,
+	  what about if it was 64-bit instead of 32-bit? Again just a
+	  few commands (if the suite involves checking out source and
+	  building, which I recommend.)
+
+Concerning the return on investment on test rigs built like this:
+
+	* an arbitarily long useable future, unlike real hardware. Even
+	  a virtualisation technique can only run on a specific type of
+	  hardware, that hardware itself can usually be virtualised. In
+	  other words, this is a much better approach than test labs
+	  with rooms full of decaying equipment. Naturally, real
+	  hardware has to be used at some point to check the results of
+	  virtualisation
+
+	* relative speed of execution in virtualised environments
+	  increases over time as the host hardware gets better and better
+	  (even if you have a clocked virtualisation: the speed of the
+	  central clock just increases.) Real hardware declines in
+	  relative speed over time. This means that a test suite that
+	  works today with virtualisation will work better next year.
+	  The same is not true for real hardware.
+
+-- 
+Dan Shearer
+<A HREF="mailto:dan@shearer.org">dan@shearer.org</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

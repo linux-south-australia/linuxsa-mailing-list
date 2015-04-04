@@ -1,0 +1,113 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: how to move kde without breaking it!" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="" -->
+<!-- ToEmail="newton@atdot.dotat.org" -->
+<!-- Date="Wed, 3 Feb 1999 13:10:58 +1030" -->
+<!-- Id="199902030240.NAA04851@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: how to move kde without breaking it!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+  Date: Wed, 3 Feb 1999 13:10:58 +1030
+</PRE>
+<H1>Re: how to move kde without breaking it!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Mark,
+
+I agree. 
+That's the old tar-to-tar pipe trick from the old Unix tar manuals.
+
+I actually wrote a script to do this.
+See appended.
+
+Cheers,
+ak.
+
+PS. No guarantee this will work -- please read it before use.
+Usage is to type "tarcp x y", where x is the parent of the directory
+you want to move, and y is the relative path of the directory you watn to move.
+The directory is moved to ".", i.e. you current directory
+when you invoke the command tarcp.
+
+====================================
+#! /bin/csh
+# ~/bin/tarcp   13 April 1994   Alan Kennington.
+# Script to use "tar" to copy a directory through a pipe from one file system to
+# another. The motivation here is to get around limits on disk space which occur
+# when tarring a directory through a temporary file.
+
+set n = $#argv
+if ($n != 2) then
+    echo 'Usage:  tarcp &lt;parent directory&gt; &lt;directory to be copied&gt;'
+    exit(1)
+    endif
+    set msg = "$*"
+set pdir = $1
+set cdir = $2
+
+if (! -d $pdir) then
+    echo 'tarcp: the parent directory is not a directory.'
+    exit(1)
+    endif
+
+if (! -d $pdir/$cdir && ! -f $pdir/$cdir) then
+    echo 'tarcp: the file/directory to be copied is not a proper file/directory.'
+    exit(1)
+    endif
+
+echo "Recursively copying"
+echo "    $pdir/$cdir"
+echo "into the current directory"
+echo "    `pwd`"
+if (-e $cdir) then
+    echo "Warning: The file `pwd`/$cdir exists already\!"
+    endif
+echo "Will execute the following command:"
+echo "    tar cfb - 20 -C $pdir $cdir  | tar xvpf -"
+echo -n "Is this okay? [y]: "
+set ans = $&lt;
+if ($ans == "n" || $ans == "N") then
+    exit(1)
+    endif
+
+tar cfb - 20 -C $pdir $cdir  | tar xvpf -
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

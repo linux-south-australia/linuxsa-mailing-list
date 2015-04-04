@@ -1,0 +1,139 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Postgresql vs MySQL" -->
+<!-- FromName="Carlo" -->
+<!-- FromEmail="carlo@active-ideas.com.au" -->
+<!-- ToName="Mark Newton" -->
+<!-- ToEmail="newton@atdot.dotat.org" -->
+<!-- Date="Fri, 16 Jun 2000 16:26:41 +1030" -->
+<!-- Id="3949C199.24F88E34@active-ideas.com.au" -->
+<!-- Reference="Pine.LNX.4.10.10006151333540.21424-100000@localhost.localdomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Postgresql vs MySQL</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Carlo &lt;<I><A HREF="mailto:carlo@active-ideas.com.au">carlo@active-ideas.com.au</A></I>&gt;
+  To  : Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  Date: Fri, 16 Jun 2000 16:26:41 +1030
+</PRE>
+<H1>Re: Postgresql vs MySQL</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Mark Newton wrote:
+&gt; 
+&gt; On Fri, Jun 16, 2000 at 03:57:16PM +1030, Carlo wrote:
+&gt; 
+&gt;  &gt; This withdrawal example(select and update). If it is done in one
+&gt;  &gt; thread, which is usually the case, you can lock the tables you will be
+&gt;  &gt; selecting and updating etc.
+&gt; 
+&gt; But that's an abysmally sub-optimal solution on a busy site:  By locking
+&gt; the tables, you're guaranteeing that NOBODY ELSE can do any deposits or
+&gt; withdrawls anywhere in your entire bank while that transaction is in
+&gt; progress.  You're essentially turning a nice parallel thread-based access
+&gt; model into a degenerate sequential model, and that'll have ridiculous
+&gt; performance implications as your site scales.
+&gt; 
+&gt; You need *row locking*, not *table locking*.  Even better, locking for
+&gt; individual cells.  Anything with worse granularity than a row is going
+&gt; to slow you down to the point where any speed advantage you get by using
+&gt; mysql is utterly worthless.
+
+
+Hmm... Have to agree with that.
+
+&gt; 
+&gt;  &gt; The query with the deposit will then wait
+&gt;  &gt; and not time out until the tables are unlocked or until the thread is
+&gt;  &gt; closed(which ever comes first). More programming work than an RDBMS to
+&gt;  &gt; make sure its all done correctly, but it can be done and will still end
+&gt; 
+&gt; And, of course, if you accidentally leave something out, you can either
+&gt; reach the point where your database deadlocks against itself because you
+&gt; forgot to release a lock, or you can do transactions which you've forgotten
+&gt; to acquire locks for and produce the exact data-smashing situation which
+&gt; made locks attractive in the first place.
+&gt; 
+&gt; It's much easier to let the database care about that stuff.
+
+Um.. Yep that can happen.
+
+&gt; 
+&gt;  &gt; up cheaper/quicker than most RDBMS.
+&gt; 
+&gt; I disagree.  It'll only be quicker if your site isn't very popular (you
+&gt; do want popular sites, don't you?).  Also, it'll almost never be cheaper:
+&gt; You actually need to go to special lengths to do your locking, extra
+&gt; testing, extra development, etc, etc, and someone has to pay for that.  If
+&gt; you use a database which supports transactions, however, you get all that
+&gt; for free because the database engine is looking after locks for you.
+
+Ok if your going to be doing transactions, don't use Mysql. But doing
+simple reads/writes that don't get in the way of other tables, over the
+internet, Mysql is the way to go. Do you agree with that Mark. 
+
+&gt; 
+&gt;  &gt; &gt; I submit that it's possible to design around that limitation, so you
+&gt;  &gt; &gt; can still have fast response.
+&gt;  &gt;
+&gt;  &gt; Can you tell me, give some examples. Im very interested in more ideas
+&gt;  &gt; on ways to do things.
+&gt; 
+&gt; That all depends on the specific situation, doesn't it? :-)  That's
+&gt; why DBAs and database application authors get paid lots of cash to
+&gt; design good systems.
+&gt; 
+&gt; In the end, though, it'll come back to data modelling, and a thorough
+&gt; understanding of how an RDBMS implements the various things you ask it
+&gt; to do. For example, by simply changing the order of a comple of nested
+&gt; SELECT statements you can sometimes cut down on the amount of unindexed
+&gt; data your RDBMS needs to search to perform a query by a factor of hundreds
+&gt; of thousands.  See the ars-technica article link Dan provided a couple
+&gt; of days ago for some good examples of that (sorry, I deleted his message
+&gt; after reading the article)
+
+If anyone has this link can they please send it to me.
+
+&gt; 
+&gt;     - mark
+&gt; 
+&gt; --------------------------------------------------------------------
+&gt; I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+&gt;      but it hurt when I walked.                          Mark Newton
+&gt; ----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+Carlo Mattiazzo
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

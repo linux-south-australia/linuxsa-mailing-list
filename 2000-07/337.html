@@ -1,0 +1,143 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: sendmail causing dropped email" -->
+<!-- FromName="Robert Mibus" -->
+<!-- FromEmail="mibus@bigpond.com" -->
+<!-- ToName="Daryl Tester" -->
+<!-- ToEmail="dt@picknowl.com.au" -->
+<!-- Date="Mon, 10 Jul 2000 15:36:39 +0930" -->
+<!-- Id="20000710153639.A6049@bigpond.com" -->
+<!-- Reference="3968708F.696FD775@picknowl.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: sendmail causing dropped email</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Robert Mibus &lt;<I><A HREF="mailto:mibus@bigpond.com">mibus@bigpond.com</A></I>&gt;
+  To  : Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  Date: Mon, 10 Jul 2000 15:36:39 +0930
+</PRE>
+<H1>Re: sendmail causing dropped email</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, Jul 09, 2000 at 10:01:11PM +0930, Daryl Tester wrote:
+&gt; Robert Mibus wrote:
+&gt; 
+&gt; &gt; mail is definitely not queing up,
+&gt; 
+&gt; No, mail is queueing up, and then being delivered immediately, as
+&gt; it's supposed to.
+i meant as apposed to queing up indefinitely :)
+
+
+&gt; I take it that extmail.bigpond.com is your defined SMTP smarthost.
+no, i assumed it was the same machine as mail.bigpond.com
+it doesnt appear that way, (diff ip addresses, hardly conclusive but...)
+anyhow, 'extmail' isnt mentioned in *any* file in /etc. go figure.
+
+[from sendmail.cf]
+# who I masquerade as (null for no masquerading)
+DMbigpond.com
+# Smart host
+DSmail.bigpond.com
+
+
+&gt; Is this the correct SMTP gateway that you should be using (extmail
+&gt; sounds more like a gateway for external mail going into bigpond, and
+&gt; in fact is the MX listed for bigpond.com)?  Are you also dialled into
+&gt; bigpond when you're sending these messages?  It could be possible that
+yes, sending mail doesnt (seem to) work otherwise.
+
+&gt; they're being dropped after they've been accepted as part of some anti-
+&gt; relay measure.
+i thought something like that might be happening, but i don't know why. (or
+have any proof other than lost mails)
+
+&gt; &gt; i know for a fact that neither of these messages ever reached it's destination,
+&gt; &gt; but they do appear to have left the system.
+&gt; What happens if you send email to yourself?
+
+it works ok;
+
+[/var/log/maillog]
+Jul 10 15:21:55 mibus sendmail[6359]: PAA06359: from=mibus, size=605,
+class=0, pri=30605, nrcpts=1, msgid=&lt;<A HREF="mailto:20000710152145.A6344@bigpond.com">20000710152145.A6344@bigpond.com</A>&gt;,
+relay=<A HREF="mailto:mibus@localhost">mibus@localhost</A>
+Jul 10 15:21:55 mibus sendmail[6363]: PAA06359: to=<A HREF="mailto:mibus@bigpond.com">mibus@bigpond.com</A>,
+ctladdr=mibus (500/500), delay=00:00:08, xdelay=00:00:00, mailer=local,
+stat=Sent
+
+[part of the message header upon arrival]
+From mibus  Mon Jul 10 15:21:55 2000 
+Return-Path: &lt;mibus&gt;
+Received: (from <A HREF="mailto:mibus@localhost">mibus@localhost</A>)
+        by mibus.bigpond.com (8.9.3/8.8.7) id PAA06359
+        for <A HREF="mailto:mibus@bigpond.com">mibus@bigpond.com</A>; Mon, 10 Jul 2000 15:21:47 +0930
+Date: Mon, 10 Jul 2000 15:21:45 +0930
+
+note though i have this in sendmail.cf:
+# class L: names that should be delivered locally, even if we have a relay
+CLroot mibus bruce beemer
+
+w/o 'mibus' in that line, i get:
+
+[maillog]
+Jul 10 15:27:47 mibus sendmail[6541]: PAA06541: from=mibus, size=537,
+class=0, pri=30537, nrcpts=1, msgid=&lt;<A HREF="mailto:20000710152737.A6524@bigpond.com">20000710152737.A6524@bigpond.com</A>&gt;,
+relay=<A HREF="mailto:mibus@localhost">mibus@localhost</A>
+Jul 10 15:27:48 mibus sendmail[6543]: PAA06541: to=<A HREF="mailto:mibus@bigpond.com">mibus@bigpond.com</A>,
+ctladdr=mibus (500/500), delay=00:00:06, xdelay=00:00:01, mailer=local,
+stat=Sent
+
+[msg header]
+From mibus  Mon Jul 10 15:27:47 2000 
+Return-Path: &lt;mibus&gt;
+Received: (from <A HREF="mailto:mibus@localhost">mibus@localhost</A>)
+        by mibus.bigpond.com (8.9.3/8.8.7) id PAA06541
+	for <A HREF="mailto:mibus@bigpond.com">mibus@bigpond.com</A>; Mon, 10 Jul 2000 15:27:42 +0930
+Date: Mon, 10 Jul 2000 15:27:37 +0930
+
+perhaps it checks to see if 'mibus.bigpond.com' exists, as it doesnt really.
+??
+
+&gt; Regards,
+&gt;   Daryl Tester
+
+thanks;
+mibus
+-- 
+Robert Mibus &lt;<A HREF="mailto:mibus@bigpond.com">mibus@bigpond.com</A>&gt;
+If the facts don't fit the theory, change the facts.
+ (Albert Einstein)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

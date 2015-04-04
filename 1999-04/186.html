@@ -1,0 +1,217 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="C-bus Summary" -->
+<!-- FromName="Paul Schulz" -->
+<!-- FromEmail="pauls@caemrad.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 12 Apr 1999 10:20:50 +0930" -->
+<!-- Id="37114368.DB720CD6@caemrad.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: C-bus Summary</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Paul Schulz &lt;<I><A HREF="mailto:pauls@caemrad.com.au">pauls@caemrad.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 12 Apr 1999 10:20:50 +0930
+</PRE>
+<H1>C-bus Summary</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+To all ( short summary of what I got out of the meeting)
+
+Somebody was taking notes, so a summary will soon appear on the SAMG web
+page
+<A HREF="http://www.adelaide.net.au/~samg/">http://www.adelaide.net.au/~samg/</A>
+
+Disclaimer: These are my own thoughts and impressions.
+
+The meeting was attended by about 12 SAMG'ers and three visitors.
+I have rung Gerard Industries.. and am getting further price, feature
+and availability information sent in the post. Please email me if you
+interested.
+
+(Discussion at the end)
+
+Physical/Data Links Layers
+--------------------------
+
+The C-Bus is a 2 wire bus, which consists of a 4 kHz signal pulse,
+between which bit's are transmitted, biased to 32 V DC
+eg.
+
++32.5V        +--+           +::+            +--+
+              |  |           .  .            |  |
+              |  |        Data? .            |  |
+ 30V  ---+  +-+  +------+--+-+--+-------+  +-+  +--
+         |  |           .  .            |  |
+         |  |           .  .            |  |
+ 27.5V   +--+           +::+            +--+
+
+         |&lt;----------- 250 us ---------&gt;|
+
+
+This allows for
+1. An arbitary topology for the network. Because of the low frequency
+   there is no need for termination. The physical layer can be viewed
+   as an instantanious medium.  Loops in network don't cause any
+   problems.
+
+2. Unshielded Twisted Pair (Cat 5) is typically used in the system,
+   and can be purchased from Clipsal in a range of colours (pink or
+pink)
+
+3. Restriction on total length of wire in network given by total
+   capacitence.  Cat 5 allows for 1000m (that's 3 1/3 boxes of 305 m)
+   Maximum of 100 devices. (Clipsal have obtained 110 devices in
+workshop.)
+
+Data representation:  1 - signal pulue,  0 - no pulse
+[I'm guessing this.  It seem to me that a better protocol would
+have an inverse pulse for 0, otherwise why have the clock pulse like
+it is... now where's my CRO]
+
+It was also mentioned that it was polarity sensitive.. I don't
+understand why. Also.. I don't understand how it is 'collision
+avoidence'. (see below)
+
+Network Layer
+-------------
+The network is
+Carrier Sense Multiple Access, Carrier Detect-Collision Avoidance
+(CSMA/CD-CA)
+
+Each device on the bus has a unique 8 bit address.
+(Unlike IP, there is no broadcast address or default router address)
+
+'Packet' Message format is of the following forms:
+
+Header   (? bits)             Header   (? bits)
+Control  (? bits)       Control  (? bits)
+Data     (8 bits)       Data     (8 bits)
+Checksum (? bits)       Checksum (? bits)
+Dummy  (? bits)       Dummy    (? bits)
+Ack  (? bits)       Ack      (? bits)
+                Dummy    (? bits)
+
+There is also a time division multiplexing mode, where the 256 devices
+transmit bytes in a sequential repeating manner. (Called an MMI
+request.)
+
+Several busses can be connected together via 'bridges'.
+These look like they can only connect two busses a single point,
+as there doesn't seem to be any 'smarts' in the routing.
+
+eg.   AA1  AA2   AA3  AA4  AA/BB  BB1  BB2  BB3  BB/CC  CC1  CC2  CC3
+       +----+-----+----+---+   +---+----+----+---+   +---+----+----+
+
+I'm assuming that you couldn't connect AA to CC as an alternative, as
+messages to  CC from AA would be transmitted on both paths.
+(Another question to ask.)
+
+An example of a 'highrise' system was with a C-bus network on each
+floor, with a TCP/IP backbone and interface connecting all the floors.
+
+Devices
+-------
+These contain the Motorola HC05-B6 microprocessor with a 256k EEPROM
+Each device contains:
+- Type of unit (Key input, Relay, Dimmer, Clock etc.)
+  (pre-programmed at Clipsal)
+- Address (Group Address and Unit Address)
+- Description (8 character, eg. 'bedroom')
+
+Powered by 32V DC on bus, drawing 15 mA.
+
+The Power supply/Sync signal unit supplies 300 mA -&gt; 20 units
+Additional power supply/Sync signal units are required for more devices.
+
+Switches
+--------
+The switch (push button) units can be programmed to send several
+different messages depending on how they are activated.
+eg.  Short on, Short off, Long on, Long off
+
+Relays/Dimmers
+--------------
+Messages able to be transmitted across the network include:
+Swith on, Swith off, Ramp up and ramp down (in t sec)
+
+
+===========
+Personal plans:
+
+In order for the C-Bus network to work, it requires a sync signal
+source (of which there may be more than one, on master with several
+listening, able to switch on if needed)
+This source is also the PC interface (RS232) which allows the various
+devices to be individually programmed.
+
+Using the real-time functions of Linux (available in the RTLinux
+modules) and the parallel port, I would like to
+1) Generate this sync signal  - relatively easy
+2) Monitor the bus            - need to get interupt handler working
+3) Talk to the bus            - decode C-bus protocol
+
+This will enable me to avoid the $$ of this particular piece of
+equipment, and allow me to talk to the bus directly.  Further
+experimentation is then possible. (Ahh.. the possibilites
+TCP/IP over C-Bus  :-)
+
+Needed.. a 32V powersupply and the circuits to put signals on and off
+of the bus.
+===========
+
+Some notes:
+The C-bus system is relatively insecure.. anyone with access to the
+bus can control all the devices on the it.  As C0buc is installed in
+the Olympic Stadium for instance, this could give rise to an
+interesting hack.
+
+There are no plans for control of standard power points, or
+controllers that could be plugged into power points to control
+appliances like 'standard lamps' etc.
+
+Units are expensive: ~$100 for the units.
+
+
+--
+Paul Schulz(<A HREF="mailto:pauls@caemrad.com.au">pauls@caemrad.com.au</A>)                             SysAdmin
+CAE-Mrad, Innovation House West, First Avenue, TECHNOLOGY PARK SA 5095
+-..-.----_...._--..._---_.-----.....---___.,-..----.-,---.-.--__._....
+
+
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,115 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Newbie in Anti-Spamming in Sendmail" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 14 Dec 1999 15:10:44 +1030" -->
+<!-- Id="3855CA4C.E5E85B18@aarnet.edu.au" -->
+<!-- Reference="Pine.LNX.3.95.991214105156.13631A-100000@mail.ne-link.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Newbie in Anti-Spamming in Sendmail</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Tue, 14 Dec 1999 15:10:44 +1030
+</PRE>
+<H1>Re: Newbie in Anti-Spamming in Sendmail</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+"Jose N. de Vera Jr." wrote:
+&gt; One of my friends told me that my SMTP is open and other people using my
+&gt; mail server as their relaying point..
+&gt; 
+&gt; Can anybody help me to sealed out this open hole...
+
+None of the popular Linux distributions now allow relaying by
+default, so I am assuming you have installed sendmail by hand.
+If not, upgrading is the simplest answer.
+
+It's better to use sendmail.mc rather than editing sendmail.cf
+directly.  You say:
+
+  FEATURE(`access_db')
+
+in /etc/sendmail.mc and generate sendmail.cf with
+
+  m4 sendmail.mc &gt; sendmail.cf
+
+Create a file called /etc/mail/access containing:
+
+  localhost.localdomain           RELAY
+  localhost                       RELAY
+  example.com                     RELAY
+
+then generate the database file with
+
+  makemap hash access.db &lt; access
+
+Then restart sendmail
+
+  .../init.d/sendmail restart
+
+and look in
+
+  /var/log/messages
+
+for errors.
+
+All this is incredibly well documented in the Operations
+Guide.
+
+Finally test the configuration
+
+  telnet localhost mail
+    220
+  HELO www.ibm.com
+    250
+  MAIL FROM: <A HREF="mailto:fred@www.ibm.com">fred@www.ibm.com</A>
+    250
+  RCPT TO: <A HREF="mailto:jane@www.sun.com">jane@www.sun.com</A>
+    550 <A HREF="mailto:jane@www.sun.com...">jane@www.sun.com...</A> Relaying denied
+  QUIT
+    221
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ Earth is a single point of failure
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

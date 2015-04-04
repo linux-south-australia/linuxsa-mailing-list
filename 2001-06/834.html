@@ -1,0 +1,101 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Multiple dumps to one tape" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="'Andrew Reid'" -->
+<!-- ToEmail="andrew.reid@plug.cx" -->
+<!-- Date="Mon, 25 Jun 2001 11:12:41 +0930" -->
+<!-- Id="3B369711.5070703@ns.aus.com" -->
+<!-- Reference="1372.192.168.1.1.993030647.squirrel@mail.plug.cx" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Multiple dumps to one tape</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : Andrew Reid &lt;<I><A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A></I>&gt;
+  Date: Mon, 25 Jun 2001 11:12:41 +0930
+</PRE>
+<H1>Re: Multiple dumps to one tape</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Andrew Reid wrote:
+
+&gt; On 25 Jun 2001 10:09:50 +0930, Richard Sharpe wrote:
+
+&gt;&gt; No. AFAIK, the second will overwrite the first. Try:
+&gt; 
+&gt; 
+&gt; OK, so dump will actually issue a rewind command to the tape drive
+&gt; before it starts/after it's finished?
+
+No, dump simply closes the device. The semantics of /dev/nst0, as 
+opposed to /dev/st0 (the default, or whatever default tape you are 
+using) are that /dev/nst0 stays where it is on a close, where as 
+/dev/st0 rewinds on a close. Nut'n to do with dump.
+
+ 
+&gt;&gt; dump -0f /dev/nst0 /var; dump -0 /usr
+&gt;&gt; 
+&gt;&gt; This will cause the tape to stay where it was after the first and put 
+&gt;&gt; the second after it.
+&gt;
+&gt; Is that because dump thinks it's writing to a file rather than a tape?
+&gt; 'man dump' shows that -f is the 'write to a file' switch, so I assume
+&gt; that no rewind command is issued using -f.
+
+Tape or file makes almost no difference to dump. The file I gave you is 
+the device special file associated with the tape. If you have SCSI 
+tapes, dump will most likely use /dev/st0 by default. It rewinds after a 
+close. Have I said that enough times :-)
+
+&gt; Now, what about restore? Will it be able to distinguish between the two
+&gt; filesystems and stop at the end of the first one acordingly (or
+&gt; continue, but restore the /usr filesystem to its rightful place)?
+
+You have to give the correct device again.
+
+restore if /dev/nst0
+
+will allow you to do an interactive restore from the first file on the 
+tape, and will stop at the end of the file, rather than rewind. They you 
+can do:
+
+restore i
+
+to get the second backup off. The tape will rewind at the end of this.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

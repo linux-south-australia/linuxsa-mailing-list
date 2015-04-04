@@ -1,0 +1,144 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: non-standard serial speeds" -->
+<!-- FromName="'Anthony Symons'" -->
+<!-- FromEmail="ant@sa.pracom.com.au" -->
+<!-- ToName="'Anthony Symons'" -->
+<!-- ToEmail="ant@sa.pracom.com.au" -->
+<!-- Date="17 Jun 2002 13:33:38 +0930" -->
+<!-- Id="1024286618.30245.64.camel@ant.internal" -->
+<!-- Reference="1024278590.30246.14.camel@ant.internal" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: non-standard serial speeds</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  To  : Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  Date: 17 Jun 2002 13:33:38 +0930
+</PRE>
+<H1>Re: non-standard serial speeds</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I think Ive got this sussed. There doesnt seem to be any info on the net
+stating this though, and as this list is archived on the web, and
+thus cached in google, I thought i'd post the answer here.
+
+Problem: you need to set a non-standard baud rate (in this case 5720).
+
+from generic_serial.c (kernel serial driver):
+--------------------------------------------------------
+        else if ((port-&gt;flags & ASYNC_SPD_MASK) == ASYNC_SPD_CUST)
+            baudrate = (port-&gt;baud_base / port-&gt;custom_divisor);
+    }
+
+    /* I recommend using THIS instead of the mess in termios (and
+       duplicating the above code). Next we should create a clean
+       interface towards this variable. If your card supports arbitrary
+       baud rates, (e.g. CD1400 or 16550 based cards) then everything
+       will be very easy..... */
+    port-&gt;baud = baudrate;
+--------------------------------------------------------
+
+So, what they are saying is that your normal 16550 uart can just take a
+speed setting of what ever speed you tell it, yet the kernel API sucks
+and doesnt allow you to just set one.
+
+However, the driver just does a divion of baud_base/custom_divisor. So,
+if you were to set baud_base=5720 and divisor=1, then you have kludged
+the API to get your speed to the baudrate variable in the kernal!
+
+Disclaimer: I havnt tryed this yet :)
+
+Ant
+
+On Mon, 2002-06-17 at 11:19, Anthony Symons wrote:
+&gt; I'm trying to develp a smartcard program for linux. The cavet is that my
+&gt; smartcard device uses a 3.58mhz crystal, where as the smartcard expects
+&gt; a 6mhz clock. This means that the cards sense of time is somewhat
+&gt; skewed, and its idea of 9600,8,E,2 is really 5720,8,E,2. I have programs
+&gt; that work under windows fine (and even wine under linux), they just call
+&gt; a serial set speed type function with "5720" and bingo, its set. Under
+&gt; linux however, it seems a little trickyer...
+&gt; 
+&gt; Anyone have any idea how to do this in C, or if not, with serserial?
+&gt; (since I have its source). As far as I can tell, I need to set spd_cust
+&gt; divisor 20, as 115200/20=~5720. The code in set serial doesnt seem to
+&gt; support a divisor with decimals, as to get a real 5720 would require a
+&gt; divisor of 20.13986013986014.
+&gt; 
+&gt; Also, it seems relevant to baud_base, which seems to be 115200 although
+&gt; it depends on the crystal speed on the serial card. I dont know how to
+&gt; verify this, as I suspect this might be whats wrong. 
+&gt; 
+&gt; Does anyone have any experience with these kinds of serial operation, or
+&gt; can give me some pointer to docs with relevant levels of info? (the
+&gt; serial programming howto is a joke if you dont want a normal 8,N,1
+&gt; setting).
+&gt; 
+&gt; Thanks,
+&gt; Ant
+&gt; -- 
+&gt; Systems Administrator       
+&gt; Pracom Ltd.             
+&gt; +61 8 82029074 -=- +61 402 100 671 
+&gt; <A HREF="mailto:anthony.symons@sa.pracom.com.au">anthony.symons@sa.pracom.com.au</A>
+&gt; 
+&gt; PRIVILEGED - PRIVATE AND CONFIDENTIAL
+&gt; This electronic mail is solely for the use of the addressee and may
+&gt; contain information which is confidential or privileged.
+&gt; If you receive this electronic mail in error, please delete it from
+&gt; your system immediately and notify the sender by electronic mail or
+&gt; using any of the above contact details.
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+-- 
+Systems Administrator       
+Pracom Ltd.             
++61 8 82029074 -=- +61 402 100 671 
+<A HREF="mailto:anthony.symons@sa.pracom.com.au">anthony.symons@sa.pracom.com.au</A>
+
+PRIVILEGED - PRIVATE AND CONFIDENTIAL
+This electronic mail is solely for the use of the addressee and may
+contain information which is confidential or privileged.
+If you receive this electronic mail in error, please delete it from
+your system immediately and notify the sender by electronic mail or
+using any of the above contact details.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

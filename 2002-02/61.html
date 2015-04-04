@@ -1,0 +1,152 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: automation of apt-get" -->
+<!-- FromName="'Daniel Mundy'" -->
+<!-- FromEmail="djmunds@gmx.net" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 02 Feb 2002 20:59:16 +1030" -->
+<!-- Id="3C5BBF7C.3E04522D@gmx.net" -->
+<!-- Reference="3C5A8379.23A5ECBD@gmx.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: automation of apt-get</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Mundy &lt;<I><A HREF="mailto:djmunds@gmx.net">djmunds@gmx.net</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 02 Feb 2002 20:59:16 +1030
+</PRE>
+<H1>Re: automation of apt-get</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I have come up with this script that will run from ip-up, and will have
+a cron job run once-daily to delete the file /tmp/autoupgrade. Now my
+problem is that I don't know whether this script will actually work and
+how to test it... Could people please let me know if they think I should
+be doing anything differently? (I am fairly new to shell scripting) Also
+this script is fairly long (i think) is there a simpler way I should be
+doing it?
+
+#!/bin/sh
+
+if [ ! -e /tmp/autoupgrade ]
+then
+        exit_status=1
+        while [ $exit_status != 0 ]
+# put in a while loop so that if the command gets an error (ie
+downloading of files failed) then the command is fun again
+        do
+                pppstats
+                ppp_status=$?
+                if [ $? = 1 ]
+                then
+                        exit 0
+                        fi
+# check whether ppp0 is still up, as if it disconnected the script could
+just keep running the command which just keep returning errors, nasty
+loop (i think, would this actually happen?) the script just exits and
+will be re-run next time ip-up is run.
+                apt-get update
+                exit_status=$?
+                done
+# same stuff below, just for the second part, apt-get upgrade
+        exit_status=1
+        while [ $exit_status != 0 ]
+        do
+                pppstats
+                ppp_status=$?
+                if [$? = 1 ]
+                then
+                        exit 0
+                        fi
+                apt-get -dy upgrade
+                exit_status=$?
+                done
+
+        touch /tmp/autoupgrade
+# make the file, so that if if-up is run again on the same day it wont
+make it past the first check and the script will exit
+        fi
+
+
+Alex Wallis wrote:
+&gt; 
+&gt; Well I don't run debian, but I've seen the other replies and wonder...
+&gt; 
+&gt; I'd put the commands in a shell script and cron that. Maybe create a
+&gt; file in ip-up and delete it again with ip-down, and then get the script
+&gt; to use "test" to check if that file exists. If it doesn't then exit. You
+&gt; could vary this method to write a file on completion so the script could
+&gt; check for that to see if it has already completed the task for the day.
+&gt; If not then run the upgrade. Just cron the script for example every 2
+&gt; hours, and if the script has already successfully run the upgrade for
+&gt; the day, then the script will detect the file created and exit.
+&gt; 
+&gt; If you want/need help with the script just let me know.
+&gt; 
+&gt; Alex
+&gt; 
+&gt; Daniel Mundy wrote:
+&gt; &gt;
+&gt; &gt; I have been looking into using cron (anacron more specifically) to have
+&gt; &gt; apt-get upgrade my system once a day, I have managed it but I would like
+&gt; &gt; to know a better way to do it. Currently my crontab looks like this:
+&gt; &gt;
+&gt; &gt; 0 21 * * * apt-get update
+&gt; &gt; 0 * * * * apt-get -dy upgrade
+&gt; &gt;
+&gt; &gt; Now the problem is if I am not connected to the internet at this time.
+&gt; &gt; In this case I would like the commands run later on during the day when
+&gt; &gt; it is connected. I could put something in ip-up but that would run twice
+&gt; &gt; on the same day if I connected twice, which I don't want.
+&gt; &gt;
+&gt; &gt; Also, sometimes while downloading the packages I get errors along the
+&gt; &gt; lines of "remote end closed connection". In this case I would also like
+&gt; &gt; the 'apt-get -dy upgrade' run to try and download the missing files.
+&gt; &gt;
+&gt; &gt; I have been thinking about this for a few days now but thought it might
+&gt; &gt; be nice to see other people's way of achieving this the best. Thankyou
+&gt; &gt; for any ideas you can provide.
+&gt; &gt;
+&gt; &gt; -Daniel
+&gt; &gt;
+&gt; 
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

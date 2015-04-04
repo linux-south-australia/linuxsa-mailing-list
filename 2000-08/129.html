@@ -1,0 +1,136 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="perl help" -->
+<!-- FromName="Jake Hawkes" -->
+<!-- FromEmail="jake@infinitylimited.net" -->
+<!-- ToName="LinuxSA Mailing List" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 05 Aug 2000 14:20:55 -0600" -->
+<!-- Id="398C7727.BC4B95BB@infinitylimited.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: perl help</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  To  : LinuxSA Mailing List &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 05 Aug 2000 14:20:55 -0600
+</PRE>
+<H1>perl help</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+ok, i'm doing some funky[1] stuff with perl and IMAP.
+
+I getting the IMAP message from my server (in perl) as a reference to an
+array of lines.
+
+    # get the message, returned as a _reference_ to an array of lines
+    $lines = $server-&gt;get( $msg );
+    $linecount = scalar(@$lines);
+
+
+ok, then I'm looking for a header:
+	$header = get_header("To", $lines);
+	# do stuff
+	$header = get_header("Cc", $lines);
+	# do_stuff
+
+where get_header() does things like this:
+sub get_header {
+    my ($head, @lines) = @_;
+    my $bigline;
+    my $gotStart = 0;
+    my $chopped = 0;
+
+    foreach $lookline (@$lines) {
+	# get rid of \r\n, if its there
+	$lookline =~ s/\r//g;
+	$lookline =~ s/\n//g;
+	if($gotStart) {
+	    # we have start of the header, looking for the beginning of the
+next one
+	    if ( $lookline =~ /[a-zA-Z\ ]*:/igs) {
+		# found start of next header
+		# means we have all of the one we want
+		return ($bigline);
+	    } else {
+		# the header we are getting is split over multiple lines
+		$bigline = join(", ", $bigline, $lookline);
+	    }
+	######################### not got start ###############################
+	} else {
+	    # looking for header $head
+	    if($lookline =~ /^$head\ *:/igs) {
+		$gotStart = 1;
+		# join this line to bigline (well, bigline is empty but who cares)
+		$bigline = join("", "", $lookline);
+	    }
+	} # end else gotstart
+    } # end loop
+
+Now, a common looking snippet from a message from LinuxSA looks like
+this:
+&lt;---snip---&gt;
+Date: Thu, 15 Jun 2000 21:39:54 +0930
+From: Mark Newton &lt;<A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>&gt;
+To: Daryl Tester &lt;<A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A>&gt;
+CC: Mark Phillips &lt;<A HREF="mailto:mark@ist.flinders.edu.au">mark@ist.flinders.edu.au</A>&gt;, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+Subject: Re: [Oz-ISP] &lt;blah&gt; &lt;blah&gt; (fwd)
+&lt;---snip---&gt;
+
+My problem is thus:
+get_header will find the "to" header, but will not find the "cc" header.
+Now if I look for the "cc" header first, I find it, and then I find the
+"to" header. I think what it boils down to is I am mangling the lines
+somehow in my loop.
+
+I'm fairly new to perl, so please be gentle if you are moved to violence
+due to the ugliness of my code :)
+
+Things I'm not sure about, are these right?
+if ($string =~ /regexp/igs) { stuff; }
+           (the "i" modififer doesn't seem to work for me....)
+$lookline =~ s/\r//g;
+$lookline =~ s/\n//g;
+
+Thanks for reading this far. If you can help, that'd be sweet.
+
+--
+Jake Hawkes B.Eng, (CSE)
+
+For some reason, this quote reminds everyone of Marvin Zelkowitz.
+
+[1] Well, *I* think it's funky.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,224 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba - Trusts  & Routed Network browsing" -->
+<!-- FromName="Nick Morrison" -->
+<!-- FromEmail="nickm@bhwb.nsw.gov.au" -->
+<!-- ToName="Nick Morrison" -->
+<!-- ToEmail="nickm@bhwb.nsw.gov.au" -->
+<!-- Date="Mon, 21 Aug 2000 15:31:36 +0930 (CST)" -->
+<!-- Id="200008210601.PAA20774@bhwb.nsw.gov.au" -->
+<!-- Reference="200008210424.NAA19737@bhwb.nsw.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba - Trusts  & Routed Network browsing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Nick Morrison &lt;<I><A HREF="mailto:nickm@bhwb.nsw.gov.au">nickm@bhwb.nsw.gov.au</A></I>&gt;
+  To  : Nick Morrison &lt;<I><A HREF="mailto:nickm@bhwb.nsw.gov.au">nickm@bhwb.nsw.gov.au</A></I>&gt;
+  Date: Mon, 21 Aug 2000 15:31:36 +0930 (CST)
+</PRE>
+<H1>Re: Samba - Trusts  & Routed Network browsing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+...  and after reading your original post again, I've realised that this
+reply isn't particularly relevant.
+
+Hope someone else found it interesting?  Heh :)
+
+Nick
+
+
+
+Nick Morrison spake...
+&gt; 
+&gt; 
+&gt; John,
+&gt; 
+&gt; I just went through exactly the same problem with a network here just last
+&gt; week.  I had two totally seperate NT domains on two totally seperate
+&gt; networks (in two totally seperate buildings!) and had to link them with a
+&gt; radio network thingo and a router.
+&gt; 
+&gt; Samba saved me ;)
+&gt; 
+&gt; The problems were numerous.  They ranged from totally stuffed routing
+&gt; tables on the other NT PDC machine, to having some machines not configured
+&gt; to use WINS.
+&gt; 
+&gt; My fix was basically a great big cleanup.  When I'd fixed the IP
+&gt; configuration on all the machines to use my DHCP server, which handed out
+&gt; the WINS (option netbios-name-servers x.x.x.x), and fixed the static
+&gt; routing on the *cough* MS Proxy machine, it all  -  eventually  -  worked.
+&gt; 
+&gt; Keep in mind also that the WINS server will not necessarily instantly be
+&gt; updated - machines announce themselves to it periodically, so you may just
+&gt; have to make sure that ALL the TCP/IP config is right at Layer 3, make sure
+&gt; the WINS crap is all set up correctly by using DHCP, make your Samba box
+&gt; sit there listening and registering, and leave it all for about 15 minutes.
+&gt; 
+&gt; Also try "ping"ing the PDC's from each PDC from each other PDC - if the
+&gt; name lookups don't work, WINS is the problem.
+&gt; 
+&gt; Good luck......  NT is a bitch to set up.
+&gt; 
+&gt; 
+&gt; --
+&gt; 
+&gt; Nick Morrison
+&gt; <A HREF="mailto:nickm@bhwb.nsw.gov.au">nickm@bhwb.nsw.gov.au</A>
+&gt; 
+&gt; Information Technology Officer
+&gt; Phone:  +61 8 8082 5813
+&gt; Fax:    +61 8 8082 5822
+&gt; Mobile: +61 4 1486 0844
+&gt; 
+&gt; Broken Hill Water Board
+&gt; PO Box 442
+&gt; Broken Hill, NSW 2880
+&gt; 
+&gt; "Why should we limit computers to the lies people tell them through
+&gt; keyboards?"  - Bill Gospar, MIT, 1965
+&gt; 
+&gt; 
+&gt; 
+&gt; 
+&gt; 
+&gt; 
+&gt; 
+&gt; 
+&gt; John Davey spake...
+&gt; &gt; 
+&gt; &gt; I'm having a problem with Samba & network browsing over 3 WinNT Domains set
+&gt; &gt; up like this.
+&gt; &gt; It works everywhere but in the USERS domain..
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; Admin Domain                        Management Domain
+&gt; &gt; -----------------                 ------------------
+&gt; &gt; |Admin  Network |                 | Management Net  |
+&gt; &gt; |192.168.1.0/24 |                 | 192.168.2.0/24  |
+&gt; &gt; |               |                 |                 |
+&gt; &gt; -----------------                 -------------------
+&gt; &gt;        |                                  |
+&gt; &gt;        |  Trust                    Trust  |
+&gt; &gt;        +--&gt;----------+    +------------&lt;--+
+&gt; &gt;                      |    |
+&gt; &gt; 			Users Domain
+&gt; &gt;   ------------------------------------------------
+&gt; &gt;   |   Users PDC -- 192.168.200.254/24  (BOW)     |
+&gt; &gt;   |      ||                                      |
+&gt; &gt;   |      |+Other server -- 192.168.200.253/24    |
+&gt; &gt;   |      |                                       |
+&gt; &gt;   |   ........................................   |
+&gt; &gt;   |      |                                       |
+&gt; &gt;   |     Samba Server -- 10.10.10.1  (ARROW)      |
+&gt; &gt;   |                                              |
+&gt; &gt;   ------------------------------------------------
+&gt; &gt; 
+&gt; &gt; All boxes are WinNT except for Samba with each PDC running Wins &
+&gt; &gt; Replicating between Domains.
+&gt; &gt; 
+&gt; &gt; The DOMAIN USERS trusts both ADMIN & MANAGEMENT and works fine.
+&gt; &gt; I've just installed SAMBA on a server to be part of DOMAIN USERS. It is on a
+&gt; &gt; different Network from the rest of the users domain but meant to be part of
+&gt; &gt; the domain. The connection to the other users servers is fine HTTP, FTP etc
+&gt; &gt; all works ping, traceroute etc.
+&gt; &gt; 
+&gt; &gt; The problem is that although Samba(ARROW) appears in the network browse list
+&gt; &gt; and in the server manager for USERS it is not accessible. The fun part is it
+&gt; &gt; is accessible from the Admin & Management Domains.
+&gt; &gt; 
+&gt; &gt; Now if I start a DOS box on the Users PDC (BOW)
+&gt; &gt; 
+&gt; &gt; C:\&gt; net view ARROW
+&gt; &gt; System error 53
+&gt; &gt; Network path no found
+&gt; &gt; 
+&gt; &gt; Same for
+&gt; &gt; C:\&gt; net view 10.10.10.1
+&gt; &gt; System error 53
+&gt; &gt; Network path no found
+&gt; &gt; 
+&gt; &gt; This occurs for all systems in the Users domain but it works correctly for
+&gt; &gt; all the Parent Domains.
+&gt; &gt; 
+&gt; &gt; Now I suspect that it is a WINS/BROWSER issue because the Samba(ARROW) box
+&gt; &gt; is the only one in its subnet (No NT boxes) and I get the following error in
+&gt; &gt; log.nmb
+&gt; &gt; 
+&gt; &gt; [2000/08/21 12:23:04, 0]
+&gt; &gt; nmbd/nmbd_browsesync.c:find_domain_master_name_query_fail(362)
+&gt; &gt;   find_domain_master_name_query_fail:
+&gt; &gt;   Unable to find the Domain Master Browser name USERS&lt;1b&gt; for the workgroup
+&gt; &gt; USERS.
+&gt; &gt;   Unable to sync browse lists in this workgroup.
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; smb.conf
+&gt; &gt;         netbios name = ARROW
+&gt; &gt;         workgroup = USERS
+&gt; &gt;         server string = Authentication Server [Samba %v]
+&gt; &gt; 
+&gt; &gt;         wins support = no
+&gt; &gt;         wins server = 192.168.200.254
+&gt; &gt; 
+&gt; &gt;         interfaces = 10.10.10.1/24
+&gt; &gt; 
+&gt; &gt;         security = domain
+&gt; &gt;         domain master = no
+&gt; &gt;         preferred master = no
+&gt; &gt;         local master = yes
+&gt; &gt;         remote announce = 192.168.200.254
+&gt; &gt;         password server = BOW
+&gt; &gt;         password level = 8
+&gt; &gt;         username level = 8
+&gt; &gt;         encrypt passwords = yes
+&gt; &gt;         smb passwd file = /etc/smbpasswd
+&gt; &gt;         username map = /etc/smbusers
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; Regards John Davey
+&gt; &gt; 
+&gt; &gt; -- 
+&gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt; 
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

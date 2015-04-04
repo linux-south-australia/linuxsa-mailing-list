@@ -1,0 +1,171 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: "Connecting a LAN to the Internet using IP Masquerading"" -->
+<!-- FromName="Mark Smith" -->
+<!-- FromEmail="marks@senet.com.au" -->
+<!-- ToName="Geoffrey D. Bennett" -->
+<!-- ToEmail="g@netcraft.com.au" -->
+<!-- Date="Sat, 21 Feb 1998 18:36:23 +1030 (CST)" -->
+<!-- Id="XFMail.980221183623.marks@senet.com.au" -->
+<!-- Reference="199802210153.MAA28783@Mich.netcraft.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: "Connecting a LAN to the Internet using IP Masquerading"</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Smith &lt;<I><A HREF="mailto:marks@senet.com.au">marks@senet.com.au</A></I>&gt;
+  To  : Geoffrey D. Bennett &lt;<I><A HREF="mailto:g@netcraft.com.au">g@netcraft.com.au</A></I>&gt;
+  Date: Sat, 21 Feb 1998 18:36:23 +1030 (CST)
+</PRE>
+<H1>Re: "Connecting a LAN to the Internet using IP Masquerading"</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Just a minor thing, and now that I have made a presentation about it I don't
+have an excuse to ignore it, in Geoffreys examples, the subnet should be
+10.&lt;0.1&gt;.0 not 10.&lt;0.0&gt;.0 with a subnet mask of 255.255.255.0.
+
+Remember that a subnet value of all binary zeros is classed as "this"
+subnetwork, not a valid subnet. Remember 2^8 = 256 - 2 = 254, where subnet 0 and
+subnet 255 are the invalid subnets (the minus 2 part).
+
+Technically, you are able to use subnet 0, as long as all the routers in
+the internetwork understand subnet zero. I like to think of it as a pocket knife
+subnet, the one you pull out when you have used up all your other subnets, and
+desperately need one more.
+
+The problem is that you have to check that all devices doing any sort of
+routing will support subnet zero, which could take some time, particularly if
+you have a large number of routers, running different versions of the routing
+software.
+
+BTW, the exam will be at the end of the next meeting. Pass mark is 80%, and you
+will be expected to be able to subnet on a partial octet boundary. The exam
+will last 1 hour.
+
+HTH,
+Mark.
+
+On 21-Feb-98 Geoffrey D. Bennett wrote:
+&gt; Hi Wayne,
+&gt; 
+&gt; you wrote:
+&gt; 
+&gt;&gt; As I wasn't fortunate enough to be involved with the group when the above
+&gt;&gt; topic was covered at a meeting last year, I wonder if anyone could tell me
+&gt;&gt; if there are any notes available from it. Notably this entry in the list of
+&gt;&gt; past meetings on the LinuxSA web page does not have a link. Alternatively,
+&gt;&gt; perhaps someone knows offhand of a suitable other source of information?
+&gt;&gt; Preferably concise and straightforward information, that is! :)
+&gt; 
+&gt; Hmmm, that would be my fault (no notes).  The basic steps to get IP
+&gt; Masquerading running are:
+&gt; 
+&gt; Build your LAN (loungeroom area network) as described by Mark (web
+&gt; notes coming Real Soon Now) and get it working.  For this example,
+&gt; I'll use these IP addresses and parameters:
+&gt; 
+&gt; 10.0.0.1 - IP Masq server with the modem & internet connection
+&gt; 10.0.0.2 - client number 1
+&gt; 10.0.0.3 - client number 2
+&gt; (etc)
+&gt; 255.255.255.0 - netmask for your network
+&gt; 10.0.0.0 - network address
+&gt; 10.0.0.255 - broadcast address
+&gt; 
+&gt; Make sure you can do things like "telnet 10.0.0.1" from the other
+&gt; machines on the network.
+&gt; 
+&gt; Get PPP dialup working on your IP Masq server.  You should be able to
+&gt; do things like "ftp ftp.redhat.com" from this box.
+&gt; 
+&gt; Make sure IP Masq support is compiled into your server's kernel (if
+&gt; you have Red Hat 5.0, skip this step; it's already there).
+&gt; 
+&gt; Type:
+&gt;   ipfwadm -F -p deny
+&gt;   ipfwadm -F -a m -S 10.0.0.0/24 -D 0.0.0.0/0
+&gt; 
+&gt; Set the "default gateway" on the clients to 10.0.0.1 (like Mark
+&gt; mentioned, the server's default gateway is managed by PPP).
+&gt; 
+&gt; Don't forget to set the nameserver IP address correctly on all
+&gt; machines.
+&gt; 
+&gt; That should be it.
+&gt; 
+&gt; The main reference that I know of for IP masquerading is the
+&gt; IP-Masquerade mini-HOWTO.
+&gt; 
+&gt;&gt; Thanks to Mark Smith for his good coverage of networking and TCP/IP at the
+&gt;&gt; last meeting. But you forgot to tell us, will it be in the end of term
+&gt;&gt; exam? :)
+&gt;&gt; 
+&gt;&gt; Thankyou also to NetCraft Australia for the Red Hat mouse mat. It is being
+&gt;&gt; put to good use at my place of employment where it is attracting the
+&gt;&gt; attention of all who pass by.
+&gt; 
+&gt; It's good to hear that it is being used well :).
+&gt; 
+&gt;&gt; (And, yes, they're too stingy to even provide
+&gt;&gt; me with a mouse mat! Last week my mouse's left button stopped working - so
+&gt;&gt; they swapped it with the unused (by me) middle mouse button! Still, that's
+&gt;&gt; probably the sort of resourcefulness that a die-hard Linux afficionado
+&gt;&gt; would appreciate! :) And I deny completely that the failure of the mouse
+&gt;&gt; button was in any way directly related to any after-hours Quake playing! By
+&gt;&gt; the way, is there a Linux port of Quake yet?
+&gt; 
+&gt; AFAIK, there has been a Linux port of Quake for a while now.  No idea
+&gt; where to get it from though, sorry.
+&gt; 
+&gt;&gt; Well, time to blow the dust off the old boot disk and let you all get back
+&gt;&gt; to some serious Linuxing.
+&gt; 
+&gt; I will!
+&gt; 
+&gt; Regards,
+&gt; -- 
+&gt; Geoffrey D. Bennett (<A HREF="mailto:geoffrey@netcraft.com.au">geoffrey@netcraft.com.au</A>)
+&gt; Computer Systems Manager, NetCraft Australia
+&gt; <A HREF="http://www.netcraft.com.au/geoffrey/">http://www.netcraft.com.au/geoffrey/</A>
+&gt; Red Hat Linux Resellers: <A HREF="http://www.netcraft.com.au/redhat/">http://www.netcraft.com.au/redhat/</A>
+&gt; 
+&gt; -- 
+&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+----------------------------------
+E-Mail: Mark Smith &lt;<A HREF="mailto:marks@senet.com.au">marks@senet.com.au</A>&gt;
+Date: 21-Feb-98
+Time: 18:26:55
+
+Please ignore previous fortune.
+
+----------------------------------
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

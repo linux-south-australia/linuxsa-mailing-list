@@ -1,0 +1,99 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Honeypots get stickier??" -->
+<!-- FromName="'Ant'" -->
+<!-- FromEmail="fineales@ozemail.com.au" -->
+<!-- ToName="'James Leone'" -->
+<!-- ToEmail="linuxcpa@netscape.net" -->
+<!-- Date="17 Apr 2003 13:12:40 +0930" -->
+<!-- Id="1050550961.7052.98.camel@ant.localdomain" -->
+<!-- Reference="347C66CAA5AEB948AA431B1C1BCF99BAE4F18F@adlex3.elderslimited.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Honeypots get stickier??</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Ant &lt;<I><A HREF="mailto:fineales@ozemail.com.au">fineales@ozemail.com.au</A></I>&gt;
+  To  : James Leone &lt;<I><A HREF="mailto:linuxcpa@netscape.net">linuxcpa@netscape.net</A></I>&gt;
+  Date: 17 Apr 2003 13:12:40 +0930
+</PRE>
+<H1>Re: Honeypots get stickier??</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, 2003-04-17 at 02:33, James Leone wrote:
+&gt; I also had another idea...hardware related to rooting.  Is there a way 
+&gt; to embed commonly "rooted" applications in embedded firware so that 
+&gt; commonly rooted applications such as sudo cannot be overwritten with a 
+&gt; trojaned version?
+
+Yes, there is a file attribute called immutable which is set by chattr.
+ext2 or 3 only?
+
+EG:
+
+[<A HREF="mailto:ant@ant">ant@ant</A> ant]$ touch test   // create the file
+[<A HREF="mailto:ant@ant">ant@ant</A> ant]$ lsattr test  // check attributes
+-------------- test         // no attributes
+[<A HREF="mailto:ant@ant">ant@ant</A> ant]$ rm test      // kill it
+[<A HREF="mailto:ant@ant">ant@ant</A> ant]$ ls test      
+ls: test: No such file or directory  // gone! (normal)
+[<A HREF="mailto:ant@ant">ant@ant</A> ant]$ touch test   // create another
+[<A HREF="mailto:ant@ant">ant@ant</A> ant]$ chattr +i test  // set immutable flag
+chattr: Operation not permitted while setting flags on test  //not r00t
+[<A HREF="mailto:ant@ant">ant@ant</A> ant]$ su   
+Password:
+[<A HREF="mailto:root@ant">root@ant</A> ant]# chattr +i test  // set immutable flag
+[<A HREF="mailto:root@ant">root@ant</A> ant]# ls -al test     // root or ant could delete or modify 
+-rw-rw-r--    1 ant      ant             0 Apr 17 13:05 test
+[<A HREF="mailto:root@ant">root@ant</A> ant]# lsattr test    
+---i---------- test             // immutable flag
+[<A HREF="mailto:root@ant">root@ant</A> ant]# rm test
+rm: remove write-protected regular empty file `test'? y
+rm: cannot remove `test': Operation not permitted    // no-go!
+
+I used to set this flag on /bin/* /sbin/* /usr/bin/* /usr/sbin/*
+/usr/local/bin/* /usr/local/sbin/*
+
+This meant that any generic exploit that patches system binarys would
+fail. Instead the hacker would have to guess it was the immutable flag
+and modify the exploit to break the system, then un-immutable the
+attributes then patch the file. This is still possible, but it gets
+harder with each extra level you add. I doubt most script kiddies would
+know about this one.
+
+Ant
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

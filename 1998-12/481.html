@@ -1,0 +1,125 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Byte counting over a PPP link" -->
+<!-- FromName="Daniel Callan" -->
+<!-- FromEmail="dcallan@dataline.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 23 Dec 1998 18:25:23 +1000" -->
+<!-- Id="3.0.32.19981223182518.00915eb0@hub.dataline.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Byte counting over a PPP link</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Callan &lt;<I><A HREF="mailto:dcallan@dataline.net.au">dcallan@dataline.net.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Wed, 23 Dec 1998 18:25:23 +1000
+</PRE>
+<H1>Re: Byte counting over a PPP link</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 13:42 23/12/98 +1000, Tristan wrote:
+&gt;At 10:23 AM 12/23/98 +1030, Matthew Tippett wrote:
+&gt;&gt;&gt; 
+&gt;&gt;&gt; At 08:40 AM 12/23/98 +1030, you wrote:
+&gt;&gt;&gt; 
+&gt;&gt;&gt; ipfwadm is probably more efficient in term's of the CPU cycles tho,
+however
+&gt;&gt;&gt; tcpdump will give you more detail.
+&gt;&gt;&gt; 
+
+I know it's a bit old now, but 'nacctd' doesn't do too bad a job
+at comprimising the tidyness of ipfwadm and the verboseness of tcpdump.
+The package is called "Net-Acct.0.4" (network accounting daemon) and it
+_was_ still available on a few Sunsite mirrors (nearly a year ago now tho).
+
+It has a config file, in which you can customise how much info it logs
+per packet and what subnets to watch/ignore, and is quite well-geared 
+towards keeping tabs on ppp connections (although I'm primarily logging
+what they pull into the server's eth0 off the LAN and _then_ back out
+on the ppp device).
+
+It writes to a file in /var/log and I have a perl cronjob that, once a day 
+(midnight actually), kills the dameon, parses its log into a neater formated 
+master log and clears the net-acct log file before restarting the daemon.
+I find this 24 hr lifespan also helps the daemon from getting too flaky. ;-)
+
+Caveats:
+----------------------------------------------------------------------------
+- It logs both eth and ppp interfaces. ie: it can log the same packet twice
+and the only visible difference is that one log entry will have "eth0" as
+it's dev and the other will have "ppp0".
+
+- It only has about a 95% success rate of logging packets so you may
+not get BOTH the ppp and eth entries for a given packet.
+(I get around this by producing two totals for a user and taking
+the larger, ie: the dev that missed the least). The acuracy would
+undoubtably go up on a system with less individual ppp connections
+to worry about.
+
+- You need ppp2.3.5 to be able to grab the username via the "auth-up",
+and "auth-down" scripts (only supported by ver 2.3.5). It uses them to
+write the username to a file in /var/run (named by the IP assigned),
+which it queries when logging packets. 
+*You can also put files there for the IPs of servers/domains that 
+you want logged, ie: it will put the value found in the file (the domain
+name) 
+as the username of the logged packet.
+
+- If the packet is coming from somewhere on the same subnet, it checks
+the sender for ID (before checking if there is a username for the receiver).
+*I have hacked this part of the code to make the order reversed. I can make
+a patch (or atleast a diff statement) to make this bit easy to fix, but
+unless you are trying to log dialup users on an ISP LAN I don't think
+it will be necessary.
+----------------------------------------------------------------------------
+
+All in all, this daemon is probably more suited to a multiuser system, 
+(where you need to know WHO as well as HOW MUCH) but I thought it might 
+be worth a mention for anyone who has tried the other two and was looking
+for alternatives.
+
+Hope this helps,
+-Daniel
+
+
+         Daniel Callan
+        Network Manager
+
+     <A HREF="mailto:hostmaster@dataline.net.au">hostmaster@dataline.net.au</A>
+      -- DataLine.net.au --
+     <A HREF="http://dataline.net.au">http://dataline.net.au</A> 
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

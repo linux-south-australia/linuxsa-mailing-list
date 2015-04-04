@@ -1,0 +1,91 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Checking PHP variables [newbie]" -->
+<!-- FromName="'John Edwards'" -->
+<!-- FromEmail="isplist@pinnacle.net.au" -->
+<!-- ToName="'Rhett'" -->
+<!-- ToEmail="rhett@theinbox.org" -->
+<!-- Date="Mon, 26 Mar 2001 15:44:02 +0930" -->
+<!-- Id="3ABEDE2A.FF23B4D1@pinnacle.net.au" -->
+<!-- Reference="20010326155126.657562e0.rhett@theinbox.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Checking PHP variables [newbie]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: John Edwards &lt;<I><A HREF="mailto:isplist@pinnacle.net.au">isplist@pinnacle.net.au</A></I>&gt;
+  To  : Rhett &lt;<I><A HREF="mailto:rhett@theinbox.org">rhett@theinbox.org</A></I>&gt;
+  Date: Mon, 26 Mar 2001 15:44:02 +0930
+</PRE>
+<H1>Re: Checking PHP variables [newbie]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Rhett wrote:
+
+&gt; I'm currently working with PHP, and using variables to form part of the SQL queries of a database.
+&gt; 
+&gt; I was wondering, how's the best way to make sure the variables don't contain malicious SQL statements? If someone modifies the url the browser is calling to say "?query=blah';alter table database rename"...
+
+There are lots of dangerous escape characters and even trying to allow
+for them can still leave you vulnerable to unicode oddities on some
+platforms.
+
+The safest ways to deal with this threat are to check all variables, ie:
+
+if (ereg("^[:alpha]",$query){
+	die("Invalid Character Detected");
+}
+
+You might need to fine tune this to allow for spaces, hyphens and
+whatever else you need in queries. Don't forget the irish folk who like
+apostrophes in their names :)
+
+A longer alternative might be:
+ereg("^[A-Za-z0-9-]",$query).
+
+If you need to allow the "-" character, make it the last one in the
+regex.
+
+In some development environments, you can call the sql statement like
+"SELECT * FROM table WHERE X=?" and use $query as a parameter, so that
+it's only treated as data to replace ? instead of being part of the SQL
+statement. The ? has special meaning as opposed to just putting the
+string "$query" in the sql statement.
+
+It doesn't look like you can do this with PHP.
+
+John Edwards
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

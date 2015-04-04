@@ -1,0 +1,218 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba slow" -->
+<!-- FromName="'Brian Marr'" -->
+<!-- FromEmail="cabernet@internode.on.net" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 5 Aug 2002 16:28:48 +0930" -->
+<!-- Id="200208051628.48259.cabernet@internode.on.net" -->
+<!-- Reference="F126Nvk2zRAm50czl08000153a4@hotmail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba slow</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Brian Marr &lt;<I><A HREF="mailto:cabernet@internode.on.net">cabernet@internode.on.net</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 5 Aug 2002 16:28:48 +0930
+</PRE>
+<H1>Re: Samba slow</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I am using Version 2.2.3a-64 for both server & client- VMware running on Suse 
+8.0. I enclose some results of testparm that I don't understand and a longish
+Smb.conf file. I have made a couple of small changes to this. An alteration to 
+the TCP_NODELAY line and introduced the 40GB share.
+
+Brian Marr
+=================================
+
+Testparm is showing......
+ browseable = Yes
+        blocking locks = Yes
+        fake oplocks = No
+        locking = Yes
+        oplocks = Yes
+        level2 oplocks = Yes
+        oplock contention limit = 2
+        posix locking = Yes
+        strict locking = No
+        share modes = Yes
+=================================
+
+# /etc/samba/smb.conf ist the main samba configuration file. Cf. the
+# manual page of smb.conf and the included documantation in
+# /usr/share/doc/packages/samba in order to understand the options
+# listed here and many more features.
+#
+# Lines in this example which starts with ; and # are ignored comment
+# ones. # indicates a comment and ; a deactivated example line.
+#
+# We suggest to use the command 'testparm' after any changes you made.
+#
+# Copyright (c) 1999 - 2001 SuSE GmbH Nuernberg, Germany.
+#
+# Please send bugfixes or comments to <A HREF="mailto:feedback@suse.de.">feedback@suse.de.</A>
+#
+[global]
+	workgroup = KID
+	os level = 2
+
+	security = user
+	encrypt passwords = Yes
+	guest account = Nobody
+	map to guest = Bad User
+# This tells samba to use the file smbusers for user mapping.
+;	username map = /etc/samba/smbusers
+
+# This tells samba to write log files per machine.
+;	log file = /var/log/samba/%m
+# This sets an alternate log level. Default is 2.
+;	log level = 3
+
+# Uncomment the following, if you want to use an existing NT-Server to
+# authenticate users, but don't forget that you also have to create them
+# locally!
+;	security = server
+;	password server = 192.168.1.10
+
+	printing = LPRNG
+	printcap name = /etc/printcap
+	load printers = Yes
+
+# These settings are a suggestion for a local network. Cf. section
+# 'socket options' in the man page of smb.conf and socket(7).
+#	socket options = SO_KEEPALIVE IPTOS_LOWDELAY TCP_NODELAY
+	socket options = TCP_NODELAY
+
+# Uncomment this, if you want to integrate your server
+# into an existing net e.g. with NT-WS to prevent nettraffic
+;	local master = No
+
+# Please uncomment the following entry and replace the ip number and
+# netmask with the values of your network interface configuration.
+;	interfaces = 192.168.1.1/255.255.255.0
+
+# If you want Samba to act as a wins server, please set
+# 'wins support' to yes.
+	wins support = No
+
+# If you want Samba to use an existing wins server, please uncomment the
+# following line and replace the dummy with the wins server's ip number.
+;	wins server = 192.168.1.1
+
+# Set these two parameters to your DOS code page and appropriate UNIX
+# character set. These values are for west European languages (Latin-9)
+# UNIX character and MS-DOS Latin 1 code page.
+	character set = ISO8859-15
+	client code page = 850
+
+# This is a simple measure against Nimba Worm. Cf. README.Win32-Viruses
+	veto files = /*.eml/*.nws/riched20.dll/*.{*}/
+
+# Do you wan't samba to act as a logon-server for your windows 95/98
+# clients, so uncomment the following:
+	domain logons = Yes
+	domain master = Yes
+# For a specific logon script per user
+;	logon script = %U.bat
+# For a specific logon script per machine
+;	logon script = %m.bat
+
+# Where to store the logon scripts.
+;[netlogon]
+;	comment = Network Logon Service
+;	path = /var/lib/samba/netlogon
+
+# Where profiles of Windows 9x systems are stored.
+# First example for a centralized place.
+;	logon home = \\%L\profiles\%U
+# Second example for a subdirectory of the users home.
+;	logon home = \\%L\%U\profile
+# Where profiles of Windows NT systems are stored.
+;	logon path = \\%L\profiles\%U
+
+# Extra share for profiles. Default is the home of the user.
+;[profiles]
+;	comment = Network Profiles Service
+;	path = /var/lib/samba/profiles
+;	browseable = No
+
+[homes]
+	comment = Home Directories
+	read only = No
+	create mask = 0640
+	directory mask = 0750
+	browseable = No
+
+[40GB]
+	comment = Drawings
+	read only = No
+#	create mask = 0640
+#	directory mask = 0750
+	browseable = yes
+	path = /data3/home/gringo/CAD
+
+# The following share gives all users access to the Server's CD drive,
+# assuming it is mounted under /media/cdrom. To enable this share,
+# please remove the semicolons before the lines
+;[cdrom]
+;	comment = Linux CD-ROM
+;	path = /media/cdrom
+;	locking = No
+
+[printers]
+	comment = All Printers
+	path = /var/tmp
+	create mask = 0600
+	printable = Yes
+	browseable = No
+
+
+
+On Monday 05 August 2002 14:13, you wrote:
+&gt; did u have oplocks set to yes, and sharing the file with more than one
+&gt; client ?
+&gt;
+&gt; can you post your smb.conf ?
+&gt;
+&gt; cheers
+&gt; R
+&gt;
+&gt; _________________________________________________________________
+&gt; Chat with friends online, try MSN Messenger: <A HREF="http://messenger.msn.com">http://messenger.msn.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,138 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Installing packages on a bare bones embedded linux system" -->
+<!-- FromName="'Damien Uern'" -->
+<!-- FromEmail="carrigan_2606@optusnet.com.au" -->
+<!-- ToName="'Klovekorn, Patrick','linuxsa@linuxsa.org.au'" -->
+<!-- ToEmail="patrick.klovekorn@thermo.com,linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 8 Sep 2003 22:50:44 +0930" -->
+<!-- Id="200309082250.44107.carrigan_2606@optusnet.com.au" -->
+<!-- Reference="84CD2FF0DC594B49A1843CA6EB3912E4442053@mail.tgm.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Installing packages on a bare bones embedded linux system</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Damien Uern &lt;<I><A HREF="mailto:carrigan_2606@optusnet.com.au">carrigan_2606@optusnet.com.au</A></I>&gt;
+  To  : Klovekorn, Patrick &lt;<I><A HREF="mailto:patrick.klovekorn@thermo.com">patrick.klovekorn@thermo.com</A></I>&gt;<BR>        linuxsa@linuxsa.org.au &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 8 Sep 2003 22:50:44 +0930
+</PRE>
+<H1>Re: Installing packages on a bare bones embedded linux system</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+If you want the flexibility to install on a bare bones box without rpm, you 
+will need to compile these packages yourself. Also, compiling from source 
+allows you to specify the target directory. Note that compiling gcc and gdb 
+is fairly hairy, you may want to practice with a simpler program first such 
+as "GNU Hello", which is a multilingual "hello, world!" program that uses the 
+GNU autotools (tools that allow software to be built on multiple flavours of 
+Unix/Linux). In general the procedure goes like this:
+
+tar -xzvf someprogram-0.1.tar.gz
+cd someprogram-0.1
+./configure
+make
+make install
+
+you can pass a whole heap of options to the configure script to change things, 
+this is package independent but all packages have the same base options. To 
+see these options do
+
+./configure --help
+
+before the ./configure stage above. One of the common options is specifying a 
+prefix directory, i.e.:
+
+./configure --prefix=/usr/local
+
+if you were compiling gcc, the gcc binary would end up in /usr/local/bin after 
+the "make install" stage. My friend once compiled gcc up for an embedded 
+system (ARM SoC board), it took him 2 weeks to work it out :) But from what 
+he said, you need to compile gcc twice. Once with the compiler you already 
+have, and then once again with itself. However, he was building a cross 
+compiler for the ARM... is that what you want to do? What is the host CPU on 
+the embedded device? 
+
+If you are building a cross compiler you need to pass a bunch of options to 
+./configure in order to build gcc for the desired architecture you want the 
+resultant gcc to be able to build for. The first time you build gcc, you will 
+need to build it for a desired arch of x86. Then recompile gcc with the 
+recently compiled gcc. Then recompile gcc as a cross compiler for the target 
+arch. If you intend to actually install gcc onto the embedded box (I'm 
+assuming you have a non-x86 CPU on this box at this point), then you will of 
+course need to use the newly built cross compiler to compile gcc for the 
+embedded system.
+
+I'm not sure, but I think the reason for building gcc with itself is because 
+redhat's version of gcc is non-standard and may introduce errors. So I guess 
+building gcc with itself makes a "pure" compiler.
+
+Note that I haven't actually built gcc myself, I am relaying what my friend 
+did. I'm sure other people on this list will correct any mistakes I made.
+
+Cheers,
+
+Damien
+
+
+On Mon, 8 Sep 2003 02:25 pm, Klovekorn, Patrick wrote:
+&gt; Hi
+&gt;
+&gt; Please excuse a newbie. I have to install gdb and gcc on an embedded PC
+&gt; running a bare bones version of Red Hat 7.3. It does not have rpm, so I
+&gt; don't know how to proceed. I have another box that is running RH8.0.
+&gt;
+&gt; I have tried first installing rpm by downloading
+&gt; rpm-build-4.0.4-7x.18.i386.rpm (as well as gcc and gdb) onto the RH8.0 box
+&gt;
+&gt; When I try
+&gt; rpm -i rpm*.rpm, I get an error
+&gt; "Failed Dependencies:
+&gt; 	rpm = 4.0.4 is needed by...
+&gt; 	librpm-4.0.4.so is needed by..
+&gt;
+&gt; The last time I used Linux was slackware in 1997, so my knowledge is VERY
+&gt; rusty and out of date.
+&gt;
+&gt; Any ideas on how I can get these packages to run on the embedded version?
+&gt; Is there any way of specifying a different install directory, so I could
+&gt; run say off a USB flash drive?
+&gt;
+&gt; Any pointers would be appreciated
+&gt;
+&gt; Cheers,
+&gt; Patrick
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

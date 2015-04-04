@@ -1,0 +1,285 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: [OT] Telstra DSl to Internode DSL + Smoothwall" -->
+<!-- FromName="'michael'" -->
+<!-- FromEmail="michael@home.lyppard.com.au" -->
+<!-- ToName="'Michael Selge'" -->
+<!-- ToEmail="mselge@hansenyuncken.com.au" -->
+<!-- Date="Tue, 9 Apr 2002 18:35:22 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.10.10204091827340.30718-100000@sandwich.home.lyppard.com.au" -->
+<!-- Reference="000a01c1df8e$0a9a50c0$bf5391a2@HYSA" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: [OT] Telstra DSl to Internode DSL + Smoothwall</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: michael &lt;<I><A HREF="mailto:michael@home.lyppard.com.au">michael@home.lyppard.com.au</A></I>&gt;
+  To  : Michael Selge &lt;<I><A HREF="mailto:mselge@hansenyuncken.com.au">mselge@hansenyuncken.com.au</A></I>&gt;
+  Date: Tue, 9 Apr 2002 18:35:22 +0930 (CST)
+</PRE>
+<H1>RE: [OT] Telstra DSl to Internode DSL + Smoothwall</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi.
+
+Assuming pppoe works from the same command as isdn (I think it does,
+looking at the script), you just need to type /etc/ppp/ppp-on and the link
+should activate. /etc/ppp/ppp-off will bring it down.
+
+(from the head of the script):
+---------------------------------------
+#!/usr/bin/perl
+#
+# SmoothWall CGIs
+#
+# This code is distributed under the terms of the GPL
+#
+# (c) The SmoothWall Team
+ 
+# Clean up our environment (we're running SUID!)
+delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
+require '/var/smoothwall/header.pl';
+ 
+my %pppsettings;
+my %isdnsettings;
+my %netsettings;
+my %usbadslsettings;
+ 
+# read vars back from file.
+&readhash("${swroot}/ppp/settings", \%pppsettings);
+&readhash("${swroot}/isdn/settings", \%isdnsettings);
+&readhash("${swroot}/ethernet/settings", \%netsettings);
+&readhash("${swroot}/usbadsl/settings", \%usbadslsettings);
+
+if ((! -e "${swroot}/red/active") && ($pppsettings{'DIALONDEMAND'} eq
+'on'))
+{
+        system ('/bin/touch', "${swroot}/red/dial-on-demand");
+}
+ 
+if (-e '/var/run/ppp-smooth.pid') {
+        exit; }
+ 
+if (! -e "${swroot}/red/active")
+{
+        &log("Dialing $pppsettings{'PROFILENAME'}.");
+ 
+        if ($pppsettings{'COMPORT'} =~ /^tty/) {
+                &domodemdial(); }
+        elsif ($pppsettings{'COMPORT'} =~ /^isdn/) {
+                &doisdndial(); }
+        elsif ($pppsettings{'COMPORT'} =~ /^pppoe/) {
+                &dopppoedial(); }
+        elsif ($pppsettings{'COMPORT'} =~ /^usbadsl/) {
+                &dousbadsldial(); }
+}
+ 
+exit 0;
+-----------------------------------------
+&lt;snip&gt;
+
+There it is: 
+        elsif ($pppsettings{'COMPORT'} =~ /^pppoe/) {
+                &dopppoedial(); }
+
+Regards,
+
+Michael
+
+(this is from 0.99, I dunno what the current is)
+
+
+On Tue, 9 Apr 2002, Michael Selge wrote:
+
+&gt; I'll check that tonight...If I SSH to my Smoothy and disconnect
+&gt; remotely...I'm in trouble..obviously
+&gt; 
+&gt; Below is the config file.
+&gt; 
+&gt; /var/smoothwall/ppp/settings
+&gt; 
+&gt; USERNAME=<A HREF="mailto:user@adsl.on.net">user@adsl.on.net</A>
+&gt; DIALONDEMAND=off
+&gt; AUTOCONNECT=on
+&gt; MAXRETRIES=10
+&gt; TELEPHONE=
+&gt; COMPORT=pppoe
+&gt; DNS=Manual
+&gt; DIALONDEMANDDNS=off
+&gt; TIMEOUT=15
+&gt; DTERATE=115200
+&gt; SPEAKER=on
+&gt; LOGINSCRIPT=
+&gt; VALID=yes
+&gt; PROFILE=1
+&gt; PERSISTENT=on
+&gt; PROFILENAME='Internode ADSL'
+&gt; SERVICENAME=
+&gt; AUTH=pap-or-chap
+&gt; CONCENTRATORNAME=
+&gt; PASSWORD=xxxxxxxxx
+&gt; DNS1=192.231.203.2
+&gt; DNS2=192.231.203.3
+&gt; DIALMODE=T
+&gt; SENDCR=off
+&gt; 
+&gt; 
+&gt; I'm unsure what the command line is on Smoothwall to start a session. By
+&gt; Default it's controlled by a cgi script initiated from a Web interface on
+&gt; one of the other LAN PCs.
+&gt; 
+&gt; I have NO problems starting a connection when the Smoothwall box is
+&gt; initially booted either using
+&gt; " Connect on Smoothwall start / Persistant connection " or via the manual
+&gt; "Connect" button.
+&gt; It's only a problem when I am forcibly disconnected ot manually disconnect.
+&gt; 
+&gt; &gt; -----Original Message-----
+&gt; &gt; From: Matthew Moyle-Croft [mailto:<A HREF="mailto:mmc@mmc.com.au">mmc@mmc.com.au</A>]
+&gt; &gt; Sent: Tuesday, 9 April 2002 15:33
+&gt; &gt; To: Michael Selge
+&gt; &gt; Cc: 'David Lloyd'; 'Evan Bourlotos'; <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; &gt; Subject: RE: [OT] Telstra DSl to Internode DSL + Smoothwall
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; Michael,
+&gt; &gt; WRT to your problem, I assume the when you ask it to drop the
+&gt; &gt; connection
+&gt; &gt; that the pppd actually dies?
+&gt; &gt;
+&gt; &gt; (ie. "ps -ef | grep pppd" shows nothing?)
+&gt; &gt;
+&gt; &gt; Given that Internode effectively use the same Telstra
+&gt; &gt; infrastructure to
+&gt; &gt; provide PPPoE connections for residential, I don't quite see
+&gt; &gt; how it could
+&gt; &gt; be an Internode problem.
+&gt; &gt;
+&gt; &gt; Are the any problems actually starting a connection?  I'm
+&gt; &gt; very curious as to
+&gt; &gt; what happens if you try a command line connect.
+&gt; &gt;
+&gt; &gt; MMC
+&gt; &gt;
+&gt; &gt; On Tue, 9 Apr 2002, Michael Selge wrote:
+&gt; &gt;
+&gt; &gt; &gt; David,
+&gt; &gt; &gt;
+&gt; &gt; &gt; Why go out and buy bread when you can grow some Wheat,
+&gt; &gt; Crush it and make
+&gt; &gt; &gt; your own
+&gt; &gt; &gt;
+&gt; &gt; &gt; Products like Smoothwall are very easy to set up and it
+&gt; &gt; spreads knowledge of
+&gt; &gt; &gt; Linux. Surely this is a good thing. I've got 3 friends with
+&gt; &gt; Telstra Cable
+&gt; &gt; &gt; who would NEVER EVER have had anything to do with Linux if
+&gt; &gt; it wasn't for
+&gt; &gt; &gt; Smoothwall. Whilst they primarily don't do too much else at
+&gt; &gt; least they know
+&gt; &gt; &gt; Linux exists now and runs on "obsolete hardware" and does a
+&gt; &gt; bloody good job
+&gt; &gt; &gt; of protecting their Internal Windows Network.
+&gt; &gt; &gt;
+&gt; &gt; &gt; My own Smoothwall box has worked flawlessly for 12 months
+&gt; &gt; on Telstra ADSL
+&gt; &gt; &gt; and the problem I'm having now that I've gone to Internode
+&gt; &gt; is annoying but
+&gt; &gt; &gt; minor. The "Problem" has to be something that has occurred
+&gt; &gt; as a result of
+&gt; &gt; &gt; going to Internode and I'd like to think that a solution
+&gt; &gt; can be found rather
+&gt; &gt; &gt; than saying " Don't use Smoothwall "
+&gt; &gt; &gt;
+&gt; &gt; &gt; and Yes..I have contacted both Simon, Internode Helpdesk
+&gt; &gt; and Smoothwall IRC
+&gt; &gt; &gt; support and thus far no-one has any answers. I was hoping
+&gt; &gt; that one of the
+&gt; &gt; &gt; "so called gurus" that frequent this mailing list might have some
+&gt; &gt; &gt; constructive suggestions on finding what the problem is.
+&gt; &gt; &gt;
+&gt; &gt; &gt; I really don't cherish the thought of advising prospective
+&gt; &gt; ADSL users that
+&gt; &gt; &gt; they should have a Firewall setup, but you must either
+&gt; &gt; &gt;
+&gt; &gt; &gt;    a) Learn how to set up and secure FreeBSD/Debian/Other
+&gt; &gt; linux from scratch
+&gt; &gt; &gt; or b) Install WinRoute or similar
+&gt; &gt; &gt;
+&gt; &gt; &gt; my Tuesday Afternoon rant..
+&gt; &gt; &gt;
+&gt; &gt; &gt; Michael
+&gt; &gt; &gt;
+&gt; &gt; &gt; &gt; -----Original Message-----
+&gt; &gt; &gt; &gt; From: David Lloyd [mailto:<A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A>]
+&gt; &gt; &gt; &gt; Sent: Tuesday, 9 April 2002 14:46
+&gt; &gt; &gt; &gt; To: Evan Bourlotos
+&gt; &gt; &gt; &gt; Cc: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; &gt; &gt; &gt; Subject: Re: [OT] Telstra DSl to Internode DSL + Smoothwall
+&gt; &gt; &gt; &gt;
+&gt; &gt; &gt; &gt;
+&gt; &gt; &gt; &gt;
+&gt; &gt; &gt; &gt; The answer, Evan, is to install Debian/FreeBSD or whatever
+&gt; &gt; &gt; &gt; and configure
+&gt; &gt; &gt; &gt; it yourself ;-)
+&gt; &gt; &gt; &gt;
+&gt; &gt; &gt; &gt; *all these weenies expecting other people to build their
+&gt; &gt; &gt; &gt; damned firewalls*
+&gt; &gt; &gt; &gt;
+&gt; &gt; &gt; &gt; LOL
+&gt; &gt; &gt; &gt;
+&gt; &gt; &gt; &gt; --
+&gt; &gt; &gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on
+&gt; &gt; &gt; &gt; irc.linux.org.au
+&gt; &gt; &gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt; &gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as
+&gt; &gt; &gt; &gt; the subject
+&gt; &gt; &gt;
+&gt; &gt; &gt;
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; Matthew
+&gt; &gt; --
+&gt; &gt; <A HREF="mailto:Matthew@Moyle-Croft.com">Matthew@Moyle-Croft.com</A>    | <A HREF="mailto:mmc@mmc.com.au">mmc@mmc.com.au</A>        |    <A HREF="mailto:mmc@206gti.net">mmc@206gti.net</A>
+&gt; &gt; <A HREF="http://www.Moyle-Croft.com">http://www.Moyle-Croft.com</A> | <A HREF="http://www.mmc.com.au">http://www.mmc.com.au</A> |
+&gt; <A HREF="http://206gti.net">http://206gti.net</A>
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,202 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE:Re: USB Modem" -->
+<!-- FromName="'David Delyn'" -->
+<!-- FromEmail="delyn@email.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 23 Nov 2001 11:37:58 +1030" -->
+<!-- Id="005601c173bb$5cd7a700$680930cb@main" -->
+<!-- Reference="003801c172fc$ccea0b60$5c0930cb@main" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE:Re: USB Modem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Delyn &lt;<I><A HREF="mailto:delyn@email.com">delyn@email.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 23 Nov 2001 11:37:58 +1030
+</PRE>
+<H1>RE:Re: USB Modem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Thanks Brian,
+    Made some sense out of what I had already read,but didn't work entirely.
+Beware this is a fairly big page. but I'm getting peeved at getting in and
+out of winblows all the time. Just to communicate.
+
+***What did work*****
+Created device
+mknode /dev/usb/ttyACM0 c 166 0
+    No idea what the 3 bits of info on the end are but got from another
+install site
+created link
+ln -si /dev/usb/ttyACM0  /dev.modem
+
+***What didn't****
+tried modprobe acm and usb-uhci with no result
+
+tried make modules
+cd /usr/src/linux-2.4.7
+make modules
+( received a lot of info below)
+make modules_install
+(More info below)
+tried to list modules n.b. no change from prior to exercise
+uhci is there but acm is not output as follows.
+
+[<A HREF="mailto:root@localhost">root@localhost</A> linux-2.4.8]# lsmod
+Module                  Size  Used by
+binfmt_misc             6208   1
+via82cxxx_audio        17104   1
+uart401                 6352   0  [via82cxxx_audio]
+ac97_codec              9312   0  [via82cxxx_audio]
+sound                  58400   0  [via82cxxx_audio uart401]
+soundcore               4208   5  [via82cxxx_audio sound]
+af_packet              12560   0  (autoclean)
+ip_vs                  62000   0  (autoclean)
+usb-uhci               21232   0  (unused)
+usbcore                50752   1  [usb-uhci]
+sr_mod                 14912   0  (autoclean) (unused)
+nls_iso8859-1           2880   4  (autoclean)
+nls_cp850               3632   4  (autoclean)
+vfat                    9968   4  (autoclean)
+fat                    32192   0  (autoclean) [vfat]
+ide-scsi                8096   0
+scsi_mod               91072   2  [sr_mod ide-scsi]
+rtc                     5600   0  (autoclean)
+reiserfs              158304   2
+found the acm.c itself in the following directory
+
+/usr/src/linux-2.4.7/drivers/usb
+
+this directory also has a Makefile but if I run make modules  from here it
+comes up with a no rules error.
+
+
+[<A HREF="mailto:root@localhost">root@localhost</A> linux-2.4.8]# make modules
+make -C  kernel CFLAGS="-D__KERNEL__ -I/usr/src/linux-2.4.8/include  -Wall -
+Wstrict-prototypes -Wno-trigraphs
+-O2 -fno-strict-aliasing -fno-common -fomit-frame-pointer -pipe -mpreferred-
+stack-boundary=2 -march=i586 -fno-merge-constants  -DMODULE -DMODVERSIONS -i
+nclude /usr/src/linux-2.4.8/include/linux/modversions.h" MAKING_MODULES=1
+modules
+make[1]: Entering directory `/usr/src/linux-2.4.8/kernel'
+make[1]: Nothing to be done for `modules'.
+make[1]: Leaving directory `/usr/src/linux-2.4.8/kernel'
+make -C  drivers
+CFLAGS="-D__KERNEL__ -I/usr/src/linux-2.4.8/include  -Wall -Wstrict-prototyp
+es -Wno-trigraphs -O2 -fno-strict-aliasing -fno-common -fomit-frame-pointer 
+-pipe -mpreferred-stack-boundary=2 -march=i586 -fno-merge-constants  -DMODUL
+E -DMODVERSIONS -include /usr/src/linux-2.4.8/include/linux/modversions.h"
+MAKING_MODULES=1 modules
+make[1]: Entering directory `/usr/src/linux-2.4.8/drivers'
+make -C atm modules
+make[2]: Entering directory `/usr/src/linux-2.4.8/drivers/atm'
+make[2]: *** No rule to make target
+`/home/quintela/rpm/BUILD/linux/include/linux/module.h', needed by `eni.o'.
+Stop.
+make[2]: Leaving directory `/usr/src/linux-2.4.8/drivers/atm'
+make[1]: *** [_modsubdir_atm] Error 2
+make[1]: Leaving directory `/usr/src/linux-2.4.8/drivers'
+make: *** [_mod_drivers] Error 2
+
+
+
+[<A HREF="mailto:root@localhost">root@localhost</A> linux-2.4.8]# make modules-install
+make -C  kernel modules_install
+make[1]: Entering directory `/usr/src/linux-2.4.8/kernel'
+make[1]: Nothing to be done for `modules_install'.
+make[1]: Leaving directory `/usr/src/linux-2.4.8/kernel'
+make -C  drivers modules_install
+make[1]: Entering directory `/usr/src/linux-2.4.8/drivers'
+make -C atm modules_install
+make[2]: Entering directory `/usr/src/linux-2.4.8/drivers/atm'
+mkdir -p /lib/modules/2.4.8-26mdk/kernel/drivers/atm/
+cp eni.o suni.o zatm.o uPD98402.o nicstar.o suni.o idt77105.o horizon.o
+ambassador.o atmtcp.o iphase.o suni.o
+fore_200e.o /lib/modules/2.4.8-26mdk/kernel/drivers/atm/
+cp: cannot stat `eni.o': No such file or directory
+cp: cannot stat `suni.o': No such file or directory
+cp: cannot stat `zatm.o': No such file or directory
+cp: cannot stat `uPD98402.o': No such file or directory
+cp: cannot stat `nicstar.o': No such file or directory
+cp: cannot stat `suni.o': No such file or directory
+cp: cannot stat `idt77105.o': No such file or directory
+cp: cannot stat `horizon.o': No such file or directory
+cp: cannot stat `ambassador.o': No such file or directory
+cp: cannot stat `atmtcp.o': No such file or directory
+cp: cannot stat `iphase.o': No such file or directory
+cp: cannot stat `suni.o': No such file or directory
+cp: cannot stat `fore_200e.o': No such file or directory
+make[2]: *** [_modinst__] Error 1
+make[2]: Leaving directory `/usr/src/linux-2.4.8/drivers/atm'
+make[1]: *** [_modinst_atm] Error 2
+make[1]: Leaving directory `/usr/src/linux-2.4.8/drivers'
+make: *** [_modinst_drivers] Error 2
+
+
+
+
+
+----- Original Message -----
+From: "Brian Marr" &lt;<A HREF="mailto:cabernet@internode.on.net">cabernet@internode.on.net</A>&gt;
+To: &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Sent: Thursday, November 22, 2001 3:46 PM
+Subject: Re: USB Modem
+
+
+&gt; Mandrake 8.0 Kernel 2.4.3-20mdk
+&gt;
+&gt; You may need the usb-uhci module
+&gt; modprobe usb-uhci
+&gt; and possibly the acm module
+&gt; modprobe acm
+&gt; These will need to be enabled in the kernel as modules.
+&gt; If not enable them -then do (in /usr/src/linux)
+&gt; make modules
+&gt; make modules_install
+&gt; Then you should be able to use these.
+&gt;
+&gt; There is also a uhci alternate driver and and ohci module in the kernel if
+&gt; you strike problems.
+&gt;
+&gt; Ah ! found it
+&gt; /dev/modem is a link to /dev/input/ttyACM0
+&gt;
+&gt; Brian Marr
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

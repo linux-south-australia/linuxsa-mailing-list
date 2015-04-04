@@ -1,0 +1,129 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: chmod and other questions." -->
+<!-- FromName="Mike Andrew" -->
+<!-- FromEmail="mikero@norfolk.nf" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 1 Dec 1999 01:40:38 +1130" -->
+<!-- Id="9912010200500N.00891@mikero.home" -->
+<!-- Reference="99120100085001.00646@localhost.localdomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: chmod and other questions.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mike Andrew &lt;<I><A HREF="mailto:mikero@norfolk.nf">mikero@norfolk.nf</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Wed, 1 Dec 1999 01:40:38 +1130
+</PRE>
+<H1>Re: chmod and other questions.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 01 Dec 1999, Robyn Manning wrote:
+&gt; Where can I find 'understandable' information about chmod and what it does?
+
+------
+it's an archaic octal convention that's thrown you.
+
+if you are absolutely desperate to move forward, you can type in
+
+chmod 777  whatever
+
+some programs however are smart enough to look at their own permissions
+and say no way, i'm not running open to the world like that. The above is
+not a good idea, unless you're flat desperate.
+
+here is a safe one if 'just you' plan to use the file
+
+chmod 664 whatever (for 'text' type files)
+and
+chmod 774 whatever (for executing a program of that name)
+--------
+
+&gt; How do I mount a drive when not logged in as root? Can I do this in a bootup
+&gt; script??
+
+yes, certainly. the file you are most interested in is /etc/fstab and
+scripting aint necessary.
+
+as root you can edit /etc/fstab
+
+1)
+mkdir /mnt/whatever      (makes a directory for you)
+
+chmod 777 /mnt/whatever 
+(this is a rare occasion you really do want to do this)
+
+in etc fstab you want to insert (or modify) a line looking like this
+
+/dev/hdXY /mnt/whatever  iso9660  defaults,auto, user  0 0
+
+"iso0660" is for cd's, "vfat" would be for a windows partition.
+
+the thing to focus on here is "auto,user" It automatically mounts at boot
+time and allows you, not just root, to mount it.
+
+hdXY is a little tricky. it means drive and partition as in hda1. For a
+cdrom it will be something like /dev/hdd. (no numeric)
+
+I suspect you're trying to automount windows. It is most likely to be
+/dev/hda1 in your system.
+
+&gt; 
+&gt; What should be the permissions etc for /dev/modem because I changed them and
+&gt; don't know how to change them back again?
+
+it is perfectly safe, and very sensible to 
+
+chmod 777 /dev/modem
+
+it is actually a link to a specific serial port. you can find out which one
+by typing
+
+ls -l  /dev/modem
+
+it is also a good idea to change the serial port to
+
+chmod 666 ttyS?   (? = 0,1,2 or 3)
+
+dialling software that use the modem link, alter the permissions 'on the
+fly' but they don't get past first base if the permissions are wrong to
+begin with.
+
+--
+<A HREF="http://users.nf/linux/">http://users.nf/linux/</A>
+StepByStep submissions: <A HREF="mailto:mikero@norfolk.nf">mikero@norfolk.nf</A>
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

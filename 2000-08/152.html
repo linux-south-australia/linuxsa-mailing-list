@@ -1,0 +1,79 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: pppd - local-IP-address" -->
+<!-- FromName="Jake Hawkes" -->
+<!-- FromEmail="jake@infinitylimited.net" -->
+<!-- ToName="Michael Fewings" -->
+<!-- ToEmail="oldpop@ihug.com.au" -->
+<!-- Date="Sun, 06 Aug 2000 12:46:17 -0600" -->
+<!-- Id="398DB279.85C14D5@infinitylimited.net" -->
+<!-- Reference="398D0D49.A2B34651@ihug.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: pppd - local-IP-address</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  To  : Michael Fewings &lt;<I><A HREF="mailto:oldpop@ihug.com.au">oldpop@ihug.com.au</A></I>&gt;
+  Date: Sun, 06 Aug 2000 12:46:17 -0600
+</PRE>
+<H1>Re: pppd - local-IP-address</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Michael Fewings wrote:
+&gt;     Thankyou Daryl - this script was to be found in
+&gt; /etc/sysconfig/network-scripts/ifup-_post_; sort of makes sense, doesn't it.
+&gt; This is it:
+&gt;                     ifconfig ppp0 | grep 'inet addr' | awk -F: '{print $2}' |
+&gt; awk '{print $1}'
+&gt;     - just what I needed.
+
+This may be fine for you, but I had the need for more. I had multiple
+pppd starting up to handle dialin calls. Now, in order to get the
+ipchains right, I needed to know there IP address (easy, cause I gave it
+to them) *and* their interface name - which changes. 
+
+Now, add to this, the fact that I also had 2 outgoing pppd connections
+(ppp0 and ppp1) which I needed different ipchains for.
+
+Ok, so now consider this: incoming pppd's can snitch ppp0 or ppp1 (its
+possible, and not to improbable)
+
+Basically, I needed to get pppd to talk directly to me, and not rely on
+the redhat scripts, cause, consider this:
+Dialout connection (ppp0) dies and so is re-started. But lo and behold,
+during the time it is down, in incoming pppd snitches ppp0, so it grabs
+the next available one - ppp4. 
+
+to bring that interface down, you dont dp ifdown ppp4. you do ifdown
+ppp0. Therefore all the ifup-post scripts are bogus, cause they refer to
+ppp0, not ppp4.
+
+Ok, so the link comes up, the routing all works (cause its by IP only)
+and the ipchains are screwed. 
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

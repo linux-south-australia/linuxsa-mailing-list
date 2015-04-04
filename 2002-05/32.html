@@ -1,0 +1,140 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: kernel message - LSR safety check engaged" -->
+<!-- FromName="'nik [tm]'" -->
+<!-- FromEmail="tmcruisin@sond.com.au" -->
+<!-- ToName="'LinuxSA Mailing List'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 1 May 2002 13:17:43 +0930" -->
+<!-- Id="009101c1f0c2$f332a9f0$0301a8c0@nick" -->
+<!-- Reference="004a01c1f0b4$8566f060$0301a8c0@nick" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: kernel message - LSR safety check engaged</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: nik [tm] &lt;<I><A HREF="mailto:tmcruisin@sond.com.au">tmcruisin@sond.com.au</A></I>&gt;
+  To  : LinuxSA Mailing List &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 1 May 2002 13:17:43 +0930
+</PRE>
+<H1>Re: kernel message - LSR safety check engaged</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; &gt;From reading the source, the kernel does not believe that you actually
+&gt; have a UART at the port address that you have configured (source snippet
+&gt; below).  Probably need to re-check that address in the setserial
+&gt; command.
+
+the information I am finding says it is relevant to the UART, I have two
+addresses listed in /proc/pci;
+
+[<A HREF="mailto:root@sure-host">root@sure-host</A> /root]# cat /proc/pci
+PCI devices found:
+  Bus  0, device   0, function  0:
+    Host bridge: Intel Corp. 82810 GMCH [Graphics Memory Controller Hub]
+(rev 2).
+  Bus  0, device   1, function  0:
+    VGA compatible controller: Intel Corp. 82810 CGC [Chipset Graphics
+Controller] (rev 2).
+      IRQ 11.
+      Prefetchable 32 bit memory at 0xd0000000 [0xd3ffffff].
+      Non-prefetchable 32 bit memory at 0xd4100000 [0xd417ffff].
+  Bus  0, device  30, function  0:
+    PCI bridge: Intel Corp. 82801AB PCI Bridge (rev 1).
+      Master Capable.  No bursts.  Min Gnt=6.
+  Bus  0, device  31, function  0:
+    ISA bridge: Intel Corp. 82801AB ISA Bridge (LPC) (rev 1).
+  Bus  0, device  31, function  1:
+    IDE interface: Intel Corp. 82801AB IDE (rev 1).
+      I/O at 0xf000 [0xf00f].
+  Bus  0, device  31, function  2:
+    USB Controller: Intel Corp. 82801AB USB (rev 1).
+      IRQ 11.
+      I/O at 0xd000 [0xd01f].
+  Bus  0, device  31, function  3:
+    SMBus: Intel Corp. 82801AB SMBus (rev 1).
+      IRQ 5.
+      I/O at 0x5000 [0x500f].
+  Bus  0, device  31, function  5:
+    Multimedia audio controller: Intel Corp. 82801AB AC'97 Audio (rev 1).
+      IRQ 5.
+      I/O at 0xd800 [0xd8ff].
+      I/O at 0xdc00 [0xdc3f].
+  Bus  1, device   0, function  0:
+    Ethernet controller: Realtek Semiconductor Co., Ltd. RTL-8139 (rev 16).
+      IRQ 11.
+      Master Capable.  Latency=32.  Min Gnt=32.Max Lat=64.
+      I/O at 0xc000 [0xc0ff].
+      Non-prefetchable 32 bit memory at 0xd4000000 [0xd40000ff].
+  Bus  1, device   1, function  0:
+    Serial controller: PCI device 1409:7168 (Timedia Technology Co Ltd) (rev
+1).
+      IRQ 5.
+--&gt; I/O at 0xc400 [0xc41f].
+
+there are no conflicting devices from /proc/pci as I can see it
+but if I use the first of the two addresses listed (0xc400) it says address
+already in use;
+
+[<A HREF="mailto:root@sure-host">root@sure-host</A> /root]# setserial /dev/ttyS2 port 0xc400 UART 16550A irq 5
+Baud_base 921600
+Cannot set serial info: Address already in use
+
+but setserial is fine with the other address;
+
+[<A HREF="mailto:root@sure-host">root@sure-host</A> /root]# setserial /dev/ttyS2 port 0xc41f UART 16550A irq 5
+Baud_base 921600
+
+[<A HREF="mailto:root@sure-host">root@sure-host</A> /root]# setserial -a /dev/ttyS2
+/dev/ttyS2, Line 2, UART: 16550A, Port: 0xc41f, IRQ: 5
+        Baud_base: 921600, close_delay: 50, divisor: 0
+        closing_wait: 3000
+        Flags: spd_normal skip_test
+
+so the problem maybe that it needs to be the 0xc400 address, and the fact
+setserial thinks it is in use and if so I am at a loss how to convince
+setserial to use the other address..
+
+any ideas on how to maybe force use of the address?
+
+cheers
+nik [tm]
+
+
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

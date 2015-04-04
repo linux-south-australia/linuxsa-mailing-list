@@ -1,0 +1,188 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Package management in free OSs" -->
+<!-- FromName="Greg Lehey" -->
+<!-- FromEmail="grog@lemis.com" -->
+<!-- ToName="Dan Shearer" -->
+<!-- ToEmail="dan@linuxcare.com" -->
+<!-- Date="Wed, 31 May 2000 18:03:58 +0930" -->
+<!-- Id="20000531180358.A18128@wantadilla.lemis.com" -->
+<!-- Reference="Pine.LNX.4.10.10005311643080.1596-100000@localhost.localdomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Package management in free OSs</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Greg Lehey &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  To  : Dan Shearer &lt;<I><A HREF="mailto:dan@linuxcare.com">dan@linuxcare.com</A></I>&gt;
+  Date: Wed, 31 May 2000 18:03:58 +0930
+</PRE>
+<H1>Re: Package management in free OSs</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wednesday, 31 May 2000 at 16:52:25 +0930, Dan Shearer wrote:
+&gt; Well, I seem to have managed to send the last version before I finished.
+&gt; Here it is again, with minor changes.
+
+I didn't see the last one...
+
+&gt; Package management is one of the most important (and potentially,
+&gt; expensive) things about an OS, when considering its use in commercial
+&gt; and/or large environments. I have some ideas I've formed through practical
+&gt; experience over where things are, and I'd be interested in other peoples'
+&gt; comments on what I'm forgetting or don't know about, which is probably a
+&gt; lot.
+
+I think you need to define what you mean by "Package management".
+Looking further down, I don't know whether I should criticize what you
+say or not, since I'm not sure how you use the term.
+
+&gt; Something that is clearly not good is having perhaps 10 different
+&gt; package specifications for things like GNU fileutils, which are
+&gt; required by all Linux and BSD distributions.
+
+BSD doesn't use fileutils.  It's not even available as a port,
+apparently, one of the very few ones which isn't.  Note also that
+those packages used as part of the base BSD system, such as GNU
+binutils, aren't handled by this method: the base system is installed
+differently, primarily by make(1).
+
+&gt; pkg
+&gt; ---
+
+I got about this far and said "He said free OSs, not just Linux, but
+he's omitted the BSD packaging systems".  I didn't recognize the name:
+I don't know anybody who calls it "pkg".
+
+&gt; I know the least about this, not being very experienced with BSD. It
+&gt; is a very simple system, with a basic list of installed packages in
+&gt; /var/db/pkg and commands like pkg_add and pkg_delete which handle a
+&gt; package description file that is bundled with a tar.gz of the
+&gt; binaries to be installed.
+&gt;
+&gt; pkg is not ported to any other OS that I know of.
+
+In fact, pkg_add and friends are closely related to the System V
+packaging tools, so closely that I don't understand why they're not a
+complete clone.
+
+&gt; There is good documentation, although being so simple not a lot is
+&gt; needed. A good thing about pkg is that the collections of ports are
+&gt; maintained in a consistent way and there aren't that many ports
+&gt; collections.
+
+Hmm.  There are about 3,300, which is a fair number in my book.  We
+use the term "Ports Collection" to refer to the entire collection of
+3,300 ports.
+
+&gt; The rules for making a package are very clear. I don't _think_ there
+&gt; is too much in the way of a framework for digital package signing
+&gt; but it is such a simple thing to do that I presume I'm wrong :-)
+
+We have MD5 signing on all ports.  I'm not so sure about the packages.
+
+&gt; pkg appears to have similar base capabilities to apt with respect to
+&gt; location and retrieval methods, but much less flexibility with the current
+&gt; number of methods and ability to add in new methods [this might be wrong,
+&gt; corrections welcomed]. So pkg too can look for a package on the CD ROM,
+&gt; not find it and then go to a web/ftp site.
+
+I think you've missed the point that pkg_add and friends are just one
+relatively small part of the ports collection.  They only handle
+binary packages, and it's perfectly possible to install all your BSD
+ports without ever using pkg_add.  By far the most important part of
+the ports framework is the Makefile.  In general, if you want to
+install a third-party (i.e. not BSD) package, you use a port.  This
+contains those files required to locate the source archive and build
+and install it.  For example, the FreeBSD port for bash-2.04 contains:
+
+$ ls -RFC
+CVS/            Makefile        files/          patches/        pkg/
+
+./files:
+CVS/    md5
+
+./patches:
+CVS/            patch-ab        patch-ad        patch-af
+patch-aa        patch-ac        patch-ae
+
+./pkg:
+COMMENT         CVS/            DESCR           PLIST
+
+I've omitted the CVS directory contents.  The important things here
+are:
+
+Make<A HREF="file:">file:</A> Includes the real ports Makefile.  The main contents of this
+          file are info on where to get the source archives, a
+          post-install script, and generic information such as what
+          kind of configure scheme it uses.
+
+patches/: Lists of diffs which should be applied before installing.
+	  I'm a little suspicious of the number here; I'll probably
+	  try feeding them back to Chet.
+
+md5:	  The MD5 signature.
+COMMENT:  A one-line description.
+DESCR:	  A more verbose description.
+PLIST:	  "Packing list".  A list of the files which get installed,
+	  may also contains shell commands for execution on install
+	  and uninstall.
+
+One of the Makefile targets is "package", which makes a binary package
+suitable for installation with pkg_add.
+
+&gt; Overall
+&gt; -------
+&gt;
+&gt; Although there are a lot of problems to solve when designing packaging
+&gt; tools, I think the big issue is maintaining the package archives. The fact
+&gt; that the program "alien" works very well in translating between the major
+&gt; Linux package formats proves that this isn't the major problem.
+&gt;
+&gt; In the archive maintainence area the apt and pkg approach is pretty good,
+&gt; with apt being quite an advance on the ports collection concept in that it
+&gt; is designed to be easily extended. The user can specify an arbitary number
+&gt; of repositries and their location, and OSs that have base packages in
+&gt; common just fit into the hierachy very neatly.
+
+I don't really understand what you're saying here.  If you mean the
+BSD Ports Collections, they are very much set up for independent
+repositories.  A lot depends on the definition of the term "archive
+maintenance".  The Ports Collection is maintained in a CVS repository,
+but the archives themselves are spread around the Internet.
+
+Greg
+--
+See complete headers for address and phone numbers
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

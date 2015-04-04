@@ -1,0 +1,185 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: user auth. with samba and nt" -->
+<!-- FromName="'JBCurry'" -->
+<!-- FromEmail="jbcurry@hline.localhealth.net" -->
+<!-- ToName="'Sam Silvester','Richard Sharpe'" -->
+<!-- ToEmail="sam@quadlink.com.au,sharpe@ns.aus.com" -->
+<!-- Date="Wed, 27 Dec 2000 16:13:43 -0500" -->
+<!-- Id="NEBBIDFGCLPNOAPPJALJAEPJCBAA.jbcurry@hline.localhealth.net" -->
+<!-- Reference="Pine.LNX.4.21.0012271626050.13529-100000@phydeaux.quadlink.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: user auth. with samba and nt</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: JBCurry &lt;<I><A HREF="mailto:jbcurry@hline.localhealth.net">jbcurry@hline.localhealth.net</A></I>&gt;
+  To  : Sam Silvester &lt;<I><A HREF="mailto:sam@quadlink.com.au">sam@quadlink.com.au</A></I>&gt;<BR>        Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  Date: Wed, 27 Dec 2000 16:13:43 -0500
+</PRE>
+<H1>RE: user auth. with samba and nt</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Sam -
+
+You should only need the standard entries in /etc/group (i.e., your Unix
+groups) to resolve group membership. (Somebody please correct me if I'm
+wrong.)
+
+There are some parameters for mapping group names between Unix and Windows
+NT, if you decide to throw NT into the mix.  These parameters are "domain
+group map", "domain user map", and "local group map".  Haven't used 'em
+myself, so it'd be better if I didn't try to tell you how.  Check out Samba
+FAQ's/HOWTO's or pick up a copy of something like Richard's "Special
+Edition: Using Samba" for more info on these parameters.
+
+In your config.pol file, then, (on the server in the /netlogon directory),
+you would also need to add the groups you wish to configure policies for.
+Remember that policies can get tricky when a user is a member of several
+groups, or if you have a combination of machine, user and group policies.
+There's a great book on policies entitled "Windows System Policy Editor" put
+out by O'Reilly.
+
+You may still yet need to install the group policy handler on your Win9x
+machines.  This is required for Win9x to be able to pick up group policies.
+On the Win98 CD, this would be in \tools\reskit\netadmin\poledit. Configure
+a PC, then log off and on again a couple of times to see if Win98 picks up
+group policies. Unfortunately, you will need to do this on every Win9x
+machine that uses group policies.
+
+One last item:  If your group policies still don't work, get an updated
+version of grouppol.dll for your Win9x clients.  I understand that some
+older version(s) don't work properly.
+
+Hope this helps.
+
+
+&gt; -----Original Message-----
+&gt; From: Sam Silvester [mailto:<A HREF="mailto:sam@quadlink.com.au">sam@quadlink.com.au</A>]
+&gt; Sent: Wednesday, December 27, 2000 12:59 AM
+&gt;
+&gt; On Wed, 27 Dec 2000, Richard Sharpe wrote:
+&gt;
+&gt; &gt; At 12:15 AM 12/27/00 +1030, Sam Silvester wrote:
+&gt; &gt; &gt;Hi all.
+&gt; &gt; &gt;
+&gt; &gt; &gt;I've been working on a linux/samba system to do domain logons
+&gt; &gt; &gt;for a heap of windows 98 workstations (including system policies),
+&gt; &gt; &gt;and I've run into a problem as far as authenticating users goes:
+&gt; &gt; &gt;
+&gt; &gt; &gt;I need to use group policies on the windows machines, and I
+&gt; &gt; &gt;can't work out how to do arrange users into groups with samba.
+&gt; &gt; &gt;Ideally I'd like a group for 'domain admins', 'teachers' and
+&gt; &gt; &gt;'students', but seeing as I don't think samba can do this yet, I
+&gt; &gt; &gt;was thinking of using a windows NT machine to do user
+&gt; &gt; &gt;authentication, with samba using the NT machine for user
+&gt; &gt; &gt;authentication. Is this necessary?  (or maybe I should be asking
+&gt; &gt; &gt;will this work?)
+&gt; &gt;
+&gt; &gt; Have you tried it under Samba? What actually goes wrong?
+&gt;
+&gt; I haven't tried it as I don't know how I can put users into groups.
+&gt; eg say I have 500 users - what I would like is to put them into a
+&gt; single group called students so I can then define a policy for the
+&gt; group students rather than making 500 copies of the one policy.
+&gt;
+&gt; But I don't know if samba can actually do this.
+&gt;
+&gt;
+&gt; &gt; Secondly, how do you implement group policies under Win9X?
+&gt;
+&gt; When you install it, select the option "Group policies" and away you go.
+&gt;
+&gt; This used to be the setup under NT, but now the servers all run Linux.
+&gt; I'd really like to keep it that way as well! :-) Not that I am at all
+&gt; biased or anything...
+&gt;
+&gt;
+&gt; Cheers,
+&gt;
+&gt; Sam!
+&gt;
+&gt;
+&gt; &gt; &gt;Thanks,
+&gt; &gt; &gt;
+&gt; &gt; &gt;Sam.
+&gt; &gt; &gt;
+&gt; &gt; &gt;--
+&gt; &gt; &gt;Programming is an art form that fights back.
+&gt; &gt; &gt;
+&gt; &gt; &gt;Sam Silvester
+&gt; &gt; &gt;&lt;<A HREF="mailto:sam@quadlink.com.au">sam@quadlink.com.au</A>&gt;
+&gt; &gt; &gt;
+&gt; &gt; &gt;Ph:  0408 492 205
+&gt; &gt; &gt;Fax: (08) 8849 2376
+&gt; &gt; &gt;
+&gt; &gt; &gt;<A HREF="http://www.quadlink.com.au">http://www.quadlink.com.au</A>
+&gt; &gt; &gt;
+&gt; &gt; &gt;--
+&gt; &gt; &gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on
+&gt; irc.linux.org.au
+&gt; &gt; &gt;To unsubscribe from the LinuxSA list:
+&gt; &gt; &gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt; &gt;
+&gt; &gt; &gt;
+&gt; &gt;
+&gt; &gt; Regards
+&gt; &gt; -------
+&gt; &gt; Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+&gt; &gt; Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+&gt; &gt; Contributing author, SAMS Teach Yourself Samba in 24 Hours
+&gt; &gt; Author, Special Edition, Using Samba
+&gt; &gt;
+&gt; &gt;
+&gt;
+&gt; --
+&gt; Programming is an art form that fights back.
+&gt;
+&gt; Sam Silvester
+&gt; &lt;<A HREF="mailto:sam@quadlink.com.au">sam@quadlink.com.au</A>&gt;
+&gt;
+&gt; Ph:  0408 492 205
+&gt; Fax: (08) 8849 2376
+&gt;
+&gt; <A HREF="http://www.quadlink.com.au">http://www.quadlink.com.au</A>
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

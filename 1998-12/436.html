@@ -1,0 +1,130 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: pppd goes mad!" -->
+<!-- FromName="Stephen Baxter" -->
+<!-- FromEmail="steve@senet.com.au" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Tue, 22 Dec 1998 15:41:09 +1030 (CST)" -->
+<!-- Id="Pine.BSF.4.01.9812221526590.2224-100000@armageddon.senet.com.au" -->
+<!-- Reference="199812220454.PAA08661@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: pppd goes mad!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Stephen Baxter &lt;<I><A HREF="mailto:steve@senet.com.au">steve@senet.com.au</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Tue, 22 Dec 1998 15:41:09 +1030 (CST)
+</PRE>
+<H1>Re: pppd goes mad!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; ============================================================================
+&gt; [<A HREF="mailto:akenning@dog">akenning@dog</A>]$ /usr/sbin/traceroute -i ppp0 dart
+&gt; traceroute to dartagnan.maths.adelaide.edu.au (129.127.44.41), 30 hops max, 40 byte packets
+&gt;  1  * gw.way7.Adelaide.telstra.net (139.130.140.1)  1179.736 ms  120.157 ms
+&gt;  2  Ethernet1-0.way1.Adelaide.telstra.net (139.130.237.65)  127.151 ms  128.935 ms  128.515 ms
+
+
+If you are doing ping tests to do performance benchmarks then you need to
+do it as close as possible to the other end of your ppp link as you can !
+
+Traceroutes make use of IP packet handling to show the path taken by an IP
+packet on its *outward* leg of any journey. You send out UDP packets that
+have exceeded their TTL, then wait for the ICMP packet back from the
+router that discarded the packet reporting what it has done (sends a
+Time Exceeded - I think ?). From this packet you can work out the router
+it got sent from - not the path that packet took ! The next set of packets
+have the TTL incremented by 1.
+
+The traceroute utility sends three messages with the time between
+messages of 1 second, it reports the response time from each router that
+replies with Time Exceeded.
+
+&gt;  3  Fddi0-0.way-core1.Adelaide.telstra.net (139.130.237.226)  127.510 ms  129.098 ms  128.436 ms
+&gt;  4  Atm1-0-2.lon-core1.Melbourne.telstra.net (139.130.239.49)  127.707 ms  138.954 ms *
+&gt;  5  FastEthernet0-0-0.lon14.Melbourne.telstra.net (139.130.239.235)  3908.563 ms  138.364 ms  128.401 ms
+&gt;  6  optvm.lnk.telstra.net (139.130.55.2)  137.689 ms  139.119 ms *
+&gt;  7  atm20-19.mb1.optus.net.au (192.65.89.138)  3463.710 ms  141.806 ms  138.209 ms
+&gt;  8  aarnet-sa.mb1.optus.net.au (192.65.88.226)  157.081 ms  148.974 ms  158.562 ms
+&gt;  9  atm0-0.adelaide.saard.net (203.21.37.252)  147.664 ms *  3379.889 ms
+&gt; 10  dartagnan.maths.adelaide.edu.au (129.127.44.41)  166.381 ms  156.030 ms  138.679 ms
+
+What this looks like is that you are going from your machine through
+Telstra Internet, through their POI with OPTUS (not know as an especially
+high bandwidth connection unless things have changed some) and then onto
+AARNET - so it most likely went to Melbourne and back !
+
+&gt; 
+&gt; I have no idea what this all means.
+&gt; But obviously this is something I should learn about.
+&gt; 
+&gt; If I do the same thing to senet.com.au, I get also a bunch of random
+&gt; times. But the fact that re-booting "pppd" fixes the problem
+&gt; indicates to me that it isn't a network problem.
+
+That is hard to say unless you measure the ICMP response time from your
+interface (the ppp interface) to your next hop interface - way1 would be a
+good start if you can't rely on getting gw.way7 all the time !
+ 
+&gt; ============================================================================
+&gt; [<A HREF="mailto:akenning@dog">akenning@dog</A>]$ /usr/sbin/traceroute -i ppp0 senet.com.au
+&gt; traceroute to senet.com.au (203.11.90.2), 30 hops max, 40 byte packets
+&gt;  1  gw.way7.Adelaide.telstra.net (139.130.140.1)  2313.590 ms  117.358 ms  128.650 ms
+&gt;  2  Ethernet1-0.way1.Adelaide.telstra.net (139.130.237.65)  127.427 ms  127.743 ms  128.512 ms
+&gt;  3  * Fddi0-0.way-core1.Adelaide.telstra.net (139.130.237.226)  3839.726 ms  128.210 ms
+&gt;  4  Atm1-0-2.lon-core1.Melbourne.telstra.net (139.130.239.49)  136.980 ms  127.694 ms  128.491 ms
+&gt;  5  FastEthernet0-0-0.lon14.Melbourne.telstra.net (139.130.239.235)  127.620 ms *  3444.763 ms
+&gt;  6  optvm.lnk.telstra.net (139.130.55.2)  179.524 ms  139.179 ms  137.826 ms
+&gt;  7  bignetworks.mi1.optus.net.au (202.139.7.98)  149.085 ms  136.925 ms  148.432 ms
+&gt;  8  ser-0-1-bigpipe-grote-adl.bna.com.au (203.34.35.130)  147.637 ms *  3379.955 ms
+&gt;  9  pluto.senet.com.au (203.11.90.2)  206.418 ms  148.659 ms  148.508 ms
+
+
+&gt; It's interesting that Telstra Bigpond Direct seems to send my traffic
+&gt; round the country first before getting it to sites just down the
+&gt; road from here.
+
+.... welcome to dealing with Telstra - if I had a spare $150k we could
+push a local interconnect agreement with Telstra (all of that $150k would
+have to be given to a lawyer).
+
+
+
+------------------------------------------------------------------
+Stephen Baxter             SE Network Access/Big Networks Australia
+phone : +61 8 8221 5221    222 Grote Street 
+fax   : +61 8 8221 5220    Adelaide 5000, Australia
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

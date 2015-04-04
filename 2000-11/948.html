@@ -1,0 +1,108 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Telstra ADSL Sharing Troubles" -->
+<!-- FromName="'adix@camtech.net.au'" -->
+<!-- FromEmail="adix@camtech.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 24 Nov 2000 00:48:07 "GMT"" -->
+<!-- Id="20001124004805.JYFD14574.mta02.mail.mel.aone.net.au@mymail" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Telstra ADSL Sharing Troubles</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: adix@camtech.net.au &lt;<I><A HREF="mailto:adix@camtech.net.au">adix@camtech.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 24 Nov 2000 00:48:07 "GMT"
+</PRE>
+<H1>Telstra ADSL Sharing Troubles</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Excuse the ill amount of information in my last message. It was due to me trying to send the mail via my computer, it failing cos i cannot send stuff over one kilobyte so i dialed up and copyied it to another computer, i forgot to paste the topic. The second email was me realising that there was no topic and from my computer sending an email that would go through. Settle.
+
+
+Now, My system.
+Redhat7, 133mhz 48ram, Alcatel SpeedTouch Home DSL Modem, 100mbit LAN(realtek) 10mbit [DSL NIC](accton).
+
+Its a standard use of roaring penguin pppoe, Telstra ADSL, It works in windows, can upload at 12ksec no prob, cant even begin to when i try on linux, just did a fresh install of the server too. The routing tables look ok ;
+
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+172.31.28.3     *               255.255.255.255 UH    0      0        0 ppp0
+192.168.100.0   *               255.255.255.0   U     0      0        0 eth1
+127.0.0.0       *               255.0.0.0       U     0      0        0 lo
+default         172.31.28.3     0.0.0.0         UG    0      0        0 ppp0
+
+Where PPP0 is the established internet connection, and eth1 is the LAN, eth0 is the NIC that the dsl modem is set to use, the rc.firewall file which i wrote and execute after each connection is established is as follows;
+
+#/sbin/depmod -a
+/sbin/modprobe ip_masq_quake ports=26000,27000,27910,27500,27505
+/sbin/insmod -f /lib/modules/2.2.16-22/ip_masq_icq.o
+ports=4000,4001,4002,4003,4004,4005,4006,4007,4008,4009,4010,4011
+range=60200,61000 tcp_timeout=14400 tcp_fin_timeout=60 limit=512 log=i
+for a in /lib/modules/`uname -r`/ipv4/ip_masq*; do
+        echo "inserting module $a"
+        insmod $a
+done
+
+echo "1" &gt; /proc/sys/net/ipv4/ip_forward
+/sbin/ipchains --flush
+/sbin/ipchains -P forward DENY
+/sbin/ipchains -A forward -i ppp0 -j MASQ
+
+
+------------
+
+If you're thinking 'why are you routing through ppp0 instead of eth0', as per instruction from the writer of RP PPPOE:
+"Make sure no entries in the routing table go through the Ethernet card
+connected to the ADSL modem."  
+
+A note on eth0 (dsl nic) this card is not enabled at startup, and is set to DCHP, when the connection is started is when it is used and given an ip and what not from the dhcp server.
+
+
+There are no logs in here, simply becuase they are all normal, no output of any kind detailing error at all, even when running the adsl-start command in debug mode.
+
+On windows setup, of the TCP/IP PPPOE driver detailed the following settings;
+	Non specified IP
+	WINS Resolution from DHCP
+	DNS Blank (With Domain Name Search Suffix set to 'vic.bigpond.net.au'
+	
+
+__________________________________________________________
+Message sent by MyMail <A HREF="http://www.mymail.com.au/">http://www.mymail.com.au/</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

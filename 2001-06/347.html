@@ -1,0 +1,121 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Small Window Sizes, repeater latency, and Ethernet over Fiber..." -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="LinuxSA@linuxsa.org.au" -->
+<!-- Date="Wed, 06 Jun 2001 20:13:16 +0900" -->
+<!-- Id="3.0.6.32.20010606201316.00f317e0@10.0.2.1" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Small Window Sizes, repeater latency, and Ethernet over Fiber...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:LinuxSA@linuxsa.org.au">LinuxSA@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 06 Jun 2001 20:13:16 +0900
+</PRE>
+<H1>Small Window Sizes, repeater latency, and Ethernet over Fiber...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+In was in MIMP today getting some more Aviator 24 cards and so forth, and I
+made the mistake of casually remarking that I have heard that some Telcos
+are offering Ethernet over fiber ...
+
+There ensued a confusing discussion where the two people behind the counter
+trotted out some rules of thumb (Ethernet will only give you 80% of its
+stated bandwidth) and a statement that some ISP was trying to use Ethernet
+over Fiber and was only getting 3 or so Mb/s. They mumbled about repeater
+latency, etc ...
+
+It seemed that there might be something to what they were saying, so I
+thought some more about it, and got out some scrap paper, and came up with
+an explanation.
+
+Assuming TCP, and given that some Windows clients (NT SP1 at least, and
+maybe more) use a window size of 8192 bytes or thereabouts, and there are
+often a lot of ethernet hops, they could be right. Eg,
+
+
+[Node]----[Hub]----[Router]----[Enet to fiber]---[router]---[hub]---[Node]
+                                link frm telco
+
+If this were 10MB/s Ethernet, we have 6 hops over Ethernet plus the fiber
+link from end-to-end, for a min of at least 8mS end to end latency and a
+round-trip-time of at least 12mS (ack's can be smaller).
+
+But, a window of 8192 bytes will take about 6.6mS to fill up, after which
+we have to wait for ACKs to come back before we can send any more. Thus we
+waste almost 50% of the available throughput, and can only achieve about
+5Mb/s. If the latency is any worse, then the throughput for any TCP
+connection going over the link above would be worse as well. Simple
+solution is to increase the window size. Linux uses a window of 32k, and we
+could go up to 64k without using the window scale option. 100Mb/s operation
+makes it worse. (We can use the delay-bandwidth product to estimate the
+minimum window size we need.)
+
+Of course, the link could still be kept full, if you had multiple
+communicating parties between the two sides of the fiber link, this
+discussion is limited to what two communicating parties on either side of
+the link could achieve.
+
+So, on to some questions:
+
+1. Does this sound reasonable.
+
+2. What are the latencies of hubs and switches (in store-and-forward mode)
+and routers. Experience suggest that Cisco 3600s add very little, and that
+switch latency should be lower than link latency.
+
+3. On the surface, NetBEUI might seem to escape this problem, using LLC as
+it does, with it's MOD 128 sequence numbers. However, since NetBEUI is
+mostly used for file accesses, and many current Windows clients copy/access
+files in chunks of 2920 (Win9X) or 4096 (WinNT) bytes, they would seem to
+be actually worse. Does that make sense?
+
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.ethereal.com)
+Contributing author, SAMS Teach Yourself Samba in 24 Hours
+Author, Special Edition, Using Samba
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

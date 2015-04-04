@@ -1,0 +1,106 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Linux, ADSL, TCP, Window Sizes, download times" -->
+<!-- FromName="'Martin'" -->
+<!-- FromEmail="marty@supine.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 17 Sep 2003 12:18:05 +1000" -->
+<!-- Id="20030917021805.GA4088@kevin.supine.com" -->
+<!-- Reference="20030917111104.4274b015.slackjaw77@iprimus.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Linux, ADSL, TCP, Window Sizes, download times</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Martin &lt;<I><A HREF="mailto:marty@supine.com">marty@supine.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 17 Sep 2003 12:18:05 +1000
+</PRE>
+<H1>Re: Linux, ADSL, TCP, Window Sizes, download times</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+$author = "Chris" ;
+&gt; 
+&gt; See this is where some get confused at my question.  I am not talking
+&gt; about the size of the packets.  I am merely talking about the speed.  I
+&gt; guess it was a bit confusing giving a file size.  I just wanted to know
+&gt; if TCP itself will rate limit my download to the slowest direction
+&gt; (upload 256kbps).  I have been told it will but I can't seem to find any
+&gt; documentation on it.  So I hope that makes it a bit clearer?
+
+chris, your understanding of TCP flow control is a little simplistic.
+
+TCP flow control is designed to increase the rate data is sent (using "slow
+start", google for it) until you reach the limit of the weakest link in the
+connection.
+
+if you are downloading a file (no matter how big) the payload in the packets
+you are receiving will be a great deal larger than in the packets you send
+acknowledging the ones received. you will also only be sending one packet
+for approximately every five packets received.
+
+eg
+server -&gt; packet 1 -&gt; you
+server -&gt; packet 2 -&gt; you
+server -&gt; packet 3 -&gt; you
+server -&gt; packet 4 -&gt; you
+server -&gt; packet 5 -&gt; you
+
+you -&gt; ack 1-5 -&gt; server
+
+server -&gt; packet 6 -&gt; you
+server -&gt; packet 7 -&gt; you
+server -&gt; packet 8 -&gt; you
+server -&gt; packet 9 -&gt; you
+server -&gt; packet 10 -&gt; you
+
+you -&gt; ack 6-10 -&gt; server
+
+as you are sending a lot less data then you are receiving, if your ADSL is
+the weakest link in the connection then it is possible to achieve download
+speeds up to the full 1500 without saturating your uplink.
+
+marty
+
+-- 
+Do you wanna ride in my car
+It's parked out on the street
+Or just stay with me a while
+Before I fall asleep
+
+"Million Tears" - Kasey Chambers
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

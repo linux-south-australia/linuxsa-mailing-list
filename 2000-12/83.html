@@ -1,0 +1,175 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Conclusions on Software Packaging (Linux only, and Long)" -->
+<!-- FromName="'Dan Shearer'" -->
+<!-- FromEmail="dan@tellurian.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 4 Dec 2000 12:38:33 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0012041145350.5038-100000@calulu.shearer.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Conclusions on Software Packaging (Linux only, and Long)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 4 Dec 2000 12:38:33 +1030 (CST)
+</PRE>
+<H1>Conclusions on Software Packaging (Linux only, and Long)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+This is the first of what might be several postings arising from technical
+decisions I've had to take in my job. Hope it helps someone else. Please
+send me fixes, diff -u format preferred.
+
+--
+Dan Shearer
+Open Source Manager
+<A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A>
+
+======
+
+Look in the LinuxSA archives for previous discussions on this topic. Since
+I started the first thread I have learnt more about what the BSD package
+management system can do (and Irix's, but that's not relevant.) This
+message is about the situation on Linux, especially some recent RPM work.
+The binary convergance between RPM and dpkg I wrote about some months ago
+as reported by the principal authors of each system appears not to have
+eventuated.
+
+There are two things I require in a server operating system with respect
+to its software: a good package management system and a well-maintained
+package repository. The latter is not quite so important in networks where
+full-time software packagers can be employed (which is the case in many
+large corporate networks, even one that only run Windows. Repackaging
+applications like Microsoft Office is not a nice job, but I assure you it
+is essential in some contexts! Packaging is not something peculiar to
+Unix.)
+
+Background
+----------
+
+In Linux there have been a number of package management systems developed.
+Two of them have broad support, rpm and dpkg. Over the top of these two
+sits something called apt-get, which is able to do meta-tasks such as
+dependency checking. Until recently apt-get was only ever used with dpkg.
+
+In Linux there have been massive numbers of package repositories created.
+Nearly all of them are rpm. A Debian-based distribution typically just
+uses (and contributes to) the main Debian package repository and then adds
+its own packages for an installer and other distro-specific items. An
+RPM-based distribution maintains its own RPM version of every package in
+the distribution. If you look at rpmfind.net you will see that for each
+package there are usually many rpms. Rpms are usually not safely portable
+across distributions (RH &lt;--&gt; Mandrake is an exception. Incidentally, do
+not assume that rpm-based distributions are related to Red Hat. Not all
+are, and of those that are very large differences have grown with the
+most.) 
+
+There are differences between rpm and dpkg, but so far from the point of
+view of a maintainer of many server systems on a single network I think
+there are three that count:
+
+    - RPM has no policy implications. It is just a tool. There are some
+      conventions, but look at the number of incompatible rpms to see that
+      there are no particular standards. dpkg is policy-driven. There is
+      pre-determined, predictable right way to do many things. The tool
+      implements, enforces and encourages policy-driven administration.
+
+    - dpkg has apt-get. What's more the dpkg database format encourages
+      apt-get to work well. rpm's does not.
+
+    - the Debian package repository is maintained in an open-source manner
+      by a far larger team than any distribution could ever afford and
+      without any commercial pressures or deadlines. There are far fewer
+      packages per maintainer than found within any of the rpm
+      distributions.
+
+So What's New?
+--------------
+
+Connectiva, one of the many RPM-based distributions, has been doing some
+with with RPM. They have published two good articles on Freshmeat:
+
+Is is Time to Change RPM?
+<A HREF="http://freshmeat.net/news/2000/09/16/969163199.html">http://freshmeat.net/news/2000/09/16/969163199.html</A>
+
+An RPM Port of APT
+<A HREF="http://freshmeat.net/news/2000/12/02/975819599.html">http://freshmeat.net/news/2000/12/02/975819599.html</A>
+
+The work described and the resulting discussion brings out many technial
+features of both systems. I won't repeat technical information that is in
+these articles, but it mirrors my experiences well. Bear in mind, this is
+written by employees of a Brazilian company that has spent large amounts
+of money on RPM technology.
+
+I think there is quite wide consensus that:
+
+   - RPM as-is requires a major overhaul (everyone agrees, including the 
+     authors at Red Hat.)
+   - RPM has one feature that dpkg lacks, but otherwise dpkg is largely a
+     superset of RPM
+   - It is a very major investment for an RPM distro to change
+   - The quality and consistency of the Debian package archive is 
+     very high
+   - It might cost too much for an RPM distro to move to Debian, therefore
+     some acceptable compromise must be found
+
+Conclusions
+-----------
+
+This is not a distribution war. Repeat, this is not a distribution war. It
+seems to me that from the point of view of package maintenance, for a new
+server system, apt-get should be used. If Connectiva's work settles in
+well, then either dpkg or rpm will suit underneath apt-get.
+
+The best package repository should also be used, and I can't find any
+metric to support a choice of anything other than the Debian repository.
+The metrics I've looked at include: number of maintainers, time to release
+important fixes, peer review mechanisms, policies, audit trails.
+
+I haven't been able to find any collection of RPMs which scores better
+than the Debian package repository in these categories, even Mandrake with
+its Cooker programme. Of course, I don't have the capacity to do this
+exhaustively, so please tell me if I've overlooked something.
+
+--
+Dan Shearer
+Open Source Manager
+<A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

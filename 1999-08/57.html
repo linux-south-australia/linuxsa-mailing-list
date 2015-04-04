@@ -1,0 +1,102 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: send email from different users using one account?" -->
+<!-- FromName="" -->
+<!-- FromEmail="slide@tellurian.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="tim@oztek.net.au" -->
+<!-- Date="Wed, 4 Aug 1999 11:21:46 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.10.9908041052360.15850-100000@slide.tellurian.com.au" -->
+<!-- Reference="37A77EF6.4C8753B@oztek.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: send email from different users using one account?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: <A HREF="mailto:slide@tellurian.com.au">slide@tellurian.com.au</A>
+  To  : <A HREF="mailto:tim@oztek.net.au">tim@oztek.net.au</A>
+  Date: Wed, 4 Aug 1999 11:21:46 +0930 (CST)
+</PRE>
+<H1>Re: send email from different users using one account?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Can anyone tell me if it's possible to send email via command line with
+&gt; a From: tag of a user that is only a mail-alias.  Currently I'm using a
+&gt; script that su's to an account sends the mail using the mail command
+&gt; then exits back to the previous login. 
+
+Yes, it is fairly easy.
+
+Each email contains two From addresses; From_ on the envelope and From: in
+the headers.
+
+According to the sendmail(8) man page:
+
+NAME
+     sendmail - an electronic mail transport agent
+
+SYNOPSIS
+     sendmail [flags] [address ...]
+ 
+...
+   -fname       Sets the name of the ``from'' person (i.e., the
+                sender of the mail).  -f can only be used by 
+                ``trusted'' users (normally root, daemon, and 
+                network) or if the person you are trying to
+                become is the same as the person you are.
+
+Trusted users are defined in sendmail.cf as follows:
+
+#####################
+#   Trusted users   #
+#####################
+
+# this is equivalent to setting class "t"
+#Ft/etc/sendmail.ct
+Troot
+Tdaemon
+Tuucp
+
+To change the From_, you use sendmails -f parameter.  When you run
+sendmail, you are given no prompts.  First you type the headers, then a
+blank line, then the body of the message.  To finish the message, use a
+full stop at the start of a line.
+
+To send mail from_ test, appearing to come from test2, to slide, I do the
+following:
+
+[<A HREF="mailto:trusteduser@x">trusteduser@x</A>]$ /usr/lib/sendmail -f '<A HREF="mailto:test@x.com.au">test@x.com.au</A>' <A HREF="mailto:slide@y.com.au">slide@y.com.au</A>
+From: <A HREF="mailto:test2@x.com.au">test2@x.com.au</A>
+To: <A HREF="mailto:slide@y.com.au">slide@y.com.au</A>
+Subject: test
+
+Hello
+.
+
+Which results in the following in my inbox (extra headers cut):
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

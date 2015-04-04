@@ -1,0 +1,167 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: My hd is sick -- or is it software?" -->
+<!-- FromName="'Toby Corkindale'" -->
+<!-- FromEmail="tjcorkin@sa.pracom.com.au" -->
+<!-- ToName="'Mark Phillips'" -->
+<!-- ToEmail="mark@austrics.com.au" -->
+<!-- Date="Tue, 28 Aug 2001 10:49:27 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0108281039080.13266-100000@localhost.localdomain" -->
+<!-- Reference="3B8AEC91.46087ECD@austrics.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: My hd is sick -- or is it software?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@sa.pracom.com.au">tjcorkin@sa.pracom.com.au</A></I>&gt;
+  To  : Mark Phillips &lt;<I><A HREF="mailto:mark@austrics.com.au">mark@austrics.com.au</A></I>&gt;
+  Date: Tue, 28 Aug 2001 10:49:27 +0930 (CST)
+</PRE>
+<H1>Re: My hd is sick -- or is it software?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Sounds very much like hardware to me! (The kernel message and also the
+sound -- seen and heard both before)
+
+To recover what you can:
+Turn the PC off, get another harddrive, and boot off it.
+Mount the bad drive (say, under /mnt/broken) readonly somewhere.
+Use tar to try and copy everything off of it, eg
+(cd /mnt/broken;tar -clpf - .)|(cd /home/recover/;tar -xpvf -)
+
+Now, go away for a long while it slowly, slowly, tries to recover
+stuff.. Linux will retry the bad sectors a few times and then give up and
+move onto the next one, and tar will pad those bad sections of files out
+with zeros instead of aborting.
+If the drive is damaged in bad places, then it may not mount at all - if so,
+you'll need to fiddle with alternative backup superblocks, and possibly try
+fscking it - note that if the drive is badly damaged, there's an even chance
+it'll actually end up worse though.
+
+Once its all done, unplug dodgy drive and return to manufacturer.
+
+By the way, I'm surprised you're still running a 2.4.0-testX kernel -- i
+think there were a heap of reiserfs bugs found since then, and reiserfs
+wasn't even a default part of the kernel until 2.4.1...
+
+-Toby
+
+On Tue, 28 Aug 2001, Mark Phillips wrote:
+
+&gt; Normally I keep my machine on all the time, but the last
+&gt; week or so I have been turning it off at night (less noise
+&gt; for when I sleep).  Yesterday morning I turned it on, waited
+&gt; for it to boot as normal, except its attempt to mount local
+&gt; filesystems failed in a rather scary manner.  Here are the
+&gt; messages I get:
+&gt;
+&gt; Mounting local filesystems...
+&gt; reiserfs: checking transaction log (device 3a:03)
+&gt; reiserfs: replayed 1 transactions in 14 seconds
+&gt; Using tea hash to sort names
+&gt; reiserfs: using 3.5.x disk format
+&gt; ReiserFS version 3.6.17
+&gt; /dev/main_vg/usr_lv on /usr type reiserfs(rw)
+&gt; Reiserfs: checking transaction log (device 3a:02)
+&gt; hdc: read_intr: status=0x59 { DriveReady Seek Complete DataRequest Error }
+&gt; hdc: read_intr: error 0x40 { UnrecoverableError }, LBAsect=2363618, sector=2170838
+&gt; Unable to handle kernel NULL pointer dereference at virtual address 00000034
+&gt; printing eip:
+&gt; c016f3df
+&gt; *pde = 00000000
+&gt; Oops: 0000
+&gt; CPU: 0
+&gt; EIP: 0010:[&lt;c016f3df&gt;]
+&gt; .
+&gt; .
+&gt; .
+&gt; /etc/init.d/rcS: line 12:   60 Segmentation fault    mount -avt nonfs,noproc,nosmbfs
+&gt;
+&gt;
+&gt; At about the time these errors came up, my hard drive made some funny
+&gt; noises (usually it is rather quiet).  It sounded sort of like:
+&gt;
+&gt; sca-sca-sca-sca  short pause  sca-sca-sca-sca
+&gt;
+&gt; and that was it.
+&gt;
+&gt; After this error it does continue to try and boot, but has lots of errors
+&gt; along the way.  It does get there eventually, but has only the / partition
+&gt; and /usr mounted.  Ie, /home, /var, /tmp and /usr/local are not mounted.
+&gt;
+&gt; So, I want to know --- is this a problem with my hard drive?  Or is it
+&gt; a software problem?
+&gt;
+&gt; The drive itself is only about a year old.  It is an IBM 15Gig ATA100
+&gt; 7200rpm drive.  I had been lead to believe that the IBMs were very
+&gt; reliable so I will be rather surprised if it is indeed a drive hardware
+&gt; problem.
+&gt;
+&gt; I am runing LVM 0.8final and reiserfs under a 2.4.0-test9 kernel (I
+&gt; think anyway).
+&gt;
+&gt; Any ideas about what I should do now?  I have backups of some of my
+&gt; important stuff on the drive, but there is stuff on the /home partition
+&gt; that I'd prefer not to lose if I can avoid it.
+&gt;
+&gt; Cheers,
+&gt;
+&gt; Mark.
+&gt;
+&gt;
+
+-- 
+ Toby Corkindale
+ UNIX Developer, Core Tech R&D
+ Technology SA, Pracom Ltd
+ 288 Glen Osmond Road
+ Fullarton,	5063
+ South Australia
+ Tel: +61 8 8202 9075
+ Fax: +61 8 8202 9001
+ mailto:<A HREF="mailto:Toby.Corkindale@sa.pracom.com.au">Toby.Corkindale@sa.pracom.com.au</A>
+ <A HREF="http://www.sa.pracom.com.au/">http://www.sa.pracom.com.au/</A>
+
+                  PRIVILEGED - PRIVATE AND CONFIDENTIAL
+
+   Privileged/Confidential Information may be contained in this message.
+   If you are not the addressee indicated in this message, you may not
+   copy or deliver this message to anyone.  In such case, you should
+   destroy this message and notify the sender by reply email. Opinions,
+   conclusions and other information in this message that do not relate
+   to the official business of this organisation shall be understood as
+   neither given nor endorsed by it.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

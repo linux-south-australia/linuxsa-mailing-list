@@ -1,0 +1,134 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: script errors (was script problem)" -->
+<!-- FromName="'Vladimir V. Bashkirtsev'" -->
+<!-- FromEmail="mega@konectanet.com.au" -->
+<!-- ToName="'Michael Kratz'" -->
+<!-- ToEmail="michael_kratz@hotmail.com,linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 6 Mar 2001 00:15:04 +1030" -->
+<!-- Id="00ec01c0a57a$7c0d1840$7aba26cb@konectanet.com.au" -->
+<!-- Reference="F240fEAkqBiBsbrL1SC0001477a@hotmail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: script errors (was script problem)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Vladimir V. Bashkirtsev &lt;<I><A HREF="mailto:mega@konectanet.com.au">mega@konectanet.com.au</A></I>&gt;
+  To  : Michael Kratz &lt;<I><A HREF="mailto:michael_kratz@hotmail.com">michael_kratz@hotmail.com</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 6 Mar 2001 00:15:04 +1030
+</PRE>
+<H1>Re: script errors (was script problem)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+It will not cause any problems because sleep with empty parameter leaves
+asap. There no such big problem that script will check connection again as
+soon as previous check will be completed becuase inside of check you can
+find 90 secs sleep which enough for pppd to establish connection...
+
+Vlaidimir
+
+&gt; Hi,
+&gt;
+&gt; I think I found more errors see below: my comments are in [these]
+&gt;
+&gt; #!/usr/bin/perl
+&gt; #
+&gt; # Link monitor Script
+&gt;
+&gt; #
+&gt; # Set Constants
+&gt; #
+&gt; $SLEEP_INC = 600;
+&gt; $RETRIES = 8;
+&gt; $mailprog = "/usr/lib/sendmail";
+&gt; $CONNECT_SCRIPT = "/etc/ppp/ip-up";
+&gt; $LOG_FILE = "/var/log/redial";
+&gt;
+&gt; # IP Address of ISP server.
+&gt; $ISP_IP = "xxx.xxx.xxx";
+&gt;
+&gt; #
+&gt; # Initialise Variables.
+&gt; #
+&gt; $SLEEP_TIME = $SLEEPINC; [&lt;- here is the one you guys spotted]
+&gt; $ATTEMPTS = 0;
+&gt;
+&gt; #
+&gt; # Main Script.
+&gt; #
+&gt; do
+&gt; {
+&gt;
+&gt; sleep $SLEEPTIME; [&lt;- Here is another see below]
+&gt;
+&gt; if ( `/sbin/ifconfig | /bin/grep -c $ISP_IP` == 0 ) {
+&gt;     sleep 90;
+&gt;   if ( `/sbin/ifconfig | /bin/grep -c $ISP_IP` == 0 ) {
+&gt;     system ( $CONNECT_SCRIPT );
+&gt;     $ATTEMPTS = $ATTEMPTS + 1;
+&gt;     $SLEEP_TIME = $SLEEP_TIME + $SLEEP_INC * $ATTEMPTS; [&lt;-Sleep time
+&gt; related to above]
+&gt;     system("echo ReDial $ATTEMPTS : `date` &gt;&gt; $LOG_FILE");
+&gt;   }
+&gt; } else {
+&gt;    $SLEEPTIME = $SLEEPINC; [&lt;- and here]
+&gt;    $ATTEMPTS = 0;
+&gt;   }
+&gt; }
+&gt; until  $ATTEMPTS == $RETRIES ;
+&gt;
+&gt; #
+&gt; # Mail out advise
+&gt; #
+&gt;    open( MAIL , "|$mailprog -t");
+&gt;
+&gt;    print MAIL "To: root\n";
+&gt;    print MAIL "From: cron\n";
+&gt;    print MAIL "Subject: Link Script Termination\n\n";
+&gt;
+&gt;    print MAIL "The Linkchecker Script has Ended.\n";
+&gt;    print MAIL "Too many call attempts.\n";
+&gt;
+&gt;    close (MAIL);
+&gt;
+&gt; _________________________________________________________________________
+&gt; Get Your Private, Free E-mail from MSN Hotmail at <A HREF="http://www.hotmail.com.">http://www.hotmail.com.</A>
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

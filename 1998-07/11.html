@@ -1,0 +1,413 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Automated FTP" -->
+<!-- FromName="David Merrick" -->
+<!-- FromEmail="drmerr@isa.mim.com.au" -->
+<!-- ToName="Paul Schulz" -->
+<!-- ToEmail="pschulz@adelaide.on.net" -->
+<!-- Date="Fri, 3 Jul 1998 10:40:45 +1000" -->
+<!-- Id="B0000183914@pc1650.isa.mim.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Automated FTP</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Merrick &lt;<I><A HREF="mailto:drmerr@isa.mim.com.au">drmerr@isa.mim.com.au</A></I>&gt;
+  To  : Paul Schulz &lt;<I><A HREF="mailto:pschulz@adelaide.on.net">pschulz@adelaide.on.net</A></I>&gt;
+  Date: Fri, 3 Jul 1998 10:40:45 +1000
+</PRE>
+<H1>RE: Automated FTP</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Greetings.
+
+Finally I get to respond instead of ask! :D
+
+We use a lot of automatic ftping to transmit lab results.  I have
+attached 
+one of the scripts we use ( with all IP addresses, usernames and
+passwords missing of course).  However it is still pretty much intact.
+It may not be of use as is for you, but it works like a charm for us and
+should get you pointed in the right direction.
+
+The file is run through the night with cron and the output is sent to a
+log file 
+which itself is scanned for any problems.  If there is a problem ( any
+line with the 
+word error in it ) I have it send me an email describing the problems.
+Makes for 
+an easier life the next day and helps when the customers complain about
+not getting
+results.
+
+I hope it helps somewhat,
+
+Dave M. 
+
+
+David Merrick,
+LIMS Administrator,
+Chemical Laboratory,
+Mount Isa Mines
+
+(07) 4744 2126
+<A HREF="mailto:drmerr@isa.mim.com.au">drmerr@isa.mim.com.au</A>
+
+
+	----------
+	From:  Paul Schulz[SMTP:<A HREF="mailto:pschulz@adelaide.on.net">pschulz@adelaide.on.net</A>]
+	Sent:  Friday, July 03, 1998 7:24 PM
+	To:  <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+	Subject:  Automated FTP
+
+	Greetings all,
+	A while ago (more than several months) someone had some scripts
+for
+	running ftp to automatically
+	upload (download) from a site...
+
+	I just remember that there were difficulties because ftp expects
+input
+	from 'stdio' at odd times when
+	outputting to'stderr'.
+
+	Does someone out there have a script for uploading file to a
+site that
+	they are happy with.
+	(I wish to use it in a cron job.)
+
+	Paul Schulz
+	<A HREF="mailto:pschulz@adelaide.on.net">pschulz@adelaide.on.net</A>
+
+	-- 
+	Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+	To unsubscribe from the LinuxSA list:
+	  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the
+subject
+
+
+Mount Isa Mines Limited - Isa Operations
+The information contained in this E-Mail is confidential and 
+is intended only for the use of the addressee(s). If you receive 
+this E-Mail in error any use, distribution or copying of this 
+E-Mail is not permitted and you are requested to forward the 
+E-Mail to <A HREF="mailto:unwanted.mail@isa.mim.com.au">unwanted.mail@isa.mim.com.au</A>
+
+Thank You.
+#!/bin/sh
+#  ---------------------------------------------------------------------------- 
+#
+#                         Written by Dave Merrick
+#                              on 4/7/97
+#
+#	This script is designed to execute from crontab as root.
+#	It automates the file transfer of exported authorised PbSme assays
+#	to the PbSme Office Assay FTP Server (ip: Address ) using
+#	the ftp protocol.
+#
+#  ----------------------------------------------------------------------------
+
+#  Crontab setup should be such that output is captured to a log file. This will
+#  be useful for support problems.
+
+#  EOFTP is just a tag and could have been any string. EOFTP was
+#  chosen as the string to represent an acronym for End Of FTP. Make sure there
+#  are no spaces after it appears on a line of its own. This is called a 'here'
+#  document, the document is here in the script, from the &lt;&lt;EOFTP to the line
+#  where EOFTP appears on a line on its ownR (with no spaces after it).
+
+#  STEPS:
+#  1. Search the LIMS database for authorised PbSme sample assays at 5 pm daily 
+#     and append to respective local /lims/export/auto/auth_* files - temporary 
+#     concatenated files of sample assays.
+#	If the file does not exist, a new one is created.
+#  2. Check the remote PbSme Office FTP Server PC is alive at 9 pm daily.
+#	If not, then terminate and try again tomorrow.
+# 	If the PC is alive, then;
+#  3. Remove local *.txt files.
+#  4. Get remote data *.txt files.
+# 	If no remote file exists, no local file is created.
+#  5. Append local auth_* files to respective local *.txt files.
+#	If no local auth_* exists, null bytes are appended.
+# 	If no local *.txt file exists, append creates a new one.
+#  6. Put local *.txt files back to remote.
+#	This is the original remote data file plus any new assays.
+# 	There will always be a *.txt file. Either, get remote (step 3) or append
+#	/create local (step 4).
+#  7. Append local auth_* files to local *.arc files and remove auth_* files.
+#  8. Put local *.arc files back to remote.
+#	This is a remote archive of assays.
+
+#  -------
+#  STEP: 2
+#  -------
+#  Error check that the PbSme Office Assay FTP Server is alive. If the
+#  connection is not alive then this script ends. If the connection is alive
+#  proceed with the script, if not then terminate.
+#  Error check that the PbSme Office Assay FTP Server login account is okay. If
+#  the login is unsuccessful this script ends. If the login is successful
+#  proceed with the script, if not then terminate.
+#  Connect to the PbSme Office Assay FTP Server using the file transfer protocol
+#  The ftp command cannot automatically execute the .netrc file because crontab
+#  is running this script as root. Root does not have an account that can
+#  autoexecute its own .netrc file. To overcome this problem, the file 
+#  pbsme.ftp.command? contains all the necessary ftp commands for the
+#  connection and is redirected into the initial ftp command. The -n parameter 
+#  disables the autologin sequence (because root) and -v displays verbose.
+
+PBSMENAME="IP Address"	
+
+# okay, the reason for this bit is the server maintainer likes tokeep changing the 
+# pc name.  We use the name of the pc to check we're getting logged in okay, but 
+# when they change it it stuffs things up.  This just makes it easier to change things.
+
+cd /lims/export/pbsme
+cat check &gt;&gt; check.old
+rm check
+date
+ftp -nv IP Address &lt;&lt;EOFTP &gt;check
+user
+username password
+bye
+EOFTP
+#
+if cat check | grep "$PBSMENAME FTP server"
+  then
+	echo "PbSme FTP Server response check successful "
+	echo " "
+  else 
+	echo "PbSme FTP Server response check failed "
+	echo "----------------------- .... End .... ----------------------"
+	echo " "
+	exit
+fi
+
+#
+ftp -nv IP Address &lt;&lt;EOFTP &gt;check
+user
+username password
+bye
+EOFTP
+if cat check | grep "User pbassay logged in"
+  then
+	echo "PbSme FTP Server login check successful "
+	echo " "
+  else 
+	echo "PbSme FTP Server login check failed "
+	echo "----------------------- .... End .... ----------------------"
+	echo " "
+	exit
+fi
+
+#  -------
+#  STEP: 3
+#  -------
+echo "STEP 3: remove local *.txt"
+echo "--------------------------"
+rm /lims/export/pbsme/water.txt
+rm /lims/export/pbsme/sinter.txt
+rm /lims/export/pbsme/coke.txt
+rm /lims/export/pbsme/crude.txt
+rm /lims/export/pbsme/pbb_pbsm.txt
+echo " "
+
+#  -------
+#  STEP: 4
+#  -------
+echo "STEP 4: get remote *.txt -&gt; local"
+echo "---------------------------------"
+ftp -nv IP Address &lt;&lt;EOFTP
+user
+username password
+lcd /lims/export/pbsme
+cd /sql/assay
+get water.txt water.txt
+get sinter.txt sinter.txt
+get crude.txt crude.txt
+get coke.txt coke.txt
+get pbb_pbsm.txt pbb_pbsm.txt
+bye
+EOFTP
+echo " "
+
+#  -------
+#  STEP: 5
+#  -------
+echo "STEP 5: local append auth_* -&gt; *.txt"
+echo "------------------------------------"
+cd /lims/export/pbsme
+
+if test -e auth_pbwater
+  then
+	cat auth_pbwater &gt;&gt;water.txt
+	echo "water.txt appended"
+  else 
+	echo "No auth_pbwater file exists "
+fi
+
+if test -e auth_pbcoke
+  then
+	cat auth_pbcoke &gt;&gt;coke.txt
+	echo "coke.txt appended"
+  else
+	echo "No auth_pbcoke file exists "
+fi
+
+if test -e auth_crudepb
+  then
+	cat auth_crudepb &gt;&gt;crude.txt
+	echo "crude.txt appended"
+  else
+	echo "No auth_crudepb file exists "
+fi
+
+if test -e auth_sinter
+  then
+	cat auth_sinter &gt;&gt;sinter.txt
+	echo "sinter.txt appended"
+  else 
+	echo "No auth_sinter file exists "
+fi
+
+if test -e auth_bloodpb
+  then
+	cat auth_bloodpb &gt;&gt;pbb_pbsm.txt
+	echo "pbb_pbsme.txt appended"
+  else 
+	echo "No auth_bloodpb file exists "
+fi
+echo " "
+
+#  -------
+#  STEP: 6
+#  -------
+echo "STEP 6: put local *.txt -&gt; remote"
+echo "---------------------------------"
+ftp -nv IP Address &lt;&lt;EOFTP
+user
+username password
+lcd /lims/export/pbsme
+cd /sql/assay
+put water.txt water.txt
+put sinter.txt sinter.txt
+put crude.txt crude.txt
+put coke.txt coke.txt
+put pbb_pbsm.txt pbb_pbsm.txt
+bye
+EOFTP
+echo " "
+
+#  -------
+#  STEP: 7
+#  -------
+echo "STEP 7: local append auth_* -&gt; *.arc"  
+echo "        remove local auth_*         "
+echo "------------------------------------"
+cd /lims/export/pbsme
+
+if test -e auth_pbwater
+  then
+	echo " " &gt;&gt;water.arc
+	date &gt;&gt;water.arc
+	cat auth_pbwater &gt;&gt;water.arc
+	rm auth_pbwater
+	echo "auth_pbwater archived & removed"
+  else
+	echo "No auth_pbwater file exists "
+fi
+
+if test -e auth_pbcoke
+  then
+	echo " " &gt;&gt;coke.arc
+	date &gt;&gt;coke.arc
+	cat auth_pbcoke &gt;&gt;coke.arc
+	rm auth_pbcoke
+	echo "auth_pbcoke archived & removed"
+  else
+	echo "No auth_pbcoke file exists "
+fi
+
+if test -e auth_crudepb
+  then
+	echo " " &gt;&gt;crude.arc
+	date &gt;&gt;crude.arc
+	cat auth_crudepb &gt;&gt;crude.arc
+	rm auth_crudepb
+	echo "auth_crudepb archived & removed"
+  else
+	echo "No auth_crudepb file exists "
+fi
+
+if test -e auth_sinter
+  then
+	echo " " &gt;&gt;sinter.arc
+	date &gt;&gt;sinter.arc
+	cat auth_sinter &gt;&gt;sinter.arc
+	rm auth_sinter
+	echo "auth_sinter archived & removed"
+  else
+	echo "No auth_sinter file exists "
+fi
+
+if test -e auth_bloodpb
+  then
+	echo " " &gt;&gt;bloodpb.arc
+	date &gt;&gt;bloodpb.arc
+	cat auth_bloodpb &gt;&gt;bloodpb.arc
+
+
+#  -------
+#  STEP: 8
+#  -------
+echo "STEP 8: put local *.arc -&gt; remote"
+echo "---------------------------------"
+ftp -n -v IP Address &lt;&lt;EOFTP
+user
+username password
+lcs /lims/export/pbsme
+cd /sql/assay
+put water.arc water.arc
+put sinter.arc sinter.arc
+put crude.arc crude.arc
+put coke.arc coke.arc
+put bloodpb.arc bloodpb.arc
+bye
+EOFTP
+echo " "
+
+echo "----------------------- .... End .... ----------------------"
+echo " "
+exit
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

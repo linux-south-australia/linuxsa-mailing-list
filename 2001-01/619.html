@@ -1,0 +1,111 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: smbpasswd in a perl script" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Sam Silvester'" -->
+<!-- ToEmail="sam@quadlink.com.au" -->
+<!-- Date="Mon, 15 Jan 2001 21:17:39 +1030" -->
+<!-- Id="3A62D54B.35F0784E@aarnet.edu.au" -->
+<!-- Reference="Pine.LNX.4.21.0101152016240.11382-100000@phydeaux.quadlink.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: smbpasswd in a perl script</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Sam Silvester &lt;<I><A HREF="mailto:sam@quadlink.com.au">sam@quadlink.com.au</A></I>&gt;
+  Date: Mon, 15 Jan 2001 21:17:39 +1030
+</PRE>
+<H1>Re: smbpasswd in a perl script</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; &gt; &gt; I'm writing a script to take a tab delimited list of users and add
+&gt; &gt; &gt; them to the smbpasswd file, but I've got stuck on how to send the
+&gt; &gt; &gt; password itself to the smbpasswd program.
+
+&gt; &gt; The -s switch tells smbpasswd to read from stdin/stdout instead of
+&gt; &gt; /dev/tty.
+
+&gt; I found that switch in the man page and figured that I'd need it, but how
+&gt; then do I send the password to the program when it asks for it?? Also, the
+&gt; password needs to be entered twice, so how would I wait for the second
+&gt; prompt before repeating the procedure?
+
+"smbpasswd -s" doesn't issue prompts.  Simply provide the
+input it expects on different lines.  I don't use Perl,
+but the shell syntax would be
+
+  OLDPASSWD=fred
+  NEWPASSWD=jane
+
+  smbpasswd -s &lt;&lt;EOF
+${OLDPASSWD}
+${NEWPASSWD}
+${NEWPASSWD}
+EOF
+
+  if [ $? -ne 0 ]
+  then
+    # handle error
+    exit 1
+  fi
+
+This creates an unnamed file containing a line with the old password
+and two lines with the new password.  It then starts smbpasswd with
+that file connected to stdin.  Once smbpasswd is finished, the status
+code is checked to see if smbpasswd reported an error.
+
+In Real Life this shell script would fail the first time
+someone used an odd character in their password, but you
+get the idea.
+
+Perl tends to have shell syntax (but without a lot of the
+quoting problems) so have a look for "here documents" in
+your Perl documentation.
+
+It might also be worthwhile asking Richard where his
+libsmb library is up to.  You could then simply call
+a function to change the password, with no worries
+about odd characters, spaces, etc.
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

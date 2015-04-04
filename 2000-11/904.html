@@ -1,0 +1,86 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IP-MASQ Help!!!" -->
+<!-- FromName="'Michael Neuling'" -->
+<!-- FromEmail="mneuling@radlogic.com.au" -->
+<!-- ToName="'Tim Fairchild'" -->
+<!-- ToEmail="amosf@mrbean.net.au" -->
+<!-- Date="Thu, 23 Nov 2000 10:08:59 +1030" -->
+<!-- Id="E13yjTf-0000Bp-00@flea.radnet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IP-MASQ Help!!!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Neuling &lt;<I><A HREF="mailto:mneuling@radlogic.com.au">mneuling@radlogic.com.au</A></I>&gt;
+  To  : Tim Fairchild &lt;<I><A HREF="mailto:amosf@mrbean.net.au">amosf@mrbean.net.au</A></I>&gt;
+  Date: Thu, 23 Nov 2000 10:08:59 +1030
+</PRE>
+<H1>Re: IP-MASQ Help!!!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Tim,
+
+&gt; Any hints to point in the right direction, I really want to learn how to
+&gt; do this shit... I've tried various things with ipchains, BTW, but flying
+&gt; blind a bit.
+
+All looks fine except that you have different MTU's for the ethernet
+link and the ppp link.  There is/was a long standing bug where
+masqurading didn't work when the MTU was different between the two
+interfaces.  I'm not sure if this has been resolved yet.  
+
+So try setting the MTU's the same for eth0 and ppp0 or upgrading the
+kernel on the masqurdading machine.
+
+BTW you don't need the last rule in the forward chain as you already
+have the policy set to ACCEPT.  Also, you should set the policy to
+DENY (if you're not masqurading the packet is useless anyway and
+outside people *could* get a packet thru your firewall as it stands).
+Also you should masqurade based on the interface it is going out
+rather than the source addresses.  eg. you should only need to run
+these two commands to get masqurading happening.
+	 ipchains -P forward DENY
+	 ipchains -A forward -i ppp0 -j MASQ
+
+Hope this helps,
+Michael
+--
+Michael Neuling                        <A HREF="mailto:mneuling@radlogic.com.au">mneuling@radlogic.com.au</A> (o_ 
+RADLogic Pty Ltd, Adelaide, South Australia ph: +61 8 8373-3990 //\ 
+<A HREF="http://www.radlogic.com.au">http://www.radlogic.com.au</A>                  fx: +61 8 8373-3251 V_/_
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,124 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Setting Quota on Internet Traffic." -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 6 Jun 2001 20:56:30 +0930" -->
+<!-- Id="20010606205630.A18412@dog.topology.org" -->
+<!-- Reference="001601c0ee6d$2d972520$a700a8c0@mshome.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Setting Quota on Internet Traffic.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 6 Jun 2001 20:56:30 +0930
+</PRE>
+<H1>Re: Setting Quota on Internet Traffic.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Jun 06, 2001 at 07:13:43PM +0930, Craig Keogh wrote:
+&gt; 
+&gt; Soon, I hope to get broadband internet. I plan to use a linux host as my
+&gt; internet gateway and host a small local area network of personal computers.
+&gt; 
+&gt; Recently, telstra have imposed a 3 GB limit per month on broadband
+&gt; connections.
+&gt; How can I impose a quota on 3 users of the internet, each 1 GB ?
+&gt; 
+&gt; Quota has to include all traffic, http, ftp, icq and online games.
+&gt; 
+&gt; Squid has been suggested to me, but from the documentation I have found no
+&gt; reference to setting a hard quota.
+&gt; 
+
+Craig,
+
+There's a little problem with this.
+What do you really want the quota system to do?
+If someone gets to their quota in 3 weeks of the calendar
+month, do you want their bit-rate to be dropped to 0 kbits/sec
+until midnight on the last day of the month?
+
+First you should specify what the quota system should do exactly.
+Here's a reaonsable spec:
+
+The aggregate of the 3 users is to be given "credit" for 
+1 GByte / (30 * 24 * 3600 seconds) = 3086 bits/second.
+
+That's not much.
+But if accumulated over time, it mounts up to your 1 GB, obviously.
+
+Now you need some subsystem to keep track of usage and enforce
+the limit. But if they use very little for 3 weeks, do you want them
+to be able to use 1 GB in the last week of the month?
+
+The usual answer to these questions if to use token buckets.
+With such a system, users are allowed to accumulate credit
+upt to a limit.
+So suppose you allow credit to be accumulated for a whole day.
+That's credit for about 33 MBytes.
+So you need a token bucket with
+credit rate = 3 kbits/sec
+bucket size = 33 MBytes.
+
+To enforce this, use the "tc" command.
+Here's a manual for iproute2+tc:
+<A HREF="http://snafu.freedom.org/linux2.2/iproute-notes.html">http://snafu.freedom.org/linux2.2/iproute-notes.html</A>
+And here's the section for "tc":
+<A HREF="http://snafu.freedom.org/linux2.2/iproute-notes.html">http://snafu.freedom.org/linux2.2/iproute-notes.html</A>#syntc
+
+I think you need something like 
+
+tc qdisc tbf ....
+
+There's more to it than that. You have to read the manuals.
+
+Cheers,
+Alan Kennington.
+
+--------------------------------------------------------------------
+    name: Dr. Alan Kennington
+  e-mail: <A HREF="mailto:akenning@topology.org">akenning@topology.org</A>
+ website: <A HREF="http://www.topology.org/">http://www.topology.org/</A>
+    city: Adelaide, South Australia
+  coords: 34.88051 S, 138.59334 E
+timezone: UTC+0930 <A HREF="http://www.topology.org/timezone.html">http://www.topology.org/timezone.html</A>
+ pgp-key: <A HREF="http://www.topology.org/key_ak2.asc">http://www.topology.org/key_ak2.asc</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

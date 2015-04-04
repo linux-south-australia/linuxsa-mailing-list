@@ -1,0 +1,170 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: ftp" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="'Leigh Hart','Robyn Manning'" -->
+<!-- ToEmail="hart@dotat.com,robynman@dove.net.au" -->
+<!-- Date="Thu, 21 Dec 2000 00:09:23 +1000" -->
+<!-- Id="3.0.6.32.20001221000923.00b25620@203.16.214.248" -->
+<!-- Reference="200012201320.XAA03976@at.dotat.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: ftp</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : Leigh Hart &lt;<I><A HREF="mailto:hart@dotat.com">hart@dotat.com</A></I>&gt;<BR>        Robyn Manning &lt;<I><A HREF="mailto:robynman@dove.net.au">robynman@dove.net.au</A></I>&gt;
+  Date: Thu, 21 Dec 2000 00:09:23 +1000
+</PRE>
+<H1>Re: ftp</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 12:00 AM 12/21/00 +1000, Richard Sharpe wrote:
+&gt;At 11:50 PM 12/20/00 +1030, Leigh Hart wrote:
+&gt;&gt;Hi Robyn,
+&gt;&gt;
+&gt;&gt;Robyn Manning &lt;<A HREF="mailto:robynman@dove.net.au">robynman@dove.net.au</A>&gt; wrote:
+&gt;&gt;&gt; 
+&gt;&gt;&gt; What's the difference between passive and non-passive ftp
+&gt;&gt;
+&gt;&gt;Quick summary:
+&gt;&gt;
+&gt;&gt;    FTP uses two connections between you and the FTP server - one
+&gt;&gt;    for commands, one for file transfers - the latter is made by
+&gt;&gt;    the server to you, the former by you to the server.  Firewalls
+&gt;&gt;    don't generally like this.
+&gt;&gt;
+&gt;&gt;    Passive FTP uses one connection between you and the FTP server
+&gt;&gt;    and both commands and file transfers are effected across the
+&gt;&gt;    same connection.  Firewalls generally like this.
+&gt;
+&gt;Ummm, not so!
+&gt;
+&gt;Passive uses two connections, one for control and one for data, only the
+&gt;client  establishes both.  Try it out and grab a trace some time. You will
+&gt;see the port command go out, plus one other command very early on, like
+&gt;when you issue the passive command. Then you will see the client establish
+&gt;the FTP-DATA connection rather than the server.
+
+I would like to modify that slightly.
+
+Here is what a trace showed between two Linux systems:
+
+  Client sent PASV request
+  Server responded with OK, and an IP address and port number that it was
+  listening on.
+  Client established a connection on that port. (Three way handshake)
+  Client sent STOR file
+  Server said OK
+  Client sent the data
+  Client dropped the connection.
+
+So, FTP-DATA is not involved, but there is definitely a separate
+connection. The FTP protocol has no commands for doing an in-band data
+transfer, thus the need for out-of-band.
+
+&gt;&gt;More detail:
+&gt;&gt;
+&gt;&gt;Normal (non-passive) FTP sees the FTP client (program) connect
+&gt;&gt;to the FTP server (also a program) using a TCP channel to port
+&gt;&gt;21 on the remote server.
+&gt;&gt;
+&gt;&gt;The FTP client executes FTP commands over this TCP stream but
+&gt;&gt;any resulting file transfers and/or directory listings are not
+&gt;&gt;delivered over the same TCP stream, but in fact the FTP server
+&gt;&gt;establishes a *new* TCP stream back to your computer, allowing
+&gt;&gt;the FTP server take advantage of TCP sliding window protocols
+&gt;&gt;to make best use of available bandwidth, among other things.
+&gt;&gt;
+&gt;&gt;Passive FTP is when the FTP client connects to the FTP server
+&gt;&gt;using a TCP channel to port 21 on the remote server also using
+&gt;&gt;this channel for executing commands, however all file transfer
+&gt;&gt;and directory listings are transferrred inside that same client
+&gt;&gt;opened TCP channel as well - meaning a firewall doesn't need to
+&gt;&gt;allow a remote site to connect to an inside host to effect any
+&gt;&gt;file transfers (unlike when using non-passive).
+&gt;&gt;
+&gt;&gt;&gt; and which is the better one to use?
+&gt;&gt;
+&gt;&gt;Depends on your circumstances, behind a tight firewall that
+&gt;&gt;prevents non passive FTP, then passive is the best - otherwise,
+&gt;&gt;normal FTP is probably better as it makes better use of TCP's
+&gt;&gt;sliding window flow control protocols.
+&gt;&gt;
+&gt;&gt;There are plenty of more technical (and perhaps more specifically
+&gt;&gt;accurate) descriptions of how the FTP protocol actually works, 
+&gt;&gt;but I think the above summary makes it easy to understand.
+&gt;&gt;
+&gt;&gt;Cheers
+&gt;&gt;
+&gt;&gt;Leigh
+&gt;&gt;-- 
+&gt;&gt;| "By the time they had diminished | Leigh Hart, <A HREF="mailto:hart@dotat.com">hart@dotat.com</A> |
+&gt;&gt;|  from 50 to 8, the other dwarves | CCNA: <A HREF="http://www.cisco.com">http://www.cisco.com</A> |
+&gt;&gt;|  began to suspect 'Hungry' ..."  | PO Box 3057 Newton SA 5074 |
+&gt;&gt;|   -- Gary Larson, "The Far Side" | <A HREF="http://www.dotat.com/hart/">http://www.dotat.com/hart/</A> |
+&gt;&gt;
+&gt;&gt;-- 
+&gt;&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;&gt;To unsubscribe from the LinuxSA list:
+&gt;&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;&gt;
+&gt;&gt;
+&gt;
+&gt;Regards
+&gt;-------
+&gt;Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+&gt;Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+&gt;Contributing author, SAMS Teach Yourself Samba in 24 Hours
+&gt;Author, Special Edition, Using Samba
+&gt;
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Contributing author, SAMS Teach Yourself Samba in 24 Hours
+Author, Special Edition, Using Samba
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

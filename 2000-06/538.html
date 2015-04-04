@@ -1,0 +1,114 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: system write(2) call bounds checking" -->
+<!-- FromName="Daryl Tester" -->
+<!-- FromEmail="dt@picknowl.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="akenning@dog.topology.org, linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 19 Jun 2000 08:27:29 +0930" -->
+<!-- Id="394D53D9.48603177@picknowl.com.au" -->
+<!-- Reference="20000618203635.A26531@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: system write(2) call bounds checking</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  To  : <A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 19 Jun 2000 08:27:29 +0930
+</PRE>
+<H1>Re: system write(2) call bounds checking</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Alan Kennington wrote:
+
+&gt; Technical question about linux kernel.
+&gt; 
+&gt; Does anyone happen to know anthing about how the
+&gt; system write(2) call should check bounds of its
+&gt; arguments?
+
+(No comments on lack of error checking; this is a quick throwaway program.)
+
+[<A HREF="mailto:dt@nipnyep">dt@nipnyep</A> dt]$ uname -a
+Linux nipnyep 2.2.12-20 #1 Mon Sep 27 10:40:35 EDT 1999 i686 unknown
+
+[<A HREF="mailto:dt@nipnyep">dt@nipnyep</A> dt]$ cat tst.c
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/stat.h&gt;
+#include &lt;fcntl.h&gt;
+
+int
+main(int argc, char *argv[])
+{
+    int  fd;
+    char buffer[1];
+
+    fd = open("/dev/null", O_WRONLY);
+    if (write(fd, (void *) buffer, (size_t) -1) == -1)
+        perror("write");
+    close(fd);
+}
+[<A HREF="mailto:dt@nipnyep">dt@nipnyep</A> dt]$ ./tst
+write: Operation not permitted
+
+*Hmph* - not what I'd expected.
+
+If I replace "/dev/null" with "/tmp/foo" (and adjust open() accordingly), I get:
+
+[<A HREF="mailto:dt@nipnyep">dt@nipnyep</A> dt]$ ./tst
+write: Invalid argument
+
+Which is better.
+
+&gt; I've got a situation where a call to the system
+&gt; write(2) function with a parameter of 4294967295 bytes
+&gt; (i.e. -1 bytes accidentally converted to unsigned long
+&gt; due to someone _else's_ bug)
+
+size_t is defined as int here, so anything &gt; 2^31 is going to cause
+undefined behaviour and should be rejected (but this appears to be
+the case).
+
+&gt; Since this seems like a bit of a show-stopper for the
+&gt; linux reliability idea, I'm a bit worried about it.
+
+Looks like a device driver issue.
+
+
+Regards,
+  Daryl Tester
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

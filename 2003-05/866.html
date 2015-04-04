@@ -1,0 +1,139 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Solutions to PHP-amrecover interface design..." -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 23 May 2003 23:07:00 +0930" -->
+<!-- Id="000d01c32130$63c641b0$020120ac@skink" -->
+<!-- Reference="1053685806.19621.14.camel@SCOOBY.localnet" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Solutions to PHP-amrecover interface design...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 23 May 2003 23:07:00 +0930
+</PRE>
+<H1>Solutions to PHP-amrecover interface design...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&lt;snip&gt;
+
+&gt; * Interacting with external commands (specifically, amrecover -- I
+need
+&gt; to be able to communicate with stdin/stdout)
+
+Problem sort of solved. I found proc_open, which will give me file
+descriptors that I can read from and write to. Cool. Only problem is
+that it needs PHP4 4.3.0 or greater, and I only have 4.1.2 on my Debian
+Woody sytem. I think that just about does it for me and Woody. Anyway,
+once I've worked out how to get around that small issue, I should have a
+way to interact with interactive processes in PHP. That's a good
+start...
+
+&gt; * How to communicate with a process that lasts longer than a single
+HTTP
+&gt; session...
+
+This is still causing me grief. However, I have a few ideas, which, due
+to my version problems, I have not yet tested. There are basically two
+parts to the problem -- the first is interacting with amrecover to
+select the appropriate files, and the second is using amrestore and
+amtape to actually restore the files. I think I've solved both, but hope
+others can comment on my proposed solutions:
+
+For the first part, I plan to start a new amrecover each time, and
+basically build a list of selected files to restore within PHP,
+re-selecting them in a new amrecover process on every page refresh. This
+could be somewhat slow, but would have the benefit that a session that
+dies doesn't really matter. I could keep an array (or map), indexed by
+datestamp, which would contain an array containg the selected files or
+directories to be restored from that date, as follows:
+
+$selected = array( "2003-05-20" =&gt; array("/foo", "/bar/baz"),
+                   "2003-05-17" =&gt; array("/bar/quux") );
+
+and so on. Remember that the "/foo" and so on are relative to the users'
+home directory. There would also be a current directory variable as well
+(of course, also relative to the users' home dir), and the current date
+that is being browsed -- though these could quite sensibly be passed in
+the URL itself. Once all the files desired are selected, the list
+command could be used to create a file that would contain text like:
+
+TAPE Daily-02 LEVEL 0 DATE 2003-05-17
+        /bar/quux
+TAPE Daily-05 LEVEL 0 DATE 2003-05-20
+        /foo
+        /bar/baz
+
+A script could be written to run this in an at job, using amtape to
+change to the right tape, and amrestore -p and either restore or tar to
+restore the relevant files... I haven't quite worked out how to do this
+(which isn't helped by the fact that I lack familiarity with almost
+everything I'm using here, from amanda itself through to PHP and even
+HTML :) ... Certainly, this would require either an auto tape changer,
+or operator intervention (and I'm not sure how that would work with an
+at job, but I'll cross that bridge later...)
+
+Another problem here (and with any solution) is that I would need to
+enable some sort set uid access to amrecover, probably through sudo.
+This means that effectively, the www-data user could run amrecover as
+root, and probably more if I wasn't careful. Can anyone say "security
+risk" ... ?
+
+And, of course, I still have the problem of monitoring the restore
+process once it has started. I don't want to have to make the user keep
+refreshing the webpage to prompt PHP to check if another tape is being
+asked for, or if the process is completed.
+
+Any further comments from anyone?
+
+Cheers
+
+rr
+
+PS yes, I'm doing this on a Friday night...
+
+-- 
+Richard Russell
+Yellow Goanna P/L
+m: +61 412 827 805
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+w: <A HREF="http://www.yellowgoanna.com">http://www.yellowgoanna.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

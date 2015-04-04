@@ -1,0 +1,668 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Unidentified subject!" -->
+<!-- FromName="David Lloyd" -->
+<!-- FromEmail="lloy0076@senet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 17 Jun 1999 20:01:09 +0900" -->
+<!-- Id="3.0.5.32.19990617200109.007acec0@pop.senet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Unidentified subject!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@senet.com.au">lloy0076@senet.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Thu, 17 Jun 1999 20:01:09 +0900
+</PRE>
+<H1>Unidentified subject!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Here are my various chat scripts:
+
+(THIS IS IFUP)
+#!/bin/bash
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+
+cd /etc/sysconfig/network-scripts
+. network-functions
+
+need_hostname
+
+CONFIG=$1
+
+[ -z "$CONFIG" ] && {
+    echo "usage: ifup &lt;device name&gt;" &gt;&2
+    exit 1
+}
+
+[ -f "$CONFIG" ] || CONFIG=ifcfg-$CONFIG
+[ -f "$CONFIG" ] || {
+    echo "usage: ifup &lt;device name&gt;" &gt;&2
+    exit 1
+}
+
+if [ $UID != 0 ]; then
+    if [ -x /usr/sbin/usernetctl ]; then
+	exec /usr/sbin/usernetctl $CONFIG up
+    fi
+    echo "Users cannot control this device." &gt;&2
+    exit 1
+fi
+
+source_config
+
+if [ "foo$2" = "fooboot" -a "${ONBOOT}" = "no" ]
+then
+    exit
+fi
+
+IPSETUP=no
+
+DEVICETYPE=`echo $DEVICE | sed "s/[0-9]*$//"`
+REALDEVICE=`echo $DEVICE | sed 's/:.*//g'`
+if echo $DEVICE | grep -q ':' ; then
+    ISALIAS=yes
+else
+    ISALIAS=no
+fi
+
+# Old BOOTP variable
+if [ "$BOOTP" = "yes" ]; then
+    BOOTPROTO=bootp
+fi
+
+OTHERSCRIPT="/etc/sysconfig/network-scripts/ifup-${DEVICETYPE}"
+
+if [ -x $OTHERSCRIPT ]; then
+    exec $OTHERSCRIPT $CONFIG $2
+fi
+
+# is this device available? (this catches PCMCIA devices for us)
+/sbin/ifconfig ${REALDEVICE} 2&gt;&1 | grep -s "unknown interface" &gt; /dev/null
+if [ "$?" = "0" ]; then
+    echo "Delaying ${DEVICE} initialization."
+    exit 0
+fi
+
+if [ "$SLAVE" = yes -a "$ISALIAS" = no -a "$MASTER" != "" -a \
+     -x /sbin/ifenslave ]; then
+    RFLAG="" ; [ "$RECIEVE-ONLY" = yes ] && RFLAG="-r"
+
+    ifconfig ${DEVICE} down
+    echo "Enslaving $DEVICE to $MASTER"
+    ifenslave $RFLAG "$DEVICE" "$MASTER"
+
+    exit 0
+fi
+
+if [ "$BOOTPROTO" = bootp -a "$ISALIAS" = no ]; then
+    ifconfig ${DEVICE} down
+    ifconfig ${DEVICE} 0.0.0.0 broadcast 255.255.255.255 netmask 0.0.0.0
+    route add default ${DEVICE}
+    echo "Sending bootp request"
+    TMPFILE=`/bin/mktemp /tmp/bootp-${DEVICE}.XXXXXX` || {
+	ifconfig ${DEVICE} down
+	echo 'mktemp failed'
+	exit 1
+    }
+    bootpc --returniffail --timeoutwait 6 --dev ${DEVICE} 2&gt;/dev/null &gt;
+${TMPFILE}
+    if [ "$?" = "0" ]; then
+	. ${TMPFILE}
+	BOOTPHOSTNAME="$HOSTNAME"
+	echo "bootp response received -- using IP ${IPADDR}"
+    elif [ -z "$IPADDR" ]; then
+	ifconfig ${DEVICE} down
+	echo "No bootp response recieved -- not configuring device ${DEVICE}."
+	rm -f ${TMPFILE}
+	exit 1
+    else 
+	echo "No bootp response recieved -- using default configuration for device
+${DEVICE}."
+    fi
+
+    rm -f ${TMPFILE}
+elif [ "$BOOTPROTO" = dhcp -a "$ISALIAS" = no ]; then
+    echo -n "Using DHCP for ${DEVICE}... "
+    IFNAME=${DEVICE} \
+	/sbin/dhcpcd -c /etc/sysconfig/network-scripts/ifdhcpc-done ${DEVICE} 
+    echo "echo \$$ &gt; /var/run/dhcp-wait-${DEVICE}.pid; exec sleep 30" | sh
+
+    if [ -f /var/run/dhcp-wait-${DEVICE}.pid ]; then
+	echo "failed."
+	exit 1
+    else
+	rm -f /var/run/dhcp-wait-${DEVICE}.pid
+	echo "done."
+	IPSETUP=yes
+    fi
+fi
+
+if [ "$IPSETUP" != yes ]; then
+    if [ -z "$NETMASK" ]; then
+	eval `/bin/ipcalc --netmask ${IPADDR}`
+    fi
+
+    if [ -z "$BROADCAST" ]; then
+	eval `/bin/ipcalc --broadcast ${IPADDR} ${NETMASK}`
+    fi
+
+    if [ -z "$NETWORK" ]; then
+	eval `/bin/ipcalc --network ${IPADDR} ${NETMASK}`
+    fi
+
+    ifconfig ${DEVICE} ${MACADDR:+hw ether $MACADDR} ${IPADDR} \
+      netmask ${NETMASK} broadcast ${BROADCAST}
+    if [ "$ISALIAS" = no ] ; then
+	route add -net ${NETWORK} netmask ${NETMASK} ${DEVICE}
+    else
+	route add -host ${IPADDR} ${DEVICE}
+    fi
+
+    # this is broken! it's only here for compatibility with old RH systems
+    if [ "${GATEWAY}" != "" -a "${GATEWAY}" != "none" ]; then
+	route add default gw ${GATEWAY} metric 1 ${DEVICE}
+    fi
+
+    . /etc/sysconfig/network
+
+    if [ "${GATEWAY}" != "" ]; then
+	if [ "${GATEWAYDEV}" = "" -o "${GATEWAYDEV}" = "${DEVICE}" ]; then
+	    # set up default gateway
+	    route add default gw ${GATEWAY} ${DEVICE}
+	    DEFGW=${GATEWAY}
+	fi
+    fi
+
+    if [ "$BOOTPROTO" = bootp -a "$ISALIAS" = no ]; then
+	if [ -n "$GATEWAYS" ]; then
+	    for gw in $GATEWAYS; do
+		if [ $gw != "${DEFGW}" ]; then
+		    route add default gw $gw ${DEVICE}
+		fi
+	    done
+	fi
+
+	if [ -n "$DNSSRVS" -a -n "$SEARCH" ]; then
+	    echo "search $SEARCH" &gt; /etc/resolv.conf
+	    for dns in $DNSSRVS; do
+		    echo "nameserver $dns" &gt;&gt; /etc/resolv.conf
+	    done
+	fi
+
+	if [ -n "$BOOTPHOSTNAME" -a -n "$NEEDHOSTNAME" ]; then
+	    set_hostname $BOOTPHOSTNAME
+	fi
+    fi
+fi
+
+if [ "$IPX" = yes ]; then
+	/etc/sysconfig/network-scripts/ifup-ipx $DEVICE
+fi
+
+exec /etc/sysconfig/network-scripts/ifup-post $CONFIG
+(END OF IFUP)
+
+
+(THIS ISN IFUP-PPP)
+#!/bin/sh
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+
+# ifup-post for PPP is handled through /etc/ppp/ip-up
+
+if [ "$1" != daemon ] ; then
+  # disconnect stdin, out, err to disassociate from controlling tty
+  # so that no HUPs will get through.
+  $0 daemon $*& &lt;/dev/null &gt;/dev/null 2&gt;/dev/null
+  exit 0
+fi
+shift
+
+cd /etc/sysconfig/network-scripts
+. network-functions
+
+CONFIG=$1
+source_config
+
+if [ -z "$DISCONNECTTIMEOUT" ]; then
+  DISCONNECTTIMEOUT=2
+fi
+
+if [ -z "$RETRYTIMEOUT" ]; then
+  RETRYTIMEOUT=30
+fi
+
+if [ "$2" = "boot" -a "${ONBOOT}" = "no" ]; then
+  exit
+fi
+
+[ -x /usr/sbin/pppd ] || {
+  echo "/usr/sbin/pppd does not exist or is not executable"
+  echo "ifup-ppp for $DEVICE exiting"
+  logger -p daemon.info -t ifup-ppp \
+    "/usr/sbin/pppd does not exist or is not executable for $DEVICE"
+  exit 1
+}
+
+[ -f /etc/sysconfig/network-scripts/chat-$DEVICE ] || {
+  echo "/etc/sysconfig/network-scripts/chat-$DEVICE does not exist"
+  echo "ifup-ppp for $DEVICE exiting"
+  logger -p daemon.info -t ifup-ppp \
+    "/etc/sysconfig/network-scripts/chat-$DEVICE does not exist for $DEVICE"
+  exit 1
+}
+
+opts="lock"
+if [ "${HARDFLOWCTL}" = yes ] ; then
+  opts="$opts modem crtscts"
+fi
+if [ "${ESCAPECHARS}" = yes ] ; then
+  opts="$opts asyncmap FFFFFFFF"
+fi
+if [ "${DEFROUTE}" = yes ] ; then
+  opts="$opts defaultroute"
+fi
+if [ -n "${MRU}" ] ; then
+  opts="$opts mru ${MRU}"
+fi
+if [ -n "${MTU}" ] ; then
+  opts="$opts mtu ${MTU}"
+fi
+if [ -n "${IPADDR}${REMIP}" ] ; then
+  # if either IP address is set, the following will work.
+  opts="$opts ${IPADDR}:${REMIP}"
+fi
+if [ -n "${PAPNAME}" ] ; then
+  opts="$opts name ${PAPNAME}"
+fi
+if [ "${DEBUG}" = yes ] ; then
+  opts="$opts debug"
+  chatdbg="-v"
+fi
+
+CHATSCRIPT=/etc/sysconfig/network-scripts/chat-$DEVNAME
+[ -f $CHATSCRIPT ] || {
+  CHATSCRIPT=/etc/sysconfig/network-scripts/chat-$PARENTDEVNAME
+}
+
+while : ; do
+  (logger -p daemon.info -t ifup-ppp \
+    "pppd started for $DEVICE on $MODEMPORT at $LINESPEED" &)&
+
+  &gt; /var/run/ppp-$DEVICE.dev
+  /usr/sbin/pppd -detach $opts $MODEMPORT $LINESPEED \
+    remotename $DEVICE ipparam $DEVICE \
+    ${PPPOPTIONS} \
+    connect "/usr/sbin/chat $chatdbg -f $CHATSCRIPT"
+
+  # exit if we're not supposed to persist or our lock file has disappeared 
+  if [ "$PERSIST" != "yes" -o ! -f /var/run/ppp-$DEVICE.dev ]; then
+    rm -f /var/run/ppp-$DEVICE.dev
+    exit 0
+  fi
+
+  size=`wc -c &lt; /var/run/ppp-$DEVICE.dev`
+
+  if [ $size = 0 ]; then
+    # pppd never connected
+    timeout=$RETRYTIMEOUT
+  else
+    # pppd connected and then disconnected
+    timeout=$DISCONNECTTIMEOUT
+  fi
+
+  [ -z "$timeout" ] && {
+    timeout=30
+  }
+
+  sleep $timeout || {
+    # sleep was killed
+    rm -f /var/run/ppp-$DEVICE.dev
+    exit 0
+  }
+
+  # exit if our lock file disappeared while we slept
+  if [ ! -f /var/run/ppp-$DEVICE.dev ]; then
+    exit 0
+  fi
+done
+(END OF IFUP-PPP)
+
+
+(THIS IS CHAT-PPP0)
+'ABORT' 'BUSY'
+'ABORT' 'ERROR'
+'ABORT' 'NO CARRIER'
+'ABORT' 'NO DIALTONE'
+'ABORT' 'Invalid Login'
+'ABORT' 'Login incorrect'
+'' 'ATZ'
+'OK' 'ATDT0882101300'
+'CONNECT' ''
+'ogin:' 'lloy0076'
+'ord:' '[I'M NOT SAYING]'
+'TIMEOUT' '5'
+'~--' ''
+(END OF PPP0)
+
+(THIS IF IFCG-PPP0)
+ERSIST="no"
+DEFROUTE="yes"
+ONBOOT="no"
+INITSTRING="ATZ"
+MODEMPORT="/dev/modem"
+LINESPEED="115200"
+ESCAPECHARS="no"
+DEFABORT="yes"
+HARDFLOWCTL="yes"
+DEVICE="ppp0"
+PPPOPTIONS=""
+DEBUG="no"
+PAPNAME=""
+REMIP=""
+IPADDR=""
+BOOTPROTO="none"
+MTU="1500"
+MRU="1500"
+DISCONNECTTIMEOUT="5"
+RETRYTIMEOUT="5"
+USERCTL="yes"
+NETMASK=""
+(END OF IFCG-PPP0)
+
+(THIS IS A SNIP FROM MY /VAR/LOG/MESSAGES)
+Jun 17 18:50:58 localhost syslogd 1.3-3: restart.
+Jun 17 18:50:58 localhost kernel: klogd 1.3-3, log source = /proc/kmsg
+started.
+Jun 17 18:50:58 localhost kernel: Cannot find map file.
+Jun 17 18:50:58 localhost kernel: No module symbols loaded.
+Jun 17 18:50:58 localhost kernel: Linux version 2.3.6
+(<A HREF="mailto:root@localhost.localdomain">root@localhost.localdomain</A>) (gcc version 2.7.2.3) #1 Mon Jun 14 13:38:57
+CST 1999
+Jun 17 18:50:58 localhost kernel: Detected 223566591 Hz processor.
+Jun 17 18:50:58 localhost kernel: Console: colour VGA+ 80x25
+Jun 17 18:50:58 localhost kernel: Calibrating delay loop... 222.82 BogoMIPS
+Jun 17 18:50:58 localhost kernel: Memory: 30780k/32768k available (852k
+kernel code, 404k reserved, 692k data, 40k init)
+Jun 17 18:50:58 localhost kernel: Checking if this processor honours the WP
+bit even in supervisor mode... Ok.
+Jun 17 18:50:58 localhost kernel: VFS: Diskquotas version dquot_6.4.0
+initialized
+Jun 17 18:50:58 localhost kernel: CPU: Cyrix M II 3x Core/Bus Clock
+stepping 08
+Jun 17 18:50:58 localhost kernel: Checking 386/387 coupling... OK, FPU
+using exception 16 error reporting.
+Jun 17 18:50:58 localhost kernel: Checking 'hlt' instruction... OK.
+Jun 17 18:50:58 localhost kernel: POSIX conformance testing by UNIFIX
+Jun 17 18:50:58 localhost kernel: mtrr: v1.35 (19990512) Richard Gooch
+(<A HREF="mailto:rgooch@atnf.csiro.au">rgooch@atnf.csiro.au</A>)
+Jun 17 18:50:58 localhost kernel: PCI: PCI BIOS revision 2.10 entry at 0xfb9e0
+Jun 17 18:50:58 localhost kernel: PCI: Using configuration type 1
+Jun 17 18:50:58 localhost kernel: PCI: Probing PCI hardware
+Jun 17 18:50:58 localhost kernel: Linux NET4.0 for Linux 2.2
+Jun 17 18:50:58 localhost kernel: Based upon Swansea University Computer
+Society NET3.039
+Jun 17 18:50:58 localhost kernel: NET4: Unix domain sockets 1.0 for Linux
+NET4.0.
+Jun 17 18:50:58 localhost kernel: NET4: Linux TCP/IP 1.0 for NET4.0
+Jun 17 18:50:58 localhost kernel: IP Protocols: ICMP, UDP, TCP
+Jun 17 18:50:58 localhost kernel: TCP: Hash tables configured (established
+32768 bind 32768)
+Jun 17 18:50:58 localhost kernel: Starting kswapd v 1.5 
+Jun 17 18:50:58 localhost kernel: parport0: PC-style at 0x378 (0x778)
+[SPP,ECP,ECPEPP,ECPPS2]
+Jun 17 18:50:58 localhost kernel: parport0: detected irq 7; use procfs to
+enable interrupt-driven operation.
+Jun 17 18:50:58 localhost kernel: Serial driver version 4.27 with no serial
+options enabled
+Jun 17 18:50:58 localhost kernel: ttyS00 at 0x03f8 (irq = 4) is a 16550A
+Jun 17 18:50:58 localhost kernel: ttyS01 at 0x02f8 (irq = 3) is a 16550A
+Jun 17 18:50:58 localhost kernel: lp0: using parport0 (polling).
+Jun 17 18:50:58 localhost kernel: Uniform Multi-Platform E-IDE driver
+Revision: 6.19
+Jun 17 18:50:58 localhost kernel: ALI15X3: IDE controller on PCI bus 00 dev 58
+Jun 17 18:50:58 localhost kernel: ALI15X3: not 100ative mode: will probe
+irqs later
+Jun 17 18:50:58 localhost kernel:     ide0: BM-DMA at 0xf000-0xf007, BIOS
+settings: hda:DMA, hdb:pio
+Jun 17 18:50:58 localhost kernel:     ide1: BM-DMA at 0xf008-0xf00f, BIOS
+settings: hdc:pio, hdd:pio
+Jun 17 18:50:58 localhost kernel: hda: SAMSUNG SV0432A 010, ATA DISK drive
+Jun 17 18:50:58 localhost kernel: hdc: Maxtor 7420 AV, ATA DISK drive
+Jun 17 18:50:58 localhost kernel: hdd: CREATIVECD2421E, ATAPI CDROM drive
+Jun 17 18:50:58 localhost kernel: ide0 at 0x1f0-0x1f7,0x3f6 on irq 14
+Jun 17 18:50:58 localhost kernel: ide1 at 0x170-0x177,0x376 on irq 15
+Jun 17 18:50:58 localhost kernel: hda: SAMSUNG SV0432A 010, 4112MB w/482kB
+Cache, CHS=8912/15/63
+Jun 17 18:50:58 localhost kernel: hdc: Maxtor 7420 AV, 400MB w/32kB Cache,
+CHS=986/16/52, DMA
+Jun 17 18:50:58 localhost kernel: hdd: ATAPI 24X CD-ROM drive, 240kB Cache
+Jun 17 18:50:58 localhost kernel: Uniform CDROM driver Revision: 2.55
+Jun 17 18:50:58 localhost kernel: Floppy drive(s): fd0 is 1.44M
+Jun 17 18:50:58 localhost kernel: FDC 0 is a post-1991 82077
+Jun 17 18:50:58 localhost kernel: PPP: version 2.3.7 (demand dialling)
+Jun 17 18:50:58 localhost kernel: TCP compression code copyright 1989
+Regents of the University of California
+Jun 17 18:50:58 localhost kernel: PPP line discipline registered.
+Jun 17 18:50:58 localhost kernel: Partition check:
+Jun 17 18:50:58 localhost kernel:  hda: hda1 hda2 hda3 hda4
+Jun 17 18:50:58 localhost kernel:  hdc: hdc1
+Jun 17 18:50:58 localhost kernel: VFS: Mounted root (ext2 filesystem)
+readonly.
+Jun 17 18:50:58 localhost kernel: Freeing unused kernel memory: 40k freed
+Jun 17 18:50:58 localhost kernel: Adding Swap: 65672k swap-space (priority -1)
+Jun 17 18:50:59 localhost named[158]: starting.  named 8.1.2 Thu Sep 24
+02:47:08 EDT 1998 ^<A HREF="mailto:Iroot@porky.redhat.com">Iroot@porky.redhat.com</A>:/usr/src/bs/BUILD/src/bin/named
+Jun 17 18:50:59 localhost named[158]: cache zone "" (IN) loaded (serial 0)
+Jun 17 18:50:59 localhost named[158]: master zone "0.0.127.in-addr.arpa"
+(IN) loaded (serial 1997022700)
+Jun 17 18:50:59 localhost named[158]: listening on [127.0.0.1].53 (lo)
+Jun 17 18:50:59 localhost named[158]: Forwarding source address is
+[0.0.0.0].1024
+Jun 17 18:50:59 localhost named[159]: Ready to answer queries.
+Jun 17 18:50:59 localhost named[159]: sysquery: sendto([128.9.0.107].53):
+Network is unreachable
+Jun 17 18:51:05 localhost PAM_pwdb[201]: (login) session opened for user
+root by (uid=0)
+Jun 17 18:51:05 localhost login[201]: ROOT LOGIN ON tty1
+Jun 17 18:51:05 localhost PAM_pwdb[201]: (login) session closed for user root
+Jun 17 18:52:26 localhost kernel: tty_io.c: process 227 (X) used obsolete
+/dev/cua0 - update software to use /dev/ttyS0
+Jun 17 19:02:48 localhost PAM_pwdb[384]: auth could not identify password
+for [root]
+Jun 17 19:05:39 localhost useradd[430]: new user: name=lloy0076, uid=500,
+gid=0, home=/home/lloy0076, shell=/bin/bash 
+Jun 17 19:05:50 localhost PAM_pwdb[424]: password for (lloy0076/500)
+changed by (root/0)
+Jun 17 19:06:07 localhost PAM_pwdb[432]: (login) session opened for user
+lloy0076 by (uid=0)
+Jun 17 19:06:07 localhost login[432]: LOGIN ON tty1 BY lloy0076
+Jun 17 19:06:07 localhost PAM_pwdb[432]: (login) session closed for user
+lloy0076
+Jun 17 19:06:34 localhost PAM_pwdb[447]: (login) session opened for user
+root by (uid=0)
+Jun 17 19:06:34 localhost login[447]: ROOT LOGIN ON tty1
+Jun 17 19:06:34 localhost PAM_pwdb[447]: (login) session closed for user root
+Jun 17 19:10:07 localhost ifup-ppp: pppd started for ppp0 on /dev/modem at
+115200
+Jun 17 19:10:07 localhost pppd[497]: pppd 2.3.5 started by root, uid 0
+Jun 17 19:10:07 localhost kernel: tty_io.c: process 497 (pppd) used
+obsolete /dev/cua1 - update software to use /dev/ttyS1
+Jun 17 19:10:07 localhost kernel: registered device ppp0
+Jun 17 19:10:07 localhost kernel: tty_io.c: process 497 (pppd) used
+obsolete /dev/cua1 - update software to use /dev/ttyS1
+Jun 17 19:10:32 localhost kernel: tty_io.c: process 502 (X) used obsolete
+/dev/cua0 - update software to use /dev/ttyS0
+Jun 17 19:10:36 localhost pppd[497]: Serial connection established.
+Jun 17 19:10:37 localhost pppd[497]: Using interface ppp0
+Jun 17 19:10:37 localhost pppd[497]: Connect: ppp0 &lt;--&gt; /dev/modem
+Jun 17 19:11:08 localhost pppd[497]: IPCP: timeout sending Config-Requests
+Jun 17 19:11:09 localhost pppd[497]: Connection terminated.
+Jun 17 19:11:10 localhost pppd[497]: Exit.
+Jun 17 19:11:10 localhost ifup-ppp: pppd started for ppp0 on /dev/modem at
+115200
+Jun 17 19:11:10 localhost pppd[606]: pppd 2.3.5 started by root, uid 0
+Jun 17 19:11:10 localhost kernel: tty_io.c: process 606 (pppd) used
+obsolete /dev/cua1 - update software to use /dev/ttyS1
+Jun 17 19:11:12 localhost chat[608]: Failed (NO CARRIER)
+Jun 17 19:11:12 localhost pppd[606]: Connect script failed
+Jun 17 19:11:13 localhost pppd[606]: Exit.
+Jun 17 19:11:13 localhost pppd[613]: pppd 2.3.5 started by root, uid 0
+Jun 17 19:11:13 localhost ifup-ppp: pppd started for ppp0 on /dev/modem at
+115200
+Jun 17 19:11:59 localhost chat[615]: Failed
+Jun 17 19:11:59 localhost pppd[613]: Connect script failed
+Jun 17 19:12:00 localhost pppd[613]: Exit.
+Jun 17 19:12:00 localhost ifup-ppp: pppd started for ppp0 on /dev/modem at
+115200
+Jun 17 19:12:00 localhost pppd[634]: pppd 2.3.5 started by root, uid 0
+Jun 17 19:12:11 localhost ifup-ppp: pppd started for ppp0 on /dev/modem at
+115200
+Jun 17 19:12:11 localhost pppd[664]: pppd 2.3.5 started by root, uid 0
+Jun 17 19:12:11 localhost pppd[664]: Device modem is locked by pid 634
+Jun 17 19:12:11 localhost pppd[664]: Exit.
+Jun 17 19:12:49 localhost pppd[634]: Serial connection established.
+Jun 17 19:12:50 localhost pppd[634]: Using interface ppp0
+Jun 17 19:12:50 localhost pppd[634]: Connect: ppp0 &lt;--&gt; /dev/modem
+Jun 17 19:13:21 localhost pppd[634]: IPCP: timeout sending Config-Requests
+Jun 17 19:13:21 localhost pppd[634]: Connection terminated.
+Jun 17 19:13:22 localhost pppd[634]: Exit.
+Jun 17 19:19:23 localhost ifup-ppp: pppd started for ppp0 on /dev/modem at
+115200
+Jun 17 19:19:23 localhost pppd[864]: pppd 2.3.5 started by root, uid 0
+Jun 17 19:19:51 localhost pppd[864]: Serial connection established.
+Jun 17 19:19:52 localhost pppd[864]: Using interface ppp0
+Jun 17 19:19:52 localhost pppd[864]: Connect: ppp0 &lt;--&gt; /dev/modem
+Jun 17 19:20:23 localhost pppd[864]: IPCP: timeout sending Config-Requests
+Jun 17 19:20:23 localhost pppd[864]: Connection terminated.
+Jun 17 19:20:24 localhost pppd[864]: Exit.
+(END OF /VAR/LOG/MESSAGE)
+
+[SYSTEM INFORMATION]
+IBM Cyrix686 @ 300mHZ
+RAM 32mB
+S3VirgeDX(375) Video Driver (2mB onboard RAM)
+Hyundai HCM-428E SVGA Monitor
+4.3gB Samsung Hard Drive
+28.8kB KTX Fax/Modem (external) connects to /dev/cua1 [DOS=com2]
+
+[OPERATING SYSTEM(S)]
+RedHat 5.2 (Kernel 2.3.6 Developers Kernel)
+WinShit 95 (beta, i.e. stable) version
+I'm on a FULL installation (i.e. I have every pacakge that comes with 5.2
+installed)
+Whilst I've forgotten which daemons I actually run, an internet connection
+has successfully run with the daemons I now have running in the past
+
+[OTHER USEFUL INFORMATION]
+I *used* to be able to connect to SENET.COM.AU on 8405 9999 (the 56kB line)
+and 8239 6500 (the 33.6kB line) with no problems in WinShit or Linux
+
+I don't believe that my modem is a win modem
+
+I generally use "netcfg" to configure my ppp connections, checking it
+against linuxconf later.
+
+I have two ways of starting my PPP connection:
+ 1) I "su" to root, then open "netcfg" and activate my ppp connection
+(which is called ppp0)
+ 2) I do the equivalent of typing "/etc/sysconfig/network-scripts/sh ifup
+ppp0"
+
+THE PROBLEM
+
+After the usual screeching and squealing a message is logged saying 
+"
+  Jun 17 19:19:52 localhost pppd[864]: Connect: ppp0 &lt;--&gt; /dev/modem
+  Jun 17 19:20:23 localhost pppd[864]: IPCP: timeout sending Config-Requests
+  Jun 17 19:20:23 localhost pppd[864]: Connection terminated.
+"
+(and Netscape, licq and so forth don't see the DNS, or make http or any
+kind of connections)
+
+I switched to SENET's flat rate plan of $40 per month. The new number I
+dial is 8210 1300. I have contacted SENET customer support who have
+confirmed that my details there are correct. Additionally, I *am* able to
+connect to this phone number using my Windows Box.
+
+Furthermore I have previously been able to connect to SENET's other service
+lines (8239 6500 @ 33.6kB and 8405 9999 @ 56kB) using *EXACTLY* the same
+scripts with a the relevant phone numbers. I was able to do this under
+Kernel 2.0.36 and 2.3.6 with absolutely NO trouble. Of course, my modem
+does speak with the other modems properly - I know this because I get a
+connection message, but something goes wrong, and it's worked before.
+
+I have attempted these things:
+
+1)
+I manually edited out my old "ATDT82396500" and replaced the numbers with
+"ATDT82102300". I activated ppp0 using "netcfg" and also tried "sh ifup
+ppp0" - same message as above
+
+2)
+I "removed" ppp0 using "netcfg" and made a new ppp0. I made *certain* I
+used exactly the same options as I used to connect previously (to the old
+number 8278 6500) EXCEPT the change of number. I activated ppp0 using
+"netcfg" and also tried "sh ifup ppp0" - same message as above
+
+3)
+I used linuxconf to create the various bits and pieces; same message
+
+4)
+I reinstalled RedHat 5.2 *totally*. Went through steps 1, 2 and 3. Same
+message no matter what Kernel version I decided to use.
+
+3)
+I had SENET send me various scripts similar to those shown on their help
+page for LINUX. Essentially one enters the scripts and runs pppd DIRECTLY
+as root. I've never been able to get this method to work properly and
+surprisingly enough it didn't...besides which I'm able to actually get the
+other method to work (with some scripting) as a non-super-user.
+
+4)
+I considered dunking the computer in the fish pond...but that might just
+make the problem worse
+
+To be honest, this feels like a "one minute it's working, next minute it
+just decides it's not working" type problem. I have absolutely NO idea
+what's wrong because it has worked before and I'm kinda hoping it will work
+again.
+
+Anyone got any clues???
+
+DAVID.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

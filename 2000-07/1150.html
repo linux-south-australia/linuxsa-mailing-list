@@ -1,0 +1,144 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Limitations of pipes?  (Was Re: Gui vs Cli)" -->
+<!-- FromName="Mark Phillips" -->
+<!-- FromEmail="mark@ist.flinders.edu.au" -->
+<!-- ToName="Linux SA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 21 Jul 2000 08:51:38 +0930" -->
+<!-- Id="20000721085138.F25281@destiny.ist.flinders.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Limitations of pipes?  (Was Re: Gui vs Cli)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Phillips &lt;<I><A HREF="mailto:mark@ist.flinders.edu.au">mark@ist.flinders.edu.au</A></I>&gt;
+  To  : Linux SA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 21 Jul 2000 08:51:38 +0930
+</PRE>
+<H1>Limitations of pipes?  (Was Re: Gui vs Cli)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I recently had a dvi file which I wanted to view using xdvi, but it
+was gzipped.  Instead of gzipping it and then viewing it, I wanted to
+do something like this:
+
+zcat filename.dvi.gz | xdvi -
+
+The only problem is that xdvi does not have this option of accepting
+standard input.  I tried to get around this by doing:
+
+mkfifo mypipe
+
+zcat filename.dvi.gz &gt; mypipe &
+xdvi mypipe &
+
+But it came back with the error "xdvi.bin: DVI file corrupted" so that
+didn't work.  In the end I gave up and just did zcat to a temp file
+and used that.
+
+But I still haven't got to my point.  Just suppose xdvi did allow
+standard input --- then you could use pipes.  But one feature of xdvi
+is that if you update the file (ie you run latex again), xdvi rereads
+the file and displays the updated version.  But with pipes, you
+receive the stream once and then that's it!  Perhaps the pipe protocol
+could be changed so that you could receive multiple streams, one after
+the other until someone said stop?  Would this be a valuable
+improvement to pipes, or is it the wrong layer to be adding such
+functionality?
+
+With the Gui vs Cli debate, one idea would be to implement Cli
+structures graphically.  Command lines are powerful, but they are
+linear, which means they don't express some structures as well as
+others.  With pipes, it seems natural to allow pipes between things in
+a graph like structure.  Who says programs need have only one input or
+output?  (And indeed they don't, take standard error for example ---
+but expressing multiple outputs is tricky on a command line.)  You
+could could express a graph like structure of interactions between
+different programs much more easily graphically.
+
+I can envisage the following setup being useful.  In a graphfical
+"pipes setup" interface, you connect up the following picture:
+
+            [latex filename1.tex]      [latex filename2.tex]
+                      \                        /
+                       \                      /        
+                        \                    /        
+                         \                  /        
+                          \                /        
+                           \______________/
+                                [xdvi]        
+                                  |
+                                  |
+                                  \/
+                            [some window]
+
+Having set up the structure, every time you want to update your view
+of filename1, you click on [latex filename1.tex], and it sends a new
+stream down the pipe.  If you want to see filename2, you click on the
+other latex node.
+
+I imagine there could be much more complexity with this kind of setup.
+For example, you could add "switches", meaning you could use some kind
+of test to see which input to accept.  You could add "delays" which
+postponed the sending of something along a pipe until something else
+was done.  I imagine there are all sorts of other things you could do.
+And it could be done in a way that gave you all the power of a CLI and
+more besides.  Well, I'm sure a CLI could be made to do all this, but
+not easily or in a way that was intuitively done.  Of course, with the
+graphical interface, there would still be places for entering linear
+stuff, for example the conditions at "switches" would be best added
+using linear expression.
+
+I think the time has come to design a tool which represents the power
+of the command line graphfically.
+
+Actually, the ideal thing would be to have something like lyx for
+shell programming.  Express your shell programming graphically, and
+then convert this into shell code.
+
+Cheers,
+
+Mark.
+
+-- 
+_/~~~~~~~~\___/~~~~~~\____________________________________________________
+____/~~\_____/~~\__/~~\__________________________Mark_Phillips____________
+____/~~\_____/~~\<A HREF="mailto:________________________________mark@ist.flinders.edu.au_">________________________________mark@ist.flinders.edu.au_</A>
+____/~~\HE___/~~\__/~~\APTAIN_____________________________________________
+____/~~\______/~~~~~~\____________________________________________________
+__________________________________________________________________________
+        "They told me I was gullible ... and I believed them!" 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

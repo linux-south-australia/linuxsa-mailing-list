@@ -1,0 +1,472 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: database connection [long reply with code]" -->
+<!-- FromName="'dcd'" -->
+<!-- FromEmail="azmon@eml.cc" -->
+<!-- ToName="'D B'" -->
+<!-- ToEmail="tsujigiri@japan.com" -->
+<!-- Date="Mon, 02 Sep 2002 19:38:46 -0400" -->
+<!-- Id="3D73F686.9070006@eml.cc" -->
+<!-- Reference="20020902022420.37122.qmail@mail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: database connection [long reply with code]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: dcd &lt;<I><A HREF="mailto:azmon@eml.cc">azmon@eml.cc</A></I>&gt;
+  To  : D B &lt;<I><A HREF="mailto:tsujigiri@japan.com">tsujigiri@japan.com</A></I>&gt;
+  Date: Mon, 02 Sep 2002 19:38:46 -0400
+</PRE>
+<H1>Re: database connection [long reply with code]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Perfect.
+    I've started to do something similar in Java, but wasn't sure how to 
+address some of it. I've only had a quick sqiz through it, but it looks 
+like I can combine the two.
+
+Thanks
+dcd
+
+ps Update on current Status. I did the quick fix for the current problem 
+and exported it on their system to a .csv file and then built the mysql 
+db from there. (Quick & Dirty, but it did enough to work out the 
+required sql statements ) For my own satisfaction I've continued 
+although at a somewhat slower pace to try and solve the original problem.
+
+ie converting a blabla.mbd to a useable mysql database
+ 
+D B wrote:
+
+&gt;Hello.
+&gt;
+&gt;I thought you might be interested in this Access module code.  It takes an Access database and creates an SQL script for MySQL to rebuild it data and all.  It's a bit old (made in 97) but usually works quite well.  But I've only used it on simple databases.  
+&gt;
+&gt;Best of luck with your efforts.
+&gt;
+&gt;Damien Byrne
+&gt;IT Support and Development
+&gt;Cardiac Surgical Research,
+&gt;Dept of Cardiac Surgery,
+&gt;Flinders Medical Centre,
+&gt;Bedford Park, Adelaide, South Australia, 5042
+&gt;
+&gt;Tel: 61 8 8404 2016
+&gt;Ext: 62016
+&gt;E-mail: <A HREF="mailto:damien.byrne@fmc.sa.gov.au">damien.byrne@fmc.sa.gov.au</A>
+&gt;
+&gt;-------------------------------------------------
+&gt;
+&gt;I originally found it here:
+&gt;
+&gt;<A HREF="http://www.bitmechanic.com/mail-archives/mysql/Jul1997/0887.html">http://www.bitmechanic.com/mail-archives/mysql/Jul1997/0887.html</A>
+&gt;
+&gt;And here is my reformatted version (avert your eyes if VBA is offensive to you, I know it is to me ;)
+&gt;
+&gt;&lt;VBA Module&gt;
+&gt;
+&gt;
+&gt;Option Compare Database
+&gt;Option Explicit
+&gt;
+&gt;Function export_mysql()
+&gt;    
+&gt;    ' Exports the database contents into a file in mysql format
+&gt;    ' IS NOT SELECTIVE! (exports ALL tables)
+&gt;    
+&gt;    ' version 1.00  August 1997
+&gt;    
+&gt;    ' INSTRUCTIONS
+&gt;    
+&gt;    'Paste this function into an Access module of a database which has the
+&gt;    'tables you want to export. Create a macro with the function RunCode and the
+&gt;    'argument export_mysql (). Run the macro to start the export.
+&gt;    
+&gt;    
+&gt;    Dim dbase As Database, tdef As Recordset, i As Integer, fd As Integer, tname As String, j As Integer, iname As String
+&gt;    Dim s As String, found As Integer, stuff As String, idx As Index, k As Integer, f As Integer, fld As Field, istuff As String
+&gt;
+&gt;    Set dbase = CurrentDb()
+&gt;    
+&gt;    'Open the file to export the defintions and data to. Change this to suit your needs ****
+&gt;    
+&gt;    Open "c:\temp\mysqldump.txt" For Output As #1
+&gt;
+&gt;    Print #1, "# Converted from MS Access to mysql "
+&gt;    Print #1, "# by Brian Andrews, (c) InforMate (www.informate.co.nz), <A HREF="mailto:brian@informate.co.nz">brian@informate.co.nz</A>, 1997"
+&gt;    Print #1, ""
+&gt;
+&gt;    'Go through the table definitions
+&gt;
+&gt;
+&gt;    For i = 0 To dbase.TableDefs.Count - 1
+&gt;    
+&gt;         
+&gt;        ' Let's take only the visible tables
+&gt;        
+&gt;        If ((dbase.TableDefs(i).Attributes And DB_SYSTEMOBJECT) Or (dbase.TableDefs(i).Attributes And DB_HIDDENOBJECT)) Then
+&gt;        
+&gt;        Else
+&gt;            
+&gt;            ' We DROP the table if it already exists
+&gt;            ' and then create it again
+&gt;            
+&gt;                    tname = "" & dbase.TableDefs(i).Name
+&gt;                    
+&gt;                       'remove spaces from tablename
+&gt;            
+&gt;                        For j = 1 To Len(tname)
+&gt;
+&gt;                        If j &lt; Len(tname) Then
+&gt;
+&gt;                        If Mid$(tname, j, 1) = " " Then
+&gt;
+&gt;
+&gt;                        s = Left$(tname, j - 1)
+&gt;                        s = s & "" & Right$(tname, Len(tname) - j)
+&gt;                        j = j + 1
+&gt;                        found = True
+&gt;                        tname = s
+&gt;
+&gt;                        End If
+&gt;                        End If
+&gt;
+&gt;                        Next j
+&gt;            
+&gt;            'restrict tablename to 19 chars
+&gt;            
+&gt;            tname = Left$(tname, 19)
+&gt;            
+&gt;            
+&gt;            'comment out these lines if the table doesn't exist or else create it first
+&gt;            
+&gt;            Print #1, ""
+&gt;            Print #1, ""
+&gt;            Print #1, "DROP TABLE " & tname & "\g"
+&gt;            
+&gt;            
+&gt;            Print #1,
+&gt;            Print #1, "CREATE TABLE " & tname & "("
+&gt;            
+&gt;          
+&gt;            ' Step through all the fields in the table
+&gt;            
+&gt;            For fd = 0 To dbase.TableDefs(i).Fields.Count - 1
+&gt;            
+&gt;                        
+&gt;                Dim tyyppi As String, pituus As Integer, comma As String
+&gt;                Select Case dbase.TableDefs(i).Fields(fd).Type
+&gt;                    Case DB_BOOLEAN
+&gt;                        tyyppi = "SMALLINT"
+&gt;                    Case DB_INTEGER
+&gt;                        tyyppi = "SMALLINT"
+&gt;                    Case DB_BYTE
+&gt;                        tyyppi = "TINYBLOB"
+&gt;                    Case DB_LONG
+&gt;                        tyyppi = "INT"
+&gt;                    Case DB_DOUBLE
+&gt;                        tyyppi = "DOUBLE"
+&gt;                    Case DB_SINGLE '
+&gt;                        tyyppi = "REAL"
+&gt;                    Case DB_CURRENCY
+&gt;                        tyyppi = "DOUBLE (8,4)"
+&gt;                    Case DB_TEXT
+&gt;                         pituus = dbase.TableDefs(i).Fields(fd).Size
+&gt;                         tyyppi = "CHAR (" & pituus & ")"
+&gt;                    Case dbAutoIncrField
+&gt;                        tyyppi = "INT NOT NULL AUTO_INCREMENT"
+&gt;                    
+&gt;                    'Access Date fields are set as the mysql date type - you can change this to
+&gt;                    'DATETIME if you prefer.
+&gt;                    
+&gt;                    Case DB_DATE
+&gt;                         tyyppi = "DATE"
+&gt;                    Case DB_MEMO, DB_LONGBINARY
+&gt;                         tyyppi = "BLOB"
+&gt;                                     
+&gt;                End Select
+&gt;                
+&gt;            
+&gt;                'Print the field definition
+&gt;                    
+&gt;                'remove spaces from fieldname
+&gt;                
+&gt;                       stuff = "" & dbase.TableDefs(i).Fields(fd).Name
+&gt;                
+&gt;                'we had a table called Index which mysql doesn't like
+&gt;                
+&gt;                        If stuff = "Index" Then stuff = "Indexm"
+&gt;                        
+&gt;                        For j = 1 To Len(stuff)
+&gt;
+&gt;                        If j &lt; Len(stuff) Then
+&gt;
+&gt;                        If Mid$(stuff, j, 1) = " " Then
+&gt;
+&gt;
+&gt;                        s = Left$(stuff, j - 1)
+&gt;                        s = s & "" & Right$(stuff, Len(stuff) - j)
+&gt;                        j = j + 1
+&gt;                        found = True
+&gt;                        stuff = s
+&gt;
+&gt;                        End If
+&gt;                        End If
+&gt;
+&gt;                        Next j
+&gt;               
+&gt;               stuff = Left$(stuff, 19)
+&gt;               
+&gt;               'not null
+&gt;                If dbase.TableDefs(i).Fields(fd).Required = True Then
+&gt;                    tyyppi = tyyppi & " NOT NULL "
+&gt;                End If
+&gt;                    
+&gt;                'default value
+&gt;                
+&gt;                If (Not (IsNull(dbase.TableDefs(i).Fields(fd).DefaultValue)) And dbase.TableDefs(i).Fields(fd).DefaultValue &lt;&gt; "") Then
+&gt;                    
+&gt;                    If dbase.TableDefs(i).Fields(fd).Required = False Then
+&gt;                        tyyppi = tyyppi & " NOT NULL "
+&gt;                    End If
+&gt;                    
+&gt;                    If Left$(dbase.TableDefs(i).Fields(fd).DefaultValue, 1) = Chr(34) Then
+&gt;                        tyyppi = tyyppi & " DEFAULT '" & Mid$(dbase.TableDefs(i).Fields(fd).DefaultValue, 2, Len(dbase.TableDefs(i).Fields(fd).DefaultValue) - 2) & "'"
+&gt;                    Else
+&gt;                        tyyppi = tyyppi & " DEFAULT " & dbase.TableDefs(i).Fields(fd).DefaultValue
+&gt;                    End If
+&gt;                    
+&gt;                End If
+&gt;                
+&gt;            'print out field info
+&gt;                comma = ","
+&gt;                
+&gt;                If fd = dbase.TableDefs(i).Fields.Count - 1 Then
+&gt;                
+&gt;                    If dbase.TableDefs(i).Indexes.Count = 0 Then
+&gt;                        comma = ""
+&gt;                    Else
+&gt;                        comma = ","
+&gt;                    End If
+&gt;                End If
+&gt;                
+&gt;                Print #1, "     " & stuff & " " & tyyppi & comma
+&gt;            
+&gt;            Next fd
+&gt;                  
+&gt;                
+&gt;            'primary key and other index declaration
+&gt;               
+&gt;               k = 0
+&gt;               
+&gt;               
+&gt;               For Each idx In dbase.TableDefs(i).Indexes
+&gt;            
+&gt;            'Check Primary property
+&gt;            
+&gt;               k = k + 1
+&gt;               
+&gt;                If idx.Primary Then
+&gt;                    istuff = "     PRIMARY KEY ("
+&gt;                Else
+&gt;                    istuff = "     KEY ("
+&gt;                End If
+&gt;                
+&gt;                    f = 0
+&gt;                    
+&gt;                    For Each fld In idx.Fields
+&gt;                        f = f + 1
+&gt;                        iname = fld.Name
+&gt;                        
+&gt;                        For j = 1 To Len(iname)
+&gt;
+&gt;                        If j &lt; Len(iname) Then
+&gt;
+&gt;                        If Mid$(iname, j, 1) = " " Then
+&gt;
+&gt;
+&gt;                        s = Left$(iname, j - 1)
+&gt;                        s = s & "" & Right$(iname, Len(iname) - j)
+&gt;                        j = j + 1
+&gt;                        found = True
+&gt;                        iname = s
+&gt;
+&gt;                        End If
+&gt;                        End If
+&gt;
+&gt;                        Next j
+&gt;                        
+&gt;                        istuff = istuff & iname
+&gt;                        
+&gt;                        If f &lt; idx.Fields.Count Then
+&gt;                            istuff = istuff & ","
+&gt;                        End If
+&gt;                        
+&gt;                    Next fld
+&gt;                    
+&gt;                    If k &lt; dbase.TableDefs(i).Indexes.Count Then
+&gt;                    
+&gt;                        Print #1, istuff & "),"
+&gt;                    Else
+&gt;                        Print #1, istuff & ")"
+&gt;                                          
+&gt;                    End If
+&gt;                    
+&gt;                
+&gt;                Next idx
+&gt;    
+&gt;                                          
+&gt;                
+&gt;            Print #1, ")\g"
+&gt;            Print #1, ""
+&gt;        
+&gt;               
+&gt;            Dim recset As Recordset
+&gt;            Dim row As String, it As String
+&gt;            Dim is_string As String, reccount As Integer, X As Integer
+&gt;            
+&gt;            Set recset = dbase.OpenRecordset(dbase.TableDefs(i).Name)
+&gt;            
+&gt;            reccount = recset.RecordCount
+&gt;            
+&gt;            
+&gt;            If reccount &lt;&gt; 0 Then
+&gt;            
+&gt;            ' Step through the rows in the table
+&gt;            
+&gt;            recset.MoveFirst
+&gt;            Do Until recset.EOF
+&gt;                 
+&gt;                row = "INSERT INTO " & tname & " VALUES ("
+&gt;                
+&gt;                ' Go through the fields in the row
+&gt;                
+&gt;                For fd = 0 To recset.Fields.Count - 1
+&gt;                           
+&gt;                    is_string = ""
+&gt;                    stuff = "" & recset.Fields(fd).Value
+&gt;                    
+&gt;                    Select Case recset.Fields(fd).Type
+&gt;                    Case DB_BOOLEAN
+&gt;                        
+&gt;                        'true fields are set to 1, false are set to 0
+&gt;                        
+&gt;                        If recset.Fields(fd).Value = True Then
+&gt;                            stuff = "0"
+&gt;                        Else
+&gt;                            stuff = "1"
+&gt;                        End If
+&gt;                        
+&gt;                    Case DB_TEXT, DB_MEMO, 15, DB_LONGBINARY
+&gt;                        is_string = "'"
+&gt;                    Case DB_DATE
+&gt;                        is_string = "'"
+&gt;                        
+&gt;                        'format date fields to YYYY-MM-DD. You may want to add time formatting as
+&gt;                        'well if you have declared DATE fields as DATETIME
+&gt;                        
+&gt;                        If stuff &lt;&gt; "" And Not (IsNull(stuff)) Then
+&gt;                            stuff = Format(stuff, "YYYY-MM-DD")
+&gt;                        End If
+&gt;                    Case Else
+&gt;                        
+&gt;                        'default empty number fields to 0 - comment this out if you want
+&gt;                        
+&gt;                        If stuff = "" Then
+&gt;                            stuff = "0"
+&gt;                        End If
+&gt;                    End Select
+&gt;                                                                          
+&gt;              '**** escape single quotes
+&gt;
+&gt;                    X = InStr(stuff, "'")
+&gt;                    
+&gt;                    While X &lt;&gt; 0
+&gt;                        s = Left$(stuff, X - 1)
+&gt;                        s = s & "\" & Right$(stuff, Len(stuff) - X + 1)
+&gt;                        stuff = s
+&gt;                        X = InStr(X + 2, stuff, "'")
+&gt;                    Wend
+&gt;                    
+&gt;                 '**** convert returns to &lt;br&gt;'s
+&gt;                 
+&gt;                 X = InStr(stuff, Chr(13))
+&gt;                    
+&gt;                    While X &lt;&gt; 0
+&gt;                        s = Left$(stuff, X - 1)
+&gt;                        s = s & "&lt;br&gt;" & Right$(stuff, Len(stuff) - X - 1)
+&gt;                        stuff = s
+&gt;                        X = InStr(X + 2, stuff, Chr(13))
+&gt;                    Wend
+&gt;                    
+&gt;                    row = row & is_string & stuff & is_string
+&gt;                    
+&gt;                    If fd &lt; recset.Fields.Count - 1 Then
+&gt;                        row = row & ","
+&gt;                    End If
+&gt;                Next fd
+&gt;                
+&gt;                ' Add trailers and print
+&gt;                
+&gt;                row = row & ")\g"
+&gt;                Print #1, row
+&gt;                
+&gt;                ' Move to the next row
+&gt;                
+&gt;                recset.MoveNext
+&gt;            Loop
+&gt;        
+&gt;            recset.Close
+&gt;            Set recset = Nothing
+&gt;        
+&gt;        End If
+&gt;    End If
+&gt;    Next i
+&gt;    
+&gt;  
+&gt;    
+&gt;    Close #1
+&gt;    
+&gt;    dbase.Close
+&gt;    Set dbase = Nothing
+&gt;
+&gt;End Function
+&gt;
+&gt;&lt;/VBA Module&gt;
+&gt;  
+&gt;
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,171 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Does GNU "cp -a" do any error checking as it copies?" -->
+<!-- FromName="Mark Phillips" -->
+<!-- FromEmail="mark@ist.flinders.edu.au" -->
+<!-- ToName="Daryl Tester" -->
+<!-- ToEmail="dt@picknowl.com.au" -->
+<!-- Date="Fri, 13 Oct 2000 20:45:24 +0930" -->
+<!-- Id="20001013204524.C498@destiny.ist.flinders.edu.au" -->
+<!-- Reference="39E6E067.F2A1F8E7@picknowl.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Does GNU "cp -a" do any error checking as it copies?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Phillips &lt;<I><A HREF="mailto:mark@ist.flinders.edu.au">mark@ist.flinders.edu.au</A></I>&gt;
+  To  : Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  Date: Fri, 13 Oct 2000 20:45:24 +0930
+</PRE>
+<H1>Re: Does GNU "cp -a" do any error checking as it copies?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Daryl Tester [<A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A>] wrote:
+
+&gt; Mark Phillips wrote:
+&gt; 
+&gt; &gt; But surely at disk I/O driver or hardware level, only a certain amount
+&gt; &gt; of integrity checking can be done?
+&gt; 
+&gt; Perhaps, but you're not gaining that much by having cp do a verify after
+&gt; write either.  Take your first suggestion (I think it was yours) where
+&gt; you do a checksum of a block, then compare that.  Any algorithm that
+&gt; reduces 'x' bits to 'y' (where y &lt; x) suffers from information loss, and
+&gt; stands a very small (but non-zero) chance of not detecting corruption, so
+&gt; now you have this safe and cozy feeling while several bits of your data
+&gt; have changed state, possibly rendering someone to the opposite sex or
+&gt; increasing their bank balance by several orders of magnitude.
+
+I accept your point about information reduction meaning corruption
+might not be detected.  But you can still reduce the probability of
+corruption without detection drastically.  Take for example parity,
+where your check is a single bit.  Suppose there is a 1/1000 chance of
+any given bit flipping (for the sake of the argument --- in practice
+this would be much smaller).  If we have 8 bits we are interested in.
+The probability of there being at least one bit in error of
+1-(999/1000)^8 which is about 0.008.  If we introduce parity, which
+will detect an odd number of errors, then we have a probability of
+non-detection of an error of
+28*0.999^6*0.001^2+70*0.999^4*0.001^4+28*0.999^2*0.001^6+0.001^8 which
+is about 0.000028, ie it is a probability which is about 300 times
+better than without parity.
+
+And of course, if you know something more about the probability model
+of the error processes, then you can design your redundancy so that
+the probabilities do much better!  Parity is in some ways a simple
+minded approach, so you would probably want to use something more
+sophisticated for error checking, but even with that we do quite well
+(unless of course you have an error process that generates errors in
+pairs!)
+
+So I don't accept your point about not gaining much by doing a verify.
+If your point was valid, then there wouldn't be much point in md5sum
+checks either!
+
+&gt; Even if you do compare the data immediately, what about spontaneous
+&gt; disk decay?  Your data has been copied and verified as correct, _then_
+&gt; your data goes faulty (admittedly this takes a while to happen, but
+&gt; again it's a non-zero chance).  Normally, disk block checksums pick
+&gt; that up, but see above.
+
+Okay, I suppose I'm a bit ignorant about the relative risks.  I had
+thought that copying a whole partition (a large one) to another
+partition may be a slightly more risky operation than most others.
+But I might be quite wrong about this.  I don't have parity RAM, and I
+assumed that the reason parity RAM exists is because there is the
+occasional error that occurs.  Given that I don't have parity RAM, I
+thought that perhaps for more risky operations, it might be
+advantageous to use some software checks.  But perhaps I haven't got
+an accurate perspective of the relative risks.
+
+&gt; &gt; For example if you have RAM corruption happening (and don't have
+&gt; &gt; parity RAM), then disk I/O won't pick it up.
+&gt; 
+&gt; Isn't the moral here to run parity RAM?  (Actually, the moral is
+&gt; to run ECC; see above ...).
+
+Well that's a good question.  How important is having parity RAM?
+What are the risks?  And secondly, given that I don't have parity RAM,
+what are ways of reducing my risk exposure to it.  Having cp do error
+checking is one way.
+
+&gt; &gt; And besides, what if you don't know how good your disk
+&gt; &gt; I/O driver and hardward do things?
+&gt; 
+&gt; So you'll be reading the cached contents of what you've just written.
+&gt; Cosy.  Or you'll trust the driver that just wrote the block incorrectly
+&gt; to read it back correctly.  Cosier.
+
+You don't need to trust the driver --- if it makes an error reading it
+back as well, the error is still likely to be detected (using
+something more sophisticated than parity).
+
+As for the cache stuff, I think the same comment applies.  Except that
+perhaps the data only gets written to cache not to the disk?  Can you
+force a flush to disk or something?
+
+&gt; Risk in computing is a funny thing.
+
+True.  I suppose the real issue is, how much risk is there in copying
+around large filesystems?  Is it worth taking special measures to
+check for errors when doing so?
+
+&gt; &gt; Michael Neuling just sent me (and to the list) a good way of doing an
+&gt; &gt; integrity check by hand using md5sum.  Why not have cp do something
+&gt; &gt; like this itself, or at least have it as an option?
+&gt; 
+&gt; Because Michael's method is built from tools that makes Unix king
+&gt; over NT.  Or is this a trick question designed to flush out my fake
+&gt; MCSE?
+
+What is MCSE?
+
+&gt; &gt; I can't see why the idea is absurd and warrants a beating!
+&gt; 
+&gt; David is probably itching to try out his new cat o' nine tails
+&gt; he smuggled back through customs.
+
+I'd better watch myself then! :-)
+
+Mark.
+
+-- 
+_/~~~~~~~~\___/~~~~~~\____________________________________________________
+____/~~\_____/~~\__/~~\__________________________Mark_Phillips____________
+____/~~\_____/~~\<A HREF="mailto:________________________________mark@ist.flinders.edu.au_">________________________________mark@ist.flinders.edu.au_</A>
+____/~~\HE___/~~\__/~~\APTAIN_____________________________________________
+____/~~\______/~~~~~~\____________________________________________________
+__________________________________________________________________________
+        "They told me I was gullible ... and I believed them!" 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,156 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: sshd message query (from a newbie)" -->
+<!-- FromName="David Lloyd" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="Paul Malcolm Bailey" -->
+<!-- ToEmail="pmbailey@senet.com.au" -->
+<!-- Date="Fri, 08 Sep 2000 15:01:06 +0930" -->
+<!-- Id="39B8799A.B45C8EEE@rebel.net.au" -->
+<!-- Reference="39B5F806.4012C539@senet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: sshd message query (from a newbie)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : Paul Malcolm Bailey &lt;<I><A HREF="mailto:pmbailey@senet.com.au">pmbailey@senet.com.au</A></I>&gt;
+  Date: Fri, 08 Sep 2000 15:01:06 +0930
+</PRE>
+<H1>Re: sshd message query (from a newbie)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Paul!
+
+&gt; Aug  9 21:54:19 localhost sshd: error: Could not load host key:
+&gt; /etc/ssh/ssh_host_key: No such file or directory
+&gt; Aug  9 21:54:19 localhost sshd: sshd startup failed
+
+Those messages mean exactly what they mean. Check it manually:
+
+* ls /etc/ssh/ssh_host_key
+* ps ax | grep sshd
+
+&gt; Why am I getting this message?  I haven't configured or set up my
+&gt; machine to run sshd (since I'm not running this machine as a host; it's
+&gt; purely a desktop Linux box), but I also wouldn't know how to remove sshd
+&gt; either!
+
+You've answered this in part yourself. SSH uses ssh_host_key as a token
+to identify itself and to encrypt various parts of the protocol.
+Obviously if you haven't setup SSH then it can't find the host key!
+
+&gt; So I guess I have two options:  set up the machine so it runs sshd
+&gt; (which would be pointless, since I don't login to this machine), or
+&gt; alter the bootup process so that it doesn't seek to run the ssh daemon.
+
+That's absolutely correct.
+
+&gt; How do I do the latter, or is it something I have to recompile out of
+&gt; the kernel?
+
+You need to learn about the intricacies of the Linux startup. You have
+the following directory:
+
+* /etc/rc.d
+
+In that directory are files such as:
+
+* /etc/rc.d/rc.local
+
+And other directories such as:
+
+* /etc/rc.d/rc3.d
+            ^^^
+You'll also see rc1, rc2 and rc5. You may see more.
+
+At startup you have a default run level. You can find out your default
+by looking in /etc/inittab and searching for a line like:
+
+* id:3:initdefault:
+
+The run level is the "3". This corresponds to /etc/rc.d/rc3.d [save this
+for later reference]. The general run levels on my RedHat system can be
+described as:
+
+Run Level 0 - shutdown
+Run Level 1 - single user
+Run Level 2 - all services except network services (but a console login)
+Run Level 3 - all services including network services (but a console
+login)
+Run Level 4 - not used
+Run Level 5 - Same as 3, but X is automatically started and a graphical
+login prompt is presented
+Run Level 5 - shutdown
+
+You're probably 3 or 5.
+
+Now, in /etc/rc3.d (or rc5.d) you'll notice files with names like:
+
+* S80httpd
+* K01linuxconf
+
+The text (httpd or linuxconf) tends to be referenced or relate to the
+service to be started or killed. S means the service runs or is started.
+K means the service does not run or is killed [stopped]. 
+
+(1) Note: services don't need to be given SENSIBLE textual
+names...S80ridiculous is just as valid as S80httpd if the script they
+refer to conforms to the standards I'm speaking of
+
+Despite this note, the one you're looking for would be something like:
+
+* S55ssh
+
+LOOK for the ssh in the name. You can manually change the S to a K:
+
+* mv S55ssh K55ssh
+
+HOWEVER there is a different way. If you're running a RedHat style
+system, you can use the chkconfig command:
+
+* chkconfig --level 2345 ssh off
+
+Do a man chkconfig (or a man mv if you don't know about the mv command).
+Try the chkconfig command AFTER READING CHKCONFIG'S MAN PAGES to see if
+it exists on your system...
+
+DL
+
+-- 
+The Linux C and C++ Home Pages:
+ * <A HREF="http://www.rebel.net.au/~lloy0076/linux_c_programming/index.html">http://www.rebel.net.au/~lloy0076/linux_c_programming/index.html</A>
+ ( *** fw.tellurian.com.au can't find f!@#k.com: Non-existent
+host/domain )
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

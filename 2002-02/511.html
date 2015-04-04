@@ -1,0 +1,241 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Notes on setting up Toshiba TE2000 Laptop with Windows XP Pro, RedHat 7.2, FreeBSD 4.5 and Solaris 8." -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'LinuxSA (E-mail)'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 14 Feb 2002 20:14:17 +1030" -->
+<!-- Id="002201c1b53c$2bd7e940$0c00a8c0@albert" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Notes on setting up Toshiba TE2000 Laptop with Windows XP Pro, RedHat 7.2, FreeBSD 4.5 and Solaris 8.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : LinuxSA (E-mail) &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 14 Feb 2002 20:14:17 +1030
+</PRE>
+<H1>Notes on setting up Toshiba TE2000 Laptop with Windows XP Pro, RedHat 7.2, FreeBSD 4.5 and Solaris 8.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi guys -- I'm almost finished installing too many OS's on my laptop,
+and I thought I'd write some notes on how I did it... They are from
+memory, and are not complete (and nor am I -- I'm still at step 13
+below, but hope the rest is easy :)
+
+Feel free, ye who are interested, to take a read, and see if you can
+correct me, or contribute, or just form a negative opinion of me based
+on this shoddy piece of workmanship...
+
+rr
+
+-----
+
+Notes on setting up Toshiba TE2000 Laptop with Windows XP Pro, RedHat
+7.2, FreeBSD 4.5 and Solaris 8.
+
+1.	Install Windows XP using standard Toshiba install CDs (or just
+start with how it came from the factory). It's advisable not to install
+other software here, because if things go wrong later, which they most
+likely will, you may have to start again. ~1 hour
+2.	Use Partition Magic 7 (or your favourite NTFS-capable fs and
+partition shrinker - I don't think there's any free ones worth trusting)
+to shrink the Windows XP NTFS partition to around 6Gb, rather than the
+default 18Gb (the entire drive). ~30 mins
+3.	Use Linux' fdisk to partition the rest of the disk as follows:
+hda1	NTFS (Windows XP)
+hda2	DOS Extended (for Linux)
+hda3	BSD
+hda4	Solaris - with a few cylinders gap on either side
+Don't worry about the Linux partitions at this stage -- most linuces
+will install in logical partitions quite happily, so you will create
+hda5-n within hda2 later.
+Also note that it's important to leave a few cylinders gap before and
+after the Solaris partition - the Solaris fdisk is very painful, and is
+likely to break your partition table, or insist that you have
+overlapping partitions when you don't. There may be a more sensible
+workaround to this, but I am not aware of it. ~10 mins
+4.	Install FreeBSD 4.4 (well, that's the CDs I had), taking care to
+install it on /dev/ad0s3 - the third DOS slice on the first IDE disk. It
+can do its own partitioning thing from there. Install the minimum - at
+this stage, you just want to make sure everything boots and is workable,
+then worry about spending the time installing and/or compiling more
+software. (then again, you probably want to get the most advantage from
+your CDROMs, so you may as well install everything you can, and then use
+CVSup later to update it) Stay in text mode, and don't worry about X at
+this stage - you'll be compiling and configuring XFree86 4 soon. ~1 hour
+5.	Install Solaris 8 by booting from the "Applications CD 1 of 2"
+rather than the Install CD. The Install CD uses "WebStart", which has an
+even more broken fdisk, and generally won't install all the way. This
+one starts a basic X server, taking up a small window in the centre of
+your screen. It's annoying, because not only does it make you scroll
+within the little window to see the higher virtual resolution, but it
+won't let you scroll enough to see all the buttons, so you have to move
+windows around to see which button to click, and occasionally are forced
+to guess. Again, don't worry about X or extra software - just install
+the stuff from the CD, and reboot ~1.5 hours
+6.	At each stage here, each OS installs its own bootloader. Win XP
+just loads Win XP. FreeBSD's will let you use the F-Keys to select "??"
+(Win XP), "FreeBSD" or "??" (the presently empty Solaris partition -
+IIRC, it ignores the Extended partition). Solaris will let you choose
+any of the primary partitions to boot from. It's quite likely that you
+will still be able to boot each OS at each stage, but don't worry if you
+can't - GRUB will cure your ills.
+7.	Install RedHat (or Debian, or Sorcerer, or whatever, for that
+matter - just make sure you can use GRUB). RedHat, if you choose the
+graphical install, will also open up an irritatingly small window, like
+Solaris. I recommend the text based install. Again, don't worry about X
+configuration for now, nor any apps. ~1 hour
+8.	Now we come to the GRUBby bit. RedHat, by default, sets GRUB up
+to boot whatever it can find - which for me, meant Win XP and RedHat
+itself. I don't think it noticed FreeBSD or Solaris. Add lines similar
+to the following to your /etc/grub.conf:
+other
+This is actually quite a delicate operation, and if you get it wrong,
+it's quite possible that almost nothing will boot. It's important to at
+_least_ get the RedHat bit right (so then you can fix it if the rest is
+wrong). Read the GRUB HOW-TO, especially the bit on numbering - it's not
+intuitive in any sense of the word. Then run grub-install (I believe
+grub-install is deprecated, or not recommended, but I don't know what
+else to use - I'm kind of using it like LILO). ~15 minutes (check it,
+check it again - use fdisk to ensure you got it right, etc)
+9.	Reboot about 8 times - twice per OS - to ensure that it all
+works, and that booting one doesn't mess up the other(s). Solaris will
+still want to run it's own bootloader, but it's advisable not to try
+loading anything else from there. If "stuff" doesn't work as expected,
+you're on your own - try messing about with a linuxcare bootable
+business card CD, or whatever OS is working, plus the install disks, and
+see what you can do. Also note that these notes are written from memory,
+and may be wrong - if so, please email me ASAP with your comments and/or
+corrections.
+10.	For me, network configuration was trivial under all OS's - I
+used the standard tools, and it all worked. My Toshiba has a built in
+Intel 8225x 10/100 ethernet card, and it's well supported.
+11.	Boot RedHat. Install this file
+(<A HREF="http://www.cs.helsinki.fi/linux/XF86Config-4">http://www.cs.helsinki.fi/linux/XF86Config-4</A>) as /etc/X11/XF86Config-4
+to make X work. Personally, I hate configuring X, and the card on my
+Toshiba (Trident CyberBlade XP Ai1) is not real well supported under X,
+as Trident (or ALi, who I understand now own Trident) won't release
+documentation. Test it. Shut down. ~10 mins
+12.	Boot FreeBSD. Ensure you are attached to the internet with a
+broadband link, which you are not paying for (this takes a long time,
+and downloads a lot of data). Run cvsupit (cd /usr/ports/net/cvsupit;
+make; make install) and select a local cvsup mirror and the appropriate
+version of FreeBSD to track (I chose 4.5-STABLE). Follow the
+instructions in the FreeBSD handbook to update (make buildworld, make
+buildkernel, make installkernel, make installworld, mergemaster, etc)
+your BSD. ~3 hours
+13.	Install XFree86 4 on FreeBSD. (cd /usr/ports/x11/Xfree86-4;
+make; make install). This is where I am presently up to, but I suspect I
+should be able to use pretty much the same config file as above (with
+some changes for Linux-&gt;BSD device naming), and it should be OK. ~1 hour
+14.	Just to make yourself feel good, boot all your OS's in turn
+again.
+15.	Boot Something that Works with a browser (or configure your
+browser in XP, RH or BSD). go to
+<A HREF="http://soldc.sun.com/developer/support/driver/tools/video/video-index.ht">http://soldc.sun.com/developer/support/driver/tools/video/video-index.ht</A>
+ml, and read away, printing what you need. Download the XFree86 porting
+kit for Solaris 8 intel. Put this file somewhere accessible from your
+Solaris installation - It will be hard to download it using Solaris, so
+find an FTP server somewhere. If you can't, it is possible to do it with
+Solaris, but it's a pain.
+16.	Boot Solaris. Get the file from wherever you put it. Follow the
+instructions you printed. I suggest using the VESA driver here, as I
+don't think the porting kit has support for the Trident card either.
+17.	At this stage, once you have tested networking and XFree86 on
+each platform, and you can successfully boot whatever you want, take it
+to your friends' houses and show them. "oo-er".
+
+Misc notes:
+.	This was all written from memory, whilst I was half way through
+compiling XFree86 4 on FreeBSD, so it is probably wrong, will probably
+render your BIOS unreadable, and make your sister pregnant. Don't blame
+me. Especially about your sister - she told me she was on the pill.
+.	A lot of this probably applies to other laptops and even
+desktops - mainly, the X stuff is laptop-specific, so everything else
+should work on any PC.
+.	If you have a larger HDD, you could probably install more
+Linux's - I would have liked to have had Debian and Sorcerer on it as
+well. Simply create more logical partitions within the extended
+partition. Solaris, Windows and FreeBSD seem to all demand primary
+partitions. Linux is flexible. Take advantage of that flexibility.
+.	Back up your data (or just don't have any data, like I did)
+before starting. You will very likely lose data willy nilly (which is
+far more serious than it sounds).
+.	Don't expect any help from Toshiba - they won't want to know,
+especially about FreeBSD (FreeWhat?) and Solaris (SolWhat?).
+.	Don't expect any help from me - I don't want to know, unless you
+pay me or are just pointing out errors in my notes.
+.	As for why you would want to run all of the above OS's, well who
+knows? Maybe, like me, you need to support all four, and want them
+handy.
+.	If you wanted to be really cool, you could run VMWare on Linux
+(or Windows) and try running other OS's within it. However, some
+(Solaris) tend to like their hardware to remain as it was when they were
+installed, and VMWare virtualises hardware. I haven't tried it, but I
+suspect it wouldn't be that successful - go for the evaluation edition
+first.
+.	Note also that there's no reason why just because it's all
+working now, it will still all be working tomorrow - you may have done
+nothing, but when you have four OS's, not really knowing anything about
+the others, one or other may just decide that it's going to do something
+stupid, and you may lose data - keep it all backed up.
+.	Finally, note that the Solaris partition looks like a Linux Swap
+partition. RH asked me if I wanted to format it as swap. I have heard of
+some linux installs not asking, and just doing. This is bad. AFAIK, you
+can get around this by either installing in the opposite order (in which
+case, you may end up with the Solaris Boot Block in the MBR, and you'd
+rather not have that), or by temporarily changing the type of the
+Solaris partition to something innocuous whilst installing Linux. Just
+remember to change it back.
+
+
+
+-----
+
+
+
+
+-- 
+Richard Russell
+Yellow Goanna Pty Ltd
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+m: +61 412 827 805
+f: +61 8 8462 2362
+ 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

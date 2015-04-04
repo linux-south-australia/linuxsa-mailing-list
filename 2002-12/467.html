@@ -1,0 +1,111 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re:" -->
+<!-- FromName="'nik [tm]'" -->
+<!-- FromEmail="tmcruisin@visualspace.com.au" -->
+<!-- ToName="'Andrew Hill'" -->
+<!-- ToEmail="list@fornax.net" -->
+<!-- Date="Tue, 10 Dec 2002 14:13:08 +1030" -->
+<!-- Id="3DF562CC.20806@visualspace.com.au" -->
+<!-- Reference="1039411912.1411.3.camel@slave-i" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re:</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: nik [tm] &lt;<I><A HREF="mailto:tmcruisin@visualspace.com.au">tmcruisin@visualspace.com.au</A></I>&gt;
+  To  : Andrew Hill &lt;<I><A HREF="mailto:list@fornax.net">list@fornax.net</A></I>&gt;
+  Date: Tue, 10 Dec 2002 14:13:08 +1030
+</PRE>
+<H1>Re:</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+ok, your firewall show that it should allow anything from 
+localhost.localdomain and your local subnet, on the 111 port, on both 
+protocols, to anywhere.
+
+Chain INPUT (policy DROP 9 packets, 769 bytes)
+pkts bytes target prot opt in  out source                destination
+
+    0     0 ACCEPT  udp  -- any any localhost.localdomain anywhere
+    udp dpt:sunrpc
+
+    2   120 ACCEPT  tcp  -- any any localhost.localdomain anywhere
+    tcp dpt:sunrpc
+
+    0     0 ACCEPT  udp  -- any any 192.168.0.0/24        anywhere
+    udp dpt:sunrpc
+
+    0     0 ACCEPT  tcp  -- any any 192.168.0.0/24        anywhere
+    tcp dpt:sunrpc
+
+you can see you have had some packets on the tcp connection coming from 
+localhost, but none on the udp or the local subnet and some dropped 
+packets. check to see if the DROP packet/bytes rise after getting the 
+error or check your logfile for dropped packets (if your firewall logs them)
+'cat /var/log/messages | grep INPUT | grep DPT=111'
+also are you masquerading with the firewall? if so what does the nat 
+table say? in fact what is the complete firewall you have running?
+
+your /etc/hosts shows localhost ok, but has no entries for the 
+192.168.0.254 interface (which is the interface you get rpcinfo -p 
+returning correctly from (on udp), but not localhost WTF??)
+unless you didnt show us that section in your last email.
+
+have you tried it on tcp on the host 192.168.0.254 interface?
+rpcinfo -n 111 -t 192.168.0.254 portmap
+
+and I noticed this in portmap man pages;
+
+BUGS
+	If portmap crashes, all rpc servers must be restarted.
+
+hosts.allow looks fine.
+
+and you can ping localhost fine.. can you ping 192.168.0.254 ok?
+
+if it aint one of these, I am stumped. (but thats no mean feat)
+
+-- 
+regards
+nik [tm]
+
+<A HREF="mailto:tmcruisin@visualspace.com.au">tmcruisin@visualspace.com.au</A>
+www.visualspace.com.au
+
+·´¯`·.¸¸..&gt;&lt;((((º&gt;.·´¯`·.¸¸.·´¯`·.¸
+  &gt;&lt;((((º&gt;`·.¸¸.·´¯`·.¸&gt;&lt;((((º&gt;`·.¸
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

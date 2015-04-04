@@ -1,0 +1,150 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Toshiba slimline laptop CD-reader choice" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 21 Jun 2001 21:13:58 +0930" -->
+<!-- Id="20010621211358.A16121@dog.topology.org" -->
+<!-- Reference="3B31D88F.94B4D1C8@iocane.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Toshiba slimline laptop CD-reader choice</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 21 Jun 2001 21:13:58 +0930
+</PRE>
+<H1>Re: Toshiba slimline laptop CD-reader choice</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, Jun 21, 2001 at 08:50:47PM +0930, Daryl Tester wrote:
+&gt; Alan Kennington wrote:
+&gt; 
+&gt; &gt; I've done a "dd" on the floppy disk, but I have no idea which
+&gt; &gt; bytes I should look at to determine the file system type.
+&gt; 
+&gt; "file - &lt; /dev/fd0" usually gives a clue.
+&gt; 
+
+[The gist of what's below is a request for info on
+how to convert a mounted minix file system into
+a file which contains that file system.]
+
+Well, finally, by swapping the disk between different
+machines (and discovering that one of the machines
+seems to have a dud floppy dirve now!), I worked out
+that the disk was in VFAT format.
+
+(In the meantime, the process that was trying to mount
+the disk as a file system went into "uninterruptible sleep"
+mode, necessitating a re-boot to get back access to the
+drive. But then the "shutdown" ended up getting hung on
+trying to kill that process, and itself became 
+uninterruptible. So I turned the machine off and on.
+And this resulted in about 40 minutes of fsck check
+on the 500 GB or so of file system. Something tells me
+that testing the file system type of a floppy disk should
+not lead to 40 minutes of fsck checking. But maybe life
+is just like that. Anyway...)
+
+Then when I looked into the VFAT file system, it turned out
+that there were 3 gzipped minix file systems!!
+Someone must have had a good laugh designing this
+floppy disk!
+
+So I looked in on minix file system <A HREF="file:">file:</A>
+
+--------------------------------------------------
+emu soft/suse# file net-mod
+net-mod: Minix filesystem, 30 char names
+
+emu soft/suse# mount ./net-mod ./net -t minix -o loop
+
+emu soft/suse# ls net
+.              de4x5.o        es3210.o       ni5010.o       sk98lin.o
+..             de600.o        eth16i.o       ni52.o         sktr.o
+82596.o        de620.o        ewrk3.o        ni65.o         smc-ultra.o
+8390.o         depca.o        hp-plus.o      old_tulip.o    smc-ultra32.o
+NEEDMOD        dgrs.o         hp.o           olympic.o      smc9194.o
+NET            dmfe.o         hp100.o        pcnet32.o      tlan.o
+ac3200.o       e2100.o        ibmtr.o        plip.o         via-rhine.o
+acenic.o       eepro.o        lance.o        rl100a.o       yellowfin.o
+arcnet.o       eepro100.o     lne390.o       rrunner.o
+at1700.o       eexpress.o     ne2k-pci.o     rtl8139.o
+cs89x0.o       epic100.o      ne3210.o       sis900.o
+
+---------------------------------------------------
+
+Well, that's what it looks like now, because I added the
+file 8390.o from another system (SuSE 6.2) because it
+looks like the D-Link DE660 PC card requires the module
+8390.o, not something like de660.o.
+
+And then I thought - now I'll just collapse this minix
+file system that I've mounted and modified back into
+a file. But... how on earth do you turn a minix file system
+into a file?
+I tried "dd":
+
+---------------------------------------
+emu soft/suse# df net
+Filesystem         1024-blocks  Used Available Capacity Mounted on
+/home1/akenning/softemu/suse/net-mod
+                        1353    1230      123     91%   /home1/akenning/softemu/suse/net 
+
+emu soft/suse# dd if=net of=zzz.dat
+dd: net: Is a directory
+0+0 records in
+0+0 records out
+---------------------------------------
+
+
+I just can't think of anything to get that file 8390.o into
+that frozen minix file system.
+
+It's odd that SuSE provide the module as part of the 
+SuSE 6.2 distribution, but it isn't on the "modules"
+disk for the SuSE 7.1 distribution.
+And yet there's heaps of spare space on the disk.
+
+Neither the mkfs.minix nor dd manuals seem to be helpful.
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

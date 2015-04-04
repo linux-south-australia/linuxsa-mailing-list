@@ -1,0 +1,84 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Which UNIX systems still allow SUID scripts ..." -->
+<!-- FromName="'David Newall'" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="'Richard Sharpe'" -->
+<!-- ToEmail="sharpe@ns.aus.com" -->
+<!-- Date="Thu, 17 May 2001 12:45:52 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0105171228280.15912-100000@smart-panel.tellurian.com.au" -->
+<!-- Reference="3.0.6.32.20010517104717.00d88360@10.0.2.1" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Which UNIX systems still allow SUID scripts ...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  Date: Thu, 17 May 2001 12:45:52 +0930 (CST)
+</PRE>
+<H1>Re: Which UNIX systems still allow SUID scripts ...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+In order for SUID scripts to be honoured the kernel needs to recognise
+that it is a script and to invoke the interpreter accordingly.  Certainly
+bash cannot honour that bit, nor can any non-SUID interpreter.  This is
+why many sites install a SUID-perl as well as a regular perl.
+
+Old SysV kernels did not recognise scripts at all, and they worked by
+virtue of /bin/sh, which found the script after exec failed, and checked
+to see if it started with : (which is a sh command).  Later, they adopted
+the BSD convention of treating text files that start with #! as a script
+(with the interpreter named after the #!.)  This change was made in the
+userspace library wrapping the exec system calls (thus there could only
+be SUID scripts on such a system if the interpreter itself was SUID.)
+
+SUID scripts are easy to get wrong, and much has been written on that
+topic.  If you really need a SUID script you can use a SUID wrapper to
+invoke the shell SUID, thus:
+
+  #! /home/me/bin/suid-me arg1 ...
+  ...
+
+and
+
+  main() { *argv = "sh"; execvp("/bin/sh", *argv); perror("/bin/sh"); return 1; }
+
+The C program is compiled to /home/me/bin/suid-me and is SUID me.
+
+Obviously the fact that you utter "#! /home/me/bin/suid-me" means that
+you are thinking carefully about the security implications.  (As if.)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

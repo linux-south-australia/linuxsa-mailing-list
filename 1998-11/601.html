@@ -1,0 +1,87 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Modem" -->
+<!-- FromName="Michael Pearson" -->
+<!-- FromEmail="alcaron@ozemail.com.au" -->
+<!-- ToName="Big Fellow" -->
+<!-- ToEmail="bigfellow@cyberdude.com" -->
+<!-- Date="Sun, 29 Nov 1998 18:24:37 +1030 (CST)" -->
+<!-- Id="Pine.LNX.3.96.981129181912.583A-100000@longbow.claymore" -->
+<!-- Reference="001401be1b37$8ed7a140$657916cb@local.netlink.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Modem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Pearson &lt;<I><A HREF="mailto:alcaron@ozemail.com.au">alcaron@ozemail.com.au</A></I>&gt;
+  To  : Big Fellow &lt;<I><A HREF="mailto:bigfellow@cyberdude.com">bigfellow@cyberdude.com</A></I>&gt;
+  Date: Sun, 29 Nov 1998 18:24:37 +1030 (CST)
+</PRE>
+<H1>Re: Modem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; No, it doesn't. When I click on connect, it just stays like that. When I
+&gt; check the log it says, "Expecting OK" at the bottom, but it never comes...
+&gt; 
+&gt; I've also tried to use minicom and the step-by-step instructions from the
+&gt; ISP hookup, but it always stops, when it comes to dialing the number...
+
+Sounds like a com port problem to me. Check which port linux is using to
+communicate to your modem, then do the following:
+
+echo atdt808080 &gt; /dev/cua0
+echo atdt808080 &gt; /dev/cua1
+echo atdt808080 &gt; /dev/cua2
+echo atdt808080 &gt; /dev/cua3
+
+One of those should cause the modem to try to dial. Kppp and minicom
+should be using that port. What's probably happening is that kppp and
+minicom are using /dev/modem, which is a link to one of those ports. The
+link may be incorrect. Therefore, if the correct port was /dev/cua1, you
+would have to do
+
+ln -si /dev/cua1 /dev/modem
+
+And say yes when it asks you whether you want to overwrite /dev/modem.
+
+Oh, seeing as it's internal, it'll probably be on either /dev/cua2 or 3.
+If none of the above 4 work, it's a conflict. Yay for plug and pray *sigh*
+
+--
+
+Michael Pearson 
+ -Freelance network consultancy
+For more info mail:
+ <A HREF="mailto:-alcaron@ozemail.com.au">-alcaron@ozemail.com.au</A> 
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

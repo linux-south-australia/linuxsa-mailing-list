@@ -1,0 +1,104 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Changes to exim.conf" -->
+<!-- FromName="Dan Shearer" -->
+<!-- FromEmail="dan@linuxcare.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 31 May 2000 18:50:53 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.10.10005311850410.1869-100000@localhost.localdomain" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Changes to exim.conf</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@linuxcare.com">dan@linuxcare.com</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Wed, 31 May 2000 18:50:53 +0930 (CST)
+</PRE>
+<H1>Re: Changes to exim.conf</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 31 May 2000, Mark Phillips wrote:
+
+&gt; My question: is simply changing the file enough to enact the changes,
+&gt; or do I have to do something like "/etc/init.d/exim restart"?
+
+It depends how your system is set up, but normally exim runs as a daemon.
+This means that it needs to be told to reread the configuration file.
+Running a script like you describe should do the trick (from the directory
+I'd guess you're running a Debian or Debian-derived system) but all it
+will be doing is a:
+
+   killall -HUP exim 
+
+or similar.
+
+Be careful! If you have an error in your config file Exim may not be
+running at all! So immediately after doing this, do
+
+   telnet localhost 25
+
+and type "QUIT" if you get a succesful connection. If you get "connection
+refused" then Exim didn't restart. Regardless of the result of the
+previous test, have a look at the error logs:
+
+   tail /var/log/exim/mainlog
+   tail /var/log/exim/paniclog   
+
+which should have helpful messages in them.
+
+&gt; I am guessing the answer is the latter, but I'm a little unsure about
+&gt; things.  Does exim run as a daemon, or is it periodically executed or
+&gt; what?
+
+There's two parts to it: what happens when there's an incoming request on
+port 25 (the SMTP port) and how locally queued mail is delivered. Starting
+exim with a commandline something like:
+
+    exim -bd -q10m 
+
+says "make Exim run as a background daemon and check the queue every 10
+minutes, attempting a delivery of every queued message that has reached
+its delivery retry time."
+
+Your /etc/init.d/exim script will have a line something like this in it.
+
+You can see from the docs what the story is about running Exim from inetd,
+ie starting it up every time there's an incoming connection to port 25.
+
+Dan
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

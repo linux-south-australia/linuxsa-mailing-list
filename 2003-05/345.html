@@ -1,0 +1,111 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Richoe and Gestetner scan routers in Linux" -->
+<!-- FromName="'Daryl Tester'" -->
+<!-- FromEmail="Daryl.Tester@iocane.com.au" -->
+<!-- ToName="'David Fitch'" -->
+<!-- ToEmail="davidf@parachilna.com" -->
+<!-- Date="Sun, 11 May 2003 11:15:10 +0930" -->
+<!-- Id="3EBDAB26.3E461A1A@iocane.com.au" -->
+<!-- Reference="NEEGJIEEHILAAIJOHBBDOEAGCAAA.davidf@parachilna.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Richoe and Gestetner scan routers in Linux</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  To  : David Fitch &lt;<I><A HREF="mailto:davidf@parachilna.com">davidf@parachilna.com</A></I>&gt;
+  Date: Sun, 11 May 2003 11:15:10 +0930
+</PRE>
+<H1>Re: Richoe and Gestetner scan routers in Linux</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+First cup of coffee still sinking in ...
+
+David Fitch wrote:
+
+&gt;&gt; How complicated can it be to get ftp to listen on the port I want it to?
+
+&gt; not very!
+&gt; I'm using proftp too (debian woody), so I edited /etc/proftp.conf,
+&gt; changed "Port 21" to "Port 3670".
+&gt; Edited /etc/inetd.conf (since for me proftp is started by inetd)
+&gt; and copied the "ftp" line calling the service "myftp" instead, ie:
+&gt; 
+&gt; myftp stream tcp nowait root /usr/sbin/tcpd /usr/sbin/proftpd
+&gt; 
+&gt; edited /etc/services, and added:
+&gt; 
+&gt; myftp           3670/tcp
+&gt; 
+&gt; then restarted inetd, proftp is now listening on the port:
+&gt; 
+&gt; # netstat -a |grep ftp
+&gt; tcp        0      0 *:ftp                   *:*                     LISTEN
+&gt; tcp        0      0 *:myftp                 *:*                     LISTEN
+
+Sorry for the large quote, but I needed to keep some context here.
+
+The part between editing the config for inetd and proftpd is possibly
+conflicting - either *one or the other* listens to the port that that
+the initial connections are made on.  When inetd is starting up the ftp
+daemon (or any daemon), it listens to that port on the programs behalf,
+then spawns the process on an incoming connection and hands across file
+descriptors 0 and 1 (and possibly 2 - NFI, DFC[1] currently :-) to that
+process.  Unless the process uses some system calls, it's not even aware
+that it's been handed a set of sockets to talk over (ftp daemons usually
+do, because it places some access controls limits on the connection).
+When ftpd daemons are run in standalone mode (which the more modern
+variations like proftp are able to do), it handles the listening that
+inetd would normally do.  But it's a one or the other deal - if both do
+it, you'll get the 'Address in use' error.  David, you'll probably find
+that there is some other configuration option that's preventing proftp
+from starting up in stand alone mode, but it shouldn't care at all about
+the port setting.  If it does, well, I'd consider that broken behaviour.
+
+
+-- 
+Regards,
+  Daryl Tester,  Software Wrangler and Bit Herder, IOCANE Pty. Ltd.
+
+"The philosophy exam was a piece of cake -- which was a bit of a surprise,
+ actually, because I was expecting some questions on a sheet of paper."
+  -- Smith & Jones
+
+[1]  "No F* Idea, Don't F* Care" - Standard IOCANE saying when someone
+     tries to bog down a process too early in detail.  It's also
+     applicable when you truly don't care.  :-)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

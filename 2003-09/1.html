@@ -1,0 +1,272 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="[OT] FreeBSD 5.1 Current Newbie eLog Part IV" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 31 Aug 2003 15:57:34 -0700" -->
+<!-- Id="3F527D5E.9010806@pacbell.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: [OT] FreeBSD 5.1 Current Newbie eLog Part IV</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 31 Aug 2003 15:57:34 -0700
+</PRE>
+<H1>[OT] FreeBSD 5.1 Current Newbie eLog Part IV</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+1. A follow up on my earlier posts:
+
+I want to thank Alex Wilkinson for helping me with these two items:
+
+&gt;&gt;:It didn't work for me. It is set up to install Netscape 7.02 and it will
+&gt;&gt;	:leave a message that its forbidden.
+&gt;&gt;	:Same thing, Open Office will not download, and ymessenger will install
+&gt;&gt;	:but has an error.
+&gt;
+&gt;
+&gt;Update your ports tree:
+&gt;
+&gt;shell&gt; grep -i portver /usr/ports/www/netscape7/Makefile
+&gt;PORTVERSION?=   7.1
+&gt;
+&gt;I tried and it started building fine.
+
+
+I just want to verify that it worked fine for me as well, after I fixed my supfile and reran cvsup.
+
+Thanks again to Alex for this help:
+
+
+&gt;:*default release=cvs tag=RELENG_4
+&gt;
+&gt;Aren't you tracking the head of the tree ? ie -CURRENT ? If so, you are using the wrong tag.
+&gt;
+
+
+I looked up the tag for current, and it appears that it is:
+
+
+:*default release=cvs tag=.
+
+2. New Stuff:
+
+
+A. Open Office
+
+The open Office port used to sleep and then eventually return an error 
+on my desk, but that was fixed after I ran cvsup. However, the port 
+still has one problem, and I broke my system trying to work around it.
+
+After I ran cvsup, the port sucessfully downloaded Open Office. However, 
+it seems that the port has a very large laundry list of dependencies, 
+long enough to keep the port running for over two hours, on a broadband 
+connection.  At the end of the port, there was an error message that read:
+
+&gt; Checking if devel/gettext already installed
+&gt; ===&gt;   An older version of devel/gettext is already installed 
+&gt; (gettext-0.11.5_1)
+&gt;       You may wish to ``make deinstall'' and install this port again
+&gt;       by ``make reinstall'' to upgrade it properly.
+&gt;       If you really wish to overwrite the old port of devel/gettext
+&gt;       without deleting it first, set the variable "FORCE_PKG_REGISTER"
+&gt;       in your environment or the "make install" command line.
+&gt; *** Error code 1
+
+Last time I used pkg_delete to get rid of gettext, and that was the kiss 
+of death.  When I tried to reinstall gettext or Open Office, I fell into 
+an endless loop, the same compilation messages came up over and over 
+again, and after about two hours of waiting, I hit ctrl-c and went on to 
+other things. After I rebooted ,was unable to log into KDE 3.1 after 
+that, and Mutt would not start, with an error showing that elf could not 
+find libslang.  Kdeinit would not start, and DCOP was broken.
+
+
+B. pkg_info
+
+Before I formatted the parttion for a reinstall, I obtained a list of 
+all of the applications installed in FreeBSD 5.1 Current by running the 
+pkg_info command at the console, redirecting the output to a text file 
+called packages.txt. I opened up LyX and imported the file so I could 
+print the list.
+
+pkg_info &gt; packages.txt
+
+Between having that list and my trusty floppy with configgies, I was 
+able to completely restore my system to its previous state in two hours.
+
+
+C.  The Gettext problem:
+
+I found that LyX would not install, as it had the same gettext error as 
+open Office. I was at stalemeate and had to do something. So I bit the 
+bullet again and upgraded gettext this way:
+
+localhost# make FORCE_PKG_REGISTER=yes install clean
+
+Note that the message that suggests that I "set the variable 
+'FORCE_PKG_REGISTER'" does not provide enough information to help the 
+new user.  I had to guess that "make FORCE_PKG_REGISTER=yes install 
+clean" was the proper command to use. After running that command, the 
+gettext port seemed to work, and I was able to continue running the Open 
+Office port.  It seems to be carrying on far too long however.
+
+
+D. Konqueror file permission weirdness.
+
+This is really odd.  I can access all of my Fat formatted partitions or 
+disks, but when I use Konqueror to enter the directories inside the 
+mount point by clicking on them, I get an error that reads:
+
+"You do not have enough permissions to read <A HREF="file:/storage/Network">file:/storage/Network</A> 
+Operating Systems"
+
+However, if I merely right click and say open in new Window, it opens as 
+normal and without a problem.
+
+
+E. Finding out what drivers are loaded in FreeBSD
+
+To do this, I just opened up the console ant typed:
+
+kldstat
+
+Here is what I have now: I have IPX compiled into the kernel.
+
+&gt; localhost# kldstat
+&gt; Id Refs Address    Size     Name
+&gt;  1   10 0xc0100000 622f74   kernel
+&gt;  2    1 0xc0723000 4c1d0    acpi.ko
+&gt;  3    1 0xc2871000 18000    linux.ko
+&gt;  4    1 0xc28ed000 1f000    smbfs.ko
+&gt;  5    2 0xc2918000 3000     libiconv.ko
+&gt;  6    2 0xc2914000 3000     libmchain.ko
+
+
+
+F.  LyX
+
+The best way to install LyX is to use the ports system and run this command:
+
+make WITH_QT=yes WITH_ISPELL=yes install clean
+
+
+3. I have some new ports:
+
+I have made no code changes to any of the following applications, but 
+was able to get these installed in FreeBSD 5.1-Current. I don't know if 
+that means I have a port or not, but it seems like I do, so I should 
+mention them.
+
+A. Antiword:
+
+Good program, I tested it and it was able to extract the text from a 
+MSword document without a problem. Here is what I did to get it to work 
+in FreeBSD 5.1- Current:
+
+I downloaded it from  
+<A HREF="http://freshmeat.net/redir/antiword/286/url_tgz/antiword-0.33.tar.gz">http://freshmeat.net/redir/antiword/286/url_tgz/antiword-0.33.tar.gz</A>
+
+Then opened up the console and uncompressed the <A HREF="file:">file:</A>
+
+gzip -dc antiword-0.33.tar.gz | tar xvf -
+
+Wen into the directory so I could compile it:
+
+cd antiword-0.33
+
+Compiled the progam without incident:
+
+make
+make install
+
+&gt; localhost# antiword
+&gt;         Name: antiword
+&gt;         Purpose: Display MS-Word files
+&gt;         Author: (C) 1998-2002 Adri van Os
+&gt;         Version: 0.33  (05 Jul 2002)
+&gt;         Status: GNU General Public License
+&gt;         Usage: antiword [switches] wordfile1 [wordfile2 ...]
+&gt;         Switches: [-t|-p papersize][-m mapping][-w #][-i #][-Ls]
+&gt;                 -t text output (default)
+&gt;                 -p &lt;paper size name&gt; PostScript output
+&gt;                    like: a4, letter or legal
+&gt;                 -m &lt;mapping&gt; character mapping file
+&gt;                 -w &lt;width&gt; in characters of text output
+&gt;                 -i &lt;level&gt; image level (PostScript only)
+&gt;                 -L use landscape mode (PostScript only)
+&gt;                 -s Show hidden (by Word) text
+
+
+B. Real One Player:
+
+Obtain the Real One Player as I describe in this post:
+
+<A HREF="http://www.linuxsa.org.au/mailing-list/2002-07/725.html">http://www.linuxsa.org.au/mailing-list/2002-07/725.html</A>
+
+But to install the program without error, run these commands:
+
+mkdir ~/.kde/share/mimelnk
+mkdir ~/.kde/share/mimelnk/application
+mkdir ~/.kde/share/mimelnk/audio
+mkdir ~/.kde/share/mimelnk/image
+mkdir ~/.kde/share/mimelnk/text
+mkdir ~/.kde/share/mimelnk/video
+
+It works this way with the same error on sound found with the Real 
+Player 8 port:
+
+For the ports:
+
+The download can be automated with:
+lynx scopes.real.com/real/player/unix/unix.html
+
+
+Hope this helps,
+
+James Leone
+
+
+
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

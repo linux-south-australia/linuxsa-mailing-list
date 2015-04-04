@@ -1,0 +1,162 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Union File Systems..." -->
+<!-- FromName="'Michael Neuling'" -->
+<!-- FromEmail="michael.neuling@keyworks.com.au" -->
+<!-- ToName="'Richard Russell'" -->
+<!-- ToEmail="richard@yellowgoanna.com" -->
+<!-- Date="Fri, 01 Feb 2002 15:36:28 +1030" -->
+<!-- Id="20020201050628.6BB2057763@vodka.keyworks.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Union File Systems...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Neuling &lt;<I><A HREF="mailto:michael.neuling@keyworks.com.au">michael.neuling@keyworks.com.au</A></I>&gt;
+  To  : Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  Date: Fri, 01 Feb 2002 15:36:28 +1030
+</PRE>
+<H1>Re: Union File Systems...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I had exacly the same problem but you don't need any special file
+system, just use hard links.  If a file is the same then just hard
+link it to the last version else create a new copy of the file.  The
+directory strucure is recreated the same as the working directory
+(links don't replace directories).
+
+This, of course, doesn't work well if you have a lot of large files
+with small changes.  We use it here at work and there is no problems
+with efficiency, and of course backup access time is as good as it
+gets.  
+
+Restoring is easy as cp -a.  
+
+One cool feature of using hard links is that you can delete any
+incremental backup (with a simple rm -rf command) and the rest of the
+backups remain consistant.  So if your backup disk runs out of space
+you can just remove older incrementals or make them less regular by
+deleting a few of them (say you keep daily backups for a month then
+after that you only keep weeklies, then all you need to do is go back
+a month and delete 6 out of every 7 incremental backups).
+
+I have a few simple scripts which do all of this for you.  I've been
+meaning to rewrite them in C (or as a option to rsync) but I've not
+had the time (plus they run quick enough as is).  I run them each
+night as our onsite backups.  Works a treat.  You can have them if you
+like (or you can pay me for them :-))
+
+In message &lt;002d01c1aad8$554f9020$<A HREF="mailto:0c00a8c0@albert">0c00a8c0@albert</A>&gt; you wrote:
+&gt; Hi all...
+&gt; 
+&gt; I was just discussing with a friend some techniques for keeping large
+&gt; backups online, and remembered Union File Systems... I believe FreeBSD
+&gt; does these nicely, but, for reasons involving other software, Linux is
+&gt; required in this situation -- does anyone know of how close union fs's
+&gt; are for Linux? Is there a core project out there? Is anyone willing to
+&gt; pay for it to be done?
+&gt; 
+&gt; I've done some brief searching around, and have come across something
+&gt; called IFS (Inherited File System) and TFS (Translucent File System --
+&gt; Sun) ... But not real sure what the status is on these...
+&gt; 
+&gt; Also, in this specific instance, the idea that I have running around in
+&gt; my head is pretty specific... I'd want:
+&gt; 
+&gt; Say four complete backups, that look like live filesystems, but are
+&gt; mounted read-only for users...
+&gt; 
+&gt; Eg:
+&gt; 
+&gt; /thisweek
+&gt; /lastweek
+&gt; /theweekbefore
+&gt; /theweekbeforethat
+&gt; 
+&gt; Then within each of these, there would be a directory for the backup of
+&gt; each day:
+&gt; 
+&gt; /weekend (full, done on sat or sun)
+&gt; /monday
+&gt; /tuesday
+&gt; /wednesday
+&gt; /thursday
+&gt; /friday
+&gt; 
+&gt; Monday through to Friday would be effectively incremental backups, but
+&gt; mounted on top of weekend (or on top of all the previous days), so they
+&gt; look like full FS's.
+&gt; 
+&gt; The idea would be that once per week, you could do a dump/restore (or
+&gt; tar c/tar x or etc) to create the weekly backup, and then every night,
+&gt; use rsync, dump, or whatever, to create the difference filesystems...
+&gt; After this, they could all be read-only, as you specifically wouldn't
+&gt; want to change anything anyway...
+&gt; 
+&gt; So it doesn't really need to be a proper live union FS, just one that I
+&gt; can create, then have read-only...
+&gt; 
+&gt; Of course, one option that I thought of was Katie, but I don't know if
+&gt; it's production ready yet, and it may be too slow to use on hundred MB
+&gt; plus fs's...
+&gt; 
+&gt; Comments?
+&gt; 
+&gt; rr
+&gt; 
+&gt; 
+&gt; -- 
+&gt; Richard Russell
+&gt; Yellow Goanna Pty Ltd
+&gt; e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+&gt; m: +61 412 827 805
+&gt; f: +61 8 8462 2362
+&gt;  
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+
+
+Regards,
+Michael
+--
+  "I don't have to be careful.  I got a gun."
+    Homer J. Simpson
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,87 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: kernel" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="Robyn Manning" -->
+<!-- ToEmail="robynman@dove.net.au" -->
+<!-- Date="Thu, 26 Oct 2000 02:35:19 +0930" -->
+<!-- Id="20001026023519.A6515@dog.topology.org" -->
+<!-- Reference="00102523335100.06212@kanga" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: kernel</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : Robyn Manning &lt;<I><A HREF="mailto:robynman@dove.net.au">robynman@dove.net.au</A></I>&gt;
+  Date: Thu, 26 Oct 2000 02:35:19 +0930
+</PRE>
+<H1>Re: kernel</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Oct 25, 2000 at 11:34:00PM +0930, Robyn Manning wrote:
+&gt; 
+&gt;  Entering directory `/usr/src/linux-2.2.16/arch/i386/lib'
+&gt; gcc -D__KERNEL__ -I/usr/src/linux/include -D__ASSEMBLY__  -traditional -c 
+&gt; checksum.S -o checksum.o
+&gt; checksum.S:231: badly punctuated parameter list in #define
+&gt; checksum.S:237: badly punctuated parameter list in #define
+
+Robyn,
+
+This seems to be the code in question:
+
+------------------------------------------------------------------------
+#define SRC(y...)                       \
+        9999: y;                        \
+        .section __ex_table, "a";       \
+        .long 9999b, 6001f      ;       \
+        .previous
+
+#define DST(y...)                       \
+        9999: y;                        \
+        .section __ex_table, "a";       \
+        .long 9999b, 6002f      ;       \
+        .previous  
+------------------------------------------------------------------------
+
+I guess the "..." has annoyed the compiler.
+Obviously non-standard C.
+And that means as the previous respondent said, that
+you need a different compiler.
+
+Cheerio,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

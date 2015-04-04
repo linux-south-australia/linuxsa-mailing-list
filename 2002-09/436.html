@@ -1,0 +1,101 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: DNS Question" -->
+<!-- FromName="'Jim O'Halloran'" -->
+<!-- FromEmail="jim@kendle.com.au" -->
+<!-- ToName="'Justin Hawkins','Matthew Moyle-Croft'" -->
+<!-- ToEmail="justin@internode.com.au,mmc@mmc.com.au" -->
+<!-- Date="Thu, 12 Sep 2002 12:29:47 +0930" -->
+<!-- Id="C16C7A51BA30D51187EE0000E8D8C9972F889D@int-gw.kendle.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: DNS Question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jim O &lt;<I><A HREF="mailto:jim@kendle.com.au">jim@kendle.com.au</A></I>&gt;
+  To  : Justin Hawkins &lt;<I><A HREF="mailto:justin@internode.com.au">justin@internode.com.au</A></I>&gt;<BR>        Matthew Moyle-Croft &lt;<I><A HREF="mailto:mmc@mmc.com.au">mmc@mmc.com.au</A></I>&gt;
+  Date: Thu, 12 Sep 2002 12:29:47 +0930
+</PRE>
+<H1>RE: DNS Question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+&gt;&gt; To be honest, the ONLY reason to have secondary MXs these days is if you 
+&gt;&gt; experience very high loads or you have an unreliable link.
+&gt;
+&gt;It'd have to be *really* unreliable.
+&gt;
+&gt;SMTP has built in resilience. It doesn't really matter if your mail
+&gt;server is down a few hours. Or even a few more.
+
+This is true, but for intermittently connected systems it does help.  Most
+of our customers run Exchange servers on a dialup link.  The link is a "dial
+on demand" arrangement, and rarely stays up for more than 10-15 minutes,
+then goes offline for another couple of hours...  Without a secondary MX,
+the sending mail server has a pretty small "window" in which it can deliver
+mail, and if the sender is only retrying (say) once an hour its possible
+that it won't deliver in a sensible time period.  
+
+The solution: A secondary MX.  Mail is delivered to us, customer comes
+online and sends the secondary MX an ETRN and we deliver all of their mail.
+Customer waits until mail delivery is finished, and drops off the air for a
+few more hours.
+
+&gt;Also, having a secondary MX is a good way to get more spam and cost
+&gt;yourself more traffic. Since the secondary MX can't make a decision on
+&gt;whether an email address exists or not, it'll typically accept
+&gt;everything. The canny spammer uses this to full advantage.
+
+True, we've been bitten by this a couple of times...  In the last couple of
+weeks we've had lots of attempts to relay spam through our secondary MX to
+non-existent email addresses on domains we MX for.  The solution was to use
+/etc/mail/access in sendmail to block those addresses...  Ie.
+
+&lt;company&gt;.com.au	RELAY
+&lt;nonexistent-user&gt;@&lt;company&gt;.com.au	REJECT
+
+Would have preferred to...
+
+&lt;valid-user&gt;@&lt;company&gt;.com.au	RELAY
+
+... for the users that are valid, but it doesn't seem to work.  The solution
+here I guess is to keep an eye on your postmaster accounts for NDR's and if
+the same address pops up often, then block it.
+
+Jim.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

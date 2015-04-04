@@ -1,0 +1,167 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Printer woes --- again!" -->
+<!-- FromName="'Brian Marr'" -->
+<!-- FromEmail="sirreg@dove.net.au" -->
+<!-- ToName="'Mark Phillips','LinuxSA'" -->
+<!-- ToEmail="mark@ist.flinders.edu.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 06 Dec 2000 23:22:07 +1030" -->
+<!-- Id="3A2E3677.33F9A7B6@dove.net.au" -->
+<!-- Reference="Pine.GSO.4.10.10012052230280.19141-100000@kurango" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Printer woes --- again!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Brian Marr &lt;<I><A HREF="mailto:sirreg@dove.net.au">sirreg@dove.net.au</A></I>&gt;
+  To  : Mark Phillips &lt;<I><A HREF="mailto:mark@ist.flinders.edu.au">mark@ist.flinders.edu.au</A></I>&gt;<BR>        LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 06 Dec 2000 23:22:07 +1030
+</PRE>
+<H1>Re: Printer woes --- again!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Printer problem solving.
+
+
+Have you tried to start and stop lpr ? 
+
+/etc/rc.d/ini.d/lpd stop
+
+There have been times when I have had to restart the printer queue
+
+(as root) lpc
+
+lpc&gt; help
+
+In this example I check the printer queue and remove a file.
+I then use lpc to restart the printer and enable the queue
+
+<A HREF="mailto:root@Manduck">root@Manduck</A> bombay]# lpq
+lpq: lp: unknown printer
+[<A HREF="mailto:root@Manduck">root@Manduck</A> bombay]# lpq -Pplotter
+Warning: plotter is down: printing disabled
+Warning: no daemon present
+Rank   Owner      Job  Files                                 Total Size
+1st    bombay     269   ...                                  506391
+bytes
+2nd    bombay     270   ...                                  228517
+bytes
+[<A HREF="mailto:root@Manduck">root@Manduck</A> bombay]# lprm -Pplotter 270
+dfA270Manduck dequeued
+cfA270Manduck dequeued
+[<A HREF="mailto:root@Manduck">root@Manduck</A> bombay]# lpq -Pplotter
+Warning: plotter is down: printing disabled
+Warning: no daemon present
+Rank   Owner      Job  Files                                 Total Size
+1st    bombay     269   ...                                  506391
+bytes
+[<A HREF="mailto:root@Manduck">root@Manduck</A> bombay]# start plotter
+bash: start: command not found
+[<A HREF="mailto:root@Manduck">root@Manduck</A> bombay]# lpc
+lpc&gt; start plotter
+plotter:
+        printing enabled
+        daemon started
+lpc&gt; stop plotter
+plotter:
+        printing disabled
+lpc&gt; start plotter
+plotter:
+        printing enabled
+        daemon started
+lpc&gt;
+
+
+Recently in order to get remote printing to work I had to move
+/etc/printcap and configure another. It turned out that something 
+in printcap was causing a problem (there were a number of entries).
+The networked printer started ok after this
+
+Regards
+
+Brian Marr
+
+
+Mark Phillips wrote:
+&gt; 
+&gt; Just when I thought I had solved my printer problems...
+&gt; 
+&gt; As I recently reported, I have replaced a printer cable, following which
+&gt; lpr started working (lprng).
+&gt; 
+&gt; But now I am having a problem in that after a while it stops working
+&gt; again.  The only way I have found of fixing it, is to reboot, and then it
+&gt; only works for a while.
+&gt; 
+&gt; When it stops working I get the output:
+&gt; 
+&gt; # lpr test.txt
+&gt; Status Information:
+&gt;  sending job '<A HREF="mailto:root@jib">root@jib</A>+665' to <A HREF="mailto:lp@localhost">lp@localhost</A>
+&gt;  connecting to 'localhost', attempt 1
+&gt;  cannot open connection to localhost - Connection timed out
+&gt; Make sure LPD server is running on the server
+&gt;  job '<A HREF="mailto:root@jib">root@jib</A>+665' transfer to <A HREF="mailto:lp@localhost">lp@localhost</A> failed
+&gt; 
+&gt; #lpq
+&gt; Printer '<A HREF="mailto:lp@localhost">lp@localhost</A>' - cannot open connection - Connection timed out
+&gt; Make sure LPD server is running on the server
+&gt; 
+&gt; # ps aux | grep lpd
+&gt; daemon     205  0.0  0.6  1752  776 ?        S    15:06   0:00 lpd Waiting
+&gt; 
+&gt; What on earth could be wrong!!!??
+&gt; 
+&gt; Rebooting the computer every time I want to print is not a long term
+&gt; solution.
+&gt; 
+&gt; Cheers,
+&gt; 
+&gt; Mark.
+&gt; 
+&gt; _/~~~~~~~~___/~~~~~~____________________________________________________
+&gt; ____/~~_____/~~__/~~__________________________Mark_Phillips____________
+&gt; ____/~~_____/~~<A HREF="mailto:________________________________mark@ist.flinders.edu.au_">________________________________mark@ist.flinders.edu.au_</A>
+&gt; ____/~~\HE___/~~__/~~\APTAIN_____________________________________________
+&gt; ____/~~______/~~~~~~____________________________________________________
+&gt; __________________________________________________________________________
+&gt;         "They told me I was gullible ... and I believed them!"
+&gt; 
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,106 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Mounting .iso images with konqueror" -->
+<!-- FromName="'Damien Uern'" -->
+<!-- FromEmail="carrigan_2606@optusnet.com.au" -->
+<!-- ToName="'Linux SA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 13 Apr 2003 12:36:58 +0930" -->
+<!-- Id="200304131236.58474.carrigan_2606@optusnet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Mounting .iso images with konqueror</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Damien Uern &lt;<I><A HREF="mailto:carrigan_2606@optusnet.com.au">carrigan_2606@optusnet.com.au</A></I>&gt;
+  To  : Linux SA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 13 Apr 2003 12:36:58 +0930
+</PRE>
+<H1>Mounting .iso images with konqueror</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+Just made a nice script, thought I'd share it with you. This script and 
+servicemenu allow you to rightclick an ISO image and mount it to a directory. 
+Unfortunately you have to drop to a root terminal to umount it. Also, the 
+script does not ask for a password, so you need to be running konqueror as 
+root (easy enough with alt-f2 run as root, etc).
+
+Anyway, you need to copy this file (call it mountiso.desktop) to 
+/usr/share/apps/konqueror/servicemenus (on Mandrake 9.1 at least, it depends 
+where KDE is installed).
+
+#############&lt;CUT&gt;################
+[Desktop Entry]
+Actions=MountCDImage
+Encoding=UTF-8
+ServiceTypes=application/x-iso
+
+[Desktop Action MountCDImage]
+Exec=mountiso.sh %u
+Name=Mount ISO Image
+#############&lt;/CUT&gt;################
+
+And you need the accompanying bash script (which even has nice friendly 
+dialogs that ask you where to mount it :) Save this file to somewhere in your 
+path, call it mountiso.sh.
+
+#############&lt;CUT&gt;################
+#! /usr/bin/env bash
+
+mountdir=`kdialog --inputbox "Enter directory name to mount iso to"`;
+
+if [[ ! -e "$mountdir" ]]; then
+ kdialog --yesno "Directory does not exist, create it?" && mkdir "$mountdir";
+ if [[ ! -e "$mountdir" ]]; then
+   echo "Cannot mount iso image.";
+   exit 1;
+ fi
+fi
+
+mount -t iso9660 -o loop "$1" "$mountdir";
+#############&lt;/CUT&gt;################
+
+I'm sure more experienced people could rewrite that bash script so that it 
+asks for password if not root, etc etc. But I'm pretty inexperienced at shell 
+scripting. I will gladly accept people's modifications :) Oh it should 
+probably check to make sure they're not mounting the image to / (or somewhere 
+equally important) :)
+
+Damien
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

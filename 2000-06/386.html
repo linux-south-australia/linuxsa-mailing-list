@@ -1,0 +1,140 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Postgresql vs MySQL" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Carlo" -->
+<!-- ToEmail="carlo@active-ideas.com.au" -->
+<!-- Date="Tue, 13 Jun 2000 20:05:01 +0930" -->
+<!-- Id="20000613200501.D73469@atdot.dotat.org" -->
+<!-- Reference="3945B247.9CF78394@active-ideas.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Postgresql vs MySQL</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Carlo &lt;<I><A HREF="mailto:carlo@active-ideas.com.au">carlo@active-ideas.com.au</A></I>&gt;
+  Date: Tue, 13 Jun 2000 20:05:01 +0930
+</PRE>
+<H1>Re: Postgresql vs MySQL</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, Jun 13, 2000 at 02:32:15PM +1030, Carlo wrote:
+
+ &gt; Mark Newton wrote:
+ &gt; &gt; On Tue, Jun 13, 2000 at 01:55:29PM +1030, Carlo wrote:
+ &gt; &gt;  &gt; This doesn't really help, but may be of interest.
+ &gt; &gt;  &gt; Don't know about Postgresql. But with Mysql, one reason for its good
+ &gt; &gt;  &gt; speed/reliability is the fact that it was ALL written form scratch.
+ &gt; &gt; Hey, wow!  That's the same argument MS uses when they explain why NT is
+ &gt; &gt; better than UNIX!
+ &gt; 
+ &gt; I have nothing to do with sales and yet I have the natural talent of
+ &gt; using the same arguments MS use, who spend millions um... billions on
+ &gt; sales. What a complement. Thanks Mark.
+ &gt; Or is it a criticism?
+
+"Yes".  :-)
+
+For what it's worth, the speed gains of mysql (which have been shrinking
+as PostgreSQL improves) are due more to the fact that it doesn't support
+features which most people think are actually mandatory features of a 
+database, most notably including its lack of support for transactions.
+Transactions are "hard" to implement, and necessarily involve a performance
+loss, but the mysql developers have consciously chosen to not support them,
+so they don't pay the speed penalties that real databases like PostgreSQL
+must pay.
+
+One thing to be very careful of when using a database for a web site
+backend is that web pages are, by the nature, accessed in parallel;  so,
+if you have any multiple-write updates to do in the course of running
+the site, you're left with three alternatives:
+
+       1. mysql, and just put up with random data corruption from 
+	  transactions which are smashed by multiple simultaneous 
+	  updaters;  
+
+       2. mysql with wrappers around SQL operations to do shared and
+	  exclusive locking, eg:
+
+		$lck = establish_shared_lock();
+		$dbt = $dbi-&gt;prepare("select ...");
+		$dbt-&gt;execute();
+		# handle results;
+		$dbt-&gt;finish();
+		release_shared_lock($lck);
+	  and:
+
+		$lck = establish_exclusive_lock();
+		$dbt = $dbi-&gt;prepare("update ...");
+		$dbt-&gt;execute();
+		# handle results
+		$dbt-&gt;finish();
+		release_exclusive_lock($lck);
+
+      3. Use a real database which supports transactions.
+
+Option 1 is frankly unacceptable.  Even if you say, "But it really 
+doesn't matter, it's only a web site..." sooner or later a lack of 
+explicit transaction handling will bite you in the arse.
+
+Option 2 is also unacceptable in all but the simplest of cases:  In 
+many cases doing your own locking will involve a greater performance
+loss than using a real database, and if you get the locking wrong you
+either leave some transactions unprotected (see option 1) or cause
+deadlocks.
+
+Option 3 is simple:  You get concurrency issues solved "for free", the
+code doesn't cost any more, and in all likelihood your performance loss
+is less than what you'd end up with if you handled your own locking.
+
+As it happens, the rider above that option two can be acceptable in
+the simplest of cases is often true for web site backends, which often
+don't stress databases all that much.  However, if you ever find that a
+single form submission from a user results in more than one discrete
+SQL operation being processed by the backend, you run the risk of presenting
+the user with worthless and wrong information at best, and corrupting 
+the structure of your database at worst.
+
+[ and yes, carlo, you probably know this stuff already; many other readers
+  probably don't, though. ]
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

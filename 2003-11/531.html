@@ -1,0 +1,89 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: How to change the dir of a shell from a script" -->
+<!-- FromName="'Paul Shirren'" -->
+<!-- FromEmail="shirro@shirro.com" -->
+<!-- ToName="'Wiechert, Holger-Fa.IKS'" -->
+<!-- ToEmail="Holger.Wiechert-Fa.IKS@ProACTIV.de" -->
+<!-- Date="Wed, 26 Nov 2003 21:01:55 +1030" -->
+<!-- Id="3FC4811B.8070506@shirro.com" -->
+<!-- Reference="840EF1C51903BC41A66609D75B8DA6203F9CDB@S001MX01.ad001.proactiv.grp" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: How to change the dir of a shell from a script</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Paul Shirren &lt;<I><A HREF="mailto:shirro@shirro.com">shirro@shirro.com</A></I>&gt;
+  To  : Wiechert, Holger-Fa.IKS &lt;<I><A HREF="mailto:Holger.Wiechert-Fa.IKS@ProACTIV.de">Holger.Wiechert-Fa.IKS@ProACTIV.de</A></I>&gt;
+  Date: Wed, 26 Nov 2003 21:01:55 +1030
+</PRE>
+<H1>Re: How to change the dir of a shell from a script</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Child processes can't change anything in the parent process. Running a 
+shell script creates a child process.
+
+You could try sourcing the script instead of executing it so it is 
+running in the current process.
+
+$ . myscript
+
+or
+
+$ source myscript
+
+If your script doesn't write to stdout you could do something like this
+
+myscript:
+
+#!/bin/sh
+#Do something
+echo /tmp
+
+$ cd `./myscript`
+
+Probably the best way is to do it like mc. Create a shell alias which 
+sources a wrapper script.
+
+The wrapper script
+  - creates a tempfile and save the name in a shell variable
+  - passes the filename to your main script on the command line
+  - the main script writes the path to the filename supplied on exit
+  - your wrapper then cds to the the path in the file
+  - the wrapper deletes the temp file and unsets the tempfile variable
+
+Ofcourse someone on the list will probably know a much better way ;-)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,147 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Too many open files in system" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="'Steve Sloan','Linux-SA'" -->
+<!-- ToEmail="steve@lansol.com.au,LinuxSA@linuxsa.org.au" -->
+<!-- Date="Tue, 08 May 2001 19:58:07 +0900" -->
+<!-- Id="3.0.6.32.20010508195807.00d4a210@10.0.2.1" -->
+<!-- Reference="003401c0d7a3$38111aa0$1602a8c0@internal" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Too many open files in system</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : Steve Sloan &lt;<I><A HREF="mailto:steve@lansol.com.au">steve@lansol.com.au</A></I>&gt;<BR>        Linux-SA &lt;<I><A HREF="mailto:LinuxSA@linuxsa.org.au">LinuxSA@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 08 May 2001 19:58:07 +0900
+</PRE>
+<H1>Re: Too many open files in system</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 07:12 PM 5/8/01 +0930, Steve Sloan wrote:
+&gt;I have a RH6.2 server that runs a large application DB for about 50 - 60
+&gt;users. It has been running really well form since it was put in about 4
+&gt;months ago until about a week ago when the errors below started appearing in
+&gt;the log and users were getting kicked out of the box.
+&gt;I took the opportunity to rebuild the box and fix a few other things. Rh6.2
+&gt;was installed again and I seemed good until today when the same thing
+&gt;happened.
+&gt;Is this something that can be fixed by changing the setup of the system as I
+&gt;have no idea how linux handles the number of open files.
+
+This is one of the areas that Linux excels at ...
+
+	cat /proc/sys/fs/file-max 
+
+to see the max open files ... You can also check /proc/sys/fs/file-nr.
+
+You can increase this with:
+
+      echo 8192 &gt; /proc/sys/fs/file-max
+
+Add something like that to /etc/rc.d/rc.local ...
+
+Also check inode-max etc ...
+
+&gt;The DB also has over 3000 files in one directory at present, with a totoal
+&gt;combined size of 1.5 gig for live data and another 1.5gig for dummy data ie.
+&gt;copy of live data.
+&gt;
+&gt;Steve Sloan
+&gt;
+&gt;
+&gt;
+&gt;May  8 12:08:16 booth3 login: PAM unable to
+&gt;dlopen(/lib/security/pam_pwdb.so)
+&gt;May  8 12:08:16 booth3 login: PAM [dlerror: libpwdb.so.0: cannot open shared
+&gt;object <A HREF="file:">file:</A> Too many open files in system]
+&gt;May  8 12:08:16 booth3 login: PAM adding faulty module:
+&gt;/lib/security/pam_pwdb.so
+&gt;May  8 12:08:16 booth3 login: PAM unable to
+&gt;dlopen(/lib/security/pam_nologin.so)
+&gt;May  8 12:08:16 booth3 login: PAM [dlerror: /lib/security/pam_nologin.so:
+&gt;cannot open shared object <A HREF="file:">file:</A> Too many open files in system]
+&gt;May  8 12:08:16 booth3 login: PAM adding faulty module:
+&gt;/lib/security/pam_nologin.so
+&gt;May  8 12:08:16 booth3 login: PAM unable to
+&gt;dlopen(/lib/security/pam_cracklib.so)
+&gt;May  8 12:08:16 booth3 login: PAM [dlerror: /lib/security/pam_cracklib.so:
+&gt;cannot open shared object <A HREF="file:">file:</A> Too many open files in system]
+&gt;May  8 12:08:16 booth3 login: PAM adding faulty module:
+&gt;/lib/security/pam_cracklib.so
+&gt;May  8 12:08:16 booth3 login: PAM unable to
+&gt;dlopen(/lib/security/pam_console.so)
+&gt;May  8 12:08:16 booth3 login: PAM [dlerror: /lib/security/pam_console.so:
+&gt;cannot open shared object <A HREF="file:">file:</A> Too many open files in system]
+&gt;May  8 12:08:16 booth3 login: PAM adding faulty module:
+&gt;/lib/security/pam_console.so
+&gt;May  8 12:08:16 booth3 login: PAM unable to
+&gt;dlopen(/lib/security/pam_deny.so)
+&gt;May  8 12:08:16 booth3 login: PAM [dlerror: /lib/security/pam_deny.so:
+&gt;cannot open shared object <A HREF="file:">file:</A> Too many open files in system]
+&gt;May  8 12:08:16 booth3 login: PAM adding faulty module:
+&gt;/lib/security/pam_deny.so
+&gt;May  8 12:08:17 booth3 login: FAILED LOGIN SESSION FROM 192.168.1.5 FOR
+&gt;xxxxx, Module is unknown
+&gt;May  8 12:08:17 booth3 inetd[14519]: pid 20789: exit status 1
+&gt;
+&gt;_____________________________________________
+&gt;
+&gt;LanSol Computers
+&gt;283 Burbridge Rd.
+&gt;Brooklyn Park SA 5032
+&gt;Ph 618 8238 3406   Fax 618 83538479
+&gt;Email   <A HREF="mailto:steve@lansol.com.au">steve@lansol.com.au</A>
+&gt;URL  www.lansol.com.au
+&gt;_____________________________________________
+&gt;
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.ethereal.com)
+Contributing author, SAMS Teach Yourself Samba in 24 Hours
+Author, Special Edition, Using Samba
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

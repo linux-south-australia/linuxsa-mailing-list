@@ -1,0 +1,120 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: disapearing disk space problem" -->
+<!-- FromName="'Horst Poehlmann'" -->
+<!-- FromEmail="horst@pobox.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 11 Sep 2001 15:09:38 +0930" -->
+<!-- Id="20010911150938.D2632@pobox.com" -->
+<!-- Reference="20010911140545.A26826@suburbia.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: disapearing disk space problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Horst Poehlmann &lt;<I><A HREF="mailto:horst@pobox.com">horst@pobox.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 11 Sep 2001 15:09:38 +0930
+</PRE>
+<H1>Re: disapearing disk space problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Well, it may be an inode problem. I used to be able to write a number to
+/proc/sys/fs/inodes-max to increase the inodes. However redhat 7.1 won't
+let me do this anymore. I did have a look at the messages file to see if
+I had any "File system full" messages. I didn't see any, but I did see
+this: 
+
+Sep 11 14:56:16 linuxserver kernel: kernel BUG at inode.c:384!
+Sep 11 14:56:16 linuxserver kernel: invalid operand: 0000
+Sep 11 14:56:16 linuxserver kernel: CPU:    0
+Sep 11 14:56:16 linuxserver kernel: EIP:    0010:[clear_inode+130/384]
+Sep 11 14:56:16 linuxserver kernel: EIP:    0010:[&lt;c0150402&gt;]
+Sep 11 14:56:16 linuxserver kernel: EFLAGS: 00010286
+Sep 11 14:56:16 linuxserver kernel: eax: 0000001b   ebx: 00000000   ecx: 00000002   edx: 04000000
+Sep 11 14:56:16 linuxserver kernel: esi: eebebd80   edi: f0f21424   ebp: ef31ddec   esp: ef31dd8c
+Sep 11 14:56:16 linuxserver kernel: ds: 0018   es: 0018   ss: 0018
+Sep 11 14:56:16 linuxserver kernel: Process ps (pid: 3437, stackpage=ef31d000)
+Sep 11 14:56:16 linuxserver kernel: Stack: c0230d7b c0230e9e 00000180 f8941180 f0f21424 f890d26c eebebd80 eebebd80 
+Sep 11 14:56:16 linuxserver kernel:        f8941180 c0150ef2 eebebd80 f7b13460 ef31ddec f89135b3 f0f21424 00000000 
+Sep 11 14:56:16 linuxserver kernel:        ef31de88 f8930cdd eebebd80 3a699d00 ef31de3c f890a37c 00000002 eebebd80 
+Sep 11 14:56:16 linuxserver kernel: Call Trace: [error_table+60707/64248] [error_table+60998/64248] [megaraid:mega_hbas+1012160/88211088] [megaraid:mega_hbas+799404/88423844] [megaraid:mega_hbas+1012160/88211088] [iput+354/368] [megaraid:mega_hbas+824819/88398429] 
+Sep 11 14:56:16 linuxserver kernel: Call Trace: [&lt;c0230d7b&gt;] [&lt;c0230e9e&gt;] [&lt;f8941180&gt;] [&lt;f890d26c&gt;] [&lt;f8941180&gt;] [&lt;c0150ef2&gt;] [&lt;f89135b3&gt;] 
+Sep 11 14:56:16 linuxserver kernel:        [megaraid:mega_hbas+945437/88277811] [megaraid:mega_hbas+787388/88435860] [megaraid:mega_hbas+787433/88435815] [megaraid:mega_hbas+947916/88275332] [megaraid:mega_hbas+925630/88297618] [megaraid:mega_hbas+925473/88297775] [megaraid:mega_hbas+819240/88404008] [megaraid:mega_hbas+819164/88404084] 
+Sep 11 14:56:16 linuxserver kernel:        [&lt;f8930cdd&gt;] [&lt;f890a37c&gt;] [&lt;f890a3a9&gt;] [&lt;f893168c&gt;] [&lt;f892bf7e&gt;] [&lt;f892bee1&gt;] [&lt;f8911fe8&gt;] [&lt;f8911f9c&gt;] 
+Sep 11 14:56:16 linuxserver kernel:        [megaraid:mega_hbas+819144/88404104] [megaraid:mega_hbas+926307/88296941] [cached_lookup+45/80] [path_walk+674/2432] [dput+59/416] [open_namei+144/1808] [filp_open+54/96] [getname+91/160] 
+Sep 11 14:56:16 linuxserver kernel:        [&lt;f8911f88&gt;] [&lt;f892c223&gt;] [&lt;c01459ed&gt;] [&lt;c0145f42&gt;] [&lt;c014e8cb&gt;] [&lt;c0146d60&gt;] [&lt;c0139ae6&gt;] [&lt;c01456fb&gt;] 
+Sep 11 14:56:16 linuxserver kernel:        [sys_open+58/224] [system_call+51/56] 
+Sep 11 14:56:16 linuxserver kernel:        [&lt;c0139dfa&gt;] [&lt;c01091cb&gt;] 
+Sep 11 14:56:16 linuxserver kernel: 
+Sep 11 14:56:16 linuxserver kernel: Code: 0f 0b 8b 86 f8 00 00 00 83 c4 0c 83 e0 08 74 07 56 e8 98 f9 
+
+Happens with other processes as well, not just ps.
+
+Anyone come across this before? The machine is a Quad-CPU, 1Gig RAM, hardware
+raid (striped and mirrored) in case it makes a difference.
+
+Horst.
+
+On Tue, Sep 11, 2001 at 02:05:45PM +1000, David Fitch wrote:
+&gt; On Tue, Sep 11, 2001 at 09:19:51AM +0930, Horst Poehlmann wrote:
+&gt; &gt; As you can see, / is 100% full. However when you do a du on all the
+&gt; &gt; directories it doesn't look like it's anywhere near full. It's a one Gig
+&gt; &gt; partition. It shouldn't even be using half that. 
+&gt; 
+&gt; just a stab in the dark but... it couldn't be out of inodes maybe?
+&gt; 
+&gt; (if as you say, you've unmounted everything and checked for "hidden"
+&gt; dirs and stuff under mount points etc, and checked in /dev?  also
+&gt; done a 'find / -mount -name "*core*"'?  and a find for size &gt; I
+&gt; dunno something fairly big?)
+&gt; 
+&gt; Dave.
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+
+-- 
+Horst.
+Phone: 0414851661 		email: <A HREF="mailto:horst@pobox.com">horst@pobox.com</A>
+
+ Beer is proof that God loves us and wants us to be happy.
+ --Benjamin Franklin
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

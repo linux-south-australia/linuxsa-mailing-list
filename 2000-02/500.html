@@ -1,0 +1,94 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Integrating Linux into a Solaris environment" -->
+<!-- FromName="Matthew Tippett" -->
+<!-- FromEmail="mtippett@ticons.com.au" -->
+<!-- ToName="Richard Sharpe" -->
+<!-- ToEmail="sharpe@ns.aus.com" -->
+<!-- Date="Wed, 23 Feb 2000 23:23:15 +1030 (CST)" -->
+<!-- Id="200002231253.XAA28750@matt.ticons.com.au" -->
+<!-- Reference="3.0.6.32.20000222154310.00906a60@203.16.214.248" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Integrating Linux into a Solaris environment</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Tippett &lt;<I><A HREF="mailto:mtippett@ticons.com.au">mtippett@ticons.com.au</A></I>&gt;
+  To  : Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  Date: Wed, 23 Feb 2000 23:23:15 +1030 (CST)
+</PRE>
+<H1>Re: Integrating Linux into a Solaris environment</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; What gotcha's are then when using NIS or NIS+ for Linux to allow access to
+&gt; the various NIS or NIS+ maps.
+
+I haven't played with NIS+ on Linux, but using NIS+ in NIS compatibility
+mode for Linux works a treat (in fact RH 6.1 allows NIS as an install
+option.
+
+&gt; Automounter gotchas and problems.
+
+Mostly work fine except for the root (-) point.  Basically you need to 
+define most of the base mount points for autofs to pick them up.  I haven't
+looked too closely at what the autofs/NIS integration give you but it appears
+to be there.
+
+&gt; Also, what issues are faced when looking at NFS mounting applications on a
+&gt; Linux box rather than, say, simply installing them all on each Linux box. I
+&gt; am thinking of issues like shared libraries, and ldconfig and the like.
+
+The main problem with integrating NFS under Linux with Solaris is that 
+Linux will talk NFS v2 against a Solaris box (Solaris against Solaris 
+will talk NFS v3).  The difference in performance being that NFSv3 allows
+asynchronous writes, whilst NFS v2 on Solaris will always write the 
+data before completing the RPC call.  In other words, NFS write performace
+sux (Linux -&gt; Solaris that is).  The Linux nfs daemon doesn't enforce the
+synchronous writes, and so Linux -&gt; Linux (and I would imagine Solaris -&gt;
+Linux) work quite snappy.
+
+To mitigate the Linux -&gt; Solaris problem you can by hardware from Sun which
+effective give a NVRAM disk which the system writes to first.  This has 
+the effect of increase Linux write performance by typically an order of
+magnitude.  (IIRC the hardware is called a Prospero server - but I could
+be wrong).
+
+Regards,
+
+Matthew
+
+-- 
++---[ Matthew Tippett ]-[ Ph:+61 416 006 047 ]-[ Fax:+61 414 000 694 ]---+
++---[ TICons ]-[ <A HREF="mailto:mtippett@ticons.com.au">mtippett@ticons.com.au</A> ]-[ <A HREF="http://www.ticons.com.au/">http://www.ticons.com.au/</A> ]--+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

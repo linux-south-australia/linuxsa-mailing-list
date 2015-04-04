@@ -1,0 +1,165 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: my first DOS attack" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Tue, 5 Sep 2000 01:16:37 +0930" -->
+<!-- Id="20000905011637.A6523@atdot.dotat.org" -->
+<!-- Reference="20000905005455.A10714@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: my first DOS attack</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Tue, 5 Sep 2000 01:16:37 +0930
+</PRE>
+<H1>Re: my first DOS attack</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, Sep 05, 2000 at 12:54:55AM +0930, Alan Kennington wrote:
+
+ &gt; Is that  attack of which you speak the kind of attack where
+ &gt; you fake the reverse DNS look-up to fool the server host into
+ &gt; thinking that the client is a trusted client?
+ 
+No.  It is an attack which forges packets so that they appear to come
+from "trusted" IP addresses.
+
+ &gt; If so, then the use of numerical host addresses should fix this.
+
+Sadly not.
+
+ &gt; If not, then I'd like to be convinced how an attacker from 
+ &gt; 1. outside the firewall which blocks the rlogin/rsh ports, or
+ &gt; 2. within the LAN behind the firewall
+ &gt; can get authenticated as a trusted host.
+
+Sigh.
+
+The reason you gave for pointing out that use of rlogin/rsh was good 
+was that if someone compromised the firewall and sniffed the internal
+network, they wouldn't be able to see passwords.
+
+My reaction to that is to say that if you're using .rhosts or
+hosts.equiv files behind your firewall, once they've compromised it
+they don't *NEED* to see your passwords, because they can break in
+anyway.
+
+ &gt; I'm not claiming that it can't be done.
+ &gt; This is a genuine request for info.
+ &gt; If I can see a credible method of attack, I'll stop using
+ &gt; the .rhosts thing.
+
+The attack method is well known, and has been for many years.  There
+was a very long and drawn out thread on it started by Tsotumo
+Shimomura in comp.unix.security in 1996 or thereabouts;  It's also
+one of the reasons why so much effort has been invested into selecting
+difficult-to-guess seed sequence numbers in TCP implementations 
+since that time.
+
+The rsh/rlogin protocol is fundamentally broken by design -- It 
+gives 100% total trust to the source IP address of a client (because
+it uses it as the one-and-only authenticator), even though the source
+IP address can be trivially forged to be whatever the hell an attacker
+wants it to be.  If an attacker is at the end of a WAN link, and you're
+using .rhosts/hosts.equiv, and they can credibly guess initial sequence
+numbers, they'll break in;  If they're able to sniff your LAN, they 
+no longer need to guess initial sequence numbers.
+
+Aside from that, whether you're using telnet, rsh, HTTP basic
+authentication, or any other unencrypted wire protocol, an attacker can
+perform a "hijacking" attack if they're on your LAN.  Thus, even small
+amounts of trust in unencrypted protocols are terribly misguided if
+you're even remotely interested in security.
+
+ &gt; On a related topic, the "r" commands are useful for all sorts
+ &gt; of purposed, like inclusion in scripts and makefiles.
+
+Get ssh.  Functionally identical to the "r" commands, able to run as
+a command-line-compatible drop-in replacement, but with the benefit of
+cryptographic security.
+
+ &gt; I could look it up, I suppose, but could you say whether
+ &gt; it is possible to do this easily also with "ssh".
+ &gt; I think I've seen somewhere that "ssh" (which I use
+ &gt; day in, day out - on your recommendation, I think) is able
+ &gt; to be used in scripts by lodging a signature-file sort of
+ &gt; thing with the client host for access without manual
+ &gt; intervention.
+
+Yes - Place public keys of authorized clients into a user's
+$HOME/.ssh/authorized_keys file (to generate the keypair, use 
+ssh-keygen(1) -- Perhaps non-obvious).
+
+ &gt; But then would that no weaken my whole security?
+ &gt; If someone gets hold of that unencrypted signature-file
+ &gt; thing, then they can impersonate me even over the net
+ &gt; through my firewall (which lets ssh through).
+
+There is no such thing as an unencrypted signature file.  There are
+private key files (which are supposed to be unreadable to everyone
+except their owner, and are passphrase-protected just in case) and 
+there are public key files (which are useless without the corresponding
+private key).
+
+ &gt; PS. I don't use hosts.equiv files.
+ &gt; That would be a disaster, I admit.
+
+There is no functional difference between a hosts.equiv and a .rhosts.
+If anything, the hosts.equiv is stronger because the only individual
+who can control it is the superuser (consider for a moment the security
+implications of running a system with thousands of accounts on it, where
+any one of those users could accidentally place a line in their
+.rhosts file which permits anyone on the Internet to login to their 
+account -- A standard trick when I was at uni was to put
+"+ +" into a user's .rhosts file if they walked away from their terminal
+without logging out;  Hours of fun for all the family :-)
+
+ &gt; I used to use them in the old days (ultrix etc.).
+ &gt; It's convenient in an organisation with people sharing
+ &gt; a dozen workstations.
+
+That alone should set the security alarms ringing.
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

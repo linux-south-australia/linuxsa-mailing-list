@@ -1,0 +1,199 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: FreeBSD blues... Tape drive... not even google knows why :(" -->
+<!-- FromName="'Greg 'groggy' Lehey'" -->
+<!-- FromEmail="grog@lemis.com" -->
+<!-- ToName="'Daniel A Moore'" -->
+<!-- ToEmail="danielm@gropep.com.au" -->
+<!-- Date="Thu, 8 May 2003 12:52:54 +0930" -->
+<!-- Id="20030508032254.GE94580@wantadilla.lemis.com" -->
+<!-- Reference="3EB899CF.5060302@gropep.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: FreeBSD blues... Tape drive... not even google knows why :(</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Greg  &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  To  : Daniel A Moore &lt;<I><A HREF="mailto:danielm@gropep.com.au">danielm@gropep.com.au</A></I>&gt;
+  Date: Thu, 8 May 2003 12:52:54 +0930
+</PRE>
+<H1>Re: FreeBSD blues... Tape drive... not even google knows why :(</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wednesday,  7 May 2003 at 14:59:51 +0930, Daniel A Moore wrote:
+&gt; Hello all... I have been trying to solve this problem for weeks and
+&gt; there doesn't seem anywhere on the net that can help.
+
+You know about <A HREF="http://www.auug.org.au/mailman/listinfo/buga,">http://www.auug.org.au/mailman/listinfo/buga,</A> right?  I
+would have thought that would have been a more relevant list to send
+this message to.
+
+&gt; I seem to be having a "little" trouble with my tape drive. I "aquired" a
+&gt; SONY AIT SDX-S300C tape drive and am trying to put it to use on my
+&gt; FreeBSD 4.4. I installed the SCSI card and that works, I have some
+&gt; mounted SCSI drives running off it. I have put all the jumpers to the
+&gt; positions that the Sony page says are for Unix... they don't say
+&gt; anything about FreeBSD in particular. I can access the tape drive
+&gt; through the mt command. I can rewind the tape, I can delete the tape.
+&gt; But here's where the trouble starts:
+&gt;
+&gt; dump -0u -b 512 -f  /dev/sa0 /home
+&gt;
+&gt; I found on the Sony site that the block size was meant to be 512 so I
+&gt; put it just in case (-b 512). However this outputs :
+&gt;
+&gt; DUMP: Date of this level 0 dump: Wed May 7 13:55:15 2003
+&gt; DUMP: Date of last level 0 dump: the epoch
+&gt; DUMP: Dumping /home to /dev/sa0
+&gt; DUMP: bad sblock magic number
+&gt; DUMP: The ENTIRE dump is aborted.
+&gt;
+&gt; I read somewhere that FreeBSD only does dumps to entire devices... I
+&gt; didn't really believe this but I tried it anyway:
+&gt;
+&gt; dump -0u -b 512 -f  /dev/sa0 /
+&gt;
+&gt; DUMP: Date of this level 0 dump: Wed May 7 14:09:07 2003
+&gt; DUMP: Date of last level 0 dump: the epoch
+&gt; DUMP: Dumping /home to /dev/sa0
+
+This doesn't appear to match the command you mention above.
+
+&gt; DUMP: mapping (Pass I) [regular files]
+&gt; DUMP: mapping (Pass II) [directories]
+&gt; DUMP: estimated 462375 tape blocks on 10.61 tape(s).
+&gt; DUMP: 0.11% done, finished in 0:00
+&gt; DUMP: dumping (Pass III) [directories]
+&gt; DUMP: dumping (Pass IV) [regular files]
+&gt; DUMP: Closing /dev/sa0
+&gt; DUMP: Change Volumes: Mount volume #2
+&gt; DUMP: Is the new volume mounted and ready to go?: ("yes" or "no")
+&gt;
+&gt; This process takes about 5 minutes to get to this point. Now this can't
+&gt; be right. I am using the SDX1-25C tape media and that has an
+&gt; uncompressed capacity of 25 GB! With hardware compression that's 50.
+&gt; Perhaps it's dumping data to the contents information portion of the
+&gt; tape or something. I don't know what's going on.
+
+dump is stupid.
+
+&gt; I have read about someone getting it working by installing an MX
+&gt; driver but I have no idea what that is or even where to look for it.
+
+What's an MX driver?
+
+&gt; So can anyone give me a little insight into what's going on or even
+&gt; just give me some ideas as to where to go to next? Apart from this
+&gt; using FreeBSD has been a dream.
+
+The thing here is that end-of-medium handling on modern tapes is just
+plain broken, so dump makes assumptions about how long the tape is.
+They're based on much older tapes.  You have a number of options here.
+From dump(8):
+
+     -a      ``auto-size''.  Bypass all tape length considerations, and
+             enforce writing until an end-of-media indication is returned.
+             This fits best for most modern tape drives.  Use of this option
+             is particularly recommended when appending to an existing tape,
+             or using a tape drive with hardware compression (where you can
+             never be sure about the compression ratio).
+
+     -B records
+             The number of kilobytes per output volume, except that if it is
+             not an integer multiple of the output block size, the command
+             uses the next smaller such multiple.  This option overrides the
+             calculation of tape size based on length and density.
+
+     -d density
+             Set tape density to density.  The default is 1600BPI.
+
+Note that default.
+
+     -s feet
+             Attempt to calculate the amount of tape needed at a particular
+             density.  If this amount is exceeded, dump prompts for a new
+             tape.  It is recommended to be a bit conservative on this option.
+             The default tape length is 2300 feet.
+
+These parameters are correct for the tapes used on VAXen 20 years
+ago.  They give you a default capacity per tape of 46 MB, unless they
+also make assumptions about tape gaps.
+
+&gt; Oh yeah and when I try a restore (just for the heck of it, I've never
+&gt; tried to complete the 10 tape series, as I don't have 10 tapes :( ):
+&gt;
+&gt; restore -if /dev/sa0
+&gt;
+&gt; It makes some whirring noise and the busy light goes on...
+&gt;
+&gt; (sa0:sym0:0:0): 65536-byte tape record bigger than supplied buffer
+&gt; tape read error: Input/output error
+&gt; May 7 14:23:29 testbed /kernel: (sa0:sym0:0:0): 65536-byte tape record bigger than supplied buffer
+&gt; May 7 14:23:29 testbed /kernel: (sa0:sym0:0:0): 65536-byte tape record bigger than supplied buffer
+
+Yes, that's reasonable, since you've used the -b 512 option.  Again,
+from the man page:
+
+     -b blocksize
+             The number of kilobytes per output block, except that if it is
+             larger than 64, the command uses 64. (See the BUGS section.)  The
+             default block size is 10.
+
+BUGS
+
+     Currently, physio(9) slices all requests into chunks of 64 KB.  There-
+     fore, it is impossible to use a larger output block size, so dump will
+     prevent this from happening.
+
+This bug is in fact incorrect; physio(9) now does 128 kB.  Anyway, you
+need to specify -b 64 to restore as well.
+
+As others have observed, though, there are better choices.  On tape I
+use tar, because the format is more portable.
+
+Greg
+--
+Finger <A HREF="mailto:grog@lemis.com">grog@lemis.com</A> for PGP public key
+See complete headers for address and phone numbers
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.0 (FreeBSD)
+
+iD8DBQE+uc2OIubykFB6QiMRAk6cAKCQRssvP+PMp6Jx/P0n0MzZ+nJ1jQCfRDxq
+Ai1rRkxncoByO7sLQlDCLvM=
+=7aXA
+-----END PGP SIGNATURE-----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

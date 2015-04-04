@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="SCSI Disk Hard Drive speed" -->
+<!-- FromName="Tim Ansell" -->
+<!-- FromEmail="mithro@senet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 01 Jul 2000 13:47:30 +0000" -->
+<!-- Id="395DF672.5BDF5366@senet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: SCSI Disk Hard Drive speed</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Tim Ansell &lt;<I><A HREF="mailto:mithro@senet.com.au">mithro@senet.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sat, 01 Jul 2000 13:47:30 +0000
+</PRE>
+<H1>SCSI Disk Hard Drive speed</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hello, i've been playing around with my hard drive lately so i thought i
+would test out compared to the SCSI disk in at school. 
+
+The results i got from my home machine where:
+
+
+[<A HREF="mailto:root@localhost">root@localhost</A> libuta-0.3.26]# hdparm -t -T /dev/hda
+
+/dev/hda:
+ Timing buffer-cache reads:   128 MB in  3.10 seconds =41.29 MB/sec
+ Timing buffered disk reads:  64 MB in  7.26 seconds = 8.82 MB/sec
+[<A HREF="mailto:root@localhost">root@localhost</A> libuta-0.3.26]# 
+
+This is a normal EIDE hard drive, nothing special about it.
+
+Now the reason i'm writing this is because of the preformance i got
+reported from the scsi drives at school:
+
+[<A HREF="mailto:root@web">root@web</A> admin]# hdparm -t -T /dev/md0
+
+/dev/md0:
+ Timing buffer-cache reads:   64 MB in  0.43 seconds =148.84 MB/sec
+ Timing buffered disk reads:  32 MB in  2.79 seconds =11.47 MB/sec
+[<A HREF="mailto:root@web">root@web</A> admin]# 
+
+/dev/md0 is a 2 80mb/sec SCSI drives raided together using raid1
+(mirroring) on a Dual Pentium 600E computer.
+
+Heres the message i get from the kernel at start up
+
+md driver 0.90.0 MAX_MD_DEVS=256, MAX_REAL=12
+raid1 personality registered
+raid5: measuring checksumming speed
+raid5: MMX detected, trying high-speed MMX checksum routines
+   pII_mmx   :  1338.453 MB/sec
+   p5_mmx    :  1397.508 MB/sec
+   8regs     :  1026.414 MB/sec
+   32regs    :   603.123 MB/sec
+using fastest function: p5_mmx (1397.508 MB/sec)
+(scsi0) &lt;Adaptec AIC-7896/7 Ultra2 SCSI host adapter&gt; found at PCI
+0/12/0
+(scsi0) Wide Channel A, SCSI ID=7, 32/255 SCBs
+(scsi0) Downloading sequencer code... 396 instructions downloaded
+(scsi1) &lt;Adaptec AIC-7896/7 Ultra2 SCSI host adapter&gt; found at PCI
+0/12/1
+(scsi1) Wide Channel B, SCSI ID=14, 32/255 SCBs
+(scsi1) Downloading sequencer code... 396 instructions downloaded
+scsi0 : Adaptec AHA274x/284x/294x (EISA/VLB/PCI-Fast SCSI) 5.1.28/3.2.4
+       &lt;Adaptec AIC-7896/7 Ultra2 SCSI host adapter&gt;
+scsi1 : Adaptec AHA274x/284x/294x (EISA/VLB/PCI-Fast SCSI) 5.1.28/3.2.4
+       &lt;Adaptec AIC-7896/7 Ultra2 SCSI host adapter&gt;
+scsi : 2 hosts.
+(scsi0:0:2:0) Synchronous at 80.0 Mbyte/sec, offset 31.
+  Vendor: QUANTUM   Model: QM39100TD-SW      Rev: N1B0
+  Type:   Direct-Access                      ANSI SCSI revision: 02
+Detected scsi disk sda at scsi0, channel 0, id 2, lun 0
+(scsi0:0:4:0) Synchronous at 80.0 Mbyte/sec, offset 31.
+  Vendor: QUANTUM   Model: QM39100TD-SW      Rev: N1B0
+  Type:   Direct-Access                      ANSI SCSI revision: 02
+Detected scsi disk sdb at scsi0, channel 0, id 4, lun 0
+(scsi1:0:0:0) Synchronous at 20.0 Mbyte/sec, offset 15.
+  Vendor: IBM       Model: DCAS-34330    !#  Rev: S63A
+  Type:   Direct-Access                      ANSI SCSI revision: 02
+Detected scsi disk sdc at scsi1, channel 0, id 0, lun 0
+scsi : detected 3 SCSI disks total.
+SCSI device sda: hdwr sector= 512 bytes. Sectors= 17783249 [8683 MB]
+[8.7 GB]
+SCSI device sdb: hdwr sector= 512 bytes. Sectors= 17783249 [8683 MB]
+[8.7 GB]
+SCSI device sdc: hdwr sector= 512 bytes. Sectors= 8467200 [4134 MB] [4.1
+GB]
+
+
+And another scsi drive in our proxy server:
+
+[<A HREF="mailto:root@gihs">root@gihs</A> admin]# hdparm -t -T /dev/sda 
+
+/dev/sda:
+ Timing buffer-cache reads:   64 MB in  0.50 seconds =128.00 MB/sec
+ Timing buffered disk reads:  32 MB in  4.22 seconds = 7.58 MB/sec
+[<A HREF="mailto:root@gihs">root@gihs</A> admin]# 
+
+Which is an IBM 20mb/sec SCSI hd
+
+and
+
+[<A HREF="mailto:root@gihs">root@gihs</A> admin]# hdparm -t -T /dev/sdc
+
+/dev/sdc:
+ Timing buffer-cache reads:   64 MB in  0.58 seconds =110.34 MB/sec
+ Timing buffered disk reads:  32 MB in  1.62 seconds =19.75 MB/sec
+[<A HREF="mailto:root@gihs">root@gihs</A> admin]# 
+
+Which is an 18 gig 80mb/sec SCSI hard drive.
+
+I was wondering if hdparm is lying, if so is there a better tool to
+check the speeds of these hard drives. And if hdparm isn't lying what
+can i do to make these drive run and something close to there rated (or
+even half there rated) speed.
+
+Tim Ansell
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

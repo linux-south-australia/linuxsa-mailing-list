@@ -1,0 +1,131 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: System outages" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Mike Gratton'" -->
+<!-- ToEmail="mike@vee.net" -->
+<!-- Date="Tue, 22 Oct 2002 10:50:56 +0930" -->
+<!-- Id="3DB4A7F8.5030206@aarnet.edu.au" -->
+<!-- Reference="C4F0D9D424216A408BE98AEE84EAA3EF6946@adlex2.elderslimited.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: System outages</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Mike Gratton &lt;<I><A HREF="mailto:mike@vee.net">mike@vee.net</A></I>&gt;
+  Date: Tue, 22 Oct 2002 10:50:56 +0930
+</PRE>
+<H1>Re: System outages</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Mike Gratton wrote:
+
+&gt; Provided you're not disclosing some AARNet-internal secret, what do you 
+&gt; use to collect, sort and report on that sort of data?
+
+SNMP client on every machine, Nagios (was NetSaint) to notice
+the outages, a requirement on staff that each outage be
+acknowleged, and a set of standardised acknowledgement texts.
+
+There's a Nagios plugin to test every service (SMTP, etc
+come with Nagios, we add tests that the traffic accounting
+system works, BGP works, etc).
+
+Not rocket science.
+
+We also use MRTG to collect baseline stats for capacity
+planning and fault finding.  We collect a *lot* of stuff.
+ From memory for the Linux boxes it is stuff like:
+CPU, run queue lengths, disk space, disk I/O bandwidth
+utilisation, TCP connections, top 10 processes, most
+recently started processes, voltages and temperatures,
+CPU sleep states, cover off state, interface states,
+packet counts, error counts.
+
+Depending upon the application we also collect BGP
+neighbour state, BGP routing table sizes, MPLS tunnel
+states, RSVP reserved bandwidths.
+
+It's surprising just how useful the baseline stats are
+when things go wrong and you need to decide what to
+do next.
+
+For example, we've currently got a switch that reboots,
+apparently randomly.  By looking at the stats (add adding
+some more) we've been able to tell that the switch has
+an internal 4MB packet buffer and drops the highest-numbered
+MAC addresses from this buffer when it fills.  The result
+being that when you overload the switch OSPF Hello packets
+are the first packets dropped.  We're applying the LART
+to that manufacturer.
+
+We put a lot of effort and time into monitoring the
+network and making it managable.  For example, every
+PoP has a Linux machine responsible for monitoring
+that PoP.  Unlike your average ISP we need to do this:
+our mission is advanced Internet services so we are
+always running gear that isn't entirely production
+quality.
+
+Note that Nagios and MRTG aren't the best possible
+tools, by a long way.  But we're very much of the
+view that stats collection should happen today, not
+when the perfect tool appears.  The Open Source
+nature of the tools is essential -- for example, we've
+extended MRTG to be able to count the number of rows
+of a table, as it's often the size of something
+rather than its contents that is of interest.
+
+The lesson for us has been that *every* time we have
+added new collections to the stats system we have
+learned important things.  For example, we have
+recently added statistics of TCP dynamics and found
+that the Randon Early Drop parameters on our network,
+which were the manufacturer's default, halved
+throughput on low-capacity links compared to what
+was possible with some tuning.  That is, we got
+an effective capacity doubling of small links for
+very little expenditure.
+
+-- 
+  Glen Turner                                 Network Engineer
+  (08) 8303 3936      Australian Academic and Research Network
+  <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+  The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

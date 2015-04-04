@@ -1,0 +1,109 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: RH7.3 logrotate bug??" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="Jarrad.Schenk@dsto.defence.gov.au" -->
+<!-- Date="Fri, 27 Sep 2002 10:57:17 +0930" -->
+<!-- Id="3D93B3F5.7020108@aarnet.edu.au" -->
+<!-- Reference="200209270940.49812.jarrad.schenk@dsto.defence.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: RH7.3 logrotate bug??</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:Jarrad.Schenk@dsto.defence.gov.au">Jarrad.Schenk@dsto.defence.gov.au</A></I>&gt;
+  Date: Fri, 27 Sep 2002 10:57:17 +0930
+</PRE>
+<H1>Re: RH7.3 logrotate bug??</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Schenk, Jarrad wrote:
+&gt; Hi list,
+&gt; 
+&gt; I have a P2-450 with 128mb ram running RH7.3. 
+&gt; 
+&gt; Every morning I find that there is a process called logrotate that is hogging 
+&gt; 35MB or more of ram and using a high percentage of the CPU load. From the 
+&gt; name I can guess what it is supposed to be doing but does it really need that 
+&gt; much ram and CPU time to swap a few files around? Is this a bug or does this 
+&gt; process really use that much?
+&gt; 
+&gt; Because it is using a good percentage of my system ram, it makes everything 
+&gt; else run really slow as the system needs to swap things in and out of disk. I 
+&gt; can kill the process off (which I don't really like doing but is the only way 
+&gt; to get a usable system) and everything comes good but soon after, another 
+&gt; process called updatedb starts. this uses alot of IO time on the disk and 
+&gt; also slows things down. is it safe stop updatedb from running and if so, how?
+
+
+We've seen this.  Basically if logrotate has to rotate tens
+of thousands of files it slows to a crawl and becomes a resource
+hog.
+
+Try
+
+   find /var/log -name '*.[0-9]' -print
+
+to see if this has happened.
+
+The bug is usually in the configuration files.  For example
+if /etc/logrotate.d/example it says
+
+   /var/log/example/* {  ... }
+
+then logrotate tries to rotate the example.log file and the
+already-rotated files example.log.1 and so on.  The result
+is thousands of log files over time.
+
+The correct regular expression
+
+   /var/log/example/*.log { ... }
+
+fixes this problem
+
+To clean up the mess you probably need to delete all the
+multiply-rotated files.
+
+-- 
+  Glen Turner                                 Network Engineer
+  (08) 8303 3936      Australian Academic and Research Network
+  <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+  The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

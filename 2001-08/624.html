@@ -1,0 +1,178 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Cisoc 827 and IPTables" -->
+<!-- FromName="'Steve Sloan'" -->
+<!-- FromEmail="steve@lansol.com.au" -->
+<!-- ToName="'Daniel Callan'" -->
+<!-- ToEmail="dcallan@wias.net.au" -->
+<!-- Date="Thu, 16 Aug 2001 10:47:42 +0930" -->
+<!-- Id="00b101c125f1$60b6bfe0$1602a8c0@stephen" -->
+<!-- Reference="4.3.1.20010816104151.00bf5ba0@mail.wias.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Cisoc 827 and IPTables</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Steve Sloan &lt;<I><A HREF="mailto:steve@lansol.com.au">steve@lansol.com.au</A></I>&gt;
+  To  : Daniel Callan &lt;<I><A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A></I>&gt;
+  Date: Thu, 16 Aug 2001 10:47:42 +0930
+</PRE>
+<H1>Re: Cisoc 827 and IPTables</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Daniel,
+
+Here is the configuration of the 827.
+
+Steve
+
+
+xxx#show configuration
+Using 1189 out of 131072 bytes
+!
+version 12.2
+no parser cache
+service config
+no service single-slot-reload-enable
+no service pad
+service timestamps debug uptime
+service timestamps log uptime
+no service password-encryption
+!
+hostname xxx
+!
+logging rate-limit console 10 except errors
+enable secret 5 xxxxxx
+enable password xxx
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+ip subnet-zero
+!
+no ip dhcp-client network-discovery
+!
+!
+!
+interface Ethernet0
+ ip address x.x.x.x 255.255.255.248
+ no cdp enable
+!
+interface ATM0
+ ip address x.x.x.x 255.255.255.0
+ no atm ilmi-keepalive
+ pvc 8/35
+  encapsulation aal5mux ppp dialer
+  dialer pool-member 1
+ !
+ dsl operating-mode auto
+!
+interface Dialer0
+ ip address negotiated
+ encapsulation ppp
+ dialer pool 1
+ ppp authentication chap callin
+ ppp chap hostname xxxxx
+ ppp chap password xxxxx
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 x.x.x.x
+ip http server
+!
+dialer-list 1 protocol ip permit
+dialer-list 1 protocol ipx permit
+snmp-server community public RO
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0 4
+ password xxx
+ login
+!
+scheduler max-task-time 5000
+end
+
+
+----- Original Message -----
+From: "Daniel Callan" &lt;<A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A>&gt;
+To: "Steve Sloan" &lt;<A HREF="mailto:steve@lansol.com.au">steve@lansol.com.au</A>&gt;
+Cc: &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Sent: Thursday, August 16, 2001 10:18 AM
+Subject: Re: Cisoc 827 and IPTables
+
+
+&gt; At 10:05  16/08/01 +0930, you wrote:
+&gt; &gt;Just setup a Cisco 827 route on an ADSL line and also connected to a
+RH7.1
+&gt; &gt;gateway running IPtables. Everything works fine except I notice with the
+&gt; &gt;with IPtables logging turned on, the gateway is blocking a continuos
+stream
+&gt; &gt;of traffic from the router on UDP port 69. The from address is from the
+lan
+&gt; &gt;side of the router and going to 255.255.255.255. A quick search on Google
+&gt; &gt;tells me that UDP 69 is TFTP but I don't know why this is happening or
+more
+&gt; &gt;to the point how do I stop it.
+&gt;
+&gt; Sounds like your router is looking for a config/flash-update/something
+from
+&gt; somewhere???
+&gt; Routers use TFTP locations to aquire files of configs and flash-upgrades.
+&gt; But normally
+&gt; only when they are told to. I'm not familiar with that model so someone
+&gt; else can hopefully
+&gt; give a better diagnosis.
+&gt; Can you supply a "sh conf" output? (details editted to protect the
+innocent
+&gt; ofcourse ;-)
+&gt;
+&gt; Cheers,
+&gt; -Dan
+&gt;
+&gt;
+&gt; Daniel Callan
+&gt; <A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A>
+&gt; Systems Admin.
+&gt; WIAS Aust.
+&gt; www.wias.net.au
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

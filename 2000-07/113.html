@@ -1,0 +1,100 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Virtual Root Directory (fwd)" -->
+<!-- FromName="Sean Burford" -->
+<!-- FromEmail="slide@tellurian.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 4 Jul 2000 11:17:31 +0930 (CST)" -->
+<!-- Id="Pine.BSI.3.91.1000704110948.5907K-100000@tellurus.tellurian.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Virtual Root Directory (fwd)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Sean Burford &lt;<I><A HREF="mailto:slide@tellurian.com.au">slide@tellurian.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Tue, 4 Jul 2000 11:17:31 +0930 (CST)
+</PRE>
+<H1>Re: Virtual Root Directory (fwd)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Does anyone know how to set the root directory for a user to /home so 
+&gt; that when they type in "cd /" it takes them to their /home directory 
+&gt; even though it appears to them that they are in the root???
+
+It is possible, but it will not improve your security greatly unless the 
+users only require one or two executables.  Run your daemons chroot and 
+let your users have the run of the system.
+ 
+After going to all of the trouble of creating a chroot environment for 
+your users, you will either have a reasonably secure environment where 
+the users can run one or two commands, or you will have a system with 
+the same problems as before but less setuid binaries.
+
+If you just want to improve security because you need local (from 
+the network sense) untrusted users then dont chroot, either secure your 
+system or provide a different method of access (ie follow Alex's advice).
+
+Sean
+
+PS:
+Doing a chroot on login will restrict your users to any directory tree you 
+wish.  In case you need proof that this is a hazardous and time 
+consuming adventure, here is a list of some things to consider:
+
+  Read the Chroot-Bind howto for a detailed view of chrooting:
+    <A HREF="http://linux.senet.com.au/HOWTO/Chroot-BIND-HOWTO.html">http://linux.senet.com.au/HOWTO/Chroot-BIND-HOWTO.html</A>
+  Make sure the binaries the users require are under the chroot tree, 
+   including their shell.  If they need any set[ug]id binaries, 
+   reconsider the trouble of chrooting against the diminished benefit it 
+   will provide.
+  Make sure the libraries required by the binaries are under the chroot tree,
+   ldd &lt;executable&gt;   
+   will tell you what shared libraries are required
+  Have some way of forwarding syslogs from inside the chroot to outside, 
+   for example holelogd, otherwise, you will not know what is happening
+   inside the chroot hole.
+  Mount their filesystem nodev and nosuid to make it harder to break out
+   of chroot
+  Patch your kernel with the OpenWall patch to protect chroot from the
+   obvious (and some less obvious) ways of breaking out
+  Create files in &lt;newroot&gt;/etc/ such as passwd and group to map uids and
+   gids to users and groups for ls.  Do not include passwd hashes in the
+   /etc/passwd.
+  Anything that uses /etc/mtab or /proc/ (eg ps) will be broken unless you
+   also provide these.
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,102 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Feedback to mount cdrom in RH6" -->
+<!-- FromName="Benjamin Close" -->
+<!-- FromEmail="linux@senet.com.au" -->
+<!-- ToName="Mike Earnshaw" -->
+<!-- ToEmail="mearnshaw@bigpond.com" -->
+<!-- Date="Thu, 10 Jun 1999 08:50:42 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.10.9906100838440.4096-100000@Bytes4u.nodomain.yet" -->
+<!-- Reference="008c01beb265$b41a0e00$0b01a8c0@lancelot" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Feedback to mount cdrom in RH6</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Benjamin Close &lt;<I><A HREF="mailto:linux@senet.com.au">linux@senet.com.au</A></I>&gt;
+  To  : Mike Earnshaw &lt;<I><A HREF="mailto:mearnshaw@bigpond.com">mearnshaw@bigpond.com</A></I>&gt;
+  Date: Thu, 10 Jun 1999 08:50:42 +0930 (CST)
+</PRE>
+<H1>Re: Feedback to mount cdrom in RH6</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 9 Jun 1999, Mike Earnshaw wrote:
+
+&lt;SNIP&gt;
+ 
+&gt; Now I have a second problem of mounting a DOS logical drive. When I tried to
+&gt; use vfat as the type it spat the dummy. Also is there a way to get the
+&gt; system to read the fstab file without rebooting?
+&gt;
+
+I'll have a shot at answering the question but if it fails can you provide
+us with the actual error rather than 'spat the dummy' :)
+
+Firstly, changes to fstab take effect immediatley, you don't need to
+reboot. mount rereads the file everytime you run it. 
+
+If you are trying to mount your dos drive and it is on an extended
+partition you may be trying to access the wrong device. Ie:
+
+/dev/hdx1 = primary partition 1      (where x is the physical disk ie 'a')
+/dev/hdx2 =     "       "     2
+/dev/hdx3 =     "       "     3
+/dev/hdx4 =     "       "     4
+/dev/hdx5 = extened partition 1
+
+First find out where your dos partition exist.
+do:
+
+fdisk /dev/hdx   (once again x is the physical disk ie 'a')
+p                (list partition information)
+q                (quit)
+
+You'll see something like:
+
+   Device Boot    Start       End    Blocks   Id  System
+/dev/hda1   *         1       666   1342624+   6  FAT16
+/dev/hda2           667       793    256032   83  Linux
+/dev/hda3           794       826     66528   82  Linux swap
+
+The fat16 (or fat32) is the one your after. 
+Then do: mount -t vfat /dev/dospartition /mnt/test(or other mount point)
+This should mount it.
+
+cheers,
+--
+
+* Benjamin Close
+* <A HREF="mailto:Benjsc@senet.com.au">Benjsc@senet.com.au</A>
+* Web Page: <A HREF="http://users.senet.com.au/~benjsc">http://users.senet.com.au/~benjsc</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

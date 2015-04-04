@@ -1,0 +1,169 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: comp sci question: fast status mask handling" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="Martin Sheppard" -->
+<!-- ToEmail="martin.sheppard@hsn.csiro.au" -->
+<!-- Date="Mon, 7 Aug 2000 17:29:32 +0930" -->
+<!-- Id="20000807172932.A18061@dog.topology.org" -->
+<!-- Reference="4.3.0.20000807165321.00d56c60@pop.dhn.csiro.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: comp sci question: fast status mask handling</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : Martin Sheppard &lt;<I><A HREF="mailto:martin.sheppard@hsn.csiro.au">martin.sheppard@hsn.csiro.au</A></I>&gt;
+  Date: Mon, 7 Aug 2000 17:29:32 +0930
+</PRE>
+<H1>Re: comp sci question: fast status mask handling</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Aug 07, 2000 at 05:01:40PM +0930, Martin Sheppard wrote:
+&gt; 
+&gt; Mod 37 works quite well, classifying all powers of two from 2^0 to 2^35 
+&gt; uniquely into the range 1 to 36. Is this going to be quick enough for you?
+
+Now _that's_ what I was looking for.
+I should have thought of that.
+I had forgotten my old number theory.
+
+Since 37 is a prime, the number 2 has a fighting chance
+of generating the multiplicative group modulo 37.
+
+Do you happen to know what the rule is for the _powers_
+of 2 to generate the group, as opposed to the _multiples_?
+
+In the case of multiples, it is sufficient for the modulus
+to be prime. But for powers, it might be something else.
+
+Yep. It turns out that modulo 41, you get:
+
+n = 41
+2^0: 1
+2^1: 2
+2^2: 4
+2^3: 8
+2^4: 16
+2^5: 32
+2^6: 23
+2^7: 5
+2^8: 10
+2^9: 20
+2^10: 40
+2^11: 39
+2^12: 37
+2^13: 33
+2^14: 25
+2^15: 9
+2^16: 18
+2^17: 36
+2^18: 31
+2^19: 21
+2^20: 1
+2^21: 2
+2^22: 4
+2^23: 8
+2^24: 16
+2^25: 32
+2^26: 23
+2^27: 5
+2^28: 10
+2^29: 20
+2^30: 40
+2^31: 39
+
+But modulo 37 you get:
+
+n = 37
+2^0: 1
+2^1: 2
+2^2: 4
+2^3: 8
+2^4: 16
+2^5: 32
+2^6: 27
+2^7: 17
+2^8: 34
+2^9: 31
+2^10: 25
+2^11: 13
+2^12: 26
+2^13: 15
+2^14: 30
+2^15: 23
+2^16: 9
+2^17: 18
+2^18: 36
+2^19: 35
+2^20: 33
+2^21: 29
+2^22: 21
+2^23: 5
+2^24: 10
+2^25: 20
+2^26: 3
+2^27: 6
+2^28: 12
+2^29: 24
+2^30: 11
+2^31: 22 
+
+[Trivial script at:
+<A HREF="http://www.topology.org/src/aktools/bitmask1.pl">http://www.topology.org/src/aktools/bitmask1.pl</A> ]
+
+That looks unique to me.
+
+So now I just need:
+
+while (status) {
+    u32 one_less_bit = status & (status - 1);
+    u32 single_bit = status ^ one_less_bit;
+    int r = single_bit % 37;
+    (*jump_table[r])(); /* Or whatever the correct syntax is. */
+    status = one_less_bit;
+    }
+
+That gets out of all masking and heaps of other fuss.
+
+Cheers, and many thanks for that,
+Alan Kennington.
+
+PS. My apologies in advance if you didn't want me to
+quote your message in this post.
+
+PPS.  Maybe I should study up on number theory again,
+which I have always referred to as "recreational mathematics".
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

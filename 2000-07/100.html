@@ -1,0 +1,112 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Bash Script Error" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Darryl Ross" -->
+<!-- ToEmail="dross@syc.asn.au" -->
+<!-- Date="Mon, 3 Jul 2000 15:54:58 +0930" -->
+<!-- Id="20000703155458.C46416@atdot.dotat.org" -->
+<!-- Reference="Pine.LNX.4.21.0007031218320.10628-100000@boss.syc.asn.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Bash Script Error</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Darryl Ross &lt;<I><A HREF="mailto:dross@syc.asn.au">dross@syc.asn.au</A></I>&gt;
+  Date: Mon, 3 Jul 2000 15:54:58 +0930
+</PRE>
+<H1>Re: Bash Script Error</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Jul 03, 2000 at 12:27:16PM +0930, Darryl Ross wrote:
+
+ &gt; #!/bin/sh
+ &gt; OUTPUT="`ps aux | grep \`cat /var/run/squid.pid\` | grep -c squid`"
+ &gt; BAD="0"
+ &gt; if [ "$OUTPUT" == "$BAD" ]; then
+ &gt;   /etc/rc.d/init.d/squid start
+ &gt;   echo "Squid was just restarted.\n Time is `date`"
+ &gt; fi
+ 
+Optimize it:
+
+    if ps p`cat /var/run/squid.pid` &gt;/dev/null 2&gt;&1; then
+        echo "squid running"
+    else
+        /etc/rc.d/init.d/squid start
+        echo "squid was just restarted\n Time is `ddate`"
+    fi
+
+Yes, it has an additional else clause, but on the other hand you've saved
+yourself at fork for the built-in "test" ([) command and two invocations
+of grep.
+
+Hmm - that won't work, actually, if there's a case where another process
+has started up with the same PID as the dead squid daemon.  Oh well, I'll
+leave it here anyway so people can ponder over it to work out how it 
+works, and an example of how optimization can break things in very hard
+to find ways :-)
+
+ &gt; But, when I run it, it give the following:
+ &gt; ./chksquid: [: ==: binary operator expected
+ 
+It's fairly simple:  You've thrown people off the scent a bit by saying
+"bash question" on the Subject: line, but you've actually executed this
+script with #!/bin/sh on the first line:  sh != bash.  In particular,
+/bin/sh doesn't have an "==" operator.
+
+Starting bash as "sh" makes it mimic the Bourne shell as closely as
+possible;  since the Bourne shell doesn't recognize ==, neither does
+bash invoked as /bin/sh.  Try it out for yourself:  Type "bash", then
+type in your script at the command line and watch it work;  Then type
+"sh" and type your script again, and watch it fail with the exact error
+message you've posted here.
+
+To make your script work, either change "==" to "=", or put "#!/bin/bash"
+on the first line of the script.
+
+Alternatively, squid is bundled with a perfectly servicible "RunCache"
+script which is supposed to be used to start it up, and which does what
+you're trying to do immediately as soon as the squid daemon dies.  Perhaps
+you should be using that...
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

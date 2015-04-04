@@ -1,0 +1,125 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Linux and VIA Chipsets" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'michael'" -->
+<!-- ToEmail="michael@home.lyppard.com.au" -->
+<!-- Date="Thu, 4 Oct 2001 22:47:36 +0930" -->
+<!-- Id="20011004224736.A30370@yellowgoanna.com" -->
+<!-- Reference="Pine.LNX.4.10.10110042004590.2064-100000@sandwich.home.lyppard.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Linux and VIA Chipsets</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : michael &lt;<I><A HREF="mailto:michael@home.lyppard.com.au">michael@home.lyppard.com.au</A></I>&gt;
+  Date: Thu, 4 Oct 2001 22:47:36 +0930
+</PRE>
+<H1>Re: Linux and VIA Chipsets</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, Oct 04, 2001 at 08:17:16PM +0930, michael wrote:
+&gt; Hi.
+&gt; 
+&gt; Doesn't this just come down to load? If you have a system running an
+&gt; application/service/process that starts to get cpu-bound, an extra
+&gt; processor will relieve the load without requiring a complete new 'extra'
+&gt; server.
+
+no.
+
+without special programming, a single process (or thread, actually) is
+bound to one CPU.  This is because each thread is just that -- a
+single thread of execution, woven through a program's code. It is
+defined by the value of certain registers, particularly the Program
+Counter, which tells the CPU which instruction to execute next. It is
+possible (though non-trivial) to migrate a thread from one CPU to
+another, but it's not possible for one thread to execute on two CPUs.
+
+(note that a single process can be multi-threaded -- ie have many
+threads of execution within the one logical address space. Also,
+threads are sometimes referred to as Lightweight Processes or LWPs, as
+they are like a whole new process, except that rather than having
+their own protected block of memory, they share it with other LWPs in
+the same process... they have different PIDs though... although I
+beleive that this depends on implementation)
+
+The way SMP systems work is by sharing the threads around. I'm not
+entirely sure if all the threads in one heavyweight process need to be
+in the same CPU, but they certainly need a level of cache
+synchronisation (it's no good for one thread to modify a variable, and
+another to read it but get the old value back simply because the
+threads were in different CPUs, and the new value hadn't been
+propagated back to main memory yet)... In fact, you have to be very
+very careful with this kind of thing, because as soon as you allow a
+process to have two threads on two CPUs, you have real multi-tasking,
+and you can really end up in trouble with resource contention if you
+don't know what you are doing...)
+
+anyway...
+
+the point was that each thread will definitely be constrained to one
+CPU, and depending on implementation, each process may also be
+constrained, so it's quite possible that you will get exactly zero
+benefit from having SMP (for eg on an average compile), while still
+paying the price of keeping everything synchronised, just in case
+(hence a net loss...). If this is the kind of processing you do
+mostly, then a single, faster CPU is better for you.
+
+However, if most of what you do is lots of little jobs, then SMP will
+benefit you a lot. For eg, a compile server used by many people will
+benefit, as each users' compile will start on the lowest loaded CPU...
+
+I think I could have said this much quicker if I had just said that
+the granularity of the parallelism is the process (or thread,
+depending on implementation).
+
+&gt; 
+&gt; Given that you are flat out buying double the cpu capacity in a single cpu
+&gt; across the available cpu's, doubling up on the cpu's is also probably the
+&gt; most economical method of increasing the cpu capacity of a system.
+
+Basically, it varies. :)
+
+rr
+
+
+-- 
+Richard Russell
+Yellow Goanna Pty Ltd
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

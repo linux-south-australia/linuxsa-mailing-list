@@ -1,0 +1,175 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Port Forwarding..." -->
+<!-- FromName="Tim Ansell" -->
+<!-- FromEmail="ansell@chariot.net.au" -->
+<!-- ToName="Linux User Group" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 18 Jul 1999 12:47:19 +0930" -->
+<!-- Id="3791473F.4FF7093C@chariot.net.au" -->
+<!-- Reference="379018EB.FCE124FC@chariot.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Port Forwarding...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Tim Ansell &lt;<I><A HREF="mailto:ansell@chariot.net.au">ansell@chariot.net.au</A></I>&gt;
+  To  : Linux User Group &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 18 Jul 1999 12:47:19 +0930
+</PRE>
+<H1>Re: Port Forwarding...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Anyone heave a clue?
+
+Tim
+
+Tim Ansell wrote:
+
+&gt; I'm trying to setup up port forwarding on my current firewall...
+&gt;
+&gt; My current network configuration is..
+&gt;
+&gt;         Internet
+&gt;             |
+&gt;             | 210.9.63.147
+&gt;             | 210.9.63.146
+&gt;         ____|________
+&gt;        |  Firewall   | 192.168.1.1
+&gt;        |             |--------- DMZ    192.168.1.2
+&gt;        |_____________|                 192.168.1.3
+&gt;            |
+&gt;            |
+&gt;         Network
+&gt;
+&gt;     10.1.1.1
+&gt;
+&gt; I would like to forward port www (80) from 210.9.63.147 to 192.168.1.2
+&gt; and forward.
+&gt; As well i would like to forward Imap (143) and SMTP (25) from
+&gt; 210.9.63.147 to 192.168.1.3
+&gt;
+&gt; I can telnet to 192.168.1.2 on port 80
+&gt;
+&gt; [<A HREF="mailto:root@gihs">root@gihs</A> linux]# telnet 192.168.1.2 80
+&gt; Trying 192.168.1.2...
+&gt; Connected to 192.168.1.2.
+&gt; Escape character is '^]'.
+&gt;
+&gt; So i use this command which should forward from 210.9.63.147 80 to
+&gt; 192.168.1.2 80
+&gt;
+&gt; [<A HREF="mailto:root@gihs">root@gihs</A> linux]# /usr/sbin/ipmasqadm portfw -a -P tcp -L
+&gt; 210.9.63.147 80 -R 192.168.1.2 80
+&gt;
+&gt; Yet when i try and telnet to 210.9.63.147 80 i get the following
+&gt;
+&gt; [<A HREF="mailto:root@gihs">root@gihs</A> linux]# telnet 210.9.63.147 80
+&gt; Trying 210.9.63.147...
+&gt; <A HREF="telnet:">telnet:</A> Unable to connect to remote host: Connection refused
+&gt; [<A HREF="mailto:root@gihs">root@gihs</A> linux]#
+&gt;
+&gt; Meaning that the port forwarding isn't working yet when i start up
+&gt; httpd on 210.9.63.147 i can connect to the machine... This seems to
+&gt; mean that port forwarding isn't at all!
+&gt;
+&gt; ipchains -L gives the following...
+&gt; Chain input (policy ACCEPT):
+&gt; Chain forward (policy ACCEPT):
+&gt; Chain output (policy ACCEPT):
+&gt;
+&gt; ipmasqadm portfw -l gives the following....
+&gt; prot localaddr            rediraddr               lport    rport
+&gt; pcnt  pref
+&gt; TCP  mail.gihs.sa.edu.au  192.168.1.2               www      www
+&gt; 10    10
+&gt;
+&gt; more /proc/sys/net/ipv4/ip_forwarding gives
+&gt; 1
+&gt;
+&gt; Can anyone help? I have got port forwarding working before but can't
+&gt; seem to get it working again.
+&gt;
+&gt; Masqurading out works perfectly.
+&gt;
+&gt; The 2 kernels i'm trying to use are 2.2.5-15 (the one that comes with
+&gt; redhat 6.0) and the 2.3.10 kernel.
+&gt;
+&gt; In the kernel i have
+&gt;
+&gt;                          &lt;*&gt; Packet socket
+&gt;                          [*] Kernel/User netlink socket
+&gt;                          [*] Routing messages
+&gt;                          &lt;*&gt; Netlink device emulation
+&gt;                          [*] Network firewalls
+&gt;                          [*] Socket Filtering
+&gt;                          &lt;*&gt; Unix domain sockets
+&gt;                          [*] TCP/IP networking
+&gt;                          [ ] IP: multicasting
+&gt;                          [*] IP: advanced router
+&gt;                          [ ] IP: policy routing
+&gt;                          [ ] IP: equal cost multipath
+&gt;                          [ ] IP: use TOS value as routing key
+&gt;                          [ ] IP: verbose route monitoring
+&gt;                          [ ] IP: large routing tables
+&gt;                          [ ] IP: kernel level autoconfiguration
+&gt;                          [*] IP: firewalling
+&gt;                          [*] IP: firewall packet netlink device
+&gt;                          [*] IP: always defragment (required for
+&gt; masquerading)
+&gt;                          [ ] IP: transparent proxy support
+&gt;                          [*] IP: masquerading
+&gt;                        --- Protocol-specific masquerading support will
+&gt; be built as modules.
+&gt;                          [*] IP: ICMP masquerading
+&gt;                        --- Protocol-specific masquerading support will
+&gt; be built as modules.
+&gt;                          [*] IP: masquerading special modules support
+&gt;                          &lt;M&gt; IP: ipautofw masq support (EXPERIMENTAL)
+&gt;                          &lt;*&gt; IP: ipportfw masq support (EXPERIMENTAL)
+&gt;                          &lt;*&gt; IP: ip fwmark masq-forwarding support
+&gt; (EXPERIMENTAL)
+&gt;                          [*] IP: optimize as router not host
+&gt;                          &lt; &gt; IP: tunneling
+&gt;                          &lt; &gt; IP: GRE tunnels over IP
+&gt;                          [*] IP: aliasing support
+&gt;                          [ ] IP: ARP daemon support (EXPERIMENTAL)
+&gt;                          [ ] IP: TCP syncookie support (not enabled
+&gt; per default)
+&gt;                        --- (it is safe to leave these untouched)
+&gt;
+&gt; I have tried everything can you please help...
+&gt;
+&gt; Tim
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

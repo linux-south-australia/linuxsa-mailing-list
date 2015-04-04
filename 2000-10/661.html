@@ -1,0 +1,105 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Followup to C library calls on Linux" -->
+<!-- FromName="Michael T Pope" -->
+<!-- FromEmail="michael.pope@dsto.defence.gov.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 20 Oct 2000 10:36:44 +1030" -->
+<!-- Id="200010200006.KAA05413@riesling.dsto.defence.gov.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Followup to C library calls on Linux</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael T Pope &lt;<I><A HREF="mailto:michael.pope@dsto.defence.gov.au">michael.pope@dsto.defence.gov.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Fri, 20 Oct 2000 10:36:44 +1030
+</PRE>
+<H1>Re: Followup to C library calls on Linux</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; I have a related question regarding the following code:
+&gt;
+&gt; #include &lt;stdio.h&gt;
+&gt;
+&gt; main()
+&gt; {
+&gt;   char str1[] = "Copy a string.";
+&gt;   char str2[15];
+&gt;   char *ptr_str = "Try this one at home!!";
+
+&gt;   strcpy(str2, str1);
+&gt;   printf("\nTesting...\n%s\n", str2);
+&gt;   printf("Stuff means:  %d.\n", strlen(ptr_str));
+&gt;   return 0;
+&gt; }
+&gt;
+&gt; Now, I understand that the functions strcpy() and strlen() require me to
+&gt; have the string.h header files for compilation to work.  However,
+&gt; despite omitting #include &lt;string.h&gt;, I still get the output:
+
+&gt; Testing...
+&gt; Copy a string.
+&gt; Stuff means:  22.
+
+&gt; So how come I can get away with *not* including the right header file
+&gt; for string manipulation, and yet it compiles and runs just fine?  Or is
+&gt; string.h referenced to or part of stdio.h in gcc?
+
+If that were true we could run gcc -E on your file and successfully
+grep for a definition of strlen() et al.  That is not the case on my
+Redhat box.  What I suspect is happening here is that the compiler is
+taking advantage of a dispensation available since 1989 for C
+compilers to expand standard C library functions into their own
+internal version.  The following shows that gcc `knows' about
+strlen():
+
+
+  210 Riesling&gt; cat &gt; foo.c
+  int main(void) {
+    char ch = strlen();
+  }
+  211 Riesling&gt; gcc -c foo.c
+  foo.c: In function `main':
+  foo.c:3: too few arguments to function `strlen'
+
+
+This does not mean one should omit &lt;string.h&gt;, but it certainly makes
+it easy to forget it.  Been there, bitten by that.
+
+Cheers,
+Mike Pope
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

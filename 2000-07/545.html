@@ -1,0 +1,126 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: bind 8.2.2_P5-9 and forwarders option" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="Alex Garner" -->
+<!-- ToEmail="alex@netcraft.com.au" -->
+<!-- Date="Thu, 13 Jul 2000 18:08:41 +0900" -->
+<!-- Id="3.0.6.32.20000713180841.009d5c50@203.16.214.248" -->
+<!-- Reference="3.0.6.32.20000713164137.009bb920@203.16.214.248" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: bind 8.2.2_P5-9 and forwarders option</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : Alex Garner &lt;<I><A HREF="mailto:alex@netcraft.com.au">alex@netcraft.com.au</A></I>&gt;
+  Date: Thu, 13 Jul 2000 18:08:41 +0900
+</PRE>
+<H1>Re: bind 8.2.2_P5-9 and forwarders option</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 03:31 PM 7/13/00 +0930, Alex Garner wrote:
+&gt;&gt; &gt; &gt; I have bind 8.2.2_P5-9 installed at a site and am trying to set
+&gt;&gt; &gt; &gt; up a split DNS, but am having real problems getting the
+&gt;&gt; &gt; &gt; forwarders statement to work.
+&gt;&gt; &gt;
+&gt;&gt; &gt; When you say split, are you referring to the split of resolver and
+&gt;&gt; &gt; server?
+&gt;&gt; 
+&gt;&gt; No, having a separate internal and external DNS ...
+&gt;
+&gt;Yes, but which functions of DNS are you trying to move around. You
+&gt;have the "name server" and the "resolver server (library)". All
+&gt;'forwarders' does, is queries the listed server for the DNS resolution
+&gt;and the queried server does the whole "get the . domain server, get
+&gt;the .au domain server, get the .com.au. domain server" thing.
+
+Well, here is what I am trying to do:
+
+[Big Bad Internet]------[Firewall]-------[Internal Network]
+
+Big Bad Internet, we all know about.
+
+Firewall runs a DNS and contains a minimal set of names, like www, mail,
+etc. They all resolve to the firewall or IP addresses that the firewall has
+or other machines in the DMZ have.
+
+Internal Network uses private IP, and runs its own DNS. Internal names
+resolve in it and I want two do two more things:
+
+1. External names that are queried by internal users should be passed to
+the external DNS for resolution.  The documentation on the forwarders
+option says:
+
+"The forwarding facility can be used to create a large site-wide cache on a
+few servers, reducing traffic over links to external nameservers. It can
+also be used to allow queries by servers that do not have direct access to
+the Internet, but wish to look up exterior names anyway. Forwarding occurs
+only on those queries for which the server is not authoritative and does
+not have the answer in its cache. "
+
+The last sentence seems to cover what I want.
+
+2. On the firewall, I want to set resolv.conf to point to the internal DNS.
+This appears to be the classic split DNS setup, according to my
+understanding. Then, the firewall can resolve both internal and external
+addresses, at the cost of an extra hop for all external addresses.
+
+&gt;&gt; &gt; &gt; Has anyone had this working?
+&gt;&gt; &gt;
+&gt;&gt; &gt; Yup. What else is in your named.conf file?
+
+Unfortunately, despite using:
+
+   options {
+       directory  "/var/named";
+	forwarders { xxx.yyy.zzz.aaa; };
+       query source address * port 53;
+  }
+
+I do not get any queries forwarded to the external DNS, while all names for
+which my internal DNS are authoritative are answered promptly.
+
+[Rest of the useful information deleted.]
+
+
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+ 
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

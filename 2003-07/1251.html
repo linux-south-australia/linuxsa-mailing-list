@@ -1,0 +1,128 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="The joy of DNS (on Cobalt)" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 29 Jul 2003 10:21:34 +0930" -->
+<!-- Id="002801c3556b$a1cb6930$020120ac@skink" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: The joy of DNS (on Cobalt)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 29 Jul 2003 10:21:34 +0930
+</PRE>
+<H1>The joy of DNS (on Cobalt)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+I've recently started working on a Cobalt Raq550, and am having some
+puzzling experiences. When I set up a site, it asks me a whole bunch o'
+stuff, about web, mail, and so on. Because I am more familiar with the files
+than the GUI, I check what is going on by looking at the relevant files.
+However, for some reason, it's not acting in the way I'd expect with regards
+to MX records...
+
+Here's the situation:
+
+1) I set up an account for www.domain.com
+2) I add domain.com as a web alias, and both domain.com and mail.domain.com
+as an email alias. My understanding of these is that it adds the web aliases
+to httpd.conf, and the email aliases to the sendmail config as local
+hostnames, with virtusertable entries to redirect messages to the
+appropriate address. I had hoped it would ifx up the DNS, but it doesn't...
+
+The problem here is the DNS. The zone file looks like this:
+
+...
+domain.com.       IN      NS      &lt;other name for server&gt;.
+
+mail.domain.com.  in mx 20 www.domain.com.
+mail.domain.com.  in a x.x.x.x
+www.domain.com.   in a x.x.x.x
+...
+
+Unless I've misunderstood something about zone files here, it would appear
+to me that resolving domain.com won't work, and worse, mail to @domain.com
+won't work. If I had done this manually, it would look like:
+
+...
+domain.com.       IN      NS      &lt;other name for server&gt;.
+
+domain.com.		in mx 20 mail.domain.com.
+mail.domain.com.	in a x.x.x.x
+domain.com.		in cname www
+www.domain.com.	in a x.x.x.x
+...
+
+ie the MX record would be for mail.domain.com, and there would be a CNAME
+for domain.com.
+
+I've tried to use the GUI to add the extra records as above, trying with "@"
+or "" in the hostname field, but it gives an error. I (eventually)
+successfully added the following MX record using the GUI:
+
+candyspencer.com.       in mx 20 mail.candyspencer.com.
+
+But I can't add the CNAME (or an equivalent A) because it wants to see a
+hostname. I could add it manually, but that seems to defeat the purpose
+(which is to allow my client to do this himself without learning about unix
+text editing or zone files).
+
+It appears to me as if the cobalt GUI has set apache and sendmail up
+correctly, so if I connect to the relevant ports, and send the correct
+request, it should work as expected. I just can't get the DNS right while
+staying within the bounds of the rules...
+
+Anyone got any relevant experience that they can elinghten me with?
+
+Cheers
+
+rr
+
+-- 
+Richard Russell
+Yellow Goanna P/L
+m: +61 412 827 805
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+w: <A HREF="http://www.yellowgoanna.com">http://www.yellowgoanna.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

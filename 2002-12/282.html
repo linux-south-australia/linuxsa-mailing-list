@@ -1,0 +1,135 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: P.S. Unix / Windows Interoperability" -->
+<!-- FromName="'Matthew Geddes'" -->
+<!-- FromEmail="mgeddes@tellurian.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="adam.smith@sageautomation.com" -->
+<!-- Date="05 Dec 2002 14:29:11 +1030" -->
+<!-- Id="1039060753.24217.36.camel@hilarious" -->
+<!-- Reference="002801c29c05$e2979670$e209a8c0@bugman" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: P.S. Unix / Windows Interoperability</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A></I>&gt;
+  Date: 05 Dec 2002 14:29:11 +1030
+</PRE>
+<H1>RE: P.S. Unix / Windows Interoperability</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, 2002-12-05 at 12:57, Adam Smith wrote:
+
+&gt; This isn't out of the question.  Keeping right away from the Linux vs.
+&gt; Microsoft debate, it makes more sense to me to implement a Windows
+&gt; ActiveDirectory and incorporate Unix into it.  We run Windows Desktops,
+&gt; and will also require at least one Windows server to support some
+&gt; services.
+
+I'd be interested to hear which services.
+
+&gt; To get the most out of the Windows environment for the users, using
+&gt; Windows would allow me to do a lot more across the Windows side of
+&gt; things when it comes down to implementing NT policies, or even
+&gt; deployment of some software in the Microsoft part of our environment.
+
+You'll actually find that things like profiles and policies are (on the
+server side at least) just files that are copied from the server and
+work no matter which platform the server is. Remote application
+deployment tools will also generally work in a similar fashion, rather
+than implement their own network protocols.
+
+&gt; I can't see why an authentication system based on Unix is advantageous
+&gt; at this point.  I'm open to feedback ;-)
+
+We could talk for days about security, stability and scalability, but I
+think we're all sick of pointless discussions about who's is better
+(when we all know that the answer is ********). Obviously it depends a
+lot on the task at hand, but here's a couple of things I like about this
+kind of thing being done on Unix.
+
+Unix systems are typically much more flexible than most others. In a
+Unix environment, I have a filesystem of mostly useless tools (cat,
+grep, cut, find) by themselves, but I can put them all together like
+lego set and make them do the job that's necessary. Whereas under
+Windows, I have to look at the handful of GUI tools available that have
+been created with specific things in mind and shape my problem around
+the tools or buy a more expensive tool that may do the job better, but
+may not.
+
+As far as authentication goes, it's not all that difficult to have
+Windows authenticate from a unix machine (using Samba) and have Samba do
+some trickery to keep the accounts synchronised.
+
+Here's a file server example. Let's say you're running a legacy 16-bit
+Windows application (like certain recent versions of Office). You can't
+change the application for another, the company that wrote it won't
+support it for whatever reason and you have a problem. The problem is
+that you need to store the data files for this application on a file
+server, so that many people can access the data. This in itself is fine,
+but due to a feature of the software you have problems.
+
+Before writing the data to disk when you click save, this application
+checks to see if there's enough disk space left. A good thing, you'd
+think. Unfortunately, when the application was written, Windows was
+still only using FAT16. Anyway, to cut a long story short, the network
+file system had a number of GB of disk free, which overflowed the
+variable used to store the amount of free space left, which made the
+application think that there was a negative amount of disk space free.
+It barfed.
+
+If you had a Windows server, how would you solve the problem?
+
+How would you solve the problem on Novell's Netware?
+
+How about Unix?
+
+
+The way we fixed this particular problem was to tell Samba to use a
+shell command to find out how much space was free, instead of native OS
+calls. We just told Samba to run a command that would always return a
+number less than 2GB for the amount of free space. Hey presto, the
+application worked.
+
+Standards are also a reason why one might choose a Unix system over
+anything else.
+
+Hope it helps,
+Matt
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

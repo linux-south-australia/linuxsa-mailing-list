@@ -1,0 +1,164 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: RealTek ethernet" -->
+<!-- FromName="'Anthony Symons'" -->
+<!-- FromEmail="ant@sa.pracom.com.au" -->
+<!-- ToName="'Mark Phillips'" -->
+<!-- ToEmail="mark@austrics.com.au" -->
+<!-- Date="Thu, 24 May 2001 10:58:11 +0930" -->
+<!-- Id="3B0C63AB.71B277F4@sa.pracom.com.au" -->
+<!-- Reference="Pine.LNX.4.21.0105231640440.18450-100000@smart-panel.tellurian.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: RealTek ethernet</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  To  : Mark Phillips &lt;<I><A HREF="mailto:mark@austrics.com.au">mark@austrics.com.au</A></I>&gt;
+  Date: Thu, 24 May 2001 10:58:11 +0930
+</PRE>
+<H1>Re: RealTek ethernet</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+You can set 'reset configuration data' to yes in the bios, and on the
+next boot the plug'n'pray will try to rework all the irqs. Then reset
+configuration data will set itself back to no automatically, and then
+you can see where you stand. 
+
+You can also move the card to a physically different spot as some ports
+are physically wired to others in the case of some motherboards. Usually
+the pci slot closest to the agp will share the irq with agp, and the
+furthest will share with onboard motherboard stuff. If you have more
+than 4 pci slots then they will share with one of the first 4. Some
+things will more happily share with each other than others, so you may
+be able to swap things around, still have an irq conflict between other
+things, yet find it works. It's all a bit of a juggling act.
+Incidentally I think my ethernet card (a realtek 8139 based card) is
+sharing with my agp vga and all is good. It just depends on your
+hardware.
+
+Ant
+
+Mark Phillips wrote:
+&gt; 
+&gt; Okay, here's an update of the situation...
+&gt; 
+&gt; &gt;From what people said, IRQ conflict is the most likely
+&gt; problem, so this is what I investigated.
+&gt; 
+&gt; After a reboot, just before the LILO prompt I get the
+&gt; following information:
+&gt; 
+&gt; Onboard Communications Device, IRQ10
+&gt; Onboard Ethernet, IRQ5
+&gt; Slot 2 Ethernet, IRQ11
+&gt; Onboard Multimedia Device, IRQ9
+&gt; Onboard IDE, IRQ14,15
+&gt; AGP VGA, IRQ11
+&gt; 
+&gt; The ethernet card in PCI slot 2 is the RealTek RTL8139
+&gt; card that I am using.  It would appear that I have
+&gt; onboard ethernet as well, but it is not used, and I
+&gt; did not discover any BIOS mention of it which is
+&gt; strange.  From the above it would seem that the
+&gt; RealTek ethernet card has an IRQ clash with the
+&gt; IRQ given to the onboard VGA.  However, when I
+&gt; cat /proc/interrupts I get:
+&gt; 
+&gt; 0:      timer
+&gt; 1:      keyboard
+&gt; 2:      cascade
+&gt; 8:      rtc
+&gt; 11:     eth0
+&gt; 12:     ps/2 mouse
+&gt; 13:     fpu
+&gt; 14:     ide0
+&gt; 15:     ide1
+&gt; NMI:
+&gt; 
+&gt; So this doesn't show a clash at 11!  Indeed it does
+&gt; not even show an interrupt for the graphics card!
+&gt; 
+&gt; I had another look at the BIOS and saw there was
+&gt; an option to turn off IRQ assignment for VGA.  I
+&gt; did this resulting in the follow at startup:
+&gt; 
+&gt; Onboard Communications Device, IRQ10
+&gt; Onboard Ethernet, IRQ9
+&gt; Slot 2 Ethernet, IRQ5
+&gt; Onboard Multimedia Device, IRQ11
+&gt; Onboard IDE, IRQ14,15
+&gt; AGP VGA
+&gt; 
+&gt; So it seems three of the items have changed and that
+&gt; the VGA card no longer has an interrupt --- I'm not
+&gt; sure what effect this has except to say that
+&gt; Windows didn't like it.  Anyway, for the purposes
+&gt; of sorting out IRQ clashes this seemed a good option
+&gt; to try --- as there should no longer be a clash.
+&gt; Unfortunately I still could not connect with the
+&gt; network (pinging the gateway didn't work, packets
+&gt; lost).
+&gt; 
+&gt; As far as /proc/interrupts goes, the only change was
+&gt; that eth0 moved to IRQ5.
+&gt; 
+&gt; Well, that's where I'm up to.  I'm not really sure
+&gt; what to try next!!  Any suggestions would be most
+&gt; appreciated.
+&gt; 
+&gt; Cheers,
+&gt; 
+&gt; Mark.
+&gt; 
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+Systems Administrator       
+Pracom Ltd.             
++61 8 82029074 -=- +61 402 100 671 
+<A HREF="mailto:anthony.symons@sa.pracom.com.au">anthony.symons@sa.pracom.com.au</A>
+
+PRIVILEGED - PRIVATE AND CONFIDENTIAL
+This electronic mail is solely for the use of the addressee and may
+contain information which is confidential or privileged.
+If you receive this electronic mail in error, please delete it from
+your system immediately and notify the sender by electronic mail or
+using any of the above contact details.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

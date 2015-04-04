@@ -1,0 +1,94 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: An entry in inetd doesnt work.." -->
+<!-- FromName="John" -->
+<!-- FromEmail="john@fiend.securesys.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="tjcorkin@steadycom.com.au" -->
+<!-- Date="Sat, 3 Jul 1999 00:11:14 +0930 (CST)" -->
+<!-- Id="199907021441.AAA04737@fiend.securesys.com.au" -->
+<!-- Reference="377C51CF.C9503B56@steadycom.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: An entry in inetd doesnt work..</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: John &lt;<I><A HREF="mailto:john@fiend.securesys.com.au">john@fiend.securesys.com.au</A></I>&gt;
+  To  : <A HREF="mailto:tjcorkin@steadycom.com.au">tjcorkin@steadycom.com.au</A>
+  Date: Sat, 3 Jul 1999 00:11:14 +0930 (CST)
+</PRE>
+<H1>Re: An entry in inetd doesnt work..</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; I thought inetd was just supposed to do a select() on the sockets
+&gt; myself..
+
+	A socket needs to be bound and listened on before you can 
+	call select() on it. How else do you get the file descriptor 
+	you need????
+
+&gt; It's up to your client to do the accepting and all that.
+
+	Crap. Servers do the accept()ing. That's what makes them 
+	servers. Clients do the connect().
+
+&gt; inetd is called a 'superserver' because it waits until there is a need
+&gt; to have a server running before it starts the server...
+
+	Inetd does the opening and the listening. When it detects a connect
+	it calls the relevant server, with file descriptors 0-2 (stdin,
+	stdout, stderr) replaced with the fd of the newly created
+	connection. 
+	That's why servers called via inetd are different (code wise) than
+	standalone servers.
+
+&gt; This way, you don't need servers running until someone tries to connect,
+&gt; then the server loads, services the port, and then quits at the end.
+
+	No, no, no. Look at the source code to in.*. 
+
+&gt; If a server had to start up for every possible connection, then you'd
+&gt; need  a million telnet/ftp/etc daemons all running just incase that many
+&gt; connected.
+
+	Sigh. Inetd listen()s on all ports that have servers associated with
+	them. Inetd does the accept(). Then it dup2()s the file descriptor
+	returned from the accept() call, and passes it to the server
+	(file descriptors are transparent to execv() calls -- unless the
+	CLOSE_ON_EXEC bits are set using fcntl()).
+ 
+	You really need to read up on TCP/IP.
+
+J.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

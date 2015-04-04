@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: [OT] USB SSD" -->
+<!-- FromName="'Toby Corkindale'" -->
+<!-- FromEmail="toby@netcraft.com.au" -->
+<!-- ToName="'Shane Warner'" -->
+<!-- ToEmail="Shane_Warner@bigfoot.com" -->
+<!-- Date="Mon, 19 Aug 2002 15:53:28 +0930" -->
+<!-- Id="20020819155328.S5098@april.netcraft.com.au" -->
+<!-- Reference="200208190459.g7J4xne03879@butters.earthquake-site.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: [OT] USB SSD</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:toby@netcraft.com.au">toby@netcraft.com.au</A></I>&gt;
+  To  : Shane Warner &lt;<I><A HREF="mailto:Shane_Warner@bigfoot.com">Shane_Warner@bigfoot.com</A></I>&gt;
+  Date: Mon, 19 Aug 2002 15:53:28 +0930
+</PRE>
+<H1>Re: [OT] USB SSD</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Shane,
+
+I've been fiddling with these kind of things lately.
+Admitedly my disk is slightly larger, at 80 Gb, but its not really key-chain
+material either at around half a kilo. :)
+
+The ease of use of the device varies, depending on the age of your
+installation and what configuration the kernel and USB stuff was setup as.
+
+On some distros you shouldn't need to do anything more than just plug the
+little guy into the port, and then fdisk /dev/sda. (or /dev/scsi/.../disc if
+you're on devfs)
+
+Assuming this isn't the case, since you're having trouble, you'll probably
+need to download the latest linux kernel, 2.4.19. If that's a big jump up from
+what you have now, then there will probably be a few other upgrades required
+as well.
+
+When compiling the kernel, you need to enable the usb-storage driver in the
+USB section. You *also* have to enable scsi! This caught me out the first time
+around. You don't need to compile in any scsi adaptor drivers, but you do need
+to enable (probably as a module) the main scsi core, and the scsi disk
+support.
+
+If you are using a prebuilt kernel (eg. mandrake, redhat, etc) then they've
+probably already included those options by default so you're probably OK.
+
+
+If you're finding nothing happens when you plug the device in, try manually
+loading the appropriate modules.
+Eg:
+modprobe usb-storage
+modprobe sd_mod
+
+type 'dmesg' now should display kernel messages, and hopefully there'll be
+something in there now like :
+Initializing USB Mass Storage driver...
+usb.c: registered new driver usb-storage
+scsi0 : SCSI emulation for USB Mass Storage devices
+  Vendor: ST380021  Model: A                 Rev: 3.19
+  Type:   Direct-Access                      ANSI SCSI revision: 02
+USB Mass Storage device found at 2
+USB Mass Storage support registered.
+Attached scsi disk sda at scsi0, channel 0, id 0, lun 0
+SCSI device sda: 156301488 512-byte hdwr sectors (80026 MB)
+
+If you get the first messages but not the last, then you may need to trigger a
+rescan on the scsi bus to get them to appear. However it seems to 'just work'
+for me every time, (except on firewire, but thats another driver altogether.)
+
+Once you've reached this stage, you should just be able to use the disc like
+you would any other.
+Since it's so small, you probably don't want to use fdisk and partitions, so
+just create a filesystem directly onto /dev/sda.
+
+I'd reccommend using a lightweight system like cramfs, which is practically
+designed for that sort device. Note that it's a ROM FS though, so if you need
+writeability, give minix or zisofs a try perhaps. ext2 is better for full
+compatibility with Linux permissions etc, or vfat is better for compatibility
+with other Windows machines. I don't know how well Windows would handle a
+non-partitioned setup though, so you might have to waste space on a partition
+table if you really want vfat ;(
+
+Eg:
+mkcramfs &lt;source directory&gt; /dev/sda
+mount /dev/sda /mnt/portable
+
+or
+mkfs.minix /dev/sda
+
+Hope this helps, and let us know how you go,
+
+Toby
+
+On Mon, Aug 19, 2002 at 02:29:48PM +0930, Shane Warner wrote:
+&gt; Hi All.
+&gt; 
+&gt; I recently purchased a 128Mb USB solid state disk.  Neither the box nor the
+&gt; device itself carries any markings indicating the manufacturer and so I am
+&gt; having difficulties locating drivers.
+&gt; 
+&gt; The device is about 8-10cm long, 1cm wide and 3/4cm deep.  It is made of a
+&gt; dark blue/purple translucent plastic through which I can make out it uses a
+&gt; SAMSUNG chip of some description.
+&gt; 
+&gt; The whole device can be attached to a key chain.
+&gt; 
+&gt; Any think this sounds familiar and can point me inthe right direction to a
+&gt; manufacturers website?
+&gt; 
+&gt; Cheers,
+&gt; Shane.
+&gt; 
+
+-- 
+Turning and turning in the widening gyre
+The falcon cannot hear the falconer;
+Things fall apart; the centre cannot hold;
+Mere anarchy is loosed upon the world.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

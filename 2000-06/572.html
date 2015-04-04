@@ -1,0 +1,187 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Problems with Portfw" -->
+<!-- FromName="Tim Ansell" -->
+<!-- FromEmail="mithro@senet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 18 Jun 2000 19:59:02 +0000" -->
+<!-- Id="394D2A06.C1E9FA3@senet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Problems with Portfw</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Tim Ansell &lt;<I><A HREF="mailto:mithro@senet.com.au">mithro@senet.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sun, 18 Jun 2000 19:59:02 +0000
+</PRE>
+<H1>Problems with Portfw</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+We have been using a program called rinetd for somequite time now
+because of nasty experiences with using portfw for portwarding with the
+2.2.2 kernel. Recently we would like to use portfw again as it allows
+IPs to pass through the firewall thus making usful logs. (ie not
+everything appears to be coming from the firewall). The problem is that
+it does not seem to work with our network setup.
+
+Internet
+  |
+Firewall  - Student Network 10.*.*.*
+  |      \
+ DMZ       Admin Network 192.168.0.*
+192.168.1.*
+
+The firewall is forwarding the following ports to the web and mail
+server on the DMZ...
+
+#!/bin/sh
+ipmasqadm portfw -f
+# Perminate Redirs # !
+ipmasqadm portfw -a -P tcp -L 210.9.63.146 85 -R 192.168.1.2 85 # Web:
+Webmin
+ipmasqadm portfw -a -P tcp -L 210.9.63.146 22 -R 192.168.1.2 22 # Web:
+SSH
+ipmasqadm portfw -a -P tcp -L 210.9.63.146 www -R 192.168.1.2 80 # Web:
+www
+ipmasqadm portfw -a -P tcp -L 210.9.63.146 443 -R 192.168.1.2 443 # Web:
+HTTPS
+ipmasqadm portfw -a -P tcp -L 210.9.63.146 smtp -R 192.168.1.3 smtp #
+Web: Mail
+ipmasqadm portfw -a -P tcp -L 210.9.63.146 23 -R 192.168.1.2 23 # Web:
+Telnet
+ipmasqadm portfw -a -P tcp -L 210.9.63.147 22 -R 192.168.1.3 22 # Mail:
+SSH
+ipmasqadm portfw -a -P tcp -L 210.9.63.147 85 -R 192.168.1.3 85 # Mail:
+Webmin
+ipmasqadm portfw -a -P tcp -L 210.9.63.147 www -R 192.168.1.2 81 # Mail:
+www
+ipmasqadm portfw -a -P tcp -L 210.9.63.147 443 -R 192.168.1.100 443 #
+Mail: HTTPS
+ipmasqadm portfw -a -P tcp -L 210.9.63.147 smtp -R 192.168.1.3 smtp #
+Mail: Mail
+ipmasqadm portfw -a -P tcp -L 210.9.63.147 imap -R 192.168.1.3 imap #
+Mail: Imap
+ipmasqadm portfw -a -P tcp -L 210.9.63.147 110 -R 192.168.1.3 110 #
+Mail: pop3
+ipmasqadm portfw -a -P tcp -L 210.9.63.148 www -R 192.168.1.2 82 #
+SAMYP: www
+ipmasqadm portfw -a -P tcp -L 210.9.63.149 85 -R 192.168.1.2 85 #
+Intranet: Webmin
+ipmasqadm portfw -a -P tcp -L 210.9.63.149 www -R 192.168.1.100 www #
+Intranet: www
+ipmasqadm portfw -a -P tcp -L 210.9.179.64 www -R 192.168.1.2 100 #
+Users: www
+# Worldforge Redirs # !
+ipmasqadm portfw -a -P tcp -L 210.9.179.125 80 -R 192.168.1.110 80 #
+WF.net: www
+ipmasqadm portfw -a -P tcp -L 210.9.179.125 23 -R 192.168.1.2 23 #
+WF.net: Telnet
+ipmasqadm portfw -a -P tcp -L 210.9.179.125 22 -R 192.168.1.2 22 #
+WF.net: SSH
+ipmasqadm portfw -a -P tcp -L 203.63.40.115 6667 -R 192.168.1.110 6667 #
+WF-IRC: Server-Irc
+ipmasqadm portfw -a -P tcp -L 210.9.179.125 6665 -R 192.168.1.110 6665 #
+WF-IRC: Irc
+ipmasqadm portfw -a -P tcp -L 210.9.179.125 6666 -R 192.168.1.110 6666 #
+WF-IRC: Irc
+ipmasqadm portfw -a -P tcp -L 210.9.179.125 6667 -R 192.168.1.110 6667 #
+WF-IRC: Irc
+ipmasqadm portfw -a -P tcp -L 210.9.179.125 6668 -R 192.168.1.110 6668 #
+WF-IRC: Irc
+ipmasqadm portfw -a -P tcp -L 210.9.179.125 6767 -R 192.168.1.2 6767 #
+WF.net: Cyphesis-Atlas
+ipmasqadm portfw -a -P tcp -L 210.9.179.125 6768 -R 192.168.1.2 6768 #
+WF.net: Cyphesis-Atlas2
+ipmasqadm portfw -a -P tcp -L 210.9.179.126 6767 -R 192.168.1.115 6767 #
+WF.net: Chatworld-Atlas
+ipmasqadm portfw -a -P tcp -L 210.9.179.126 4000 -R 192.168.1.115 4000 #
+WF.net: Chatworld-Raw
+ipmasqadm portfw -a -P tcp -L 210.9.179.126 6667 -R 192.168.1.115 6667 #
+WF.net: Chatworld-IRC
+ipmasqadm portfw -a -P tcp -L 210.9.179.126 www -R 192.168.1.111 www #
+Bugs-WF: www
+ipmasqadm portfw -a -P tcp -L 210.9.179.127 www -R 192.168.1.110 86 #
+Circe-WF: www
+ipmasqadm portfw -a -P tcp -L 210.9.179.124 www -R 192.168.1.112 www #
+PI: www
+ipmasqadm portfw -a -P tcp -L 210.9.179.124 23 -R 192.168.1.2 23 # PI:
+Telnet
+ipmasqadm portfw -a -P tcp -L 210.9.179.124 22 -R 192.168.1.2 22 # PI:
+SSH
+# Devnet Redirs # !
+ipmasqadm portfw -a -P tcp -L 210.9.179.67 80 -R 192.168.1.101 80 #
+Devnet: www
+ipmasqadm portfw -a -P tcp -L 210.9.179.70 80 -R 192.168.1.2 2000 #
+Devnet-Roxen: www
+ipmasqadm portfw -a -P tcp -L 210.9.179.70 2000 -R 192.168.1.2 2001 #
+Devnet-Roxen: Admin
+ipmasqadm portfw -a -P tcp -L 210.9.179.71 80 -R 192.168.1.104 80 #
+Devnet-Indra: www
+ipmasqadm portfw -a -P tcp -L 210.9.179.71 143 -R 192.168.1.104 143 #
+Devnet-Indra: HTTPS
+ipmasqadm portfw -a -P tcp -L 210.9.179.71 5050 -R 192.168.1.104 5050 #
+Newest wiki
+# Tims Computer # Redirs !
+ipmasqadm portfw -a -P tcp -L 210.9.179.127 6767 -R 192.168.1.4 6767 #
+Tim's Computer
+ipmasqadm portfw -a -P tcp -L 210.9.179.127 6667 -R 192.168.1.4 6667 #
+Tim's Computer
+ipmasqadm portfw -a -P tcp -L 210.9.179.75 80 -R 192.168.1.105 80 #
+Jonno 
+ipmasqadm portfw -a -P tcp -L 210.9.179.69 80 -R 192.168.1.5 80 # Devil:
+www
+ipmasqadm portfw -a -P tcp -L 210.9.179.69 22 -R 192.168.1.5 22 # Devil:
+ssh
+ipmasqadm portfw -a -P tcp -L 210.9.179.69 85 -R 192.168.1.5 85 # Devil:
+Webmin 
+ipmasqadm portfw -l
+
+All these ports work perfectly from the Internet and the Student
+network, they do not however work on localhost (on the firewall) from
+the Admin network or from the DMZ.
+
+I was wondering if anyone has had any experience with this? If so would
+you know how to fix this...
+
+
+Tim Ansell
+
+-- 
+Mithro
+<A HREF="mailto:mithro@plug.cx">mithro@plug.cx</A>              Join worldforge! www.worldforge.org
+(Please use the above email address as i might change ISP soon)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

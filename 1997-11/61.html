@@ -1,0 +1,127 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="[linux-security] Perl script to locate F0 0F C7 C8 bombs (fwd)" -->
+<!-- FromName="Ismail Ibrahim <mi-mi@sbs.itc.usm.my>" -->
+<!-- FromEmail="mi-mi@sbs.itc.usm.my" -->
+<!-- ToName="linuxsa" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 10 Nov 1997 11:41:17 +0000 (MYT)" -->
+<!-- Id="Pine.A32.3.91.971110113956.12492F-100000@sbs.itc.usm.my" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: [linux-security] Perl script to locate F0 0F C7 C8 bombs (fwd)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Ismail Ibrahim &lt;mi-mi@sbs.itc.usm.my&gt; &lt;<I><A HREF="mailto:mi-mi@sbs.itc.usm.my">mi-mi@sbs.itc.usm.my</A></I>&gt;
+  To  : linuxsa &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 10 Nov 1997 11:41:17 +0000 (MYT)
+</PRE>
+<H1>[linux-security] Perl script to locate F0 0F C7 C8 bombs (fwd)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Ladies and Gentlemen,
+More on the Pentium bug.
+- mael -
+
+---------- Forwarded message ----------
+Date: Fri, 7 Nov 1997 13:03:23 -0800 (PST)
+From: Sam Trenholme &lt;<A HREF="mailto:set@reality.samiam.org">set@reality.samiam.org</A>&gt;
+To: <A HREF="mailto:linux-security@redhat.com">linux-security@redhat.com</A>
+Subject: [linux-security] Perl script to locate F0 0F C7 C8 bombs
+
+
+There is no known fix to the F0 0F C7 C8 bug at this time.  What can be
+done, however, is run a program, such as the script after my signature, to
+locate any and all such programs.  This script can be used in single
+user mode after a mysterious lockup on a multiuser Pentium system.
+
+I hope it is possible to come up with a software fix for this problem.
+
+- Sam
+
+"You can...turn sadness into laughter" -- Sunscreem, _Love_U_More_
+
+#!/usr/bin/perl 
+
+# There is no known software fix to the F0 0F C7 C8 bug at this time
+
+# usage: finddeath dir
+
+# where dir is the directory you recursively look at all programs in
+# for instances of the F0 0F C7 C8 sequence
+
+# This script will search for programs with this sequence, which will
+# help sysadmins take appropriate action against those running such
+# programs
+
+# This script is written (but has not been tested) in Perl4, to
+# insure maximum compatibility 
+
+sub findit {
+
+  local($dir,$file,@files,$data) = @_;
+
+  undef $/;
+
+  if(!opendir(DIR,$dir)) {
+    print STDERR "Can not open $dir: $!\n";
+    return 0;
+    }
+
+  @files=readdir(DIR);
+
+  foreach $file (@files) {
+    if($file ne '.' && $file ne '..') {
+      if( -f "$dir/$file" && open(FILE,"&lt; $dir/$file")) {
+        $data=&lt;FILE&gt;;
+        if($data =~ /\xf0\x0f\xc7\xc8/) {
+          print "$dir/$file contains F0 0F C7 C8\n";
+          }
+        } elsif( -d "$dir/$file") {
+          &findit("$dir/$file");
+        }
+      }
+    }
+
+  }
+
+$dir = shift || '/home';
+
+&findit($dir);
+    
+
+-- 
+----------------------------------------------------------------------
+Please refere to the information about this list as well as general
+information about Linux security at <A HREF="http://www.aoy.com/Linux/Security.">http://www.aoy.com/Linux/Security.</A>
+----------------------------------------------------------------------
+
+
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

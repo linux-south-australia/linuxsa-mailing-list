@@ -1,0 +1,98 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: comp sci question: fast status mask handling" -->
+<!-- FromName="Daryl Tester" -->
+<!-- FromEmail="dt@picknowl.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="akenning@dog.topology.org, linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 07 Aug 2000 17:05:45 +0930" -->
+<!-- Id="398E66D1.A0B10F80@picknowl.com.au" -->
+<!-- Reference="000001bfff73$f212bf20$0d5736cb@louis" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: comp sci question: fast status mask handling</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  To  : <A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 07 Aug 2000 17:05:45 +0930
+</PRE>
+<H1>Re: comp sci question: fast status mask handling</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Alan Kennington wrote:
+
+&gt; There are generally one or two very urgent events to handle,
+&gt; and the rest are more relaxed.
+
+Is it possible that some events are going to be intermingled?
+(eg, a packet is ready to be read, but some other condition
+must be checked for as well?).
+
+I did something in assembler once which was to rotate the
+bit through a flag while incrementing a pointer into an
+index table (of then, 16 entries).  Something like (vaguely
+C-ish, as I don't have my C brain on at the moment):
+
+int *(*p), (*dispatch)[32] = { various function addresses here };
+int  i, event;
+
+/* Note AlanK short circuit evaluation hack in for() test. */
+for (p = dispatch, i = 32; i != 0 && event != 0; i--, p++) {
+    if (event & 1)
+        p(original_event);
+    event &gt;&gt;= 1;
+}
+
+&gt; A good example of this would be a select() event handler,
+&gt; monitoring 50 TCP connections in an un-forked process, where
+&gt; all I/O events are a-priori equal.
+
+Actually, that's an example of exactly the same problem
+you have now - you are signaled that an event has occured,
+but you don't know which event, so you have to cycle through
+all the file descriptors until you find the event of interest.
+Perhaps it's worth looking in squid and other single process
+monters (INN?) to see what performance hacks they use (I know
+squid uses poll() if it's available for that reason).
+
+&gt; The resulting code would not be more incomprehensible than
+&gt; a lexical analyser state machine....
+
+And this is a bad thing?
+
+
+Regards,
+  Daryl Tester
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

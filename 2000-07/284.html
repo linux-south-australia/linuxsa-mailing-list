@@ -1,0 +1,132 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: www updates..." -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="Russell, Richard (DEH)" -->
+<!-- ToEmail="rrussell@deh.sa.gov.au" -->
+<!-- Date="Thu, 06 Jul 2000 19:55:29 +0930" -->
+<!-- Id="39645E99.DF963CCA@aarnet.edu.au" -->
+<!-- Reference="9F7323D0C702D4119B4C0008C70D427901720B5A@mail.dehaa.sa.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: www updates...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Russell, Richard (DEH) &lt;<I><A HREF="mailto:rrussell@deh.sa.gov.au">rrussell@deh.sa.gov.au</A></I>&gt;
+  Date: Thu, 06 Jul 2000 19:55:29 +0930
+</PRE>
+<H1>Re: www updates...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+"Russell, Richard (DEH)" wrote:
+&gt; 
+&gt; Is there any way to find out where?
+
+mkdir fred
+cd fred
+wget -v <A HREF="http://www.rebel.net.au/~festinisers/">http://www.rebel.net.au/~festinisers/</A>
+
+Look for headers like:
+  X-Cache: HIT from http-proxy.example.edu.au
+
+If you use an explicit proxy (as opposed to a transparent proxy)
+then before running wget say:
+
+  export http_proxy=http-proxy.example.edu.au:8080
+
+&gt; the page is <A HREF="http://www.rebel.net.au/~festinisers/">http://www.rebel.net.au/~festinisers/</A>
+
+This is the problem:
+
+  $ wget -v <A HREF="http://www.rebel.net.au/~festinisers/">http://www.rebel.net.au/~festinisers/</A>
+   ...
+  $ wget -v <A HREF="http://www.rebel.net.au/~festinisers/">http://www.rebel.net.au/~festinisers/</A>
+   ...
+  6 Last-Modified: Thu, 06 Jul 2000 05:23:26 GMT
+   ...
+  Local file `index.html' is more recent, not retrieving.
+
+Because if I do
+
+  $ export TZ=UTC
+  $ ls -l index.html
+  -rw-rw-r-- 1 gdt gdt 8905 Jul 6 05:23 index.html
+
+it is plain that the timestamp on your web server's file is
+wrong.  Fix this with something like
+
+  ssh www.example.com
+  touch -m /home/httpd/html/index.html
+or
+  find /home/httpd/html -name '*.html' -exec touch -m {} \;
+
+and install xntpd and clock your web server off tictoc.tip.csiro.au
+so that the problem does not recur.
+
+Once the timestamps are rational, use Shift-Reload to force
+the proxy to refresh the page.
+
+Sample /etc/ntp.conf
+
+# tictoc.tip.csiro.au is the public NTP server at
+# CSIRO Telecommunications and Information Processing,
+# which is responsible for Australia's weights and
+# measures.
+server 130.155.98.1
+# Don't serve NTP to others
+restrict 130.155.98.1 noquery
+restrict 127.0.0.1
+restrict default ignore
+# NTP needs to keep some timing estimates
+driftfile /etc/ntp/drift
+broadcastdelay	0.008
+# Public NTP servers have no authentication, so you
+# need to run your own GPS-derived system is you are
+# running Kerberos.
+authenticate no
+
+Sample /etc/ntp/step-tickers
+
+130.155.98.1
+
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

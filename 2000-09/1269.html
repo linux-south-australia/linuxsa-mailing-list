@@ -1,0 +1,112 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Questions (SAMBA, PPPD)" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="Richard Sharpe" -->
+<!-- ToEmail="sharpe@ns.aus.com" -->
+<!-- Date="Wed, 27 Sep 2000 18:15:44 +0930" -->
+<!-- Id="39D1B3B8.A8F5AC74@aarnet.edu.au" -->
+<!-- Reference="3.0.6.32.20000927080807.00a7ee50@203.16.214.248" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Questions (SAMBA, PPPD)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  Date: Wed, 27 Sep 2000 18:15:44 +0930
+</PRE>
+<H1>Re: Questions (SAMBA, PPPD)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Richard Sharpe replied to somone asking about file permissions
+when using Samba to upload files to a web server:
+&gt;
+&gt; If you are not the owner of the files, or are not in the group that owns
+&gt; the files, then you can't access them, as Samba respects Linux permissions.
+
+For a web server's content, define the share as:
+
+&gt; [www]
+&gt;    comment = www.aarnet.edu.au
+&gt;    path = /home/httpd/html
+&gt;    browseable = Yes
+&gt;    writable = Yes
+&gt;    read list = @html
+&gt;    write list = @html
+&gt;    force group = +html
+&gt;    create mask = 0664
+&gt;    directory mask = 0775
+&gt;    force create mode = 0664
+&gt;    force directory mode = 0775
+
+where the UNIX group "html" is a group containing the users
+allowed to maintain the web site.
+
+Set the owner, group and permissions of /home/httpd/html to
+root, html and rwxrwsr-x.
+
+            -----------------------------------
+
+To maintain the web server files from the UNIX command line say
+
+&gt; newgrp html
+&gt; umask 002
+&gt; cd /home/httpd/html
+
+            -----------------------------------
+
+You can also set WU-FTPD to force ownership and permissions
+on uploads.  /etc/ftpaccess says, amoung other things:
+
+&gt; defumask 002
+&gt; deny-uid %-499 %65535
+&gt; deny-gid %-99 %101-499 %65535
+&gt; allow-gid ftp html
+&gt; realgroup html
+&gt;
+&gt; upload absolute /home/gdt /home/httpd/html yes gdt html 0664 dirs 0775
+&gt; upload absolute /home/gdt /home/gdt yes gdt users 0600 dirs 0700
+
+where "/home/gdt" is the home directory of the "gdt" user.  And so
+on for every user that needs FTP access to the web server.
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

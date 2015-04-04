@@ -1,0 +1,159 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: spurious iptables "untracked packet" problem" -->
+<!-- FromName="'Toby Corkindale'" -->
+<!-- FromEmail="tjcorkin@sa.pracom.com.au" -->
+<!-- ToName="'Alan Kennington'" -->
+<!-- ToEmail="akenning@topology.org" -->
+<!-- Date="Thu, 5 Jul 2001 10:57:45 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0107051051050.28718-100000@localhost.localdomain" -->
+<!-- Reference="20010705053643.A1112@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: spurious iptables "untracked packet" problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@sa.pracom.com.au">tjcorkin@sa.pracom.com.au</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  Date: Thu, 5 Jul 2001 10:57:45 +0930 (CST)
+</PRE>
+<H1>Re: spurious iptables "untracked packet" problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+One warning about 2.4.6 - I was running 2.4.5, and had it set to drop all
+unclean packets that hit the input and forward rules in iptables.
+After upgrading to 2.4.6 it seemed to decide that almost everything was
+unclean! I'm now running with that rule disabled, but if you were upgrading
+the box remotely, you could be in for a nasty surprise.
+
+
+We signed up for Telstra Cable, btw.. I have to say it was extremely easy to
+setup on Linux.. Plug cable modem into ethernet card, edit the config file
+for the netcard to say 'use dhcp', and then run bpalogin with the right
+username and password.
+
+
+Does anyone else here on Telstra cable find they get BULK unrelated traffic
+hitting their box? I'm dropping it all, of course, but there's multicast
+stuff and other wierd things like this:
+Eg:
+Firewalled packet:IN=eth1 OUT= MAC=ff:ff:ff:ff:ff:ff:00:04:28:22:ec:70:08:00
+SRC=10.64.4.1 DST=255.255.255.255 LEN=372 TOS=0x00 PREC=0x00 TTL=255
+ID=35010 PROTO=UDP SPT=67 DPT=68 LEN=352
+Firewalled packet:IN=eth1 OUT= MAC=01:00:5e:00:00:01:00:04:28:22:ec:70:08:00
+SRC=10.64.4.1 DST=224.0.0.1 LEN=28 TOS=0x00 PREC=0xC0 TTL=1 ID=63329 PROTO=2
+
+What worries me is that we're probably paying for this data?
+It adds up to a meg or two per day.
+Do you think i'll be able to post the log files and accounting data to
+telstra at the end of the month and say "we want a refund on this s***!"
+
+(UNLIKELY)
+
+-Toby
+
+On Thu, 5 Jul 2001, Alan Kennington wrote:
+
+&gt; On Mon, Jul 02, 2001 at 07:09:52PM +0930, Alan Kennington wrote:
+&gt; &gt; Has anyone else experienced a surprising number of
+&gt; &gt; "untracked" packet rejections by iptables for no obvious reason?
+&gt; &gt;
+&gt; &gt; Here's an example from my log <A HREF="file:">file:</A>
+&gt; &gt;
+&gt; &gt; =================================================
+&gt; &gt; May 14 18:05:16 dog kernel: NAT: 0 dropping untracked packet c4f06c00 1 139.130.140.1 -&gt; 139.130.140.14
+&gt; &gt;  May 14 18:05:16 dog kernel: NAT: 0 dropping untracked packet c08439e0 1 139.130.140.1 -&gt; 139.130.140.14
+&gt; &gt;  May 14 18:05:16 dog kernel: NAT: 0 dropping untracked packet c4f06c00 1 139.130.140.1 -&gt; 139.130.140.14
+&gt; &gt;  May 14 18:05:16 dog kernel: NAT: 0 dropping untracked packet c08439e0 1 139.130.140.1 -&gt; 139.130.140.14
+&gt; &gt;  May 14 18:05:16 dog kernel: NAT: 0 dropping untracked packet c4f13640 1 139.130.140.1 -&gt; 139.130.140.14
+&gt; &gt;  May 14 18:05:25 dog kernel: NAT: 0 dropping untracked packet c08439e0 1 139.130.140.1 -&gt; 139.130.140.14
+&gt; &gt;  May 14 18:05:25 dog kernel: NAT: 0 dropping untracked packet c4f13640 1 139.130.140.1 -&gt; 139.130.140.14
+&gt; &gt;  May 14 18:05:25 dog kernel: NAT: 0 dropping untracked packet c4f067a0 1 139.130.140.1 -&gt; 139.130.140.14
+&gt; &gt;  May 14 18:05:25 dog kernel: NAT: 0 dropping untracked packet c08439e0 1 139.130.140.1 -&gt; 139.130.140.14
+&gt; &gt;  May 14 18:05:25 dog kernel: NAT: 0 dropping untracked packet c4f13640 1 139.130.140.1 -&gt; 139.130.140.14
+&gt; &gt;  May 14 18:05:25 dog kernel: NAT: 0 dropping untracked packet c4f067a0 1 139.130.140.1 -&gt; 139.130.140.14
+&gt; &gt; ==================================================
+&gt; &gt;
+&gt;
+&gt;
+&gt;
+&gt; Well, that's history now.
+&gt; I've just built a new linux kernel 2.4.6, and the old
+&gt; "untracked packet" problem has mysteriously disappeared,
+&gt; as far as my initial tests indicate.
+&gt;
+&gt; By the way, if anyone wants to use the new kernel,
+&gt; beware of some compilation problems with files like
+&gt; drivers/mtd/amd_flash.c  line 642
+&gt; drivers/mtd/cfi.h        line 387
+&gt; (These are relevant to flash memory devices only.)
+&gt;
+&gt; These both had include-file errors which caused the
+&gt; function do_softirq() to not be defined when I compiled the
+&gt; kernel on my Toshiba Portégé 3020CT, although the problem
+&gt; did not arise on my AMD K6-2/500.
+&gt;
+&gt; Apart from that, I would say that the 2.4.6 kernel is
+&gt; a good idea to compile and use right now, because
+&gt; it fixes ReiserFS problems and iptables problems.
+&gt;
+&gt; Cheers, and good compilage,
+&gt; Alan Kennington.
+&gt;
+&gt;
+
+-- 
+ Toby Corkindale
+ UNIX Developer, Core Tech R&D
+ Technology SA, Pracom Ltd
+ 288 Glen Osmond Road
+ Fullarton,	5063
+ South Australia
+ Tel: +61 8 8202 9075
+ Fax: +61 8 8202 9001
+ mailto:<A HREF="mailto:Toby.Corkindale@sa.pracom.com.au">Toby.Corkindale@sa.pracom.com.au</A>
+ <A HREF="http://www.sa.pracom.com.au/">http://www.sa.pracom.com.au/</A>
+
+                  PRIVILEGED - PRIVATE AND CONFIDENTIAL
+
+   Privileged/Confidential Information may be contained in this message.
+   If you are not the addressee indicated in this message, you may not
+   copy or deliver this message to anyone.  In such case, you should
+   destroy this message and notify the sender by reply email. Opinions,
+   conclusions and other information in this message that do not relate
+   to the official business of this organisation shall be understood as
+   neither given nor endorsed by it.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,97 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Forcing Immediate Writes" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 23 May 2000 15:59:57 +0930" -->
+<!-- Id="392A2565.99D9B39C@aarnet.edu.au" -->
+<!-- Reference="3929C4BF.20AE723E@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Forcing Immediate Writes</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Tue, 23 May 2000 15:59:57 +0930
+</PRE>
+<H1>Re: Forcing Immediate Writes</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Mark Newton wrote:
+&gt; 
+&gt; On Tue, May 23, 2000 at 09:07:35AM +0930, lloy0076 wrote:
+&gt; 
+&gt;  &gt; Most of the time it's OK to buffer writes on a file system, however for
+&gt;  &gt; a floppy it can become a little disjointed. Specifically I use mount -t
+&gt;  &gt; vfat /dev/fd0 /mnt/b and use the usual unix file tools to copy stuff to
+&gt;  &gt; it (eg cp, mv etc). However, when I write stuff to the disk, it doesn't
+&gt;  &gt; actually write immediately and I have to umount the disk...
+&gt; 
+&gt; What's the problem with this?  It'll write the data to disk when you
+&gt; request to have it unmounted.
+
+The problems are:
+
+ - buffering data destined to floppy disk for long periods of
+   time is a bit pointless.  Although it's a block device the
+   usage of floppy disks are such that people are unlikely
+   to read any data they have just written.  This makes caching
+   that data for long periods a loss -- you could be caching
+   something else that has a higher probability of being read.
+
+ - the user interface is poor.  People write the data to floppy
+   and nothing happens, then when they want to remove the floppy
+   they have to wait 30s.  It would be better to write the data
+   when the user wasn't waiting.
+
+Insisting on synchronous writes isn't the answer either.  Because
+floppies are slow you do want to buffer the data long enough to
+get complete tracks and to give the block sorting routines enough
+blocks to minimise head movement.
+
+The answer probably lies in altering the way the kernel allocates
+and flushes disk blocks to treat some cached disks blocks as having
+a lower usefulness than others.  This would also advantage other
+slow removable file systems such as flash memory.
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ Earth is a single point of failure
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,151 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: linux uses.." -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="" -->
+<!-- ToEmail="behoffski@grouse.com.au" -->
+<!-- Date="Wed, 27 Oct 1999 22:27:04 +0930" -->
+<!-- Id="199910271257.WAA09150@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: linux uses..</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : <A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A>
+  Date: Wed, 27 Oct 1999 22:27:04 +0930
+</PRE>
+<H1>Re: linux uses..</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+You can even just forget about the paging problem
+when considering real-time.
+
+Suppose you need to do something at a given time,
+and you have a kernel module with locked pages
+which is waiting for a clock to interrupt it
+to do something or other. If the kernel
+is busy doing some paging for a kmalloc()
+call or something, then you just have to wait.
+
+E.g. I just found this in the kmalloc function:
+
+----------------------------------------------
+        save_flags(flags);
+        cli();
+
+        bucket-&gt;nfrees++;
+        bucket-&gt;nbytesmalloced -= ptr-&gt;bh_length;
+
+        ptr-&gt;bh_next = page-&gt;firstfree;
+        page-&gt;firstfree = ptr;
+        if (!page-&gt;nfree++) {
+/* Page went from full to one free block: put it on the freelist. */
+                if (bucket-&gt;nblocks == 1)
+                        goto free_page;
+                page-&gt;next = *pg;
+                *pg = page;
+        }
+/* If page is completely free, free it */
+        if (page-&gt;nfree == bucket-&gt;nblocks) {
+                for (;;) {
+                        struct page_descriptor *tmp = *pg;
+                        if (!tmp)
+                                goto not_on_freelist;
+                        if (tmp == page)
+                                break;
+                        pg = &tmp-&gt;next;
+                }
+                *pg = page-&gt;next;
+free_page:
+                bucket-&gt;npages--;
+                free_kmalloc_pages(page, bucket-&gt;gfporder, dma);
+        }
+        restore_flags(flags); 
+--------------------------------------------------
+
+That's a lot of code between the cli() which blocks out all
+interrupts (except for NMI) and the restore_flags().
+A for loop through the page list is going to use up a lot
+of cycles! Even at 400 MHz, this could be quite a long time.
+
+Now another more basic problem......
+
+My /proc/interrupts has:
+
+================================================
+           CPU0
+  0:    9000700          XT-PIC  timer
+  1:      78922          XT-PIC  keyboard
+  2:          0          XT-PIC  cascade
+  4:     560830          XT-PIC  serial
+  8:          2          XT-PIC  rtc
+ 10:     261429          XT-PIC  Intel EtherExpress Pro 10/100 Ethernet
+ 11:      68398          XT-PIC  ncr53c8xx
+ 12:       7927          XT-PIC  es1371
+ 13:          1          XT-PIC  fpu
+ 14:    1905754          XT-PIC  ide0
+ 15:          5          XT-PIC  ide1
+NMI:          0
+================================================
+
+
+Suppose your kernel module is at priority 13 or whatever.
+It is still in danger of being interrupted by IDE.
+
+And when the hardware interrupt does happen for
+your module, you still have to wait for the 
+kernel to do some basic processing before it
+actually hands on to your module bottom half.
+
+So that's 3 reasons why you can forget
+real real-time in linux.
+
+Cheers,
+Alan Kennington.
+
+--------------------------------------------------------------------
+   name: Dr. Alan Kennington
+ e-mail: <A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>
+website: <A HREF="http://topology.org/">http://topology.org/</A>
+   city: Adelaide, South Australia
+ coords: 34.89744 S, 138.58970 E
+pgp-key: <A HREF="http://topology.org/key_ak1.asc">http://topology.org/key_ak1.asc</A>
+saying1: `The Internet is the parliament of the people.' ak 28/5/1999.
+saying2: `Seek truth from facts.' mao or deng, 1970s?
+saying3: `Let a 1000 flowers bloom, let a 1000 schools contend.' mao, 1970s?
+saying4: `Cut down the tall poppies.' mao, a few months later.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

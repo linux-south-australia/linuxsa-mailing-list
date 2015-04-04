@@ -1,0 +1,303 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="HINT Bash 2.04 shell completion" -->
+<!-- FromName="Dan Shearer" -->
+<!-- FromEmail="dan@shearer.org" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 3 Jul 2000 07:38:54 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.10.10007030736000.6133-100000@localhost.localdomain" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: HINT Bash 2.04 shell completion</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@shearer.org">dan@shearer.org</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 3 Jul 2000 07:38:54 +0930 (CST)
+</PRE>
+<H1>HINT Bash 2.04 shell completion</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Forwarded with permission.
+
+Ian Macdonald (<A HREF="mailto:ian@linuxcare.com">ian@linuxcare.com</A>) wrote the following:
+
+&gt; Well, bash 2.04 has been out a couple of months now, and one of the
+&gt; nice new features (well, pretty much the only new feature) is the
+&gt; addition of programmable completion, à la zsh.
+&gt;
+&gt; Try adding some of the following stuff to your ~/.bashrc <A HREF="file:">file:</A>
+    :
+    :
+&gt; -- 
+&gt; Ian Macdonald               | "If you want to eat hippopatomus, you've   
+&gt; Senior System Administrator | got to pay the freight." -- attributed to  
+&gt; Linuxcare, Inc.             | an IBM guy, about why IBM software uses so 
+&gt; Support for the Revolution  | much memory                                
+
+Dan
+
+===========
+
+# Turn on extended globbing
+shopt -s extglob
+
+# Make directory commands see only directories
+#
+complete -d cd mkdir rmdir pushd
+
+# Make file commands see only relevant files
+#
+complete -f cat less more chown ln strip
+complete -f -X '*.gz' gzip
+complete -f -X '*.Z' compress
+complete -f -X '!*.+(gz|tgz|Gz)' gunzip zcat zmore
+complete -f -X '!*.Z' uncompress zmore zcat
+complete -f -X '!*.+(gif|jpg|jpeg|GIF|JPG|bmp)' ee xv
+complete -f -X '!*.+(ps|PS)' gv
+complete -f -X '!*.+(dvi|DVI)' dvips xdvi dviselect dvitype
+complete -f -X '!*.+(pdf|PDF)' acroread xpdf
+complete -f -X '!*.texi*' makeinfo texi2dvi texi2html
+complete -f -X '!*.+(tex|TEX)' tex latex slitex
+complete -f -X '!*.+(mp3|MP3)' mpg123
+
+# kill & killall see only signals
+#
+complete -A signal kill killall
+
+# user commands see only users
+#
+complete -u finger su usermod userdel passwd
+
+# bg completes with stopped jobs
+#
+complete -A stopped -P '%' bg
+
+# other job commands
+#
+complete -j -P '%' fg jobs disown
+
+# network commands complete with hostname
+#
+complete -A hostname ssh rsh telnet rlogin ftp ping fping host traceroute \
+	    nslookup
+
+# export and others complete with shell variables
+#
+complete -v export local readonly unset
+
+# set completes with set options
+#
+complete -A setopt set
+
+# shopt completes with shopt options
+#
+complete -A shopt shopt
+
+# helptopics
+#
+complete -A helptopic help
+
+# unalias completes with aliases
+#
+complete -a unalias
+
+# type completes with commands
+#
+complete -c command type
+
+# make umount complete with currently mounted file systems
+#
+_umount_func ()
+{
+	local cur prev
+
+        COMPREPLY=()
+        cur=${COMP_WORDS[COMP_CWORD]}
+        prev=${COMP_WORDS[COMP_CWORD-1]}
+
+	COMPREPLY=( $( mount | cut -d' ' -f 3 | grep ^$cur) )
+	return 0
+}
+complete -F _umount_func umount
+
+# make group related commands complete with valid group names
+#
+_gid_func ()
+{
+	local cur prev
+
+        COMPREPLY=()
+        cur=${COMP_WORDS[COMP_CWORD]}
+        prev=${COMP_WORDS[COMP_CWORD-1]}
+	COMPREPLY=( $( awk 'BEGIN {FS=":"} {if ($1 ~ /^'$cur'/) print $1}' /etc/group ) )
+	return 0
+}
+complete -F _gid_func groupdel groupmod
+
+# make mount complete with valid mount points from fstab, unless an
+# NFS host is specified, in which case we complete with valid exports
+# (this could be made more intelligent -- I leave it as an exercise
+# for the reader)
+#
+_mount ()
+{
+	local cur prev
+
+        COMPREPLY=()
+        cur=${COMP_WORDS[COMP_CWORD]}
+        prev=${COMP_WORDS[COMP_CWORD-1]}
+
+	case "$cur" in
+	*:*)
+		COMPREPLY=( $( /usr/sbin/showmount -e --no-headers ${cur%%:*}|\
+			       grep ^${cur#*:} | awk '{print $1}'))
+		return 0
+		;;
+	*)
+		COMPREPLY=( $( awk '{if ($2 ~ /\//) print $2}' /etc/fstab | \
+			       grep ^$cur ))
+		return 0
+		;;
+	esac
+}
+complete -F _mount mount
+
+# make rmmod complete with currently loaded modules
+#
+_rmmod ()
+{
+	local cur prev
+
+        COMPREPLY=()
+        cur=${COMP_WORDS[COMP_CWORD]}
+        prev=${COMP_WORDS[COMP_CWORD-1]}
+
+	COMPREPLY=($( lsmod | awk '{if (NR != 1 && $1 ~ /^'$cur'/) print $1}'))
+	return 0
+}
+complete -F _rmmod rmmod
+
+# make insmod & friends complete with modules available to current kernel
+#
+_insmod ()
+{
+	local cur prev modpath
+
+        COMPREPLY=()
+        cur=${COMP_WORDS[COMP_CWORD]}
+        prev=${COMP_WORDS[COMP_CWORD-1]}
+	modpath=/lib/modules/`uname -r`
+
+	COMPREPLY=($( ls -R $modpath | sed -ne 's/^\('$cur'.*\)\.o$/\1/p'))
+	return 0
+}
+complete -F _insmod insmod depmod modprobe
+
+# Make man complete with possible man page names.
+# Allows you to complete based only on the relevant
+# section of the manual.
+#
+# So:
+#
+# $ man 3 str&lt;tab&gt;&lt;tab&gt;
+#
+# would show you a list of all the string handling library calls in
+# section 3 of the manual.
+
+_man ()
+{
+        local cur prev
+
+        COMPREPLY=()
+        cur=${COMP_WORDS[COMP_CWORD]}
+        prev=${COMP_WORDS[COMP_CWORD-1]}
+
+        case "$prev" in
+        [0-9n])
+                COMPREPLY=($( slocate -ql 0 -r '/man/man'$prev'/'$cur | \
+                      sed -ne 's/^.*\/\('$cur'[^.\/]*\)\..*$/\1/p' ))
+                return 0
+                ;;
+        *)
+                COMPREPLY=($( slocate -ql 0 -r '/man/man./'$cur | \
+                      sed -ne 's/^.*\/\('$cur'[^.\/]*\)\..*$/\1/p' ))
+                return 0
+                ;;
+        esac
+}                     
+
+complete -F _man man
+
+# make rpm complete with build options where relevant, .spec file
+# names where relevant, RPMs where relevant, and names of installed
+# packages where relevant
+# (this is a little slow and buggy, but already quite useful,
+# especially when issuing an 'rpm -q' command)
+#
+_rpm ()
+{
+	local cur prev
+
+        COMPREPLY=()
+        cur=${COMP_WORDS[COMP_CWORD]}
+        prev=${COMP_WORDS[COMP_CWORD-1]}
+
+	# Complete build options
+	case "$cur" in
+	-b|-t)	COMPREPLY=(p l c i b s a); return 0 ;;
+	esac
+
+	case "$prev" in
+	-b*|-t*)
+		COMPREPLY=( $(compgen -f $cur -G *.spec) ); return 0 ;;
+	-qp*|-i*|-U*|-F*)
+		COMPREPLY=( $(compgen -f $cur -G *.rpm) ); return 0 ;;
+	--rebuild|--recompile)
+		COMPREPLY=( $(compgen -f $cur -G *src.rpm) ); return 0 ;;
+	-q|-V|-e)
+		COMPREPLY=( $( rpm -qa | \
+			       sed -ne 's/^\('$cur'.*\)-[^-]\+-[^-]\+$/\1/p') )
+		return 0
+		;;
+	esac
+}
+complete -F _rpm rpm
+###
+
+                            |                                            
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

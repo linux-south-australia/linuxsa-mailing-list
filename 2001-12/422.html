@@ -1,0 +1,123 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Network Card IRQ problems" -->
+<!-- FromName="'Tim Riley'" -->
+<!-- FromEmail="tr@rebel.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 18 Dec 2001 22:46:16 +1030" -->
+<!-- Id="20011218224616.A362@rebel.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Network Card IRQ problems</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Tim Riley &lt;<I><A HREF="mailto:tr@rebel.net.au">tr@rebel.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 18 Dec 2001 22:46:16 +1030
+</PRE>
+<H1>Network Card IRQ problems</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+Yesterday I purchased two brand-less network cards (they have RealTek 8139 
+chips in them).  I put them in my two machines, then configured the 
+Slackware 8.0 OS on each machine to be networked.  It was all very 
+straightforward, and after the configuration, `route` and `ifconfig` were 
+returning the right messages.  When I tried to ping machine A from machine 
+B, however, it would fail.  The light's of machine A's NIC would flash, 
+but B's wouldn't.
+
+Upon further inspection, some nasty-looking IRQ errors in dmesg turned up, 
+and they are included below:
+
+PCI: Found IRQ 12 for device 00:0b.0
+IRQ routing conflict in pirq table for device 00:0b.0
+es1371: found chip, vendor id 0x1274 device id 0x1371 revision 0x08
+es1371: found es1371 rev 8 at io 0xec00 irq 9
+es1371: features: joystick 0x0
+ac97_codec: AC97 Audio codec, id: 0x8384:0x7609 (SigmaTel STAC9721/23)
+8139too Fast Ethernet driver 0.9.17
+PCI: Found IRQ 11 for device 00:0a.0
+IRQ routing conflict in pirq table for device 00:0a.0
+eth0: RealTek RTL8139 Fast Ethernet at 0xcc84c000, 00:40:f4:2c:94:e2, IRQ 
+12
+eth0:  Identified 8139 chip type 'RTL-8139C'
+eth0: Setting 100mbps full-duplex based on auto-negotiated partner ability 
+41e1.
+
+--
+
+There seem to be two different IRQ conflicts, one occuring before the 
+soudn card module is loaded (es1371), and the other before the network 
+card module is loaded (8139too).
+
+/proc/interrupts contains this:
+
+           CPU0       
+  0:     470100          XT-PIC  timer
+  1:      20934          XT-PIC  keyboard
+  2:          0          XT-PIC  cascade
+  3:     201061          XT-PIC  serial
+  4:      92696          XT-PIC  serial
+  8:          1          XT-PIC  rtc
+  9:          0          XT-PIC  es1371
+ 12:         60          XT-PIC  eth0
+ 14:       4504          XT-PIC  ide0
+NMI:          0 
+ERR:          0
+
+--
+
+It was suggested that I go into the BIOS and reserve the IRQ of the NIC 
+for use by ISA devices, thus causing it to use another IRQ, hence avoiding 
+possible conflicts, but this made no difference.
+
+I am using the 2.4.5 kernel distributed with Slackware 8.0.  There seems 
+to be no problem (well, nothing that I can see) with the hardware itself 
+(new NICs and a new crossover cable) or the software configuration, so 
+this IRQ problem seems to be the perpetrator.  Is this correct?  Would 
+anyone have any ideas of how to get around this?
+
+Thanks for your help,
+
+Tim Riley
+
+-- 
+tim riley | tr at rebel.net.au | upbc.org.au slash tr | &lt;&gt;&lt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

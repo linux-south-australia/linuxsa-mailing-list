@@ -1,0 +1,123 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Adding SCSI tape drives" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 13 Nov 2000 17:50:55 +1030" -->
+<!-- Id="3A0F9657.F872D206@aarnet.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Adding SCSI tape drives</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 13 Nov 2000 17:50:55 +1030
+</PRE>
+<H1>Adding SCSI tape drives</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+This is to save someone else the pain, as there's a huge
+lack of info.
+
+I've make the device accessible by members of the "disk" group.
+This isn't necessary.
+
+Operating System: Red Hat Linux 6.0
+
+Establish "tape" pseudo-device:
+  su
+  cd /dev
+  ./MAKEDEV st0
+  ./MAKEDEV nst0
+  chgrp disk st0
+  chgrp disk nst0
+  newgrp disk
+     ln -s st0 tape
+     ln -s nst0 ntape
+     exit
+  exit
+
+Set up modules:
+  su
+  vi /etc/conf.modules
+    # Controller: AHA-2940 (PCI)
+    #   SCSI ID: 7
+    #   Connector: HP-CEN
+    alias scsi_hostadapter aic7xxx
+    # Tape: HP SureStore 6000 (model C1529-62702)
+    #   SCSI ID: 5
+    #   Connector: Centronics
+    #   Termination: external passive Centronics
+    # it is the zeroth (and only) device detected on the SCSI
+    # bus, so has minor number 0 for /dev/st0 and 128 for
+    # /dev/nst0.
+    alias char-major-9-0 st
+    alias char-major-9-128 st
+  depmod -a
+  exit
+
+Test:
+  su
+    mt rewind
+    dmesg
+    exit
+
+The successful output from dmesg is:
+&gt; st: bufsize 32768, wrt 30720, max buffers 4, s/g segs 16.
+&gt; (scsi0) &lt;Adaptec AHA-294X SCSI host adapter&gt; found at PCI 0/18/0
+&gt; (scsi0) Narrow Channel, SCSI ID=7, 16/255 SCBs
+&gt; (scsi0) Downloading sequencer code... 416 instructions downloaded
+&gt; enable_irq() unbalanced from c80853c7
+&gt; scsi0 : Adaptec AHA274x/284x/294x (EISA/VLB/PCI-Fast SCSI) 5.1.28/3.2.4
+&gt;        &lt;Adaptec AHA-294X SCSI host adapter&gt;
+&gt; scsi : 1 host.
+&gt; (scsi0:0:6:0) Synchronous at 10.0 Mbyte/sec, offset 8.
+&gt;   Vendor: HP        Model: C1533A            Rev: 9608
+&gt;   Type:   Sequential-Access                  ANSI SCSI revision: 02
+&gt; Detected scsi tape st0 at scsi0, channel 0, id 6, lun 0
+
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

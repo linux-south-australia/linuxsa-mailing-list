@@ -1,0 +1,184 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Duplicate MAC addresses" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Richard Sharpe" -->
+<!-- ToEmail="sharpe@ns.aus.com" -->
+<!-- Date="Wed, 7 Apr 1999 00:32:10 +0930 (CST)" -->
+<!-- Id="199904061502.AAA00714@atdot.dotat.org" -->
+<!-- Reference="3.0.5.32.19990406225239.00828990@mail.adelaide.on.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Duplicate MAC addresses</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  Date: Wed, 7 Apr 1999 00:32:10 +0930 (CST)
+</PRE>
+<H1>Re: Duplicate MAC addresses</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Richard Sharpe wrote:
+
+ &gt; However, having said that, how unique do MAC addresses need to be?
+
+ARP is all about "direct" connectivity -- theoretically, the hosts you
+can receive ARP information about consist of that set of hosts which
+will fall off their desks if you pull your ethernet cable hard enough.
+
+Don't try that at home.  It should be ok at work, but not at home.
+:-)
+
+If you have more than one ethernet cable, yanking different cables
+will cause different sets of machines to get pulled from their desks.
+The machines are in different "physical address spaces", and those
+physical address spaces are non-overlapping.
+
+ &gt; I had asserted that they only need to be locally unique.
+ &gt; There are three situations I can think of:
+ &gt; 1. Duplicate MAC addresses on the same segment. Danger Will Robinson.
+
+Indeed - This will not work. Related:  Duplicate MAC addresses on 
+both sides of a bridge won't work either.
+
+ &gt; 2. Duplicate MAC addresses on different segments separated by a router:
+ &gt; 
+ &gt;     11:22:33:44:55:66                      11:22:33:44:55:66
+ &gt;            -----------------[Router]------------------ 
+ &gt; 
+ &gt;    Here, whether or not this will work depends on how ARP is implemented,
+ &gt;    it seems. A check on a Linux 2.0.3x system I have access to shows that
+ &gt;    ARP keeps the interface with the MAC address and IP in the ARP table.
+ &gt;    So, it suggests that this situation will work, but without looking at
+ &gt;    the code, I cannot be sure.
+
+It's important to note how the ARP table is used before working out
+whether this will be happy or not.  It's useful to go through the 
+motions of transmitting a network packet to illustrate why the case
+you've provided above should work fine.
+
+Whe you want to transmit an IP packet, the kernel starts by consulting
+its routing table.  The routing table contains two main subdivisions of
+information:  Stuff which says, "To reach this network, go via that router
+over there," and stuff which says, "To reach this host, use this network
+interface."  The former are called network routes, the latter are host
+routes.  When your system wants to send to a foreign network it notionally
+works out which router to use then does another lookup to work out which
+network interface that router can be reached through (although sane
+implementations of IP routing merge the two together by noting that the
+only difference between a host route and a network route is the route's
+netmask, so you only really need one lookup -- But I'm talking about 
+concepts here, not hard implementations).
+
+If the routing table says that a given destination is directly reachable
+via an ethernet (or ATM, or FDDI, or whatever) interface, the next step
+is to work out the network access layer address of the station you're
+trying to reach.  IP addresses are only useful when hosts are communicating
+with IP, but IP packets need to be sent using lower-level protocols like
+Ethernet 802.3, so you need Ethernet 802.3 addresses to send datagrams.
+
+The ARP table acts as a translation table between internet layer addresses
+and network access layer addresses (e.g.: IP -&gt; Ethernet, Appletalk -&gt; ATM,
+whatever).  By the time the ARP table is consulted, the transmitting host
+already knows which destination IP address it wants to reach (duh!) and
+the interface it needs to use to reach it (due to info from the routing
+table).
+
+When you pop those two bits of info into the ARP table, you should
+only get back one answer (i.e.: one hardware address) even if the
+hardware address exists on multiple local networks.  The reason for this
+is that ARP lookups are made on the tuple of (dst-ip-address, interface),
+so if a MAC address exists on more than one interface different answers
+will come back depending on which interface you're asking about.
+
+The result of the ARP lookup is, of course, a network access layer address,
+such as an ethernet MAC address.  That's what you need to send the packet,
+so the world can continue :-)
+
+The only part of the story left is the question of how the ARP table
+is populated in the first place.  Again, this is done in an
+interface-sensitive fashion: 
+
+  1)  If an ARP query comes in for an (ip, interface) pair which isn't
+      currently in the ARP table, an "ARP WHOHAS" broadcast will be
+      transmitted on the nominated interface (not all interfaces, just
+      the one we know we want to talk through).
+
+  2)  The ARP reply arrives on the same interface the WHOHAS query was
+      transmitted on;  the info in that reply is used to construct an
+      (ip-address, interface, mac-address) tuple for insertion into the
+      ARP table.
+
+So entries are inserted into the table in a way which preserves the
+mapping between network interface and MAC address;  So you should be
+able to put the same MAC address into the same table more than once.
+
+Anyway, that was the long answer.  The short answer is that scenario
+(2) should work. :-)
+
+ &gt; 3. Duplicate MAC addresses with two or more routers between them:
+ &gt; 
+ &gt;   11:22:33:44:55:66                                        11:22:33:44:55:66
+ &gt;    ------------------[Router1]---------------------[Router2]----------------
+ &gt; 	Segment1 		     Segment2				Segment3
+ &gt; 
+ &gt;    This should work, but I would not suggest trying it.
+
+&lt;shrug&gt;  No skin off anyone's nose;  it'll work fine. You'd probably
+want to be careful moving hosts around from network to network, though :-)
+
+Throughout these discussions, keep in mind the fact that MAC addresses
+aren't really unique at all.  As has been previously noted, they're 
+settable in software with the vast majority of ethernet NICs, but even
+without that fact duplicates *have* slipped through.
+
+Things which complicate these pictures:  Proxy ARP (whereby you can 
+receive ARP info about a host which isn't actually on your ethernet
+at all) and VLANs (where the MAC address takes on a whole new importance).
+
+ &gt; So, my question is, can anyone state that 2 above will not work (in some
+ &gt; cases)?
+
+Nope. :-)  Only with broken ARP implementations.  There are probably
+quite a lot of them, though.
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

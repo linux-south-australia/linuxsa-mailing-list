@@ -1,0 +1,158 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Debian Sarge + DHCP" -->
+<!-- FromName="'John Davey'" -->
+<!-- FromEmail="list@davey.net.au" -->
+<!-- ToName="'David Lloyd'" -->
+<!-- ToEmail="dlloyd@microbits.com.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 2 Mar 2003 08:37:32 +1030" -->
+<!-- Id="GNECLCLHIFNNAHMOKHDPIEFGDFAA.list@davey.net.au" -->
+<!-- Reference="20030228153229.12c41107.dlloyd@microbits.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Debian Sarge + DHCP</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: John Davey &lt;<I><A HREF="mailto:list@davey.net.au">list@davey.net.au</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:dlloyd@microbits.com.au">dlloyd@microbits.com.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 2 Mar 2003 08:37:32 +1030
+</PRE>
+<H1>RE: Debian Sarge + DHCP</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+man dhclient.conf
+
+LEASE DECLARATIONS
+       The lease declaration
+
+        lease { lease-declaration [ ... lease-declaration ] }
+
+       The DHCP client may decide after some period of time (see PROTOCOL
+TIM-
+       ING)  decide  that  it  is not going to succeed in contacting a
+server.
+       At that time, it consults its own database of old leases and tests
+each
+       one  that  has  not yet timed out by pinging the listed router for
+that
+       lease to see if that lease could work.   It is possible to  define
+one
+       or  more  fixed  leases  in  the client configuration file for
+networks
+       where there is no DHCP or BOOTP service, so that the client  can
+still
+       automatically  configure  its  address.    This  is done with the
+lease
+       statement.
+
+In other words the lease statment in dhclient.conf is only used if it fails
+to
+contact a DHCP server.
+
+IF you want a fixed address with DHCP put the following in dhcpd.conf on the
+DHCP server. ( Replace 00:xx:xx:xx:xx:xx with the MAC of your network card)
+
+host orthanc {
+      hardware ethernet 00:xx:xx:xx:xx:xx;
+      fixed-address 10.0.0.100
+}
+
+
+
+Regards John
+
+-----Original Message-----
+From: David Lloyd [mailto:<A HREF="mailto:dlloyd@microbits.com.au">dlloyd@microbits.com.au</A>]
+Sent: Friday, 28 February 2003 3:32 PM
+To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+Subject: Debian Sarge + DHCP
+
+
+
+..hmmm...
+
+I have:
+
+---
+% cat /etc/network/interfaces
+auto eth0
+iface eth0 inet dhcp
+auto eth1
+iface eth1 inet static
+	address 10.0.0.100
+	netmask 255.255.255.0
+---
+
+And...
+
+% cat /etc/dhclient.conf
+send host-name "orthanc";
+supersede domain-name "stepney.microbits.com.au";
+supersede domain-name-servers 192.168.1.12;
+
+lease {
+	interface "eth1";
+	fixed-address 10.0.0.100;
+---
+
+(the --- are not part of the files).
+
+Now every time the dhcp renews eth1 goes and loses its IP address and comes
+back with some ip address BUT NOT 10.0.0.100. I can't work out WHY it is
+losing its IP address when it is CLEARLY stated that it should be
+10.0.0.100. Even if it does pick up a DHCP address it should get 10.0.0.100.
+dhclient complains that /var/lib/dhcp/leases (the leases) file is corrup but
+I haven't done anything to it.
+
+My current kludge is:
+
+# dpkg -r dhcp-client
+
+..because you can't get dhcp addresses if you don't have a dhcp-client but
+surely there's something I'm missing here.
+
+:(
+
+--
+Microbits Linux Technician
+
+Ph: +61 8 8362 9220
+
+--
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

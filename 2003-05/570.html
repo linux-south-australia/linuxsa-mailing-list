@@ -1,0 +1,167 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: umount problem" -->
+<!-- FromName="'David Ananian-Cooper'" -->
+<!-- FromEmail="davidac17@yahoo.com" -->
+<!-- ToName="'Daryl Tester'" -->
+<!-- ToEmail="Daryl.Tester@iocane.com.au" -->
+<!-- Date="Sat, 17 May 2003 18:59:59 +0930" -->
+<!-- Id="200305171900.01746.davidac17@yahoo.com" -->
+<!-- Reference="3EC5F182.3C07555@iocane.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: umount problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Ananian-Cooper &lt;<I><A HREF="mailto:davidac17@yahoo.com">davidac17@yahoo.com</A></I>&gt;
+  To  : Daryl Tester &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  Date: Sat, 17 May 2003 18:59:59 +0930
+</PRE>
+<H1>Re: umount problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+hi
+
+firstly i should point out that the only way i can replicate the problem is 
+with the following series of events:
+
+1) mount the drive
+2) kill the mount.smbfs process
+3) unplug the network
+
+this series of events seems to somehow create a process somewhere which i cant 
+find which prevents me from unmounting the share
+
+i tried the fuser command and this is what it gave:
+
+[<A HREF="mailto:root@david">root@david</A> /mnt] #fuser -m /mnt/smbmount
+/mnt/smbmount: Input/output error
+[<A HREF="mailto:root@david">root@david</A> /mnt] #
+
+and the same happens with all the extra dud mounts i now have as a result of 
+trying to replicate the error :-)
+
+the 'ls' command also gives the following output:
+
+[<A HREF="mailto:root@david">root@david</A> /mnt] #ls
+ls: ntfs: Input/output error
+ls: cdrom: Input/output error
+ls: smbmount: Input/output error
+floppy
+[<A HREF="mailto:root@david">root@david</A> /mnt] #
+(i mounted the extra test shares onto the other directories in /mnt which are 
+now also having the I/O problem)
+
+running the stat command on the directories also gave the same error
+
+dunno if it will help, but here is the output of the 'mount' command:
+
+[<A HREF="mailto:root@david">root@david</A> /mnt] #mount
+/dev/hda4 on / type reiserfs (rw,noatime,notail)
+proc on /proc type proc (rw)
+none on /dev type devfs (rw)
+tmpfs on /mnt/.init.d type tmpfs (rw,mode=0644,size=2048k)
+tmpfs on /dev/shm type tmpfs (rw)
+usbdevfs on /proc/bus/usb type usbdevfs (rw)
+//150.203.239.92/My_Music on /mnt/smbmount type smbfs (0)
+//chiron/SharedDocs on /mnt/cdrom type smbfs (0)
+//chiron/SharedDocs on /mnt/ntfs type smbfs (0)
+//chiron/SharedDocs on /mnt/floppy type smbfs (0)
+[<A HREF="mailto:root@david">root@david</A> /mnt] #
+
+and i'm using gentoo (just trying to give as much info as possible)
+
+
+i guess what i am really trying to do here is forcibly unmount something when 
+its no-longer working as it should!!
+
+well, thanks in advance
+
+david ac
+
+
+
+
+
+On Sat, 17 May 2003 17:53, Daryl Tester wrote:
+&gt; David Ananian-Cooper wrote:
+&gt; &gt; i'm refering to the smbfs.o module. the exact problem i'm having is that
+&gt; &gt; i mount network shares onto my filesystem - then the other side cancels
+&gt; &gt; the connection, then umount refuses to let me unmount the connection -
+&gt; &gt; claiming that the device is busy.
+&gt;
+&gt; This is probably true.
+&gt;
+&gt; &gt; the output of an 'lsmod' confirms this, claiming
+&gt; &gt; that the smbfs module is in use by 1 process.
+&gt;
+&gt; This is false.  lsmod shows reference counts of instances, not processes.
+&gt; If you had two mounted shared and 4000 processes with open files, you would
+&gt; most likely see a count of 2 (or 3 - I think sometimes a reference is
+&gt; incremented by one just to keep it resident.  For example, my SCSI
+&gt; controller shows a link count of 3, but only 2 mounted filesystems off that
+&gt; controller).
+&gt;
+&gt; &gt; Other then a reboot, i cant
+&gt; &gt; work out how to unmount this connection.
+&gt;
+&gt; rmmod is *not* what you want to do.  You want to find out what process is
+&gt; currently residing on that file system, kill the processes, and then you
+&gt; will be able to unmount the file system.
+&gt;
+&gt; "fuser -m /mount_point_name" should show you the process ids with files
+&gt; open to that mount point.  Once that list drops to zero, then you will
+&gt; be able to unmount the file system.
+&gt;
+&gt;
+&gt; --
+&gt; Regards,
+&gt;   Daryl Tester,  Software Wrangler and Bit Herder, IOCANE Pty. Ltd.
+&gt;
+&gt; "The philosophy exam was a piece of cake -- which was a bit of a surprise,
+&gt;  actually, because I was expecting some questions on a sheet of paper."
+&gt;   -- Smith & Jones
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (GNU/Linux)
+
+iD8DBQE+xgEZqKJjsK82VBsRAtpWAJ0TGwv56EK6fWdytqpFzJT5gg/7zACbBwQd
+5CjU0/3nMCH8BZFO3Y/DZQI=
+=kb3Y
+-----END PGP SIGNATURE-----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,124 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: New Motherboard with onboard lan" -->
+<!-- FromName="'Rick Harris'" -->
+<!-- FromEmail="rickharris@mightylegends.zapto.org" -->
+<!-- ToName="'Evan Bourlotos'" -->
+<!-- ToEmail="evan@cs.adelaide.edu.au" -->
+<!-- Date="12 Aug 2003 18:12:08 +0930" -->
+<!-- Id="1060677728.24629.63.camel@LAPTOP.localnet" -->
+<!-- Reference="002c01c36006$d7095850$0d00000a@nb" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: New Motherboard with onboard lan</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Rick Harris &lt;<I><A HREF="mailto:rickharris@mightylegends.zapto.org">rickharris@mightylegends.zapto.org</A></I>&gt;
+  To  : Evan Bourlotos &lt;<I><A HREF="mailto:evan@cs.adelaide.edu.au">evan@cs.adelaide.edu.au</A></I>&gt;
+  Date: 12 Aug 2003 18:12:08 +0930
+</PRE>
+<H1>Re: New Motherboard with onboard lan</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Evan,
+
+On Mon, 2003-08-11 at 22:18, Evan Bourlotos wrote:
+&gt; Hi List,
+&gt; I have recently upgraded my system by installing a new ABIT IS7 (p4)
+&gt; motherboard. The board is good and has on board gigabit lan (even
+&gt; though
+&gt; the specs say otherwise)
+&gt; So far I have managed to track down a module for the LAN from ASUS
+&gt; (of all places) (which runs the same 3com onboard chip) The module
+&gt; appears
+&gt; to work as I compiled it and fired up eth0 and I could ping my other
+&gt; machines.
+
+Great !
+
+&gt; 
+&gt; The problem is I have tried running insmod 3c2000.o and it placed it
+&gt; in
+&gt; /proc/modules I pinged but I cant do much else - the gateway and other
+&gt; things are not setup (normally done from the DHCP server but seeing I
+&gt; manually ifconfig up I hardcoded the ip address ). I have never faced
+&gt; this
+&gt; (installing a custom module) before as most of my hardware was always
+&gt; a
+&gt; generation behind and always autodetected.
+
+To get dhcp up, bring eth0 down with 'ifconfig eth0 down'
+then try 'dhcpcd eth0'.
+This should auto-get the IP address & gateway info from the dhcp server.
+Check it with 'ifconfig' & 'route'
+
+If dhcp is giving problems, less /var/log/messages & /var/log/syslog on
+the dhcp server to check for any errors. If your dhcpd.conf on the
+server is using MAC addresses to identify hosts on the network, then it
+will need to be changed to include the MAC address (HWaddr: in ifconfig)
+of your new NIC.
+
+If it does get the IP address, but not the gateway, you can manually set
+it up like so:
+'route del default'
+'routed add default gw &lt;ip-address_of_gateway&gt;'
+
+If all is well & you can now ping remote IP's through the gateway, then
+it's time to make it automatically set your network up on boot. How this
+is done depends largely on what linux distribution you're using. If it's
+either Slackware or Gentoo, I can help, otherwise I wouldn't have a clue
+:)
+
+But to make this transition easier you want to be able to modprobe the
+3c2000.o module.
+
+'cp 3c2000.o /lib/modules/`uname -r`/kernel/drivers/net/'
+then run 'depmod -a'
+You should now be able to 'modprobe 3c2000'
+
+&gt; I may have another question regarding with ac97 sound
+
+If memory serves, ac97 is a type of audio codec used by many different
+manufacturers of soundcards. So, if it's your soundcard your looking to
+setup here you'll need to provide the brand.
+'lspci | grep audio' should do the trick.
+
+Hope at least some of this helps. Nice specs on the new box btw ;-)
+
+Regards,
+Rick
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,144 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Samba - Trusts  & Routed Network browsing" -->
+<!-- FromName="John Davey" -->
+<!-- FromEmail="john@davey.netyp.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="LinuxSA@linuxsa.org.au" -->
+<!-- Date="Mon, 21 Aug 2000 12:57:38 +0930" -->
+<!-- Id="001e01c00b1f$c1a7b860$02001eac@davey.netyp.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Samba - Trusts  & Routed Network browsing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: John Davey &lt;<I><A HREF="mailto:john@davey.netyp.com">john@davey.netyp.com</A></I>&gt;
+  To  : <A HREF="mailto:LinuxSA@linuxsa.org.au">LinuxSA@linuxsa.org.au</A>
+  Date: Mon, 21 Aug 2000 12:57:38 +0930
+</PRE>
+<H1>Samba - Trusts  & Routed Network browsing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I'm having a problem with Samba & network browsing over 3 WinNT Domains set
+up like this.
+It works everywhere but in the USERS domain..
+
+
+Admin Domain                        Management Domain
+-----------------                 ------------------
+|Admin  Network |                 | Management Net  |
+|192.168.1.0/24 |                 | 192.168.2.0/24  |
+|               |                 |                 |
+-----------------                 -------------------
+       |                                  |
+       |  Trust                    Trust  |
+       +--&gt;----------+    +------------&lt;--+
+                     |    |
+			Users Domain
+  ------------------------------------------------
+  |   Users PDC -- 192.168.200.254/24  (BOW)     |
+  |      ||                                      |
+  |      |+Other server -- 192.168.200.253/24    |
+  |      |                                       |
+  |   ........................................   |
+  |      |                                       |
+  |     Samba Server -- 10.10.10.1  (ARROW)      |
+  |                                              |
+  ------------------------------------------------
+
+All boxes are WinNT except for Samba with each PDC running Wins &
+Replicating between Domains.
+
+The DOMAIN USERS trusts both ADMIN & MANAGEMENT and works fine.
+I've just installed SAMBA on a server to be part of DOMAIN USERS. It is on a
+different Network from the rest of the users domain but meant to be part of
+the domain. The connection to the other users servers is fine HTTP, FTP etc
+all works ping, traceroute etc.
+
+The problem is that although Samba(ARROW) appears in the network browse list
+and in the server manager for USERS it is not accessible. The fun part is it
+is accessible from the Admin & Management Domains.
+
+Now if I start a DOS box on the Users PDC (BOW)
+
+C:\&gt; net view ARROW
+System error 53
+Network path no found
+
+Same for
+C:\&gt; net view 10.10.10.1
+System error 53
+Network path no found
+
+This occurs for all systems in the Users domain but it works correctly for
+all the Parent Domains.
+
+Now I suspect that it is a WINS/BROWSER issue because the Samba(ARROW) box
+is the only one in its subnet (No NT boxes) and I get the following error in
+log.nmb
+
+[2000/08/21 12:23:04, 0]
+nmbd/nmbd_browsesync.c:find_domain_master_name_query_fail(362)
+  find_domain_master_name_query_fail:
+  Unable to find the Domain Master Browser name USERS&lt;1b&gt; for the workgroup
+USERS.
+  Unable to sync browse lists in this workgroup.
+
+
+smb.conf
+        netbios name = ARROW
+        workgroup = USERS
+        server string = Authentication Server [Samba %v]
+
+        wins support = no
+        wins server = 192.168.200.254
+
+        interfaces = 10.10.10.1/24
+
+        security = domain
+        domain master = no
+        preferred master = no
+        local master = yes
+        remote announce = 192.168.200.254
+        password server = BOW
+        password level = 8
+        username level = 8
+        encrypt passwords = yes
+        smb passwd file = /etc/smbpasswd
+        username map = /etc/smbusers
+
+
+Regards John Davey
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

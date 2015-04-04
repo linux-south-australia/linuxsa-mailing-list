@@ -1,0 +1,127 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Postgres, PL/pgSQL and triggers" -->
+<!-- FromName="'Andrew Hill'" -->
+<!-- FromEmail="list@fornax.net" -->
+<!-- ToName="'Jason Tan'" -->
+<!-- ToEmail="jason@rebel.rebel.net.au" -->
+<!-- Date="Mon, 03 Sep 2001 12:32:56 +0930" -->
+<!-- Id="3B92F2E0.2040509@fornax.net" -->
+<!-- Reference="Pine.LNX.3.95.1010831165724.9410Q-100000@rebel.rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Postgres, PL/pgSQL and triggers</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Hill &lt;<I><A HREF="mailto:list@fornax.net">list@fornax.net</A></I>&gt;
+  To  : Jason Tan &lt;<I><A HREF="mailto:jason@rebel.rebel.net.au">jason@rebel.rebel.net.au</A></I>&gt;
+  Date: Mon, 03 Sep 2001 12:32:56 +0930
+</PRE>
+<H1>Re: Postgres, PL/pgSQL and triggers</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Jason Tan wrote:
+
+&gt; Can nayone here tell me if it is possible to access a query taht causes a
+&gt; trigger to fire in a postgrs triggr writtenin PL/pgSQL?
+
+
+Yes.
+
+
+&gt; Does anyoen know of a variable or functionto access the query that fires
+&gt; that trigger?
+
+
+Something like.....?
+
+-------------------------------------------------------
+
+1) Enable PL/pgSQL (modify for installation as required):
+
+CREATE FUNCTION plpgsql_call_handler () RETURNS OPAQUE AS
+   '/var/pgsql/lib/plpgsql.so' LANGUAGE 'C';
+
+CREATE TRUSTED PROCEDURAL LANGUAGE 'plpgsql'
+   HANDLER plpgsql_call_handler
+   LANCOMPILER 'PL/pgSQL';
+
+-------------------------------------------------------
+
+2) Create the trigger function:
+
+CREATE FUNCTION logFooInsert() RETURNS OPAQUE AS '
+   BEGIN
+     -- Log the PostgreSQL user name:
+     NEW.user := getpgusername();
+     - Log the time:
+     NEW.updated := ''now'';
+     RETURN NEW;
+   END;
+' LANGUAGE 'plpgsql';
+
+-------------------------------------------------------
+
+3) Set up the table with the trigger:
+
+CREATE TABLE foo (
+   PUT YOUR COLUMNS HERE,
+   user    TEXT,
+   updated DATETIME
+);
+
+CREATE TRIGGER fooTrigger BEFORE INSERT
+   -- If required:
+   -- OR UPDATE
+   ON foo FOR EACH ROW
+   EXECUTE PROCEDURE logFooInsert();
+
+-------------------------------------------------------
+
+ 
+&gt; Also does anyone know of some fucntion like printf that can be accessed
+&gt; from PL/pgSQL for printing ot stdout or stderr?
+
+No, I don't but that doesn't mean it doesn't exist. You could raise an 
+exception, and that will be logged to the PostgreSQL log file.....
+
+Cheers,
+
+-- 
+Andrew Hill
+
+"Being attractive was never part of my game plan." - 2001-03-28
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

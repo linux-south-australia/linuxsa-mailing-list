@@ -1,0 +1,153 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Super Block" -->
+<!-- FromName="'Toby Corkindale'" -->
+<!-- FromEmail="tjcorkin@sa.pracom.com.au" -->
+<!-- ToName="'Anthony Symons'" -->
+<!-- ToEmail="ant@sa.pracom.com.au" -->
+<!-- Date="Tue, 15 Jan 2002 14:20:57 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0201151412310.15439-100000@localhost.localdomain" -->
+<!-- Reference="1011063867.28268.68.camel@ant.internal" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Super Block</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@sa.pracom.com.au">tjcorkin@sa.pracom.com.au</A></I>&gt;
+  To  : Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  Date: Tue, 15 Jan 2002 14:20:57 +1030 (CST)
+</PRE>
+<H1>Re: Super Block</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Close..
+the ext2/3 system is a tree structure, and the superblock is the block at
+the beginning.. Contains info like the volume name, last mounted position,
+uuid, magic number, filesystem flags, state, inode, block, etc. counts,
+block, fragment, group, etc. sizes, last mount/written times, number of
+times mounted since last check, check intervals in times and mounts, and so
+on and so forth.
+
+
+It's not like the FAT table though -- the FAT table contained chains of
+allocated clusters, all in one big table.
+The ext2/3 filesystem will store that sort of info in the directory entry
+inodes instead.
+
+Features like that, and distributed replicated superblocks, and later on,
+journalling, are some of the reasons why ext2 and now ext3 has been much
+more resilient to harddisk corruption and crashes.
+
+FAT16 and FAT32 were an "all your eggs in one basket" kind of deal.
+There was a second backup FAT table, but it was placed immediately after the
+first version, so anything that corrupted the first table was likely to
+damage the second as well. Also, there was absolutely no checksumming done,
+so even if you could read both copies of the FAT, you didn't know which one
+was right, and which one was wrong!
+
+
+-Toby
+
+
+
+On 15 Jan 2002, Anthony Symons wrote:
+
+&gt; I may be wrong in the technicalitys but I belive it is the filesystem
+&gt; info. Eg file names, filename to inode lookups and inode locations on
+&gt; disk. Like your FAT table (File Allocation Table table?) in a FAT file
+&gt; system. The good thing about multiple copys all over your disk are, say
+&gt; the first half of your partition gets blown away. You can use an
+&gt; alternate superblock to recover the last half of your files, or vice
+&gt; versa etc. How many you have and exactly whats in them depends on your
+&gt; filesystem.
+&gt;
+&gt; Ant
+&gt;
+&gt; On Tue, 2002-01-15 at 12:11, Wilkinson,Alex wrote:
+&gt; &gt; Howdy Crew,
+&gt; &gt;
+&gt; &gt; I am wanting to find out the significance of the Super Block, whether FreeBSD, Linux, Solaris...
+&gt; &gt; whatever.
+&gt; &gt;
+&gt; &gt; I know:
+&gt; &gt;
+&gt; &gt; *  The Super Block contains critical data for the device's filesystem [but what ??].
+&gt; &gt; *  It is located on sectors 16 through 31 at the beggining of the device.
+&gt; &gt; *  FreeBSD keeps an alternate SuperBlock at the begging of every cylinder group.
+&gt; &gt; *  The first alternate Super block on FBSD is at block 32.
+&gt; &gt;
+&gt; &gt; This is all the info I could scrounge up.
+&gt; &gt;
+&gt; &gt; What does the SuperBlock actually do ?
+&gt; &gt; Why is the SuperBlock so critical ?
+&gt; &gt;
+&gt; &gt; Can anyone give me a *good* summary on the purpose of the Super Block ?
+&gt; &gt; And/Or any recommendations ?
+&gt; &gt;
+&gt; &gt;  Thanks
+&gt; &gt;
+&gt; &gt;   - Alex
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt;
+&gt;
+
+-- 
+ Toby Corkindale
+ UNIX Developer, Core Tech R&D
+ Technology SA, Pracom Ltd
+ 288 Glen Osmond Road
+ Fullarton,	5063
+ South Australia
+ Tel: +61 8 8202 9075
+ Fax: +61 8 8202 9001
+ mailto:<A HREF="mailto:Toby.Corkindale@sa.pracom.com.au">Toby.Corkindale@sa.pracom.com.au</A>
+ <A HREF="http://www.sa.pracom.com.au/">http://www.sa.pracom.com.au/</A>
+
+                  PRIVILEGED - PRIVATE AND CONFIDENTIAL
+
+   Privileged/Confidential Information may be contained in this message.
+   If you are not the addressee indicated in this message, you may not
+   copy or deliver this message to anyone.  In such case, you should
+   destroy this message and notify the sender by reply email. Opinions,
+   conclusions and other information in this message that do not relate
+   to the official business of this organisation shall be understood as
+   neither given nor endorsed by it.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

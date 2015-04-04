@@ -1,0 +1,123 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: RH7.3 logrotate bug??" -->
+<!-- FromName="'Schenk, Jarrad'" -->
+<!-- FromEmail="jarrad.schenk@dsto.defence.gov.au" -->
+<!-- ToName="'Glen Turner'" -->
+<!-- ToEmail="glen.turner@aarnet.edu.au" -->
+<!-- Date="Fri, 27 Sep 2002 16:19:17 +0930" -->
+<!-- Id="200209271619.18299.jarrad.schenk@dsto.defence.gov.au" -->
+<!-- Reference="3D93B3F5.7020108@aarnet.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: RH7.3 logrotate bug??</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Schenk, Jarrad &lt;<I><A HREF="mailto:jarrad.schenk@dsto.defence.gov.au">jarrad.schenk@dsto.defence.gov.au</A></I>&gt;
+  To  : Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  Date: Fri, 27 Sep 2002 16:19:17 +0930
+</PRE>
+<H1>Re: RH7.3 logrotate bug??</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Thanks glen,
+
+it seems that you were dead on the money!
+
+doing a, 
+
+find /var/log -name '*.[0-9]' -print &gt; tempfile
+
+produced an 11MB file !! with 267000 entries !!! now I just need to work out a 
+way to delete them all :)
+
+I'll try your fix, delete the offending files and then let you know how it 
+goes on monday.
+
+regards
+
+Jarrad
+
+
+
+On Fri, 27 Sep 2002 10:57, Glen Turner wrote:
+&gt; Schenk, Jarrad wrote:
+&gt; &gt; Hi list,
+&gt; &gt;
+&gt; &gt; I have a P2-450 with 128mb ram running RH7.3.
+&gt; &gt;
+&gt; &gt; Every morning I find that there is a process called logrotate that is
+&gt; &gt; hogging 35MB or more of ram and using a high percentage of the CPU load.
+&gt; &gt; From the name I can guess what it is supposed to be doing but does it
+&gt; &gt; really need that much ram and CPU time to swap a few files around? Is
+&gt; &gt; this a bug or does this process really use that much?
+&gt; &gt;
+&gt; &gt; Because it is using a good percentage of my system ram, it makes
+&gt; &gt; everything else run really slow as the system needs to swap things in and
+&gt; &gt; out of disk. I can kill the process off (which I don't really like doing
+&gt; &gt; but is the only way to get a usable system) and everything comes good but
+&gt; &gt; soon after, another process called updatedb starts. this uses alot of IO
+&gt; &gt; time on the disk and also slows things down. is it safe stop updatedb
+&gt; &gt; from running and if so, how?
+&gt;
+&gt; We've seen this.  Basically if logrotate has to rotate tens
+&gt; of thousands of files it slows to a crawl and becomes a resource
+&gt; hog.
+&gt;
+&gt; Try
+&gt;
+&gt;    find /var/log -name '*.[0-9]' -print
+&gt;
+&gt; to see if this has happened.
+&gt;
+&gt; The bug is usually in the configuration files.  For example
+&gt; if /etc/logrotate.d/example it says
+&gt;
+&gt;    /var/log/example/* {  ... }
+&gt;
+&gt; then logrotate tries to rotate the example.log file and the
+&gt; already-rotated files example.log.1 and so on.  The result
+&gt; is thousands of log files over time.
+&gt;
+&gt; The correct regular expression
+&gt;
+&gt;    /var/log/example/*.log { ... }
+&gt;
+&gt; fixes this problem
+&gt;
+&gt; To clean up the mess you probably need to delete all the
+&gt; multiply-rotated files.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,310 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="FW: wireless card setup" -->
+<!-- FromName="'Laredo Tirnanic'" -->
+<!-- FromEmail="laredo@labven.co.za" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 5 Feb 2004 11:24:02 +0200" -->
+<!-- Id="008b01c3ebc9$cb6c1d80$0403a8c0@OMEGA" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: FW: wireless card setup</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Laredo Tirnanic &lt;<I><A HREF="mailto:laredo@labven.co.za">laredo@labven.co.za</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 5 Feb 2004 11:24:02 +0200
+</PRE>
+<H1>FW: wireless card setup</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+Sorry about that, I read laptop and assumed pcmcia .....
+
+I've not worked with the pci cards, but the following is from my
+experience with the pcmcia cards, maybe it's applicable to you as well:
+
+a. Make sure you've got the latest wireless tools. This can make a huge
+difference.
+
+b. Are u using the Orinoco drivers that come with the pcmcia package, or
+the kernels drivers. I found the best results with the kernels dirvers.
+
+
+dmesg | more
+
+Make sure you see the following:
+
+eth1: index 0x01: Vcc 5.0, irq 12, io 0x0100-0x013f
+
+It must be running the correct voltage, I've had it that the voltage
+gets set 2 3v. It looked like it was running fine, but wasn't.
+
+Hope this helps .....
+
+
+Here's some documentation I found:
+
+A. <A HREF="http://www.tldp.org/HOWTO/Wireless-HOWTO.html">http://www.tldp.org/HOWTO/Wireless-HOWTO.html</A>
+
+A Writer's View of the Linux Wireless Dream, Part 1
+Setting SuSE 8.0 Linux Up for the SMC2632W Wireless Card
+
+Rob Reilly
+
+
+The first order of business was to get the stock card working, before I
+did any hardware hacking or modifications. Hardware hacking of the card
+will be described in the next story in this series. Since the SMC 2632
+card was a Prism2 chip from Intersil, it was a given I was going to use
+the wlan-ng drivers. There were a few files that needed to be changed in
+order to get the card recognized and working properly under the Linux
+2.4.18-4GB kernel. 
+
+The first file that had to be changed was /etc/modules.config. I added
+an entry for the wireless card. 
+
+alias wlan0 prism2_cs
+
+
+And, I almost forgot to run depmod, as root.
+
+
+depmod -a
+
+I also created a file in /etc/sysconfig/network called ifcfg-wlan0. The
+card was set with DHCP, although you could easily use static IPs too. It
+looked like this:
+
+
+DEVICE=wlan0
+ONBOOT=no
+BOOTPROTO=dhcp
+USERCTL=yes
+DHCLIENT_SET_DOWN_LINK=yes
+STARTMODE=hotplug
+MODE="Managed"
+UNIQUE=""
+
+
+Next was the config file in /etc/pcmcia directory. I had to make sure
+that the SMC2632 entry was bound to the prism2 card. It looked like:
+
+
+card "SMC2632W"
+manfid 0x0156, 0x0002
+bind "prism2_cs"
+
+The last file that needed editing was the wlan-ng.opts file in the
+/etc/pcmcia directory. I had to make sure the IS_ADHOC line said "no,"
+like this. 
+
+IS_ADHOC=no
+# y|n, y - adhoc, n - infrastructure
+
+I also had to set the variables for Auth Type and DesiredSSID. I left
+the DesiredSSID empty so that it could just pick up the first access
+point it found. They looked like this:
+
+
+AuthType="opensystem"     
+# opensystem | sharedkey (requires WEP)
+DesiredSSID=""
+
+I didn't bother with WEP initially because my location was fairly
+isolated and I could accept the risk of a neighborhood hacker. This is
+something you will need to determine on your own, however. If you are in
+a corporate setting, then you will definitely need to read the wlan-ng
+documentation to set this security measure up. 
+
+WEP isn't all that great anyway, since programs like Airsnort can figure
+out the encryption keys. VPN sounds like a good start to securing a
+wireless link, but, I haven't started working with that yet. Perhaps in
+a later article. 
+
+With all the files edited, it was time to start up the stock PCMCIA
+card, grab an IP and see how it worked.
+
+
+eth0: Lite-On 82c168 PNIC rev 32 at 0xe800, 00:A0:CC:62:4D:D7, IRQ 11.
+scsi0 : SCSI host adapter emulation for IDE ATAPI devices
+Linux Kernel Card Services 3.1.22
+  options:  [pci] [cardbus] [pm]
+isapnp: Scanning for PnP cards...
+isapnp: No Plug & Play device found
+Intel PCIC probe: not found.
+Databook TCIC-2 PCMCIA probe: not found.
+PCI: Found IRQ 12 for device 00:0a.0
+Yenta IRQ list 0000, PCI irq12
+Socket status: 10000011
+cs: IO port probe 0x0c00-0x0cff: clean.
+cs: IO port probe 0x0800-0x08ff: clean.
+cs: IO port probe 0x0100-0x04ff: excluding 0x170-0x177 0x370-0x37f
+0x4d0-0x4d7
+cs: IO port probe 0x0a00-0x0aff: clean.
+cs: memory probe 0xa0000000-0xa0ffffff: clean.
+hermes.c: 5 Apr 2002 David Gibson &lt;<A HREF="mailto:hermes@gibson.dropbear.id.au">hermes@gibson.dropbear.id.au</A>&gt;
+orinoco.c 0.11b (David Gibson &lt;<A HREF="mailto:hermes@gibson.dropbear.id.au">hermes@gibson.dropbear.id.au</A>&gt; and others)
+orinoco_cs.c 0.11b (David Gibson &lt;<A HREF="mailto:hermes@gibson.dropbear.id.au">hermes@gibson.dropbear.id.au</A>&gt; and
+others)
+eth1: Station identity 001f:0001:0008:0048
+eth1: Looks like a Lucent/Agere firmware version 8.72
+eth1: Ad-hoc demo mode supported
+eth1: IEEE standard IBSS ad-hoc mode supported
+eth1: WEP supported, 104-bit key
+eth1: MAC address 00:02:2D:8B:CE:82
+eth1: Station name "HERMES I"
+eth1: ready
+eth1: index 0x01: Vcc 5.0, irq 12, io 0x0100-0x013f
+usb.c: registered new driver usbdevfs
+usb.c: registered new driver hub
+usb-uhci.c: $Revision: 1.275 $ time 15:38:38 Mar 11 2003
+usb-uhci.c: High bandwidth mode enabled
+usb-uhci.c: v1.275:USB Universal Host Controller Interface driver
+uhci.c: USB Universal Host Controller Interface driver v1.1
+usb.c: deregistering driver usbdevfs
+usb.c: deregistering driver hub
+eth0: Setting full-duplex based on MII#1 link partner capability of
+45e1.
+
+I'm certain you should see something like this. I've had the problem
+with 
+
+
+
+-----Original Message-----
+From: Frank Bendon [mailto:<A HREF="mailto:frankben@internode.on.net">frankben@internode.on.net</A>] 
+Sent: Wednesday, February 04, 2004 2:13
+To: Laredo Tirnanic
+Cc: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+Subject: Re: wireless card setup
+
+Laredo
+Thanks for that ..... but
+
+Laredo Tirnanic wrote:
+
+&gt;Quick guide to setting up wireless:
+&gt;
+&gt;/etc/rc.d/pcmcia/wireless.opts
+&gt;  
+&gt;
+It is not a pcmcia card and as far as I can tell this bit does not apply
+
+&gt;B. Next find out what your wireless device is
+&gt;
+&gt;<A HREF="mailto:root@lcm">root@lcm</A>:/etc/pcmcia# iwconfig
+&gt;  
+&gt;
+iwconfig gives (amongst other things):
+wlan0   IEEE820-11b  ESSID:""
+           Mode:Auto Access Point: 00:00:00:00:00:00:00
+           Encryption Point:off
+
+- so prism2_pci appears to be running OK
+
+&gt;C. restart pcmcia devices
+&gt;   /etc/rc.d/rc.pcmcia restart
+&gt;  
+&gt;
+again does not apply
+
+
+&gt;d. Give the wireless an IP.
+&gt;ifconfig eth1 192.168.10.2 broadcast 192.168.10.0 netmask
+&gt;255.255.255.224
+&gt;  
+&gt;
+in my case - ifconfig wlan0 192.168 .......... etc   reports:
+"SIOCSIFFFLAGS : no such device
+
+The question is - where does wlan0 come from and what controls it - I 
+cannot find a howto that explains that part.
+
+Cheers
+Frank
+
+ 
+
+&gt;-----Original Message-----
+&gt;From: Laredo Tirnanic [mailto:<A HREF="mailto:laredo@labven.co.za">laredo@labven.co.za</A>] 
+&gt;Sent: Wednesday, February 04, 2004 10:46
+&gt;To: 'Frank Bendon'
+&gt;Subject: RE: wireless card setup
+&gt;
+&gt;Type,
+&gt;
+&gt;"Iwconfig", it will list all the wlan devices.
+&gt;
+&gt;
+&gt;
+&gt;
+&gt;-----Original Message-----
+&gt;From: Frank Bendon [mailto:<A HREF="mailto:frankben@internode.on.net">frankben@internode.on.net</A>] 
+&gt;Sent: Wednesday, February 04, 2004 2:45
+&gt;To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt;Subject: wireless card setup
+&gt;
+&gt;Hi
+&gt;I have an Actiontec 802MIP mini PCI wireless card in a laptop running 
+&gt;Fedora.
+&gt;lspci lists it as a Prism2.5 which is consistent with informationI can 
+&gt;find on the card.
+&gt;I have tried both prism2_pci (from linux wlan-ng) and orinoco _pci
+(part
+&gt;
+&gt;of fedora instl) and both seem to load OK but when it comes to 
+&gt;configuring wlan the system complains that no wlan0 device is present.
+&gt;Where does 'wlan0' come from ?
+&gt;... or a pointer to a  _good_ wireless setup howto.
+&gt;
+&gt;Cheers
+&gt;Frank
+&gt;
+&gt;
+&gt;
+&gt;  
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on
+irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

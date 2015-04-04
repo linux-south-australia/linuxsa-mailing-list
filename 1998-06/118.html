@@ -1,0 +1,106 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Timezones and stuff" -->
+<!-- FromName="Geoffrey D. Bennett" -->
+<!-- FromEmail="g@netcraft.com.au" -->
+<!-- ToName="Don Collins" -->
+<!-- ToEmail="doncol@george.mdt.net.au" -->
+<!-- Date="Wed, 24 Jun 1998 13:40:38 +0930 (CST)" -->
+<!-- Id="199806240410.NAA08579@Kara.netcraft.com.au" -->
+<!-- Reference="358FBF54.3A5BF757@mail.mdt.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Timezones and stuff</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Geoffrey D. Bennett &lt;<I><A HREF="mailto:g@netcraft.com.au">g@netcraft.com.au</A></I>&gt;
+  To  : Don Collins &lt;<I><A HREF="mailto:doncol@george.mdt.net.au">doncol@george.mdt.net.au</A></I>&gt;
+  Date: Wed, 24 Jun 1998 13:40:38 +0930 (CST)
+</PRE>
+<H1>Re: Timezones and stuff</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; This one's been bugging me as well.  If I run `netdate` it shows up as time
+&gt; relative to GMT, but a `date` shows the actual time.  This is frustrating as
+&gt; some progs appear to work on one thing and others on something else.  Netscape
+&gt; is real bad like that... I get some very odd Dates and times on Netscape e-mail,
+&gt; both sending and recieving.  A visit to Red Hat's site revealed nothing, and an
+&gt; attempt to look at the knowledge base only resulted in a error.. Grrrrrrrr.
+
+Hi Don,
+
+I believe that you'll find the applications that don't display the
+"correct" time are libc5 applications.  glibc looks for your timezone
+information in /usr/share/zoneinfo, but libc5 looks for your timezone
+information in /usr/lib/zoneinfo.  Have a look at this:
+
+Check where glibc looks for the zone information:
+% strings /lib/libc.so.6 | grep zoneinfo
+/usr/share/zoneinfo
+
+Check where libc5 looks for the zone information:
+% strings /usr/i486-linux-libc5/lib/libc.so.5 | grep zoneinfo
+/usr/lib/zoneinfo
+
+The directory that libc5 looks for does not exist:
+% ls -la /usr/lib/zoneinfo
+ls: /usr/lib/zoneinfo: No such file or directory
+
+The glibc-linked date command shows time in the correct timezone:
+% /bin/date
+Wed Jun 24 00:41:00 CST 1998
+
+The date command that came with Red Hat 4.2 (linked with libc5)
+doesn't show the correct time:
+% ./date
+Tue Jun 23 15:11:01     1998
+
+If we link /usr/lib/zoneinfo to /usr/share/zoneinfo like the Red Hat
+5.0 errata describes:
+% ln -s /usr/share/zoneinfo /usr/lib/zoneinfo
+
+Then the libc5-linked date command now shows the time in the correct
+timezone:
+% ./date
+Wed Jun 24 00:42:31 CST 1998
+
+Problem solved!
+
+Regards,
+-- 
+Geoffrey D. Bennett (<A HREF="mailto:geoffrey@netcraft.com.au">geoffrey@netcraft.com.au</A>)
+Computer Systems Manager, NetCraft Australia
+<A HREF="http://www.netcraft.com.au/geoffrey/">http://www.netcraft.com.au/geoffrey/</A>
+Red Hat Linux Resellers: <A HREF="http://www.netcraft.com.au/redhat/">http://www.netcraft.com.au/redhat/</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

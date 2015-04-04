@@ -1,0 +1,148 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: "Host based" routers and BGP" -->
+<!-- FromName="'Mark Newton'" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="'Dale Long'" -->
+<!-- ToEmail="dalel@loftuscomp.com.au" -->
+<!-- Date="Wed, 6 Dec 2000 23:46:54 +1030" -->
+<!-- Id="20001206234654.A40943@atdot.dotat.org" -->
+<!-- Reference="Pine.LNX.4.10.10012062151220.29527-100000@lftbww01.loftuscomp.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: "Host based" routers and BGP</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Dale Long &lt;<I><A HREF="mailto:dalel@loftuscomp.com.au">dalel@loftuscomp.com.au</A></I>&gt;
+  Date: Wed, 6 Dec 2000 23:46:54 +1030
+</PRE>
+<H1>Re: "Host based" routers and BGP</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Dec 06, 2000 at 09:56:40PM +1030, Dale Long wrote:
+
+ &gt; What defines a router? Hardware containing as OS optimised for routing
+ &gt; running only routing based services? Or A generic OS (perhaps compiled in
+ &gt; a way that optimises it for routing) running only routing based
+ &gt; processes/services? Or hardware and OS optimised for routing? Surely
+ &gt; network load and so on would dictate what would be be better solution.
+ 
+Sigh. 
+
+Ok, here's why you'd use a dedicated router in a routing role:
+
+  1.  PC hardware sucks arse.  You have no idea about exactly how badly
+      it sucks arse until you're an ISP with tens of thousands of customers
+      who can't use the Internet because a crappy Taiwanese power supply
+      has borked itself *again*.  A truly excellent reason to run a dedicated
+      router is because it's not a PC, and that reason is serious enough to
+      be all the convincing you should need even if you can't find any other
+      reasons.
+
+  2.  General purpose operating systems aren't good at routing.  If you
+      asked a 2nd-year computer science student to come up with the most
+      buggy and least efficient TCP/IP routing system they could possibly
+      think of, a UNIX box with a couple of Ethernet cards in it would 
+      be pretty close to the top of the heap (an NT system with a couple
+      of Ethernet cards would pip it at the post, though :-).  There are
+      far too many reasons for me to go into here to describe why a general
+      purpose OS is bad at routing;  Allow me to summarize by drawing attention
+      to overheads caused by layer upon layer of I/O abstraction which isn't
+      really relevent to routing, overheads caused by trying to stuff
+      tens of thousands of small, variable-sized packets per second through
+      kernel buffers which are optimized to work with 8kbyte buffers, and
+      the fact that there are essentially no general purpose operating
+      systems which support hot-swap network interface cards.
+
+  3.  Scalability.  The PCI bus is simply not scaleable enough to handle
+      a large ISP's core.  End of story.  There is no argument on this.  If
+      you're serious about network performance, you can't use a PC as a 
+      router.
+
+  4.  Features.  Want a single box to run OSPF, BGP and legacy RIP?  Simple;
+      Give it a few configuration commands and you're away.  Want to add
+      a bit of stuff to make transparent HTTP proxying work?  Add one more
+      configuration command.  Want to set up a hot spare for redundancy and
+      arrange for the failover to be completely automatic and transparent?
+      Easy; there are dozens of configuration examples on www.cisco.com.
+      The reason I'll pick a real router over a general purpose OS any time
+      is because I can pick up a black-box piece of hardware, spend five
+      minutes typing a dozen or so configuration commands, and end up with
+      something which is perfectly capable of serving as an essential part
+      of my network core, with no kernel compiles, no patches, no additional
+      software to install, and no hassle.
+
+  5.  Support.  Usually the open-source model wins out big time here, because
+      the support given by commercial software companies is so woeful, any
+      ol' peon in a newsgroup is bound to be providing better support info
+      than your commercial software vendors.  Router vendors, on the other
+      hand, offer truly stellar support.  If you want to make something work
+      and you don't know how, call the vendor and you'll have the info in less
+      than an hour.  If something is breaking, call the vendor and the bug
+      will usually actually be fixed.  At work we've had Cisco software 
+      engineers flying in from Sydney and Perth to look at problems we've been
+      having which they haven't been able to duplicate in the lab;  Try getting
+      that kind of support from any software vendor.
+
+There are lots of other reasons, but I'm starting to get boring.  Suffice to
+say that there are really very few reasons to use a PC in the role of a 
+router, unless the only thing you really care about is how much it costs.
+And, if you have an "important" network, you probably figure that the amount
+you're prepared to spend on it has some kind of relationship to the loss
+you'll suffer if it goes down and the ongoing support load to keep it running.
+
+ &gt; This rule can also apply to database servers, print servers, firewalls and
+ &gt; so on. But it also depends on capacity and load and security, among other
+ &gt; things.
+
+It depends a whole lot more on exactly how important your network resources
+are to you.  
+
+Sure -- If you want a cheap solution and you don't care much about how well
+it works, how suitable it is to the task, or what to do when it fails, 
+cobble together some spare parts and build whatever kind of server or 
+router you want, and laugh all the way to the bank -- Just don't try to
+do anything critical with it, because it'll break and it'll be your fault.
+
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

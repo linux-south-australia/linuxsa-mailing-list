@@ -1,0 +1,143 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="CVS is fine (modulo 4 days of struggle)" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 4 Mar 2001 13:24:41 +1030" -->
+<!-- Id="20010304132441.A11727@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: CVS is fine (modulo 4 days of struggle)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 4 Mar 2001 13:24:41 +1030
+</PRE>
+<H1>CVS is fine (modulo 4 days of struggle)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Apparently undocumented methods of revision number management
+in CVS.
+
+
+Just reporting back on the suggestion that several people
+had that one should use CVS for keeping software
+synchronised between multiple machines (even when there's
+only one person writing it).....
+
+The CVS software turns out to do most of what I wanted.
+It does have a single point of failure though - the repository.
+But I finally got it to work fairly efficiently, and over ssh.
+
+The real struggle, though, comes in managing revision numbers.
+I still have found no documentation of how to do this.
+
+In the unlikely event that someone else out there:
+1.	needs to know how to do this, and
+2.	hasn't found out by trial and error or some other
+	means (such as asking someone else),
+here's an outline of how I solved the "issue".
+
+---------------------------------------------------
+A. To start work on revision 0.1.0:
+
+Suppose you have source in ~/src/xyz.
+
+cd ~/src/xyz
+cvs import -m "blah" -d -b0.1.0 src/xyz vtag rtag
+cd ..
+cvs checkout -d xyz-0.1.0 -r0.1.0 src/xyz
+
+The -r0.1.0 is essential. Otherwise it will not put the
+required "tags" on files for use in future "commit" commands.
+Then the next versions would be 0.2, 0.3 etc.
+
+--------------------------------------------------
+B. To create revisions 0.2.0, 0.3.0 etc.
+
+cd ~/src
+cvs checkout -d xyz-0.2.0 -r0.1 src/xyz
+cd xyz-0.2.0
+cvs commit -m "blah" -r0.2
+cvs commit -m "blah" -r0.2.0
+
+I.e. first you checkout revision 0.1, and then you
+upgrade it to 0.2, and _then_ you create branch 0.2.0.
+The only documented method for creating new branches
+that I found was to use "cvs tag" and "cvs rtag",
+which automatically allocate the revision numbers for
+you, not necessarily anything like what you wanted.
+
+--------------------------------------------------
+C. When working on version 1.1.1 in ~/src/xyz-1.1.1,
+   add new file "file1".
+
+cd ~/src/xyz-1.1.1
+cvs add -m "blah" file1
+cvs commit -m "blah" -r1.1 file1
+cvs commit -m "blah" -r1.1.1 file
+
+The CVS will not let you just add file1 directly to the
+branch. 
+
+--------------------------------------------------
+All of this, like all knowledge, is obvious when you know how.
+But it tooke me 4 days and nights - or was it 5 - to work this
+out from the man-manual, the online manual here:
+<A HREF="http://www.cvshome.org/docs/manual/index.html">http://www.cvshome.org/docs/manual/index.html</A>
+and anything else I could find.
+But mostly I just tried hundreds of different options and
+looked at the files generated, and worked through it.
+
+If the above know-how is not documented anywhere already,
+I'll consider writing it up and putting it on my web-site.
+Or contributing it to someone else's FAQ or manual?
+
+Cheers,
+Alan Kennington.
+
+PS. Please don't flame me yet again for not knowing things
+which are obvious.
+Sometimes it is not _obvious_ that something _is_ obvious.
+
+PPS. The CVS seems to have various purposely hidden "magic"
+aspects in revision number allocation, which give special
+significance to the numbers 0 and 2, and even numbers generally.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

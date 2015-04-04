@@ -1,0 +1,106 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: block-wise hard disk copying" -->
+<!-- FromName="" -->
+<!-- FromEmail="branko@senet.com.au" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Sat, 21 Aug 1999 22:55:45 +0930 (CST)" -->
+<!-- Id="m11IB9W-000GgFC@lector" -->
+<!-- Reference="199908211052.UAA31919@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: block-wise hard disk copying</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: <A HREF="mailto:branko@senet.com.au">branko@senet.com.au</A>
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Sat, 21 Aug 1999 22:55:45 +0930 (CST)
+</PRE>
+<H1>Re: block-wise hard disk copying</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Alan Kennington wrote:
+
+&gt;Question:
+&gt;
+&gt;Are there tools to block-wide copy one hard disk to another?
+
+Alan,
+
+dd(1) is one tool that would do what you are asking
+
+eg
+	$&gt; dd if=/dev/hda1 of=/dev/hdb1
+	# assuming that hdb1 is no smaller than hda1
+
+&gt;Case 1:
+&gt;A 2 MB linux disk which I would like to "move" to a 4 or 13 GB disk.
+&gt;I imagine a problem here is that I need superblocks (or whatever)
+&gt;all the way over the new disk. I.e. it needs to have "fdisk" run over it
+&gt;to get the basic file system in there.
+
+"fdisk" is used to set up the partitions.  My I suggest mkfs is what
+you meant.  mkfs will lay down the file system including those 
+superblocks.  There was an excellent description of filesysetems
+on this list a while back.
+
+&gt;I imagine that I need to run lilo over the new disk,
+&gt;because the exacty physical locations of boot files
+&gt;etc. will change.
+Correct!
+
+&gt;Another question:
+&gt;Suppose I just use two "tar" processes back-to-back
+&gt;over a pipe via "rsh" to copy all files from
+&gt;disk 1 to disk 2. Would I lose anything apart
+&gt;from the boot sector?
+&gt;In other words, if I copy all files by tarring,
+&gt;and if I create a new boot sector, should the new
+&gt;disk work just the same when I try to boot it?
+
+This method is safer (IMHO).  You would create the file system
+with mkfs, then use tar (or cpio) with the options that would
+preserve modification times and ownership - very important.
+
+There is something that could be lost if you didn't do the mkfs
+step: the lost+found directory.  Although it appears to be
+just an empty directory, it acutally contains some unused
+i-nodes that fsck can attach lost files to.
+
+Regards,
+-- 
+Branko Bratkovic
+<A HREF="mailto:branko@senet.com.au">branko@senet.com.au</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,150 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="IP-MASQ Help!!!" -->
+<!-- FromName="'Tim Fairchild'" -->
+<!-- FromEmail="amosf@mrbean.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="LinuxSA@linuxsa.org.au" -->
+<!-- Date="Wed, 22 Nov 2000 20:47:05 +1000 (EST)" -->
+<!-- Id="Pine.LNX.4.21.0011222027250.2069-100000@shiva.home" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: IP-MASQ Help!!!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Tim Fairchild &lt;<I><A HREF="mailto:amosf@mrbean.net.au">amosf@mrbean.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:LinuxSA@linuxsa.org.au">LinuxSA@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 22 Nov 2000 20:47:05 +1000 (EST)
+</PRE>
+<H1>IP-MASQ Help!!!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Okay, I'm stupid. I keep reading the IP-Masq How-to, but I just can't do
+it. Forget security, I can't even start :-(  It has to be simple, but I'm
+just dim, I guess...
+
+the scene... I have 192.168.1.1 (shiva) connected to the net with a dial
+up PPP. I want the kids to be able to use 192.168.1.2 (snorky) to use the
+net now and then while shiva is connected.  
+
+Local network is fine. Server (shiva) is linux mandrake 7.1, snorky is a
+dual boot linux/win ME box - in ME for this situation (tho probably not
+later)  Samba, telnet, printer, all local stuff is perfect working order.
+
+But the ipchains stuff has me stumped... The following are some of the
+printouts of various commands to maybe highlight my (stupid) mistake. I'm
+trying to follow all the ip-masq how-to hints, but no luck.
+
+[<A HREF="mailto:root@shiva">root@shiva</A> ipmasqstuff]# netstat -rn
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+192.168.1.1     0.0.0.0         255.255.255.255 UH        0 0          0 eth0
+203.37.235.4    0.0.0.0         255.255.255.255 UH        0 0          0 ppp0
+192.168.1.0     0.0.0.0         255.255.255.0   U         0 0          0 eth0
+127.0.0.0       0.0.0.0         255.0.0.0       U         0 0          0 lo
+0.0.0.0         203.37.235.4    0.0.0.0         UG        0 0          0 ppp0
+
+
+[<A HREF="mailto:root@shiva">root@shiva</A> ipmasqstuff]# ifconfig
+eth0      Link encap:Ethernet  HWaddr 00:20:18:54:67:A4
+          inet addr:192.168.1.1  Bcast:192.168.1.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:909 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:569 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:100
+          Interrupt:11 Base address:0x6100
+ 
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:3924  Metric:1
+          RX packets:4897 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:4897 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+ 
+ppp0      Link encap:Point-to-Point Protocol
+          inet addr:203.37.235.187  P-t-P:203.37.235.4  Mask:255.255.255.255
+          UP POINTOPOINT RUNNING NOARP MULTICAST  MTU:500  Metric:1
+          RX packets:1823 errors:2 dropped:0 overruns:0 frame:2
+          TX packets:1385 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:10
+ 
+[<A HREF="mailto:root@shiva">root@shiva</A> ipmasqstuff]#                  
+
+[<A HREF="mailto:root@shiva">root@shiva</A> ipmasqstuff]# /sbin/ipchains -n -L
+Chain input (policy ACCEPT):
+Chain forward (policy REJECT):
+target     prot opt     source                destination           ports
+MASQ       all  ------  192.168.1.1          0.0.0.0/0             n/a
+MASQ       all  ------  192.168.1.2          0.0.0.0/0             n/a
+ACCEPT     all  ------  0.0.0.0/0            0.0.0.0/0             n/a
+Chain output (policy ACCEPT):
+[<A HREF="mailto:root@shiva">root@shiva</A> ipmasqstuff]#           
+
+
+Now from snorky (192.168.1.2) I can ping 192.168.1.1 and 203.37.235.187
+but nothing else outside. No masq icmp forwarding, right? but why???
+
+cat /proc/sys/net/ipv4/ip_forward gives me a 1.  I did a 
+echo "1" &gt; /proc/sys/net/ipv4/ip_forward to get that. 
+
+Is that enough or do I have to change this in /etc/sysconfig/network and
+reboot ??? Ahh, hold on, /etc/sysconfig/network is already
+
+NETWORKING=yes 
+FORWARD_IPV4=yes 
+HOSTNAME=shiva
+
+Any hints to point in the right direction, I really want to learn how to
+do this shit... I've tried various things with ipchains, BTW, but flying
+blind a bit.
+
+Then I can start on some sort of security...
+
+tim
+
+-- 
+---------------------------------------------------------
+  Tim & Therese Fairchild
+  Atchafalaya Border Collies.
+  Kuttabul, Queensland, Australia.
+---------------------------------------------------------
+ Email       mailto:<A HREF="mailto:amosf@mrbean.net.au">amosf@mrbean.net.au</A>
+ Homepage    <A HREF="http://www.home.aone.net.au/tims">http://www.home.aone.net.au/tims</A> 
+ BCs4me Page <A HREF="http://members.xoom.com/amosf">http://members.xoom.com/amosf</A>
+---------------------------------------------------------
+ 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

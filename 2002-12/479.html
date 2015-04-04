@@ -1,0 +1,88 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Re:" -->
+<!-- FromName="'Andrew Hill'" -->
+<!-- FromEmail="list@fornax.net" -->
+<!-- ToName="'nik [tm]'" -->
+<!-- ToEmail="tmcruisin@visualspace.com.au" -->
+<!-- Date="10 Dec 2002 16:19:01 +1030" -->
+<!-- Id="1039499341.1411.73.camel@slave-i" -->
+<!-- Reference="1039411912.1411.3.camel@slave-i" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Re:</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Hill &lt;<I><A HREF="mailto:list@fornax.net">list@fornax.net</A></I>&gt;
+  To  : nik [tm] &lt;<I><A HREF="mailto:tmcruisin@visualspace.com.au">tmcruisin@visualspace.com.au</A></I>&gt;
+  Date: 10 Dec 2002 16:19:01 +1030
+</PRE>
+<H1>Re: Re:</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, 2002-12-10 at 15:47, nik [tm] wrote:
+&gt; did you get DROP packets racking up when you tried the tcp request, in 
+&gt; the same chain the packets racket up for ACCEPT on the udp requests.. 
+&gt; which would say the firewall needs a little adjustment in that chain...
+
+Bingo!
+
+I added a new firewall rule to catch all packets, rather than just
+relying on the default drop policy:
+
+# rpcinfo -n 111 -t 192.168.0.254 portmap
+
+# iptables -L INPUT -v
+Chain INPUT (policy DROP 0 packets, 0 bytes)
+pkts bytes target prot opt in  out source         destination
+
+   2   120 ACCEPT tcp  --  any any 192.168.0.0/24 anywhere
+           tcp dpt:sunrpc 
+
+   2   120 REJECT all  --  any any anywhere       anywhere
+           reject-with icmp-port-unreachable 
+
+Sooo, rpcinfo contacts the portmapper via TCP on port 111, and then gets
+sent to another TCP port somewhere???
+
+Cheers,
+-- 
+Andrew Hill
+
+This may seem a bit weird, but that's okay, because it is weird.
+-The Perl v5.0 manual page.
+
+<A HREF="479_signature.asc">signature.asc</A>
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,103 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: block-wise hard disk copying" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="" -->
+<!-- ToEmail="branko@senet.com.au" -->
+<!-- Date="Sun, 22 Aug 1999 01:33:51 +0930" -->
+<!-- Id="199908211603.BAA32676@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: block-wise hard disk copying</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : <A HREF="mailto:branko@senet.com.au">branko@senet.com.au</A>
+  Date: Sun, 22 Aug 1999 01:33:51 +0930
+</PRE>
+<H1>Re: block-wise hard disk copying</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Branko,
+
+Many thanks for that.
+It looks like then the "dd" command is too low-level to be able
+to correctly deal with superblocks. 
+But doesn't the tar|tar copy-method _not_ copy the i-nodes in
+the lost+found?
+I guess I can just ignore the lost+found stuff anyway.
+
+So basically it looks like 
+1. The "dd" method is too low level for setting up the right
+superblocks.
+2. The tar|tar copy-method would ignore the lost i-nodes,
+but I don't really need those anyway.
+
+So that solves the linux-&gt;linux disk copy problem.
+
+That still leaves open the problem of vfat-&gt;vfat copying.
+Presumably the vfat format assumes also some sort of
+superblock structuring, so that when I copy from a small disk
+to a big disk, there would be a big open space at the
+end of the long disk.
+
+old, small disk            new, big disk
+1.6 GB disk	-&gt;	   1.6 GB block-by-block copy with "dd"
+nothing		-&gt;	   2.7 GB blank empty blocks.
+
+Presumably this would sort of work, but the FATs in the
+new disk would not know anything about the rest of the
+2.7 GB disk space.
+
+The mkfs and fsck manuals do not seem to indicate that
+a new vfat file system can be _created_ on a newly formatted
+disk. Therefore it looks like linux cannot be used to
+disk-copy a smaller disk with vfat fs to a larger disk.
+
+....I've just been looking around and have found a HOWTO
+on the linux disk-copy thing:
+
+<A HREF="http://www.linuxhq.com/HOWTO/mini/Hard-Disk-Upgrade.html">http://www.linuxhq.com/HOWTO/mini/Hard-Disk-Upgrade.html</A>
+
+But they say that to do a vfat or dos disk-copy, you have to
+use the relevant OS for that purpose!
+If that's true, then there must be something in the vfat fs
+which is _not_ copied by a simple tar|tar copy of all
+files visible from the linux vfat level.
+
+Cheers, and thanks,
+Alan Kennington.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

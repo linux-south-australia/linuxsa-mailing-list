@@ -1,0 +1,150 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Linux/Unix VPN's" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Paul Schulz" -->
+<!-- ToEmail="pauls@CAEmrad.com.au" -->
+<!-- Date="Thu, 23 Mar 2000 10:32:18 +1030" -->
+<!-- Id="20000323103218.A73946@atdot.dotat.org" -->
+<!-- Reference="200003222301.JAA13305@neutrino.caemrad.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Linux/Unix VPN's</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Paul Schulz &lt;<I><A HREF="mailto:pauls@CAEmrad.com.au">pauls@CAEmrad.com.au</A></I>&gt;
+  Date: Thu, 23 Mar 2000 10:32:18 +1030
+</PRE>
+<H1>Re: Linux/Unix VPN's</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, Mar 23, 2000 at 09:31:23AM +1030, Paul Schulz wrote:
+
+ &gt; As intoduction...
+ &gt;   Mark&gt; On Thu, Mar 23, 2000 at 08:20:48AM +1030, Glen Turner wrote:
+ &gt;   &gt;&gt; Mark Newton wrote: &gt; For performance reasons you'll probably want
+ &gt;   &gt;&gt; to jack-up the MTU on &gt; the PPP link to 16k or so.  The reason is
+ &gt;   &gt;&gt; that TCP is already going &gt; to be fragmenting your conversation
+ &gt;   &gt;&gt; into smaller datagrams than &gt; your applications really need, and
+ &gt;   &gt;&gt; by default ppp will produce *further* &gt; fragmentation by breaking
+ &gt;   &gt;&gt; your datagrams up into 1500-byte chunks.  &gt; If you increase the
+ &gt;   &gt;&gt; MTU, fragmentation can be left to happen where &gt; it really needs
+ &gt;   &gt;&gt; to happen, which is in the data link layer of the &gt; underlying
+ &gt;   &gt;&gt; packet transport.
+ &gt;   &gt;&gt; 
+ &gt;   &gt;&gt; If you need to so this, then something bad is happening.
+ &gt; 
+ &gt; (snip - see archives for explaination..  nice one too..)
+ &gt; 
+ &gt; Mark.. what have you noticed with regard the windowing/error
+ &gt; correcting complications with a second TCP layer stacked on top of
+ &gt; another?  
+ &gt; 
+ &gt; There is a HOWTO which has some words of warning regarding the how
+ &gt; the various timers interact with each other, ie. if you start to get
+ &gt; errors in the low level which causes delays, this will cause packet
+ &gt; retransmission at the higher level, and the whole thing will grind to
+ &gt; a crawl. 
+ &gt; (Sorry.. I can't find the URL)
+
+Yes, that's a problem too.  Think of a retransmit timer operating on
+a TCP session running over the tunnel:  If an ACK is not received before
+the retransmit timer expires, the TCP session will resend the last window.
+
+Underneath all that is the retransmit timer on the underlying TCP
+session carrying the tunnel.
+
+Let's consider what happens when there's some congestion.  Your "top-level"
+session transmits some data and sets its retransmit timer.  That data runs
+through the network stack until it pops out the PPP interface, which 
+is carried over a TCP session, so your data gets transmitted through that
+one too, so another retransmit timer is set.  
+
+Now, due to congestion, the ACK coming back gets delayed.  The "top level"'s
+TCP retransmit timer will expire first (because it would have sent the 
+data a couple of milliseconds before the tunnel sent it), so it'll resend
+the data which is outstanding.  
+
+That retransmission will be submitted to the underlying tunnel, which 
+will now have some new data to send.  That data won't be able to go 
+anywhere yet, though, because the underlying tunnel has an unacknowledged
+window of data still outstanding, so it'll sit in the transmit queue
+waiting for the interface to become ready.
+
+A couple of milliseconds later, the underlying tunnel, attempting to 
+guarantee reliable delivery like TCP is supposed to do, will *also* 
+retransmit its *original* window -- And that's before the window has
+even advanced to the point where TCP gets to the duplicate tunnelled
+packets.
+
+What's happening is that duplicate packets from the tunnel are transformed
+into unique packets on the underlying transport, which must be reliably
+transmitted, so in the case of congestion you double your traffic over
+your physical infrastructure.  Since the congestion is caused by 
+excessive traffic in the first place, this only makes the problem worse,
+which causes additional duplicate data to be sent, which makes the 
+congestion worse, which...
+
+You don't want to go there :-)
+
+That's why it's *FAR* more efficient to tunnel over UDP, which doesn't
+attempt to deliver reliably.  If there is congestion, the only layer
+which is going to give a rat's arse about it is the original "top-level"
+TCP connection, there will be no retransmissions on the underlying 
+infrastructure unless that TCP session requires it.
+
+Unfortunately, tunnelling over UDP is often firewall-hostile, so it
+isn't particularly well-suited for VPNs.  It also presents the same
+MTU issues I raised in my last message, so it isn't all roses.
+
+*BSD provides "tun" network interfaces to do tunnelling, making it simple
+to tunnel over anything you want (whether it's RS-232, TCP or UDP makes
+little difference).  You "ifconfig" a tun interface in the same way you
+can ifconfig a ppp interface;  any packets transmitted through that 
+network interface can be read by a user process reading from /dev/tun*,
+and any packets written to /dev/tun* are "received" by the kernel's
+network protocol stack.  This makes it simple to come up with an 
+"ip-over-UDP" tunnelling program in about 30 lines of C code.  I'm not
+sure what Linux provides to do the same thing, but I'm sure there's
+something.
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

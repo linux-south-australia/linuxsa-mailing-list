@@ -1,0 +1,172 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: mixing strings and variables in c" -->
+<!-- FromName="'Toby Corkindale'" -->
+<!-- FromEmail="tjcorkin@sa.pracom.com.au" -->
+<!-- ToName="'Anthony Symons'" -->
+<!-- ToEmail="ant@sa.pracom.com.au" -->
+<!-- Date="Fri, 10 May 2002 18:35:41 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0205101830380.12153-100000@localhost.localdomain" -->
+<!-- Reference="1021021007.16294.262.camel@ant.internal" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: mixing strings and variables in c</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@sa.pracom.com.au">tjcorkin@sa.pracom.com.au</A></I>&gt;
+  To  : Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  Date: Fri, 10 May 2002 18:35:41 +0930 (CST)
+</PRE>
+<H1>Re: mixing strings and variables in c</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Close, but no cigar.
+The snprintf() code won't null terminate the string if it would have
+overflowed the buffer.
+ie. It'll write out as many bytes as the string was long, but unless you
+limit the maximum length when you print it, you'll run off the end of the
+string and start printing garbage.
+
+My preferred solution is to use sprintf(), and limit the length of each
+individual %s within the format definition, such that you know the total
+length cannot be longer than the size of your destination buffer.
+
+Eg:
+
+char TextBuf[55];
+sprintf(TextBuf, "%.*s has %.*s deliveries", 30, row[1], 6, row[2]);
+
+In the real world you should set the 30 and 6 to the maximum column sizes
+for row 1 and 2 respectively, and then set the size of textbuf to be the
+total of those two sizes, plus the number of other characters in the format
+string, plus 1 for the null terminator.
+
+
+Hope that helps :)
+
+-Toby
+
+
+
+On 10 May 2002, Anthony Symons wrote:
+
+&gt; I havnt done much coding in recent years, but wouldnt this be buffer
+&gt; overflowable by inserting long strings in the database?
+&gt;
+&gt; What about:
+&gt;
+&gt; char Text_OutputBuff[55];
+&gt; snprintf( Text_OutputBuff, sizeof(Text_OutputBuff), "%s has %s
+&gt;   deliveries", row[1], row[3] );
+&gt; gtk_text_insert (user_data, NULL, NULL, NULL, Text_Output, -1);
+&gt;
+&gt; No doubt someone will correct me if i'm wrong, or if theres a better
+&gt; way.
+&gt;
+&gt; Ant
+&gt;
+&gt; On Fri, 2002-05-10 at 18:18, Jayson Hay wrote:
+&gt; &gt; On Fri, 19 Apr 2002 16:23:45 +0930
+&gt; &gt; Matthew Williams &lt;<A HREF="mailto:mattheww@empower.com.au">mattheww@empower.com.au</A>&gt; said to me:
+&gt; &gt;
+&gt; &gt; Hi there,
+&gt; &gt;
+&gt; &gt; &gt; try
+&gt; &gt; &gt; sprintf( newvar, "%s with some text and even %s", oldvar, morevars );
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; This is actually just what I needed, but at that point I had no idea how
+&gt; &gt; to declare newvar. I eventually found out that this was what I needed:
+&gt; &gt;
+&gt; &gt; &lt;while fetching stuff from mysql&gt;
+&gt; &gt;
+&gt; &gt; char Text_OutputBuff[55];
+&gt; &gt; sprintf( Text_OutputBuff, "%s has %s deliveries", row[1], row[3] );
+&gt; &gt; gtk_text_insert (user_data, NULL, NULL, NULL, Text_Output, -1);
+&gt; &gt;
+&gt; &gt; &lt;/while&gt;
+&gt; &gt;
+&gt; &gt; Anyway works a treat and I'm happy.
+&gt; &gt;
+&gt; &gt; Jay.
+&gt; &gt;
+&gt; &gt; &gt;
+&gt; &gt; &gt; As for a book try
+&gt; &gt; &gt; The C Programming Language, Second Edition
+&gt; &gt; &gt; by Brian W. Kernighan and Dennis M. Ritchie.
+&gt; &gt; &gt; Prentice Hall, Inc., 1988.
+&gt; &gt; &gt; ISBN 0-13-110362-8 (paperback), 0-13-110370-9 (hardback).
+&gt; &gt;
+&gt; &gt; When I can afford it... ;)
+&gt; &gt;
+&gt; &gt; I actually found the GTK+ book by NewRiders to be excellent in
+&gt; &gt; explaining a few little things I missed while learning by cut & paste /
+&gt; &gt; trial & error. ;-)
+&gt; &gt;
+&gt; &gt; jay
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; &gt;
+&gt; &gt; &gt; HTH
+&gt; &gt; &gt; Matt
+&gt; &gt; &gt; -----Original Message-----
+&gt; &gt; &gt; From: Jayson Hay [mailto:<A HREF="mailto:ridefast@ozemail.com.au">ridefast@ozemail.com.au</A>]
+&gt; &gt; &gt; Sent: Friday, 19 April 2002 3:56 PM
+&gt; &gt; &gt; To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; &gt; &gt; Subject: mixing strings and variables in c
+&gt; &gt; &gt;
+&gt; &gt; &gt;
+&gt; &gt; &gt; Hello there,
+&gt; &gt; &gt;
+&gt; &gt; &gt; Sorry this is so stupid, but I just cant figure out how to declare
+&gt; &gt; &gt; variables in c properly. In perl I used to write something like:
+&gt; &gt; &gt; $newvar = "$oldvar with some text and even $morevars";
+&gt; &gt; &gt; But I can't figure out how this is done in C.
+&gt; &gt; &gt;
+&gt; &gt; &gt; If anyone can suggest a good book or website about C that would be
+&gt; &gt; &gt; invaluable.
+&gt; &gt; &gt;
+&gt; &gt; &gt; thanks in advance
+&gt; &gt; &gt;
+&gt; &gt; &gt; jay
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt;
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

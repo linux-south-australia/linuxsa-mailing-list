@@ -1,0 +1,311 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: init scripts" -->
+<!-- FromName="Andrae Muys" -->
+<!-- FromEmail="A.Muys@mailbox.uq.edu.au" -->
+<!-- ToName="Linux SA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 29 Jul 1997 12:53:15 +1000 (GMT+1000)" -->
+<!-- Id="Pine.OSF.3.95.970729100112.11467H-100000@dingo.cc.uq.edu.au" -->
+<!-- Reference="01BC9C04.67BD6940@DANEEL" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: init scripts</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrae Muys &lt;<I><A HREF="mailto:A.Muys@mailbox.uq.edu.au">A.Muys@mailbox.uq.edu.au</A></I>&gt;
+  To  : Linux SA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 29 Jul 1997 12:53:15 +1000 (GMT+1000)
+</PRE>
+<H1>Re: init scripts</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, 29 Jul 1997, Peter McCarthy wrote:
+
+&gt; Hi how do the damn init scripts in Red Hat work.  My goal is to get
+&gt; named running.  It apears in the rc.initd dir but what is the mechanism
+&gt; to get it off the ground at boot ?
+&gt; 
+(aside: Please, it makes it easier to read if you format your mail for 80
+columns, easier to reply if you use 75.)
+
+Please note that RedHat provides a section in it's Linux Tips on the boot
+process.  You can read it at
+&lt;<A HREF="http://www.redhat.com/support/docs/rhl/Tips/Boot-Process-Tips/Boot-Process-Tips.html&gt">http://www.redhat.com/support/docs/rhl/Tips/Boot-Process-Tips/Boot-Process-Tips.html&gt</A>;
+
+This post is quite long, so I've reproduced the quick summary at the end
+here so you don't _have_ to read the whole thing unless you want to :).
+
+-------------------------------------------------------------------------
+Remember...
+
+/etc/inittab - Is the root of the intialisation sequence.
+/etc/rc.d/rc - Is the common base of all runlevel configuration scripts.
+/etc/rc.d/init.d/ - Is where the physical scripts lie.
+/etc/rc.d/rc?.d/ - Contain the appropriate symbolic links to start/stop
+services.
+/etc/sysconfig/ - Contains the configuration information used by the rc.d
+scripts to initialise the system, and the services/daemons run on it.  
+-------------------------------------------------------------------------
+
+
+
+OK, my system is a standard RedHat 4.0 install, patched.  So I'll draw on
+my own init files as a generic example.
+
+So a normal reboot entails...
+
+'In the beginning was the POST, then the bootloader, then the kernel
+bootstrap.  Much deep magic is performed to summon the kernel from the
+depths of the root device.' :)  Then as soon as the kernel get's it's act
+together it spawns 'init' and slips into the background (dealing with
+interrupts, and system calls and such).  init then looks through inittab
+for the default runlevel, and the system initialisation scripts and finds
+
+id:3:initdefault:
+
+Which specifies that the default run-level should be 3.
+
+si::sysinit:/etc/rc.d/rc.sysinit
+
+Which means that init should run /etc/rc.d/rc.sysinit when initialising
+the system (ie now).
+
+Now would be a good idea to have a look at rc.sysinit,  notice the line
+
+if [ -f /etc/sysconfig/network ]; then
+    . /etc/sysconfig/network
+
+Now /etc/sysconfig/network is where you configure your basic networking.
+Mine contains
+
+NETWORKING=yes
+HOSTNAME=reynier.meeting.humbug.org.au
+GATEWAYDEV=eth0
+GATEWAY=192.168.105.1
+
+Note that the effect of the 'if' statement in rc.sysinit is to define
+these 4 values as shell variables in the script.  This is common trick
+used throughout RedHats initialisation scripts.  In fact you'll find that
+the files under /etc/sysconfig/ are regularly included in this manner in
+the rc.d scripts.
+
+In the case of rc.sysinit, the only one they are interested in is
+HOSTNAME.  Read through the script and you should find you recognise much
+of it from the bootup messages which flash past everytime you reboot.
+You'll also spot some interesting bit's and pieces, especially how to
+diable the fsck's without actually modifiying a single script.  (As this
+isn't really a good idea, I'll leave it as an exercise for the reader :).
+
+OK, back to inittab now.  init has finished initialising the system
+(/etc/rc.d/rc.sysinit), and it is now ready to change to the correct
+runlevel.  Now it is my belief that there are 8 run levels.
+
+0 - Which halts the system.
+1 - Which is single user mode, should drop you to a single root shell (ie
+it is one good reason for physical security if you want a secure machine).
+2 - Multi-user without NFS mounts (IIRC limited networking?? Real
+sysadmins can discuss the use of 2, I don't really know enough about it).
+3 - Is full multi-user, with all the trimmings.  (Your default should
+probably be this or 5)
+4 - Typically unused (ie often defaults to 3).
+5 - X, often runs xdm etc, set the default run level to 5 if you want X to
+run automatically.
+6 - reboot.
+
+The eighth is actually S, which is startup. ie this is what we've been in
+so far.  So because the default run-level in this case is 3
+(id:3:initdefault:) we are actually changing from runlevel S to runlevel 
+3.
+
+OK, now look further down /etc/inittab till you see a group of lines
+similar to the following...
+
+l0:0:wait:/etc/rc.d/rc 0
+l1:1:wait:/etc/rc.d/rc 1
+l2:2:wait:/etc/rc.d/rc 2
+l3:3:wait:/etc/rc.d/rc 3
+l4:4:wait:/etc/rc.d/rc 4
+l5:5:wait:/etc/rc.d/rc 5
+l6:6:wait:/etc/rc.d/rc 6
+
+Note that this section is VERY different to the BSD init model used by
+Slackware and many older distributions.
+
+There are a few things which should be recognised here.
+a) All runlevel changes are listed as 'wait'.  This means that init will
+wait until the config script for that runlevel has finished before
+continuing.
+b) Under RedHat (ie under the SysVinit model) one script handles ALL
+run level changes.
+c) That script is called /etc/rc.d/rc and it takes the new runlevel as the
+first and only arguement.
+
+So lets go have a look at this script.
+Unfortunately my scripting ability isn't exactly crash hot, so I get a
+little confused by the mess at the top, however the end result is to set
+the variable 'runlevel' to the new runlevel we are changing to.  
+
+So we continue to the important part (If someone would be willing to
+explain to me exactly how those five lines work I'd appreciate it).
+
+if [ -d /etc/rc.d/rc$runlevel.d ]; then
+
+This checks to see if there is a directory called '/etc/rc.d/rc[0123456].d' 
+In this case as we are going to runlevel 3, it is looking for a directory
+called '/etc/rc.d/rc3.d'.
+
+If there isn't such a directory then you skip all the way to the 'fi' on
+the last line (ie the script finishes there).  If there is (and if you do
+a `ls /etc/rc.d`, you'll note that these directories do exist), then it
+proceeds to shutdown those process'/services which are not required in the
+new runlevel.
+
+The key lines in this section are
+
+        for i in /etc/rc.d/rc$runlevel.d/K*; do
+
+this loops through once for every file in /etc/rc.d/rc3.d which begins
+with a 'K'.  
+
+                subsys=${i#/etc/rc.d/rc$runlevel.d/K??}
+                [ ! -f /var/lock/subsys/$subsys ] && continue
+
+If the specific subsystem is actually up at the moment then ...
+
+                $i stop
+
+it executes the script (`/etc/rc.d/rc?.d/K*`) passing 'stop' as the first
+parameter.
+
+So, in other words, there is a subdirectory for every runlevel under rc.d.
+And when you change runlevels it automatically executes every file in that
+directory beginning with a K asking to to 'stop'.
+
+The second half should be obvious now,
+
+        for i in /etc/rc.d/rc$runlevel.d/S*; do
+                # Check if the script is there.
+                [ ! -f $i ] && continue
+
+                # Check if the subsystem is already up.
+                subsys=${i#/etc/rc.d/rc$runlevel.d/S??}
+                [ -f /var/lock/subsys/$subsys ] && continue
+
+Exactly the same as the first half, only now we are looking for files
+beginning with a 'S'.
+
+                $i start
+
+And instead of telling it to 'stop', we tell it to 'start'.
+
+So hey presto we now have a simple way to start and stop different
+process', daemons, jobs', etc each time we change runlevels.  The only
+thing that matters is whether the first letter is a K or an S.
+
+Now this would be powerful, but the SysVinit model goes further, so
+naturally RedHat does to.
+
+do an `ls -l /etc/rc.d/rc2.d` 
+
+lrwxrwxrwx   1 root root 15 Mar  9 04:21 K10nfsfs -&gt; ../init.d/nfsfs
+lrwxrwxrwx   1 root root 18 Mar  9 04:21 S01keytable -&gt; ../init.d/keytable
+lrwxrwxrwx   1 root root 17 Mar  9 04:21 S10network -&gt; ../init.d/network
+lrwxrwxrwx   1 root root 16 Mar  9 04:24 S30syslog -&gt; ../init.d/syslog
+     .
+     .
+     V
+
+Note that they are all symbolic links!  That's right, every single file in
+/etc/rc.d/rc?.d/ is a symbolic link.  And they all point to scripts in
+/etc/rc.d/init.d.  So in other words if you want to change how the network
+is brought up (for instance), you only have to change ONE file
+(/etc/rc.d/init.d/network) and you have changed the config for EVERY
+runlevel which uses networking..  
+
+Now compare `ls -l /etc/rc.d/rc1.d` with `ls -l /etc/rc.d/rc3.d` (ie
+single user mode, with normal multi-user mode).
+
+`ls -l /etc/rc.d/rc1.d`
+lrwxrwxrwx   1 root root 15 Mar  9 04:21 K10nfsfs -&gt; ../init.d/nfsfs
+lrwxrwxrwx   1 root root 13 Mar  9 11:45 K15gpm -&gt; ../init.d/gpm
+lrwxrwxrwx   1 root root 23 Mar  9 11:30 K30sendmail -&gt; ../init.d/sendmail.init
+lrwxrwxrwx   1 root root 14 Mar  9 11:51 K50inet -&gt; ../init.d/inet
+
+`ls -l /etc/rc.d/rc3.d` (I've changed the order for clarity).
+lrwxrwxrwx   1 root root 15 Mar  9 04:21 S70nfsfs -&gt; ../init.d/nfsfs
+lrwxrwxrwx   1 root root 13 Mar  9 11:45 S85gpm -&gt; ../init.d/gpm
+lrwxrwxrwx   1 root root 23 Mar  9 11:30 S80sendmail -&gt; ../init.d/sendmail.init
+lrwxrwxrwx   1 root root 14 Mar  9 11:51 S50inet -&gt; ../init.d/inet
+
+Notice that both the START and the STOP scripts are simply LINKS TO THE
+*SAME SCRIPT*.  
+
+Remember we pass 'start' or 'stop' to the script when we run it.  So we
+can use the SAME SCRIPT for both starting and stopping the service.
+
+Have a look in a few of the scripts under /etc/rc.d/init.d, you'll see
+that they follow the same basic format.  
+
+[Basic initialisation]
+[Check for basic error conditions]
+[if ($1 == start) then start service]
+[if ($1 == stop then stop service]
+[Any necessary clean up]
+[exit]
+
+If you look in '/etc/rc.d/init.d/inet', you'll see this basic format.
+
+Take note of the first two lines (excluding comments), especially
+
+. /etc/sysconfig/network
+
+As I said before, this is the standard way RedHat init scripts handle
+common config info.
+
+Well I hope I haven't been too long winded, and if you've read this far
+thank-you for your time, I hope it has been helpful.  You should be able
+to find your way around RedHat initialisation reasonably well now.
+
+Remember...
+
+/etc/inittab - Is the root of the intialisation sequence.
+/etc/rc.d/rc - Is the common base of all runlevel configuration scripts.
+/etc/rc.d/init.d/ - Is where the physical scripts lie.
+/etc/rc.d/rc?.d/ - Contain the appropriate symbolic links to start/stop
+services.
+/etc/sysconfig/ - Contains the configuration information used by the rc.d
+scripts to initialise the system, and the services/daemons run on it.
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+Andrae Muys
+<A HREF="mailto:andrae@humbug.org.au">andrae@humbug.org.au</A>
+
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

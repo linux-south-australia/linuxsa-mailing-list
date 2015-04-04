@@ -1,0 +1,131 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: moving a site and domain name from one ISP to another" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Ben Donohue" -->
+<!-- ToEmail="donohueb@bvm.com.au" -->
+<!-- Date="Fri, 26 Mar 1999 17:04:55 +1030 (CST)" -->
+<!-- Id="199903260634.RAA34487@atdot.dotat.org" -->
+<!-- Reference="36FB245B.39B8BD5D@bvm.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: moving a site and domain name from one ISP to another</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Ben Donohue &lt;<I><A HREF="mailto:donohueb@bvm.com.au">donohueb@bvm.com.au</A></I>&gt;
+  Date: Fri, 26 Mar 1999 17:04:55 +1030 (CST)
+</PRE>
+<H1>Re: moving a site and domain name from one ISP to another</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Ben Donohue wrote:
+
+ &gt; can anyone help me with what is involved with moving a site from one ISP
+ &gt; to another ISP, such that it is done with the minimum of fuss and
+ &gt; downtime for the client. I'm moving a site, ie. a complete
+ &gt; www.name.com.au to another ISP, but want to keep the site up for as long
+ &gt; as possible. does the first ISP have to "release" the domain name and
+ &gt; then the second ISP take it up? is there a correct protocol for moving
+ &gt; the site?
+
+Having just done this for myself (moving my permanent net link for
+home from Camtech, my old employer, to Internode, my new one) and
+having previously done it for several customers in my professional life,
+I can provide a way of doing it with no disruption or downtime whatsoever.
+
+1.  Bring up the link to the new ISP over a second line (i.e.: you'll
+    be running both in parallel).
+
+2.  Use IP aliasing to give yourself secondary IP addresses on each
+    "important" machine which are inside the address allocation you
+    got from your ISP.  Example:  I moved from 203.23.150.32/28 to
+    150.101.89.0/28, so on my nameserver (203.23.150.35) I did something
+    akin to this:
+
+      ifconfig eth0:1 inet 150.101.89.3 netmask 255.255.255.240
+
+    Now the machine responds to both its new *and* old IP address.
+    Incoming packets to its old address come in via the old ISP,
+    incoming packets to the new address come in via the new ISP.
+    I also did something similar on the ethernet interface on my 
+    router (but not its PPP interfaces).
+
+3.  Alter your nameserver records to include new addresses for all
+    your machines.  Remove the old addresses.  Renumber the machines
+    to match what's in the DNS.  Change the default routes on all
+    the machines to point to the new IP address for your router instead
+    of the old one, and change the router's default gateway to point
+    to the new ISP.
+
+    Once you've done this, *all* your outbound traffic and most of your
+    inbound traffic will go via the new ISP.  Incoming packets to your old 
+    IP addresses, including your nameservers, will continue to arrive
+    via the old ISP.  Note that this means you're using asymmetrical
+    routing in many cases -- in via the old ISP, out via the new.
+
+4.  Talk to whatever registry hosts your domain name (Internic, AUNIC,
+    whatever) and do  whatever is necessary to tell them the IP address
+    of your nameserver has changed.  Give them your nameserver's new
+    IP address.  [ the procedure used for this varies from registry to
+    registry ]
+
+5.  Monitor the old net link (use tcpdump or mrtg or similar).  After a
+    few days (after everyone's nameserver caches have expired) you should
+    see that the old link remains totally quiescent because nameserver 
+    lookups no longer occur over that link.  At that point it's safe to
+    drop the link.
+
+6.  Finish the job by removing the old IP addresses from your routers
+    and nameservers altogether;  The new address should be the primary
+    address on your interface instead of an aliased address.
+
+I haven't actually rebooted any of my machines since switching over to
+Internode, which is why I claim you can do it with no downtime or 
+disruption whatever.  The only gotcha I found was that named needs
+to be restarted when you add the ethernet alias on the nameserver, and
+xdm needs to be restarted on any machine you renumber (otherwise you 
+don't get a login window after an XDMCP prod;  You'll still get a 
+login window on :0, though).
+
+Cheers,
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1958-3414 ------------- Fax: +61-8-83034403 -----
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

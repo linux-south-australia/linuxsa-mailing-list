@@ -1,0 +1,152 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: more spooky stuff on the net!" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Wed, 17 Nov 1999 12:12:31 +1030 (CST)" -->
+<!-- Id="199911170142.MAA88536@atdot.dotat.org" -->
+<!-- Reference="199911162214.IAA20777@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: more spooky stuff on the net!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Wed, 17 Nov 1999 12:12:31 +1030 (CST)
+</PRE>
+<H1>Re: more spooky stuff on the net!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Alan Kennington wrote:
+
+ &gt; It's gone! You're right. Netscape makes the "DNS harrasser" appear,
+ &gt; and netscape exit implies "DNS hassler" exit.
+
+Netscape uses the dns helper so that DNS lookups will occur asynchronously.
+People who have used netscape since the early days of v1.0 will remember
+that DNS lookups could take absolutely ages, and the browser's display
+would essentially lock-up while they were occurring.  In Netscape v3.0
+they introduced the "dns helper" process, spawned by netscape, which
+communicates with the main netscape process over a socket.  Whenever the
+browser wants to do a DNS lookup it communicates with the dns helper and
+gets it to do it instead;  if any process is going to lock up, it'll
+therefore be the helper instead of the browser's user interface.
+
+ &gt; Hmmm. Well that's another theory into the bin!
+ &gt; Maybe telnet creates it's own "helper" to feed incorrect
+ &gt; IP addresses to it.
+
+Telnet does nothing of the sort ("Use the source, Luke!").  Additionally,
+the Netscape dns helper has nothing to do with incorrect addresses.
+
+ &gt; So maybe the IP addresses are being cached in the IP layer of
+ &gt; the kernel.
+
+The IP layer of the kernel knows absolutely nothing whatsoever about
+hostnames;  They exist purely and exclusively at the application layer.
+
+ &gt; One way to test this would be to re-boot the PC.
+
+No, that won't test that -- That'll do a whole lot of other things
+too, which may have other side effects.  If your problem goes away
+after a reboot you will not be able to conclude that the kernel was
+caching something.
+
+Restart your nameservers, as I suggested yesterday.  Nameservers
+run their own caches.
+
+ &gt; And there are some other things to do before actually
+ &gt; reading telnet and kernel source.
+
+The kernel is irrelevent.  And I'd strongly suggest that reading
+telnet source would be a waste of time too.
+
+ &gt; Very sneaky access to a Unix socket!!!
+ &gt; This does not show up in tcpdump -i lo.
+ &gt; socket(PF_UNIX, SOCK_STREAM, 0)         = 3
+
+That's because tcpdump doesn't know anything about sockets, ever.
+tcpdump watches network packets on network interfaces at the 
+network access layer.  Sockets are on the boundary between the 
+Internet layer and the application layer.
+
+Furthermore, this socket has nothing to do with a network anyway,
+because it's a UNIX domain socket (PF_UNIX), so it's always local
+to the machine.
+
+You'll find it's communicating with a daemon called nscd, the
+nameservice cache daemon.
+
+ &gt; Another sneaky access to the same Unix socket!
+
+It's not sneaky, Alan -- It's doing precisely what it's supposed to
+do.  The resolver in libc (i.e.: the implementation of the routines
+which do DNS lookups in the standard runtime library) does all this
+whenever you ask to have a name resolved.
+
+ &gt; Then opens /etc/nsswitch.conf.
+ &gt; But shouldn't it have done this earlier?
+
+Not necessarily.  If you start with a call to res_init() then use the
+other routines in resolver(3) to construct your query, you'll bypass
+nsswitch.conf by operating at a lower level.  nsswitch.conf is only
+used by high-level routines like gethostbyname(), getpwnam(), etc.
+
+ &gt; Does this libnss_db package have something to do with
+ &gt; name service databases?
+
+It's the name service switch - it's the bit that loads the shared
+objects which implement lookups in the various name services listed
+in nsswitch.conf
+
+ &gt; Also opens libnss_files package.
+
+One of the aforementioned shared objects.
+
+ &gt; Also connected with name lookup?
+
+Yes, due to the fact that "files" is listed as one of the ways to
+obtain host information.
+
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

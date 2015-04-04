@@ -1,0 +1,241 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Egg on my face (was: Re: screen and PTY ?)" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="LinuxSA@linuxsa.org.au" -->
+<!-- Date="Sun, 18 Jul 1999 17:45:13 +0900" -->
+<!-- Id="" -->
+<!-- Reference="3.0.5.32.19990716233453.00957b80@mail.adelaide.on.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Egg on my face (was: Re: screen and PTY ?)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:LinuxSA@linuxsa.org.au">LinuxSA@linuxsa.org.au</A>
+  Date: Sun, 18 Jul 1999 17:45:13 +0900
+</PRE>
+<H1>Egg on my face (was: Re: screen and PTY ?)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+It is refreshing to find that one does not know what one is talking about.
+
+In a recent exchange with John &lt;<A HREF="mailto:john@fiend.securesys.com.au">john@fiend.securesys.com.au</A>&gt;, I spouted a
+load of bullshit.
+
+I would like to thank John for being so patient with me, but, correct what
+I am now confident is a minor misconception on John's part.
+
+At 08:02 AM 7/17/99 +0930, John &lt;<A HREF="mailto:john@fiend.securesys.com.au">john@fiend.securesys.com.au</A>&gt; wrote:
+&gt;&gt; Hmmm, a quick check of 'tty' in an xterm shows:
+&gt;&gt; 
+&gt;&gt;   # tty
+&gt;&gt;   /dev/ttyp0
+&gt;&gt; 
+&gt;&gt; Also, login via telnet with 'telnet localhost', and then 'tty':
+&gt;&gt; 
+&gt;&gt;   # tty
+&gt;&gt;   /dev/ttyp1
+&gt;&gt;
+&gt;&gt; So, I conclude that /dev/ttypn devices are the (pseudo) terminal end of the
+&gt;&gt; connection.
+
+The above was written because I completely misunderstood the pseudo tty
+devices. After chasing down various pieces of source, I now see that the
+master side of the pseudo tty is /dev/ptynn devices, while the slave side
+it /dev/ttypn and so on, wrapping around to /dev/ttyan and so on.
+
+&gt;	When you  telnet to localhost, telnetd opens a pseudo terminal
+&gt;	(see call to getpty() in source). Telnetd hangs around
+&gt;	(do a ps, you'll see an in.telnetd for each person who's logged 
+&gt;	in).
+
+Indeed it does, and this was never under dispute.
+
+&gt;	Telnetd reads characters from the socket (network connection)
+&gt;	and feeds them into the pty. They travel through the pty to the
+&gt;	tty (which the shell is attached to).
+
+Indeed, they pass through routines like (in /usr/src/linux/drivers/char/)
+like pty.c, m_tty.c, tty_io.c, etc ... It takes a fair bit of intestinal
+fortitude, and a not insignificant number of glasses of red to unravel the
+actual code paths :-) (Actually, I lie, with more than about 2 glasses of
+red, I am unlikely to be able to understand it :-)
+
+&gt;	When you telnet to localhost, there are 2 pty/tty pairs in action:
+&gt;	the tty your original shell is attached to passes chars to the
+&gt;	pty, which shoves them into the TCP socket that was opened by telnet.
+&gt;	At the other end of the TCP socket, telnetd reads the chars in,
+&gt;	and stuffs them into the second pty, which from whence they go
+&gt;	through to the second tty, which is where your second shell (the
+&gt;	'remote' shell) reads its  data from.
+
+This is the only point that I cannot agree with here.  While the source to
+telnet is in C++, it is not that hard to read, and there is no need for a
+pseudo tty.
+
+telnet simply establishes a connection to the target host, in this case
+localhost (going via the lo device) and then pumps any data received on
+stdin out the TCP connection and any data received on the TCP connection
+out stdout, and handles Telnet commands along the way. (For an idea of the
+number of telnet commands that scurry back and forth when a connection is
+established, get a copy of ethereal and grab a trace of a telnet session.
+If you find any telnet commands and options that it does not understand, I
+damn well want to know about it.)
+
+&gt;	Linux assigns the next free tty/pty pair. The first time you got ttyp0,
+&gt;	the second time you got ttyp1.
+
+Yes, it does, and I now so that they are ptynn and ttypn etc.
+
+[Code deleted as irrelevant]
+
+&gt;&gt; In the case of xterm, xterm opens up a ttyan and ttypn pair, forks, and in
+&gt;&gt; the child sets ttypn as stdin, stdout and stderr, and then exec's /bin/sh.
+&gt;&gt; The parent then shoves the characters you type down the ttyan device.
+
+Oh well, more of my bullshit :-) 
+
+&gt;	I don't run  X here, so I could be wrong here. It's late, too,
+&gt;	so I'm not going to trawl through the code to xterm :)
+
+No need. I am sure now (although I have not looked at the source either)
+that xterm opens a ptynn/ttypn pair.
+
+&gt;&gt; In the case of telnet, telnetd accepts incoming connections on port 23,
+&gt;&gt; opens a ttyan/ttypn pair, forks and arranges that the child has ttypn on
+&gt;&gt; stdin, stdout and stderr.  The child then exec's login which does all the
+&gt;&gt; normal stuff.  The network connection is quite removed from all this stuff.
+
+This is a mish-mash of misconceptions with some truth.
+
+&gt;	Again, see above.
+&gt; 
+&gt;&gt; &gt;	At the tty end of the stream sits the application program: your
+&gt;&gt; &gt;	shell, mail program, text editor, whatever.
+&gt;&gt; 
+&gt;&gt; Hmmm, no, the evidence suggests that the application program gets the ttypn
+&gt;&gt; device.
+
+Well, this statement was essentially true, based on the evidence above, and
+the knowledge that the ttypn devices are the slave ends of the pseudo ttys
+
+&gt;	Nope, but it does get a tty device.
+
+Well, my defence here is that I like to distinguish between /dev/ttyn
+devices, and /dev/ttySn devices and /dev/ttypn devices, etc ...
+
+&gt;&gt; Hmmm, telnetd does this conversion as part of the telnet protocol. The pair
+&gt;&gt; of ttyan and ttypn do not do this at all. 
+
+Here I was referring to things like mapping NVT ASCII to the local mode,
+which essentially means CRNL to NL and vice versa ... 
+
+Again, I got it wrong :-)
+
+&gt;	The telnet protocol specifies options like line-mode or character mode.
+&gt;	Passing the character-mode buffering option to telnetd tells telnetd 
+&gt;	to put *its* pty/tty pair into character-mode.
+&gt;	That way, the output from the remote application is passed straight
+&gt;	from the (remote) tty to the (remote) pty to the socket to
+
+Except for my contention that there is no remote pty, as there is no need
+for one, this is essentially correct.
+
+&gt;	the local pty (also in character-mode buffering) to the tty that
+&gt;	is attached to the the telnet client.
+&gt;
+&gt;	But let's  look  furthur at the source (#defines cut for
+&gt;	readability):
+
+[Source cut ...]
+
+&gt;...Uses some VERY streamlike kinda ioctl()s.
+&gt;Telnetd does the flow control? Not on your life.
+
+Well, I guess I have to agree, although I was not talking about flow
+control.  However, I was *wrong* in what I *was* talking about :-)
+
+&gt;&gt; In addition, things like ctrl-c are also handled by signalling between the
+&gt;&gt; telnet client and telnetd. I suspect that xterm does the same. Xterm
+&gt;&gt; notices the ^C and calls an ioctl to send the SIGTERM: the pair of ttyan
+&gt;&gt; and ttypn have nothing to do with it.
+&gt;
+&gt;	Hmmm. The source code to  telnetd doesn't even contain a reference
+&gt;	to the kill(2) or killpg(2) system calls. 
+&gt;	So how does is signal the process at the other end of the stream???
+
+No, it does not, but it does contain references to ioctls that send SIGINTs
+and SIGQUITs etc, but this does not come into play under Linux.
+
+An examination of n_tty_receive_char from n_tty.c in
+/usr/src/linux/drivers/char shows that it handles both CRNL to NL
+processing and ^C processing for characters pumped into a pty, and the
+slave tty (ttypn) receives the appropriate things.
+
+Along the way I learned some other things.  I had assumed that when the
+user at the client end types a ^C this is mapped to TCP urgent data (ie,
+OOB). When I actually fired up ethereal and checked, I found another place
+where I was wrong.  Of course, telnetd does not need to receive urgent
+data, as it is sitting on a select waiting for data from either the pty or
+the socket, and can react as soon as a ^C comes it.
+
+&gt;&gt; &gt;	When the application at the tty end writes output, the stream
+&gt;&gt; &gt;	does processing as well (stripping the 8th bit from characters,
+&gt;&gt; &gt;	nl-&gt;crnl conversions, and so on).
+&gt;&gt; 
+&gt;&gt; Ummm, again, this is a function of telnet client and telnetd implementing
+&gt;&gt; the telnet options processing.
+&gt;
+&gt;	Again, look at the source. It's all in the ptys and ttys.
+
+Yup, it sure was ... 
+
+&gt;J.
+
+I was wrong about most of what I said, and my penance was to go and check
+it all out in the source.  Now I feel better for having done so.
+
+
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>, NS Computer Software and Services P/L,
+Samba (Team member www.samba.org), Ethereal (Team member www.zing.org)
+Co-author, SAMS Teach Yourself Samba in 24 Hours
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

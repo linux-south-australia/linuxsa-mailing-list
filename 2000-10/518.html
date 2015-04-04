@@ -1,0 +1,173 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Moving windows in X" -->
+<!-- FromName="Andrew Hill" -->
+<!-- FromEmail="list@fornax.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 16 Oct 2000 11:25:00 +0930" -->
+<!-- Id="39EA5FF4.6C64741C@fornax.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Moving windows in X</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Hill &lt;<I><A HREF="mailto:list@fornax.net">list@fornax.net</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 16 Oct 2000 11:25:00 +0930
+</PRE>
+<H1>Moving windows in X</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+A while ago I had a question about moving an X window about on the
+screen without using the mouse. After some very helpful replies and a
+bit of hand holding, here is the solution I have come up with. Thanks to
+everyone for their help, and feel free to tell me what I've done wrong
+and how to fix it.
+
+Cheers.
+
+------------------------------------
+
+#!/usr/bin/perl
+
+# Copyright 2000 Andrew Hill
+# A program to get the window number of a VMware machine running
+# on a second monitor, so that the number can be passed to a C 
+# program to move the window about.
+
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details (at
+# <A HREF="http://www.gnu.org/copyleft/gpl.txt">http://www.gnu.org/copyleft/gpl.txt</A>).
+
+require 5;
+
+open(INPUT, "xwininfo -display :0.1 -int -name 'VMware Workstation [F8]:
+/home/andrew/.vmware/win2000/win2000.cfg (Andrew Hill)'|");
+        while (&lt;INPUT&gt;) {
+                if (/^xwininfo:.*/) {
+                        $window = $_;
+                        $window =~ s/[^\d]*([\d]*).*/$1/;
+                        print "$window";
+                }
+        }
+close(INPUT);
+
+------------------------------------
+
+/* Copyright 2000 Andrew Hill 
+   A program to move a VMware window about on a second monitor
+   so that the guest O/S, running at the same resolution as the
+   monitor, is offest so that it appears to be in full screen
+   mode, or is set at 0,0 so that the VMware buttons can be
+   accessed.
+
+   Big thanks to both JB's for their help.
+
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License
+   as published by the Free Software Foundation; either version 2
+   of the License, or (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details (at
+   <A HREF="http://www.gnu.org/copyleft/gpl.txt">http://www.gnu.org/copyleft/gpl.txt</A>). */
+
+
+#include &lt;X11/Xlib.h&gt;
+#include &lt;X11/Xutil.h&gt;
+#include &lt;string.h&gt;
+
+/* A util to display errors */
+showError(char *message) {
+        puts(message);
+        exit(1);
+}
+
+main(int argc,char **argv) {
+        /* Open the :0.1 display (the second monitor) */
+        Display *d = XOpenDisplay(":0.1");
+        /* The VMware window */
+        Window w;
+        /* Convert the window number string passed in to an int */
+        sscanf(argv[2], "%d", &w);
+
+        /* Warn if the display couldn't be opened */
+        if (d == NULL) {
+                showError("Unable to open the display");
+        }
+
+        /* Check the argument supplied was okay, otherwise
+           give the details on how to use it */
+        if (argc!=3) {
+                showError("Usage: moveVMware {show | hide}
+window_number");
+        }
+        if (strcmp(argv[1], "hide") && strcmp(argv[1], "show")) {
+                showError("Usage: moveVMware {show | hide}
+window_number");
+        }
+
+        /* Move the widow about as required */
+        if (!strcmp(argv[1], "hide")) {
+                XMoveWindow(d, w, +-8, +-53);
+        }
+        if (!strcmp(argv[1], "show")) {
+                XMoveWindow(d, w, +0, +0);
+        }
+
+        /* Clean up */
+        XCloseDisplay(d);
+        return(0);
+}
+
+--------------------------------------
+
+Andrew Hill
+
+"Right now, I'd happily snort gunk from the sink if it would take
+my brain somewhere away from here...." - JB
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

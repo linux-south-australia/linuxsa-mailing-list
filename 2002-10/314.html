@@ -1,0 +1,231 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Ghost 7.0 no good.  Kernel Panic" -->
+<!-- FromName="'Anthony Symons'" -->
+<!-- FromEmail="ant@sa.pracom.com.au" -->
+<!-- ToName="'Brian Marr'" -->
+<!-- ToEmail="cabernet@internode.on.net" -->
+<!-- Date="04 Oct 2002 11:09:41 +0930" -->
+<!-- Id="1033695581.1219.26.camel@ant.internal" -->
+<!-- Reference="FD14944A4C95D211AF350004AC4C55A4064182E1@mx.sola.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Ghost 7.0 no good.  Kernel Panic</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  To  : Brian Marr &lt;<I><A HREF="mailto:cabernet@internode.on.net">cabernet@internode.on.net</A></I>&gt;
+  Date: 04 Oct 2002 11:09:41 +0930
+</PRE>
+<H1>Re: Ghost 7.0 no good.  Kernel Panic</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Thats the version with the type-o.. see below..
+
+On Fri, 2002-10-04 at 09:36, Brian Marr wrote:
+&gt; A long post, but I found this to work very well. It came from "Ant" alias 
+&gt; Anthony Symons. You have to adapt it to your situation.
+&gt; Brian Marr
+&gt; 
+&gt; 
+&gt; 1. quick, simple, wastefull way
+&gt; 
+&gt; assuming drive is hda.
+&gt; install new drive as hdc or other drive.
+&gt; 
+&gt; dd if=/dev/hda of=/dev/hdc
+&gt; 
+&gt; wait.
+&gt; 
+&gt; You'll get a partition of the same size as what you had. It should be
+&gt; bootable.
+&gt; 
+&gt; 2. Better more complex way.
+&gt; 
+&gt; Get a rescue cd.
+&gt; 
+&gt; Install new drive as (say) hdc
+&gt; 
+&gt; boot system
+&gt; 
+&gt; as root: fdisk /dev/hdc
+&gt; make partitions as you want them. (usually a /boot a / and a swap. you
+&gt; need to change the type of the swap partition to type linux swap. Keep
+&gt; them in the same order as the original drive, else be prepared to have
+&gt; to modify /etc/fstab.
+&gt; 
+&gt; I'll assume hda1 is boot hda2 is swap and hda3 is root. This may not be
+&gt; the case in your system. Try not to get partitions confused when your
+&gt; data is at stake!
+&gt; 
+&gt; Make file systems:
+&gt; 
+&gt; mke2fs /dev/hda1
+&gt; mke2fs /dev/hda3
+&gt; mkswap /dev/hda2
+
+They all should be the destination drive - hdc!
+
+Ant
+ 
+&gt; If your using different file systems, use the appropriate tool for them.
+&gt; 
+&gt; make a temp dir to mount your new drive on, and do so. Same with your
+&gt; boot partition:
+&gt; 
+&gt; mkdir /mnt/hdc
+&gt; mount /dev/hdc3 /mnt/hdc
+&gt; mkdir /mnt/hdc/boot
+&gt; mount /dev/hdc1 /mnt/hdc/boot
+&gt; 
+&gt; Use tar to preserve ownership and permissions to transfer partitions.
+&gt; Use 1 filesystem flag to stop it recursivly copying itself.
+&gt; 
+&gt; cd /mnt/hdc
+&gt; tar -cplf - -C / . | tar -xpvf -
+&gt; 
+&gt; The first tar will (c) create a tarball, with (p) permission info (which
+&gt; is usually the default, but dont count on it) (l) on one file system
+&gt; (that a lowercase L, not a 1) (f -) to a file which is stdout. (-C /)
+&gt; change to the root directory first. Then . means current directory,
+&gt; which due to the -C / will be the root dir.
+&gt; 
+&gt; The second tar will then (x) extract the tarball, with (p) permissions,
+&gt; and a (v) verbose file listing so you can see it is working, and (f -)
+&gt; from the file stdin. Your allready in the the directory/partition where
+&gt; you want it to go, so it'll copy all the data over with permissions.
+&gt; 
+&gt; Then you'll need to do the same for the boot partition.
+&gt; 
+&gt; cd /mnt/hdc/boot
+&gt; tar -cplf - -C /boot . | tar -xpvf -
+&gt; 
+&gt; You should have this sussed now.
+&gt; 
+&gt; Now umount /mnt/hdc/boot and /mnt/hdc, and shut down your system.
+&gt; 
+&gt; Set up the new drive as hda, and store the old drive 'till your sure it
+&gt; worked. Boot off the rescue cd. Make a space to mount the new file
+&gt; systems (you need to configure the bootloader). Something like this:
+&gt; 
+&gt; cd /mnt
+&gt; mkdir hda
+&gt; mount /dev/hda3 hda
+&gt; cd hda
+&gt; mount /dev/hda1 boot
+&gt; 
+&gt; Now, presuming lilo, do
+&gt; 
+&gt; lilo -r .
+&gt; 
+&gt; You are in the root of your new drive and the -r . tells lilo to use the
+&gt; current directory as the root of the system. This puts it all in to
+&gt; perspective for lilo since things are mounted abnormally at this stage.
+&gt; 
+&gt; Lilo should list the kernels, and return your prompt. cd back off this
+&gt; drive, umount it all and reboot. That should be it.
+&gt; 
+&gt; If your using grub, then it can be a bit more confusing. I'll leave it
+&gt; here becase this has turned in to a bit of an epic allready!
+&gt; 
+&gt; Needless to say, all these commands have a man page, and I suggest you
+&gt; read them and make sure you understand what your doing before you begin.
+&gt; You dont want to get half way and get stuck, although provided you havnt
+&gt; accidentally trashed any of your original drive you should be able to
+&gt; just go back to where you were.
+&gt; 
+&gt; 3. dead easy/non linux way
+&gt; 
+&gt; Get the personal version of norton ghost. Make a boot disk. Run it. Use
+&gt; the menu options to clone disk, and select to make the partitions large.
+&gt; 
+&gt; Ant
+&gt; 
+&gt; 
+&gt; 
+&gt; 
+&gt; On Friday 04 October 2002 09:06, Matthew Western wrote:
+&gt; &gt; Hi All,
+&gt; &gt; As the title states, i've just tried everything in the book to ghost a
+&gt; &gt; redhat 7.3 across to an identical drive.  It boots up until it tries to
+&gt; &gt; mount one of the ext3 partitions.  Then it all goes pearshaped and does a
+&gt; &gt; kernel panic:
+&gt; &gt;
+&gt; &gt; Loading ext3 module
+&gt; &gt; Mounting /proc filesystem
+&gt; &gt; Creating root device
+&gt; &gt; Mounting root filesystem
+&gt; &gt; EXT3 - fs : journal inode is deleted
+&gt; &gt; mount:  error 22 mounting ext3
+&gt; &gt; pivotroot: pivot_root(/sysroot, /sysroot/initd) failed: 2
+&gt; &gt; Freeing unused kernel memory: 280k freed
+&gt; &gt; Kernel panic: No init found: try passing init = option to kernel
+&gt; &gt;
+&gt; &gt;
+&gt; &gt; Any ideas, gurus?  How do i clone a this disc?  I've tried going to an
+&gt; &gt; image and back again. I've tried the switch in ghost that says do a
+&gt; &gt; 'bit-wise' copy but it compains and says that the destination drive is too
+&gt; &gt; small, when i reality it's the same drive (model, brand, size, even the
+&gt; &gt; same day bought
+&gt; &gt;
+&gt; &gt; :)).  I tried the option that says clone unused space as well and this
+&gt; &gt; : still
+&gt; &gt;
+&gt; &gt; didn't boot.
+&gt; &gt;
+&gt; &gt; Regards
+&gt; &gt; Matthew
+&gt; &gt;
+&gt; &gt; PS:  perhaps ghost is not the thing to use here, is there alternatives?
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+-- 
+Systems Administrator       
+Pracom Ltd.             
++61 8 82029074 -=- +61 402 100 671 
+<A HREF="mailto:anthony.symons@sa.pracom.com.au">anthony.symons@sa.pracom.com.au</A>
+
+PRIVILEGED - PRIVATE AND CONFIDENTIAL
+This electronic mail is solely for the use of the addressee and may
+contain information which is confidential or privileged.
+If you receive this electronic mail in error, please delete it from
+your system immediately and notify the sender by electronic mail or
+using any of the above contact details.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

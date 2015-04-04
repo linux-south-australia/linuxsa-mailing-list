@@ -1,0 +1,176 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: pppd goes mad!" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="Mark Newton" -->
+<!-- ToEmail="newton@atdot.dotat.org" -->
+<!-- Date="Tue, 22 Dec 1998 19:20:15 +1030" -->
+<!-- Id="199812220850.TAA09450@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: pppd goes mad!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  Date: Tue, 22 Dec 1998 19:20:15 +1030
+</PRE>
+<H1>Re: pppd goes mad!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Mark,
+
+Thanks for those reponses.
+
+&gt;  &gt; At the moment, I have two hypotheses:
+&gt;  &gt; 1.	There's a bug in the ppp.o driver which makes it
+&gt;  &gt; 	not wake up properly.
+&gt;
+&gt;
+&gt; Highly unlikely.  PPP has been bashed on by too many people over
+&gt; too many years.
+
+I tend to agree. But this might be "the last bug".
+
+&gt;
+&gt;  &gt; 2.	There's a bug in the ethernet card which makes it
+&gt;  &gt; 	not wake up the CPU properly.
+&gt;
+&gt; Unless you have a really wierd ethernet card this is also unlikely 
+&gt; for similar reasons.
+
+This was a slip of the fingers -- I said ethernet when I meant modem.
+
+&gt;
+&gt; Throw away your internal modem (at the very least, borrow and external
+&gt; one and suck it 'n' see).
+
+I certainly prefer the external modem -- precisely because I can
+diagnose so many problems by just watching the lights.
+I've done that for many years, and find it enormously useful.
+The problem is that they take up space and extra money, and extra
+cables etc. etc. etc.
+I thought I'd try an internal modem just to experience how
+other people work their computers.
+This might be the experience that makes me convert back to external.
+
+However, there's an issue of bandwidth on the cable.
+If I run the external wires at 115 kbit/sec or whatever,
+I'm worried about line noise. Even 38.4 kbits/sec can
+be vulnerable to much noise. An external modem takes up
+my last spare serial port too!
+
+&gt; I'd think the "top half" would be woken up by the bottom half saying, 
+&gt; "here!  I've received a character".
+&gt;
+&gt; The bottom half of a device driver is just supposed to collect 
+&gt; data presented by the hardware and do the minimal amount necessary
+&gt; to clean up after an interrupt and prepare for the next I/O transaction.
+&gt; The top half (in the kernel) does the rest;  it's kicked into action
+&gt; by the bottom half saying, "Oi!  I just did something, now it's 
+&gt; your turn!"
+
+In fact, I think you just might be wrong here.
+I've been having a go at network drivers myself in the last few
+weeks, and I've found something which is somewhat disturbing for
+people who like "real-time" software.
+
+The way in which the bottom half of a driver informs the IP stack
+of the packet arrival is that a packet buffer is allocated by
+the driver. This buffer (actually an element in a doubly linked 
+global list) then receives the bytes of the RX packet. Then a function
+is called to just mark the packet as ready to receive.
+Then at the next 10 mS system interrupt, the function net_bh() is
+called to recieve all marked packet buffers.
+
+I.e. a process waiting for packets will only be able to receive a
+packet every 10 mS. That's why the packet arrivals in
+my example TCP dump were spaced by multiples of 10 mS.
+
+I.e. the driver receives any number of packets and queues them for
+the IP stack in any 10 mS interval, and at the ned of that
+interval, the system clock wakes up the kernel, which then
+invokes net_bh() to collect the packets and hand them on to the
+IP layer.
+Notice that this is quite different to the case of a char driver.
+net drivers operate differently. A char driver puts a process
+on the ready queue when data is ready, which may result in
+immediate wake-up of the process. But a net driver just
+puts RX packets into a queue to be collected. The process
+getting the packets from the RX queue will only get them when
+it is put onto the ready-list for process scheduling.
+
+this is all very troubling because in ATM switching by a PC running
+linux, you would want to be able to shift over 100 Mbits/sec.
+When dealing with 53-byte cells, with means an awful lot of
+items in your buffer to be collected at each system interrupt.
+Obviously ATM must be done differently.
+But even ethernet can result in heaps of packets arriving in every
+10 mS, like about 100 small packets every 10 mS.
+
+&gt;  &gt; I'm pretty sure that the kernel collects packets from the driver
+&gt;  &gt; every 10 mS.
+&gt;
+&gt; That would suck royally if you tried to run PPP over an ISDN TA
+&gt; with a 115kbps DTE (where packets can arrive every couple of mSec
+&gt; without necessarily congesting the line).
+&gt;
+&gt; The kernel *should* collect packets "when they're ready" rather 
+&gt; than waiting for arbitrary timeouts.  If that isn't what's happening
+&gt; then maybe we've found a project for someone who wants to learn a
+&gt; bit more about kernel hacking :-)
+
+Clearly this is an important topic.
+I think that the linux-atm people must have already resolved all of this
+for ATM. I haven't read the software and documentation for linux-ATM
+yet, but it's all at <A HREF="http://lrcwww.epfl.ch/linux-atm/">http://lrcwww.epfl.ch/linux-atm/</A> .
+
+&gt;  &gt; So the most believable theory for me right now
+&gt;  &gt; is that the physical IRQ from card to driver is at fault.
+&gt;
+&gt; Then it wouldn't work at all.  What kind of failure mode are you 
+&gt; expecting?
+
+One possibility is that the packet-received interrupt might not
+be activated in the modem card, but it might have a "watchdog"
+timer that wakes it up every 9 seconds.
+
+If only I could watch the TX and RX lights on the modem, I could
+narrow down the hypotheses very musch more quickly!!
+
+Cheers,
+Alan Kennington.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

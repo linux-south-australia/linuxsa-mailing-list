@@ -1,0 +1,176 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: traffic shaping (was Detering Port Scanning - Slowing it down)" -->
+<!-- FromName="'Matthew Western'" -->
+<!-- FromEmail="mwestern@affairs.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 10 Jul 2002 08:46:37 +0930" -->
+<!-- Id="FD14944A4C95D211AF350004AC4C55A4058612E6@mx.sola.com.au" -->
+<!-- Reference="FD14944A4C95D211AF350004AC4C55A405A95B19@mx.sola.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: traffic shaping (was Detering Port Scanning - Slowing it down)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Western &lt;<I><A HREF="mailto:mwestern@affairs.net.au">mwestern@affairs.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 10 Jul 2002 08:46:37 +0930
+</PRE>
+<H1>RE: traffic shaping (was Detering Port Scanning - Slowing it down)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hmm, i tell you what my brain was frazzled for a week after tc, i need a bit
+of soothing...
+
+it all become much clearer when i read the line 'you can only shape outgoing
+traffic' and it all fell into place.   i didn't have any joy from that
+security focus thing, but found it easier in the advanced routing howto.
+IPChains/IPTables chains marking then using tc to slow it down didn't work
+for me.  as in i got it going with just tc and marking the IP in my tc
+script.  the only limitation of that is that you can't (we'll i couldn't
+figure it out) mark different ports on the same IP, so if you we're to do
+that you'd need to mark with tables/chains and then do the tc thing..
+
+thought i'd post my script here for you to take a look if you're
+interested....   so ava look at the bottom...  this seems to work, but i've
+only enough understanding to look at someone elses example and have a crack.
+seems to be limiting fine tho....
+
+for accounting purposes only, i found that ipac was brilliant,  just a
+simple conf file with very easy rules and it just sits on top of iptables
+with a bit of a database to record should the iptables totals become
+zeroed//
+
+anyway i think that it's all going nicley now...
+
+thanks for feedback people.
+regards
+M
+
+-------------------------------------------
+
+#!/bin/sh
+
+TC=/sbin/tc
+
+
+#taken from the Advanced Routing Howto.
+
+#setup the base queue disc
+$TC qdisc add dev eth1 root handle 10: cbq bandwidth 100Mbit avpkt 10000
+
+#create the main class inside the queue
+$TC class add dev eth1 parent 10:0 classid 10:1 cbq bandwidth 100Mbit rate
+100Mbit allot 15140 weight 10Mb prio 1 maxburst 20 avpkt 10000
+
+#making new Manager class for manager surfers
+$TC class add dev eth1 parent 10:1 classid 10:100 cbq bandwidth 100Mbit rate
+512Kbit allot 1514 weight 51.2Kbit prio 1 maxburst 20 avpkt 10000 bounded
+
+#making new User class for general surfers
+$TC class add dev eth1 parent 10:1 classid 10:200 cbq bandwidth 100Mbit rate
+128Kbit allot 1514 weight 12.8Kbit prio 2 maxburst 20 avpkt 10000 bounded
+
+
+$TC qdisc add dev eth1 parent 10:100 sfq quantum 1514b perturb 15
+$TC qdisc add dev eth1 parent 10:200 sfq quantum 1514b perturb 15
+
+
+$TC filter add dev eth1 parent 10:0 protocol ip prio 100 u32 match ip src
+10.1.1.3 flowid 10:200
+
+$TC filter add dev eth1 parent 10:0 protocol ip prio 100 u32 match ip src
+10.1.1.4 flowid 10:100
+
+
+exit 0
+
+------------------------------------------
+
+
+
+
+
+
+
+-----Original Message-----
+From: Toby Corkindale [mailto:<A HREF="mailto:tjc@lost.net.au">tjc@lost.net.au</A>]
+Sent: Tuesday, July 09, 2002 4:23 PM
+To: Matthew Western
+Cc: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+Subject: traffic shaping (was Detering Port Scanning - Slowing it down)
+
+
+On Thu, 4 Jul 2002, Matthew Western wrote:
+
+&gt; Hi everyone,
+&gt; just been bending my brain around this Traffic Control stuff, and i read
+at
+&gt; the bottom of <A HREF="http://online.securityfocus.com/infocus/1285:">http://online.securityfocus.com/infocus/1285:</A>
+&lt;snip&gt;
+&gt; Anyway back to banging my head against my Advanced Routing Howto.  Anybody
+&gt; can explain to me what the crock half of this stuff means?  :)
+
+I feel your pain.. That stuff took me ages to figure out.
+
+it seems to work well once you've done it though. What in particular did
+you want to do? I might be able to help out with some recipes.
+
+(My use was "stop housemates using all the bandwidth" - then telstra
+capped us anyway, and the problem became accounting, instead of shaping)
+
+
+Something that might help you, is to imagine that you've got a cascading
+pyramid fountain thing. Like, lots of troughs which overflow into some of
+the ones below them. Then imagine that the water for the fountain is
+either poured into the top trough, or else you can insert some of it into
+other troughs directly. Now expand on the analogy by imagining that the
+troughs are different sizes, so some take longer than others to overflow.
+
+Got that? I don't know how much it'll help your understanding of traffic
+shaping, but its a pretty soothing mental image, and might help you get to
+sleep after fighting 'tc' all day.
+
+seeya
+
+Toby
+
+--
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

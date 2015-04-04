@@ -1,0 +1,158 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Debian package audit" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'Branko Bratkovic'" -->
+<!-- ToEmail="branko@senet.com.au" -->
+<!-- Date="Fri, 17 Jan 2003 00:23:21 +1030" -->
+<!-- Id="20030117002321.F18929@yellowgoanna.com" -->
+<!-- Reference="20030116235202.C18929@yellowgoanna.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Debian package audit</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : Branko Bratkovic &lt;<I><A HREF="mailto:branko@senet.com.au">branko@senet.com.au</A></I>&gt;
+  Date: Fri, 17 Jan 2003 00:23:21 +1030
+</PRE>
+<H1>Re: Debian package audit</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, Jan 16, 2003 at 11:52:02PM +1030, Richard Russell wrote:
+&gt; Well, that was quick... maybe 10 minutes... Someone should write a
+&gt; script to do that, and submit it to the debian people... maybe I'm
+&gt; that someone... hmmm... Naaaah... :)
+
+Here's my attempt at a script -- quick and dirty style...
+
+----
+#!/bin/bash
+
+ON_DISK=/tmp/hddmd5s.$$
+IN_DPKG=/tmp/dpkgmd5s.$$
+
+cd /
+
+/usr/bin/sort -k 2 /var/lib/dpkg/info/*.md5sums &gt; $IN_DPKG
+
+for i in `/usr/bin/cut -f3 -d" " $IN_DPKG`; do /usr/bin/md5sum $i; done &gt; $ON_DISK
+
+/usr/bin/diff $ON_DISK $IN_DPKG
+----
+
+Nothing special, no parameters, no help, no error catching, etc... run
+it on your debian system at your own risk... :)
+
+rr
+
+&gt; 
+&gt; I did as you suggested, and it seems that the only differences are in
+&gt; the following files:
+&gt; 
+&gt; /etc/pam.d/login
+&gt; /etc/pam.d/passwd
+&gt; /usr/lib/mime/packages/less
+&gt; 
+&gt; Having browsed these files, I can't see any obvious change or anything
+&gt; that would indicate to me any issues with corruption -- hard-drive or
+&gt; hacker-based.
+&gt; 
+&gt; This is a Good Thing (though I still don't know about files not in the
+&gt; database -- specifically config files...)
+&gt; 
+&gt; rr
+&gt; 
+&gt; 
+&gt; On Thu, Jan 16, 2003 at 07:34:54PM +1030, Branko Bratkovic wrote:
+&gt; &gt; You would think that there would be such a tool but I haven't been able 
+&gt; &gt; to find anything after reading dpkg(1) and a few of dpkg-* utilities.  I can 
+&gt; &gt; see that you are prepared to do a little work to make it happen.  One 
+&gt; &gt; approach would be to collect the contents of 
+&gt; &gt; /var/lib/dpkg/info/PACKAGES.md3sums into one file and sort it on the second 
+&gt; &gt; field.  Then create another using md5sum from the root directory.  Then do a 
+&gt; &gt; diff on the two files.  
+&gt; &gt; 
+&gt; &gt; Good luck,
+&gt; &gt; -- 
+&gt; &gt; Branko
+&gt; &gt; 
+&gt; &gt; On Wed, 15 Jan 2003 19:12, Richard Russell wrote:
+&gt; &gt; &gt; Hi,
+&gt; &gt; &gt;
+&gt; &gt; &gt; Is there any tool that anyone knows of that will enable me to see
+&gt; &gt; &gt; exactly what has changed from the standard debian packages on my
+&gt; &gt; &gt; machine? I want to know for two reasons -- to help document my
+&gt; &gt; &gt; installation, and to help me identify and recover a few corrupted
+&gt; &gt; &gt; files.
+&gt; &gt; &gt;
+&gt; &gt; &gt; One thought that I have is to create a subdirectory on a partition
+&gt; &gt; &gt; with room, and basically re-install all my packages there and do a
+&gt; &gt; &gt; recursive diff or something similar. However, I'd rather there was
+&gt; &gt; &gt; something a little more sophisticated available. Another thought was
+&gt; &gt; &gt; forcing a re-install of each and every package, but I have a feeling
+&gt; &gt; &gt; that that may cause more problems than it solves -- I'd rather know
+&gt; &gt; &gt; what differences existed so I could deal with each individually...
+&gt; &gt; &gt;
+&gt; &gt; &gt; Any comments?
+&gt; &gt; &gt;
+&gt; &gt; &gt; rr
+&gt; &gt; 
+&gt; 
+&gt; -- 
+&gt; -- 
+&gt; Richard Russell
+&gt; Yellow Goanna P/L
+&gt; e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+&gt; m: +61 412 827 805
+&gt; f: +61 8 8462 2362
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+&gt; 
+
+-- 
+-- 
+Richard Russell
+Yellow Goanna P/L
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+m: +61 412 827 805
+f: +61 8 8462 2362
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

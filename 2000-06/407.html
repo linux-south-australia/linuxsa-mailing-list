@@ -1,0 +1,200 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Postgresql vs MySQL" -->
+<!-- FromName="Carlo" -->
+<!-- FromEmail="carlo@active-ideas.com.au" -->
+<!-- ToName="Mark Newton" -->
+<!-- ToEmail="newton@atdot.dotat.org" -->
+<!-- Date="Wed, 14 Jun 2000 09:17:24 +1030" -->
+<!-- Id="3946B9FC.B0556C13@active-ideas.com.au" -->
+<!-- Reference="3945A1B7.DF13072@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Postgresql vs MySQL</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Carlo &lt;<I><A HREF="mailto:carlo@active-ideas.com.au">carlo@active-ideas.com.au</A></I>&gt;
+  To  : Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  Date: Wed, 14 Jun 2000 09:17:24 +1030
+</PRE>
+<H1>Re: Postgresql vs MySQL</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+This is from the Mysql Reference Manual 7.23 LOCK TABLES/UNLOCK TABLES
+syntax(in part):
+
+Normally, you don't have to lock tables, as all single UPDATE
+statements are atomic; no other thread can interfere with any
+other currently executing SQL statement. There are a few cases when you
+would like to lock tables anyway: 
+
+     If you are going to run many operations on a bunch of tables, it's
+much faster to lock the tables you are going to use.
+     The downside is, of course, that no other thread can update a
+READ-locked table and no other thread can read a
+     WRITE-locked table. 
+     MySQL doesn't support a transaction environment, so you must use
+LOCK TABLES if you want to ensure that no
+     other thread comes between a SELECT and an UPDATE. The example
+shown below requires LOCK TABLES in
+     order to execute safely: 
+
+     mysql&gt; LOCK TABLES trans READ, customer WRITE;
+     mysql&gt; select sum(value) from trans where customer_id= some_id;
+     mysql&gt; update customer set total_value=sum_from_previous_statement
+                where customer_id=some_id;
+     mysql&gt; UNLOCK TABLES;
+
+     Without LOCK TABLES, there is a chance that another thread might
+insert a new row in the trans table between
+     execution of the SELECT and UPDATE statements. 
+
+By using incremental updates (UPDATE customer SET
+value=value+new_value) or the
+LAST_INSERT_ID() function, you can avoid using LOCK TABLES in many
+cases. 
+
+You can also solve some cases by using the user-level lock functions
+GET_LOCK() and RELEASE_LOCK(). These locks
+are saved in a hash table in the server and implemented with
+pthread_mutex_lock() and
+pthread_mutex_unlock() for high speed. See section 7.3.12 Miscellaneous
+functions. 
+
+See section 10.10 How MySQL locks tables, for more information on
+locking policy. 
+
+
+
+
+
+
+
+
+
+
+
+
+Mark Newton wrote:
+&gt; 
+&gt; On Tue, Jun 13, 2000 at 02:32:15PM +1030, Carlo wrote:
+&gt; 
+&gt;  &gt; Mark Newton wrote:
+&gt;  &gt; &gt; On Tue, Jun 13, 2000 at 01:55:29PM +1030, Carlo wrote:
+&gt;  &gt; &gt;  &gt; This doesn't really help, but may be of interest.
+&gt;  &gt; &gt;  &gt; Don't know about Postgresql. But with Mysql, one reason for its good
+&gt;  &gt; &gt;  &gt; speed/reliability is the fact that it was ALL written form scratch.
+&gt;  &gt; &gt; Hey, wow!  That's the same argument MS uses when they explain why NT is
+&gt;  &gt; &gt; better than UNIX!
+&gt;  &gt;
+&gt;  &gt; I have nothing to do with sales and yet I have the natural talent of
+&gt;  &gt; using the same arguments MS use, who spend millions um... billions on
+&gt;  &gt; sales. What a complement. Thanks Mark.
+&gt;  &gt; Or is it a criticism?
+&gt; 
+&gt; "Yes".  :-)
+&gt; 
+&gt; For what it's worth, the speed gains of mysql (which have been shrinking
+&gt; as PostgreSQL improves) are due more to the fact that it doesn't support
+&gt; features which most people think are actually mandatory features of a
+&gt; database, most notably including its lack of support for transactions.
+&gt; Transactions are "hard" to implement, and necessarily involve a performance
+&gt; loss, but the mysql developers have consciously chosen to not support them,
+&gt; so they don't pay the speed penalties that real databases like PostgreSQL
+&gt; must pay.
+&gt; 
+&gt; One thing to be very careful of when using a database for a web site
+&gt; backend is that web pages are, by the nature, accessed in parallel;  so,
+&gt; if you have any multiple-write updates to do in the course of running
+&gt; the site, you're left with three alternatives:
+&gt; 
+&gt;        1. mysql, and just put up with random data corruption from
+&gt;           transactions which are smashed by multiple simultaneous
+&gt;           updaters;
+&gt; 
+&gt;        2. mysql with wrappers around SQL operations to do shared and
+&gt;           exclusive locking, eg:
+&gt; 
+&gt;                 $lck = establish_shared_lock();
+&gt;                 $dbt = $dbi-&gt;prepare("select ...");
+&gt;                 $dbt-&gt;execute();
+&gt;                 # handle results;
+&gt;                 $dbt-&gt;finish();
+&gt;                 release_shared_lock($lck);
+&gt;           and:
+&gt; 
+&gt;                 $lck = establish_exclusive_lock();
+&gt;                 $dbt = $dbi-&gt;prepare("update ...");
+&gt;                 $dbt-&gt;execute();
+&gt;                 # handle results
+&gt;                 $dbt-&gt;finish();
+&gt;                 release_exclusive_lock($lck);
+&gt; 
+&gt;       3. Use a real database which supports transactions.
+&gt; 
+&gt; Option 1 is frankly unacceptable.  Even if you say, "But it really
+&gt; doesn't matter, it's only a web site..." sooner or later a lack of
+&gt; explicit transaction handling will bite you in the arse.
+&gt; 
+&gt; Option 2 is also unacceptable in all but the simplest of cases:  In
+&gt; many cases doing your own locking will involve a greater performance
+&gt; loss than using a real database, and if you get the locking wrong you
+&gt; either leave some transactions unprotected (see option 1) or cause
+&gt; deadlocks.
+&gt; 
+&gt; Option 3 is simple:  You get concurrency issues solved "for free", the
+&gt; code doesn't cost any more, and in all likelihood your performance loss
+&gt; is less than what you'd end up with if you handled your own locking.
+&gt; 
+&gt; As it happens, the rider above that option two can be acceptable in
+&gt; the simplest of cases is often true for web site backends, which often
+&gt; don't stress databases all that much.  However, if you ever find that a
+&gt; single form submission from a user results in more than one discrete
+&gt; SQL operation being processed by the backend, you run the risk of presenting
+&gt; the user with worthless and wrong information at best, and corrupting
+&gt; the structure of your database at worst.
+&gt; 
+&gt; [ and yes, carlo, you probably know this stuff already; many other readers
+&gt;   probably don't, though. ]
+&gt; 
+&gt;     - mark
+&gt; 
+&gt; --------------------------------------------------------------------
+&gt; I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+&gt;      but it hurt when I walked.                          Mark Newton
+&gt; ----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+Carlo Mattiazzo
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,136 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Routing and mgetty problem" -->
+<!-- FromName="'Andrew Pullin'" -->
+<!-- FromEmail="andrew@hotspurbgc.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="luv@luv.asn.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 4 Apr 2001 23:59:00 +1000" -->
+<!-- Id="010401c0bd0f$67867cc0$c2de26cb@hotspurbgc.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Routing and mgetty problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Pullin &lt;<I><A HREF="mailto:andrew@hotspurbgc.com.au">andrew@hotspurbgc.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:luv@luv.asn.au">luv@luv.asn.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 4 Apr 2001 23:59:00 +1000
+</PRE>
+<H1>Routing and mgetty problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi All,
+    I am still struggling with my dialins and have narrowed
+it down to a routing problem (I think). The story so far:
+    I have a network that wants a dialin set up running
+RH7.0. The network is connected to Telstra via a modem
+running as ppp0 on ttyS1. The dialin is being set up as ppp1
+on ttyS2. mgetty is doing the work of connecting etc. pap is
+doing the authenticating. What happens is that mgetty
+detects the incoming call and tells the modem to pickup. The
+user then logs on and starts a ppp session. This is all
+confirmed by the logs as happening. There is a nice stable
+login and ppp connection happening. Here is where the
+problem occurs.
+
+    When I do a winipcfg on the dialin machine, it says that
+both the local IP address and the Gateway address is the
+same IP address as the assigned address from the server. I
+cannot ping the server or anything else from the dialin
+machine. Meanwhile on the other end of the connection the
+server says that ppp1 is running with the correctly assigned
+IP address. I can ping it and everything.
+
+    Now obviously the problem has something to do with the
+dialin machine having an IP address and Gateway address that
+is the same, but I am not sure where I am running into
+trouble here. The files I have modified are as follows:
+
+/etc/inittab
+added to <A HREF="file:">file:</A>
+S2:2345:respawn:/sbin/mgetty ttyS2 -s 115200 -n 0
+
+this should start mgetty listening to ttyS2, set the port
+speed at 115200 and answer on 0 rings.
+
+/etc/ppp/options
+auth -chap +pap login modem crtscts debug proxyarp lock
+ms-dns 139.130.4.4
+
+this basically tells the ppp session to authenticate with
+pap and a few other things and set the DNS to 139.130.4.4
+(telstra DNS server)
+
+/etc/ppp/options.ttyS2
+xxx.xxx.218.118:xxx.xxx.218.121
+
+Here is where I suspect there may be part of the problem.
+This is supposed to set the local machine IP address:
+assigned IP address
+
+/etc/mgetty+sendfax/login.config
+/AutoPPP/ -     -       /usr/sbin/pppd auth -chap +pap login
+debug
+
+This actually starts the ppp session with the Windoze box
+
+/etc/ppp/pap-secrets
+#client     server     secret     remote IP addresses
+username * passwd xxx.xxx.218.121
+
+This is supposed to set the password and IP address for the
+user.
+
+The IP address and gateway that winipcfg sees is this last
+address that is set in pap-secrets. If I leave out this
+address then the user gets thrown off the system. I have
+tried to set pap-secrets, and options.ttyS2 with the address
+I want to assign, the server IP address and another address
+in the IP range, but still I get the same problems - no
+forwarding or routing of packets.
+
+    If I tcpdump -n -i ppp1 host xxx.xxx.218.121 I get
+traffic to the interface. If I tcpdump -n -i eth0 host
+xxx.xxx.218.121, I get ZERO traffic.
+
+    O.K. I hope this is enough info for somebody to help
+out. I hope that it is something bleatingly obvious I have
+missed as I am under a little time pressure here. Thanks in
+advance for your help.
+    Cheers!
+        Andrew.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,319 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RedHat errata RHSA-1999:022-01 for Samba has bug" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@adelaide.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 26 Jul 1999 06:01:27 +0000" -->
+<!-- Id="379BF9B7.53A21997@adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RedHat errata RHSA-1999:022-01 for Samba has bug</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@adelaide.edu.au">glen.turner@adelaide.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 26 Jul 1999 06:01:27 +0000
+</PRE>
+<H1>RedHat errata RHSA-1999:022-01 for Samba has bug</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+
+Issue:
+
+Basically, on my RH 6.0 system with all current patches applied
+the update RPM
+
+  samba-2.0.5a-1.i386.rpm
+
+left /etc/inetd.conf and /etc/services without world-readable
+permissions.  This kills most Internet client software (because
+the non-root network client can't read /etc/services to get the
+TCP port number).
+
+
+Bug:
+
+The post-install script fails to set the umask to 022 before touching
+files.  If root has a umask of 027, then files are left unreadable.
+Similarly, if the root umask is 000, then the files will be left
+world-writable, which isn't desirable either.
+
+The philosophy of package management suggests that RPMs should install
+correctly regardless of the root user's current umask.
+
+
+Fix:
+
+  umask 027
+  rpm -Uvh samba-2.0.5a-1.i386.rpm samba-client-2.0.5a-1.i386.rpm
+
+I tried to report this to RedHat on their Bugzilla page, but
+it is down.
+
+-- 
+ Glen Turner                               Network Specialist
+ Tel: (08) 8303 3936          Information Technology Services
+ Fax: (08) 8303 4400         The University of Adelaide  5005
+ Email: <A HREF="mailto:glen.turner@adelaide.edu.au">glen.turner@adelaide.edu.au</A>           South Australia
+Return-Path: &lt;<A HREF="mailto:owner-bugtraq@SECURITYFOCUS.COM">owner-bugtraq@SECURITYFOCUS.COM</A>&gt;
+Received: from lists.securityfocus.com (lists.securityfocus.com [216.102.46.4])
+	by teatree.itd.adelaide.edu.au (8.8.7/8.8.7) with SMTP id NAA23313
+	for &lt;<A HREF="mailto:gturner@TEATREE.ITD.ADELAIDE.EDU.AU">gturner@TEATREE.ITD.ADELAIDE.EDU.AU</A>&gt;; Sat, 24 Jul 1999 13:09:09 +0930
+Received: (qmail 18620 invoked from network); 23 Jul 1999 18:15:09 -0000
+Received: from lists.securityfocus.com (216.102.46.4)
+  by lists.securityfocus.com with SMTP; 23 Jul 1999 18:15:09 -0000
+Received: from LISTS.SECURITYFOCUS.COM by LISTS.SECURITYFOCUS.COM
+          (LISTSERV-TCP/IP release 1.8d) with spool id 129948 for
+          <A HREF="mailto:BUGTRAQ@LISTS.SECURITYFOCUS.COM">BUGTRAQ@LISTS.SECURITYFOCUS.COM</A>; Fri, 23 Jul 1999 11:12:59 -0700
+Approved-By: <A HREF="mailto:aleph1@SECURITYFOCUS.COM">aleph1@SECURITYFOCUS.COM</A>
+Received: from brimstone.netspace.org (128.148.157.143) by
+          lists.securityfocus.com with SMTP; 22 Jul 1999 23:11:48 -0000
+Received: from netspace.org ([128.148.157.6]:2577 "EHLO netspace.org" ident:
+          "TIMEDOUT2") by brimstone.netspace.org with ESMTP id &lt;36983-1984&gt;;
+          Thu, 22 Jul 1999 19:10:23 -0400
+Received: from underground.org (underground.org [209.179.181.153]) by
+          netspace.org (8.8.7/8.8.7) with SMTP id TAA22161 for
+          &lt;<A HREF="mailto:bugtraq@netspace.org">bugtraq@netspace.org</A>&gt;; Thu, 22 Jul 1999 19:10:49 -0400
+Received: (qmail 12017 invoked by uid 500); 23 Jul 1999 00:17:19 -0000
+Received: (qmail 11903 invoked from network); 22 Jul 1999 22:59:56 -0000
+Received: from dfw.nationwide.net (198.175.15.10) by underground.org with SMTP;
+          22 Jul 1999 22:59:56 -0000
+Received: from lists.redhat.com (lists.redhat.com [199.183.24.247]) by
+          dfw.nationwide.net (8.9.3/8.9.3) with SMTP id QAA28064 for
+          &lt;<A HREF="mailto:aleph1@dfw.net">aleph1@dfw.net</A>&gt;; Thu, 22 Jul 1999 16:52:11 -0500 (CDT)
+Received: (qmail 17083 invoked by uid 501); 22 Jul 1999 21:42:42 -0000
+MBOX-Line: From <A HREF="mailto:linux-security-request@redhat.com">linux-security-request@redhat.com</A>  Thu Jul 22 17:42:41 1999
+Delivered-To: <A HREF="mailto:wolff@bitwizard.nl">wolff@bitwizard.nl</A>
+Delivered-To: <A HREF="mailto:r.e.wolff@BitWizard.nl">r.e.wolff@BitWizard.nl</A>
+Mail-Followup-To: <A HREF="mailto:redhat-watch-list@redhat.com">redhat-watch-list@redhat.com</A>, <A HREF="mailto:linux-security@redhat.com">linux-security@redhat.com</A>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+X-Mailer: Mutt 0.95.6us
+X-moderate: yes
+X-Mailing-List: &lt;<A HREF="mailto:linux-security@redhat.com">linux-security@redhat.com</A>&gt; archive/latest/99
+X-Loop: <A HREF="mailto:linux-security@redhat.com">linux-security@redhat.com</A>
+Precedence: list
+Message-ID:  &lt;"wToTG2.0.O94.H1vbt"@lists.redhat.com&gt;
+Date:         Thu, 22 Jul 1999 17:17:19 -0700
+Reply-To: <A HREF="mailto:linux-security@redhat.com">linux-security@redhat.com</A>
+Sender: Bugtraq List &lt;<A HREF="mailto:BUGTRAQ@SECURITYFOCUS.COM">BUGTRAQ@SECURITYFOCUS.COM</A>&gt;
+Comments:     RFC822 error: &lt;W&gt; RESENT-DATE field duplicated. Last occurrence
+              was retained.
+Comments:     RFC822 error: &lt;W&gt; Incorrect or incomplete address field found and
+              ignored.
+Comments:     Resent-From: <A HREF="mailto:linux-security@redhat.com">linux-security@redhat.com</A>
+Comments:     Originally-From: Bill Nottingham &lt;<A HREF="mailto:notting@redhat.com">notting@redhat.com</A>&gt;
+From: <A HREF="mailto:linux-security@redhat.com">linux-security@redhat.com</A>
+Subject:      [linux-security] [RHSA-1999:022-01] New Samba packages available
+X-To:         <A HREF="mailto:bugtraq@NETSPACE.ORG">bugtraq@NETSPACE.ORG</A>
+To: <A HREF="mailto:BUGTRAQ@SECURITYFOCUS.COM">BUGTRAQ@SECURITYFOCUS.COM</A>
+
+---------------------------------------------------------------------
+		   Red Hat, Inc. Security Advisory
+
+Synopsis:	        New Samba packages for Red Hat Linux 4.2, 5.2, 6.0
+Advisory ID:		RHSA-1999:022-01
+Issue date:		1999-07-22
+Updated on:		
+Keywords:		samba smbd nmbd security
+Cross references:	
+---------------------------------------------------------------------
+
+1. Topic:
+
+Samba 2.0.5a has been released. Among the fixes in this release
+are several security issues present in previous Samba releases.
+
+2. Bug IDs fixed:
+
+1321 2557 2625 2779 2923 2982 3715
+
+3. Relevant releases/architectures:
+
+Red Hat Linux 6.0, all architectures
+
+Red Hat Linux 5.2, all architectures
+
+Red Hat Linux 4.2, all architectures
+
+4. Obsoleted by:
+
+5. Conflicts with:
+
+The smbmount code shipped with Samba 2.0 is not compatible
+with the Linux 2.2 kernel, so it has not been built for
+the Red Hat Linux 4.2 and 5.2 releases. If support for
+the 2.2 kernel is needed under Red Hat Linux 4.2 or 5.2,
+the source RPM can be rebuilt with the following command line
+(RPM version 3.0 is required):
+
+rpm --define "KERN22 yes" --rebuild samba-2.0.5a-&lt;release&gt;.src.rpm
+
+6. RPMs required:
+
+Red Hat Linux 6.0:
+
+Intel: <A HREF="ftp://updates.redhat.com/6.0/i386/">ftp://updates.redhat.com/6.0/i386/</A>
+	samba-2.0.5a-1.i386.rpm
+	samba-client-2.0.5a-1.i386.rpm
+
+Alpha: <A HREF="ftp://updates.redhat.com/6.0/alpha/">ftp://updates.redhat.com/6.0/alpha/</A>
+	samba-2.0.5a-1.alpha.rpm
+	samba-client-2.0.5a-1.alpha.rpm
+
+Sparc: <A HREF="ftp://updates.redhat.com/6.0/sparc/">ftp://updates.redhat.com/6.0/sparc/</A>
+	samba-2.0.5a-1.sparc.rpm
+	samba-client-2.0.5a-1.sparc.rpm
+
+Source: <A HREF="ftp://updates.redhat.com/6.0/">ftp://updates.redhat.com/6.0/</A>
+	samba-2.0.5a-1.src.rpm
+
+Red Hat Linux 5.2:
+
+Intel: <A HREF="ftp://updates.redhat.com/5.2/i386/">ftp://updates.redhat.com/5.2/i386/</A>
+	samba-2.0.5a-0.5.2.i386.rpm
+	samba-client-2.0.5a-0.5.2.i386.rpm
+
+Alpha: <A HREF="ftp://updates.redhat.com/5.2/alpha/">ftp://updates.redhat.com/5.2/alpha/</A>
+	samba-2.0.5a-0.5.2.alpha.rpm
+	samba-client-2.0.5a-0.5.2.alpha.rpm
+
+Sparc: <A HREF="ftp://updates.redhat.com/5.2/sparc/">ftp://updates.redhat.com/5.2/sparc/</A>
+	samba-2.0.5a-0.5.2.sparc.rpm
+	samba-client-2.0.5a-0.5.2.sparc.rpm
+
+Source: <A HREF="ftp://updates.redhat.com/5.2/">ftp://updates.redhat.com/5.2/</A>
+	samba-2.0.5a-0.5.2.src.rpm
+
+Red Hat Linux 4.2:
+
+Intel: <A HREF="ftp://updates.redhat.com/4.2/i386/">ftp://updates.redhat.com/4.2/i386/</A>
+	samba-2.0.5a-0.4.2.i386.rpm
+	samba-client-2.0.5a-0.4.2.i386.rpm
+
+Alpha: <A HREF="ftp://updates.redhat.com/4.2/alpha/">ftp://updates.redhat.com/4.2/alpha/</A>
+	samba-2.0.5a-0.4.2.alpha.rpm
+	samba-client-2.0.5a-0.4.2.alpha.rpm
+
+Sparc: <A HREF="ftp://updates.redhat.com/4.2/sparc/">ftp://updates.redhat.com/4.2/sparc/</A>
+	samba-2.0.5a-0.4.2.sparc.rpm
+	samba-client-2.0.5a-0.4.2.sparc.rpm
+
+Source: <A HREF="ftp://updates.redhat.com/4.2/">ftp://updates.redhat.com/4.2/</A>
+	samba-2.0.5a-0.4.2.src.rpm
+
+7. Problem description:
+
+Several security issues were present in earlier samba releases.
+- a denial-of-service attack could be performed against nmbd.
+- a buffer overflow was present in the message service in smbd
+  (not enabled by default under Red Hat Linux)
+- a race condition was present in smbmnt that could cause problems
+  if installed setuid root (it is not installed setuid root by
+  default under Red Hat Linux 6.0, and is not present under Red
+  Hat Linux 4.2 or 5.2)
+
+Thanks go to Olaf Kirch (<A HREF="mailto:okir@caldera.de">okir@caldera.de</A>) for discovering the
+security holes, as well as the Samba team.
+
+8. Solution:
+
+Install the updated RPMs, and restart the affected services by
+running:
+
+/etc/rc.d/init.d/smb restart
+
+For each RPM for your particular architecture, run:
+
+rpm -Uvh &lt;filename&gt;
+
+where filename is the name of the RPM.
+
+9. Verification:
+
+MD5 sum                           Package Name
+--------------------------------------------------------------------------
+5167d97fb2f0949991555a3b8e86d509  samba-2.0.5a-1.i386.rpm
+969d609925bc09f9c113907124828dc6  samba-client-2.0.5a-1.i386.rpm
+d8091f3fa0aeda8febf3553d5b92f53f  samba-2.0.5a-1.alpha.rpm
+99f334ef87347877d1b79d4801044547  samba-client-2.0.5a-1.alpha.rpm
+58b1afe4c81028435e6cad1325d4bbee  samba-2.0.5a-1.sparc.rpm
+6e3939fcebba7ace639b766b1cf36cab  samba-client-2.0.5a-1.sparc.rpm
+5c87d78148a8a224e5f89e5dce9af1ae  samba-2.0.5a-1.src.rpm
+
+6ce227464edc1e79cf4433ede6d18c05  samba-2.0.5a-0.5.2.i386.rpm
+0f8d4c9606af2fd809c55a6dd3f9beae  samba-client-2.0.5a-0.5.2.i386.rpm
+cb51e889747ed1786996323863f64868  samba-2.0.5a-0.5.2.alpha.rpm
+f82cfb4807fa9399005a03d6dd65dca5  samba-client-2.0.5a-0.5.2.alpha.rpm
+d56551d53be6928556bb58517f265e9f  samba-2.0.5a-0.5.2.sparc.rpm
+371f7de9553d9c86c4b62d2a92c84bf0  samba-client-2.0.5a-0.5.2.sparc.rpm
+e411e3c19d19ab89d35e834c7d379589  samba-2.0.5a-0.5.2.src.rpm
+
+c5d267fc6b47a84f0571f0ce1a7a15aa  samba-2.0.5a-0.4.2.i386.rpm
+3d07e39245cdc5d8aa0ba8d50e6178f1  samba-client-2.0.5a-0.4.2.i386.rpm
+f3db3e6f607afbd861610570154fd19d  samba-2.0.5a-0.4.2.alpha.rpm
+7972cf576734d1b006258a8ca02c80ff  samba-client-2.0.5a-0.4.2.alpha.rpm
+c44a4c13f171f31686d91da3b8370311  samba-2.0.5a-0.4.2.sparc.rpm
+a6c235a206349e347dfe35ac0064d901  samba-client-2.0.5a-0.4.2.sparc.rpm
+0c326cb2a2b0964026d286fb5f6b8079  samba-2.0.5a-0.4.2.src.rpm
+
+These packages are PGP signed by Red Hat Inc. for security.  Our key
+is available at:
+
+<A HREF="http://www.redhat.com/corp/contact.html">http://www.redhat.com/corp/contact.html</A>
+
+You can verify each package with the following command:
+
+rpm --checksig  &lt;filename&gt;
+
+If you only wish to verify that each package has not been corrupted or
+tampered with, examine only the md5sum with the following command:
+
+rpm --checksig --nopgp &lt;filename&gt;
+
+10. References:
+	&lt;19990721023513Z12865037-4222+<A HREF="mailto:1570@samba.anu.edu.au">1570@samba.anu.edu.au</A>&gt;
+
+--
+----------------------------------------------------------------------
+Please refer to the information about this list as well as general
+information about Linux security at <A HREF="http://www.aoy.com/Linux/Security.">http://www.aoy.com/Linux/Security.</A>
+----------------------------------------------------------------------
+
+To unsubscribe:
+  mail -s unsubscribe <A HREF="mailto:linux-security-request@redhat.com">linux-security-request@redhat.com</A> &lt; /dev/null
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

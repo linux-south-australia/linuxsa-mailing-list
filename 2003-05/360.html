@@ -1,0 +1,246 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Ricoh and Gestetner scan routers in Linux" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="linuxcpa@netscape.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="Daryl.Tester@iocane.com.au" -->
+<!-- Date="Sun, 11 May 2003 14:14:40 -0700" -->
+<!-- Id="3EBEBD40.4040604@netscape.net" -->
+<!-- Reference="NEEGJIEEHILAAIJOHBBDCEAHCAAA.davidf@parachilna.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Ricoh and Gestetner scan routers in Linux</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:linuxcpa@netscape.net">linuxcpa@netscape.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  Date: Sun, 11 May 2003 14:14:40 -0700
+</PRE>
+<H1>Re: Ricoh and Gestetner scan routers in Linux</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Well, proftpd worked!!!   :-)  
+<A HREF="http://www.morton2001.org/LinuxFirstRichoeScanClient.pdf">http://www.morton2001.org/LinuxFirstRichoeScanClient.pdf</A>
+<A HREF="http://www.geocities.com/Colosseum/Bench/7484/gooooal.wav">http://www.geocities.com/Colosseum/Bench/7484/gooooal.wav</A>
+
+Pardon me if I am a bit happy....this is well, unbelievable.... and if I 
+didn't have the help I received from you all, this could not have happened.
+
+What a team. I am truely thankful.
+
+*******************************************************************************************************************
+
+Overview of the process again:  User scans document, the document is 
+delivered to the scan server(I just reverse engineered that), and then 
+the workstation retrieves the document from the server.
+
+ From where I left off:
+
+1. installed proftpd on a SuSE 8.1 though apt get  "apt-get install proftpd"
+2. Modified the proftpd.conf file so that it listened on port 3670, 
+accepted anonymous users without restriction and made the ftp directory 
+writable.
+3. Copied over the following files onto a floppy and brought over to my 
+SuSE 8.2 machine:   
+
+    /etc/proftpd.conf
+    /etc/init.d/proftpd
+   /usr/sbin/proftpd
+
+4. Made a symbolic link from /etc/init.d/proftpd to /usr/sbin/rcproftpd
+5. I noticed that the service showed as available in the run level 
+editor in the yast control center after I copied over /etc/init.d/proftpd.
+I set this to start at run levels 3 & 5 and restarted the service
+6. I ftp'd to the new set up configuration and tested the availability 
+of port 3670. I logged in the way that Daryl Tester wrote how to and it 
+worked.
+7. I tested all of the commands and found that I could not mkdir, so I 
+have to set write permissions in /srv/ftp. (I know I have to rethink this)
+
+Now to do this on Mandrake where I have my server, and then set up the 
+clients for this server.
+
+Boy am I happy!!!!
+
+James Leone
+
+
+
+
+
+
+
+
+I have to work ion security, and make the whole client available. It 
+fits on a floppy disk, and will be made available for download after I 
+can repeat at another machine. I will also document what I did.
+
+
+
+
+
+
+
+<A HREF="mailto:linuxcpa@netscape.net">linuxcpa@netscape.net</A> wrote:
+
+&gt; Daryl Scribed:
+&gt;
+&gt;&gt; James Leone wrote:
+&gt;&gt;
+&gt;&gt;  
+&gt;&gt;
+&gt;&gt;&gt;&gt; I also plan on opening up an ftp session from a Linux box to the 
+&gt;&gt;&gt;&gt; windows
+&gt;&gt;&gt;&gt; box to see if I can learn anything there.
+&gt;&gt;&gt;
+&gt;&gt;&gt;   
+&gt;&gt;
+&gt;&gt;
+&gt;&gt; This should be doable.  If you run the standard FTP client under Linux,
+&gt;&gt; just issue "ftp" on its own from the command line, then at the ftp 
+&gt;&gt; prompt
+&gt;&gt; enter "open w2k_server_name 3670", then enter the anonymous username and
+&gt;&gt; whatever for a password (which it should accept, otherwise you'll 
+&gt;&gt; have to
+&gt;&gt; sniff the exact password).
+&gt;&gt;
+&gt;&gt;  
+&gt;&gt;
+&gt;&gt;&gt;&gt; I opened an ftp session from another
+&gt;&gt;&gt;&gt; box to my Linux machine and tried the command CWD and it errored out,
+&gt;&gt;&gt;&gt; but when I ran cd it worked.  Do I need to worry about this?
+&gt;&gt;&gt;
+&gt;&gt;&gt;   
+&gt;&gt;
+&gt;&gt;
+&gt;&gt; No.  "cd the FTP command" is translated to "CWD the FTP protocol 
+&gt;&gt; command".
+&gt;&gt; As a _user_, you're not supposed to know those underlying details.  
+&gt;&gt; It's the
+&gt;&gt; same with retrieving the file, you're not supposed to know about the 
+&gt;&gt; PORTs
+&gt;&gt; and RETRs that go on.
+&gt;&gt;
+&gt;&gt; So your first session looks like the following from a *client* point of
+&gt;&gt; view (broken up to look a bit more functional).  You should be able to
+&gt;&gt; replicate this by ftp'ing to the windows server yourself.  Note that
+&gt;&gt; there is a lot of redundant commands in there.
+&gt;&gt;
+&gt;&gt; ftp win2kserver
+&gt;&gt; user anonymous
+&gt;&gt; pass *
+&gt;&gt;  
+&gt;&gt;
+&gt; Thank you for your help with this Daryl. :-)   Everybody thus far.   :-)
+&gt;
+&gt;
+&gt; I can confirm that ftp from a Linux client to the Win2k server, on 
+&gt; port 3670, was able to log in sucessfully and sucessfully perform the 
+&gt; tasks as outlined up to where the astricks are. I stopped there to go 
+&gt; back to the task of getting proftpd to listen on port 3670.
+&gt;
+&gt; :-)
+&gt;
+&gt; Getting warmer.....almost there....
+&gt;
+&gt; JL
+&gt;
+&gt;&gt; cd /
+&gt;&gt; bin
+&gt;&gt; get serverstatus
+&gt;&gt;  
+&gt;&gt;
+&gt; *********************************
+&gt;
+&gt;&gt; cd /
+&gt;&gt; bin
+&gt;&gt; get serveroption
+&gt;&gt;
+&gt;&gt; cd /Version
+&gt;&gt; bin
+&gt;&gt; get D000074756b8f.ver
+&gt;&gt;
+&gt;&gt; cd /Address
+&gt;&gt; bin
+&gt;&gt; get D000074756b8f.12.grp
+&gt;&gt;
+&gt;&gt; cd /Address
+&gt;&gt; bin
+&gt;&gt; get D000074756b8f.12.dst
+&gt;&gt;
+&gt;&gt; cd /Address
+&gt;&gt; bin
+&gt;&gt; get D000074756b8f.12.snd
+&gt;&gt;
+&gt;&gt; quit
+&gt;&gt;
+&gt;&gt; === Second session ===
+&gt;&gt;
+&gt;&gt; Putting files onto the server.   Incoming fax or scan?  The put of
+&gt;&gt; the file ".end" looks to be just a flag to indicate that the process
+&gt;&gt; has completed.
+&gt;&gt;
+&gt;&gt;
+&gt;&gt; ftp win2kserver
+&gt;&gt; user anonymous
+&gt;&gt; pass *
+&gt;&gt;
+&gt;&gt;
+&gt;&gt; cd /d000074756b8f
+&gt;&gt; mkdir 20030509212604019
+&gt;&gt; cd 20030509212604019
+&gt;&gt; bin
+&gt;&gt; put page1
+&gt;&gt; bin
+&gt;&gt; put docinfo.xml
+&gt;&gt; bin
+&gt;&gt; put .end
+&gt;&gt; quit
+&gt;&gt;
+&gt;&gt;
+&gt;&gt;
+&gt;&gt;  
+&gt;&gt;
+&gt;
+&gt;
+
+-- 
+Your favorite stores, helpful shopping tools and great gift ideas. 
+Experience the convenience of buying online with <A HREF="mailto:Shop@Netscape">Shop@Netscape</A>! 
+<A HREF="http://shopnow.netscape.com/">http://shopnow.netscape.com/</A>
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

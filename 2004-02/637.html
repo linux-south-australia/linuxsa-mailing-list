@@ -1,0 +1,105 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Boosting NFS performance (bottlenecks?)" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="rsharpe@richardsharpe.com" -->
+<!-- ToName="'David de Groot'" -->
+<!-- ToEmail="david@viking.org.au" -->
+<!-- Date="Wed, 11 Feb 2004 22:47:23 -0800 (PST)" -->
+<!-- Id="Pine.LNX.4.44.0402112238110.9608-100000@durable" -->
+<!-- Reference="59CA982E-5D25-11D8-A680-003065FAEBB6@viking.org.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Boosting NFS performance (bottlenecks?)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:rsharpe@richardsharpe.com">rsharpe@richardsharpe.com</A></I>&gt;
+  To  : David de Groot &lt;<I><A HREF="mailto:david@viking.org.au">david@viking.org.au</A></I>&gt;
+  Date: Wed, 11 Feb 2004 22:47:23 -0800 (PST)
+</PRE>
+<H1>Re: Boosting NFS performance (bottlenecks?)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, 12 Feb 2004, David de Groot wrote:
+
+&gt; 
+&gt; On 12/02/2004, at 4:20 PM, Ryan Verner wrote:
+&gt; 
+&gt; &gt; On 12/02/2004, at 4:33 PM, John Edwards wrote:
+&gt; &gt;&gt; You probably want to set this to 9000 if the driver on each end 
+&gt; &gt;&gt; allows it.
+&gt; &gt;
+&gt; &gt; However, on the OS X machine:
+&gt; &gt;
+&gt; &gt; # ifconfig en0 mtu 9000
+&gt; &gt; ifconfig: ioctl (set mtu): Invalid argument
+&gt; &gt;
+&gt; &gt; However, trying 1500 or below works perfectly without any error.
+&gt; &gt;
+&gt; &gt; Looks like OS X doesn't want you to use a mtu that high; d'oh.
+&gt; 
+&gt; I'm guessing at least some Apple Nic's/drivers support it, because the 
+&gt; manual ethernet settings under Network Preferences (on Panther anyway), 
+&gt; have a Jumbo option for mtu size (9000), but it's greyed out on my 
+&gt; iBook.
+
+Another thing to look at is the window size offered by OS X. If this is 
+not large enough, that will cause you problems.
+
+On my FreeBSD 4.3 system, 'sysctl -a | grep tcp' shows that 
+net.inet.tcp.recvspace is 16384. This sets the default window size, I 
+believe, and that will be too low.
+
+Grab a trace and look at the window size offered by the OS/X system on the 
+connect or in any packet.
+
+With a GigE system connected via crossover, your round trip time is going 
+to be somewhere above 200us I believe (because of interrupt latency when 
+you are doing interrupt mitigation and processing overheads etc), so the 
+delay bandwidth product is going to be at least 25kB, so you want a window 
+size at least that. However, the best way to figure your round trip time 
+will be to look at a capture taken from the OS/X system and see what it 
+is.
+
+We use adaptive coalescing of interrupts, where at low packet rates, we 
+pull the coalescing delay down to 20 or so us to improve latency, while at 
+higher utilization we increase the coalescing delay out to 200 or more us.
+
+Regards
+-----
+Richard Sharpe, rsharpe[at]richardsharpe.com, rsharpe[at]samba.org, 
+sharpe[at]ethereal.com, <A HREF="http://www.richardsharpe.com">http://www.richardsharpe.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

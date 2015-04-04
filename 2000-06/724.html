@@ -1,0 +1,140 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PHP3 bug (apparently)" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="Carlo" -->
+<!-- ToEmail="carlo@active-ideas.com.au" -->
+<!-- Date="Fri, 23 Jun 2000 12:19:20 +0930" -->
+<!-- Id="20000623121920.A6106@dog.topology.org" -->
+<!-- Reference="3952B314.F4CB9173@active-ideas.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PHP3 bug (apparently)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : Carlo &lt;<I><A HREF="mailto:carlo@active-ideas.com.au">carlo@active-ideas.com.au</A></I>&gt;
+  Date: Fri, 23 Jun 2000 12:19:20 +0930
+</PRE>
+<H1>Re: PHP3 bug (apparently)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, Jun 23, 2000 at 11:15:08AM +1030, Carlo wrote:
+&gt; 
+&gt; I have used arrays in functions with no problems (not that I have
+&gt; noticed).
+&gt; 
+&gt; Why dont you post your code, mabey we can copywri.. uh .. umm... I mean
+&gt; see if anything is wrong.
+
+Source in mailing lists is never popular.
+Not with me anyway.
+But I'll append an example.
+
+Cheers,
+Alan Kennington.
+
+x1.php3
+==================================================================
+&lt;?php
+// wwwe/x1.php3   23 June 2000   Alan Kennington.
+
+// These tables don't seem to be accessible from within functions!
+$month_offset0 = array(
+    0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334
+    );
+$month_offset1 = array(
+    0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335
+    );
+
+// Find the position of a day within a financial year.
+// This function doesn't seem to be able to access global array elements.
+function fy_doy($year, $month, $day, &$fy, &$fy_length, &$doy, &$doy_left) {
+    $month1 = $month - 1;
+    if ($month1 &lt;= 5) {
+        $fy = $year;
+        if (($year % 4) == 0) {
+            // Leap year.
+            $fy_length = 366;
+            $doy = $month_offset1[$month1] + $day + 184;
+            $mo = $month_offset1[$month1];
+            }
+        else {
+            // Non-leap year.
+            $fy_length = 365;
+            $doy = $month_offset0[$month1] + $day + 184;
+            $mo = $month_offset0[$month1];
+            }
+        $doy_left = $fy_length - $doy;
+        }
+    else {
+        $fy = $year + 1;
+        $doy = $month_offset0[$month1] + $day - 181;
+        $mo = $month_offset0[$month1];
+        // If next year is leap...
+        if (($fy % 4) == 0)
+            $fy_length = 366;
+        else
+            $fy_length = 365;
+        $doy_left = $fy_length - $doy;
+        }
+    echo("&lt;br&gt;mo = $mo, y = $year, m = $month, d = $day, f = $fy, l = $fy_length, d = $doy, l = $doy_left\n");
+    }
+echo("&lt;html&lt;head&gt;&lt;title&gt;x1&lt;/title&gt;&lt;/head&gt;&lt;body&gt;");
+fy_doy(2000, 7, 1, $fy, $fy_length, $doy, $doy_left);
+
+echo("&lt;br&gt;fy = $fy&lt;br&gt;fy_length = $fy_length
+&lt;br&gt;doy = $doy&lt;br&gt;doy_left = $doy_left&lt;/body&gt;&lt;/html&gt;");
+?&gt;
+==================================================================
+
+The output to my browser looks like this:
+
+------------------------------------------------------------------
+mo = , y = 2000, m = 7, d = 1, f = 2001, l = 365, d = -180, l = 545 
+fy = 2001
+fy_length = 365 
+doy = -180
+doy_left = 545
+------------------------------------------------------------------
+
+The array access is clearly undefined.
+The PHP version is php-3.0.15, and the server 
+version is Apache/1.3.12.
+OS (irrelevant) is 2.0.36 kernel with RH 5.2.
+
+++++++++++++++++++++++++++++++++++++++++++++++
+PS. I admit that the php3 demo program is not minimal.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

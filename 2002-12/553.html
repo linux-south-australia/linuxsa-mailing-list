@@ -1,0 +1,106 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Can a umask be set on a user without Shell Access" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="mselge@hansenyuncken.com.au" -->
+<!-- Date="Wed, 11 Dec 2002 13:56:58 +1030" -->
+<!-- Id="3DF6B082.9030206@aarnet.edu.au" -->
+<!-- Reference="002501c2a0ad$304fd5c0$bf5391a2@HYSA" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Can a umask be set on a user without Shell Access</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:mselge@hansenyuncken.com.au">mselge@hansenyuncken.com.au</A></I>&gt;
+  Date: Wed, 11 Dec 2002 13:56:58 +1030
+</PRE>
+<H1>Re: Can a umask be set on a user without Shell Access</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Michael Selge wrote:
+&gt; I'm hoping there is a way to set a umask for a user that has no Shell
+&gt; access.
+&gt; The user is a member of the "intranet" publishing group but has no a
+&gt; /bin/true shell.
+&gt; 
+&gt; They access the Intranet Files and folders by a SAMBA share. I've used
+&gt; setgid on the root intranet folder, so that all files created there are
+&gt; owned by the group "intranet", but I want the files that these non-shell
+&gt; users create, to have Write permissions for other members of the intranet
+&gt; publishing group.
+&gt; 
+&gt; Is there is a better way this can be achieved.
+
+[intranet]
+  force user=apache
+  force group=intranet
+  force create mode=0662
+  force directory mode=0775
+
+Note the need for "apache" to have read/write access to
+the files if you want Apache's mod_dav to work as well as
+Samba.  mod_dav runs as the not-at-all special "apache" user
+
+I'd suggest using DAV rather than Samba to maintain a web site,
+as you get locking (more like a RCS lock than a file lock, a
+way of indicating that you are going to update the file).
+
+There's getting to be some very nice tools.
+
+DAV can create symlinks and write CGI files, Samba can't.
+
+If you enable "index.asis" files either can do a Redirect.
+
+Both can create .htaccess files.  You might want to supply
+a library of access control files rather than rely on
+users getting the syntax right.  They can them symlink
+to the appropiate file in the library.
+
+If you're going to use DAV then only allow DAV over SHTTP,
+otherwise you'll get plain text passwords.  DreamWeaver
+won't do DAV over SHTTP, although the documentation
+says it does.
+
+DAV used to be a user interface nightmare.  But Windows'
+web folders seem to have addressed most of that.
+
+-- 
+  Glen Turner                (08) 8303 3936 or +61 8 8303 3936
+  Australian Academic and Research Network   www.aarnet.edu.au
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

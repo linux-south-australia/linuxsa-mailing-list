@@ -1,0 +1,226 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Getting Promise Fastrack Raid controller to work under Redhat Lin ux as primary boot device" -->
+<!-- FromName="Tarek Heiland" -->
+<!-- FromEmail="tarek@bakas.com.au" -->
+<!-- ToName="Tarek Heiland" -->
+<!-- ToEmail="tarek@bakas.com.au" -->
+<!-- Date="Wed, 14 Jun 2000 18:22:10 +0930" -->
+<!-- Id="55FC8B9A5F40D3119B460090278A30310EF1A7@ADELAIDENEW1" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Getting Promise Fastrack Raid controller to work under Redhat Lin ux as primary boot device</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Tarek Heiland &lt;<I><A HREF="mailto:tarek@bakas.com.au">tarek@bakas.com.au</A></I>&gt;
+  To  : Tarek Heiland &lt;<I><A HREF="mailto:tarek@bakas.com.au">tarek@bakas.com.au</A></I>&gt;
+  Date: Wed, 14 Jun 2000 18:22:10 +0930
+</PRE>
+<H1>Getting Promise Fastrack Raid controller to work under Redhat Lin ux as primary boot device</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+This email I wrote as a bit of an instruction manual to myself.
+
+There has been a lot of talk about patching the Promise Ultra 66 to make it
+a Fasttrak 66. e.g. slashdot, tomshardware etc. The logical progression is
+to get it going under linux with a current kernel. This is where things got
+real fun, especially when lilo would not write the MBR to make linux
+bootable on my hardware. (lilo appears to do its thing but no boot , not
+even a lone l)
+
+Might as well post it to save others all the hassles involved, especially if
+like me lilo will not correctly write the MBR on the system.
+
+These steps are not for the faint hearted, and you will be using Beta,
+experimental and anything in between drivers. Lilo may not work and you will
+need to #%!@#%@#$ around with loadlin and a bootstrap DOS partition.
+
+My config is IDE mirror (2 x 20 GB Fujitsu) on a MSI 6163 PRO M/B and
+Celeron 500, Trident 975 PCI NIC (so I can Overclock without having to worry
+about AGP timing), Intel pro 100 NIC, 128MB PC133 RAM + CD-rom on primary
+master M/B IDE controller
+
+I have it all working now !!!! (2.2.15 kernel)  The Drives are in UDMA 66
+mode and it runs. I have successfully removed a mirrored drive and have had
+it continue working. Rebuilding 20 GB mirror takes a while though!
+
+Have not yet explored Raid -&gt; Linux HDD fail notification signal .
+
+This makes basically a linux system bootable straight off the mirror using a
+small mirrored loadlin dos partition to bootstrap the linux system.
+
+It was a bit of a drama (i.e. one whole days worth but it runs beautifully
+now)
+
+Things you will need!
+	a) Time 
+	b) Internet access - you will be relying on driver downloads/patches
+etc
+	c) A win98 Boot disk
+	d) A Redhat 6.0 CD-ROM (&lt; 6 won't work and my 6.1 also failed)
+	e) The actual hardware you are going to use
+	f) Your Brain
+
+Steps 1-3 only if you are doing the Patch thing on an Ultra 66 controller
+
+1. Obtain and get a Promise Ultra 66 IDE controller
+2. Flash it with the latest Fasttrak Bios (current stable 1.20)
+3. Solder 100R resistor from pin 23 to gnd (Sandwich with screw to
+backplane)
+
+(This I have done numerous times without issues for Win x Flavours. I also
+have a REAL commercial Fasttrack to compare against)
+
+4. Install RAID controller in system, and configure drive array in Bios  (No
+dramas here)
+	 Forget about trying to run a normal CD-rom RH install, it will not
+work, as there is no support for the IDE controller.
+5. Boot from Win98 boot disk, use Fdisk and create a small DOS partition
+(mine is 24 MB FAT 12). 
+	This is a really necessary step to make it bootable as you will have
+some real fun with Fdisk in Linux on this controller.. (make this partition
+active) (I have played with latest LILO and various compile options without
+avail) 
+
+	Reboot of floppy and format this partition.
+	 Make sure it is bootable!
+
+(An ASIDE
+You may dislike MS, but putting a mini bootable DOS partition on any system
+like this is a great idea as you can use it for
+	a) Keeping DOS Flash, NIC setup etc utilities handy
+	b) Keeping copies of backup Kernel images and Loadlin
+	c) Getting access to CD-ROM for small files 
+etc)
+
+
+6. Go to www.promise.com and download the Beta drivers and rawwrite a boot
+disk
+   You now require a Redhat 6.0 CD (my 6.1 one did not work and hung after
+CD detection)
+   Boot from this floppy, press enter at boot prompt
+  Select 1 as the first boot
+
+7. Redhat installation should now start
+	Partition drives as minimum
+		Small Dos created at step 5 (mine is 24MB Fat 12 for
+loadlin, flash utilities etc - absolutely required as lilo will not work - I
+also mount as /dos)
+		A Boot partition (to make sure there are no 1024 cyl issues)
+		A swap partition
+		Your / partition + any more you would like.
+	You can in dual boots of course have the DOS any size you like and
+any FAT flavour.
+		
+		
+   continue as per normal but at set time zone , shell out (Alt-F2 and run
+./cpu66) this copies files from floppy to /root
+   shell back and keep going as normal
+
+8. It will crash and burn when it trys to run.
+9. Reboot off floppy and at boot type
+	"rescue root=/dev/hdxx initrd=initrd.img" 
+		xx=your root mount point mine is /dev/hde7 
+at prompt select 2 for second boot
+
+This will get you into system	
+	the kernel running has nothing going on it (i.e. you cannot mount
+VFAT or any other partition types which is a real BUGGER!$#@$)
+
+Make sure you have mtools installed, if not install it of Redhat CD (mount
+-t iso9660 /dev/cdrom /mnt/cdrom will work thank God!)
+
+In root run 
+	sh setup-u66
+this file is what is copied over with the cpu66 command. It copies the
+loadable module into the system and creates a new initrd using mkinitrd +
+preloads the IDE module.
+
+Now copy from /boot the active vmlinuz and initrd files.
+
+10. Prepare DOS partition
+
+	a) Copy Files from Win 98 boot floppy to the DOS Partition
+	b) Modify the Files Autoexec.bat, setramd.bat to point to C: instead
+of A:
+	c) Modify config.sys to remove unnecessary drivers (not essential)
+and remove these drivers
+	d) From CD copy Loadlin to DOS partition
+	e) Copy vmlinuz and intrd files from floppy to DOS partition
+	f) In Config.sys and Autoexec.bat insert new option to boot linux
+		Autoexec command will be
+		"loadlin vmlinuz root=/dev/hdxx initrd=initrd" 
+		changing vmlinuz,initrd and hdxx as appropriate to match
+your files and mount point
+	
+11. Reboot of DOS Partition, and start linux 
+12. Linux should boot with proper 6.0 Kernel now (at last)
+
+This gets you basically going. Now you wish to upgrade the Kernel again.
+Have fun, even using the setup-U66 as a guide it refuses to boot.
+
+I have it going with the following way.
+
+13 Copy Kernel source over (I am using 2.2.15)
+14 Obtain IDE patch for Kernel from
+<A HREF="http://www.kernel.org/pub/linux/kernel/people/hedrick/">http://www.kernel.org/pub/linux/kernel/people/hedrick/</A>
+15 Patch Kernel using "patch -p0 &lt;Patch file name&gt;" in directory containing
+the linux-2.2.15 source directory tree
+16 Now recompile Kernel making sure you include the PDC20262 IDE driver
+option (added by patch)
+	+ if you are game the experimental raid option directly beneath it
+(It is called something different but I cannot remember)
+17  Make dep, Make bzImage etc as per usual
+18. Run "mkinitrd /boot/initrd.000 2.2.15 to make a initrd file 
+19. Copy the bzImage and initrd.000 files to the dos partition
+20. Modify autoexec.bat to reflect new Image files (eg "loadlin bzImage
+root=/dev/hdxx initrd=initrd.000)
+
+Reboot and all should be working.
+
+Big sigh of relief allowed now :)
+
+Tarek
+
+	 
+
+____________________________________________________________
+Tarek Heiland			Bakas I.T. Solutions
+Manager			82 Flinders St Adelaide SA 5000 Australia
+B.E. (Mech.) Hons		Ph +61 (08) 8228-8228 Fx +61 (08) 8228-8299
+
+MCP				Email: <A HREF="mailto:tarek@bakas.com.au">tarek@bakas.com.au</A>
+				<A HREF="http://www.bakas.com.au">http://www.bakas.com.au</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,156 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Bind 9 and BPD secondary" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 9 Jun 2001 18:07:21 +0930" -->
+<!-- Id="20010609180721.A8623@dog.topology.org" -->
+<!-- Reference="02a201c0f0b9$608a8280$1602a8c0@internal" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Bind 9 and BPD secondary</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 9 Jun 2001 18:07:21 +0930
+</PRE>
+<H1>Re: Bind 9 and BPD secondary</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sat, Jun 09, 2001 at 05:24:13PM +0930, Steve Sloan wrote:
+&gt; 
+&gt; Just tryed a manual load from Cust data, not sure how long that is going to
+&gt; take.
+[....]
+&gt; I also would like to try a manual transfer except they have taken the
+&gt; transfer program away. Is there another way of doing a manual transfer?  
+
+Steve,
+
+What's the difference between a manual transfer and a manual load?
+They sound like the same thing to me.
+
+When doing these transfers, I'd run tcpdump something like this:
+
+    tcpdump -i ppp0 port 53 and host lns1.telstra.net
+
+That gives some useful clues.
+
+&gt; Just out of interest when I restart Bind 9 I get the following in the log
+&gt; 
+&gt; Jun  9 17:17:03 fs named[5801]: starting BIND 9.1.0 -u named
+&gt; Jun  9 17:17:03 fs named[5801]: using 1 CPU
+&gt; Jun  9 17:17:03 fs named: named startup succeeded
+&gt; Jun  9 17:17:03 fs named[5803]: loading configuration from '/etc/named.conf'
+&gt; Jun  9 17:17:03 fs named[5803]: the default for the 'auth-nxdomain' option
+&gt; is now 'no'
+&gt; Jun  9 17:17:03 fs named[5803]: no IPv6 interfaces found
+&gt; Jun  9 17:17:03 fs named[5803]: listening on IPv4 interface lo, 127.0.0.1#53
+&gt; Jun  9 17:17:03 fs named[5803]: listening on IPv4 interface eth0,
+&gt; x.x.x.x1#53
+&gt; Jun  9 17:17:03 fs named[5803]: listening on IPv4 interface ppp0, x.x.x.x#53
+&gt; Jun  9 17:17:03 fs named[5803]: running
+&gt; 
+&gt; But when I restart bind 8 on my own box I get messages about the secondary
+&gt; being notified and then a transfer so I know it is all working.
+&gt; 
+&gt; Is this normal for Bind 9 or should I be seeing some more messages.
+
+The logging systems of versions 8 and 9 are totally different.
+It all depends on what you've got in the named.conf file.
+
+By the way, most people add this line to their named.conf file
+to get rid of the auth-nxdomain message:
+
+options {
+   // ....
+   auth-nxdomain no; 
+   // ....
+   };
+
+If you want things to be logged, you have to turn them on in the
+logging block.
+
+But really, tcpdump or ethereal packet logging is the way to go.
+Then you will know everything.
+
+It's entirely possible that since the DNS works mostly on UDP,
+the packets may be getting lost in a congested network.
+I suspect that the telstra secondary DNS machine is congesting
+itself due to the excessive number of domains that it is supporting,
+and insufficient bandwidth.
+That's just a guess though.
+
+Cheers,
+Alan Kennington.
+
+PS. Here's a sample tcpdump log, where I have hidden all of the domain names
+by replacing them with zzz.com.
+
+03:30:30.896469 lns1.telstra.net.2714 &gt; dog.topology.org.domain: 14771 SOA? zzz.com (30)
+03:30:30.897867 dog.topology.org.domain &gt; lns1.telstra.net.2714: 14771*- 1/3/1 SOA (173) (DF)
+03:30:40.896458 lns1.telstra.net.2714 &gt; dog.topology.org.domain: 41519 SOA? zzz.com (30)
+03:30:40.897505 dog.topology.org.domain &gt; lns1.telstra.net.2714: 41519*- 1/3/1 SOA (173) (DF)
+03:39:28.986466 lns1.telstra.net.2714 &gt; dog.topology.org.domain: 17769 SOA? zzz.com (27)
+03:39:28.987723 dog.topology.org.domain &gt; lns1.telstra.net.2714: 17769*- 1/3/1 SOA (167) (DF)
+03:48:25.966473 lns1.telstra.net.2714 &gt; dog.topology.org.domain: 36650 SOA? zzz.com (33)
+03:48:25.967740 dog.topology.org.domain &gt; lns1.telstra.net.2714: 36650*- 1/2/1 SOA (150) (DF)
+03:56:37.916465 lns1.telstra.net.2714 &gt; dog.topology.org.domain: 29136 SOA? zzz.com (30)
+03:56:37.917720 dog.topology.org.domain &gt; lns1.telstra.net.2714: 29136*- 1/3/1 SOA (170) (DF)
+04:10:17.836454 lns1.telstra.net.2714 &gt; dog.topology.org.domain: 38804 SOA? zzz.com (27)
+04:10:17.837865 dog.topology.org.domain &gt; lns1.telstra.net.2714: 38804*- 1/3/1 SOA (167) (DF)
+04:46:43.846465 lns1.telstra.net.2714 &gt; dog.topology.org.domain: 56503 SOA? zzz.com (34)
+04:46:43.847886 dog.topology.org.domain &gt; lns1.telstra.net.2714: 56503*- 1/3/1 SOA (174) (DF)
+04:49:38.826459 lns1.telstra.net.2714 &gt; dog.topology.org.domain: 16313 SOA? zzz.com (32)
+04:49:38.827635 dog.topology.org.domain &gt; lns1.telstra.net.2714: 16313*- 1/3/1 SOA (172) (DF)
+04:50:45.826469 lns1.telstra.net.2714 &gt; dog.topology.org.domain: 23018 SOA? zzz.com (27)
+04:50:45.827668 dog.topology.org.domain &gt; lns1.telstra.net.2714: 23018*- 1/3/1 SOA (170) (DF)
+04:54:09.786476 lns1.telstra.net.2714 &gt; dog.topology.org.domain: 50884 SOA? zzz.com (28)
+04:54:09.787773 dog.topology.org.domain &gt; lns1.telstra.net.2714: 50884*- 1/3/1 SOA (168) (DF)
+05:01:07.706472 lns1.telstra.net.2714 &gt; dog.topology.org.domain: 57871 SOA? zzz.com (34)
+05:01:07.707709 dog.topology.org.domain &gt; lns1.telstra.net.2714: 57871*- 1/2/1 SOA (154) (DF)
+05:18:32.626462 lns1.telstra.net.2714 &gt; dog.topology.org.domain: 10535 SOA? zzz.com (30)
+05:18:32.627748 dog.topology.org.domain &gt; lns1.telstra.net.2714: 10535*- 1/3/1 SOA (173) (DF)
+05:22:28.626463 lns1.telstra.net.2714 &gt; dog.topology.org.domain: 36804 SOA? zzz.com (31)
+05:22:28.627589 dog.topology.org.domain &gt; lns1.telstra.net.2714: 36804*- 1/3/1 SOA (174) (DF)
+05:37:37.676460 lns1.telstra.net.2714 &gt; dog.topology.org.domain: 22314 SOA? zzz.com (39) 
+
+If lns1.telstra.net finds a change has occurred when it does one of these
+queries, it should, and usually does, download the whole changed domain.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

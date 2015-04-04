@@ -1,0 +1,229 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: devfs again" -->
+<!-- FromName="'Robyn Manning'" -->
+<!-- FromEmail="rmanning@rebel.net.au" -->
+<!-- ToName="'Darrin Ritter'," -->
+<!-- ToEmail="rittercr@chariot.net.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 26 Nov 2001 01:13:40 +1030" -->
+<!-- Id="200111251441.BAA03741@rebel.net.au" -->
+<!-- Reference="3C00F7A8.3DFCD74E@chariot.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: devfs again</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Robyn Manning &lt;<I><A HREF="mailto:rmanning@rebel.net.au">rmanning@rebel.net.au</A></I>&gt;
+  To  : Darrin Ritter &lt;<I><A HREF="mailto:rittercr@chariot.net.au">rittercr@chariot.net.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 26 Nov 2001 01:13:40 +1030
+</PRE>
+<H1>Re: devfs again</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Darrin
+
+A good place to look would be the Xine mailing list, I found them very 
+helpful as the authors of the various packages involved in Xine and encrypted 
+dvd are active on the mailing list.
+
+Robyn
+
+On Mon, 26 Nov 2001 00:22, Darrin Ritter wrote:
+&gt; Hi
+&gt;
+&gt; I've Been having a great time getting my Linux machine to play DVD's
+&gt; with the Xine player and all has been going well until I wanted to play
+&gt; an encrypted DVD. I have been able to get a copy of Xine that is
+&gt; supposed to play them but the documentation says that i need to have
+&gt; write access to the dvd drive device in order to play them.
+&gt;
+&gt; I am using mandrake 8.1 which uses devfsd and have been able to get it
+&gt; to load a link by adding the lines:
+&gt; #added 25/11/01 for dvd player
+&gt;
+&gt; LOOKUP		^dvd$	CFUNCTION GLOBAL symlink ./ide/host0/bus1/target1/lun0/cd
+&gt; dvd $devpath
+&gt;
+&gt; REGISTER	^./dvd$	CFUNCTION GLOBAL symlink
+&gt; ./ide/host0/bus1/target1/lun0/cd dvd
+&gt;
+&gt; #UNREGISTER	^./dvd$	CFUNCTION GLOBAL unlink dvd
+&gt;
+&gt;
+&gt;
+&gt; but have been un able to modify the permissions with the following line:
+&gt; REGISTER     ^./dvd       PERMISSIONS   root.dvdusers   770
+&gt;
+&gt; I have already created a new group dvdusers and intend to allow the
+&gt; users to be in this group.
+&gt;
+&gt; the main documentation that I have been using is man pages devfsd and
+&gt; devfsd.conf. If anyone is aware of other docs I'd be happy to read them,
+&gt; and If some one is successful in getting the encrypted DVD's to play on
+&gt; MDK 8.1 I'd like to here how the did it.
+&gt;
+&gt; I have included my devfsd.conf file below for comment
+&gt;
+&gt; Regards Darrin Ritter
+&gt;
+&gt; # Sample /etc/devfsd.conf configuration file.
+&gt; # Richard Gooch  &lt;<A HREF="mailto:rgooch@atnf.csiro.au">rgooch@atnf.csiro.au</A>&gt;		3-JUL-2000
+&gt; #
+&gt; # Changes for Mandrake Linux:
+&gt; #
+&gt; # Thierry Vignaud &lt;<A HREF="mailto:tvignaud@mandrakesoft.com">tvignaud@mandrakesoft.com</A>&gt;
+&gt; #	- autoload of modules on inode lookup
+&gt; #	- auto{load,save} of permissions in /var/lib/dev-state/
+&gt; #	- add an example of how to force default
+&gt; #	- more ALSA stuff
+&gt; #	- prevent devfsd to auto{save,load} permissions & ownerships
+&gt; #	  on Unix98 ptys (/dev/pts)
+&gt; #	- handle CD burners too
+&gt; #	- call dynamic scripts on device creation/removal
+&gt;
+&gt; #
+&gt; # Enable full compatibility mode for old device names. You may comment
+&gt; these
+&gt; # out if you don't use the old device names. Make sure you know what
+&gt; you're
+&gt; # doing!
+&gt; REGISTER	.*		MKOLDCOMPAT
+&gt; UNREGISTER	.*		RMOLDCOMPAT
+&gt;
+&gt; # You may comment out the above and uncomment the following if you've
+&gt; # configured your system to use the original "new" devfs names or the
+&gt; really
+&gt; # new names
+&gt; #REGISTER	vc/.*		MKOLDCOMPAT
+&gt; #UNREGISTER	vc/.*		RMOLDCOMPAT
+&gt; #REGISTER	pty/.*		MKOLDCOMPAT
+&gt; #UNREGISTER	pty/.*		RMOLDCOMPAT
+&gt; #REGISTER	misc		MKOLDCOMPAT
+&gt; #UNREGISTER	misc		RMOLDCOMPAT
+&gt;
+&gt; # You may comment these out if you don't use the original "new" names
+&gt; REGISTER	.*		MKNEWCOMPAT
+&gt; UNREGISTER	.*		RMNEWCOMPAT
+&gt;
+&gt; # Enable module autoloading. You may comment this out if you don't use
+&gt; # autoloading
+&gt; LOOKUP		.*		MODLOAD
+&gt;
+&gt; #
+&gt; # Uncomment this if you want permissions to be saved and restored
+&gt; # Do not do this for pseudo-terminal devices
+&gt; REGISTER	^pt[sy]/.*	IGNORE
+&gt; CHANGE		^pt[sy]/.*	IGNORE
+&gt; CREATE		^pt[sy]/.*	IGNORE
+&gt; CHANGE		.*		COPY	$devpath /lib/dev-state/$devname
+&gt; CREATE		.*		COPY	$devpath /lib/dev-state/$devname
+&gt; DELETE		.*		CFUNCTION GLOBAL unlink /lib/dev-state/$devname
+&gt; UNREGISTER	.*		CFUNCTION GLOBAL unlink /lib/dev-state/$devname
+&gt;
+&gt; #
+&gt; # Uncomment this if you want the old /dev/cdrom symlink
+&gt; # (e.g. those specifying CD-ROM type, mouse port, modem port etc)
+&gt; #
+&gt; LOOKUP		^cdrom$		CFUNCTION GLOBAL symlink cdroms/cdrom0 $devpath
+&gt; REGISTER	^cdroms/cdrom0$	CFUNCTION GLOBAL symlink cdroms/cdrom0 cdrom
+&gt; UNREGISTER	^cdroms/cdrom0$	CFUNCTION GLOBAL unlink cdrom
+&gt;
+&gt; #added 25/11/01 for dvd player
+&gt;
+&gt; LOOKUP		^dvd$	CFUNCTION GLOBAL symlink ./ide/host0/bus1/target1/lun0/cd
+&gt; dvd $devpath
+&gt;
+&gt; REGISTER	^./dvd$	CFUNCTION GLOBAL symlink
+&gt; ./ide/host0/bus1/target1/lun0/cd dvd
+&gt; REGISTER     ^./dvd       PERMISSIONS   root.dvdusers   770
+&gt; #UNREGISTER	^./dvd$	CFUNCTION GLOBAL unlink dvd
+&gt;
+&gt;
+&gt;
+&gt; REGISTER	^v4l/video0$	CFUNCTION GLOBAL symlink v4l/video0 video
+&gt; UNREGISTER	^v4l/video0$	CFUNCTION GLOBAL unlink video
+&gt;
+&gt; # ALSA stuff
+&gt; LOOKUP 		snd 		MODLOAD ACTION snd
+&gt; REGISTER 	sound/.*	EXECUTE /sbin/pam_console_apply
+&gt; REGISTER 	snd/.*		EXECUTE /sbin/pam_console_apply
+&gt;
+&gt;
+&gt; # Add Link for dsp & dsp1
+&gt; REGISTER	^sound/dsp0$	CFUNCTION GLOBAL symlink sound/dsp0 dsp
+&gt; UNREGISTER	^sound/dsp0$	CFUNCTION GLOBAL unlink dsp
+&gt;
+&gt;
+&gt;
+&gt; # Manage USB mouse
+&gt; REGISTER	^input/mouse0$	CFUNCTION GLOBAL symlink input/mouse0 usbmouse
+&gt; UNREGISTER	^input/mouse0$	CFUNCTION GLOBAL unlink usbmouse
+&gt;
+&gt; # dynamic desktop and co
+&gt;
+&gt; #REGISTER	.*/part.*	EXECUTE /etc/dynamic/scripts/part.script add
+&gt; $devpath
+&gt; #UNREGISTER	.*/part.*	EXECUTE /etc/dynamic/scripts/part.script del
+&gt; $devpath
+&gt;
+&gt; REGISTER	v4l/video.*	EXECUTE /etc/dynamic/scripts/webcam.script add
+&gt; $devpath
+&gt; UNREGISTER	v4l/video.*	EXECUTE /etc/dynamic/scripts/webcam.script del
+&gt; $devpath
+&gt;
+&gt; REGISTER	usb/scanner.*	EXECUTE /etc/dynamic/scripts/scanner.script add
+&gt; $devpath
+&gt; UNREGISTER	usb/scanner.*	EXECUTE /etc/dynamic/scripts/scanner.script del
+&gt; $devpath
+&gt;
+&gt; REGISTER	usb/rio500	EXECUTE /etc/dynamic/scripts/rio500.script add
+&gt; $devpath
+&gt; UNREGISTER	usb/rio500	EXECUTE /etc/dynamic/scripts/rio500.script del
+&gt; $devpath
+&gt;
+&gt; REGISTER	usb/tts/[13579]	EXECUTE /etc/dynamic/scripts/visor.script add
+&gt; $devpath
+&gt; UNREGISTER	usb/tts/[13579]	EXECUTE /etc/dynamic/scripts/visor.script del
+&gt; $devpath
+&gt;
+&gt;
+&gt; REGISTER	\(usb/\)\?\(lp\|printer\).*	EXECUTE
+&gt; /etc/dynamic/scripts/lp.script add $devpath
+&gt; UNREGISTER	\(usb/\)\?\(lp\|printer\).*	EXECUTE
+&gt; /etc/dynamic/scripts/lp.script del $devpath
+&gt;
+&gt; # devfsd.conf ends here
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

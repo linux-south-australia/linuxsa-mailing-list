@@ -1,0 +1,172 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: networking question" -->
+<!-- FromName="'Michael Kratz'" -->
+<!-- FromEmail="mkratz@internode.on.net" -->
+<!-- ToName="'Andrew Reid'" -->
+<!-- ToEmail="andrew.reid@plug.cx" -->
+<!-- Date="Mon, 26 Nov 2001 15:00:16 +1030" -->
+<!-- Id="" -->
+<!-- Reference="01112609263600.01171@neptune.newworld.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: networking question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Kratz &lt;<I><A HREF="mailto:mkratz@internode.on.net">mkratz@internode.on.net</A></I>&gt;
+  To  : Andrew Reid &lt;<I><A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A></I>&gt;
+  Date: Mon, 26 Nov 2001 15:00:16 +1030
+</PRE>
+<H1>Re: networking question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+----- Original Message -----
+From: "Andrew Reid" &lt;<A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A>&gt;
+To: "Joshua Cowdrey" &lt;<A HREF="mailto:jcowdrey@pcpro.net.au">jcowdrey@pcpro.net.au</A>&gt;
+Cc: &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Sent: Monday, November 26, 2001 10:46 AM
+Subject: Re: networking question
+
+
+&gt; On Mon, Nov 26, 2001 at 09:21:38AM +1030, Joshua Cowdrey wrote:
+&gt;
+&gt; &gt; How do I configure linux for this to work. I don't quite understand the
+theory
+&gt; &gt; behind it all. Do I need to configure eth0 with this new info or do I
+keep the
+&gt; &gt; 192. stuff and just configure the dialup with a 203. static IP or what?
+&gt;
+&gt; * Andrew scratches his head and wonders why anyone would deliberately
+&gt;   signup for a Telstra account *
+&gt;
+&gt; You want to have the IP addresses that Telstra assign you bound to the
+&gt; PPP interface (assuming you've got a dialup connection).
+
+if it is Bigpond Direct which is what it sounds like... you will have been
+assigned 1 static dialup address which should be in the 139.130 range, this
+will be the ip address of your modem/isdn router, this address should get
+assigned automatically when you connect and will have a host name something
+like *****.lnk.telstra.net this address will be automatically bound to the
+ppp interface when you connect... then you can chose to change your network
+to the 203 addresses which will leave your whole network viewable to the
+internet... or you can chose to use the 192.168 address range on your lan
+but you must setup NAT on your linux box. If you use the 203. addresses on
+your lan this may help you... an example of setting up routing.
+
+These ones are aliases bound to eth0
+/sbin/ifconfig eth0:0 203.38.200.x netmask 255.255.255.248 up
+/sbin/ifconfig eth0:1 203.38.200.x netmask 255.255.255.248 up
+/sbin/ifconfig eth0:2 203.38.200.x netmask 255.255.255.248 up
+
+These ones are to allow the LAN which has internet routeable addresses to
+talk to the linux box
+/sbin/route add -net 203.48.x.x netmask 255.255.255.240 dev eth0:2
+/sbin/route add -net 203.48.x.x netmask 255.255.255.240 dev eth0:1
+/sbin/route add -net 203.48.x.x netmask 255.255.255.240 dev eth0
+
+then this is what the routing table looks like
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use
+Iface
+203.48.x.x           *               255.255.255.255 UH    0      0        0
+eth0
+gw.tels.tra.router  *               255.255.255.255 UH    0      0        0
+ppp0
+203.38.200.x       *               255.255.255.248 U     0      0        0
+eth0
+203.48.x.x           *               255.255.255.240 U     0      0        0
+eth0
+203.48.x.x           *               255.255.255.240 U     0      0        0
+eth0
+203.48.x.x           *               255.255.255.240 U     0      0        0
+eth0
+203.48.x.x           *               255.255.255.240 U     0      0        0
+eth0
+127.0.0.0             *               255.0.0.0             U     0      0
+0 lo
+default         gw.tels.tra.router 0.0.0.0                UG    0      0
+0 ppp0
+
+NOTE this is dealing with 2 ip address ranges assigned by telstra... not
+one..
+
+"man route" is your friend here
+
+
+-----
+
+This is what the output from ifconfig looks like
+eth0      Link encap:Ethernet  HWaddr xxxxxxxxxx
+          inet addr:203.48.x.x  Bcast:203.48.x.x Mask:255.255.255.240
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:575740 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:240635 errors:1 dropped:0 overruns:1 carrier:0
+          collisions:20 txqueuelen:100
+          Interrupt:11 Base address:0xe400
+
+eth0:0    an alias to the above will look the same as it. except different
+ip address
+eth0:1   an alias to the above will look the same as it. except different ip
+address
+eth0:2   an alias to the above will look the same as it. except different ip
+address
+
+lo       local interface will look same as above except have ip address
+127.0.0.1
+
+ppp0      Link encap:Point-to-Point Protocol
+          inet addr:139.130.your.ip  P-t-P:139.130.telstra.gw
+Mask:255.255.255.255
+          UP POINTOPOINT RUNNING NOARP MULTICAST  MTU:1500  Metric:1
+          RX packets:41830 errors:182 dropped:0 overruns:0 frame:182
+          TX packets:31846 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:10
+&gt;
+&gt; The PPP interface will get a primary address (either assigned by
+&gt; Telstra to the same thing each time you authenticate, or statically in
+&gt; your PPP configuration), and you've then got the option of adding
+&gt; aliases to the interface. The aliases have the addresses that Telstra
+&gt; have assigned you.
+&gt;
+&gt; See ifconfig(8). The interfaces get named if:n, where 'if' is the name
+&gt; of your interface (ie, ppp0) and 'n' is the alias number (eg, :0, :1).
+
+
+p.s. go into custdata and make sure that telstra added the routes to your
+203. ip addresses otherwise they wont work... they forgot to do it for
+mine...
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

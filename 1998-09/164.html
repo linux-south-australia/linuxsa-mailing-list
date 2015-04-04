@@ -1,0 +1,151 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: C question: read()" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Geoffrey D. Bennett" -->
+<!-- ToEmail="g@netcraft.com.au" -->
+<!-- Date="Wed, 23 Sep 1998 12:19:33 +0930 (CST)" -->
+<!-- Id="199809230249.MAA27498@rebel.net.au" -->
+<!-- Reference="199809221634.CAA01011@Kara.netcraft.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: C question: read()</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Geoffrey D. Bennett &lt;<I><A HREF="mailto:g@netcraft.com.au">g@netcraft.com.au</A></I>&gt;
+  Date: Wed, 23 Sep 1998 12:19:33 +0930 (CST)
+</PRE>
+<H1>Re: C question: read()</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Okay,
+
+Let's try this in public.
+
+PAM manual pages:
+
+bash$ cd /tmp
+bash$ rm -f *.tar.gz
+bash$ rpm2cpio /mnt/cdrom/SRPMS/pam-0.57-2.src.rpm | cpio -i '*.tar.gz'
+bash$ for f in *.tar.gz; do tar tvfz $f; done | grep '\.[1-8]$'
+-r--r--r-- morgan/family  7872 Feb 16 05:07 1997 Linux-PAM-0.57/doc/man/pam.8
+-r--r--r-- morgan/family  3552 Feb 16 05:17 1997 Linux-PAM-0.57/doc/man/pam_fail_delay.3
+-r--r--r-- morgan/family    21 Jan 20 04:06 1997 Linux-PAM-0.57/doc/man/pam_end.3
+-r--r--r-- morgan/family  2506 Feb 16 05:21 1997 Linux-PAM-0.57/doc/man/pam_start.3
+-r--r--r-- morgan/family  2314 Feb 16 05:12 1997 Linux-PAM-0.57/doc/man/pam_chauthtok.3
+-r--r--r-- morgan/family  1930 Feb 16 05:20 1997 Linux-PAM-0.57/doc/man/pam_setcred.3
+-r--r--r-- morgan/family  2191 Feb 16 05:10 1997 Linux-PAM-0.57/doc/man/pam_authenticate.3
+-r--r--r-- morgan/family  2691 Feb 16 05:19 1997 Linux-PAM-0.57/doc/man/pam_open_session.3
+-r--r--r-- morgan/family  1150 Feb 16 05:25 1997 Linux-PAM-0.57/doc/man/pam_strerror.3
+-r--r--r-- morgan/family    28 Jan 20 04:06 1997 Linux-PAM-0.57/doc/man/pam_close_session.3
+bash$ rpm -qpl /mnt/cdrom/RedHat/RPMS/pam-0.57-2.i386.rpm | grep '\.[1-8]$'
+
+No output!  And on their own manual pages, what a shame.  Case proved.
+
+
+newstrftime.3 and date.1 from zoneinfo:
+
+bash$ rm -f *.tar.gz
+bash$ rpm2cpio /mnt/cdrom/SRPMS/zoneinfo-96i-4.src.rpm | cpio -i '*.tar.gz'
+bash$ for f in *.tar.gz; do tar tvfz $f; done | egrep 'new|date'
+-r--r--r-- 8800/0         4948 Jun  3 23:53 1996 newctime.3
+-r--r--r-- 8800/0         6424 Jun  3 23:53 1996 newstrftime.3
+-r--r--r-- 8800/0         5337 Jun  3 23:53 1996 newtzset.3
+-r--r--r-- 8800/0         5065 Jun  5 21:32 1996 date.1
+-r--r--r-- 8800/0        22726 Jun  3 23:53 1996 date.c
+-r--r--r-- 8800/10        1117 Jul  2 07:42 1996 pacificnew
+bash$ rpm -qpl /mnt/cdrom/RedHat/RPMS/zoneinfo-96i-4.i386.rpm | egrep 'new|date'
+/usr/man/man3/newctime.3
+/usr/man/man3/newtzset.3
+
+I see newstrftime.3 and date.1 in the RPMS, but not in the SRPMS.
+Case proved.
+
+
+chroot.1, hostname.1 and ansi2knr.1 from sh-utils:
+
+bash$ rm -f *.tar.gz
+bash$ rpm2cpio /mnt/cdrom/SRPMS/sh-utils-1.16-4.src.rpm | cpio -i '*.tar.gz'
+bash$ for f in *.tar.gz; do tar tvfz $f; done | egrep 'chroot|hostname|ansi2knr'
+-rw-r--r-- 1035/599       1539 Jul 15 13:17 1996 sh-utils-1.16/lib/gethostname.c
+-rw-r--r-- 1035/599       1930 Nov 21 13:12 1996 sh-utils-1.16/lib/xgethostname.c
+-rw-r--r-- 1035/599        947 Jul 12 12:16 1996 sh-utils-1.16/man/chroot.1
+-rw-r--r-- 1035/599        816 Jul 12 12:16 1996 sh-utils-1.16/man/hostname.1
+-rw-r--r-- 1035/599        910 Aug  2 13:56 1995 sh-utils-1.16/src/ansi2knr.1
+-rw-r--r-- 1035/599      13302 Nov  3 10:12 1996 sh-utils-1.16/src/ansi2knr.c
+-rw-r--r-- 1035/599       2525 Dec  8 14:53 1996 sh-utils-1.16/src/chroot.c
+-rw-r--r-- 1035/599       2915 Nov  3 10:12 1996 sh-utils-1.16/src/hostname.c
+bash$ rpm -qpl /mnt/cdrom/RedHat/RPMS/sh-utils-1.16-4.i386.rpm | egrep 'chroot|hostname|ansi2knr'
+
+No output!  My, my, my.  Case proved.
+
+
+&gt; You need to take more care.  None of the seven examples you mentioned
+&gt; have "missing" man pages.  In each case, either the man pages really
+&gt; are there, or they shouldn't be there.
+
+I'm really unsure what more I can say about levels of care.  It seems that
+seven out of seven examples have been demonstrated to be so.  As to your
+assertion that the manual pages shouldn't be there: They *are* there.
+They are in the SRPMS.  They exist.  They were written and Red Hat have
+distributed them.  Red Hat included them in their CD.  They just left them
+out of the pre-built RPM.  What happened to standards, particularly the
+one which makes Unix so much better than most of the competitors (namely
+man pages)?
+
+
+&gt; So far you have demonstrated a number of non-problems with Red Hat's
+&gt; QC.  I'm not saying they're perfect, but they're certainly not bad
+&gt; enough to warrant boycotting them.
+
+Probably you will want to retract your first assertion.  The second:
+Perhaps that's true.  Indeed I haven't boycotted them.  I'm annoyed,
+and I wish they would be more careful -- manual pages are truly one
+of the wonderful things about Unix and they most certainly are meant
+to be optional in no sense of that word.
+
+By the way, Geoffrey, I didn't mean to imply that you didn't know how
+to use RPM.   I'm not even sure that I did imply it, however to make
+it perfectly clear: I have every confidence that you are far more skilled
+in the use of RPM than am I, and I deny and reject the proposition that
+you don't know how to use it.
+
+Regards,
+
+David, who fears some people might mistake this conversation for hostility,
+and wishes it known that despite a difference of opinion, he holds Geoffrey
+in a high esteem.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

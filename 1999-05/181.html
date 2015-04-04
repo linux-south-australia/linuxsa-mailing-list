@@ -1,0 +1,119 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: redirecting output to a file (was thi has me stumped)" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@adelaide.edu.au" -->
+<!-- ToName="Jake Hawkes" -->
+<!-- ToEmail="jake@eclectic.com.au" -->
+<!-- Date="Tue, 11 May 1999 02:26:04 +0930" -->
+<!-- Id="37370FA4.8F263A48@adelaide.edu.au" -->
+<!-- Reference="199905101155.VAA18715@atdot.dotat.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: redirecting output to a file (was thi has me stumped)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@adelaide.edu.au">glen.turner@adelaide.edu.au</A></I>&gt;
+  To  : Jake Hawkes &lt;<I><A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A></I>&gt;
+  Date: Tue, 11 May 1999 02:26:04 +0930
+</PRE>
+<H1>Re: redirecting output to a file (was thi has me stumped)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Quick buffering tutorial.
+
+stderr isn't buffered.
+stdout is line buffered.
+Any other file you fopen() is block buffered.
+
+But the C buffering isn;t the only buffering in the system.
+
+When redirecting stdout to disk, you won't see anything
+in the file until at least one full disk block has been
+output.  In fact, UNIX makes no guaruntees about file
+contents until the file is closed().  Then it guaruntees
+that the next open()er of the file will see what you wrote.
+
+The people from BSD modified these guaruntees for the file append
+mode.  Otherwise writing syslogd would have been a major pain.
+
+
+There are two common cases where the buffering is a problem:
+
+1) Interactive prompts:
+
+Imagine you are presenting a prompt without a trailing \n to trigger
+the C line buffering.
+
+So, before you ask for interactive input, you need to
+
+  if (isatty(fileno(stdin) && isatty(fileno(stdout)) {
+	fflush(stdout);
+  }
+  fgets(...)
+
+
+2) Database integrity
+
+Nothing in the guaruntees above said that the blocks output by
+the program made it to disk.  The "written" disk blocks could
+still be in memory.
+
+This simply isn't acceptable for a transactional database.  These
+RDBMS's usually solve this problem by using their own filesystem
+on "raw" disk.  Unfortunately, Linux has yet to get raw disk devices.
+
+Naturally, interested people are working on this :-)
+
+
+&gt; Whilst we're on the subject, consider this:
+&gt; 
+&gt;         process A  ----- fifo pipe ------&gt; process B
+&gt; 
+&gt; A is set to write only, B is set to read only
+&gt; 
+&gt; can you confirm or deny that when process A dies, the select() call
+&gt; (waiting on bytes available to read) in B will return?
+
+confirm.
+
+You should ensure you handle incoming signals cleanly,
+not just EOF.
+
+-- 
+ Glen Turner                               Network Specialist
+ Tel: (08) 8303 3936          Information Technology Services
+ Fax: (08) 8303 4400         The University of Adelaide  5005
+ Email: <A HREF="mailto:glen.turner@adelaide.edu.au">glen.turner@adelaide.edu.au</A>           South Australia
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

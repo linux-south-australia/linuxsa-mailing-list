@@ -1,0 +1,244 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: latest RH/Mandrake/Knoppix" -->
+<!-- FromName="'Damien Uern'" -->
+<!-- FromEmail="carrigan_2606@optusnet.com.au" -->
+<!-- ToName="'Ryan Verner'," -->
+<!-- ToEmail="xfesty@computeraddictions.com.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 20 Apr 2003 19:50:29 +0930" -->
+<!-- Id="200304201950.29837.carrigan_2606@optusnet.com.au" -->
+<!-- Reference="20030420050123.M25190@computeraddictions.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: latest RH/Mandrake/Knoppix</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Damien Uern &lt;<I><A HREF="mailto:carrigan_2606@optusnet.com.au">carrigan_2606@optusnet.com.au</A></I>&gt;
+  To  : Ryan Verner &lt;<I><A HREF="mailto:xfesty@computeraddictions.com.au">xfesty@computeraddictions.com.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 20 Apr 2003 19:50:29 +0930
+</PRE>
+<H1>Re: latest RH/Mandrake/Knoppix</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, 20 Apr 2003 02:31 pm, Ryan Verner wrote:
+&gt; Hi there,
+&gt;
+&gt; Anybody here got the latest RH / Mandrake / Knoppix CD's I could pickup
+&gt; sometime today/tomorrow?
+&gt;
+&gt; Got a few opportunities to introduce Linux as a desktop OS to some people,
+&gt; not sure if any distro is up to par yet (I'm happy with my Debian Sid
+&gt; desktop, but it's not exactly something most people can/want to do).
+&gt;
+&gt; R
+&gt;
+
+Mandrake 9.1 has NTFS resizing support in the installer, though the drive has 
+to be defragged first (it wont move data). Mandrake 9.1, IMO is the best 
+distro to use, assuming that you set it up for them as it does need a bit of 
+tweaking. The most important tweak is to setup web sources for urpmi. 
+
+*** What follows is mostly what I wrote to a friend in an email who's trying 
+out Linux and so is probably too basic for you, if you think these 
+instructions are any good feel free to pass them on to anybody trying 
+mandrake, it's just my experiences really. ****
+
+1) add web packages
+
+go to <A HREF="http://plf.zarb.org/~nanardon/urpmiweb.php">http://plf.zarb.org/~nanardon/urpmiweb.php</A>
+
+choose the sources, plf, texstar, contrib and updates. This web page will 
+spit out the commands you will need to paste into a root console in order to 
+add the sources. Do these one by one (or stick them in a shell script so they 
+run one after the other). Note that the contrib package list is 9MB, the rest 
+are a bit over 1MB.
+
+2) Once the sources have been added, load the software installer 
+(K-&gt;Configuration-&gt;Packaging-&gt;Install software)
+
+search for the package freetype. There should be a freetype2 package with a 
+-plf extension to its name. If not certain, select the "maximum information" 
+Radio box and make sure that Source: is plf. This is the hacked true type 
+font renderer. The bytecode hinting algorithm is patented by apple and so 
+cannot be used legally, hence by default Mandrake uses the auto-hinting 
+algorithm which is vastly inferior.
+
+3) Install windows fonts
+
+Open the mandrake control centre (K-&gt;Configuration-&gt;Mandrake Control Center). 
+Go to System then Drakfont. Click "Get Windows Fonts", this will copy the 
+windows fonts and install them on your system. I know this works for windows 
+XP, but im not sure for windows 2000 (it failed to work in Mandrake 9.0 so I 
+had to manually copy them). If it doesn't work, copy your true type fonts to 
+a directory in /usr/share/fonts, eg /usr/share/fonts/winttf. This path needs 
+to be added to fontconfig somehow, either via the config file 
+(/etc/fonts/fonts.conf), or via the GUI. In drakfont this can be done by 
+clicking "Advanced Options" then clicking Add to add the font directory.
+
+You have to make sure KDE recognises these fonts by using the font installer 
+the KDE control centre (just enable the fonts you want).
+
+4) Install the NVIDIA Graphics Drivers (if you have an NVIDIA card)
+
+Download the NVIDIA graphics drivers from the nvidia website. Switch to 
+runlevel 3 so that X isn't running (type "telinit 3" at a root prompt). Login 
+as root and cd to the directory where the NVIDIA install script is. 
+
+chmod +x the file and run it, follow the prompts to install the drivers. Once 
+finished, edit the Xfree config file (/etc/X11/XF86Config-4), and change the 
+line that says "nv" to "nvidia". There are some other options that I add, 
+here is my nvidia driver setup:
+
+Section "Device"
+    Identifier "device1"
+    VendorName "nVidia Corporation"
+    BoardName "NVIDIA GeForce3 (generic)"
+    Driver "nvidia"
+    Option "DPMS" "True"
+    Option "CursorShadow" "True"
+    Option "NoLogo" "True"
+    Option "CursorShadowAlpha" "60"
+EndSection
+
+This will enable monitor power saving, cursor shadows, and will disable the 
+Nvidia splash screen when X starts. 
+
+Switch back to runlevel 5 by typing "telinit 5". Try out the 3d drivers by 
+running something like Chromium, Tux Racer, or Cannon-smash.
+
+5) Install sim-icq. 
+
+sim-icq is the best ICQ client for linux by far. There are _heaps_ of instant 
+messengers for just about every protocol, but I haven't seen one as good as 
+sim-icq (only supports ICQ protocol though).  Do a search in the package 
+manager  for it, if it's not there, download it from sim-icq.sourceforge.net. 
+The Mandrake 9.0 package seems to work on mine, i dont know what dependencies 
+it will want as it was compiled against KDE 3.0 not 3.1. If it wants 
+dependencies just do 
+
+rpm -ivh sim-icq-xxxxxxx.i586.rpm --nodeps
+
+I think all 3.x KDE's are backwards compatible and that's all it is really 
+relying on.
+
+6) Install ogle DVD player
+
+ogle DVD should be in the software manager if you added plf. This DVD player 
+has played every DVD I've ever thrown at it flawlessly (including menu's), 
+however I cannot get 4.1 channel sound to work.
+
+8) Go to www.kde-look.org and try out some of the XFree cursor themes. Only 
+one of em on there is very practical, but you _have_ to try tuxcursors :) 
+They're easy to install, just copy the directories in the archive to 
+~/.icons. For example, for tuxcursors, ~/.icons will contain
+tuxcursor/
+default/
+
+in default is index.theme which tells X what cursor theme to use. The new 
+cursors will be used for any newly opened apps. To have it working across 
+everything you need to logout and log back in. (This is a very new feature in 
+XFree86 and so is not really supported in the Desktop Environments yet).
+
+the plf source has lots of kdeartwork packages that contain heaps of themes 
+and icons to try. One of the nice things is to enable menu shadows, open the 
+KDE control centre, go to "LookNFeel-&gt;Style" and click the Effects tab, then 
+check the "Menu drop Shadow" checkbox.
+
+9) Misc Things to know:
+
+- Try to install packages built specifically for mandrake 9.1, and install 
+them through the package manager, or via the command line with urpmi. This 
+way dependencies are resolved and it's unlikely there will be binary 
+incompatibilities. I've installed a package from redhat 8 before and its 
+worked (with --nodeps mind you), but there's certainly no guaruntees. Binary 
+incompatibilities is one of my biggest gripes with Linux, hopefully it will 
+settle down soon.
+
+- Use xmms as your mp3/ogg player as it is by far the best. Make sure it's 
+using ALSA as it's output plugin (the ALSA sound drivers should be enabled by 
+default). You can install a panel applet called xmms-kde so that you can 
+control xmms via keyboard shortcuts or via the small gui that embeds into the 
+panel. I just started using it 5mins ago, and it's pretty sweet. After 
+installing, you can activate it by right clicking on the taskbar, and adding 
+the applet, or left clicking on one of the arrow thingies that separate KDE 
+panel applets (these can be hidden by rightclicking the taskbar, selecting 
+Configure Panel, clicking Apperance, Advanced Options, then checking the box 
+"Fade out applet handles". If you have 4+ speakers (or even if you dont), 
+install alsamixergui to tweak the ALSA settings and to enable sound from your 
+rear speakers.
+
+- k3b is by far the best burning program on Linux, it should work out of the 
+box. Nice feature for ripping and burning iso's (i.e. not pirated games):
+Rip the CD by typing "cat /dev/cdrom &gt; myfile.iso" at a prompt.
+Open konqueror file manager, rightclick on iso file, and click burn with k3b. 
+
+- download the windows codecs for xine, be wary of installing the plf version 
+of xine however, as i've done that before and it's b0rked my xine install 
+(choppy sound, etc). I think there are some divx codecs somewhere too, just 
+search in the package manager. You should be able to play just about anything 
+(except for quicktime dammit!). Mplayer is aparantly very good also.
+
+- I like kmail as my mail client, but you might like Evolution if you like 
+Outbreak express. kmail can import your Outlook inbox and address book too. 
+If you want to be able to use the same compatible client on either windows or 
+linux, you can use mozilla mail, then symlink mozilla's mail directory to 
+wherever the windows one is stored (you need a FAT partition for this because 
+Linux can't write to NTFS and you can't symlink in Windows (or write to linux 
+partitions). If you want to backup your mail (in kmail anyway), your inbox is 
+stored in ~/Mail. 
+
+- Konqueror web browser now has the kget download manager, it uses wget to 
+actually do the downloading. It looks similar to getright. You can use wget 
+from the command line by:
+
+wget -b &lt;url&gt;
+
+to download something in the background. wget will become a child process of 
+Init, so you can even logout and it wont matter, it will still download.
+
+wget -c -b &lt;url&gt;
+
+will continue a broken download. Konqueror also has tabbed browsing support 
+now and the rendering engine is being used in apples default browser Safari 
+(hence lots of apple bugfixes are being integrated into konqueror).
+
+*** There's probably many other things I've done to tweak my box, but this is 
+all I can think of at the moment. ***
+
+Regards,
+
+Damien Uern
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

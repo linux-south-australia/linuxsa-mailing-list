@@ -1,0 +1,765 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: mounting novel fs" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="linuxcpa@netscape.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="Alex.Wilkinson@dsto.defence.gov.au" -->
+<!-- Date="Mon, 25 Nov 2002 17:16:28 -0800" -->
+<!-- Id="3DE2CB6C.3030002@netscape.net" -->
+<!-- Reference="20021126110535.S3117-100000@squirm.dsto.defence.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: mounting novel fs</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:linuxcpa@netscape.net">linuxcpa@netscape.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:Alex.Wilkinson@dsto.defence.gov.au">Alex.Wilkinson@dsto.defence.gov.au</A></I>&gt;
+  Date: Mon, 25 Nov 2002 17:16:28 -0800
+</PRE>
+<H1>Re: mounting novel fs</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+  Yes!
+
+It depends upon which verion of Netware you are going to connect to, and 
+what your protocol is, and frametype.
+
+It really starts from there.  
+
+I am assuming that you are pretty experienced and such, so take a look 
+at the script text here and then plan out your approach.
+
+Note that if you are on Netware 5, you may have to complile support for 
+the ncp file system and IPX, at least that is what I have been told.
+
+Now, I made this in Lindows and as a result, didn't do much about being 
+root. If you choose, it will make a start up script to automatically log 
+you into the server. But it will be root's script.
+
+So, I suggest tying to emulate the script for now, but not run it until 
+you understand it.
+
+Alex, just email me with whatever questions that you have.
+
+I will be here for a while.
+
+Here is a post I made that explains what I am trying to do, if you use IPX.
+
+<A HREF="http://computing.net/linux/wwwboard/forum/8273.html">http://computing.net/linux/wwwboard/forum/8273.html</A>
+
+The Kernel compile is only necessary if you use Debian or Lindows AFAIK.
+
+NOTE: If you are on Netware 4 and need IPX, you will need to install 
+MARS-NWE.
+
+The /etc/nwserv.conf file must be set to auto, otherwise Mars will 
+assign an IP number to the card on SUSE, Debian or Lindows.
+
+Write with questions, ok?
+
+James Leone
+
+
+
+&gt; #! /bin/sh
+&gt; VERSION="0.6 for Lindows"
+&gt;
+&gt; RCFILE='/etc/init.d/rc.local' # The local system configuration file
+&gt; LIBDIR='/' # This can stay same for all
+&gt; EXECDIR='/usr/local/bin/' # Where the executables will be copied, must 
+&gt; be on path
+&gt; ICONDIR='/usr/share/pixmaps/' # Shared directory for icons
+&gt; KDEDIR='/etc/X11/applnk/Network'  # KDE app launcher that appears in 
+&gt; user's menu
+&gt; #GNOMEDIR='' # Gnome launchers that appear in user's menu
+&gt;
+&gt; # User must be logged in as root.
+&gt; #if [ "`whoami`" != "root" ]; then
+&gt; #    echo -e "\nYou must be logged in as root to run this setup."
+&gt; #    exit 1
+&gt; #fi
+&gt;
+&gt; echo "Setup Log of Novel Client for Linux" &gt; setup.log
+&gt; echo "setup scipt version: $VERSION" &gt;&gt; setup.log
+&gt;
+&gt; # Ask the user which distribution they are running
+&gt; until [ "$DIST" -gt 0 ] && [ "$DIST" -lt 3 ]
+&gt; do
+&gt; clear
+&gt;     echo "#########################################################"
+&gt;     echo
+&gt;     echo "           Setup of Novel Client for Linux"
+&gt;     echo "            version $VERSION"
+&gt;     echo
+&gt;     echo "#########################################################"
+&gt;     echo
+&gt;     echo "Which of these distributions are you using?"
+&gt;     echo -e "\t1. Lindows 2.0"
+&gt;     echo -e "\t2. Debian"
+&gt;     echo -n "?: "
+&gt;     read DIST
+&gt; done
+&gt;
+&gt; # &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+&gt; # Section 1 Begin: &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+&gt; # &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+&gt;
+&gt; echo " ##################################################################"
+&gt; echo " # The following is for compiling kernel to include IPX support   #"
+&gt; echo " #IMPORTANT! PLEASE READ, IT CONTAINS INFORMATION YOU NEED TO KNOW#"
+&gt; echo " ##################################################################"
+&gt; echo "This script will apt-get install the packages you need to compile"
+&gt; echo "your kernel with a graphical user interface. You should have"
+&gt; echo "already used Lindows''click and run' feature to obtain the kernel"
+&gt; echo "source and headers for kernel 2.4.19. Also please contact James"
+&gt; echo "Leone at <A HREF="mailto:linuxcpa@netscape.net">linuxcpa@netscape.net</A> if the kernel version is not 2.4.19,"
+&gt; echo "so the script can be modified accordingly. Please note that this"
+&gt; echo "script will install Tkwish, bzip2 and create some symbolic links"
+&gt; echo "and compile your kernel after you exit and save changes.
+
+&gt;
+&gt; echo ""
+&gt; echo "**************************NOTE!************************************"
+&gt; echo "WHEN THE KERNEL GUI POPS UP, CLICK ON THE NETWORKING OPTIONS BOX."
+&gt; echo "AND SELECT 'Y' FOR IPX PROTOCOL."
+&gt; echo ""
+&gt; echo "***********************MULTIPLE PARTITIONS************************"
+&gt; echo "Please mount all drives that are booted by lilo and edit the"
+&gt; echo "/etc/lilo.conf file before you start. This script performs"
+&gt; echo "make dep, make clean & make bzlilo."
+&gt; echo ""
+&gt; echo "*************************IPX WARNING!******************************"
+&gt; echo "BEFORE GOING ON, EXIT THE SCRIPT AND TAKE A LOOK AT IT WITH A TEXT"
+&gt; echo "EDITOR. MAKE SURE YOU UNDERSTAND THE PROCESS THE SCRIPT PERFORMS"
+&gt; echo "BEFORE USING. MODIFY AS NECESSARY."
+&gt; echo ""
+&gt; echo "*************************DISTRIBUTION 
+&gt; WARNING!**********************"
+&gt; echo "IF YOU PICK THE WRONG DISTRIBUTION, IT CAN BREAK THINGS."
+&gt; echo "BE SURE THAT THIS SCRIPT IS MADE FOR YOUR KERNEL."
+&gt; echo ""
+&gt; echo "***********************READ THE FINE MANUAL************************"
+&gt; echo "During the setup you will be asked to provide certain pieces of 
+&gt; technical"
+&gt; echo "information such as your protocol, frametype, distribution 
+&gt; kernel number"
+&gt; echo "make sure you understand this stuff before going on, because you 
+&gt; can't"
+&gt; echo "run this script more than once."
+&gt; echo ""
+&gt;
+&gt; #Give the user an option to bail now!
+&gt;     echo "Option to Quit"
+&gt;     echo -en "\nDo you want to continue?[Y/N]:"
+&gt;     read YN
+&gt;        if [ $YN = "n" -o $YN = "N" ]
+&gt;            then
+&gt;            exit
+&gt;        fi
+&gt;        
+&gt;     # Ask the user which protocols they will be using
+&gt;     
+&gt;     echo "#########################################################"
+&gt;     echo
+&gt;     echo "           Setup of Novel Client for Linux"
+&gt;     echo "            version $VERSION"
+&gt;     echo
+&gt;     echo "#########################################################"
+&gt;     echo "This script will copy the libraries and executables      "
+&gt;     echo "needed to run the Novel Client and can make the changes  "
+&gt;     echo "necessary, if you allow, for non-root users to mount     "
+&gt;     echo "Netware drives, bind IPX, or multicast for an SLP        "
+&gt;     echo "directory agent."
+&gt;     echo
+&gt;     echo "You can make NCP connections over either IP or IPX."
+&gt;     echo "Which protocol would you like to configure?"
+&gt;     echo -e "\t1. IP Only"
+&gt;     echo -e "\t2. Both IP & IPX"
+&gt;     echo -e "\t3. IPX Only"
+&gt;     echo -n "?: "
+&gt;     read PROTOCOLS
+&gt;
+&gt;     
+&gt;     # If users chooses IP then set variable
+&gt;     if [ "$PROTOCOLS" -lt "3" ]; then
+&gt;     IP="True"
+&gt;         fi
+&gt;
+&gt;     # If users chooses IPX then set variable
+&gt;     if [ "$PROTOCOLS" -gt "1" ]; then
+&gt;     IPX="True"
+&gt;         fi  
+&gt;        
+&gt;
+&gt; if [ "$DIST" -eq "1" ] && [ "$IPX" = "True" ]; then # do Lindows 
+&gt; kernel stuff here
+&gt;     #Activate apt-get for the first time
+&gt;     echo "Activate apt-get"
+&gt;     echo -en "\nDo you wish to activate apt-get for the first time 
+&gt; use?[Y/N]:"
+&gt;     read YN
+&gt;        if [ $YN = "y" -o $YN = "Y" ]
+&gt;            then
+&gt;            apt-get update
+&gt;        fi
+&gt;
+&gt;     #Kernel Compilation
+&gt;     #read YN
+&gt;     #if [ $YN = "y" -o $YN = "Y" ]
+&gt;     #then
+&gt;     #    apt-get install lynx
+&gt;     #apt-get install bzip2
+&gt;     cd /usr/src
+&gt;     #       lynx 
+&gt; <A HREF="http://packages.debian.org/testing/devel/kernel-source-2.4.19.html">http://packages.debian.org/testing/devel/kernel-source-2.4.19.html</A>
+&gt;     clear
+&gt;     echo "Please Wait while BZIP unzips the kernel sources."
+&gt;     echo "When finished the source tar file will be moved & stored in 
+&gt; /usr/src/sourcehold"
+&gt;     bzip2 -d kernel-source-2.4.19.tar.bz2
+&gt;     tar -xf kernel-source-2.4.19.tar
+&gt;     ln -s linux-2.4.19 linux
+&gt;     apt-get upgrade
+&gt;     apt-get install wish
+&gt;     apt-get install tk8.3
+&gt;     apt-get install gcc
+&gt;     apt-get install make
+&gt;     cd linux
+&gt;     make xconfig
+&gt;     make dep
+&gt;     make clean
+&gt;     make bzlilo
+&gt;     mkdir /usr/src/sourcehold
+&gt;     mv /usr/src/kernel-source-2.4.19.tar /usr/src/sourcehold/
+&gt;     fi
+&gt;
+&gt;
+&gt; if [ "$DIST" -eq "2" ] && [ "$IPX" = "True" ]; then # do Debian kernel 
+&gt; stuff here
+&gt; #Activate apt-get for the first time
+&gt; echo "Activate apt-get"
+&gt; echo -en "\nDo you wish to activate apt-get for the first time use?[Y/N]:"
+&gt; read YN
+&gt;    if [ $YN = "y" -o $YN = "Y" ]
+&gt;        then
+&gt;        apt-get update
+&gt;    fi
+&gt;
+&gt; #apt-get kernel sources
+&gt; echo -en "\nDo you wish to apt-get the kernel sources?[Y/N]:"
+&gt; read YN
+&gt;     if [ $YN = "y" -o $YN = "Y" ]
+&gt;         then
+&gt;     apt-get install lynx
+&gt;     cd /usr/src
+&gt;     lynx 
+&gt; <A HREF="http://packages.debian.org/testing/devel/kernel-source-2.4.19.html">http://packages.debian.org/testing/devel/kernel-source-2.4.19.html</A>
+&gt;     gzip -dc /usr/src/kernel-source-2.4.19_2.4.19.orig.tar.gz | tar xvf -
+&gt;     mv kernel-source-2.4.19-2.4.19.orig linux-2.4.19
+&gt;     ln -s linux-2.4.19 linux
+&gt;     apt-get upgrade
+&gt;     apt-get install wish
+&gt;     apt-get install tk8.3
+&gt;     apt-get install gcc
+&gt;     apt-get install make
+&gt;     apt-get install bzip2
+&gt;     cd linux
+&gt;     make xconfig
+&gt;     make dep
+&gt;     make clean
+&gt;     make bzlilo
+&gt;         fi
+&gt;     fi
+&gt;
+&gt; # &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+&gt; # Section 1 End: &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+&gt; # &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+&gt;
+&gt; echo "Please press enter to continue"
+&gt; read PAUSE
+&gt;
+&gt; until [ "$PROTOCOLS" -gt 0 ] && [ "$PROTOCOLS" -lt 4 ]
+&gt; do
+&gt; clear
+&gt; done
+&gt;
+&gt;
+&gt; # Check that the necessary software is installed
+&gt; # First check for ncpmount, ncpumount, and slist from the ncpfs package
+&gt;
+&gt; # 1&gt;&gt;  Appends the stdout from the which command to a file.
+&gt; # 2&gt;&1 Redirects stderr from the command to the same place as
+&gt; #      stdout to hide the ugliness if the file is not found.
+&gt; if which ncpmount 1&gt;&gt; setup.log 2&gt;&1
+&gt; then
+&gt;     NCPMOUNT="True"
+&gt; fi
+&gt;
+&gt; if which ncpumount 1&gt;&gt; setup.log 2&gt;&1
+&gt; then
+&gt;     NCPUMOUNT="True"
+&gt; fi
+&gt;
+&gt; if which slist 1&gt;&gt; setup.log 2&gt;&1
+&gt; then
+&gt;     SLIST="True"
+&gt; fi
+&gt;
+&gt; # Now if all the files are found then we can assume that the
+&gt; # ncpfs package is installed.
+&gt; if [ "$NCPMOUNT" = "True" ] && [ "$NCPUMOUNT" = "True" ] && [ "$SLIST" 
+&gt; = "True" ]; then
+&gt;     echo "ncpfs is installed" | tee -a setup.log
+&gt; else
+&gt;     echo "ncpfs is not installed" | tee -a setup.log
+&gt;     echo "ncpfs must be installed for novelclient to work."
+&gt; #    exit 1
+&gt;
+&gt; # &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+&gt; # Section 2 Begin: &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+&gt; # &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+&gt;
+&gt; #Install NCPFS       echo "You need ncpfs"
+&gt;    echo -en "\nDo you wish to apt-get ncpfs?[y/n]: "
+&gt;    read YN
+&gt;    if [ $YN = "y" -o $YN = "Y" ]
+&gt;        then
+&gt;        apt-get install ncpfs
+&gt;        apt-get install wajig
+&gt;    fi
+&gt;
+&gt; # &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+&gt; # Section 2 End: &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+&gt; # &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+&gt;
+&gt; fi
+&gt;
+&gt; # Now check for the ipxutils package if the user will be using it.
+&gt; if [ "$IPX" = "True" ]; then
+&gt;     if which ipx_interface 1&gt;&gt; setup.log 2&gt;&1
+&gt;     then
+&gt;         IPXINTERFACE="True"
+&gt;     fi
+&gt;
+&gt;     if [ "$IPXINTERFACE" = "True" ]; then
+&gt;         echo "ipxutils package is installed" | tee -a setup.log
+&gt;     else
+&gt;         echo "ipxutils is not installed" | tee -a setup.log
+&gt;         echo
+&gt;         echo "ipxutils must be installed if you wish to mount volumes"
+&gt;         echo "on Netware 3.x and 4.x servers or do not have IP bound"
+&gt;         echo "on your Netware 5 or above servers."
+&gt;         #echo -en "\nDo you wish to exit the setup in order to install 
+&gt; ipxutils? [y/n]: "
+&gt;         #read YN
+&gt;         #if [ $YN = "y" -o $YN = "Y" ]
+&gt;         #then
+&gt;         #exit 1
+&gt;         #fi
+&gt;
+&gt; # &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+&gt; # Section 3 Begin: &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+&gt; # &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+&gt;
+&gt;    echo -en "\nDo you wish to apt-get ipx?[y/n]: "
+&gt;    read YN
+&gt;    if [ $YN = "y" -o $YN = "Y" ]; then :
+&gt;        apt-get install ipx
+&gt;    fi
+&gt;
+&gt;  #&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+&gt;  #Section 3 End: &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+&gt;  #&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+&gt;     fi
+&gt; fi
+&gt;
+&gt;  #&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+&gt;  #Section 4 Begin: &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+&gt;  #&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+&gt;
+&gt;  #mars-nwe package must be installed.
+&gt;    echo "you need mars-nwe"
+&gt;    echo "Mars-nwe must be installed if you wish to set up"
+&gt;    echo "connection with a Netware 4 or below server. You"
+&gt;    echo "will need to download Mars-NWE via Lynx which we"
+&gt;    echo "will apt-get. Don't worry if Lynx is already"
+&gt;    echo "installed, apt-get detects this automatically"
+&gt;    echo "and will not break anything. After Lynx installs,"
+&gt;    echo "a dialogue box will come up. At this point you are"
+&gt;    echo "using lynx. Of the packages listed please select"
+&gt;    echo "mars-nwe_0.99.p120-0_i386.deb by using the down"
+&gt;    echo "arrow and pressing enter. In a few seconds you will"
+&gt;    echo "see the words save file in brown text. Press enter"
+&gt;    echo "to save. When it is done saving, it will ask you"
+&gt;    echo "what you would like to do next. Select Q for quit"
+&gt;    echo "and then Y to confirm. At this point, the script"
+&gt;    echo "will continue, and ask you if you would like to"
+&gt;    echo "install Mars-nwe. Please answer yes."
+&gt;    
+&gt;    echo -en "\n Do you want to continue?[y/n]: "
+&gt;    read YN
+&gt;    if [ $YN = "y" -o $YN = "Y" ]
+&gt;    then
+&gt;     cd $HOME
+&gt;     apt-get install lynx
+&gt;     lynx <A HREF="http://people.debian.org/~pm/pool/main/mars-nwe">http://people.debian.org/~pm/pool/main/mars-nwe</A>
+&gt;     cd $HOME
+&gt;     wajig install mars-nwe_0.99.pl20-0_i386.deb
+&gt;   fi
+&gt;
+&gt; # &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+&gt; # Section 4 End: &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+&gt; # &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+&gt;
+&gt; clear
+&gt; echo "============================================"
+&gt; echo "   Setting permissions for non root users"
+&gt; echo "============================================"
+&gt; echo -e "\nIn order for non-root users to mount Netware drives,"
+&gt; echo -e "you must make the following changes:\n"
+&gt; echo -e "\tchmod +s /usr/bin/ncpmount"
+&gt; echo -e "\tchmod +s /usr/bin/ncpumount"
+&gt; if [ "$IPX" = "True" ]; then
+&gt;     echo -e "\tchmod +s /usr/bin/slist"
+&gt; fi
+&gt; echo
+&gt; echo -en "Shall I make these changes for you? [y/n]: "
+&gt; read YN
+&gt; if [ $YN = "y" -o $YN = "Y" ]; then
+&gt;     echo -e "\nsetting ncpfs commands suid" &gt;&gt; setup.log
+&gt;     chmod +s /usr/bin/ncpmount 2&gt;&gt; setup.log
+&gt;     chmod +s /usr/bin/ncpumount 2&gt;&gt; setup.log
+&gt;     if [ "$IPX" = "True" ]; then
+&gt;     chmod +s /usr/bin/slist 2&gt;&gt; setup.log
+&gt;     fi
+&gt; fi
+&gt;
+&gt; if [ "$IP" = "True" ]; then
+&gt;     clear
+&gt;     echo "============================================"
+&gt;     echo "     Setting up the multicast route"
+&gt;     echo "============================================"
+&gt;     echo "A directory agent (DA) is contacted by the client"
+&gt;     echo "to get a list of file servers and their addresses."
+&gt;     echo ""
+&gt;     echo "In order to allow the Novel Client to find a"
+&gt;     echo "directory agent on its own, a route must be added."
+&gt;     echo ""
+&gt;
+&gt;     echo -e "\nadding route to multicast network:" &gt;&gt; setup.log
+&gt;     echo "route add -net 224.0.0.0 netmask 240.0.0.0 dev eth0" &gt;&gt; 
+&gt; setup.log
+&gt;     route add -net 224.0.0.0 netmask 240.0.0.0 dev eth0 2&gt;&gt; setup.log
+&gt;
+&gt;     echo  "I have added the route to the multicast network using the 
+&gt; command:"
+&gt;     echo "route add -net 224.0.0.0 netmask 240.0.0.0 dev eth0"
+&gt;     echo -e "\nHowever, this route will not be remembered after a reboot"
+&gt;     echo -e "unless you add this command to your rc.local file."
+&gt;     echo -en "\nMay I make this change for you? [y/n]: "
+&gt;     read YN
+&gt;     if [ $YN = "y" -o $YN = "Y" ]
+&gt;     then :
+&gt;         echo "route add -net 224.0.0.0 netmask 240.0.0.0 dev eth0" &gt;&gt; 
+&gt; $RCFILE
+&gt;         echo "multicast route added to rc.local" &gt;&gt; setup.log
+&gt;     fi
+&gt; fi
+&gt;
+&gt; if [ "$IPX" = "True" ]; then
+&gt; # Begin the bind IPX if statement
+&gt;     until [ "$BIND" -lt "4" ]
+&gt;     do
+&gt; # Begin the bind IPX do loop
+&gt;         BIND=0
+&gt; # Reset variable in case this is a second pass through the loop
+&gt;
+&gt; until [ "$NIC" -gt 0 ] && [ "$NIC" -lt 3 ]
+&gt; do
+&gt;     clear
+&gt;     echo "============================================"
+&gt;     echo "   Binding IPX to your network interface"
+&gt;     echo "    - Choose your NIC"
+&gt;     echo "============================================"
+&gt;     echo
+&gt;     echo "Now you need to bind IPX to your ethernet adapter."
+&gt;     echo
+&gt;     echo "Choose your Network Interface from the list below."
+&gt;     echo "This will be set as your primary IPX interface.   "
+&gt;     echo
+&gt;     echo "Select eth0 if you have a single ethernet card.   "
+&gt;     echo
+&gt;     echo "1. eth0"
+&gt;     echo "2. eth1"
+&gt;     echo
+&gt;     echo -en "?: "
+&gt;     read NIC
+&gt; done
+&gt; # Now convert the integer chosen to the proper form
+&gt; case $NIC in
+&gt; 1) NIC="eth0"
+&gt; ;;
+&gt; 2) NIC="eth1"
+&gt; ;;
+&gt; *) NIC="eth0" # Fall through to default
+&gt; ;;
+&gt; esac
+&gt;
+&gt; until [ "$FRAMETYPE" -gt 0 ] && [ "$FRAMETYPE" -lt 5 ]
+&gt; do
+&gt;     clear
+&gt;     echo "============================================"
+&gt;     echo "   Binding IPX to your network interface"
+&gt;     echo "    - Choose your frametype"
+&gt;     echo "============================================"
+&gt;     echo
+&gt;     echo "Choose your frametype from the list below.  "
+&gt;     echo
+&gt;     echo "802.2 has been the default for new Netware  "
+&gt;     echo "installations since version 3.12, however   "
+&gt;     echo "many Novell houses still run 802.3 as a     "
+&gt;     echo "legacy or in parallel with 802.2."
+&gt;     echo
+&gt;     echo "1. 802.2"
+&gt;     echo "2. 802.3"
+&gt;     echo "3. Ethernet_II"
+&gt;     echo "4. Ethernet_SNAP"
+&gt;     echo
+&gt;     echo -en "?: "
+&gt;     read FRAMETYPE
+&gt; done
+&gt; # Now convert the integer chosen to the proper form
+&gt; case $FRAMETYPE in
+&gt; 1) FRAMETYPE="802.2"
+&gt; ;;
+&gt; 2) FRAMETYPE="802.3"
+&gt; ;;
+&gt; 3) FRAMETYPE="EtherII"
+&gt; ;;
+&gt; 4) FRAMETYPE="SNAP"
+&gt; ;;
+&gt; *) FRAMETYPE="802.2" # Fall through to default
+&gt; ;;
+&gt; esac
+&gt;
+&gt; until [ "$BIND" -gt "0" ] && [ "$BIND" -lt "5" ]
+&gt; do
+&gt;     clear
+&gt;     echo "============================================"
+&gt;     echo "   Binding IPX to your network interface"
+&gt;     echo "    - Verify Settings"
+&gt;     echo "============================================"
+&gt;     echo
+&gt;     echo "You have chosen to bind $NIC using $FRAMETYPE"
+&gt;     echo
+&gt;     echo "1. Bind the NIC only for this session."
+&gt;     echo "2. Bind the NIC now and make it automatic at"
+&gt;     echo "   bootup so that IPX is always available."
+&gt;     echo "3. Do not bind IPX at this time."
+&gt;     echo "4. Change the NIC or frametype setting."
+&gt;     echo
+&gt;     echo -en "?: "
+&gt;     read BIND
+&gt; done
+&gt; case $BIND in
+&gt; 1) :
+&gt;     echo "adding ipx interface:" &gt;&gt; setup.log
+&gt;     ipx_interface delall 2&gt;&gt; setup.log
+&gt;     ipx_interface add -p eth0 $FRAMETYPE 2&gt;&gt; setup.log
+&gt; ;;
+&gt; 2) :
+&gt;     echo "adding ipx interface:" &gt;&gt; setup.log
+&gt;     ipx_interface delall 2&gt;&gt; setup.log
+&gt;     ipx_interface add -p eth0 $FRAMETYPE 2&gt;&gt; setup.log
+&gt;     
+&gt;     echo "#! /bin/sh" &gt;&gt; $RCFILE
+&gt;     # echo "nwserv" &gt;&gt; $RCFILE
+&gt;     #echo "nwserv" &gt;&gt; setup.log
+&gt;     echo "ipx_configure --auto_interface=on --auto_primary=on" &gt;&gt; $RCFILE
+&gt;     echo "ipx_configure --auto_interface=on --auto_primary=on" &gt;&gt; 
+&gt; setup.log
+&gt;     echo "ipx_interface delall" &gt;&gt; $RCFILE
+&gt;     echo "ipx_interface delall" &gt;&gt; setup.log
+&gt;     echo "ipx_interface add -p eth0 $FRAMETYPE" &gt;&gt; $RCFILE
+&gt;     echo "ipx_interface add -p eth0 $FRAMETYPE" &gt;&gt; setup.log
+&gt;     chmod u=rwx $RCFILE
+&gt;     
+&gt;     if [ "$DIST" -eq "1" ]
+&gt;     then :
+&gt;     echo -en "\nInto which directory that you own would you like to 
+&gt; have your Netware Volumes appear?: "
+&gt;            read mountpoint
+&gt;        mkdir $mountpoint
+&gt;        echo -en "\nPlease enter the name of your server: "
+&gt;        read server
+&gt;        echo -en "\nPlease enter your password or -n for none: "
+&gt;        read password
+&gt;        echo -en "\nPlease enter your user name: "
+&gt;        read user
+&gt;        echo "#!/bin/bash" &gt;&gt; $HOME/novel.sh
+&gt;        echo ncpmount -S $server -U $user $mountpoint $password &gt;&gt; 
+&gt; $HOME/novel.sh
+&gt;        chmod u=rwx $HOME/novel.sh
+&gt;        #echo -en "\nWould you like to copy this script to the KDE 
+&gt; Autostart Directory?" [Y/N]
+&gt;        #read YN
+&gt;        #if [ $YN = "y" -o $YN = "Y" ]
+&gt;            #then
+&gt;            #    cp $HOME/novel.sh $HOME/.kde/Autostart
+&gt;        #    fi
+&gt; fi
+&gt;
+&gt; ;;
+&gt; 3) : # Do nothing. The IPX bind loop will drop through.
+&gt; ;;
+&gt; *) : # Do nothing. The IPX bind loop will restart since $BIND !&lt; 4
+&gt; esac
+&gt;
+&gt; done # End the bind IPX do loop
+&gt; fi # End the bind IPX if statement
+&gt;
+&gt; clear
+&gt; echo "============================================"
+&gt; echo "    Installing files for Novel Client"
+&gt; echo "============================================"
+&gt;
+&gt; echo -e "\nInstalling libraries..."
+&gt; echo -e "\nInstalling libraries..." &gt;&gt; setup.log
+&gt; #cp -Rpub usr $LIBDIR 2&gt;&gt; setup.log
+&gt; cd /root/novelclient/usr/local/lib/kylix2
+&gt; mkdir /usr/local/lib/kylix2
+&gt; cp *.* /usr/local/lib/kylix2 2&gt;&gt; setup.log
+&gt; #fi
+&gt;
+&gt;
+&gt;
+&gt; echo -e "\nInstalling executables..."
+&gt; echo "Installing executables..." &gt;&gt; setup.log
+&gt; #cp -pub Novel $EXECDIR 2&gt;&gt; setup.log
+&gt; #cp -pub novelclient $EXECDIR 2&gt;&gt; setup.log
+&gt;
+&gt; if [ "$DIST" -eq "1" ]
+&gt; then :
+&gt; cp /root/novelclient/novelclient /usr/local/bin 2&gt;&gt; setup.log
+&gt; cp /root/novelclient/Novel /usr/local/bin 2&gt;&gt; setup.log
+&gt; fi
+&gt;
+&gt; if [ "$DIST" -eq "2" ]
+&gt; then :
+&gt; cp /root/novelclient/novelclient /usr/local/bin 2&gt;&gt; setup.log
+&gt; cp /root/novelclient/Novel /usr/local/bin 2&gt;&gt; setup.log
+&gt; fi
+&gt;
+&gt;
+&gt; echo -e "\nAdding icons..."
+&gt; echo "Adding icons..." &gt;&gt; setup.log
+&gt; cp -pub Graphics/NovelClient_??.png $ICONDIR 2&gt;&gt; setup.log
+&gt;
+&gt; echo -e "\nCreating KDE desktop shortcut..."
+&gt; echo "Creating KDE desktop shortcut..." &gt;&gt; setup.log
+&gt; if [ -d $KDEDIR ]
+&gt; then :
+&gt; else
+&gt;     mkdir $KDEDIR 2&gt;&gt; setup.log
+&gt; fi
+&gt; cp -pub NovelClient.desktop $KDEDIR 2&gt;&gt; setup.log
+&gt;
+&gt; if [ "$DIST" -eq "1" ]
+&gt; then :
+&gt; cp /root/novelclient/Novel.Client /root/Desktop &gt;&gt; setup.log
+&gt; cp /root/novelclient/nwserv.conf /etc/mars-nwe/nwserv.conf &gt;&gt; setup.log
+&gt; cp /root/novelclient/mars-nwe /etc/init.d &gt;&gt; setup.log
+&gt; update-rc.d -f mars-nwe remove
+&gt; update-rc.d -f mars-nwe start 20 2 3 4 5 .
+&gt; update-rc.d -f rc.local remove
+&gt; update-rc.d -f rc.local start 99 2 .
+&gt;
+&gt; fi
+&gt;
+&gt;
+&gt;
+&gt; #echo -e "\nCreating Gnome desktop shortcut..."
+&gt; #echo "Creating Gnome desktop shortcut..." &gt;&gt; setup.log
+&gt; #if [ -d $GNOMEDIR ]
+&gt; #then :
+&gt; #else
+&gt; #    mkdir $GNOMEDIR 2&gt;&gt; setup.log
+&gt; #fi
+&gt; #cp -pub NovelClient.desktop $GNOMEDIR 2&gt;&gt; setup.log
+&gt;
+&gt; echo -e "\n\n"
+&gt; echo "############################################"
+&gt; echo "Novel Client for Linux Installation Complete"
+&gt; echo "############################################"
+&gt; echo -e "\nCheck the setup.log file for error messages\n"
+&gt; echo "Setup complete..." &gt;&gt; setup.log
+&gt;
+&gt;
+
+
+
+
+
+
+For now look over the script, but don't run it.
+
+
+Look it over before you run it
+
+
+
+
+Wilkinson,Alex wrote:
+
+&gt;Howdy crew,
+&gt;
+&gt;Is it possible to mount novell filesystems on Linux.
+&gt;If so, pointer ?
+&gt;
+&gt;Thanks
+&gt;
+&gt; - aW
+&gt;
+&gt;  
+&gt;
+
+-- 
+Your favorite stores, helpful shopping tools and great gift ideas. 
+Experience the convenience of buying online with <A HREF="mailto:Shop@Netscape">Shop@Netscape</A>! 
+<A HREF="http://shopnow.netscape.com/">http://shopnow.netscape.com/</A>
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

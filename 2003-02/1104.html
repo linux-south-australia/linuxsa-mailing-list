@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Fw: Re: linux from dos" -->
+<!-- FromName="'Daniel Burke'" -->
+<!-- FromEmail="burito@airnet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 25 Feb 2003 00:04:13 +1030" -->
+<!-- Id="20030225000413.71c2d893.burito@airnet.com.au" -->
+<!-- Reference="20030224181609.419f7122.burito@airnet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Fw: Re: linux from dos</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Burke &lt;<I><A HREF="mailto:burito@airnet.com.au">burito@airnet.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 25 Feb 2003 00:04:13 +1030
+</PRE>
+<H1>Re: Fw: Re: linux from dos</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, 24 Feb 2003 20:05:09 +1030
+Daryl Tester &lt;<A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A>&gt; wrote:
+
+&gt; Nit Pickin' Time!
+&gt; 
+&gt; Daniel Burke wrote:
+&gt; 
+&gt; &gt;&gt; Need a tool to convert a text file to unix format from dos. I believe the EOL char
+&gt; &gt;&gt; is causing an issue for me.
+&gt; 
+&gt; &gt; For starters there is no such thing as a "EOL" char. There is however Carrage Return
+&gt; &gt; (0x0A) and Line Feed (0x0D).
+&gt; 
+&gt; That's Carriage Return (0x0d) and Line Feed (0x0a).
+
+Damn, dyslexia strikes again :-)
+
+&gt; 
+&gt; &gt; Here is a C program to perform the conversion,
+&gt; 
+&gt; The following program described adds carriage returns before line feeds.  To convert
+&gt; from DOS text format files to Unix text format, you need to remove the carriage
+&gt; returns.  "tr -d \\015" does this well.
+
+I'm not familiar with translate's syntax, but that should be 14 unless tr is totally loopy and starts counting at 1 instead of 0. Wow I must've completely looped out.. dyslexia is getting me hard-core I could've sworn he asked for unix to dos. I need a smoke...
+Afterthought... he did ask for "unix2dos"...
+
+&gt; &gt; it will run pathetically slow on Microsoft platforms.
+&gt; 
+&gt; Most character at a time I/O does.  Reading in larger blocks (at least, larger
+
+Of course, but my reason for singling out MS's platform is its shoddy caching, memory management (used by caching)... and general all 'round shoddyness. It would've been slow on unix, but thats nothing compared to the painfull execution speed on an ms platform.
+
+&gt; that what the Standard C library provides) improves the I/O, at the cost of
+&gt; complexity.  But this has to be weighed against the number of times the program
+&gt; is going to run anyway.
+
+I'm not using the program, so :-p
+ 
+&gt; &gt; int main (int argc, char argv[][])
+&gt; &gt; {
+&gt; &gt;         FILE * fin, fout;
+&gt; &gt;         char buf;
+&gt; &gt;         char lf=0x0D;
+&gt; &gt;         fin = fopen(argv[1], "r");
+&gt; &gt;         fout = fopen(argv[2], "w");
+&gt; 
+&gt; Should check for argument count (otherwise fopen will probably segfault on
+&gt; NULL pointers if insufficient arguments are passed in) and that fopen
+&gt; returned non-null, otherwise the following calls will fail.
+
+Should but.. I'm not distributing binaries, documentation, even a source file. It's just a little note in an email.
+
+&gt; 
+&gt; &gt;         while(fread(&buf, 1, 1, fin))
+&gt; &gt;         {
+&gt; &gt;                 if(buf==0x0A)
+&gt; &gt;                         fwrite(&lf,1,1, fout);
+&gt; &gt;                 fwrite(&buf,1,1, fout);
+&gt; &gt;         }
+&gt; 
+&gt; As noted above, the logic for this is incorrect for what was asked.
+&gt; 
+&gt; To make it more like a traditional Unix filter, it would probably
+&gt; be preferable to use stdin and stdout (and have the shell/whatnot
+&gt; open the files for you).
+I thought the filtering was the other way around, and therefore more likely to be executed on DOS, where filters are not an option. My version will run on both platforms.
+&gt; 
+&gt; #include &lt;stdio.h&gt;
+&gt; 
+&gt; #define CR  0x0d
+&gt; 
+&gt; int
+&gt; main(int argc, char *argv[])
+&gt; {
+&gt;     int  ch;
+Using ints to store chars is naughty.
+&gt;     /* Possible arg. checking here. */
+&gt; 
+&gt;     while (ch = fgetc(stdin), ch != EOF) {
+Checking for successful assignment is bad, you actually mean to check success of fgetc()
+&gt;         if (ch != CR) {
+&gt;             if (fputc(ch, stdout) == EOF) {
+&gt;                  perror("write");
+&gt;                  exit(1);
+exit() is bad karma.. its unstable on at least one platform (though I forget which) and bad practice.
+&gt;             }
+&gt;         }
+&gt;     }
+&gt; 
+&gt;     return 0;
+&gt; }
+&gt; 
+&gt; Sans comments.
+Commenting self explanatory programs is VERY evil. 
+
+int *argv[] and int argv[][] are synonyms for each other. I find [][] quicker to type, but typing patterns are out of scope here :-p
+I was assuming (yes I know assumptions are evil) the user had basic basic C knowledge (operation of a compiler at least) and would be able to see/guess the correct operation of the program.
+stdio.h is included by default in %95 of compilers. gcc being one of them. gcc 3.2 doesn't, but 2.95.x does, and it's in pretty much every distro out there. In my haste, I omitted the return 0, which in afterthought, I must say that was the most evil of my mistakes, but the aim was less lines to make it easier to understand.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

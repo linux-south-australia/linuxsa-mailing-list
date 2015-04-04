@@ -1,0 +1,163 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: (c-code)writing and reading from pipes" -->
+<!-- FromName="Robert Wuttke" -->
+<!-- FromEmail="robert.wuttke@disc.com.au" -->
+<!-- ToName="Jake Hawkes" <jake@eclectic.com.au>, "LinuxSA Mailing List" -->
+<!-- ToEmail="jake@eclectic.com.au" -->
+<!-- Date="Tue, 18 May 1999 16:57:06 +0930" -->
+<!-- Id="004a01bea0ff$d6e21d00$9d000045@robert.disc.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: (c-code)writing and reading from pipes</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Robert Wuttke &lt;<I><A HREF="mailto:robert.wuttke@disc.com.au">robert.wuttke@disc.com.au</A></I>&gt;
+  To  : Jake Hawkes" &lt;jake@eclectic.com.au&gt;, "LinuxSA Mailing List &lt;<I><A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A></I>&gt;
+  Date: Tue, 18 May 1999 16:57:06 +0930
+</PRE>
+<H1>Re: (c-code)writing and reading from pipes</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Well as far as I can see your assumptions seem to be correct.
+
+Write should return straight away with the amount of bytes written to the
+pipe file. Straight away the read happens. B Could rarely get a chance as it
+would have to be swapped in, made the active process between the write and
+read code in A, there is a window, but is extremely slim.
+
+As far as A is concerned (due to the nature of read/write pipes), the data
+waiting there for the read is new data, it doesn't care where it came from.
+
+I would suggest a timeout period and setjmp and longjmp (????!!!?? Check the
+man pages). Or a packet header to identify that it came from me. Something
+would have to be done to stop a from reading itself.
+
+To be honest I would suggest using the separate pipe idea. You can then
+handle the synch by yourself instead of hoping that the scheduler does what
+you want...
+
+I can't give you the code for several reasons:
+
+1) No Linux box or C compiler in front of me 8-(
+2) C is rusty (okay very rusty!)
+
+I hope this helps.
+
+Rob.
+
+Disclaimer: This info may/may not help, it may/may not be correct. Oh
+well................
+
+-----Original Message-----
+From: Jake Hawkes &lt;<A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A>&gt;
+To: LinuxSA Mailing List &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Date: Tuesday, 18 May 1999 3:39 PM
+Subject: PRO: (c-code)writing and reading from pipes
+
+
+&gt;
+&gt;there, hope the subject line is helpfull ;)
+&gt;
+&gt;
+&gt;ok, two progs (proc A and procB) want to communicate with each other via
+&gt;a pipe, or pipes. The communications is to be 2-way.
+&gt;
+&gt;here are the (relevant) code snippets...
+&gt;(error checking, #define removed)
+&gt;
+&gt;procA
+&gt;  pipe = open("/tmp/rip_pipe", O_RDWR);
+&gt;
+&gt;  count = write(pipe, buff, 2);
+&gt;
+&gt;  read(pipe, buff, 2));
+&gt;
+&gt;procB
+&gt;  pipe = open("tmp/rip_pipe", O_RDWR);
+&gt;
+&gt;while(1) {
+&gt;  FD_SET(pipe, &fdSet);
+&gt;  FD_ZERO(&fdSet);
+&gt;
+&gt;  select(pipe+1, &fdSet, NULL, NULL, NULL);
+&gt;
+&gt;  if(!FD_ISSET(pipe, &fdSet))
+&gt;     continue;
+&gt;
+&gt;  count = read(pipe, buff, 2);
+&gt;
+&gt;  /*logic stuff*/
+&gt;
+&gt;  count = write(pipe, buff, 2);
+&gt;} /* end while(1) */
+&gt;
+&gt;bash$&gt; mkfifo /tmp/rip_pipe
+&gt;
+&gt;this is what I think is happening.
+&gt;
+&gt;  o   procA writes to the pipe
+&gt;       \--&gt; the write is successfull (buffered is some magic kernel
+&gt;buffer ??)
+&gt;  o   procB isn't swapped in by the kernel, and so the select() doesn't
+&gt;get a chance         \--&gt; or something....
+&gt;  o   procA reads the pipe
+&gt;       \--&gt; the read is successfull, and the same data back as it wrote.
+&gt;
+&gt;As far as the reads and writes being successful, this is true. The bytes
+&gt;read and written have been checked, the data read is in fact the same as
+&gt;that written.
+&gt;
+&gt;Can anyone confirm/deny my guess as to what's happening?
+&gt;
+&gt;One alternative to this is to have 2 pipes (1 read and 1 write), but I'd
+&gt;like this solution better.
+&gt;
+&gt;If I haven't explained it well enough, I'd be glad to say it all again
+&gt;:).
+&gt;
+&gt;--
+&gt;
+&gt;Jake Hawkes, B. Eng (CSE)
+&gt;
+&gt;e-mail: <A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A>
+&gt;
+&gt;--
+&gt;Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

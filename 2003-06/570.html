@@ -1,0 +1,220 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Kernel Patching" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Master Gnome'" -->
+<!-- ToEmail="no_gnome@tpg.com.au" -->
+<!-- Date="Tue, 17 Jun 2003 15:14:52 +0930" -->
+<!-- Id="3EEEAAD4.3050508@aarnet.edu.au" -->
+<!-- Reference="1055817140.2696.2.camel@Purgatory.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Kernel Patching</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Master Gnome &lt;<I><A HREF="mailto:no_gnome@tpg.com.au">no_gnome@tpg.com.au</A></I>&gt;
+  Date: Tue, 17 Jun 2003 15:14:52 +0930
+</PRE>
+<H1>Re: Kernel Patching</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Master Gnome wrote:
+&gt; Can someone give a rough idea how long it takes to patch kernel source.
+&gt; It's the first time i've tried it and its taking a while.
+
+
+I think it might take forever.  Remember that the syntax is
+
+   patch -p1 &lt; file.patch
+
+If you have a brain-fart and say
+
+   patch -p1 file.patch
+
+it still waits for the input from stdin.  Forever.
+
+I've attached the complete procedure.
+
+-- 
+  Glen Turner         Tel: (08) 8303 3936 or +61 8 8303 3936
+  Network Engineer          Email: <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>
+  Australian Academic & Research Network   www.aarnet.edu.au
+-- 
+  linux.conf.au 2004, Adelaide          lca2004.linux.org.au
+  Main conference 14-17 January 2004   Miniconfs from 12 Jan
+
+                        COMPILING A 2.4 KERNEL
+                          (Red Hat Linux 9)
+
+
+DOWNLOAD A NEW KERNEL
+
+Kernel.org is mirrored at
+ <A HREF="http://mirror.aarnet.edu.au/pub/linux/kernel/">http://mirror.aarnet.edu.au/pub/linux/kernel/</A>
+
+Get a 2.4 kernel from 
+ <A HREF="http://mirror.aarnet.edu.au/pub/linux/kernel/v2.4/">http://mirror.aarnet.edu.au/pub/linux/kernel/v2.4/</A>
+say linux-2.4.20.tar.bz2
+
+Get any "pre" or "rc" version patches from
+ <A HREF="http://mirror.aarnet.edu.au/pub/linux/kernel/v2.4/testing/">http://mirror.aarnet.edu.au/pub/linux/kernel/v2.4/testing/</A>
+say 
+ patch-2.4.21-rc5.bz2
+
+Note that the kernel's version ordering is peculiar, the following
+relationship holds:
+
+ 2.4.21-pre1 &lt; 2.4.21-pre2 &lt; 2.4.21-rc1 &lt; 2.4.21-rc2 &lt; 2.4.21
+
+
+UNPACK THE KERNEL SOURCE
+
+Only vendor kernels go into /usr/src.  Build your own kernels under
+your home directory.
+
+  $ cd
+  $ mkdir kernel
+  $ cd kernel
+  $ tar xjf ../linux-2.4.20.tar.bz2
+
+
+PATCH THE KERNEL SOURCE
+
+  $ cd linux-2.4.20
+  $ bzip2 -dc ../patch-2.4.21-rc5.bz2 | patch -p1 --dry-run
+
+Look for any errors, if none, do it for real
+
+  $ bzip2 -dc ../patch-2.4.21-rc5.bz2 | patch -p1
+
+
+CREATE A CONFIGURATION
+
+The simplest way is to start with the vendor kernel configuration and
+examine only what has changed between the vendor kernel and this
+kernel.
+
+The Red Hat Linux configuration is kept with the kernel source.  There
+is a file per platform variant (processor, SMP).
+
+  # rpm -ivh kernel-source...rpm
+  $ cp /usr/src/linux-2.4.../configs/kernel-2.4...i686.config .config
+
+Rather than download a massive RPM to extract a very short file, have
+a look at the pre-extracted configuration files at:
+
+  <A HREF="http://www.kernelnewbies.org/kernels/rh9/SOURCES/">http://www.kernelnewbies.org/kernels/rh9/SOURCES/</A>
+
+Now
+
+  $ make oldconfig
+
+Most of the answers will automatically be completed.  Guess the
+remainder :-)
+
+You might want to explore the resulting configuration with:
+
+  $ make xconfig
+
+If you get "make: wish: Command not found" when starting the X kernel
+configuration tool then install Tcl/Tk:
+
+  # rpm -Uvh tcl-...i386.rpm tcllib-...i386.rpm tk-...i386.rpm
+
+
+COMPILE
+
+The compilation commands are:
+
+ $ make clean
+ $ make dep
+ $ make bzImage
+ $ make modules
+
+Since this takes a while you can chain the lot together
+
+ $ make clean && make dep && make bzImage && make modules
+
+The kernel unpacks in a clean state [1], so "make clean" is only
+really needed after configuration changes.
+
+  [1] This isn't so for the sources in the kernel-source RPM.
+
+
+INSTALL - EASY
+
+The kernel build system and recent Linux distributions have
+installation hooks to make life easy
+
+ # make modules_install
+ # make install
+
+
+INSTALL - HARD
+
+Otherwise copy the kernel and symbol map into /boot by hand
+
+ # VERSION=2.4.21-rc5
+ # cp arch/i386/bzImage /boot/vmlinuz-${VERSION}
+ # make modules_install
+ # mkinitrd /boot/initrd-${VERSION}.img ${VERSION}
+
+As root edit /etc/grub.conf.  Copy a previous "title" clause and
+its following indented lines.  Alter the title text and version
+numbers
+
+For example, if the file contains
+
+  title Red Hat Linux (2.4.20-13.9)
+        root (hd0,1)
+        kernel /vmlinuz-2.4.20-13.9 ro root=LABEL=/ hdc=ide-scsi idebus=100
+        initrd /initrd-2.4.20-13.9.img
+
+then add
+      
+  title My kernel
+        root (hd0,1)
+        kernel /vmlinuz-2.4.21-rc5 ro root=LABEL=/ hdc=ide-scsi idebus=100
+        initrd /initrd-2.4.21-rc5.img
+
+
+REBOOT
+
+ # shutdown -r now
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

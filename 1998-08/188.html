@@ -1,0 +1,316 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: DHCPD Server" -->
+<!-- FromName="Adrian Butterworth" -->
+<!-- FromEmail="adrian@econ-outlook.com.au" -->
+<!-- ToName="Mike O'Connor" -->
+<!-- ToEmail="mjoconr@pineview.ml.org" -->
+<!-- Date="Thu, 20 Aug 1998 00:42:05 +0930" -->
+<!-- Id="35DAEB45.9D992BB1@econ-outlook.com.au" -->
+<!-- Reference="001301bdcac2$18d7bd60$20ba26cb@themaster.pineview.ml.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: DHCPD Server</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adrian Butterworth &lt;<I><A HREF="mailto:adrian@econ-outlook.com.au">adrian@econ-outlook.com.au</A></I>&gt;
+  To  : Mike O'Connor &lt;<I><A HREF="mailto:mjoconr@pineview.ml.org">mjoconr@pineview.ml.org</A></I>&gt;
+  Date: Thu, 20 Aug 1998 00:42:05 +0930
+</PRE>
+<H1>Re: DHCPD Server</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Mike
+Just got back to my desk
+I see Geoff has pointed you to the nub of the problem.
+
+a bit of investigation suggests a nest of problems which
+could take you a while to uncover so I've made some
+more specific comments which I hope will help
+
+The short answer
+- you have set your host to the wrong ip, should be 203.38.186.33,
+  not 32 (according to domain authorities)
+- your netmask is one of 255.255.255.224 or .240 or .248 or .252
+- your netaddress is almost certainly 203.38.186.32
+ (another reason why you must change your host address)
+- your broadcast address can't be 203.38.186.40 possible options
+  corresponding to the above netmasks are 203.38.186.63 or .47
+  or .39 or .35 
+- you need to change your local nameservers domain files to match
+  the authoritative ml.org allocation of 203.38.186.33 for your host
+- you need to set telstra's reverse lookup "in-addr.arpa" for
+  203.38.186.33 to pineview.ml.org using their web form
+- once all this is done & working plug the right numbers into
+  the DHCPD conf file
+- add the 255.255.255.255 host route & some of the trimmings I
+  mentioned before if you want all windows boxes to dance 
+- the joys of DHCP should be all yours
+
+the long answer, explanations & my reasoning (and CAVEAT) are:
+
+a net/subnet has a series of addresses
+there used to be a minumum of 256 called a class C but now this can
+be cut into bits.
+these bits or classless nets must be 4, 8, 16, 32, 64 or 128
+addresses long.
+all addresses on one of these nets are contiguous.
+each net has:
+ a net address - the first address in the range 
+ a broadcast address - the last address in the range
+ host addresses - any addresses in the middle
+ a netmask - a way to describe how many host addresses are
+ in the net
+
+looking at the addresses in your DHCP config we know the
+addresses aren't right.
+
+an IP address is really a 32bit number which is best viewed as
+binary bits
+
+  203   .   38   .   186  . 32
+11001011 00100110 10111010 00100000
+
+All ip adresses are treated as two parts
+the network number
+and the host address
+
+in nets like ours most bits are the network number (all at the top)
+and a few bits at the bottom are addresses we can use for hosts etc.
+
+the netmasks purpose is to define where the split occurs
+it is always a string of ones followed by a string of zeros
+
+a netmask of 255.255.255.192 
+11111111 11111111 11111111 11000000
+describes the split where the top 26 bits are the number of the
+network the bottom 6 bits are numbers you can use for hosts. 
+--- 64 except the smallest & largest numbers are reserved 
+remember so you can use 62
+
+a netmask of 255.255.255.224 
+11111111 11111111 11111111 11100000
+ie the top 27 bits are the number of the network
+the bottom 5 bits are numbers you can use for hosts. 
+--- 32 except ... so you can use 30
+
+a netmask of 255.255.255.240 
+11111111 11111111 11111111 11110000
+ie the top 28 bits are the number of the network
+the bottom 4 bits are numbers you can use for hosts. 
+--- 16 except ... so you can use 14
+
+a netmask of 255.255.255.248 
+11111111 11111111 11111111 11111000
+ie the top 28 bits are the number of the network
+the bottom 4 bits are numbers you can use for hosts. 
+--- 8 except ... so you can use 6
+
+
+the network address is allocated to you and is of course
+all zeros at the bottom.
+if you have been given a netmask of 255.255.255.192 or
+255.255.255.64 or 255.255.255.0 (the whole class C) 
+you could have a host 203.38.186.32 but if its anything
+greater than 192 you can't because .32 is all zeros in the host
+part, all zeroes has to be the smallest address in the range.
+This all zeros host is the special reserved number to describe
+the network. Using it for a host will confuse the hell out of
+networking software (like DHCP). 
+
+I have concluded you have 5 bits or less of network space
+by looking at other people on the net around your addresses.
+a quick check shows there are several domains squashed below yours
+in the same class C IP space!
+viz: 
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ nslookup 203.38.186.1
+&gt; Server:  localhost
+&gt; Address:  127.0.0.1
+&gt;
+&gt; Name:    ilc.gov.au
+&gt; Address:  203.38.186.1
+
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ nslookup 203.38.186.17
+&gt; Server:  localhost
+&gt; Address:  127.0.0.1
+&gt;
+&gt; Name:    bronkowitz.keghouse.net
+&gt; Address:  203.38.186.17
+
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ nslookup 203.38.186.25
+&gt; Server:  localhost
+&gt; Address:  127.0.0.1
+&gt;
+&gt; Name:    patricias.norks.net
+&gt; Address:  203.38.186.25
+
+there are also hosts/domains not far above your server. viz:
+
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ nslookup 203.38.186.65
+&gt; Server:  localhost
+&gt; Address:  127.0.0.1
+&gt;
+&gt; Name:    konectanet-gw.konectanet.com.au
+&gt; Address:  203.38.186.65
+
+so unless you are hosting multiple domains and hosts &lt;&lt;&lt;&lt;=the CAVEAT
+(in which case my assumptions fall apart!)
+I have you sandwiched between 32 & 63 a max of 32 addresses (5 bits)
+  203   .   38   .   186  . 32
+11001011 00100110 10111010 00100000
+to 
+  203   .   38   .   186  . 63
+11001011 00100110 10111010 00111111
+
+...32 is reserved to indicate for the network address.
+...63 is reserved for the broadcast address.
+
+if you have less than 5 bits in your net (a distinct possibility)
+the tighter mask and broadcast addresses would apply!!
+
+I think therefore it is highly likely 203.38.186.32 is the
+first address in your range which must be reserved! 
+
+so RENUMBER YOUR HOST to 203.38.186.33
+
+Also a broadcast address can never be 203.38.186.40
+in binary this is 11001011 00100110 10111010 0101000
+a broadcast address must be the last number in the net
+therefore all 1's in the "host" part
+I suspect it is 
+  203   .   38   .   186  . 63
+11001011 00100110 10111010 00111111
+
+again if you have less bits in your net 
+the tighter mask and broadcast addresses would apply!!
+
+
+Supporting my view that you have used the net address for the server
+I see from nslookup and dnsquery's that your machines IP's are
+confused in the domain name system as well!!!
+
+according to the domain authorities your host it is supposed to be
+.33 not .32  -  This is a CRITICAL problem
+
+The "world" thinks pineview.ml.org & themaster.pineview.ml.org
+are the one machine with an IP of 203.38.186.33 viz:
+
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ nslookup pineview.ml.org
+&gt; Server:  localhost
+&gt; Address:  127.0.0.1
+&gt; 
+&gt; Non-authoritative answer:
+&gt; Name:    pineview.ml.org
+&gt; Address:  203.38.186.33
+
+&:
+
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ nslookup pineview.ml.org d.ns.ml.org
+&gt; Server:  ns.brainstorm.fr
+&gt; Address:  193.56.58.253
+&gt; 
+&gt; Name:    pineview.ml.org
+&gt; Address:  203.38.186.33
+
+&:
+
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ nslookup themaster.pineview.ml.org
+&gt; Server:  localhost
+&gt; Address:  127.0.0.1
+&gt; 
+&gt; Non-authoritative answer:
+&gt; Name:    pineview.ml.org
+&gt; Address:  203.38.186.33
+&gt; Aliases:  themaster.pineview.ml.org
+&gt; 
+
+The world however can't find a machine at this address
+
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ ping 203.38.186.33
+&gt; PING 203.38.186.33 (203.38.186.33): 56 data bytes
+&gt; ò
+&gt; --- 203.38.186.33 ping statistics ---
+&gt; 5 packets transmitted, 0 packets received, 100% packet loss
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$
+
+nor can it find a reverse lookup
+
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ nslookup 203.38 186.33
+&gt; ò
+
+there is however a machine on 203.38 186.32
+
+viz:
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ ping 203.38.186.32
+&gt; PING 203.38.186.32 (203.38.186.32): 56 data bytes
+&gt; 64 bytes from 203.38.186.32: icmp_seq=0 ttl=124 time=191.7 ms
+&gt; 64 bytes from 203.38.186.32: icmp_seq=1 ttl=124 time=192.7 ms
+&gt; ò
+&gt; --- 203.38.186.32 ping statistics ---
+&gt; 2 packets transmitted, 2 packets received, 0% packet loss
+&gt; round-trip min/avg/max = 191.7/192.2/192.7 ms
+
+This thinks it is called pineview.ml.org & themaster.pineview.ml.org
+
+viz:
+
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ nslookup pineview.ml.org 203.38.186.32
+&gt; Server:  themaster.pineview.ml.org
+&gt; Address:  203.38.186.32
+&gt; 
+&gt; Name:    themaster.pineview.ml.org
+&gt; Address:  203.38.186.32
+&gt; Aliases:  pineview.ml.org
+
+The world doesn't have a reverse lookup for it
+viz
+
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ nslookup 203.38 186.32
+&gt; ò
+
+but it has one for itself!
+
+&gt; [<A HREF="mailto:adrian@grissom">adrian@grissom</A> adrian]$ nslookup 203.38.186.32 203.38.186.32
+&gt; Server:  themaster.pineview.ml.org
+&gt; Address:  203.38.186.32
+&gt;
+&gt; Name:    themaster.pineview.ml.org
+&gt; Address:  203.38.186.32
+
+
+Hope all this helps!
+
+Regards
+Adrian
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,164 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: X SERVER HAS CARKED IT (AGAIN)" -->
+<!-- FromName="Benjamin Close" -->
+<!-- FromEmail="linux@senet.com.au" -->
+<!-- ToName="David Lloyd" -->
+<!-- ToEmail="lloy0076@senet.com.au" -->
+<!-- Date="Fri, 4 Jun 1999 16:49:04 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.10.9906041629510.608-100000@Bytes4u.nodomain.yet" -->
+<!-- Reference="3.0.5.32.19990603180448.007a7560@pop.senet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: X SERVER HAS CARKED IT (AGAIN)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Benjamin Close &lt;<I><A HREF="mailto:linux@senet.com.au">linux@senet.com.au</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:lloy0076@senet.com.au">lloy0076@senet.com.au</A></I>&gt;
+  Date: Fri, 4 Jun 1999 16:49:04 +0930 (CST)
+</PRE>
+<H1>Re: X SERVER HAS CARKED IT (AGAIN)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, 3 Jun 1999, David Lloyd wrote:
+
+&gt; I use RedHat 5.2. 
+&gt; 
+&gt; I installed Star Office 5.1 and it decided that it didn't like the S3_Virge
+&gt; drivers that I was using. This was OK. The Docs said that I'd be better off
+&gt; using a plain old SVGA driver. I used Xconfigurator to change over to the
+&gt; SVGA server...then the dramas started.
+&gt; 
+&gt; X decided that it wouldn't start at all. Essentially it says
+&gt; "-X11TransSocketUNIXConnect:can't connect:errn=111". Naturally, this is
+&gt; about as helpful to me as the Blue Screen of Death. It also states that the
+&gt; "mode 800x600 doesn't has no entry". Yet in my XF86Config file ALL my
+&gt; Screen / sub section display sections talk of a mode "800x600" and it does
+&gt; exist in the monitor section (the section which lists all the hysnc
+&gt; frequencies etc which appears above the screen section).
+&gt; 
+
+OK, this "Blue screen of death" does help me know what is wrong :)
+Your problem sounds like it lies in your monitor setting. 
+
+What?!? I hear you say.
+How does my monitor effect this?
+
+When you start X it looks at what video mode you have selected. (800x600)
+Then it goes to the monitor section and looks at what mode lines are
+available. (There is a few for 800x600 in /etc/X11/XF86Config) Next it
+looks at the max/min horizontal/vertical refresh rates for you monitor.
+
+Using these refresh rates it removes any entries that your monitor does
+not support. In your case all of them.
+
+This leaves the server in a state where it can't do its video startup.
+Since the video side of X talks to the low level stuff using sockets, one
+part of X can't talk to the other (as it didn't start) and hence you
+get... "-X11TransSocketUNIXConnect:can't connect:errn=111"
+
+&gt; After using Xf86Setup to try to rectify the situation, I determined that I
+&gt; do have the SVGA driver installed AND *all* the S3 servers installed, hence
+&gt; I don't believe my problem is "the server is not installed".
+
+Neither do I.
+ 
+&gt; I then tried to use Xconf (the text based program) to try to rectify the
+&gt; situation. It said something to the effect that I should have "/usr/X11" in
+&gt; my path *before* "/usr/X11R6/bin" (or whatever), but I can't work out how
+&gt; to change the PATH variable, either at the command line or have it set at
+&gt; boot. Interstingly, Xconf does get X to start - in 300x200 mode!!!!! 
+
+Setting the path won't solve this problem.
+You got the 300x200 mode as the monitor refresh rates where withing it's
+limits.
+ 
+&gt; In dos you simply state set Path=(whatever you want). In Unix, can you do
+&gt; the same? I've tried adjusting it using something to the effect of:
+&lt;SNIP&gt;
+&gt; I don't understand. I thought my new path would have overwritten the old
+&gt; one, but instead it just did something wacko.
+
+Linux is a bit different to dos. You have a local environment & a global
+environment. Different shells set the environment differently. You need to
+set the global envronment.
+
+Under bash the command you want is: export PATH=.....
+Under csh: setenv path (......)
+
+
+&lt;SNIP&gt;
+
+&gt; Not the 16th time :-(
+
+Did you choose the correct monitor settings or assume they didn't matter?
+
+&gt; I'm at wits end! Although I use the command line in Linux quite a lot, I
+&gt; can't view my wonderful images or use gimp in bash - I *need* X. Are there
+&gt; any suggestions of what might be wrong????
+
+Agreed, a GUI is always handy - even if it's for netscape.
+My suggestions it to edit /etc/X11/XF86Config and under the monitor
+section put in the CORRECT settings. 
+
+Ie. Mine are:
+
+Section "Monitor"
+
+    Identifier  "ADI MicroScan 4V"
+    VendorName  "ADI"
+    ModelName   "MicroScan 4V"
+
+    HorizSync   31.0-64.0
+    VertRefresh 50.0-100.0
+.
+.
+.
+
+
+PLEASE, PLEASE use the correct settings for you monitor else it can
+(depending on the monitor) blow the thing up.
+
+If you cant find settings safe ones normally are:
+
+HS: 48-60
+VR: 60-80
+
+Cheers,
+--
+
+* Benjamin Close
+* <A HREF="mailto:Benjsc@senet.com.au">Benjsc@senet.com.au</A>
+* Web Page: <A HREF="http://users.senet.com.au/~benjsc">http://users.senet.com.au/~benjsc</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

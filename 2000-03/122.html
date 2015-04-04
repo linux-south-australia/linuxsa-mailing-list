@@ -1,0 +1,121 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: converting a binary number to string on command line" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="Glen Turner <glen.turner@aarnet.edu.au>, linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 08 Mar 2000 12:59:56 +1000" -->
+<!-- Id="" -->
+<!-- Reference="Pine.BSF.3.96.1000307131536.15824A-100000@augustus.tellurian.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: converting a binary number to string on command line</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:Glen Turner <glen.turner@aarnet.edu.au>">Glen Turner <glen.turner@aarnet.edu.au></A>, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Wed, 08 Mar 2000 12:59:56 +1000
+</PRE>
+<H1>Re: converting a binary number to string on command line</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+At 06:01 PM 3/7/00 +1030, Glen Turner wrote:
+&gt;David Newall wrote:
+&gt;&gt; 
+&gt;&gt; But isn't this so much clearer (and more portable)?
+&gt;&gt; 
+&gt;&gt;  main() {
+&gt;&gt;   struct { char offset[50], unsigned short location; } data;
+&gt;&gt;   read(0, data, sizeof data);
+&gt;&gt;   printf("%u\n", data.location);
+&gt;&gt;  }
+&gt;
+&gt;It's not portable.
+&gt;
+&gt;The compiler may pad between
+&gt;  char offset[50]
+&gt;and
+&gt;  unsigned short location
+&gt;to bring "location" to a CPU word boundary.
+
+Indeed.  I have already had to deal with that issue in a number of places.
+
+Essentially you use macros to assemble the bytes into words ... 
+
+Ie,
+
+#define GSHORT(a) (unsigned short)(((unsigned char *)*a &lt;&lt; 8) | \
+					 ((unsigned char *)*a &lt;&lt; 0))
+
+Then you do GSHORT(buf + 50).
+
+A good compiler will be able to optimize the above into a 16 bit load, but
+if you want to force it on a LE system, simply make the macro a little more
+complex and change the LE version to:
+
+#define GSHORT(a) (unsigned short *)*a
+
+&gt;Interestingly, if you generalise the code you end up with
+&gt;something rather like "od".
+
+Yes, I think it _is_ better to use the tools that already exist.  While
+they do more, the order of magnitude cost in using them is going to be
+similar to a purpose built tool, and there is less code to maintain :-)
+
+
+&gt;-- 
+&gt; Glen Turner                                 Network Engineer
+&gt; (08) 8303 3936      Australian Academic and Research Network
+&gt; <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+&gt;--
+&gt; Earth is a single point of failure
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>, Master Linux Administrator :-),
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Co-author, SAMS Teach Yourself Samba in 24 Hours
+Author: First Australian 5-day, intensive, hands-on Linux SysAdmin course
+Author: First Australian 2-day, intensive, hands-on Samba course
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

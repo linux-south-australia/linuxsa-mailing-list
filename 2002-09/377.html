@@ -1,0 +1,164 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Printing with LaTeX....Avoiding the Quickbooks Pro Annual "Upgrade"with Appgen" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="linuxcpa@netscape.net" -->
+<!-- ToName="'linuxsa'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 10 Sep 2002 00:00:51 -0700" -->
+<!-- Id="3D7D98A3.5010506@netscape.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Printing with LaTeX....Avoiding the Quickbooks Pro Annual "Upgrade"with Appgen</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:linuxcpa@netscape.net">linuxcpa@netscape.net</A></I>&gt;
+  To  : linuxsa &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 10 Sep 2002 00:00:51 -0700
+</PRE>
+<H1>Printing with LaTeX....Avoiding the Quickbooks Pro Annual "Upgrade"with Appgen</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+If you are a bookkeeper or perhaps a chartered accountant that works 
+with small businesses, you have probably been forced to buy each and 
+every upgrade/version of Quickbooks each year. Using the Quickbooks 
+backup can be a real cost/time saver. What gets annoying is if your 
+client has Quickbooks 2002 and you only have 2001, you have to go out 
+and buy 2002 to read their data, and that's roughly $250 US. Appgen 
+costs $90 US, is made by accountants and offers a 30% discount to them, 
+in the hope that they will spread the word. (I know I will...have..doh! 
+:-) )
+
+Anyway, I don't appreciate having my arm twisted, so I came up with a 
+few different methods that has allowed us to not have to buy Quickbooks 
+Pro 2002 so far this year. This is what we do in order of preference:
+
+1. If the client uses Quicken, we ask them to export their data as a QIF 
+file. Gnucash & Moneydance can import that type of file. Not true for 
+Quickbooks Pro, AFAIK.
+
+2. So when we get a client's Quickbooks backup file, we restore it with 
+our older version of Quickbooks Slow. It will fail right at the end 
+saying that you need the new version of their product, Quickbooks Slower.
+
+What bites, is that you have to reboot, and you actually have to endure 
+a moment with Windows to convert the file in Appgen, as only the Windows 
+version can convert it. Be sure that before you reboot that you read the 
+instructions that come up when you go to "file/import from Quickbooks" 
+they are very clear.
+
+ After running the conversion you have to make a Apgen generated 
+Quickbooks import file for Linux. Unfortunately the next step is not 
+clear. The quickbooks file is not imported automatically as stated in 
+the instructions.  Instead you have to get the file  from where it is 
+placed.  Being able to mount other file systems comes in handy here if 
+you dual boot like I do.
+
+(There is one thing I didn't mention about the Apgen install. It will go 
+exactly as they say it will in the instructions, except that the program 
+will install and place the icon on root's desktop, and the program at 
+this point can only be run by root at the shell, unless you modify some 
+permissions. The 'monkey method' is to log in as root, right click on 
+/usr/appgen, select properties, and change the owner from root to 
+yourself/users.)
+
+Once you grab the data, you are golden, until you try to print.  The 
+Program's printing really sucks in Linux unless you use Latex.
+
+LaTeX...for everybody.
+
+I just learned this today....and I am still going to use LyX. Basically 
+this is what you do to get a readable report nothing fancy:
+
+1. Print your report to file in Appgen.
+
+2. Open the file with your favorite text editor and add the following to 
+the very top of the document:
+
+\documentclass[8pt,letterpaper]{book}                                 
+(&lt;----Note AU may use A4 instead of letterpaper)
+\special{papersize=11in,8.5in}                                           
+    (&lt;---If the print does not need to be landscape, loose this line)
+\oddsidemargin -1.25in                                                   
+        (odd and even page number left margins...I had about 1.5 in 
+empty/and off prior)
+\evensidemargin -1.25 in
+\begin{document}                                                         
+           (&lt;---means what it says)
+\begin{verbatim}                                                         
+             (&lt;----keep as is)
+
+Anything you put here literally will print as it is formatted already 
+(mostly due to spacing)  Fortunately, my  ASCII text file from Apgen's 
+trial balance is space delimited. Basicvly means, the data is already in 
+in neat rows for you.
+
+\end{verbatim}
+\end{document}
+
+
+After adding this stuff, save the file as whatever you want to call it 
+and type the following commands in the shell...
+
+1. latex name-of-tex-file-you-just-made   example:  latex qbslow.tex
+
+2. dvips name-of-tex-file-you-just-made.dvi | lpr -d 
+name-of-tex-file-you-just-made.dvi -t landscape
+(loose landscape if not desired as landscape print out)
+
+example:  latex qbslow.dvi | lpr -d qbslow.dvi -t landscape
+
+3. cat /path/to/file/qbslow.ps | lpr
+
+By magic, you have a nicely readable print out.
+
+Who wants to make the shell scripts to automate... :-) ??
+
+James Leone
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,122 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Kernel for Beginners - VFAT???" -->
+<!-- FromName="Adam Hawes" -->
+<!-- FromEmail="adam.hawes@ace.net.au" -->
+<!-- ToName="Big Fellow" -->
+<!-- ToEmail="bigfellow@cyberdude.com" -->
+<!-- Date="Sat, 21 Nov 1998 12:36:00 +0000" -->
+<!-- Id="3656B3B0.97C6C437@ace.net.au" -->
+<!-- Reference="003a01be1538$bf7f5ea0$667916cb@local.netlink.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Kernel for Beginners - VFAT???</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adam Hawes &lt;<I><A HREF="mailto:adam.hawes@ace.net.au">adam.hawes@ace.net.au</A></I>&gt;
+  To  : Big Fellow &lt;<I><A HREF="mailto:bigfellow@cyberdude.com">bigfellow@cyberdude.com</A></I>&gt;
+  Date: Sat, 21 Nov 1998 12:36:00 +0000
+</PRE>
+<H1>Re: Kernel for Beginners - VFAT???</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; I'm trying to recompile my kernel to enable vfat and ESS688 support. I'm
+&gt; using the kernel config in the X11 server, which runs xmakeconfig or
+&gt; something like that. Anyway, after I do that I do a make clean and make dep,
+&gt; as it says there, and reboot, but vfat is still not supported and my sound
+&gt; card still doesn't work.
+
+Hi. I had similar trouble as a newbie to compiling the kernel.
+
+First, run 'make xconfig' to bring up the X configuration utility.
+Set the options you want to add (try not to change too much as a 
+beginner) and then save and exit.
+
+Next, type 'make dep; make clean' to make the dependency trees and
+to clean out any old builds and stuff.
+
+After that, you have to run 'make boot' to actually build the 
+kernel.
+
+Now, here you have to back up your old modules (although not strictly
+required) just in case the new kernel is broken. Issue the command
+'mv /lib/modules/2.0.30 /lib/modules/2.0.30-working' where 2.0.30 is
+the version of your kernel that is installed. you can check in the 
+/lib directory if you like to see what dir the modules are in.
+
+After that, issue the command 'make modules; make modules_install'
+to build all the modules for the kernel.
+
+Now you have a compiled kernel in /usr/src/linux/arch/i386/boot/zImage
+Copy this file to '/boot/vmlinuz-bigfellow' and you can actually
+call it anything you like.
+
+The next step is to edit /etc/lilo.conf to add the new kernel to the
+lilo menu.
+
+My lilo.conf contains these entries:
+---------
+image = /boot/vmlinuz
+  label = linux
+image = /boot/vmlinuz-2.0.35-1
+  label = old
+other = /dev/hda1
+  label = win
+  table=/dev/hda
+---------
+You can see that each image has a file name after the image line,
+and then the label for the lilo menu is there too. The first image
+listed is the default.
+
+Add the new kernel image to the file like above, adding
+any options that you may require (see your own lilo.conf) and
+then save the file.
+
+Run '/sbin/lilo' to rebuild the lilo table in the boot sector and
+reboot. Watch for any errors and hopefully the system should boot.
+You can always restore the old kernel just by moving the backup
+modules to the original location and then redoing the lilo steps.
+
+Hope this helps. Please correct me if I am wrong anywhere, but this
+is the procedure I follow and it works well for me :-)
+
+-- 
+-----------------------------------------------------------------------
+  Adam Hawes                                 <A HREF="mailto:hawe0006@flinders.edu.au">hawe0006@flinders.edu.au</A>
+  Flinders University                                <A HREF="mailto:stubbie@beer.com">stubbie@beer.com</A>
+                                                         ICQ: 2492016
+                 WEB: <A HREF="http://www.overfiend.dyn.ml.org">http://www.overfiend.dyn.ml.org</A>
+-----------------------------------------------------------------------
+
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

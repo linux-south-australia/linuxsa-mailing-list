@@ -1,0 +1,292 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: more spooky stuff on the net!" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="" -->
+<!-- ToEmail="rosdr001@lux.levels.unisa.edu.au" -->
+<!-- Date="Wed, 17 Nov 1999 08:44:33 +1030" -->
+<!-- Id="199911162214.IAA20777@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: more spooky stuff on the net!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : <A HREF="mailto:rosdr001@lux.levels.unisa.edu.au">rosdr001@lux.levels.unisa.edu.au</A>
+  Date: Wed, 17 Nov 1999 08:44:33 +1030
+</PRE>
+<H1>Re: more spooky stuff on the net!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Huh???
+You're right!
+
+===============================
+emu/akenning&gt; ps ax | grep dns
+14838   1 S    0:00 (dns helper)
+19853  p9 S    0:00 grep dns
+===============================
+
+What? Why? How? ......
+
+Now I'll see what happens if I get out of netscape,
+and see if it affects telnet too.
+
+===============================
+emu/akenning&gt; ps ax | grep dns
+19855  p9 S    0:00 grep dns
+===============================
+
+It's gone! You're right. Netscape makes the "DNS harrasser" appear,
+and netscape exit implies "DNS hassler" exit.
+
+Now what happens to telnet.....?
+
+=================================
+<A HREF="mailto:root@emu">root@emu</A>:/home/ak &gt; telnet geekboys.org
+Trying 212.78.193.215...
+
+<A HREF="mailto:root@emu">root@emu</A>:/home/ak &gt; telnet www.geekboys.org
+Trying 212.78.194.207...
+=================================
+
+
+Hmmm. Well that's another theory into the bin!
+Maybe telnet creates it's own "helper" to feed incorrect
+IP addresses to it.
+
+The mystery is still there.
+Telnet is getting its IP addresses from a source
+other than /etc/hosts and direct access to the DNS.
+NIS is not running.
+
+So maybe the IP addresses are being cached in the IP layer of
+the kernel.
+One way to test this would be to re-boot the PC.
+
+But linux users don't re-boot PCs unless they:
+1.	Catch fire.
+2.	Need a new disk drive.
+3.	Need a new CPU.
+4.	Need to move to a different power point.
+5.	Need a new power supply.
+
+So I can't re-boot the PC.
+But I shall study further.
+
+Someone at "the meeting" suggested using "strace" (probably Alex Garner,
+I think?), and this seems like a really good idea.
+And there are some other things to do before actually
+reading telnet and kernel source.
+
+Cheerio,
+Alan Kennington.
+
+================================
+PS. At the risk of clogging up the mail server, here's
+the result of running telnet under strace.
+It gives some clues at least.
+Conclusion:   The wrong IP address comes from some Unix socket.
+The pseudo-file /proc/net/unix contains:
+
+----------------------------------------------------
+Num       RefCount Protocol Flags    Type St Inode Path 
+c4801ca0: 00000000 00000000 00010000 0001 01   221 /var/run/.nscd_socket
+c5a5c950: 00000000 00000000 00000000 0001 03  7489 /var/run/.nscd_socket
+c5a5c640: 00000000 00000000 00000000 0001 03  7145 /var/run/.nscd_socket
+c5a5c330: 00000000 00000000 00000000 0001 03  7143 /var/run/.nscd_socket
+c63b6040: 00000000 00000000 00000000 0001 03  7125 /var/run/.nscd_socket
+----------------------------------------------------
+
+Hmmm. Not very useful.
+I'm stumped.
+How do I find out which processes are connected to that socket?
+
+**********************************************************************
+Result of running telnet under strace.
+=============================================================
+<A HREF="mailto:root@emu">root@emu</A>:/home/ak &gt; strace telnet www.geekboys.org
+execve("/usr/bin/telnet", ["telnet", "www.geekboys.org"], [/* 71 vars */]) = 0
+brk(0)                                  = 0x80675c8
+open("/etc/ld.so.preload", O_RDONLY)    = -1 ENOENT (No such file or directory)
+open("/etc/ld.so.cache", O_RDONLY)      = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=53774, ...}) = 0
+mmap(NULL, 53774, PROT_READ, MAP_PRIVATE, 3, 0) = 0x40015000
+close(3)                                = 0
+open("/lib/libncurses.so.4", O_RDONLY)  = 3
+fstat(3, {st_mode=S_IFREG|0755, st_size=503252, ...}) = 0
+read(3, "\177ELF\1\1\1\0\0\0\0\0\0\0\0\0\3\0\3\0\1\0\0\0\0\344\0"..., 4096) = 4096
+mmap(NULL, 275020, PROT_READ|PROT_EXEC, MAP_PRIVATE, 3, 0) = 0x40023000
+mprotect(0x4005a000, 49740, PROT_NONE)  = 0
+mmap(0x4005a000, 36864, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED, 3, 0x36000) = 0x4005a000
+mmap(0x40063000, 12876, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x40063000
+close(3)                                = 0
+open("/lib/libc.so.6", O_RDONLY)        = 3
+fstat(3, {st_mode=S_IFREG|0755, st_size=4190668, ...}) = 0
+read(3, "\177ELF\1\1\1\0\0\0\0\0\0\0\0\0\3\0\3\0\1\0\0\0\200\203"..., 4096) = 4096
+mmap(NULL, 1021404, PROT_READ|PROT_EXEC, MAP_PRIVATE, 3, 0) = 0x40067000
+mprotect(0x40159000, 30172, PROT_NONE)  = 0
+mmap(0x40159000, 16384, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED, 3, 0xf1000) = 0x40159000
+mmap(0x4015d000, 13788, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x4015d000
+close(3)                                = 0
+mprotect(0x40067000, 991232, PROT_READ|PROT_WRITE) = 0
+mprotect(0x40067000, 991232, PROT_READ|PROT_EXEC) = 0
+munmap(0x40015000, 53774)               = 0
+personality(PER_LINUX)                  = 0
+getpid()                                = 19883
+brk(0)                                  = 0x80675c8
+brk(0x8067768)                          = 0x8067768
+brk(0x8068000)                          = 0x8068000
+brk(0x8069000)                          = 0x8069000
+uname({sys="Linux", node="emu", ...})   = 0
+brk(0x806a000)                          = 0x806a000
+gettimeofday({942789106, 246057}, NULL) = 0
+getpid()                                = 19883
+=====================================================
+
+First, telnet opens /etc/resolv.conf, as expected.
+=====================================================
+open("/etc/resolv.conf", O_RDONLY)      = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=253, ...}) = 0
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x40015000
+read(3, "#\n# /etc/resolv.conf\n#\n# Automat"..., 4096) = 253
+read(3, "", 4096)                       = 0
+close(3)                                = 0
+munmap(0x40015000, 4096)                = 0
+=====================================================
+
+Very sneaky access to a Unix socket!!!
+This does not show up in tcpdump -i lo.
+What does it get from there?
+=====================================================
+socket(PF_UNIX, SOCK_STREAM, 0)         = 3
+connect(3, {sun_family=AF_UNIX, sun_path="/var/run/.nscd_socket"}, 110) = 0
+write(3, "\2\0\0\0\4\0\0\0\4\0\0\0", 12) = 12
+write(3, "emu\0", 4)                    = 4
+read(3, "\0\0\0\0\1\0\0\0\21\0\0\0\1\0\0\0\2\0\0\0\4\0\0\0\1\0\0"..., 32) = 32
+readv(3, [{"emu.topology.org\0", 17}, {"\4\0\0\0", 4}, {"\313&\2244", 4}, {"\0\0\0\0\0\0\0\0\0\0\377\377\313&\2244", 16}], 4) = 41
+read(3, "emu\0", 4)                     = 4
+close(3)                                = 0
+ioctl(0, TCGETS, {B9600 opost isig icanon echo ...}) = 0
+rt_sigprocmask(SIG_BLOCK, NULL, [], 8)  = 0
+======================================================
+
+Another sneaky access to the same Unix socket!
+This time telnet writes the domain name to the socket.
+======================================================
+socket(PF_UNIX, SOCK_STREAM, 0)         = 3
+connect(3, {sun_family=AF_UNIX, sun_path="/var/run/.nscd_socket"}, 110) = 0
+write(3, "\2\0\0\0\4\0\0\0\21\0\0\0", 12) = 12
+write(3, "www.geekboys.org\0", 17)      = 17
+read(3, "\0\0\0\0\1\0\0\0\21\0\0\0\0\0\0\0\2\0\0\0\4\0\0\0\1\0\0"..., 32) = 32
+======================================================
+
+And receives the wrong IP address from the socket!
+212.78.194.207 == \324N\302\317
+======================================================
+readv(3, [{"www.geekboys.org\0", 17}, {"", 0}, {"\324N\302\317", 4}, {"\0\0\0\0\0\0\0\0\0\0\377\377\324N\302\317", 16}], 4) = 37
+read(3, NULL, 0)                        = 0
+close(3)                                = 0
+======================================================
+
+Then opens /etc/nsswitch.conf.
+But shouldn't it have done this earlier?
+======================================================
+open("/etc/nsswitch.conf", O_RDONLY)    = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=343, ...}) = 0
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x40015000
+read(3, "# passwd: db files nis\n# shadow:"..., 4096) = 343
+read(3, "", 4096)                       = 0
+close(3)                                = 0
+munmap(0x40015000, 4096)                = 0
+open("/etc/ld.so.cache", O_RDONLY)      = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=53774, ...}) = 0
+mmap(NULL, 53774, PROT_READ, MAP_PRIVATE, 3, 0) = 0x40015000
+close(3)                                = 0
+======================================================
+
+Does this libnss_db package have something to do with
+name service databases?
+======================================================
+open("/lib/libnss_db.so.2", O_RDONLY)   = 3
+fstat(3, {st_mode=S_IFREG|0755, st_size=202226, ...}) = 0
+read(3, "\177ELF\1\1\1\0\0\0\0\0\0\0\0\0\3\0\3\0\1\0\0\0\200\23"..., 4096) = 4096
+mmap(NULL, 22288, PROT_READ|PROT_EXEC, MAP_PRIVATE, 3, 0) = 0x40161000
+mprotect(0x40166000, 1808, PROT_NONE)   = 0
+mmap(0x40166000, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED, 3, 0x4000) = 0x40166000
+close(3)                                = 0
+open("/lib/libdb.so.3", O_RDONLY)       = 3
+fstat(3, {st_mode=S_IFREG|0755, st_size=820824, ...}) = 0
+read(3, "\177ELF\1\1\1\0\0\0\0\0\0\0\0\0\3\0\3\0\1\0\0\0p&lt;\0\000"..., 4096) = 4096
+mmap(NULL, 255708, PROT_READ|PROT_EXEC, MAP_PRIVATE, 3, 0) = 0x40167000
+mprotect(0x401a5000, 1756, PROT_NONE)   = 0
+mmap(0x401a5000, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED, 3, 0x3d000) = 0x401a5000
+close(3)                                = 0
+========================================================
+
+Also opens libnss_files package.
+Also connected with name lookup?
+========================================================
+open("/lib/libnss_files.so.2", O_RDONLY) = 3
+fstat(3, {st_mode=S_IFREG|0755, st_size=242541, ...}) = 0
+read(3, "\177ELF\1\1\1\0\0\0\0\0\0\0\0\0\3\0\3\0\1\0\0\0\0\34\0"..., 4096) = 4096
+brk(0x806b000)                          = 0x806b000
+mmap(NULL, 33984, PROT_READ|PROT_EXEC, MAP_PRIVATE, 3, 0) = 0x401a6000
+mprotect(0x401ae000, 1216, PROT_NONE)   = 0
+mmap(0x401ae000, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED, 3, 0x7000) = 0x401ae000
+close(3)                                = 0
+munmap(0x40015000, 53774)               = 0
+open("/var/db/services.db", O_RDONLY)   = -1 ENOENT (No such file or directory)
+open("/etc/services", O_RDONLY)         = 3
+fcntl(3, F_GETFD)                       = 0
+fcntl(3, F_SETFD, FD_CLOEXEC)           = 0
+fstat(3, {st_mode=S_IFREG|0644, st_size=7671, ...}) = 0
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x40015000
+read(3, "#\n# Network services, Internet s"..., 4096) = 4096
+close(3)                                = 0
+munmap(0x40015000, 4096)                = 0
+fstat(1, {st_mode=S_IFCHR|0620, st_rdev=makedev(3, 13), ...}) = 0
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x40015000
+ioctl(1, TCGETS, {B9600 opost isig icanon echo ...}) = 0
+write(1, "Trying 212.78.194.207...\r\n", 26Trying 212.78.194.207...
+) = 26
+socket(PF_INET, SOCK_STREAM, IPPROTO_IP) = 3
+getuid()                                = 0
+setresuid(ruid 4294967295, euid 0, suid 4294967295) = 0
+getuid()                                = 0
+setuid(0)                               = 0
+connect(3, {sin_family=AF_INET, sin_port=htons(23), sin_addr=inet_addr("212.78.194.207")}, 16 &lt;unfinished ...&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

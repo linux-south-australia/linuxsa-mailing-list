@@ -1,0 +1,124 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Netscape and Multiple Mailers" -->
+<!-- FromName="David Lloyd" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 04 Jul 2000 19:42:53 +0930" -->
+<!-- Id="3961B8A5.36B6B903@rebel.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Netscape and Multiple Mailers</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Tue, 04 Jul 2000 19:42:53 +0930
+</PRE>
+<H1>Netscape and Multiple Mailers</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+THE ULTIMATE KLUDGE
+-------------------
+
+Netscape 4.7 can only cope with a single POP service. Hence, if you have
+multiple services or even multiple types of services (eg POP3, APOP,
+IMAP) Netscape Messenger is not able to NATIVELY query each particular
+service. Here is a way to kludge it:
+
+* run a local SendMail
+
+If you are really security conscious you can ipchains -j deny any
+incoming SMTP connections. You need to run SendMail to get fetchmail to
+behave itself. You need fetchmail to FETCH your mail!
+
+* run a local POP or IMAP server
+
+POP3 is the easiest to get going. Simply uncomment it from inetd.conf,
+and make sure you run the inet daemon. You may want to ipchains -j deny
+the POP3 port, but it is a TCP wrappered service hence you can enter
+into your hosts.deny:
+
+ALL:ALL
+
+And in your hosts.allow:
+
+ALL:LOCAL
+
+This means that all TCP wrappered services (of which POP3 is one) will
+not accept connections unless you are connecting locally.
+
+* configure fetchamil
+
+Easiest way to do this is with fetchmailconf under X. Run this as a
+normal user. The settings are fairly self-explanatory and there is a lot
+of help. Essentially set up all your accounts - the local "listener" is
+the localhost. Most people call it localhost.localdomain althought
+127.0.0.1 should work as well.
+
+* configure netscape to collect POP from a local server
+
+This is very easy to do.
+
+* set up filters on the RECEIVE header to filter between the different
+servers
+
+All mail will go into a SINGLE mail box under this configuration. The
+easiest way to filter the different mail is to use the RECEIVE header.
+This isn't fault free but it should sort the mail sensibly. 
+
+* get fetchmail to poll your ISP if this is what you want
+
+You can either do:
+
+- fetchmail -d [number of seconds]
+
+Or create a crontab entry. I have created a crontab entry thus:
+
+*/10 * * * * * fetchamil -d0
+
+Please note that crontab entries simply DO NOT WORK AT ALL if you make a
+mistake!
+
+Now, whilst this is a MAJOR kludge it does actually work....
+
+DL
+-- 
+Nazareth your famous son should have stayed a great unknown
+ Like his father carving wood he'd have made good
+ Tables chairs, and open chests would've suited Jesus best
+ He'd caused nobody harm - noone alarm!
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

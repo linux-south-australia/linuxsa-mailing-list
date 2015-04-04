@@ -1,0 +1,164 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Putting it all together / office multifunctionals & Linux" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="linuxcpa@netscape.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="Daryl.Tester@iocane.com.au" -->
+<!-- Date="Fri, 09 May 2003 21:02:43 -0700" -->
+<!-- Id="3EBC79E3.7080008@netscape.net" -->
+<!-- Reference="3EBB38A5.7020303@netscape.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Putting it all together / office multifunctionals & Linux</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:linuxcpa@netscape.net">linuxcpa@netscape.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  Date: Fri, 09 May 2003 21:02:43 -0700
+</PRE>
+<H1>Re: Putting it all together / office multifunctionals & Linux</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+<A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A> wrote:
+
+ &gt;James Leone wrote:
+ &gt;
+ &gt;
+ &gt;
+ &gt;&gt;&gt;ARP = address resolution protocol.  The W2K is trying to find
+ &gt;&gt;&gt;out what MAC address is associated with an IP address.  This
+ &gt;&gt;&gt;is an integral function of IP which Unix/Linux does fine .
+ &gt;&gt;&gt;
+ &gt;&gt;&gt;
+ &gt;
+ &gt;
+ &gt;
+ &gt;&gt;This is what I am missing. The W2k server somehow announces to the
+ &gt;&gt;multifunctional that there is a machine named James with a certain ip
+ &gt;&gt;address that is an ftp server, ready to receive transmissions.  I need
+ &gt;&gt;to sniff when that takes place. It was already in place during the last
+ &gt;&gt;sniff.
+ &gt;&gt;
+ &gt;&gt;
+ &gt;
+ &gt;From memory (it was last night), all I saw was an ARP request.  Is the
+ &gt;the multifunctional preconfigured to know that it has to talk to a
+ &gt;machine named James?
+ &gt;
+What I observe....
+
+When I turn off Win2k,  and go to the multifunctional key pad and press
+the scan/update address, it says cannot communicate with the server. It
+then has no record of James being a recipient.  I opened up copies of
+the files remaining after a copy was transfered over from Win2k to the
+multifunctional, and the  body of the file said "james" and that's it.
+
+The very last capture I took, was taken in Win2k after I replugged in
+the ethernet cable into the multifunctional, and then had it update
+addresses. When the multifunctional updates addresses, the following
+happens:
+
+
+
+Arp broadcast using IP #'s from Multi to Win2k:  Who has 192.168.x.xxx?
+   (Who has win2k?)
+ARP response from Win2k to Multi:   192.168.x.xxx is at
+00:44:k4:64:77:6f   (Ethernet card number)
+(See the bottom of my last post for the remainder of the sniff...)
+
+Roadmap
+
+0. SYN TCP broadcast from Multi (1081) to Win2k (3670) Seq=big number;
+Ack,Win & Len=0
+1. Arp broadcast using IP #'s from Multi to Win2k:  Who has
+192.168.x.xxx?   (Who has win2k?)
+ARP response from Win2k to Multi:   192.168.x.xxx is at
+00:44:k4:64:77:6f   (Ethernet card number)
+(See the bottom of my last post for the remainder of this sniff...)
+
+2. A bunch of TCP communications take place between both machines, at 5
+sets of ports; (1081 & 3670),(1082 & 1085),(1086 & 1083),(1087 &
+1084),(1088 & 1085) but the data section of the frame is missing.  This
+packet sniff is on the bottom of my past post. (This sniff is on the
+last post I made where I say a lot more is going on here)
+3. The Win2k machine sends a message to M:  "220 server ready" and then
+the multifunctional ftp's into the win2k machine and gets 3 copies of
+files from Win2k delivering it to M (That sniff is included in the
+message where I said that this was fun, so I am not going to LA yet.)
+4. M delivers the scanned document to win2k as described last night.
+
+ &gt;
+ &gt;If I were me, and I am, which is fortunate, the next step I would do
+ &gt;is:
+ &gt;
+ &gt;1)  Power off the multifunctional.
+ &gt;2)  Start tcpdump/ethereal in packet capture mode with a suitable
+ &gt;    snaplen, and set the host IP address to that of the
+ &gt;    multifunctional.
+ &gt;
+ &gt;
+Ok, I will power off the multifunctional, start the sniff from win2k,
+filter it to only display communications with the multifunctional, then
+turn on the multifunctional, while continuing the sniff all the way
+through a scan and delivery of the document to win2k.
+
+ &gt;-OR-
+ &gt;3)  Same as 2, except by MAC address (this will capture any non-IP
+ &gt;    traffic, if that is occuring - note that a switched network will
+ &gt;    foul this up).
+ &gt;
+(Yeah I now have a switch)
+
+ &gt;4)  Power up the multifunctional.
+ &gt;5)  Do a test scan.
+ &gt;
+ &gt;Record the times of step four and five (including any substeps), so
+ &gt;you can refer back to the capture and say "Aha!  It didn't start the
+ &gt;FTP process until after the scan had completed").  I can assist in
+ &gt;analysing the capture, if you wish.
+ &gt;
+ &gt;
+ &gt;--dt, on the laptop in the smallest room in the house (which happens
+ &gt;  to be the cellar).
+ &gt;
+
+James Leone
+
+ &gt;
+ &gt;
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

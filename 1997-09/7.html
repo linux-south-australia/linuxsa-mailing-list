@@ -1,0 +1,484 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Red Hat Linux security prob" -->
+<!-- FromName="Przychodzen, Jase (DOT)" -->
+<!-- FromEmail="Jase.Przychodzen@roads.sa.gov.au" -->
+<!-- ToName="'linuxsa@linuxsa.org.au'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 02 Sep 1997 15:34:39 +0930" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Red Hat Linux security prob</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Przychodzen, Jase (DOT) &lt;<I><A HREF="mailto:Jase.Przychodzen@roads.sa.gov.au">Jase.Przychodzen@roads.sa.gov.au</A></I>&gt;
+  To  : 'linuxsa@linuxsa.org.au' &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 02 Sep 1997 15:34:39 +0930
+</PRE>
+<H1>Red Hat Linux security prob</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I know Linux and security used in one sentence are an oxymoron.
+But here is another fresh one.
+
+BTW someone asked a while back about best place for RFCs
+and I was harsh to them. To make up. Check out the internic
+they have all the latest RFC.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+
+
+************************************************************************
+******
+             ------               -----   -----  ---     -----
+             |      ----- ----   |          |    |  |   |
+             |---   |     |   |  |          |    |  |   |
+             |      |--   |   |  |          |    |--    |
+             |      |     |   |  |          |    | \    |
+             |      ----- ----    -----   -----  |  \    -----
+
+                               A D V I S O R Y
+
+                                    97.20
+************************************************************************
+******
+Topic: Red Hat Linux X11 Libraries Buffer Overflow
+Source: CIAC
+
+Creation Date: May 30, 1997 22:00 GMT
+Last Updated: May 30, 1997 22:00 GMT
+
+
+To aid in the wide distribution of essential security information,
+FedCIRC is forwarding the following information from CIAC bulletin
+H-67. FedCIRC urges you to act on this information as soon as
+possible.
+
+If you have any questions, please contact FedCIRC:
+
+        Telephone:      +1 412 268 6321
+        Email:          <A HREF="mailto:fedcirc@fedcirc.nist.gov">fedcirc@fedcirc.nist.gov</A>
+
+
+
+=======================FORWARDED TEXT STARTS
+HERE============================
+
+             __________________________________________________________
+
+                       The U.S. Department of Energy
+                    Computer Incident Advisory Capability
+                           ___  __ __    _     ___
+                          /       |     /_\   /
+                          \___  __|__  /   \  \___
+             __________________________________________________________
+
+                             INFORMATION BULLETIN
+
+                    Red Hat Linux X11 Libraries Buffer Overflow
+
+May 30, 1997 22:00 GMT
+Number H-67
+________________________________________________________________________
+______
+PROBLEM:       A problem has been identified in the X11 libraries that
+allows
+               a buffer overflow condition.
+PLATFORM:      This problem affects all Red Hat Linux machines with X
+Windows
+               installed.
+DAMAGE:        This vulnerability allows local users to gain
+unauthorized root
+               access to a system.
+SOLUTION:      Apply the necessary patches indicated below.
+________________________________________________________________________
+______
+VULNERABILITY  Information involving this vulnerability has been made
+publicly
+ASSESSMENT:    available.
+________________________________________________________________________
+______
+
+[  Start Linux Security Alert ]
+
+     Buffer overflow in the resource handling code of the libXt (X11R6)
+
+                              Thu May 29, 1997
+
+                 Distribution of this document is unlimited
+              Copyright (C) Alexander O. Yuriev (<A HREF="mailto:alex@yuriev.com">alex@yuriev.com</A>)
+                                 Net Access
+
+Abstract
+
+     A buffer overflow was found in the resource handling section of the
+X11
+     system (libXt). As this is a problem with libXt iself, every
+program
+     using libXt is affected, including core programs such as xterm and
+     programs derived from it. Of course only suid and sgid programs can
+be
+     exploited to gain access to gain extra priviledges.
+
+Permanent Solution
+
+     The permanent solution requires fixing the libXt. It is recommended
+     that you utilize temporary solution. This buffer overflow does not
+     exist in XFree86 3.3 code. It is recommended that you upgrade to
+     XFree86 3.3 as soon as it becomes available.
+
+     Currently fixed versions of fixed libraries are available for:
+
+        o Red Hat Linux 4.0, 4.1, 4.2 from Red Hat Software
+
+Temporary solution
+
+     The workaround requires identifying and temporary disabling suid
+     programs in the X11R6 tree. The following sequence of commands can
+be
+     used to find all suid and sgid programs of the X11 tree:
+
+          $ cd /usr/X11/bin
+          $ find . -type f -a \( -perm -2000 -o -perm -4000 \) -print
+
+     As the output, these commands would produce a list of suid or sgid
+     programs in directories starting from the current working directory
+     (/usr/X11/bin) to the end of the tree. A typical output would look
+     like:
+
+          X
+          xterm
+          dga
+
+     Determine if you use every program in question. Look at the manual
+     pages to see if you really need it at this time. I personally have
+no
+     idea why Red Hat did not remove the dga(1) program of the XFree86
+     distribution shipped with Red Hat 4.1 as dga(1) manual page states:
+
+          dga - test program for the Xfree86-DGA extension
+
+     Assuming that the DGA extension is required, the test program
+should be
+     used only by "root". Therefore, the suid bit is not needed and
+should
+     be removed. Same logic should be applied to other suid/sgid
+programs.
+     At this time you probably should remove suid bit from the dga(1) or
+at
+     least make it non-world executable. Use commands:
+
+          # chmod 111 dga
+          # chattr +I dga
+
+     to disable suid bit on a dga binary and make it immutable. Use the
+same
+     method to evaluate all other suid programs.
+
+     Programs that should be run by root only, should never be suid to
+root,
+     or at least should not be world executable. X Display Manager,
+xdm(1),
+     falls into this category.
+
+     If you need the functionality provided by the vulnerable program,
+     disable execution for that program and add trusted accounts that
+need
+     to run the program into the group which own the program. You must
+     realize that by doing this you are allowing those who have access
+to
+     the trusted accounts exploit the vulnerability and gain access to
+the
+     euid of the program.
+
+XTERM(1) and xterm derived programs
+
+     Unfortunately, you cannot remove suid bit from the xterm(1) and
+     programs derived from it withot losing part of functionality. The
+     advice by authors of exploits from bugtraq to squash suid bit
+prevents
+     xterm(1) from changing ownerships of tty devices allowing any user
+on a
+     system to read information from terminal devices.
+
+     This looks like a lose-lose situation unless you are willing to
+disable
+     xterm(1) program completely (and leave with it being disabled )
+until
+     the fixed version becomes available. Basically, you should consider
+     risks of someone from your system running xterm(1) and gaining root
+     access to a system vs. not being able to run xterm(1) at all and
+vs.
+     running xterm(1) as non-suid application which would allow one user
+to
+     intercept keystrokes of another. It is your choice but no matter
+what
+     you decide to do, think about the consequences first.
+
+Vendor fixes
+
+   * Red Hat Linux from Red Hat Software
+
+        o Red Hat Linux/Alpha 4.1, 4.2
+
+               <A HREF="ftp://ftp.redhat.com/updates/4.2/alpha/">ftp://ftp.redhat.com/updates/4.2/alpha/</A>
+                     XFree86-devel-3.2-10.alpha.rpm
+               <A HREF="ftp://ftp.redhat.com/updates/4.2/alpha/">ftp://ftp.redhat.com/updates/4.2/alpha/</A>
+                     XFree86-libs-3.2-10.alpha.rpm
+               <A HREF="ftp://ftp.aoy.com/pub/Linux/security/DISTRIBUTION-FIXES/">ftp://ftp.aoy.com/pub/Linux/security/DISTRIBUTION-FIXES/</A>
+                     RedHat/XFree86-devel-3.2-10.alpha.rpm
+               <A HREF="ftp://ftp.aoy.com/pub/Linux/security/DISTRIBUTION-FIXES/">ftp://ftp.aoy.com/pub/Linux/security/DISTRIBUTION-FIXES/</A>
+                     RedHat/XFree86-libs-3.2-10.alpha.rpm
+
+        o Red Hat Linux/Intel 4.0, 4.1, 4.2
+
+               <A HREF="ftp://ftp.redhat.com/updates/4.2/i386/">ftp://ftp.redhat.com/updates/4.2/i386/</A>
+                     XFree86-devel-3.2-10.i386.rpm
+               <A HREF="ftp://ftp.redhat.com/updates/4.2/i386/">ftp://ftp.redhat.com/updates/4.2/i386/</A>
+                     XFree86-libs-3.2-10.i386.rpm
+               <A HREF="ftp://ftp.aoy.com/pub/Linux/security/DISTRIBUTION-FIXES/">ftp://ftp.aoy.com/pub/Linux/security/DISTRIBUTION-FIXES/</A>
+                     RedHat/XFree86-devel-3.2-10.i386.rpm
+               <A HREF="ftp://ftp.aoy.com/pub/Linux/security/DISTRIBUTION-FIXES/">ftp://ftp.aoy.com/pub/Linux/security/DISTRIBUTION-FIXES/</A>
+                     RedHat/XFree86-libs-3.2-10.i386.rpm
+
+        o Red Hat Linux/SPARC 4.0, 4.1, 4.2
+
+               <A HREF="ftp://ftp.redhat.com/updates/4.2/sparc/">ftp://ftp.redhat.com/updates/4.2/sparc/</A>
+                     X11R6.1-devel-pl1-21.sparc.rpm
+               <A HREF="ftp://ftp.redhat.com/updates/4.2/sparc/">ftp://ftp.redhat.com/updates/4.2/sparc/</A>
+                     X11R6.1-libs-pl1-21.sparc.rpm
+               <A HREF="ftp://ftp.aoy.com/pub/Linux/security/DISTRIBUTION-FIXES/">ftp://ftp.aoy.com/pub/Linux/security/DISTRIBUTION-FIXES/</A>
+                     RedHat/X11R6.1-devel-pl1-21.sparc.rpm
+               <A HREF="ftp://ftp.aoy.com/pub/Linux/security/DISTRIBUTION-FIXES/">ftp://ftp.aoy.com/pub/Linux/security/DISTRIBUTION-FIXES/</A>
+                     RedHat/X11R6.1-libs-pl1-21.sparc.rpm
+
+          Please verify the signature of RPMs using the rpm --checksig
+          command. The RPMs are signed with the PGP key of Red Hat
+Software:
+
+          pub 1024/CBA29BF9 1996/02/20 Red Hat Software, Inc.
+          &lt;<A HREF="mailto:redhat@redhat.com">redhat@redhat.com</A>&gt;
+
+Acknowledgements
+
+     The exploits were posted in bugtraq mailing list by Ming Zhang.
+Erik
+     Troan (<A HREF="mailto:ewt@redhat.com">ewt@redhat.com</A>) from Red Hat Software provided information
+about
+     the XFree86 3.3, as well as fixes for the Red Hat Linux
+
+[ End Linux Security Alert ]
+
+________________________________________________________________________
+______
+
+CIAC wishes to acknowledge the contributions of Alexander O. Yuriev and
+others
+for the information contained in this bulletin.
+________________________________________________________________________
+______
+
+CIAC, the Computer Incident Advisory Capability, is the computer
+security incident response team for the U.S. Department of Energy
+(DOE) and the emergency backup response team for the National
+Institutes of Health (NIH). CIAC is located at the Lawrence Livermore
+National Laboratory in Livermore, California. CIAC is also a founding
+member of FIRST, the Forum of Incident Response and Security Teams, a
+global organization established to foster cooperation and coordination
+among computer security teams worldwide.
+
+CIAC services are available to DOE, DOE contractors, and the NIH. CIAC
+can be contacted at:
+    Voice:    +1 510-422-8193
+    FAX:      +1 510-423-8002
+    STU-III:  +1 510-423-2604
+    E-mail:   <A HREF="mailto:ciac@llnl.gov">ciac@llnl.gov</A>
+
+For emergencies and off-hour assistance, DOE, DOE contractor sites,
+and the NIH may contact CIAC 24-hours a day. During off hours (5PM -
+8AM PST), call the CIAC voice number 510-422-8193 and leave a message,
+or call 800-759-7243 (800-SKY-PAGE) to send a Sky Page. CIAC has two
+Sky Page PIN numbers, the primary PIN number, 8550070, is for the CIAC
+duty person, and the secondary PIN number, 8550074 is for the CIAC
+Project Leader.
+
+Previous CIAC notices, anti-virus software, and other information are
+available from the CIAC Computer Security Archive.
+
+   World Wide Web:      <A HREF="http://ciac.llnl.gov/">http://ciac.llnl.gov/</A>
+   Anonymous FTP:       ciac.llnl.gov (198.128.39.53)
+   Modem access:        +1 (510) 423-4753 (28.8K baud)
+                        +1 (510) 423-3331 (28.8K baud)
+
+CIAC has several self-subscribing mailing lists for electronic
+publications:
+1. CIAC-BULLETIN for Advisories, highest priority - time critical
+   information and Bulletins, important computer security information;
+2. CIAC-NOTES for Notes, a collection of computer security articles;
+3. SPI-ANNOUNCE for official news about Security Profile Inspector
+   (SPI) software updates, new features, distribution and
+   availability;
+4. SPI-NOTES, for discussion of problems and solutions regarding the
+   use of SPI products.
+
+Our mailing lists are managed by a public domain software package
+called Majordomo, which ignores E-mail header subject lines. To
+subscribe (add yourself) to one of our mailing lists, send the
+following request as the E-mail message body, substituting
+ciac-bulletin, ciac-notes, spi-announce OR spi-notes for list-name:
+
+E-mail to       <A HREF="mailto:ciac-listproc@llnl.gov">ciac-listproc@llnl.gov</A> or <A HREF="mailto:majordomo@tholia.llnl.gov">majordomo@tholia.llnl.gov</A>:
+        subscribe list-name
+  e.g., subscribe ciac-notes
+
+You will receive an acknowledgment email immediately with a confirmation
+that you will need to mail back to the addresses above, as per the
+instructions in the email.  This is a partial protection to make sure
+you are really the one who asked to be signed up for the list in
+question.
+
+If you include the word 'help' in the body of an email to the above
+address,
+it will also send back an information file on how to
+subscribe/unsubscribe,
+get past issues of CIAC bulletins via email, etc.
+
+PLEASE NOTE: Many users outside of the DOE, ESnet, and NIH computing
+communities receive CIAC bulletins.  If you are not part of these
+communities, please contact your agency's response team to report
+incidents. Your agency's team will coordinate with CIAC. The Forum of
+Incident Response and Security Teams (FIRST) is a world-wide
+organization. A list of FIRST member organizations and their
+constituencies can be obtained via WWW at <A HREF="http://www.first.org/.">http://www.first.org/.</A>
+
+This document was prepared as an account of work sponsored by an
+agency of the United States Government. Neither the United States
+Government nor the University of California nor any of their
+employees, makes any warranty, express or implied, or assumes any
+legal liability or responsibility for the accuracy, completeness, or
+usefulness of any information, apparatus, product, or process
+disclosed, or represents that its use would not infringe privately
+owned rights. Reference herein to any specific commercial products,
+process, or service by trade name, trademark, manufacturer, or
+otherwise, does not necessarily constitute or imply its endorsement,
+recommendation or favoring by the United States Government or the
+University of California. The views and opinions of authors expressed
+herein do not necessarily state or reflect those of the United States
+Government or the University of California, and shall not be used for
+advertising or product endorsement purposes.
+
+LAST 10 CIAC BULLETINS ISSUED (Previous bulletins available from CIAC)
+
+H-57: Windows NT/95 Out of Band Data Exploit
+H-58: IRIX runpriv Program Vulnerability
+H-59: Solaris 2.x ps Buffer Overflow Vulnerability
+H-60: Vulnerability in metamail
+H-61: SGI IRIX df, pset, and eject Buffer Overrun Vulnerabilities
+H-62: SGI IRIX ordist, login/scheme Buffer Overrun Vulnerability
+H-63: ftpd Signal Handling Vulnerability
+H-64: SGI IRIX login LOCKOUT parameter Vulnerability
+H-65: SGI IRIX rld Security Vulnerability
+H-66: Vulnerability in suidperl (sperl)
+
+
+========================FORWARDED TEXT ENDS
+HERE=============================
+
+The National Institute of Standards and Technology (NIST) has
+established a Federal Computer Incident response Capability (FedCIRC)
+to assist federal civilians agencies in their incident handling
+efforts by providing proactive and reactive computer security related
+services.  FedCIRC is a partnership among NIST, the Computer Incident
+Advisory Capability (CIAC), and the CERT* Coordination Center
+(CERT/CC). 
+
+If you believe that your system has been compromised, please contact
+FedCIRC: 
+
+        Telephone:      +1 412 268 6321
+        Email:          <A HREF="mailto:fedcirc@fedcirc.nist.gov">fedcirc@fedcirc.nist.gov</A>
+        Web Server:     <A HREF="http://fedcirc.llnl.gov/">http://fedcirc.llnl.gov/</A>
+
+* Registered in U.S. Patent and Trademark Office
+ 
+The CERT Coordination Center is part of the Software Engineering
+Institute.  The Software Engineering Institute is sponsored by the
+U.S. Department of Defense.
+
+CIAC, the Computer Incident Advisory Capability, is the computer
+security incident response team for the U.S. Department of Energy
+(DOE) and the emergency backup response team for the National
+Institutes of Health (NIH). CIAC is located at the Lawrence Livermore
+National Laboratory in Livermore, California. CIAC is also a founding
+member of FIRST, the Forum of Incident Response and Security Teams, a
+global organization established to foster cooperation and coordination
+among computer security teams worldwide.
+ 
+This document was prepared as an account of work sponsored by an
+agency of the United States Government. Neither the United States
+Government nor the University of California nor any of their
+employees, makes any warranty, express or implied, or assumes any
+legal liability or responsibility for the accuracy, completeness, or
+usefulness of any information, apparatus, product, or process
+disclosed, or represents that its use would not infringe privately
+owned rights. Reference herein to any specific commercial products,
+process, or service by trade name, trademark, manufacturer, or
+otherwise, does not necessarily constitute or imply its endorsement,
+recommendation or favoring by the United States Government or the
+University of California. The views and opinions of authors expressed
+herein do not necessarily state or reflect those of the United States
+Government or the University of California, and shall not be used for
+advertising or product endorsement purposes.
+
+
+-----BEGIN PGP SIGNATURE-----
+Version: 2.6.2
+Comment: Processed by Mailcrypt 3.3, an Emacs/PGP interface
+
+iQCVAwUBM6WFPXVP+x0t4w7BAQE9lQP/RuePVJ7+UCeifOWGO8+1CNjWMau0XSyv
+YZo3C5ZK/nncYj8TPshp7+qmEe/jWU3oTxGHYguSinjXgTVn/5x4XYFT4pOI//3w
+oRQqhfjESWbAOhnBMuH71ywBU8GnDR7W1HkDbhCaRK2ZZKET0GiSvFQqL49Nrldf
+k9bO42sZZiQ=
+=8dLk
+-----END PGP SIGNATURE-----
+
+______________________________________________________
+Jase H.Przychodzen	:JC     Network Administrator for EDS SAG N4
+Phone : 83432785                                 Mail       :
+<A HREF="mailto:mnemonic@pobox.com">mnemonic@pobox.com</A>            
+Contents are (C) Copyright 1997            #include &lt;std_disclaimer.h&gt; 
+"If a stealth bomber crashes in a forest, will it make a sound?' --
+Annon
+______________________________________________________
+By printing or forwarding this email without the express consent of the
+author you may be commiting telecommunications fraud.
+
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

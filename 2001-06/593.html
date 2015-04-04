@@ -1,0 +1,138 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Backup using FTP" -->
+<!-- FromName="'shane'" -->
+<!-- FromEmail="shane@scopenet.com.au" -->
+<!-- ToName="'David Drury','Linux SA'" -->
+<!-- ToEmail="idavid@smug.adelaide.edu.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 19 Jun 2001 10:50:00 +0930" -->
+<!-- Id="005501c0f85e$05968a20$4c5e08cb@galaxy" -->
+<!-- Reference="200106180920.f5I9KmN18359@mulder.smug.adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Backup using FTP</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: shane &lt;<I><A HREF="mailto:shane@scopenet.com.au">shane@scopenet.com.au</A></I>&gt;
+  To  : David Drury &lt;<I><A HREF="mailto:idavid@smug.adelaide.edu.au">idavid@smug.adelaide.edu.au</A></I>&gt;<BR>        Linux SA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 19 Jun 2001 10:50:00 +0930
+</PRE>
+<H1>Re: Backup using FTP</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+This is what I do, I have modified the the following examples for security
+reason it should be easy to follow
+You will need php installed, I use php because I like it, it may not be the
+best, however the following have been working for me on several servers
+without any issues for serveral months now.
+
+I add a bit of logging into the scripts, I'm sure you'll be able to work
+that out for yourself.
+
+script name: hdd-backup.sh
+#!/bin/bash
+tar -czf /backups/etc.tar.gz  /etc 2&gt; /dev/null
+tar -czf /backups/var.tar.gz  /var 2&gt; /dev/null
+tar -czf /backups/home.tar.gz  /home 2&gt; /dev/null
+tar -czf /backups/root.tar.gz  /root 2&gt; /dev/null
+php -q /root/scripts/ftp-backup.php
+
+scipt name: ftp-backup.php
+&lt;?php
+set_time_limit(0);
+$ftp_conn1 = ftp_connect(ftp.server.com.);
+ftp_login($ftp_conn1, "user", "password");
+ftp_put($ftp_conn1,"linux-backups/etc.tar.gz","/backups/etc.tar.gz",FTP_BINA
+RY);
+ftp_put($ftp_conn1,"linux-backups/home.tar.gz","/backups/home.tar.gz",FTP_BI
+NARY);
+ftp_put($ftp_conn1,"linux-backups/root.tar.gz","/backups/root.tar.gz",FTP_BI
+NARY);
+ftp_put($ftp_conn1,"linux-backups/var.tar.gz","/backups/var.tar.gz",FTP_BINA
+RY);
+ftp_quit($ftp_conn1);
+?&gt;
+
+
+Cheers
+Shane Gelven
+
+----- Original Message -----
+From: "David Drury" &lt;<A HREF="mailto:idavid@smug.adelaide.edu.au">idavid@smug.adelaide.edu.au</A>&gt;
+To: "Linux SA" &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Sent: Monday, June 18, 2001 6:50 PM
+Subject: Backup using FTP
+
+
+&gt; Hey there, I was wondering what script options I have for backing up via
+&gt; FTP.
+&gt;
+&gt; I have a linux box needing backup and a netware server with the backup
+&gt; device in it (running unix services).
+&gt;
+&gt; I'd like to do something like
+&gt;
+&gt; tar czf - &lt;files&gt; | ftp server backupfile.tar.gz
+&gt;
+&gt; But can't find anything in the man pages about this. I know NCFTP has a
+&gt; config file that'll store usernames and passwords which will be usefull,
+&gt; but there is still the problem of piping.
+&gt;
+&gt; If this can't be done. Can someone make alternae suggestions for file
+&gt; transfer that don't involve mounting the netware volumes, or putting the
+&gt; backup device in the linux box. Neither of which are options.
+&gt;
+&gt; cya
+&gt;
+&gt; --
+&gt; David Drury
+&gt;    _______________________________________
+&gt;    \ <A HREF="mailto:ua914299@teaching.cs.adelaide.edu.au">ua914299@teaching.cs.adelaide.edu.au</A> \
+&gt;     \    <A HREF="mailto:idavid@smug.adelaide.edu.au">idavid@smug.adelaide.edu.au</A>       \                __________ |
+&gt;      \     Adelaide University Union        \        / \___-=O`/|O`/___|
+&gt;       \        IT Co-ordinator.              \_______\        / | /     )
+&gt;       /    Student Machine User Group        /      `/-==__ _/__|/__=--|
+&gt;      /       Systems Administrator.         /         *      \  |      |
+&gt;     /   "Cogito cogito ergo cogito sum."   /                  (o)
+&gt;    /______________________________________/
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

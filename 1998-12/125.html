@@ -1,0 +1,135 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Bandwidth usage" -->
+<!-- FromName="Nathan Bailey" -->
+<!-- FromEmail="Nathan.Bailey@cc.monash.edu.au" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="Alan.Kennington@dsto.defence.GOV.AU" -->
+<!-- Date="Wed, 09 Dec 1998 08:59:23 +1100" -->
+<!-- Id="199812082159.IAA18828@goaway.cc.monash.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Bandwidth usage</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Nathan Bailey &lt;<I><A HREF="mailto:Nathan.Bailey@cc.monash.edu.au">Nathan.Bailey@cc.monash.edu.au</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:Alan.Kennington@dsto.defence.GOV.AU">Alan.Kennington@dsto.defence.GOV.AU</A></I>&gt;
+  Date: Wed, 09 Dec 1998 08:59:23 +1100
+</PRE>
+<H1>Re: Bandwidth usage</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Alan Kennington &lt;<A HREF="mailto:Alan.Kennington@dsto.defence.GOV.AU">Alan.Kennington@dsto.defence.GOV.AU</A>&gt; wrote:
+&gt;This is such a tricky topic, I'm reluctant to air it
+&gt;in an e-mail list.
+&gt;Does anyone know a solution to this problem?
+
+The best solution is a good relationship with your upstream provider.
+I include the following message recently posted to server-linux, and
+excellent list for those administrating (multiple) Linux server boxes:
+
+-------------------------------------------------------------------------------
+Date:    Mon, 07 Dec 1998 10:08:19 -0800
+From:    Rich Drewes &lt;<A HREF="mailto:drewes@INTERSTICE.COM">drewes@INTERSTICE.COM</A>&gt;
+To:      <A HREF="mailto:SERVER-LINUX@netspace.org">SERVER-LINUX@netspace.org</A>
+X-Mailer: Mozilla 4.07 [en] (X11; I; Linux 2.0.36 i686)
+Subject: Re: Defense against Smurf Attack
+-------------------------------------------------------------------------------
+Bao C. Ha wrote:
+
+&gt; Last weekend, we were attacked.
+&gt;
+&gt; How do I defense against Smurf attacks?  My Linux servers are
+&gt; pretty well protected, but the attack went to my gateway router,
+&gt; which is a lowly Cisco 2501.
+&gt;
+&gt; Appreciate any suggestions/comments.
+
+This happened to us as well.  Actually, the attack on us included more
+than just Smurf, it was a variety of things including other UDP and
+ICMP.
+
+Unfortunately, it probably is not good enough for you to put a filter on
+your router, which is simple enough to do using Cisco access lists.  For
+example,
+
+conf term
+int s1.1
+no ip access-group 113 in
+no access-list 113
+permit udp any eq domain any
+permit udp any any eq domain
+deny   udp any any
+deny   icmp any any
+permit ip any any
+int s1.1
+ip access-group 113 in
+
+Then use the
+
+clear access-list counters
+show access-list
+
+commands to see how many matches are taking place on each rule.
+
+The above access list will block all ICMP access and all UDP access
+except for DNS.  This may block services you want, so you may have to
+modify the access list for your site.  Don't leave the list in
+permanently, only as long as the attack persists.
+
+NOTE that you must be careful when playing with access lists on a live
+router, since if you blow a command, or if you do things in the wrong
+sequence, you can render your router unreachable for further corrective
+action.  It is a great idea to do this sort of work over the serial
+terminal port rather than telnet.  To simplify installation, I usually
+keep the commands I want to paste in up on one xterm and then do a mouse
+cut-and-paste into the xterm with the connection to the Cisco.
+
+However, the above filter probably won't solve your problem.  The only
+real defense seems to be to have your upstream provider put the filter
+in for you, since if the attack is severe, by the time the packets get
+to your router it is too late--your router will be flooded trying to
+filter them!   We had to put the filter in upstream of us during our
+attack.
+
+You will have to leave the filter in until it looks like the attack is
+no longer going on, and then remove it and hope that the attack is done
+and doesn't come back.
+
+Unfortunately our upstream provider UUNet was not able to trace the
+source of the attack.
+
+Rich
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

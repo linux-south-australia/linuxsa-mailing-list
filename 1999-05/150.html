@@ -1,0 +1,99 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: thi has me stumped" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="hawjd001" -->
+<!-- ToEmail="hawjd001@lux.levels.unisa.edu.au" -->
+<!-- Date="Mon, 10 May 1999 17:29:10 +0930 (CST)" -->
+<!-- Id="199905100759.RAA17391@rebel.net.au" -->
+<!-- Reference="199905100604.PAA05355@lux.levels.unisa.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: thi has me stumped</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : hawjd001 &lt;<I><A HREF="mailto:hawjd001@lux.levels.unisa.edu.au">hawjd001@lux.levels.unisa.edu.au</A></I>&gt;
+  Date: Mon, 10 May 1999 17:29:10 +0930 (CST)
+</PRE>
+<H1>Re: thi has me stumped</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+hawjd001 &lt;<A HREF="mailto:hawjd001@lux.levels.unisa.edu.au">hawjd001@lux.levels.unisa.edu.au</A>&gt; wrote:
+&gt; newbie - pro bull aside....
+
+No bull, but fair criticism.  After the volume of discussion, much of
+which suggested use of meaningful subject lines, "thi has me stumped"
+is both careless and almost totally lacking in description.  It takes
+no great wit to come up with a gem such as: "redirecting stdout to file
+produces no output."
+
+I also have a problem talking to people who don't give the courtesy of
+their real name.  "MrJ" gives you a juvenile appearance.
+
+Quasi-flames aside, the answer to your question might be that your
+prototype for main is wrong.  There used to be two acceptable ways of
+describing main:
+
+1. int main(argc, argv) int argc; char **argv; and
+2. int main(argc, argv, envp) int argc; char **argv, **envp;
+
+The first of these translates to:
+
+ int main(int argc, char **argv);
+
+The second form may now be deprecated.  "void main( void)" is not a
+supported option and apparently this is important.  Standard I/O is
+line buffered when to a terminal, and block buffered when to a file.
+If you don't explicitly flush the buffers prior to exiting your program,
+exit() does it for you.  Let us look at the relevant parts of the C run
+time linkage.  (This code is educational only.  Do not mistake it for
+the real thing.)
+
+  void exit(int code) {
+    fflush(stdout);
+    fflush(stderr);
+    ret(code);
+  }
+  
+  void crt(int argc, char *argv[]) {
+    exit(main(argc, argv));
+  }
+
+
+What happens if you define main as a void?  Apparently the program bombs
+on return.  I am surprised at the result, but application of Occam's
+Razor argues this to be so.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,95 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: init scripts" -->
+<!-- FromName="Matthew Tippett" -->
+<!-- FromEmail="matthew.tippett@dsto.defence.gov.au" -->
+<!-- ToName="Peter McCarthy" -->
+<!-- ToEmail="mccarthy@mail.austasia.net" -->
+<!-- Date="Tue, 29 Jul 1997 10:14:43 +0930" -->
+<!-- Id="33DD3CFB.622B2BBB@dsto.defence.gov.au" -->
+<!-- Reference="01BC9C04.67BD6940@DANEEL" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: init scripts</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Tippett &lt;<I><A HREF="mailto:matthew.tippett@dsto.defence.gov.au">matthew.tippett@dsto.defence.gov.au</A></I>&gt;
+  To  : Peter McCarthy &lt;<I><A HREF="mailto:mccarthy@mail.austasia.net">mccarthy@mail.austasia.net</A></I>&gt;
+  Date: Tue, 29 Jul 1997 10:14:43 +0930
+</PRE>
+<H1>Re: init scripts</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Peter McCarthy wrote:
+&gt; 
+&gt; Hi how do the damn init scripts in Red Hat work.  My goal is to get
+&gt; named running.  It apears in the rc.initd dir but what is the
+&gt; mechanism to get it off the ground at boot ?
+&gt; 
+Firstly, LinuxSA did a talk on this about two weeks ago.
+For the notes check out 
+	<A HREF="http://www.linuxsa.org.au/meetings/1997-07/init/">http://www.linuxsa.org.au/meetings/1997-07/init/</A>
+
+
+Secondly, I can quickly describe what how to set things up.
+
+/etc/rc.d/init.d contains most (if not all) of the service scripts.
+Each script accepts one paramater (either start or stop).
+For each run level there is a directory with a number of symbolic
+links to the scripts in /etc/rc.d/init.d.  
+Each script will start with a K or S followed by a number, and then
+the script name.  (eg S15httpd -&gt; ../init.d/httpd).
+
+When you enter a run level (say 3 for example) it will run all
+the scripts in /etc/rc.d/rc3.d that start with K in numerical order 
+(K15httpd) and then (K21smbd) with stop as the paramater.  (K = Kill).
+It then runs all the scripts (in numerical order) that starts with a S
+(S = Start).
+
+Through this method you can specify what is started and what is stopped
+when you enter each run level.
+
+As a guideline all (bar halt or reboot) should have links in
+/etc/rc.d/rc0.d
+(halt) and /etc/rc.d/rc6.d (reboot) that Kill the services. 
+/etc/rc.d/rc1.d
+(single user mode) should have only the barest services. 
+/etc/rc.d/rc2.d 
+(Multi-user - NO NFS), /etc/rc.d/rc3.d (Full Multi-user) and
+/etc/rc.d/rc5.d
+(X11 - xdm login) should have most services running in it.
+
+Under redhat there is a program called /usr/X11R6/bin/tksysv which lets
+you do
+it graphically.
+
+Hope this helps.
+
+Matt
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,108 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Replacing a dying HDD" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Anthony Symons'" -->
+<!-- ToEmail="ant@sa.pracom.com.au" -->
+<!-- Date="Fri, 19 Apr 2002 10:21:48 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.44.0204191011560.1402-100000@bush.aarnet.adelaide.edu.au" -->
+<!-- Reference="1019113524.9094.152.camel@ant.internal" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Replacing a dying HDD</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  Date: Fri, 19 Apr 2002 10:21:48 +0930 (CST)
+</PRE>
+<H1>Re: Replacing a dying HDD</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On 18 Apr 2002, Anthony Symons wrote a very nice summary.
+
+There is a Plan C, a variant of Ant's option (1) but based on partitions
+rather than the entire disk.  This allows you to copy the filesystem on
+the old smaller partition to a new bigger partition.  You can then safely
+grow the filesystem size to match the size of the new bigger partition.
+
+This is a very old UNIX sysadm trick, which is why mkfs usually has an
+option to format a disk starting from a particular disk block.
+
+&gt; 1. quick, simple, wastefull way
+&gt; 
+&gt; assuming drive is hda.
+&gt; install new drive as hdc or other drive.
+&gt; 
+&gt; dd if=/dev/hda of=/dev/hdc
+&gt; 
+&gt; wait.
+&gt; 
+&gt; You'll get a partition of the same size as what you had. It should be
+&gt; bootable. 
+
+Partition the disk, making the partitions same size or larger than
+existing partitions.  For example
+
+  /boot   was 32MB  now 50MB
+  /       was 1.2GB now 3GB
+
+Use dd to copy each partition
+
+  dd if=/dev/hda1 of=/dev/hdc1
+  dd ...
+
+Re-write the MBR using lilo as explained by Anthony.
+
+Boot the box, it should work.  Filesystem sizes will not have changed.
+
+Now boot off CD.  Run "ext2resize" to grow the filesystems to the size of
+the partition.
+
+Boot the box.  Filesystem sizes will have grown to size of partitions.
+
+If you only want to change the size of the last partition, then you can
+copy the entire disk (MBR, partition table, and partitions), use fdisk to
+grow the partition, and then ext2resize to grow the filesystem.
+
+-- 
+Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

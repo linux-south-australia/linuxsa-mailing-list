@@ -1,0 +1,94 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: using sed to cleanup a mac text file" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="<michael@home.lyppard.com.au>," -->
+<!-- ToEmail="michael@home.lyppard.com.au" -->
+<!-- Date="Thu, 7 Oct 1999 21:02:50 +0930" -->
+<!-- Id="008e01bf10b7$b2075db0$c94514cb@tellurian.com.au" -->
+<!-- Reference="199910070955.TAA05381@sandwich.home.lyppard.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: using sed to cleanup a mac text file</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : &lt;michael@home.lyppard.com.au&gt;, &lt;<I><A HREF="mailto:michael@home.lyppard.com.au">michael@home.lyppard.com.au</A></I>&gt;
+  Date: Thu, 7 Oct 1999 21:02:50 +0930
+</PRE>
+<H1>Re: using sed to cleanup a mac text file</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Michael Firkins &lt;<A HREF="mailto:michael@home.lyppard.com.au">michael@home.lyppard.com.au</A>&gt; wrote:
+&gt; [I'm] mystified as to why sed is such a recalcitrant editor.
+
+Good point.  Time to explain *why* sed doesn't do the job.
+
+Simply put, escape sequences like \n and \r are not regular expressions.
+These have their origin in the C printf routines.  The \ is widely used as
+an escape character in unix, and it is important to realise the distinction
+between "escape character" and "regular expression."  In a printf string \1
+escapes the 1 to give it special meaning (ie ASCII SOH)  In an ex, vi or sed
+expression the same string escapes the 1 to give it special meaning, but
+only in the replacement part of a substitute command (ie the first
+"remembered" expression from the find part.)  In the shell \1 escapes the 1
+to remove any special meaning.  It so happens that 1 has no special meaning
+in the shell and so \1 is logically equivalent to 1.  These are all examples
+of \ as an escape; and none of them are examples of a regular expression.
+
+Now turning our attention to sed, I am once again going to be unfashionable
+(apparently) and quote from the manual.
+
+  ``s /regular expression/replacement/flags  (2)
+         Substitute the replacement for instances of the regular
+         expression in  the  current  text  buffer.   Any
+         character  may  be used instead of `/'.  For a fuller
+         description see ed (1).''
+
+Perusal of ed's man page will reveal no special meaning for \n.  To the
+contrary, the ed page denies special meaning for \n:
+
+  ``\c     A backslash-escaped character c  other  than  `{',
+            '}',  `(', `)', `&lt;', `&gt;', `b', 'B', `w', `W', `+', and `?'
+            matches itself.''
+
+Annoyingly, sed does extend a RE by treating \t as tab, but has no other
+character escapes.  This is not surprising if you consider that \b, which is
+commonly understood as a character escape for backspace, is already used
+(indeed by ed) as a regular expression.
+
+It's notable how many questions that are asked here are answered quite
+nicely in the manual.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

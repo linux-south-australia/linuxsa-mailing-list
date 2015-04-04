@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Debian package audit" -->
+<!-- FromName="'Branko Bratkovic'" -->
+<!-- FromEmail="branko@senet.com.au" -->
+<!-- ToName="'Richard Russell'" -->
+<!-- ToEmail="richard@yellowgoanna.com" -->
+<!-- Date="Fri, 17 Jan 2003 11:07:02 +1030" -->
+<!-- Id="E18ZKVL-00007A-00@scorpio" -->
+<!-- Reference="20030117002321.F18929@yellowgoanna.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Debian package audit</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Branko Bratkovic &lt;<I><A HREF="mailto:branko@senet.com.au">branko@senet.com.au</A></I>&gt;
+  To  : Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  Date: Fri, 17 Jan 2003 11:07:02 +1030
+</PRE>
+<H1>Re: Debian package audit</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Well done!  Your "quick and dirty" is even simpler than I imagined.  My idea 
+would have created a complete md5sum of the whole drive then it would have 
+been necessary to filter out stuff such as /home, /etc, /var, /tmp . . .  
+Heck, that would take half an hour.
+-- 
+Branko
+
+
+On Fri, 17 Jan 2003 00:23, Richard Russell wrote:
+&gt; On Thu, Jan 16, 2003 at 11:52:02PM +1030, Richard Russell wrote:
+&gt; &gt; Well, that was quick... maybe 10 minutes... Someone should write a
+&gt; &gt; script to do that, and submit it to the debian people... maybe I'm
+&gt; &gt; that someone... hmmm... Naaaah... :)
+&gt;
+&gt; Here's my attempt at a script -- quick and dirty style...
+&gt;
+&gt; ----
+&gt; #!/bin/bash
+&gt;
+&gt; ON_DISK=/tmp/hddmd5s.$$
+&gt; IN_DPKG=/tmp/dpkgmd5s.$$
+&gt;
+&gt; cd /
+&gt;
+&gt; /usr/bin/sort -k 2 /var/lib/dpkg/info/*.md5sums &gt; $IN_DPKG
+&gt;
+&gt; for i in `/usr/bin/cut -f3 -d" " $IN_DPKG`; do /usr/bin/md5sum $i; done &gt;
+&gt; $ON_DISK
+&gt;
+&gt; /usr/bin/diff $ON_DISK $IN_DPKG
+&gt; ----
+&gt;
+&gt; Nothing special, no parameters, no help, no error catching, etc... run
+&gt; it on your debian system at your own risk... :)
+&gt;
+&gt; rr
+&gt;
+&gt; &gt; I did as you suggested, and it seems that the only differences are in
+&gt; &gt; the following files:
+&gt; &gt;
+&gt; &gt; /etc/pam.d/login
+&gt; &gt; /etc/pam.d/passwd
+&gt; &gt; /usr/lib/mime/packages/less
+&gt; &gt;
+&gt; &gt; Having browsed these files, I can't see any obvious change or anything
+&gt; &gt; that would indicate to me any issues with corruption -- hard-drive or
+&gt; &gt; hacker-based.
+&gt; &gt;
+&gt; &gt; This is a Good Thing (though I still don't know about files not in the
+&gt; &gt; database -- specifically config files...)
+&gt; &gt;
+&gt; &gt; rr
+&gt; &gt;
+&gt; &gt; On Thu, Jan 16, 2003 at 07:34:54PM +1030, Branko Bratkovic wrote:
+&gt; &gt; &gt; You would think that there would be such a tool but I haven't been able
+&gt; &gt; &gt; to find anything after reading dpkg(1) and a few of dpkg-* utilities. 
+&gt; &gt; &gt; I can see that you are prepared to do a little work to make it happen. 
+&gt; &gt; &gt; One approach would be to collect the contents of
+&gt; &gt; &gt; /var/lib/dpkg/info/PACKAGES.md3sums into one file and sort it on the
+&gt; &gt; &gt; second field.  Then create another using md5sum from the root
+&gt; &gt; &gt; directory.  Then do a diff on the two files.
+&gt; &gt; &gt;
+&gt; &gt; &gt; Good luck,
+&gt; &gt; &gt; --
+&gt; &gt; &gt; Branko
+&gt; &gt; &gt;
+&gt; &gt; &gt; On Wed, 15 Jan 2003 19:12, Richard Russell wrote:
+&gt; &gt; &gt; &gt; Hi,
+&gt; &gt; &gt; &gt;
+&gt; &gt; &gt; &gt; Is there any tool that anyone knows of that will enable me to see
+&gt; &gt; &gt; &gt; exactly what has changed from the standard debian packages on my
+&gt; &gt; &gt; &gt; machine? I want to know for two reasons -- to help document my
+&gt; &gt; &gt; &gt; installation, and to help me identify and recover a few corrupted
+&gt; &gt; &gt; &gt; files.
+&gt; &gt; &gt; &gt;
+&gt; &gt; &gt; &gt; One thought that I have is to create a subdirectory on a partition
+&gt; &gt; &gt; &gt; with room, and basically re-install all my packages there and do a
+&gt; &gt; &gt; &gt; recursive diff or something similar. However, I'd rather there was
+&gt; &gt; &gt; &gt; something a little more sophisticated available. Another thought was
+&gt; &gt; &gt; &gt; forcing a re-install of each and every package, but I have a feeling
+&gt; &gt; &gt; &gt; that that may cause more problems than it solves -- I'd rather know
+&gt; &gt; &gt; &gt; what differences existed so I could deal with each individually...
+&gt; &gt; &gt; &gt;
+&gt; &gt; &gt; &gt; Any comments?
+&gt; &gt; &gt; &gt;
+&gt; &gt; &gt; &gt; rr
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; --
+&gt; &gt; Richard Russell
+&gt; &gt; Yellow Goanna P/L
+&gt; &gt; e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+&gt; &gt; m: +61 412 827 805
+&gt; &gt; f: +61 8 8462 2362
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on
+&gt; &gt; irc.openprojects.net To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

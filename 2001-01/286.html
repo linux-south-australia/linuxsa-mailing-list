@@ -1,0 +1,154 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: ping" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richardrussell@mail.com" -->
+<!-- ToName="'Jason Tan'" -->
+<!-- ToEmail="jason@rebel.rebel.net.au" -->
+<!-- Date="Tue, 9 Jan 2001 23:18:24 +1030" -->
+<!-- Id="HKEMJGGDNENEDGGDCJBBIEPFCAAA.richardrussell@mail.com" -->
+<!-- Reference="Pine.LNX.3.95.1010109191831.24366f-100000@rebel.rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: ping</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richardrussell@mail.com">richardrussell@mail.com</A></I>&gt;
+  To  : Jason Tan &lt;<I><A HREF="mailto:jason@rebel.rebel.net.au">jason@rebel.rebel.net.au</A></I>&gt;
+  Date: Tue, 9 Jan 2001 23:18:24 +1030
+</PRE>
+<H1>RE: ping</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; No that makes it not network, not datalink, not mac sublayer and not
+&gt; physical.
+&gt;
+&gt; It doenst mean it is transport, there are four other layers you can
+&gt; choose above transport in the the OSI mdoel an 2 you can choose in the
+&gt; TCP/IP model that are about network layer.
+&gt;
+&gt; Just because it is above layer 3 doesnt mean it is layer 4.
+
+true. But it is also clearly not application, not presentation and not
+session. :)
+
+interestingly, the RFC referenced earlier says:
+
+   "ICMP uses the basic support of IP as if it were a higher
+   level protocol, however, ICMP is actually an integral part of IP, and
+   must be implemented by every IP module."
+
+The best thing that has been said so far was someone who said earlier that
+TCP/IP does _not_ fit into the ISO's OSI 7 layer model. This is pretty much
+universally agreed on. TCP/IP gets described as anything from 3 to 5 layers,
+and these layers do _not_ neatly fit into the OSI model. As Glen said, ICMP
+does Network Layer type things, but is carried on a Network Layer Protocol
+(IP).
+
+Anyway, the original question is answered, and clarified below, using ASCII
+art (why? because I can, and it's great for procrastinatory purposes):
+
+
+an IP Packet (X means "stuff that isn't presently relevant", and each
+tab-stop is four bits:
+
+Bits:
+0								31
+|	|	|	|	|	|	|	|	|
+
+-------------------------------------------------
+|  X	|  X	|	X	|		X		|
+-------------------------------------------------
+|		X		|  X	|	  X		|
+-------------------------------------------------
+|  X	|  X	|  Protocol	|		X		|
+-------------------------------------------------
+|			Source Address			|
+-------------------------------------------------
+|			 Dest Address			|
+-------------------------------------------------
+|			X			|	X	|
+-------------------------------------------------
+|	Data...						|
+:								:
+-------------------------------------------------
+
+Notes:
+
+Protocol -- This is a number that is found in /etc/protocols. If the data
+section is TCP, then this number is 6, if it's ICMP, it's 1, and there are
+others...
+
+Source and Destination Addresses -- These are IP addresses. Note that there
+are no ports.
+
+Data -- the contents of the IP packet, interpreted using the number in the
+Protocol part of the IP header.
+
+
+Now, a UDP packet is carried entirely within the data section of an IP
+packet, looks like this:
+
+
+
+-------------------------------------------------
+|  Src Port	| Dest Port	|	X	|	X	|
+-------------------------------------------------
+|	Data....						|
+:								:
+-------------------------------------------------
+
+TCP is similar, but has more stuff in it after the ports. Note that the
+Source and Destination ports are defined here (same in both UDP and TCP).
+
+
+An ICMP packet, which is also carried entirely within the data section of an
+IP packet, looks like this:
+
+-------------------------------------------------
+|   Type	|   Code	|	  Checksum		|
+-------------------------------------------------
+| Stuff depending on Type of the ICMP packet    |
+:								:
+-------------------------------------------------
+
+As you can see... no ports.
+
+That is all. Hope you enjoy reading this ASCII art as much as I enjoyed
+creating it -- and I did enjoy creating it :)
+
+rr
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

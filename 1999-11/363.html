@@ -1,0 +1,473 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba Problem" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="LinuxSA@linuxsa.org.au" -->
+<!-- Date="Thu, 18 Nov 1999 20:07:44 +1000" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba Problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:LinuxSA@linuxsa.org.au">LinuxSA@linuxsa.org.au</A>
+  Date: Thu, 18 Nov 1999 20:07:44 +1000
+</PRE>
+<H1>Re: Samba Problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Sigh,
+
+I have seen this problem lots.
+
+Samba 2.0.0+ defaults to security=user, which means you need aa valid
+username and password on the Samba server when you log into Windows.  You
+may also be tripping over the Encrypted password problem as well.
+
+Two choices:
+
+1. Set up a valid user and password and use encrypted passwords or run the
+plaintext password registry hack
+
+2. Set your server into security=share
+
+
+At 03:41 PM 11/18/99 +0800, "Jose N. de Vera Jr." &lt;<A HREF="mailto:joe@ne-link.net">joe@ne-link.net</A>&gt; wrote:
+&gt;
+&gt;I've got hooked up of this problem in configuring my samba server to be
+&gt;seen in the network neighborhood of Windows 95/98 OS. It always asking to
+&gt;supply a password for the resources IPC$.
+&gt;
+&gt;This dialog box always bugging me to logon on my samba server
+&gt;
+&gt;		Resource : //Station12/IPC$
+&gt;		Password : ________________
+&gt;
+&gt;My station12 have a redhat linux ver. 2.2.x
+&gt;
+&gt;Hope that somebody will reply to my problem.
+&gt;
+&gt;I also have here the copy of my smb.conf please try to have a comment on
+&gt;this file.
+&gt;
+&gt;
+&gt;
+&gt;# /etc/smb.conf
+&gt;
+&gt;
+&gt;# This is the main Samba configuration file. You should read the
+&gt;# smb.conf(5) manual page in order to understand the options listed
+&gt;# here. Samba has a huge number of configurable options (perhaps too
+&gt;# many!) most of which are not shown in this example
+&gt;#
+&gt;# Any line which starts with a ; (semi-colon) or a # (hash) 
+&gt;# is a comment and is ignored. In this example we will use a #
+&gt;# for commentry and a ; for parts of the config file that you
+&gt;# may wish to enable
+&gt;#
+&gt;# NOTE: Whenever you modify this file you should run the command "testparm"
+&gt;# to check that you have not many any basic syntactic errors. 
+&gt;#
+&gt;#======================= Global Settings
+=====================================
+&gt;[global]
+&gt;
+&gt;# workgroup = NT-Domain-Name or Workgroup-Name
+&gt;   workgroup = WORLDLINK
+&gt;
+&gt;# server string is the equivalent of the NT Description field
+&gt;   server string = Samba Server
+&gt;
+&gt;# This option is important for security. It allows you to restrict
+&gt;# connections to machines which are on your local network. The
+&gt;# following example restricts access to two C class networks and
+&gt;# the "loopback" interface. For more examples of the syntax see
+&gt;# the smb.conf man page
+&gt;;   hosts allow = 192.168.1. 192.168.2. 127.
+&gt;
+&gt;# if you want to automatically load your printer list rather
+&gt;# than setting them up individually then you'll need this
+&gt;   printcap name = /etc/printcap
+&gt;   load printers = yes
+&gt;
+&gt;# It should not be necessary to spell out the print system type unless
+&gt;# yours is non-standard. Currently supported print systems include:
+&gt;# bsd, sysv, plp, lprng, aix, hpux, qnx
+&gt;;   printing = bsd
+&gt;
+&gt;# Uncomment this if you want a guest account, you must add this to
+/etc/passwd
+&gt;# otherwise the user "nobody" is used
+&gt;; guest account = pcguest
+&gt;    log file = /var/log/samba-log.%m
+&gt;    lock directory = /var/lock/samba
+&gt;    share modes = yes
+&gt;
+&gt;
+&gt;# this tells Samba to use a separate log file for each machine
+&gt;# that connects
+&gt;   log file = /var/log/samba/log.%m
+&gt;
+&gt;# Put a capping on the size of the log files (in Kb).
+&gt;   max log size = 50
+&gt;
+&gt;# Security mode. Most people will want user level security. See
+&gt;# security_level.txt for details.
+&gt;   security = user
+&gt;# Use password server option only with security = server
+&gt;;   password server = &lt;NT-Server-Name&gt;
+&gt;    password server = linux-server
+&gt;# Password Level allows matching of _n_ characters of the password for
+&gt;# all combinations of upper and lower case.
+&gt;  password level = 8
+&gt;  username level = 8
+&gt;
+&gt;# You may wish to use password encryption. Please read
+&gt;# ENCRYPTION..txt, Win95.txt and WinNT.txt in the Samba documentation.
+&gt;# Do not enable this option unless you have read those documents
+&gt;  encrypt passwords = yes
+&gt;  smb passwd file = /etc/smbpasswd
+&gt;  update encrypted = yes
+&gt;
+&gt;# The following are needed to allow password changing from Windows to
+&gt;# update the Linux sytsem password also.
+&gt;# NOTE: Use these with 'encrypt passwords' and 'smb passwd file' above.
+&gt;# NOTE2: You do NOT need these to allow workstations to change only
+&gt;#        the encrypted SMB passwords. They allow the Unix password
+&gt;#        to be kept in sync with the SMB password.
+&gt;  unix password sync = Yes
+&gt;  passwd program = /usr/bin/passwd %u
+&gt;  passwd chat = *New*UNIX*password* %n\n *ReType*new*UNIX*password* %n\n
+*passwd:*all*authentication*tokens*updated*successfully*
+&gt;
+&gt;# Unix users can map to different SMB User names
+&gt;  username map = /etc/smbusers
+&gt;
+&gt;# Using the following line enables you to customise your configuration
+&gt;# on a per machine basis. The %m gets replaced with the netbios name
+&gt;# of the machine that is connecting
+&gt;;   include = /etc/smb.conf.%m
+&gt;
+&gt;# Most people will find that this option gives better performance.
+&gt;# See speed.txt and the manual pages for details
+&gt;   socket options = TCP_NODELAY 
+&gt;
+&gt;# Configure Samba to use multiple interfaces
+&gt;# If you have multiple network interfaces then you must list them
+&gt;# here. See the man page for details.
+&gt;;   interfaces = 192.168.12.2/24 192.168.13.2/24 
+&gt;
+&gt;# Configure remote browse list synchronisation here
+&gt;#  request announcement to, or browse list sync from:
+&gt;#	a specific host or from / to a whole subnet (see below)
+&gt;;   remote browse sync = 192.168.3.25 192.168.5.255
+&gt;# Cause this host to announce itself to local subnets here
+&gt;;   remote announce = 192.168.1.255 192.168.2.44
+&gt;
+&gt;# Browser Control Options:
+&gt;# set local master to no if you don't want Samba to become a master
+&gt;# browser on your network. Otherwise the normal election rules apply
+&gt;;   local master = no
+&gt;
+&gt;# OS Level determines the precedence of this server in master browser
+&gt;# elections. The default value should be reasonable
+&gt;;   os level = 33
+&gt;
+&gt;# Domain Master specifies Samba to be the Domain Master Browser. This
+&gt;# allows Samba to collate browse lists between subnets. Don't use this
+&gt;# if you already have a Windows NT domain controller doing this job
+&gt;;   domain master = yes 
+&gt;
+&gt;# Preferred Master causes Samba to force a local browser election on startup
+&gt;# and gives it a slightly higher chance of winning the election
+&gt;;   preferred master = yes
+&gt;
+&gt;# Use only if you have an NT server on your network that has been
+&gt;# configured at install time to be a primary domain controller.
+&gt;;   domain controller = &lt;NT-Domain-Controller-SMBName&gt;
+&gt;
+&gt;# Enable this if you want Samba to be a domain logon server for 
+&gt;# Windows95 workstations. 
+&gt;;   domain logons = yes
+&gt;
+&gt;# if you enable domain logons then you may want a per-machine or
+&gt;# per user logon script
+&gt;# run a specific logon batch file per workstation (machine)
+&gt;;   logon script = %m.bat
+&gt;# run a specific logon batch file per username
+&gt;;   logon script = %U.bat
+&gt;
+&gt;# Where to store roving profiles (only for Win95 and WinNT)
+&gt;#        %L substitutes for this servers netbios name, %U is username
+&gt;#        You must uncomment the [Profiles] share below
+&gt;;   logon path = \\%L\Profiles\%U
+&gt;
+&gt;# All NetBIOS names must be resolved to IP Addresses
+&gt;# 'Name Resolve Order' allows the named resolution mechanism to be specified
+&gt;# the default order is "host lmhosts wins bcast". "host" means use the unix
+&gt;# system gethostbyname() function call that will use either /etc/hosts OR
+&gt;# DNS or NIS depending on the settings of /etc/host.config,
+/etc/nsswitch.conf
+&gt;# and the /etc/resolv.conf file. "host" therefore is system configuration
+&gt;# dependant. This parameter is most often of use to prevent DNS lookups
+&gt;# in order to resolve NetBIOS names to IP Addresses. Use with care!
+&gt;# The example below excludes use of name resolution for machines that are NOT
+&gt;# on the local network segment
+&gt;# - OR - are not deliberately to be known via lmhosts or via WINS.
+&gt;; name resolve order = wins lmhosts bcast
+&gt;
+&gt;# Windows Internet Name Serving Support Section:
+&gt;# WINS Support - Tells the NMBD component of Samba to enable it's WINS Server
+&gt;;   wins support = yes
+&gt;
+&gt;# WINS Server - Tells the NMBD components of Samba to be a WINS Client
+&gt;#	Note: Samba can be either a WINS Server, or a WINS Client, but NOT both
+&gt;;   wins server = w.x.y.z
+&gt;
+&gt;# WINS Proxy - Tells Samba to answer name resolution queries on
+&gt;# behalf of a non WINS capable client, for this to work there must be
+&gt;# at least one	WINS Server on the network. The default is NO.
+&gt;;   wins proxy = yes
+&gt;
+&gt;# DNS Proxy - tells Samba whether or not to try to resolve NetBIOS names
+&gt;# via DNS nslookups. The built-in default for versions 1.9.17 is yes,
+&gt;# this has been changed in version 1.9.18 to no.
+&gt;   dns proxy = yes 
+&gt;
+&gt;# Case Preservation can be handy - system default is _no_
+&gt;# NOTE: These can be set on a per share basis
+&gt;;  preserve case = no
+&gt;;  short preserve case = no
+&gt;# Default case is normally upper case for all DOS files
+&gt;;  default case = lower
+&gt;# Be very careful with case sensitivity - it can break things!
+&gt;;  case sensitive = no
+&gt;
+&gt;; Mangle case = yes seems to give the correct filenames 
+&gt;; for Win95/98/NT.
+&gt;  mangle case = yes
+&gt;
+&gt;; If samba is case sensitive when looking for files
+&gt;  case sensitive = no
+&gt;
+&gt;; Default case of files that are created
+&gt;  default case = lower
+&gt;
+&gt;; Preserve case for all filenames
+&gt;  preserve case = yes
+&gt;
+&gt;; Preserve case for dos (8.3) filenames
+&gt;  short preserve case = no
+&gt;
+&gt;#============================ Share Definitions
+==============================
+&gt;
+&gt;[homes]
+&gt;   comment = Home Directories
+&gt;   browseable = no
+&gt;   writable = yes
+&gt;
+&gt;# Un-comment the following and create the netlogon directory for Domain
+Logons
+&gt;; [netlogon]
+&gt;;   comment = Network Logon Service
+&gt;;   path = /home/netlogon
+&gt;;   guest ok = yes
+&gt;;   writable = no
+&gt;;   share modes = no
+&gt;
+&gt;
+&gt;# Un-comment the following to provide a specific roving profile share
+&gt;# the default is to use the user's home directory
+&gt;;[Profiles]
+&gt;;    path = /home/profiles
+&gt;;    browseable = no
+&gt;;    guest ok = yes
+&gt;
+&gt;
+&gt;# NOTE: If you have a BSD-style print system there is no need to 
+&gt;# specifically define each individual printer
+&gt;
+&gt;[printers]
+&gt;   comment = All Printers
+&gt;   path = /var/spool/samba
+&gt;   browseable = no
+&gt;# Set public = yes to allow user 'guest account' to print
+&gt;   guest ok = no
+&gt;   writable = no
+&gt;   printable = yes
+&gt;
+&gt;# This one is useful for people to share files
+&gt;
+&gt;   [tmp]
+&gt;   comment = Temporary file space
+&gt;   path = /tmp
+&gt;   read only = no
+&gt;   public = yes
+&gt;
+&gt;# A publicly accessible directory, but read only, except for people in
+&gt;# the "staff" group
+&gt;;[public]
+&gt;;   comment = Public Stuff
+&gt;;   path = /home/samba
+&gt;;   public = yes
+&gt;;   writable = yes
+&gt;;   printable = no
+&gt;;   write list = @staff
+&gt;
+&gt;# Other examples. 
+&gt;#
+&gt;# A private printer, usable only by fred. Spool data will be placed in fred's
+&gt;# home directory. Note that fred must have write access to the spool
+directory,
+&gt;# wherever it is.
+&gt;;[fredsprn]
+&gt;;   comment = Fred's Printer
+&gt;;   valid users = fred
+&gt;;   path = /homes/fred
+&gt;;   printer = freds_printer
+&gt;;   public = no
+&gt;;   writable = no
+&gt;;   printable = yes
+&gt;
+&gt;# A private directory, usable only by fred. Note that fred requires write
+&gt;# access to the directory.
+&gt;;[fredsdir]
+&gt;;   comment = Fred's Service
+&gt;;   path = /usr/somewhere/private
+&gt;;   valid users = fred
+&gt;;   public = no
+&gt;;   writable = yes
+&gt;;   printable = no
+&gt;
+&gt;# a service which has a different directory for each machine that connects
+&gt;# this allows you to tailor configurations to incoming machines. You could
+&gt;# also use the %u option to tailor it by user name.
+&gt;# The %m gets replaced with the machine name that is connecting.
+&gt; 
+&gt; [pchome]
+&gt;  comment = PC Directories
+&gt;  path = /usr/pc/%m
+&gt;  public = no
+&gt;  writable = yes
+&gt;
+&gt;# A publicly accessible directory, read/write to all users. Note that all
+files
+&gt;# created in the directory by users will be owned by the default user, so
+&gt;# any user with access can delete any other user's files. Obviously this
+&gt;# directory must be writable by the default user. Another user could of
+course
+&gt;# be specified, in which case all files would be owned by that user instead.
+&gt;
+&gt;[public]
+&gt;
+&gt;   path = /usr/somewhere/else/public
+&gt;   public = yes
+&gt;   only guest = yes
+&gt;   writable = yes
+&gt;   printable = no
+&gt;
+&gt;# The following two entries demonstrate how to share a directory so that two
+&gt;# users can place files there that will be owned by the specific users. In
+this
+&gt;# setup, the directory should be writable by both users and should have the
+&gt;# sticky bit set on it to prevent abuse. Obviously this could be extended to
+&gt;# as many users as required.
+&gt;;[myshare]
+&gt;;   comment = Mary's and Fred's stuff
+&gt;;   path = /usr/somewhere/shared
+&gt;;   valid users = mary fred
+&gt;;   public = no
+&gt;;   writable = yes
+&gt;;   printable = no
+&gt;;   create mask = 0765
+&gt;
+&gt;
+&gt;
+&gt;; /etc/smb.conf
+&gt;;
+&gt;; Make sure and restart the server after making changes to this file, ex:
+&gt;; /etc/rc.d/init.d/smb stop
+&gt;; /etc/rc.d/init.d/smb start
+&gt;
+&gt;    [global]
+&gt;; Uncomment this if you want a guest account
+&gt;; guest account = nobody
+&gt;  log file = /var/log/samba-log.%m
+&gt;  lock directory = /var/lock/samba
+&gt;  share modes = yes
+&gt;
+&gt;  [homes]
+&gt;  comment = Home Directories
+&gt;  browseable = no
+&gt;  read only = no
+&gt;  create mode = 0750
+&gt;
+&gt;  [tmp]
+&gt;  comment = Temporary file space
+&gt;  path = /tmp
+&gt;  read only = no
+&gt;  public = yes
+&gt;
+&gt;;  [public]
+&gt;;  comment = Public Stuff
+&gt;;  path = /home/public
+&gt;;  public = yes
+&gt;;  writable = yes
+&gt;;  printable = no
+&gt;;  write list = @staff
+&gt;
+&gt;Jose N. de Vera Jr.
+&gt;Computer Engineer
+&gt;
+&gt;
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>, Master Linux Administrator :-),
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Co-author, SAMS Teach Yourself Samba in 24 Hours
+Author: First Australian 5-day, intensive, hands-on Linux SysAdmin course
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

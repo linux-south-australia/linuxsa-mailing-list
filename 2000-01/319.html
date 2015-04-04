@@ -1,0 +1,251 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="WINE setup problems" -->
+<!-- FromName="David Creed" -->
+<!-- FromEmail="davidcr@senet.com.au" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 11 Jan 2000 14:24:44 +1030" -->
+<!-- Id="387AA982.7AF51FF0@senet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: WINE setup problems</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Creed &lt;<I><A HREF="mailto:davidcr@senet.com.au">davidcr@senet.com.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 11 Jan 2000 14:24:44 +1030
+</PRE>
+<H1>WINE setup problems</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hello there Linux guru's.
+I'm hoping someone can point me in the right direction, I'm having a few
+problems getting WINE to run and they seem to stem from my wine.conf
+file.
+When I try to start WINE this is what I get;
+
+Could not stat /mnt/windows/tmp, ignoring drive E:
+Invalid path 'c:/windows' for windows directory
+Perhaps you have not properly edited or created your Wine configuration
+file.
+This is either /etc/wine/wine.conf or $HOME/.winerc
+  or it is determined by the -config option or from
+  the WINE_INI environment variable.
+Wine has used /etc/wine/wine.conf as configuration file.
+
+My windows partition is located at /mnt/windows and is mounted and the
+wine.conf file is at /etc/wine/wine.conf
+heres a copy of my conf file;
+
+;
+;; MS-DOS drives configuration
+;;
+;; Each section has the following format:
+;; [Drive X]
+;; Path=xxx       (Unix path for drive root)
+;; Type=xxx       (supported types are 'floppy', 'hd', 'cdrom' and
+'network')
+;; Label=xxx      (drive label, at most 11 characters)
+;; Serial=xxx     (serial number, 8 characters hexadecimal number)
+;; Filesystem=xxx (supported types are 'msdos'/'dos'/'fat',
+'win95'/'vfat', 'un$;;   This is the FS Wine is supposed to emulate on a
+certain
+;;   directory structure.
+;;   Recommended:
+;;   - "win95" for ext2fs, VFAT and FAT32
+;;   - "msdos" for FAT16 (ugly, upgrading to VFAT driver strongly
+recommended)
+;;   DON'T use "unix" unless you intend to port programs using Winelib !
+
+;; Device=/dev/xx (only if you want to allow raw device access)
+;;
+[Drive A]
+Path=/mnt/floppy
+Type=floppy
+Label=Floppy
+Serial=87654321
+Device=/dev/fd0
+
+[Drive C]
+Path=/mnt/windows
+Type=hd
+Label=MS-DOS
+Filesystem=win95
+
+[Drive D]
+Path=/mnt/cdrom
+Type=cdrom
+Label=CD-Rom
+Filesystem=win95
+
+[Drive E]
+Path=/mnt/windows/tmp
+Type=hd
+Label=Tmp Drive
+Filesystem=win95
+
+[Drive F]
+Path=${HOME}
+Type=network
+Label=Home
+Filesystem=unix
+
+[wine]
+Windows=c:/windows
+System=c:/windows/system
+Temp=e:/
+Path=c:/windows;c:/windows/system;e:/;e:/test;f:/
+SymbolTableFile=./wine.sym
+
+# &lt;wineconf&gt;
+
+[DllDefaults]
+EXTRA_LD_LIBRARY_PATH=${HOME}/wine/cvs/lib
+DefaultLoadOrder = native, elfdll, so, builtin
+
+[DllPairs]
+krnl386 = kernel32
+gdi     = gdi32
+user    = user32
+commdlg = comdlg32
+commctrl= comctl32
+ver     = version
+shell32, shell          = builtin, native
+lz32, lzexpand          = builtin, native
+commctrl, comctl32      = builtin, native
+wsock32, winsock        = builtin
+advapi32, crtdll, ntdll = builtin, native
+mpr, winspool.drv       = builtin, native
+ddraw, dinput, dsound   = builtin, native
+winmm, mmsystem         = builtin
+msvideo, msvfw32        = builtin, native
+mcicda.drv, mciseq.drv  = builtin, native
+mciwave.drv             = builtin, native
+mciavi.drv, mcianim.drv = native, builtin
+msacm.drv, midimap.drv  = builtin, native
+w32skrnl                = builtin
+wnaspi32, wow32         = builtin
+system, display, wprocs = builtin
+wineps                  = builtin
+icmp                    = builtin
+
+[options]
+AllocSystemColors=100
+
+[fonts]
+;Read documentation/fonts before adding aliases
+Resolution = 96
+Default = -adobe-times-
+
+[serialports]
+Com1=/dev/ttyS0
+Com2=/dev/ttyS1
+Com3=/dev/modem,38400
+Com4=/dev/modem
+
+[parallelports]
+Lpt1=/dev/lp0
+
+[spooler]
+LPT1:=|lpr
+LPT2:=|gs -sDEVICE=bj200 -sOutputFile=/tmp/fred -q -
+LPT3:=/dev/lp3
+
+[ports]
+;read=0x779,0x379,0x280-0x2a0
+;write=0x779,0x379,0x280-0x2a0
+
+[spy]
+Exclude=WM_SIZE;WM_TIMER;
+
+[registry]
+; Paths must be given in /dir/dir/file.reg format.
+; Wine will not understand dos file names here...
+
+; alternate registry file name: HKCU
+AltCurrentUserFile=
+; alternate registry file name: HKU
+AltUserFile=
+; alternate registry file name: HKLM
+AltLocalMachineFile=
+;These are all booleans.  Y/y/T/t/1 are true, N/n/F/f/0 are false.
+;Defaults are read all, write to Home and Alt
+;Note: it is pointless to specify alt files and neither load nor write
+to them.
+; Global registries (stored in /etc)
+LoadGlobalRegistryFiles=Y
+; Home registries (stored in ~user/.wine/)
+LoadHomeRegistryFiles=Y
+; Load above registries.
+LoadAltRegistryFiles=Y
+; TRY to write all changes to home registries
+WritetoHomeRegistryFiles=Y
+; TRY to write all changes to alt registries
+WritetoAltRegistryFiles=Y
+; Use new file format
+UseNewFormat=N
+; Registry periodic save timeout in seconds
+; PeriodicSave=600
+
+; Windows registries in windows path
+LoadWin311RegistryFiles=Y
+LoadWin95RegistryFiles=Y
+LoadWinNTRegistryFiles=N
+;user the private registry is taken from
+;(profiles/&lt;username&gt;/ntuser.dat)
+;NTUser=username
+
+[Tweak.Layout]
+;; WineLook=xxx  (supported styles are 'Win31'(default), 'Win95',
+'Win98')
+;WineLook=Win95
+
+[programs]
+Default=
+Startup=
+
+[Console]
+;XtermProg=nxterm
+;InitialRows=25
+;InitialColumns=80
+;TerminalType=nxterm
+
+[Clipboard]
+ClearAllSelections=0
+PersistentSelection=1
+
+I dont think I've set up my wine.conf file properly but I'm not sure
+where I've gone wrong, any help and a gentle shove in the right
+direction will be deeply appreciated.
+
+Thanks in advance,
+David Creed
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

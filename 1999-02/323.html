@@ -1,0 +1,124 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: FTPd mail & logs" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Benjamin Close" -->
+<!-- ToEmail="linux@senet.com.au" -->
+<!-- Date="Tue, 16 Feb 1999 14:03:25 +1030 (CST)" -->
+<!-- Id="Pine.BSF.3.96.990216134220.26822E-100000@augustus.tellurian.com.au" -->
+<!-- Reference="Pine.LNX.4.04.9902160927540.815-100000@Bytes4u.nodomain.yet" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: FTPd mail & logs</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Benjamin Close &lt;<I><A HREF="mailto:linux@senet.com.au">linux@senet.com.au</A></I>&gt;
+  Date: Tue, 16 Feb 1999 14:03:25 +1030 (CST)
+</PRE>
+<H1>Re: FTPd mail & logs</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt;&gt; I was just wondering is it possible to have ftpd mail me daily logs?
+&gt; Put the following in a daily cron job.
+&gt; [cron job to ftp log files removed]
+
+Not sure, but I think that's an answer to a different question.
+
+Can ftpd mail you daily logs?  No, ftpd logs using syslog, and so
+it's syslogd which you might want to mail the log files.  Okay,
+can syslogd mail the log files to you?  No, syslogd just writes
+the log entries.  (In truth it could, but the answer is absurdly
+complicated and simplifies to no.)  Well is there any way you
+can have the log files mailed to you?  Of course.  This is Unix. :-)
+
+Before you mail a (syslog) log file you need to ensure that syslog
+won't write any new log entries into that file.  You do that by
+renaming the file and then sending a signal to syslog; the signal
+causes syslog to reopen the log files:
+
+  mv /var/log/messages /var/log/messages.temp
+  kill -HUP `cat /var/run/syslog.pid`
+
+Then mail the log <A HREF="file:">file:</A>
+
+  mail -s "log file" <A HREF="mailto:xyzzy@advent.rules.ok">xyzzy@advent.rules.ok</A> &lt; /var/log/messages.temp
+  rm /var/log/messages.temp
+
+These commands should be executed by cron; or better: look at
+logrotate.
+
+Voilla; and aren't you glad you don't use Windows?  ;-)
+
+
+&gt;&gt; and perhaps make it log to another file other then /var/log/messages for FTP
+&gt;&gt; useage only? :)
+
+This I'm not so sure about.  Unfortunately syslog has an overly
+simplistic notion of what logging is about.  Log entries comprise
+three components: The facility; the log level; and the log text.
+
+The facility is chosen from the fixed set of auth, authpriv, cron,
+daemon, kern, lpr, mail, mark, news, syslog, user, uucp and local0
+through local7.  There is no restriction on which facility a program
+can use, so for example ftpd could, if it's author so chose, log as
+cron.  Nothing would stop that.  Note that none of the facilities is
+ftp.  (I don't know what facility ftpd uses; the answer is there
+somewhere; seek and ye shall find.)
+
+The level is chosen from the fixed set of debug, info, notice, warning,
+err, crit, alert and emerg.  There is no restriction on which level
+a program can use, so for example ftpd could, if it's author so chose,
+log everything as emerg.  Of course the author has done no such thing.
+Generally programs log using a number of different levels, depending
+on what they are logging.  This permits you to discard boring log
+entries (e.g. debug) and to concentrate on those which are important
+(e.g. crit, alert or emerg).
+
+You can choose the log file used for any set of facilities and levels.
+Suppose ftpd used the daemon facility (it probably does), and suppose
+nothing else used it (but I could almost guarantee that lots of other
+subsystems also use daemon), then you could put ftpd's log entries
+into any file.  E.g., put this in /etc/syslog.conf:
+
+   daemon.*    /var/log/ftp.log
+
+Voilla.  But sadly, not the answer you want.  The simple answer
+would have been "no".  This answer is more interesting.
+
+Regards,
+
+David
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,204 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Firewall & Ipchains problems" -->
+<!-- FromName="'Daniel Callan'" -->
+<!-- FromEmail="dcallan@wias.net.au" -->
+<!-- ToName="'Mick Collins'" -->
+<!-- ToEmail="mickwell@bigpond.com" -->
+<!-- Date="Wed, 15 Aug 2001 10:03:49 +1000" -->
+<!-- Id="4.3.1.20010815091716.00c02170@mail.wias.net.au" -->
+<!-- Reference="001f01c12499$94e7cce0$0201a8c0@home.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Firewall & Ipchains problems</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Callan &lt;<I><A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A></I>&gt;
+  To  : Mick Collins &lt;<I><A HREF="mailto:mickwell@bigpond.com">mickwell@bigpond.com</A></I>&gt;
+  Date: Wed, 15 Aug 2001 10:03:49 +1000
+</PRE>
+<H1>Re: Firewall & Ipchains problems</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+--=====================_6050308==_.ALT
+Content-Type: text/plain; charset="us-ascii"; format=flowed
+
+Hi Mick,
+
+At 05:47  14/08/01 +0930, you wrote:
+&gt;certain ones to come in. There has been a few problems though. I am unable
+&gt;to establish ftp connections to the outside internet.
+&gt;I have typed insmod /lib/modules/2.2.5-22/ipv4/ip_masq_ftp.o and that says
+&gt;its working. Can someone please look at my rc.local file and tell me how
+&gt;I can get this to work.
+
+FTP in passive will probably prove to test your rules, but I don't think 
+that is the
+only problem with your config. I certainly would have written it 
+differently but it is
+hard to tell what you are trying to do.
+
+Firstly, you need to clarify what interfaces you have (and to where)?
+Next, where are you trying to FTP from (on the fwall or on a ppp connection)?
+Are there any services working yet?
+
+These will help the address-translation part of forwarding but they won't open
+any holes in your input chains:
+insmod ip_masq_icq
+insmod ip_masq_quake
+insmod ip_masq_ftp
+insmod ip_masq_irc
+
+If you want (normal) FTP to work, you would need:
+#Allow Incomming FTP Requests
+/sbin/ipchains -A input -i ppp+ -p tcp --dport 20 -j ACCEPT -l
+/sbin/ipchains -A input -i ppp+ -p tcp --dport 21 -j ACCEPT -l
+
+Passive FTP would require something along the lines of:
+/sbin/ipchains -A input -i ppp+ -p tcp -d 0/0 1024:65535 -j ACCEPT -l
+But that would open you lots of different kinds of high-port protocols :-(
+
+Most importantly, you have left yourself open as a forwarding platform for 
+any spoofers who
+hit your eth0 pretending to be internal addresses. You need to add:
+
+# deny anything from eth0 (the Internet interface) that says it's coming
+# from the internal network. This will help prevent spoofing.
+/sbin/ipchains -N infilt                                        # create a 
+new chain named "infilt"
+/sbin/ipchains -A input -i eth0 -j infilt                       # use 
+infilt to check eth0
+/sbin/ipchains -A infilt -s 192.168.0.0/16 -l -j DENY   # define what 
+"infilt" will kill
+
+That last bit is from my firewall (I have numerous 192.168.X subnets on 
+different interfaces)
+so the subnet might need trimming to 192.168.1.0/24 if you like.
+
+Hope this helps,
+
+Cheers,
+-Daniel
+
+
+Daniel Callan
+<A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A>
+Systems Admin.
+WIAS Aust.
+www.wias.net.au
+
+--=====================_6050308==_.ALT
+Content-Type: text/html; charset="us-ascii"
+
+&lt;html&gt;
+Hi Mick,&lt;br&gt;
+&lt;br&gt;
+At 05:47&nbsp; 14/08/01 +0930, you wrote:&lt;br&gt;
+&lt;blockquote type=cite cite&gt;certain ones to come in. There has been a few
+problems though. I am unable&lt;br&gt;
+to establish ftp connections to the outside internet.&lt;br&gt;
+I have typed insmod /lib/modules/2.2.5-22/ipv4/ip_masq_ftp.o and that
+says&lt;br&gt;
+its working. Can someone please look at my rc.local file and tell me
+how&lt;br&gt;
+I can get this to work.&lt;/blockquote&gt;&lt;br&gt;
+FTP in passive will probably prove to test your rules, but I don't think
+that is the&lt;br&gt;
+only problem with your config. I certainly would have written it
+differently but it is&lt;br&gt;
+hard to tell what you are trying to do.&lt;br&gt;
+&lt;br&gt;
+Firstly, you need to clarify what interfaces you have (and to
+where)?&lt;br&gt;
+Next, where are you trying to FTP from (on the fwall or on a ppp
+connection)?&lt;br&gt;
+Are there any services working yet?&lt;br&gt;
+&lt;br&gt;
+These will help the address-translation part of forwarding but they won't
+open&lt;br&gt;
+any holes in your input chains:&lt;br&gt;
+&lt;font face="Courier New, Courier"&gt;insmod ip_masq_icq&lt;br&gt;
+insmod ip_masq_quake&lt;br&gt;
+insmod ip_masq_ftp&lt;br&gt;
+insmod ip_masq_irc&lt;br&gt;
+&lt;br&gt;
+&lt;/font&gt;If you want (normal) FTP to work, you would need:&lt;br&gt;
+&lt;font face="Courier New, Courier"&gt;#Allow Incomming FTP Requests&lt;br&gt;
+/sbin/ipchains -A input -i ppp+ -p tcp --dport 20 -j ACCEPT -l&lt;br&gt;
+/sbin/ipchains -A input -i ppp+ -p tcp --dport 21 -j ACCEPT -l&lt;br&gt;
+&lt;br&gt;
+&lt;/font&gt;Passive FTP would require something along the lines of:&lt;br&gt;
+&lt;font face="Courier New, Courier"&gt;/sbin/ipchains -A input -i ppp+ -p tcp
+-d 0/0 1024:65535 -j ACCEPT -l&lt;br&gt;
+&lt;/font&gt;But that would open you lots of different kinds of high-port
+protocols :-(&lt;br&gt;
+&lt;br&gt;
+Most importantly, you have left yourself open as a forwarding platform
+for any spoofers who&lt;br&gt;
+hit your eth0 pretending to be internal addresses. You need to add:&lt;br&gt;
+&lt;br&gt;
+# deny anything from eth0 (the Internet interface) that says it's
+coming&lt;br&gt;
+# from the internal network. This will help prevent spoofing.&lt;br&gt;
+/sbin/ipchains -N infilt
+&lt;x-tab&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/x-tab&gt;&lt;x-tab&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/x-tab&gt;&lt;x-tab&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/x-tab&gt;&lt;x-tab&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/x-tab&gt;&lt;x-tab&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/x-tab&gt;#
+create a new chain named &quot;infilt&quot;&lt;br&gt;
+/sbin/ipchains -A input -i eth0 -j infilt
+&lt;x-tab&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/x-tab&gt;&lt;x-tab&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/x-tab&gt;&lt;x-tab&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/x-tab&gt;#
+use infilt to check eth0&lt;br&gt;
+/sbin/ipchains -A infilt -s 192.168.0.0/16 -l -j
+DENY&lt;x-tab&gt;&nbsp;&nbsp;&nbsp;&lt;/x-tab&gt;# define what &quot;infilt&quot;
+will kill&lt;br&gt;
+&lt;br&gt;
+That last bit is from my firewall (I have numerous 192.168.X subnets on
+different interfaces)&lt;br&gt;
+so the subnet might need trimming to 192.168.1.0/24 if you like.&lt;br&gt;
+&lt;br&gt;
+Hope this helps,&lt;br&gt;
+&lt;br&gt;
+Cheers,&lt;br&gt;
+-Daniel&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;div&gt;Daniel Callan&lt;/div&gt;
+&lt;div&gt;<A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A>&lt;/div&gt;
+&lt;div&gt;Systems Admin.&lt;/div&gt;
+&lt;div&gt;WIAS Aust.&lt;/div&gt;
+&lt;div&gt;&lt;a href="<A HREF="http://www.wias.net.au/">http://www.wias.net.au/</A>" EUDORA=AUTOURL&gt;www.wias.net.au&lt;/a&gt;&lt;/div&gt;
+&lt;/html&gt;
+
+--=====================_6050308==_.ALT--
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

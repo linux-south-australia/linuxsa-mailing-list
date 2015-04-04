@@ -1,0 +1,152 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Live, via web cam - watch me scramble my kernel module!" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 16 Jul 2002 01:07:27 -0700" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Live, via web cam - watch me scramble my kernel module!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 16 Jul 2002 01:07:27 -0700
+</PRE>
+<H1>Live, via web cam - watch me scramble my kernel module!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+  Tonight, I was trying to get my web camera working.
+
+Why do I want to use a web Camera you ask? Well, because it is there, I 
+guess.   :-)
+
+I had an IBM Net Camera Pro that I was able to get the green light to 
+turn on, but only a black screen out of xawtv with the c-xirlink driver. 
+I read another page that says that the particular model I have just 
+doesn't work.  I remeber doing some kind of mknod thing to get it to 
+give me a green light.
+
+Ok, so I went off to Fry's to get another camera, this time with a print 
+out of some pages with web camera information, etc.
+
+After looking over the list of cameras that should work in Linux as well 
+as the prices, I decided to buy a Labtech Webcam listed as compatable at 
+<A HREF="http://qce-ga.sourceforce.net">http://qce-ga.sourceforce.net</A> .
+
+I downloaded the driver from the page and unzipped it, did the make 
+thing, and got this error:
+
+"memory.c in function uvirt_to_kva
+ memory.c:45 warning:implicit declaration in function kmap_pagetable"
+
+I didn't notice the error at first and continued to run the script that 
+came with the driver.
+
+Here is what I got:
+
+Using /lib/modules/2.4.18-4GB/kernel/drivers/video/videodev.o
+insmod: a module named videodev already exists
+Using /lib/modules/2.4.18-4GB/kernel/drivers/usb/usbcore.o
+insmod: a module named usbcore already exists
+Using /lib/modules/2.4.18-4GB/kernel/drivers/usb/usb-uhci.o
+insmod: a module named usb-uhci already exists
+Using /lib/modules/2.4.18-4GB/kernel/drivers/usb/usb-ohci.o
+/lib/modules/2.4.18-4GB/kernel/drivers/usb/usb-ohci.o: init_module: No 
+such device
+Hint: insmod errors can be caused by incorrect module parameters, 
+including invalid IO or IRQ parameters
+Using /lib/modules/2.4.18-4GB/kernel/drivers/usb/uhci.o
+/lib/modules/2.4.18-4GB/kernel/drivers/usb/uhci.o: init_module: No such 
+device
+Hint: insmod errors can be caused by incorrect module parameters, 
+including invalid IO or IRQ parameters.
+
+Well, the hint didn't give me a clue, so it seemed that perhaps Linux 
+thought that the IBM Camera was still installed, blocking the new Labtec 
+camera's installation.
+
+So,  I did a dumb thing and deleted the usbcore.o, videodev.o, 
+usb-uhci.o and usb-ohci.o files. I thought that if I recompiled the 
+driver I downloaded from sourceforge the files would come back. Needless 
+to say no luck down that path, so I copied all of these files back from 
+another machine with SuSE on it, minus the videodev.o, as it was not on 
+the other machine.
+
+I searched around the internet,  and FTP'd a videodev.o file, but I got 
+another error saying that the videodev.o file was compiled with the 
+2.4.18-4GB kernel, not the 2.4.18 kernel. I already did a search on my 
+SuSE disks for videodev.o, but no luck.
+
+Ok, so I went into the kernel and compiled video4linux support into the 
+kernel - I said "Y" instead of "M" - which I think changes the 
+video4linux support from a module (.o file?) to inside the kernel. I 
+chose this route because the instructions said that I could use 'ismod 
+mod_quickcam.o' to get the Labtec Camera to run instead of the script if 
+video4linux support was compilied into the kernel.
+
+bzzzzzzzzzzzzzzzzzt! Wrong answer....
+
+When I ran 'ismod mod_quickcam.o' I got this message.
+
+"mod_quickcam.o: unresolved symbol kmap_pagetable"
+
+I tried "modprobe quickcam.o" within the directory that the module was 
+compiled but I get a message that says, "can't find module quickcam.o - 
+YOU NEWBIE!!". Well, almost... :-)
+
+I searched around and I found what looks like an answer. Only thing, I 
+have no idea what it means, so I don't really know if I have an answer 
+at all. My gut tells me that I need a symbolic link somewhere.
+
+Here it is:
+
+<A HREF="http://www.linuxtv.org/mailinglists/vdr/2002/05-2002/msg03185.html">http://www.linuxtv.org/mailinglists/vdr/2002/05-2002/msg03185.html</A>
+
+Any ideas?
+
+James Leone
+
+
+
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

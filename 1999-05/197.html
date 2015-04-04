@@ -1,0 +1,191 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="int / void main() crapola" -->
+<!-- FromName="O'Connor, Steven" -->
+<!-- FromEmail="Steven.O'Connor@boral.com.au" -->
+<!-- ToName="'linuxsa@linuxsa.org.au'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 11 May 1999 13:49:01 +0930" -->
+<!-- Id="BDF1E8B3E7CBD2118C160060974FC7CF167A7D@enewaymd01.ene.boral.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: int / void main() crapola</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: O'Connor, Steven &lt;<I><A HREF="mailto:Steven.O'Connor@boral.com.au">Steven.O'Connor@boral.com.au</A></I>&gt;
+  To  : 'linuxsa@linuxsa.org.au' &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 11 May 1999 13:49:01 +0930
+</PRE>
+<H1>int / void main() crapola</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I dont know about the K&R debate, but this is worth a look at :
+
+2 bits of C code :
+
+---------------------test1.c-------------------------------------
+void main ()
+{
+	int x;
+	x = 1;
+}
+--------------------test2.c--------------------------------------
+int main ()
+{
+	int x;
+	x = 1;
+}
+--------------------------------------------------------------------
+
+And 2 bits of assembly that they generate
+(using gcc -S xxxxx.c)
+
+---------------------test1.s-------------------------------------
+	.file	"test1.c"
+	.version	"01.01"
+gcc2_compiled.:
+.text
+	.align 16
+.globl main
+	.type	 main,@function
+main:
+	pushl %ebp
+	movl %esp,%ebp
+	subl $4,%esp
+	movl $1,-4(%ebp)
+.L1:
+	movl %ebp,%esp
+	popl %ebp
+	ret
+.Lfe1:
+	.size	 main,.Lfe1-main
+	.ident	"GCC: (GNU) egcs-2.91.60 19981201 (egcs-1.1.1 release)"
+------------------------test2.s----------------------------------
+	.file	"test2.c"
+	.version	"01.01"
+gcc2_compiled.:
+.text
+	.align 16
+.globl main
+	.type	 main,@function
+main:
+	pushl %ebp
+	movl %esp,%ebp
+	subl $4,%esp
+	movl $1,-4(%ebp)
+.L1:
+	movl %ebp,%esp
+	popl %ebp
+	ret
+.Lfe1:
+	.size	 main,.Lfe1-main
+	.ident	"GCC: (GNU) egcs-2.91.60 19981201 (egcs-1.1.1 release)"
+----------------------------------------------------------
+
+No difference there at all.
+
+If you put just 'return' in the code, you get
+
+main:
+  pushl %ebp
+  movl %esp,%ebp
+  subl $4,%esp
+  movl $1,-4(%ebp)
+  jmp .L1                            &lt;---- adds this in. makes sure that the
+address of L1 is aligned
+  .p2align 4,,7
+.L1:
+  movl %ebp,%esp
+  popl %ebp
+  ret
+
+
+If you put 'return 0' in the code, it is different again
+
+.. does a xorl %eax,%eax immediately before the jmp .L1, which ensures that
+the eax register is zero before the return.
+
+
+------------------------------------
+
+Try the whole thing again, using optimisation, (gcc -S -O3 testx.c)
+
+and you get all 4 variations of code coming down to the same peice of asm :
+
+.text
+	.align 16
+.globl main
+	.type	 main,@function
+main:
+	pushl %ebp
+	movl %esp,%ebp
+	movl %ebp,%esp
+	xorl %eax,%eax     (provided that you use return 0)
+	popl %ebp
+	ret
+
+-------------------------------------------
+
+This is all very very specific to egcs ... I dunno ... but at least for this
+implementation (TurboLinux 3.4.0 running egcs 2.91.60 on a Dell Optiplex
+GXi) the following observations can be made, and reproduced by experiment :
+
+- There is NO DIFFERENCE AT ALL between having void main() and int main().
+- If you dont have a return statement at all, then your code will function
+the same, but will be slightly smaller and possibly faster by a couple of
+clock cycles. (no jmp statement)
+- If you dont have a value on the return statement, then the return value is
+whatever happens to be in the EAX register at the time.
+- If you turn on optimisation, then the compiler generates the sort of code
+it would normally generate if you had 'broken the rules' in your code.
+
+I will try the same exersize on MS-Virtual C++ when it stops complaining
+about being 'out of memory - program cannot run'
+
+---------------------------------------------
+
+The moral of the story is that you should not trust anything you read in
+books (even K&R), and that even C compilers are just code like anything
+else.
+
+Also, if you are doing any C programming, it is always a good idea to think
+in assembler, and just code in C. It is also important to generate asm code
+from your C code (using -S on the compiler) especially for functions that
+are performance critical - get to know your compiler, and be prepared to
+hand tweak the assembler output from time to time. 
+
+-------------
+SteveOC
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

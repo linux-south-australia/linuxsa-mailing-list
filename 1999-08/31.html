@@ -1,0 +1,102 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Caching DNS HOWTO and RPM broken" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@adelaide.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 02 Aug 1999 13:56:56 +0000" -->
+<!-- Id="37A5A3A8.604540C6@adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Caching DNS HOWTO and RPM broken</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@adelaide.edu.au">glen.turner@adelaide.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 02 Aug 1999 13:56:56 +0000
+</PRE>
+<H1>Caching DNS HOWTO and RPM broken</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+FYI,
+
+There was a DNS-based denial of service attack posted to
+BUGTRAQ before the weekend.  This is actively in use.
+
+The RedHat caching-nameserver-*.rpm and the DNS HOWTO
+both incorrectly and insecurely set up the BIND DNS
+server for caching.  The exploit script posted to BUGTRAQ
+makes good use of these machines.
+
+I contacted the author of the HOWTO last year about
+the lax configuration, but he couldn't see the point
+in fixing it and complicating the HOWTO.  Needless to
+say, I'll be trying again now that a published exploit
+exists.
+
+If you are using a caching DNS server as a standard host
+through an ISP or in a corporate environment you need:
+
+  options {
+    forwarders {
+       10.0.0.1;
+       10.0.0.2;
+    };
+    forward only;
+    
+    allow-query {
+      localhost;
+    };
+    allow-transfer {
+      none;
+    };
+  };
+
+where 10.0.0.1 and 10.0.0.2 are the addresses of the
+DNS servers supplied to you by your ISP that usually
+live in /etc/resolv.conf.
+
+Configurations that attempt to contact the root name servers
+directly will begin to fail as ISPs/enterprises install access
+lists to prevent their customers machines from being used as
+multipliers in denial of service attacks.
+
+-- 
+ Glen Turner                               Network Specialist
+ Tel: (08) 8303 3936          Information Technology Services
+ Fax: (08) 8303 4400         The University of Adelaide  5005
+ Email: <A HREF="mailto:glen.turner@adelaide.edu.au">glen.turner@adelaide.edu.au</A>           South Australia
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

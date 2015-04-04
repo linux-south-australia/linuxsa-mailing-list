@@ -1,0 +1,117 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: automation of apt-get" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'Daniel Mundy','LinuxSA'" -->
+<!-- ToEmail="djmunds@gmx.net,linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 2 Feb 2002 16:05:29 +1030" -->
+<!-- Id="000801c1abab$6d5970e0$0c00a8c0@albert" -->
+<!-- Reference="3C5A8379.23A5ECBD@gmx.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: automation of apt-get</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : Daniel Mundy &lt;<I><A HREF="mailto:djmunds@gmx.net">djmunds@gmx.net</A></I>&gt;<BR>        LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 2 Feb 2002 16:05:29 +1030
+</PRE>
+<H1>RE: automation of apt-get</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; I have been looking into using cron (anacron more 
+&gt; specifically) to have apt-get upgrade my system once a day, I 
+&gt; have managed it but I would like to know a better way to do 
+&gt; it. Currently my crontab looks like this:
+
+I've done similar... However, I have a permanent connection, so it just
+runs daily when I want it to... (I do "apt-get update && apt-get
+upgrade" to  ensure that the upgrade only happens after the update...
+
+&gt; 0 21 * * * apt-get update
+&gt; 0 * * * * apt-get -dy upgrade
+
+That looks more like crontab than anacrontab to me... ?
+
+&gt; 
+&gt; Now the problem is if I am not connected to the internet at 
+&gt; this time. In this case I would like the commands run later 
+&gt; on during the day when it is connected. I could put something 
+&gt; in ip-up but that would run twice on the same day if I 
+&gt; connected twice, which I don't want.
+
+I have no knowledge of any tools that could do this, but you could try
+this:
+
+Anacron allows you to name jobs, and then specify which jobnames to run
+when you start it on the command line. Eg:
+
+Excerpt from anacrontab:
+----
+#period delay   jobname command
+1       1       test1 	ls /
+1       1       test2 	ls /etc
+1	  1       test3   ls /tmp
+----
+
+Now if I run:
+
+anacron test1 test2
+
+It will run the two jobs specified, and ignore any others
+
+So, you could have jobs that you want to run online only, and start this
+anacron as `anacron online` from within the ipup script, and have other
+jobs started with the normal anacron as `anacron offline otherjob pants`
+in your normal anacron start script...
+
+
+I just investigated this a little closer, and anacron isn't a daemon
+like I had assumed -- it seems to be started from cron... Ah well...
+Daniel -- I still think this general idea could be made to work if you
+tried :)
+
+rr
+
+-- 
+Richard Russell
+Yellow Goanna Pty Ltd
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+m: +61 412 827 805
+f: +61 8 8462 2362
+ 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

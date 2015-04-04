@@ -1,0 +1,140 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: bind 8.2.2_P5-9 and forwarders option" -->
+<!-- FromName="Alex Garner" -->
+<!-- FromEmail="alex@netcraft.com.au" -->
+<!-- ToName="Richard Sharpe" -->
+<!-- ToEmail="sharpe@ns.aus.com" -->
+<!-- Date="Thu, 13 Jul 2000 15:31:51 +0930 (CST)" -->
+<!-- Id="200007130601.PAA07571@Kara.netcraft.com.au" -->
+<!-- Reference="3.0.6.32.20000713164137.009bb920@203.16.214.248" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: bind 8.2.2_P5-9 and forwarders option</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alex Garner &lt;<I><A HREF="mailto:alex@netcraft.com.au">alex@netcraft.com.au</A></I>&gt;
+  To  : Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  Date: Thu, 13 Jul 2000 15:31:51 +0930 (CST)
+</PRE>
+<H1>Re: bind 8.2.2_P5-9 and forwarders option</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; &gt; &gt; I have bind 8.2.2_P5-9 installed at a site and am trying to set
+&gt; &gt; &gt; up a split DNS, but am having real problems getting the
+&gt; &gt; &gt; forwarders statement to work.
+&gt; &gt;
+&gt; &gt; When you say split, are you referring to the split of resolver and
+&gt; &gt; server?
+&gt; 
+&gt; No, having a separate internal and external DNS ...
+
+Yes, but which functions of DNS are you trying to move around. You
+have the "name server" and the "resolver server (library)". All
+'forwarders' does, is queries the listed server for the DNS resolution
+and the queried server does the whole "get the . domain server, get
+the .au domain server, get the .com.au. domain server" thing.
+
+&gt; &gt; &gt; Has anyone had this working?
+&gt; &gt;
+&gt; &gt; Yup. What else is in your named.conf file?
+&gt; 
+&gt; Well, a few things. A couple of zone declarations, with the names of
+&gt; the zone files for the internal zones. A zone for "." with the usual
+&gt; stuff and so on.
+&gt; 
+&gt; The man page suggests that I override forwarding for internal zones,
+&gt; but I could not make sense of it.
+
+When you say 'internal zones', are you meaning the zones that you host
+that map to say 192.168 addresses, or do you mean "your zones", and
+therefore "external zones" means "all other zones on the net".
+
+&gt; I am trying to forward to the external DNS at the moment, but
+&gt; external names just do not get forwarded and named comes back very
+&gt; quickly saying not found.
+
+Forwarders is just a way of cutting down DNS traffic. When you have a
+whole bunch of 'dumb' machines (like windows) on a network with no
+resolver daemon (named), they all have to query a name server to do
+the resolving for them. If you keep that server locally then your DNS
+requests do not exit your netwok to be resolved. They get resolved
+locally by the DNS server that sends the port 53 packets out itself,
+then caches the result thus building up a rich cache. If your network
+comprises 'smart' machines like linux and other Unices, they often
+have their own resolver daemon (named), in which case each mahine has
+to resolve the DNS resquest themselves. If you forward all requests to
+a central DNS server, it builds the rich cache not each UNIX box.
+
+This of course, has nothing to do with any domains you may be hosting
+on your DNS server.
+
+One trick I use to keep traffic to any low bandwidth networks to a
+minimum, but still host my own DNS is this:
+
+You setup a primary DNS server for the domain and two secondary DNS
+servers. The primary is in your local network and the secondaries are,
+for example, Telstra and NetCraft, both very well connected DNS
+servers. You setup the zone file on the primary DNS server listing the
+two secondary DNS servers as the only servers...
+
+	IN	A	ns.telstra.net
+	IN	A	ns1.netcraft.com.au
+
+Set these two secondary servers up to get zone transfers from your
+local machine, then the only outside DNS traffic that you will see on
+your netork is those two servers updating their DNS data with a
+zone-xfer from your primary.
+
+The added advantage is that if your link goes down, you DNS still
+resolves, so that mail will still come through when you come back up.
+
+Got a bit off the original issue there, but this should be very useful
+for anyone hosting a domain on a server with only a ppp modem link to
+the 'net.
+
+Cheers
+
+Alex!
+
+--
+
+Alex Garner &lt;<A HREF="mailto:alex@netcraft.com.au">alex@netcraft.com.au</A>&gt;
+
+NetCraft Australia
+Phone (08) 8370 3650
+<A HREF="http://www.netcraft.com.au">http://www.netcraft.com.au</A>
+
+"#define QUESTION ((bb) || !(bb)) // Shakespeare."
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

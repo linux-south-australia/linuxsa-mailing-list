@@ -1,0 +1,367 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Modem install HELP! :)" -->
+<!-- FromName="'Brian Marr'" -->
+<!-- FromEmail="cabernet@internode.on.net" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 8 Sep 2002 11:55:17 +0930" -->
+<!-- Id="200209081155.17483.cabernet@internode.on.net" -->
+<!-- Reference="00ac01c256d1$1fd98d60$759afed8@ionsys.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Modem install HELP! :)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Brian Marr &lt;<I><A HREF="mailto:cabernet@internode.on.net">cabernet@internode.on.net</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 8 Sep 2002 11:55:17 +0930
+</PRE>
+<H1>Re: Modem install HELP! :)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I came across this info on the net and used it to configure an isa scsi card. 
+I  wonder if it may help. Ignore the references to Corel. 
+Brian Marr
+
+
+Q: How do I configure my ISA- PnP network card?
+
+Corel LINUX OS 1.0 Users:
+A: Issue the following command from a console screen as root :
+
+/sbin/pnpdump &gt; /etc/isapnp.conf &lt;ENTER&gt;
+
+This command scans your system for ISA-PnP devices and writes their resources 
+into the /etc/isapnp.conf file. Open this file using the Text Editor 
+(Application Starter | Applications | Utilities | Text Editor).
+
+Look for lines similar to the following:
+
+# Card 1: serial identifier 91 00 00 81 87 23 21 b0 4e
+# VendorId SUP2123, Serial Number 33159, checksum 0x91
+# Version 1.0, Vendor version 0.0
+# ANSI string --&gt;3COM 3C509&lt;--
+
+Each time you see the Card 1: heading, an ISA-PnP card has been found on the 
+system. The ANSI string line should give you a good indication as to what 
+card it is. Below these lines, you'll have some resources available for the 
+device, similar to the following:
+
+# (IO 0 (BASE 0x03f8))
+# IRQ 4.
+# High true, edge sensitive interrupt
+# (INT 0 (IRQ 4 (MODE +E))) 
+
+Remove the "#" symbols from the first and fourth lines. For example, if you 
+wanted the system to use the values it lists above, you'd change the lines to 
+match this: 
+
+(IO 0 (BASE 0x03f8))
+# IRQ 4.
+# High true, edge sensitive interrupt
+(INT 0 (IRQ 4 (MODE +E)))
+
+This makes ISAPNPTOOLS configure the card using IRQ 4 and IO 0x3f8. Now search 
+for the following lines at the end of this Card: section: 
+
+# End dependent functions
+# (ACT Y)
+
+Remove the ‘#' symbols to make the settings take effect:
+
+# End dependent functions
+(ACT Y)
+
+Save the file. Now see if this configuration is correct and ensure that it 
+doesn't conflict with other hardware devices on the system. Type the 
+following as root from a console screen:
+
+/sbin/isapnp /etc/isapnp.conf &lt;ENTER&gt;
+
+If you receive any errors, you'll need to go back into the file and change 
+IRQ, IO or both. Then, save the file and try running this command again. You 
+can use the Control Center to get an indication of what resources are 
+currently being used on your system as a guideline. Repeat the above 
+procedure until you find a combination that works. 
+
+
+
+
+On Sunday 08 September 2002 10:12, Anthony Stapells wrote:
+&gt; Wow!
+&gt;
+&gt; First off, thanks for the deluge of help!
+&gt;
+&gt; Second off, I've tried the things mentioned by all.  I did exist during the
+&gt; Dark Ages of Win3.1, (actually somewhat before that...I blush to admit that
+&gt; I have coded in 8-bit 6502 code) so I was worried that the spectre of IRQ
+&gt; conflicts was raising its ugly head once more.  And you lot seem to think
+&gt; that is the case as well.
+&gt;
+&gt; What I did was:
+&gt;
+&gt; 1)  Pulled the bloody serial mouse out of the computer, just to simply
+&gt; matters.  Don't know why I didn't beforehand ;P  I figure if I can make the
+&gt; modem work, I can probably find a PS/2 mouse.  Budget be damned!  :)
+&gt;
+&gt; 2)  Turned on PNP.  Turned off PNP.  Shouted obscenities.  Tried once PNP
+&gt; more.
+&gt;
+&gt; 3)  Disabled the second serial port in BIOS.
+&gt;
+&gt; 4)  Looked at "/sbin/lspci -v -b" (and cat /proc/pci).  Output seemed
+&gt; identical and sadly "microelectronics" was not present.
+&gt;
+&gt; 5)  Did I mention the obscenities?
+&gt;
+&gt; 6)  Tried pnpdump.  Interestingly enough information about the modem does
+&gt; indeed appear.  I am instructed to edit and uncomment the entries below to
+&gt; achieve the correct configuration.  As I am unaware which of the three
+&gt; different (?) configurations might be appropriate, this isn't too helpful.
+&gt; I may as well admit that I am even unaware of how to edit out said
+&gt; comments.
+&gt;
+&gt; 7)  "/usr/bin/wvdialconf create" once again.  Say...it seems to be pinging
+&gt; the modem at ttyS1, which is comforting as the jumpers are set at COM2 and
+&gt; I disabled ttyS1 through BIOS earlier.  However, it is time for obscenities
+&gt; as three tries of ATQ0 V1 E1 yield nothing.  However, it does mention
+&gt; setserial again, so I try "/bin/setserial /dev/ttyS1 uart 16550A port
+&gt; 0x02f8 irq 3". I used IRQ 3 since that is where the jumpers on the modem
+&gt; are set, and 02f8 since the boot messages seemed to indicate that was where
+&gt; it found the 16550A at ttyS01.  But running "/usr/bin/wvdialconf create"
+&gt; after trying that setserial string still got no modem response to the query
+&gt; string.
+&gt;
+&gt; Odds and Sods Answered:
+&gt;
+&gt; Yes, it is an internal PCI modem.  I heartily agree with Romana's "internal
+&gt; modems can be the devil in Linux:)".
+&gt;
+&gt; I have the usual two serial ports on the board and now have only the one
+&gt; serial device (the modem) present.  It is a standalone linux system, but
+&gt; the PNP enabled or disabled does not seem to make much of a difference.
+&gt;
+&gt; Oh - not once did kudzu admit that anything new was in the box.
+&gt;
+&gt; Random (and Probably Wrong) Thoughts:
+&gt;
+&gt; Would a more modern MB help?  It's actually 1997, not '99 as I originally
+&gt; mentioned.  I thought modems had been pretty stable as hayes compatible for
+&gt; awhile now, so should an older BIOS matter?
+&gt;
+&gt; Maybe I've worn off the gold on the contact constantly pulling it out and
+&gt; fiddling with jumpers...
+&gt;
+&gt; Still appearing foolish, but am REALLY appreciating the kind time people
+&gt; are sparing to hold my hand,
+&gt; Tony
+&gt;
+&gt; :)
+&gt;
+&gt; PS - I did not try all the different COM jumper settings, as there should
+&gt; no longer be a conflict since there is only ONE serial device present (and
+&gt; port for the that matter...and PCI card actually).  Right?  Theoretically?
+&gt;
+&gt; &gt; Hi Tony,
+&gt; &gt;
+&gt; &gt; you have having the clasic IRQ conflicts. You said you have a serial
+&gt;
+&gt; mouse, which I take is on COM1 (/dev/ttyS0). Here is what you should do:
+&gt; &gt; Disable COM2 in the bios of your MB.
+&gt; &gt; Change the modem jumpers to COM2.
+&gt; &gt;
+&gt; &gt; That should fix your problem, and you should see the modem on /dev/ttyS1.
+&gt; &gt; If you dont see the modem, but the serial port does appear, then I would
+&gt;
+&gt; sugest that that scrounged part is no good !
+&gt;
+&gt; &gt; Cheers,
+&gt; &gt;
+&gt; &gt; Ben.
+&gt; &gt;
+&gt; &gt; On Sat, 7 Sep 2002 14:08:05 -0400
+&gt; &gt;
+&gt; &gt; "Anthony Stapells" &lt;<A HREF="mailto:stapells@ionsys.com">stapells@ionsys.com</A>&gt; wrote:
+&gt; &gt; &gt; Hello all!  I am both new to the list and to linux in general, so
+&gt; &gt; &gt; please forgive me any particularly ignorant questions.  :)
+&gt; &gt; &gt;
+&gt; &gt; &gt; Both for the fun of it and because I'm a freelance web developer (who's
+&gt; &gt; &gt; obviously been working in Windows lo these last few years), but since
+&gt;
+&gt; most
+&gt;
+&gt; &gt; &gt; sites are deployed to linux servers I thought I'd build a linux box
+&gt; &gt; &gt; with
+&gt;
+&gt; all
+&gt;
+&gt; &gt; &gt; the odds and sods of computers parts I've scrounged over the years.
+&gt; &gt; &gt;
+&gt; &gt; &gt; Anyway, everything (RH 7.2) seems to be running smoothly...except for
+&gt;
+&gt; the
+&gt;
+&gt; &gt; &gt; bloody modem.  I cannot get a response from it.
+&gt; &gt; &gt;
+&gt; &gt; &gt; The facts:
+&gt; &gt; &gt;
+&gt; &gt; &gt; 1.  It is indeed a hardware modem, specifically Multi-Tech Systems
+&gt;
+&gt; Inc. -
+&gt;
+&gt; &gt; &gt; MT5634ZPX-PCI.  According to the RedHat site
+&gt; &gt; &gt; (<A HREF="http://hardware.redhat.com/hcl/genpage2.cgi?pagename">http://hardware.redhat.com/hcl/genpage2.cgi?pagename</A>=details&hid=422)
+&gt;
+&gt; it is
+&gt;
+&gt; &gt; &gt; dead easy to install.  Which is somewhat humbling...and perhaps why I
+&gt;
+&gt; like
+&gt;
+&gt; &gt; &gt; the software end of things. :)
+&gt; &gt; &gt;
+&gt; &gt; &gt; 2.  Linux seems to recognize that it is installed, but just doesn't
+&gt;
+&gt; quite
+&gt;
+&gt; &gt; &gt; admit that it is a modem and sticks it under "unknown" when I do a
+&gt;
+&gt; hardware
+&gt;
+&gt; &gt; &gt; probe through KDE.
+&gt; &gt; &gt;
+&gt; &gt; &gt; 3.  As per RH's instructions I tried "/sbin/lspci -v -b" to little
+&gt;
+&gt; comfort
+&gt;
+&gt; &gt; &gt; as nothing resembling Microelectronics appeared.
+&gt; &gt; &gt;
+&gt; &gt; &gt; 4.  Continuing onward into the fog, I then tried "/bin/setserial device
+&gt;
+&gt; uart
+&gt;
+&gt; &gt; &gt; 16550A port 0x02e8 irq 3" (I got the port and irq values from examining
+&gt;
+&gt; the
+&gt;
+&gt; &gt; &gt; boot sequence messages) and promptly got an error.  To wit:  "device:
+&gt; &gt; &gt; No such file or directory".  I then dropped out the word "device" from
+&gt; &gt; &gt; the line, tried adding /dev/ttyS3 (again, as the boot messages seemed
+&gt; &gt; &gt; to indicate that a device 16550A existed at ttyS3) and things seems to
+&gt;
+&gt; work.
+&gt;
+&gt; &gt; &gt; At least I got no error messages at any rate.
+&gt; &gt; &gt;
+&gt; &gt; &gt; 5.  Sadly, despite the seeming progress, I still cannot get a modem
+&gt; &gt; &gt; response.  Using KPPP I cannot get a response from /dev/ttyS3, nor
+&gt; &gt; &gt; /dev/modem for that matter.  From the CLI, "/usr/bin/wvdialconf create"
+&gt; &gt; &gt; merrily searches but cannot find a modem.   Yet, and this may actually
+&gt;
+&gt; be a
+&gt;
+&gt; &gt; &gt; clue to those less clue-less than I, it ignores ttyS3 as it claims that
+&gt; &gt; &gt; /dev/mouse/ points to that port.
+&gt; &gt; &gt;
+&gt; &gt; &gt; Other interesting bits:
+&gt; &gt; &gt;
+&gt; &gt; &gt; I've got a serial mouse hooked up too, and in fact originally had some
+&gt; &gt; &gt; trouble having a mouse and the modem in the computer at the same time.
+&gt;
+&gt; I
+&gt;
+&gt; &gt; &gt; played with my BIOS (ancient BTW...1999, Pentium 200 board...told you I
+&gt;
+&gt; made
+&gt;
+&gt; &gt; &gt; this thing from leftovers), and made serial2 02e8 rather than auto, and
+&gt;
+&gt; set
+&gt;
+&gt; &gt; &gt; PNP OS to "no".  That seemed to allow both modem and mouse.
+&gt; &gt; &gt;
+&gt; &gt; &gt; The modem jumpers are configured for IRQ3 and COM4.
+&gt; &gt; &gt;
+&gt; &gt; &gt; Discussion:
+&gt; &gt; &gt;
+&gt; &gt; &gt; Am I wrong in assuming that a 16650A device is a modem?  I admit that I
+&gt;
+&gt; am
+&gt;
+&gt; &gt; &gt; blindly guessing that from the instructions on the Redhat site.  I am
+&gt;
+&gt; dimly
+&gt;
+&gt; &gt; &gt; starting to suspect that it might actually just be a serial device...ie
+&gt;
+&gt; my
+&gt;
+&gt; &gt; &gt; mouse.
+&gt; &gt; &gt;
+&gt; &gt; &gt; I have read through the HOW-TOs at
+&gt; &gt; &gt; <A HREF="http://www.tldp.org/HOWTO/Modem-HOWTO.html.">http://www.tldp.org/HOWTO/Modem-HOWTO.html.</A>  Sadly to little avail it
+&gt;
+&gt; would
+&gt;
+&gt; &gt; &gt; seem.  Although the answer is probably buried in there, I am too
+&gt;
+&gt; ignorant to
+&gt;
+&gt; &gt; &gt; spot it.
+&gt; &gt; &gt;
+&gt; &gt; &gt; Any help that anyone can give this linux fledgling would be gratefully
+&gt; &gt; &gt; received!
+&gt; &gt; &gt;
+&gt; &gt; &gt; Thanks in advance,
+&gt; &gt; &gt; Tony
+&gt; &gt; &gt;
+&gt; &gt; &gt;
+&gt; &gt; &gt;
+&gt; &gt; &gt;
+&gt; &gt; &gt; --
+&gt; &gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on
+&gt;
+&gt; irc.linux.org.au
+&gt;
+&gt; &gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on
+&gt; &gt; irc.linux.org.au To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

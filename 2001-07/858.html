@@ -1,0 +1,114 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Bash help" -->
+<!-- FromName="'Tim Riley'" -->
+<!-- FromEmail="tr@rebel.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 17 Jul 2001 18:07:41 +0930" -->
+<!-- Id="20010717180741.A411@rebel.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Bash help</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Tim Riley &lt;<I><A HREF="mailto:tr@rebel.net.au">tr@rebel.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 17 Jul 2001 18:07:41 +0930
+</PRE>
+<H1>Bash help</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+I've been making some modifications to a tool called protopkg, which
+takes source code and makes a slackware package from it.  My first job
+has been to make it read from one build file, instead of three.
+
+Previously, it had a 'prototype' file, in which there was certain
+variables, as well as package specific compile() and install()
+functions.  The other files it could use were 'sources' and 'rules.'  In
+each of these files, there were various lines of text in between two
+flags, in the following format:
+
+flag:
+text
+text
+text
+:flag
+
+There is a read_rules() function that extracts the information between
+the flag name passed to it as an argument.  This is it below:
+
+read_rules() {
+   sed -e '/^#/d' -e '/^$/d' | sed -n "/^${1}:/,/^:${1}$/p" |
+   grep -Fv "${1}:" | grep -Fv ":${1}" | sed -e "s/^[ \t]*//"
+}
+
+So, in order to combine all three files into one, I made another set of
+flags to encapsulate that which was originally alone in the 'protopkg'
+file (flag name is 'package') and then appended the other two files to
+it.
+
+The problem starts here.  Originally, the entire prototype file was
+sourced, which was OK since it contained only Bash stuff.  However, now
+it doesn't, so I want to use the read_rules() function to just source
+the stuff in between the 'package' flags.  My failed attempt is below.
+
+     # This dumps it to a file called source.  So close!  But I want it
+     # read *internally*
+ 
+     read_rules "package" &lt; prototype &gt; source
+     . ./source
+     rm source
+     
+     # WHAT A CRUDDY HACK.
+     # Originally, it just used `. ./prototype` to source the whole
+     # file.
+               
+Every other attempt I have made, I cannot get it to do anything but dump
+the stuff between the package flags to stdout.
+
+So, all you bash wizards out there, am I missing something?  Or is there
+a better way of approaching the whole situation?
+
+Thankyou for your time and help.
+
+Cheers,
+
+Tim Riley
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

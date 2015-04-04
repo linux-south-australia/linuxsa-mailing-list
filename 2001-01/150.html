@@ -1,0 +1,107 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Kernel Mount Count Idea" -->
+<!-- FromName="'Matthew Tippett'" -->
+<!-- FromEmail="mtippett@ticons.com.au" -->
+<!-- ToName="'David Lloyd'" -->
+<!-- ToEmail="lloy0076@rebel.net.au" -->
+<!-- Date="Sat, 6 Jan 2001 22:53:06 +1100" -->
+<!-- Id="20010106225306.A21303@ticons.com.au" -->
+<!-- Reference="3A56D1AA.AB9D5FF3@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Kernel Mount Count Idea</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Tippett &lt;<I><A HREF="mailto:mtippett@ticons.com.au">mtippett@ticons.com.au</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  Date: Sat, 6 Jan 2001 22:53:06 +1100
+</PRE>
+<H1>Re: Kernel Mount Count Idea</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sat, Jan 06, 2001 at 06:34:58PM +1030, David Lloyd wrote:
+&gt; 
+&gt; The kernel keeps track of the number of times that you have mounted any
+&gt; one particular partition. If that partitions is marked as being
+&gt; checkable (i.e. run fsck on it at initialisation) the kernel initiates
+&gt; this process. It appears that most partitions will fsck on the same
+&gt; time, however because of the way the system is initialised fsck does not
+&gt; parallelize; that is to say it runs sequentially.
+
+Not quite, the kernel doen't do anything to the filesystems.  The filesystem
+itself (I assume ext2 fs or similar) keeps track of homw many times it has 
+been mounted.  When fsck is run in /etc/rc.d/sysinit (or similar) it goes 
+through all the filesytems in /etc/fstab and checks them if needed.
+
+&gt; 1) do start up stuff
+&gt; 2) read /etc/fstab
+&gt; 3) get mount counts for all file systems to be mounted
+&gt; 4) determine which ones need to be fsck'ed
+&gt; 5) run a parallel fsck on them all
+
+So step 1,2 are already done by /etc/rc.d/rc.sysinit.
+
+And 3,4 are done already by fsck
+
+The run parallel brings in a number of other issues.
+
+  o Running them serial will take time.  
+  o Running them purely in parallel is bad if they are on the same disk.
+  o Running them in serial if they are on the same disk is the best we can do
+    (to avoid thrashing the disks).
+  o Running the disks in parallel in also fine (the bottle neck is the 
+    physical speed of the disk).
+
+So, what happens is exactly that.  The partitions are ordered by physical 
+disk and each list run concurrently.  
+
+So all in all your situation can't be improved much using existing 
+2.2 filesystems.  The fsck time for journaling filesystems might be 
+different - YMMV.
+
+The last thing that might be an option is getting 2-4 smaller disks and 
+running large partitions.
+
+Regards,
+
+Matthew
+
+-- 
++---[ Matthew Tippett ]-[ Ph:+61 416 006 047 ]-[ Fax:+61 414 000 694 ]---+
++---[ TICons ]-[ <A HREF="mailto:mtippett@ticons.com.au">mtippett@ticons.com.au</A> ]-[ <A HREF="http://www.ticons.com.au/">http://www.ticons.com.au/</A> ]--+
++---[ <A HREF="http://commercialos.org/">http://commercialos.org/</A> - Commercial Open Source Devel. Info  ]---+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

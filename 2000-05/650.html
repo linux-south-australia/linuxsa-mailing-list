@@ -1,0 +1,159 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: plpgsql question" -->
+<!-- FromName="Jake Hawkes" -->
+<!-- FromEmail="jake@infinitylimited.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 24 May 2000 12:40:02 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.10.10005241227390.8474-100000@zero.infinitylimited.net" -->
+<!-- Reference="Pine.LNX.4.10.10005232301510.8474-100000@zero.infinitylimited.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: plpgsql question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Wed, 24 May 2000 12:40:02 +0930 (CST)
+</PRE>
+<H1>Re: plpgsql question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+in case anyone cares, here's how I fixed this:
+
+
+DECLARE
+	etype RECORD;
+BEGIN
+
+
+
+    FOR etype IN select * from emailtypes where flex = caserec.flex LOOP
+
+	-- blarb --
+
+    END LOOP;
+
+
+must declare ``eytpe'' before using.
+
+can also use this RECORD type to do things like:
+
+select * into etype from emailtypes;
+
+but this will silently discard everything but the first row.
+
+--
+Jake Hawkes B. Eng (CSE)
+
+"It seems Microsoft is setting a new standard: Emails without attachments."
+	-- Reemi (poster on slashdot)
+
+On Tue, 23 May 2000, Jake Hawkes wrote:
+
+&gt; 
+&gt; 
+&gt; Does anyone know why this plpgsql trigger function wont work?
+&gt; 
+&gt; Its a trigger that gets called after inserts on each row.
+&gt; 
+&gt; the error I'm getting is "parse error near LOOP", so its obviously barfing
+&gt; on this bit:
+&gt; ..
+&gt; FOR etype IN weeknum,rcpts,emailtypeid from emailtypes where flex = caserec.flex LOOP
+&gt; ..
+&gt; 
+&gt; ok, so according to the doco, the syntax is:
+&gt;     FOR record | row IN select_clause LOOP
+&gt;               statements
+&gt;     END LOOP;
+&gt; 
+&gt; so, what is a ''select_clause''?
+&gt; 
+&gt; while debugging this bugger, I noticed that I could stop it complaining
+&gt; about the parse error at "LOOP" if I removed the "where..." bit. but then,
+&gt; it complained:
+&gt; ERROR:  parser: parse error at or near "$1"
+&gt; 
+&gt; *heaps* good error message!!!!!!!!
+&gt; 
+&gt; ferk.
+&gt; 
+&gt; 
+&gt; here is the complete code, any pointers would be *great*.
+&gt; 
+&gt; 
+&gt; 
+&gt; create function fn_placement() returns opaque as '
+&gt; DECLARE
+&gt;         ercptlist text;
+&gt;         casemgremail text;
+&gt;         ecreate date;
+&gt;         edeliver date;
+&gt;         caserec RECORD; 
+&gt; BEGIN
+&gt;         -- get email creation date --
+&gt;         ecreate := now();
+&gt; 
+&gt;         -- get general case info --
+&gt;         select * into caserec from cases 
+&gt; 		where ies = new.ies and casenum = new.casenum;
+&gt; 
+&gt;         -- get casemanager email --
+&gt;         select email into casemgremail from people 
+&gt; 		where personid = caserec.casemgr;
+&gt; 
+&gt;         FOR etype IN weeknum,rcpts,emailtypeid from emailtypes where flex = caserec.flex LOOP
+&gt;           -- create an entry into the email table --
+&gt;           edeliver := now() + etype.weeknum;
+&gt;           ercptlist := etype.rcpts || '' '' || casemgremail;
+&gt;           insert into emails (...keys...)
+&gt; 		VALUES (..values..);
+&gt;         END LOOP;
+&gt;         
+&gt;         
+&gt;         return new;
+&gt; END;
+&gt; ' language 'plpgsql';
+&gt; 
+&gt; 
+&gt; --
+&gt; Jake Hawkes B. Eng (CSE)
+&gt; 
+&gt; "It seems Microsoft is setting a new standard: Emails without attachments."
+&gt; 	-- Reemi (poster on slashdot)
+&gt; 
+&gt; 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

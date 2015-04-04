@@ -1,0 +1,235 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="ipchains help" -->
+<!-- FromName="" -->
+<!-- FromEmail="gavin.hedrick@adelaide.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 6 Oct 2000 12:45:39 +0930" -->
+<!-- Id="39DDC973.8534.BFEBE5@localhost" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: ipchains help</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: <A HREF="mailto:gavin.hedrick@adelaide.edu.au">gavin.hedrick@adelaide.edu.au</A>
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Fri, 6 Oct 2000 12:45:39 +0930
+</PRE>
+<H1>ipchains help</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Howdy,
+
+	I'm setting up a home network and thought I'd do the right thing 
+and setup a firewall box.  As I have a windoze machine and a linux 
+machine and a very early Pentium60, I thought I'd use the Serious 
+Example from the IP-CHAINS-HOWTO.  I'm using RedHat 6.2 and 
+considering trying RedHat 7.0.
+
+	But it doesn't seem to work with my BigPond dialup.  Here is 
+the setup I have (using the example given).  Oh, I have the 
+ipaddresses 203.C.C.216/29 allocated to me and BigPond gives 
+me 139.130.A.B as my local ip address when I dial up to them.
+
+External network (BAD)
+           |
+           |
+   ppp0 |
+------------------------
+| 139.130.A.B   |                          Server network (DMZ)
+|                      |eth0
+|                      |----------------------------------------------------
+|                      | 203.C.D.222   |               |            |
+|                      |                      |               |            |
+|192.168.1.250 |                -------------   -----------   --------------
+------------------------               | SMTP |    | DNS |    | WWW |
+           |                           -------------   -----------   ---------------
+           |                        203.C.D.219            203.C.D.221
+           |                                         203.C.D.220
+   Internal network (GOOD)
+
+The major difference is obviously that BigPond gives me an IP 
+address that is not in the same subnet as my DMZ.  I'm sure that 
+this is the problem, but I'm not sure what I should do to fix it.
+
+Then I've followed the example and turned on anti-spoofing:
+
+	# for f in /proc/sys/net/ipv4/conf/*/rp_filter; do echo 1 &gt; $f; done
+
+denied everything while setting up rules:
+
+	ipchains -A input -i ! lo -j DENY
+	ipchains -A output -i ! lo -j DENY
+	ipchains -A forward -j DENY
+
+setup ftp masquerading:
+
+	# insmod ip_masq_ftp
+
+create user chains:
+
+     ipchains -N good-dmz
+     ipchains -N bad-dmz
+     ipchains -N good-bad
+     ipchains -N dmz-good
+     ipchains -N dmz-bad
+     ipchains -N bad-good
+     ipchains -N icmp-acc
+
+Setup jumps from forward chain:
+
+     ipchains -A forward -s 192.168.1.0/24 -i eth0 -j good-dmz
+     ipchains -A forward -s 192.168.1.0/24 -i ppp0 -j good-bad
+     ipchains -A forward -s 203.C.D.216/29 -i ppp0 -j dmz-bad
+     ipchains -A forward -s 203.C.D.216/29 -i eth1 -j dmz-good
+     ipchains -A forward -i eth0 -j bad-dmz
+     ipchains -A forward -i eth1 -j bad-good
+     ipchains -A forward -j DENY -l
+
+Defined the icmp-acc chain:
+
+     ipchains -A icmp-acc -p icmp --icmp-type destination-
+unreachable -j ACCEPT 
+     ipchains -A icmp-acc -p icmp --icmp-type source-quench -j 
+ACCEPT 
+     ipchains -A icmp-acc -p icmp --icmp-type time-exceeded -j 
+ACCEPT 
+     ipchains -A icmp-acc -p icmp --icmp-type parameter-problem -j 
+ACCEPT
+
+Good to DMZ rules
+
+     ipchains -A good-dmz -p tcp -d 203.C.D.219 smtp -j ACCEPT
+     ipchains -A good-dmz -p tcp -d 203.C.D.219 pop3 -j ACCEPT
+     ipchains -A good-dmz -p udp -d 203.C.D.220 domain -j ACCEPT
+     ipchains -A good-dmz -p tcp -d 203.C.D.220 domain -j ACCEPT
+     ipchains -A good-dmz -p tcp -d 203.C.D.221 www -j ACCEPT
+    ipchains -A good-dmz -p icmp -j icmp-acc
+     ipchains -A good-dmz -j DENY -l
+
+Bad to DMZ rules
+
+      ipchains -A bad-dmz -p tcp -d 203.C.D.219 smtp -j ACCEPT
+      ipchains -A bad-dmz -p udp -d 203.C.D.220 domain -j ACCEPT
+      ipchains -A bad-dmz -p tcp -d 203.C.D.220 domain -j ACCEPT
+      ipchains -A bad-dmz -p tcp -d 203.C.D.221 www -j ACCEPT
+      ipchains -A bad-dmz -p icmp -j icmp-acc
+      ipchains -A bad-dmz -j DENY
+
+Good to Bad rules
+
+          ipchains -A good-bad -p tcp --dport www -j MASQ
+          ipchains -A good-bad -p tcp --dport ssh -j MASQ
+          ipchains -A good-bad -p udp --dport 33434:33500 -j MASQ
+          ipchains -A good-bad -p tcp --dport ftp -j MASQ
+          ipchains -A good-bad -p icmp --icmp-type ping -j MASQ
+          ipchains -A good-bad -j REJECT -l
+
+dmz to good (not using rsynch)
+
+     ipchains -A dmz-good -p tcp ! -y -s 203.C.D.219 smtp -j 
+ACCEPT
+     ipchains -A dmz-good -p udp -s 203.C.D.220 domain -j ACCEPT
+     ipchains -A dmz-good -p tcp ! -y -s 203.C.D.220 domain -j 
+ACCEPT
+     ipchains -A dmz-good -p tcp ! -y -s 203.C.D.221 www -j 
+ACCEPT
+     ipchains -A dmz-good -p icmp -j icmp-acc
+     ipchains -A dmz-good -j DENY -l
+
+dmz to bad
+
+    ipchains -A dmz-bad -p tcp -s 203.C.D.219 smtp -j ACCEPT
+    ipchains -A dmz-bad -p udp -s 203.C.D.220 domain -j ACCEPT
+    ipchains -A dmz-bad -p tcp -s 203.C.D.220 domain -j ACCEPT
+    ipchains -A dmz-bad -p tcp ! -y -s 203.C.D.221 www -j ACCEPT
+    ipchains -A dmz-bad -p icmp -j icmp-acc
+    ipchains -A dmz-bad -j DENY -l
+
+bad to good
+
+	ipchains -A bad-good -j REJECT
+
+Packet filtering for box itself:
+
+          ipchains -N bad-if
+          ipchains -N dmz-if
+          ipchains -N good-if
+
+Create jumps to them
+
+          ipchains -A input -d 139.130.A.B -j bad-if
+          ipchains -A input -d 203.C.D.222 -j dmz-if
+          ipchains -A input -d 192.168.1.250 -j good-if
+
+Bad interface:
+
+          ipchains -A bad-if -i ! ppp0 -j DENY -l
+          ipchains -A bad-if -p TCP --dport 61000:65095 -j ACCEPT
+          ipchains -A bad-if -p UDP --dport 61000:65095 -j ACCEPT
+          ipchains -A bad-if -p ICMP --icmp-type pong -j ACCEPT
+          ipchains -A bad-if -j icmp-acc
+          ipchains -A bad-if -j DENY
+
+dmz interface:
+
+    ipchains -A dmz-if -i ! eth0 -j DENY
+    ipchains -A dmz-if -p TCP ! -y -s 203.C.D.220 53 -j ACCEPT
+    ipchains -A dmz-if -p UDP -s 203.C.D.220 53 -j ACCEPT
+    ipchains -A dmz-if -p ICMP --icmp-type pong -j ACCEPT
+    ipchains -A dmz-if -j icmp-acc
+    ipchains -A dmz-if -j DENY -l
+
+good interface:
+
+          ipchains -A good-if -i ! eth1 -j DENY
+          ipchains -A good-if -p ICMP --icmp-type ping -j ACCEPT
+          ipchains -A good-if -p ICMP --icmp-type pong -j ACCEPT
+          ipchains -A good-if -j icmp-acc
+          ipchains -A good-if -j DENY -l
+
+delete blocking walls:
+
+          ipchains -D input 1
+          ipchains -D forward 1
+          ipchains -D output 1
+
+Any ideas on what I should chase down??
+
+	Ta muchly in anticipation
+
+		Gavin Hedrick (<A HREF="mailto:gavin.hedrick@adelaide.edu.au">gavin.hedrick@adelaide.edu.au</A>)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

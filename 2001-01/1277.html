@@ -1,0 +1,125 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: ipchains syntax" -->
+<!-- FromName="'David Lloyd'" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="'PETER SZABO'" -->
+<!-- ToEmail="PSZABO@scholle.com" -->
+<!-- Date="Mon, 29 Jan 2001 17:44:59 +1030" -->
+<!-- Id="3A751873.D2510CE5@rebel.net.au" -->
+<!-- Reference="sa74b694.002@mail.scholle.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: ipchains syntax</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : PETER SZABO &lt;<I><A HREF="mailto:PSZABO@scholle.com">PSZABO@scholle.com</A></I>&gt;
+  Date: Mon, 29 Jan 2001 17:44:59 +1030
+</PRE>
+<H1>Re: ipchains syntax</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Peter didn't write:
+
+&gt; 
+&gt;    Part 1.1    Type: Plain Text (text/plain)
+&gt;            Encoding: quoted-printable
+
+But Outlook Express did.
+
+Very quickly, ipchains works in a sequential manner. The first rule that
+happens to match "wins"; if no rules match then the default policy
+(which is, by default, ACCEPT) wins. Hence, in English you could say:
+
+* allow 10.0.0.254 only
+* deny all IP from 10.0.0.0 to 10.0.0.255 inclusive
+* default policy is DENY
+
+Hence, when the rules are checked, .254 will be allowed even though it
+would be denied by the middle rule. Why? Because it comes before the
+middle rule. What you probably want to do is something similar to the
+above.
+
+As for specifying contiguous addresses, you should start to do some
+research on what are known as sub nets, netmasks, CIDR et al; basically
+you need to learn a working knowledge of how to specify IP addresses. At
+the end of your research you should understand things like:
+
+192.168.0.0/24
+192.168.0.0/255.255.255.0
+
+The reason you want to learn IP addressing is that you can use netmasks
+in your ipchains rules. So:
+
+ipchains -A input -i eth0 -p tcp -s 10.0.0.0/24 -j ACCEPT
+
+Is a rule that says "accept all TCP packets whose source is anywhere
+between 10.0.0.0 to 10.0.0.255. I could have written 10.0.0.0 to
+10.0.0.255 in 255 rules but why bother when there's a short cut?
+
+Essentially, think creatively about what networks and subnets you want
+to deny and accept and you'll come up with the answer. To do this you'll
+need to understand IP addressing techniques.
+
+Now, you shouldn't run your firewall script from rc.local because it is
+generally run last. You should run your firewall script as close to
+system start up as you can get it. My script actually starts BEFORE my
+interfaces get up. Why? There's an irritatingly slight, but very real,
+window when someone may be able to slip past your script.
+
+Other sources of info are:
+
+* the IPCHAINS howto
+* TCP/IP Unleashed by Macmillan
+* Building Linux Firewalls by Robert Ziegler
+
+But start with the IPCHAINS Howto. If you are stuck for money or
+something like that, duck into a local TAFE library or UniSA at the
+levels and find a book that describes IP addressing and photocopy like
+mad - it should be less expensive than buying one.
+
+Incidentally, most of us find it easier if you try to avoid sending HTML
+encoded mail from one of the Outlook's. I had to perform all sorts of
+weird things to your mail to read it. 
+
+DL
+-- 
+For the beauty of the earth
+ For the glory of the skies
+ For the love which o'er and
+'round us lies...
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

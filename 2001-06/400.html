@@ -1,0 +1,127 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: [OT] Telstra ADSL 'Unlimited' Introduces Download Limit" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 11 Jun 2001 14:09:54 +0930" -->
+<!-- Id="20010611140954.A24006@dog.topology.org" -->
+<!-- Reference="Pine.LNX.4.21.0106110733580.22403-100000@calulu.shearer.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: [OT] Telstra ADSL 'Unlimited' Introduces Download Limit</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 11 Jun 2001 14:09:54 +0930
+</PRE>
+<H1>Re: [OT] Telstra ADSL 'Unlimited' Introduces Download Limit</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Jun 11, 2001 at 07:59:06AM +0930, Dan Shearer wrote:
+&gt; 
+&gt; I've got an ADSL account, but not with Telstra (Internode, in fact - you
+&gt; may have heard of them.) Internode have a 500Mb/month limit. I do not
+&gt; download music or movies, but I do run a large number of free operating
+&gt; systems, and I do operating systems simulations which involve large
+&gt; filesystems in strange formats. On the other hand I do know how to run
+&gt; rsync and web proxies.
+&gt; 
+&gt; So far, admittedly not tested over many months, my only problems with this
+&gt; limit are:
+&gt; 
+&gt;   - it isn't intelligently managed. So if I am to get maximum benefit
+&gt;     out of the limit I have to write download scripts which know about
+&gt;     the date of the next traffic billing period. I'm hopeful that this
+&gt;     can be changed over time. The trick is finding an equitable way of
+&gt;     doing this. Simon has already mooted a kind of credit arrangement,
+&gt;     whereby what you didn't use this month you can use next month. I
+&gt;     am experimenting with formulae and will ask Internode about them
+&gt;     when I know a bit more.
+
+
+Dan,
+
+My opinion on this is that the most rational way to organise
+limits without artifical month-edges is to use a leaky bucket
+approach.
+
+E.g. You start with a credit of 500 MBytes, and every day
+you get credit for a further 500/30 MBytes, with max crecit = 500 MBytes.
+
+Thus every day you run the algorithm:
+
+$credit -= $todays_usage;
+if ($credit &lt; 0) {
+    pay_for(-$credit);
+    $credit = 0;
+    }
+
+$credit += 500/30;
+if ($credit &gt; $max_credit) {
+    $credit = $max_credit;
+    }
+
+Probably the initial value of $credit should be more like 100 MBytes.
+
+If I were an ISP, that's how I would do it.
+Then every day is the same.
+
+As I have suggested to people like Simon from time to time,
+an ISP service which I call a "budget shaper" would be quite popular.
+The user would specify their hourly, dail, weekly and monthly
+budget limits, and the ISP-collocated shaper would enforce these
+requirements by reducing the bandwidth gradually to a low value as the
+limits are approached. This would be quite easy to implement
+in linux with the "tc" command and the qdisc approach.
+
+The "budget shaper" protects the subscriber from an excessive bill,
+and can be made very flexible indeed. For instance, it could include
+scheduled pricing, i.e. pricing that varies according to time of
+day and week etc., just like cheap overnight STD calls.
+
+But most of the ISPs I've discussed this with are too preoocupied with
+day-to-day money-making and network-building to be able to
+consider this sort of avant-garde approach.
+The first ISP to start using intelligent network-side per-subscriber
+shaping is going to make a mint.
+But they have to do a bit of forward thinking first!!
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

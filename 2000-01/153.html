@@ -1,0 +1,187 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Sendmail config problem" -->
+<!-- FromName="Andrew Speer" -->
+<!-- FromEmail="andrew.speer@isolutions.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="Gaelyne Gasson <gaelyne@videocam.net.au>, linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 07 Jan 2000 01:44:11 +1030" -->
+<!-- Id="" -->
+<!-- Reference="14452.28133.764310.748499@videocam.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Sendmail config problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Speer &lt;<I><A HREF="mailto:andrew.speer@isolutions.com.au">andrew.speer@isolutions.com.au</A></I>&gt;
+  To  : <A HREF="mailto:Gaelyne Gasson <gaelyne@videocam.net.au>">Gaelyne Gasson <gaelyne@videocam.net.au></A>, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Fri, 07 Jan 2000 01:44:11 +1030
+</PRE>
+<H1>Re: Sendmail config problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Gaelyne,
+
+Without seeing the sendmail m4 ".mc" file, from which your sendmail.cf was
+generated, for your specific configuration, it is difficult to suggest
+exactly what to try. I have put a few suggestions below which may help. Also
+they may not ...
+
+----- Original Message -----
+From: Gaelyne Gasson &lt;<A HREF="mailto:gaelyne@videocam.net.au">gaelyne@videocam.net.au</A>&gt;
+To: &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Sent: Thursday, January 06, 2000 8:56 PM
+Subject: Sendmail config problem
+
+
+&gt; Hi All,
+&gt;
+&gt; I have a sendmail config problem that I'm hoping someone can help
+&gt; with.
+&gt;
+&gt; The problem relates to relaying mail for an entire domain to a
+&gt; specific user on our system.
+&gt;
+&gt; We've been doing this in the past with no problems, but in recent days
+&gt; we've needed to make what I thought was going to be a minor change and
+&gt; now things don't work as they should.
+&gt;
+&gt; Anyway, the details are as follows.
+&gt;
+&gt; Our main server is 'videocam.net.au' we also host other sites, such as
+&gt; NAME.com.au and vcsweb.com All mail to anyone at NAME.com.au needs to
+&gt; go to a user on our system called 'joeshmoe'. All mail to vcsweb.com
+&gt; needs to go to 'rod'
+&gt;
+&gt; Currently our name server has all of these domains using the same IP
+&gt; address (203.38.186.193).
+&gt;
+&gt; The MX records for all domains point to mail.videocam.net.au (also
+&gt; 203.38.186.193).
+&gt;
+&gt; Our sendmail "access" file has the following entries
+&gt;
+&gt; NAME.com.au  RELAY
+&gt; vcsweb.com  RELAY
+&gt;
+&gt; To compliment this out mailertable file has the following entries
+&gt;
+&gt; NAME.com.au   local:joeshmoe
+&gt; vcsweb.com   local:rod
+&gt;
+
+This is one way of doing things. It would seem that the "virtusertable" may
+be also suited to your requirements. From the sendmail-cf README:
+
+**start**
+
+ virtusertable   A domain-specific form of aliasing, allowing multiple
+        virtual domains to be hosted on one machine.  For example,
+        if the virtuser table contained:
+
+            <A HREF="mailto:info@foo.com">info@foo.com</A>    foo-info
+            <A HREF="mailto:info@bar.com">info@bar.com</A>    bar-info
+            @baz.org    <A HREF="mailto:jane@elsewhere.net">jane@elsewhere.net</A>
+
+        then mail addressed to <A HREF="mailto:info@foo.com">info@foo.com</A> will be sent to the
+        address foo-info, mail addressed to <A HREF="mailto:info@bar.com">info@bar.com</A> will be
+        delivered to bar-info, and mail addressed to anyone at
+        baz.org will be sent to <A HREF="mailto:jane@elsewhere.net.">jane@elsewhere.net.</A>  The username
+        from the original address is passed as %1 allowing:
+
+            @foo.org    %<A HREF="mailto:1@elsewhere.com">1@elsewhere.com</A>
+
+
+**end**
+
+So perhaps in your case a virtusertable entry of
+
+@NAME.com.au  <A HREF="mailto:rod@NAME.com.au">rod@NAME.com.au</A>
+
+may be all you need to get things working again (don't forget to rebuild the
+map files from the text entries, see the sendmail README for more info).
+Please bear in mind that this feature (virtusertable) needs to have been
+enabled in the .mc file (eg sendmail.mc) that was used to generate the
+sendmail.cf config file.
+
+One of the easiest ways to tell is to see if a line like:
+
+#####  @(#)virtusertable.m4 8.8 (Berkeley) 10/6/1998  #####
+
+is in your sendmail.cf file. If not, you will have to add the feature to the
+xyz.mc config and regenerate the sendmail.cf file.
+
+However you may want to also try just adding
+
+NAME.com.au
+
+to your sendmail.cw file, usually in /etc, or /etc/mail.
+
+&gt; THIS WORKS FINE.  If I send mail to '<A HREF="mailto:test@NAME.com.au">test@NAME.com.au</A>' it is correctly
+&gt; delivered into the 'joeshmoe' mailspool.
+&gt;
+&gt; Likewise mail to '<A HREF="mailto:test@vcsweb.com">test@vcsweb.com</A>' find its way into the 'rod'
+&gt; mailspool.
+&gt;
+&gt; Now the problem.  For various reasons we need to give 'NAME.com.au'
+&gt; its own ip address. No problem, we simply changed the "A" record so
+&gt; that it has the new ip (we left the MX records as they were - ie,
+&gt; pointing to 'mail.videocam.net.au').
+&gt;
+&gt; The new IP (for reference) is 203.38.186.199, so naturally we needed
+&gt; to add this to our interface table.
+&gt;
+&gt; /sbin/ifconfig eth0:1 203.38.186.199
+&gt;
+&gt; So far, all is well - the web and ftp server both work, and mail to a
+&gt; *known user on our system* is being accepted and delivered (eg
+&gt; <A HREF="mailto:rod@NAME.com.au">rod@NAME.com.au</A> gets correctly delivered to 'rod (@videocam.net.au) -
+&gt; BUT when we try to send mail to '<A HREF="mailto:test@NAME.com.au">test@NAME.com.au</A>' we are getting an
+&gt; 'unknown user' error message - In other words, the relay mechanism is
+&gt; now broken.
+&gt;
+&gt; In short, as long as NAME.com.au has the same IP address as
+&gt; videocam.net.au then all is fine, but if we change the IP and nothing
+&gt; else, the only mail that can be sent to NAME.com.au is if the user is
+&gt; known to videocam.net.au.
+&gt;
+&gt; Hopefully I've written this so that it makes sense to someone, and if
+&gt; anyone can give advise on what else I need to change in order to get
+&gt; it working correctly again I'd be very very thankful.
+&gt;
+&gt; Thanks in advance.
+&gt; Rod
+&gt;
+&gt;
+
+Hope this was of some help,
+
+Andrew Speer
+
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

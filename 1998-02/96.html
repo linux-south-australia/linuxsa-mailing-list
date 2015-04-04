@@ -1,0 +1,213 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="PPP / route not working" -->
+<!-- FromName="Stafford Goodsell" -->
+<!-- FromEmail="surge@microtronics.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 23 Feb 1998 12:50:56 +1030" -->
+<!-- Id="34F0DD08.1EE5@microtronics.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: PPP / route not working</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Stafford Goodsell &lt;<I><A HREF="mailto:surge@microtronics.com.au">surge@microtronics.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 23 Feb 1998 12:50:56 +1030
+</PRE>
+<H1>PPP / route not working</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Message-ID: &lt;<A HREF="mailto:34F0DCA0.68A6@microtronics.com.au">34F0DCA0.68A6@microtronics.com.au</A>&gt;
+Date: Mon, 23 Feb 1998 12:49:12 +1030
+From: Stafford Goodsell &lt;<A HREF="mailto:surge@microtronics.com.au">surge@microtronics.com.au</A>&gt;
+X-Mailer: Mozilla 3.04Gold (Win95; I)
+MIME-Version: 1.0
+To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+Subject: PPP / route not working
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Hi folks,
+
+Everyone seems to be on the ball here, so here's a hard one:
+
+I have an account at microtronics.com.au which works fine under win95.
+Under linux tho' I can connect, but ping to 203.30.55.1 reports 100%
+packet loss.
+
+Here's *some* info - if you need/want more, e-mail me directly.
+
+Thanks again for any help.
+Staf
+
+ifconfig:
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Bcast:127.255.255.255  Mask:255.0.0.0
+          UP BROADCAST LOOPBACK RUNNING  MTU:3584  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0
+          TX packets:0 errors:0 dropped:0 overruns:0
+
+ppp0      Link encap:Point-Point Protocol  
+          inet addr:203.30.55.106  P-t-P:203.30.55.1  Mask:255.255.255.0
+          UP POINTOPOINT RUNNING  MTU:512  Metric:1
+          RX packets:8 errors:0 dropped:0 overruns:0
+          TX packets:8 errors:0 dropped:0 overruns:0
+
+route -n:
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use
+Iface
+203.30.55.1     0.0.0.0         255.255.255.255 UH    0      0        0
+ppp0
+127.0.0.0       0.0.0.0         255.0.0.0       U     0      0        0
+lo
+0.0.0.0         203.30.55.1     0.0.0.0         UG    0      0        0
+ppp0
+
+/etc/ppp/options:
+asyncmap 0
+crtscts
+lock
+modem
+netmask 255.255.255.0
+-detach
+domain microtronics.com.au
+kdebug 7
+mtu 998
+proxyarp
+lcp-echo-interval 30
+lcp-echo-failure 4
+
+/usr/bin/ppp-on:
+#! /bin/sh
+# /etc/init.d/ppp: start or stop PPP.
+
+FLAGS="start 20 2 3 4 5 . stop 20 0 1 6 ."
+[...]
+      /usr/sbin/pppd \
+	connect "/usr/sbin/chat -v -f /etc/ppp.chatscript" `cat
+/etc/ppp.options_out`
+exit 0
+
+
+/var/log/messages:
+Jan 15 06:42:16 surge pppd[522]: pppd 2.2.0 started by root, uid 0
+Jan 15 06:42:17 surge chat[527]: abort on (BUSY) 
+Jan 15 06:42:17 surge chat[527]: abort on (NO CARRIER) 
+Jan 15 06:42:17 surge chat[527]: abort on (VOICE) 
+Jan 15 06:42:17 surge chat[527]: abort on (NO DIALTONE) 
+Jan 15 06:42:17 surge chat[527]: timeout set to 100 seconds
+Jan 15 06:42:17 surge chat[527]: send (ATDT82121911^M) 
+Jan 15 06:42:17 surge chat[527]: expect (ogin:) 
+Jan 15 06:43:11 surge chat[527]: ^M 
+Jan 15 06:43:11 surge chat[527]: CONNECT 14.4^M 
+Jan 15 06:43:11 surge chat[527]: ^M 
+Jan 15 06:43:11 surge chat[527]: V42bis 57600^M 
+Jan 15 06:43:12 surge chat[527]: ^M^M 
+Jan 15 06:43:12 surge chat[527]: ^M^M 
+Jan 15 06:43:12 surge chat[527]: BSDI BSD/OS 3.1
+(orca.microtronics.com.au) (ttyy0e)^M^M 
+Jan 15 06:43:12 surge chat[527]: ^M^M 
+Jan 15 06:43:13 surge chat[527]: login: -- got it 
+Jan 15 06:43:13 surge chat[527]: send (surge^M) 
+Jan 15 06:43:13 surge chat[527]: expect (word:) 
+Jan 15 06:43:13 surge chat[527]:  surge^M^M 
+Jan 15 06:43:13 surge chat[527]: Password: -- got it 
+Jan 15 06:43:13 surge chat[527]: send (&lt;password&gt;^M) 
+Jan 15 06:43:13 surge chat[527]: expect (PPP Ready) 
+Jan 15 06:43:13 surge chat[527]: ^M 
+Jan 15 06:43:13 surge chat[527]: Warning: your account expires on Fri
+Jan 23 00:00:00 1998^M 
+Jan 15 06:43:13 surge chat[527]: Last login: Thu Jan 15 06:43:15 on
+ttyy0c^M 
+Jan 15 06:43:13 surge chat[527]: Copyright 1992, 1993, 1994, 1995, 1996,
+1997 Berkeley Software Design, Inc.^M 
+Jan 15 06:43:14 surge chat[527]: Copyright (c) 1980, 1983, 1986, 1988,
+1990, 1991, 1993, 1994^M 
+Jan 15 06:43:14 surge chat[527]:         The Regents of the University
+of California.  All rights reserved.^M 
+Jan 15 06:43:14 surge chat[527]: ^M 
+Jan 15 06:43:14 surge chat[527]: BSDI BSD/OS 3.1 Kernel #8: Mon Dec 29
+17:13:30 CST 1997^M 
+Jan 15 06:43:14 surge chat[527]: ^M 
+Jan 15 06:43:14 surge chat[527]: Use of this software is governed by the
+BSDI End User Software License.^M 
+Jan 15 06:43:14 surge chat[527]: ^M 
+Jan 15 06:43:14 surge chat[527]: If you do not accept the terms of this
+license, immediately return the^M 
+Jan 15 06:43:14 surge chat[527]: distribution to the place of purchase
+for a full refund. Further^M 
+Jan 15 06:43:14 surge chat[527]: use of the software will be considered
+to be acceptance of the terms^M 
+Jan 15 06:43:14 surge chat[527]: of the license.^M 
+Jan 15 06:43:14 surge chat[527]: ^M 
+Jan 15 06:43:14 surge chat[527]: You have mail.^M 
+Jan 15 06:43:14 surge chat[527]: PPP Ready -- got it 
+Jan 15 06:43:14 surge chat[527]: send (^M) 
+Jan 15 06:43:14 surge pppd[522]: Serial connection established.
+Jan 15 06:43:15 surge kernel: ppp_tty_ioctl: set flags to 70000 
+Jan 15 06:43:15 surge kernel: ppp_tty_ioctl: set flags to 70000 
+Jan 15 06:43:15 surge pppd[522]: Using interface ppp0
+Jan 15 06:43:15 surge pppd[522]: Connect: ppp0 &lt;--&gt; /dev/modem
+Jan 15 06:43:15 surge kernel: ppp_tty_ioctl: set xasyncmap 
+Jan 15 06:43:15 surge kernel: ppp_tty_ioctl: set xmit asyncmap ffffffff 
+Jan 15 06:43:15 surge kernel: ppp_tty_ioctl: set flags to 70000 
+Jan 15 06:43:15 surge kernel: ppp_tty_ioctl: set mru to 5dc 
+Jan 15 06:43:15 surge kernel: ppp_tty_ioctl: set rcv asyncmap 0 
+Jan 15 06:43:15 surge kernel: ppp_tty_ioctl: set flags to 70010 
+Jan 15 06:43:17 surge kernel: ppp: successfully queued 26 bytes, flags =
+f070010 
+Jan 15 06:43:17 surge kernel: ppp_tty_ioctl: set mru to 5dc 
+Jan 15 06:43:17 surge kernel: ppp_tty_ioctl: set rcv asyncmap 0 
+Jan 15 06:43:17 surge kernel: ppp_tty_ioctl: set flags to f070000 
+Jan 15 06:43:18 surge kernel: ppp: successfully queued 18 bytes, flags =
+f070000 
+Jan 15 06:43:18 surge kernel: ppp: successfully queued 26 bytes, flags =
+f070000 
+Jan 15 06:43:18 surge kernel: ppp: successfully queued 26 bytes, flags =
+f070000 
+Jan 15 06:43:18 surge kernel: ppp_tty_ioctl: set xmit asyncmap 0 
+Jan 15 06:43:18 surge kernel: ppp_tty_ioctl: set flags to f070003 
+Jan 15 06:43:18 surge kernel: ppp_tty_ioctl: set mru to 5dc 
+Jan 15 06:43:18 surge kernel: ppp_tty_ioctl: set rcv asyncmap 0 
+Jan 15 06:43:18 surge kernel: ppp_tty_ioctl: set flags to f070003 
+Jan 15 06:43:18 surge kernel: ppp_tty_ioctl: read demand dial info 
+Jan 15 06:43:18 surge kernel: ppp_tty_ioctl: set flags to f070043 
+Jan 15 06:43:19 surge kernel: ppp: successfully queued 18 bytes, flags =
+f070043 
+Jan 15 06:43:19 surge last message repeated 2 times
+Jan 15 06:43:19 surge pppd[522]: local  IP address 203.30.55.106
+Jan 15 06:43:19 surge pppd[522]: remote IP address 203.30.55.1
+Jan 15 06:43:19 surge kernel: ppp_tty_ioctl: set maxcid to 16 
+Jan 15 06:43:19 surge kernel: ppp_tty_ioctl: set flags to f07004f 
+Jan 15 06:43:19 surge kernel: ppp: channel ppp0 going up for IP packets!
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,117 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Transparent Proxying" -->
+<!-- FromName="'John Edwards'" -->
+<!-- FromEmail="isplist@adam.com.au" -->
+<!-- ToName="'Richard Russell'" -->
+<!-- ToEmail="richard@yellowgoanna.com,linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 2 Oct 2003 23:44:03 +0930" -->
+<!-- Id="001c01c388ef$6ef90280$0800a8c0@duel.pinnacle.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Transparent Proxying</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: John Edwards &lt;<I><A HREF="mailto:isplist@adam.com.au">isplist@adam.com.au</A></I>&gt;
+  To  : Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 2 Oct 2003 23:44:03 +0930
+</PRE>
+<H1>Re: Transparent Proxying</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt;What do people think about this? Personally, it irritates me (my ISP
+&gt;does transparent proxying). Personally, I dislike it because I never
+&gt;quite know where my packets are going, if I'm doing something special or
+&gt;different on that port (eg I'm manually trying to diagnose something --
+&gt;how can I be sure that it's me and not the proxy?)
+
+Transparent proxying is only going to get more and more popular with the
+rise of broadband, and it's not just about the ISP saving money.
+
+As long as you're using TCP-based protocols, you're stuck with download
+mechanisms that were designed a decade ago. As your latency increases
+between you and your download target, your maximum possible download speed
+becomes limited by the round trip time of SYN and ACK packets. So even
+though you have a 100mbit link to the rest of the Internet, a big download
+might not come down any faster than 100kbytes/s from an uncongested
+international location.
+
+Transparent proxying and caching puts this data right next to you, at the
+best possible latency. A good ISP cache will put at least 50% of what you're
+looking for within 20ms of your broadband connection, allowing you to get
+maximum speed from http. Even if the data you want isn't cached, it's been
+shown that a proxy, caching or not, will benefit you with a small increase
+in download speed, generally because your ISP probably has more bandwidth
+than you do. A proxy will also mask any unpleasantness associated with
+dropped packets during your download if your link is going flat out. It gets
+to resend them to you locally instead of from across the world.
+
+Where this gets really interesting is with proxies on either side of the
+world working together. By transparently proxying port 80 requests on A to a
+proxy server in the US on B, you can use some non-standard (RFC1323)
+extensions to TCP between A and B to get much greater speed. By increasing
+the window size between A and B you can get a much greater download speed,
+even though the end user and the web site they are visiting do not support
+the large window size.
+
+To answer Richards specific problem (I'm sure he likes the additional speed
+of transparent caching) you can usually get around a transparent proxy for
+caching with POST or CONNECT requests.
+
+ie:
+
+&gt; telnet www.google.com 80
+&gt; CONNECT 203.1.2.3 HTTP/1.0
+&gt;
+&lt; HTTP/1.0 200 Connection established
+&gt; GET / HTTP/1.0
+&lt; HTTP/1.0 200 OK
+&lt; Content-Type: text/plain
+&lt; Connection: close
+&lt;
+&lt; Welcome to the web page on 203.1.2.3 !!!
+
+I agree, not as easy as just hacking your own /etc/hosts, but a workaround
+nonetheless. Maybe if you ask nicely your ISP can make an exception for you
+on port 80. They could already be doing it for customers with Satellite
+Internet connections that might not work at all with transproxy
+(transparently intercepting connections is bad news for asynchronous
+routes!).
+
+John Edwards
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

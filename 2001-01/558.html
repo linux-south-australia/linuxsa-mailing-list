@@ -1,0 +1,112 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Squid and DNS Question" -->
+<!-- FromName="'John Edwards'" -->
+<!-- FromEmail="isplist@pinnacle.net.au" -->
+<!-- ToName="'David Lloyd'" -->
+<!-- ToEmail="lloy0076@rebel.net.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 14 Jan 2001 00:30:02 +1030" -->
+<!-- Id="003c01c07d69$20b5d740$0800a8c0@duel.pinnacle.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Squid and DNS Question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: John Edwards &lt;<I><A HREF="mailto:isplist@pinnacle.net.au">isplist@pinnacle.net.au</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 14 Jan 2001 00:30:02 +1030
+</PRE>
+<H1>Re: Squid and DNS Question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt;My end goal is to serve a particular page no matter what IP address or
+&gt;DNS hostname is given to a web server. The server will:
+
+&lt;snip&gt;
+
+&gt;FIRST WAY
+&gt;
+&gt;* all DNS packets (query or status) received resolve to ${WEB_SERVER_IP}
+
+This probably isn't a good way to do it, since
+a) the client will need to be configured to use your DNS (or have DNS
+transproxied also)
+b) more than just a http client will be trying to lookup stuff this way
+(ICQ, mail checkers, MS-ie5 proxy auto-discovery.. etc).
+
+&gt;SECOND WAY
+&gt;
+&gt;* setup Squid and have it serve a set page regardless of what the client
+&gt;requested
+&gt;
+&gt;Using a transparent proxy, I'd set up Squid to do as I've stated. Is
+&gt;this at all possible? That is to say, can you setup Squid in such a way
+
+Yes, it is possible!
+
+If you use squid's redirector feature, you can make it always re-write the
+URL to return the page you want to return. ie, in the squid.conf <A HREF="file:">file:</A>
+
+redirect_program /usr/local/bin/redirect.pl
+redirect_children 5
+
+and in redirect.pl (off the top of my head, YMMV):
+
+#!/usr/bin/perl
+$|=1; #unbuffered output
+while (&lt;&gt;) {
+    ($url,$host,$ident,$method) = split(/\s/);
+    if ($url !~ /^http\:\/\/www\.myserver\.com/){
+        print "<A HREF="http://www.myserver.com/">http://www.myserver.com/</A>";
+    }
+}
+
+Note that the "if" line matches only the start of the URL, that way any
+images placed on www.myserver.com will still be viewable via squid.
+
+Now, to really answer your question, why use squid at all?
+
+Transproxy these users straight to the web server on port 80, and use a
+custom 404 page to redirect to the place where you want them to go
+(presumably "/" on the same web server) just in case they have a specific
+page marked as home instead of a domain name. You'll need to make sure that
+the web server doesn't require a host: header for the IP you're
+transproxying to (which is how apache is by default), and not a lot more.
+
+John Edwards
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

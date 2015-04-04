@@ -1,0 +1,116 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Konqueror Permission Change Problem" -->
+<!-- FromName="'Troy'" -->
+<!-- FromEmail="tvodopiv@microbits.com.au" -->
+<!-- ToName="'David Lloyd'" -->
+<!-- ToEmail="dlloyd@microbits.com.au" -->
+<!-- Date="05 Jun 2003 13:20:47 +0930" -->
+<!-- Id="1054785047.3704.33.camel@tv.stepney.microbits.com.au" -->
+<!-- Reference="20030602114958.1d772a0b.dlloyd@microbits.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Konqueror Permission Change Problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Troy &lt;<I><A HREF="mailto:tvodopiv@microbits.com.au">tvodopiv@microbits.com.au</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:dlloyd@microbits.com.au">dlloyd@microbits.com.au</A></I>&gt;
+  Date: 05 Jun 2003 13:20:47 +0930
+</PRE>
+<H1>Re: Konqueror Permission Change Problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Removing the KDE "Could not change permissions" nag.
+
+(on KDE 2.2 2 - Debian Woody)
+
+After a bit of hunting around the KDE binaries and libraries on my
+Debian woody system, I found our culprit string "Could not change
+permissions for" in the <A HREF="file:">file:</A>
+
+         /usr/lib/kde2/kio_file.so
+
+..and decided to rebuild this file without the nag.
+
+After unpacking the kdelibs source:
+
+# apt-get source kdelibs
+
+I located the section of code that is causing us the dramas.
+In the <A HREF="file:">file:</A>
+
+        kdelibs-2.2.2/kio/file/file.cc
+
+At line 400:
+------------------------------------------------------------------------
+    // set final permissions, if the file was just created
+    if ( _mode != -1 && !orig_exists )
+    {
+       if (::chmod(_dest_orig.data(), _mode) != 0)
+       {
+           warning( i18n( "Could not change permissions for\n%1" ).arg(
+dest_orig ) );
+       }
+    }
+------------------------------------------------------------------------
+
+And at line 537:
+------------------------------------------------------------------------
+    // set final permissions
+    if ( _mode != -1 )
+    {
+       if (::chmod(_dest.data(), _mode) != 0)
+       {
+           warning( i18n( "Could not change permissions for\n%1" ).arg(
+dest.path() ) );
+       }
+    }
+------------------------------------------------------------------------
+
+This code was simply /* commented out */.
+
+The source was then rebuilt, and the /usr/lib/kde2/kio_file.so on my
+running system replaced.
+
+Restart KDE, and what do you know.. no more nags :)
+
+Hope that helps someone!!
+
+
+Troy
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

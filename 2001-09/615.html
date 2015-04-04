@@ -1,0 +1,138 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Help with Asus A7VL-VM - vga setup" -->
+<!-- FromName="'Andrew Hill'" -->
+<!-- FromEmail="list@fornax.net" -->
+<!-- ToName="'Tyson Lloyd Thwaites'" -->
+<!-- ToEmail="tysonlt@webmedia.com.au" -->
+<!-- Date="Sat, 22 Sep 2001 17:13:33 +0930" -->
+<!-- Id="3BAC4125.4030903@fornax.net" -->
+<!-- Reference="01c14326$c10f2ce0$f75e08cb@tysonlt" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Help with Asus A7VL-VM - vga setup</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Hill &lt;<I><A HREF="mailto:list@fornax.net">list@fornax.net</A></I>&gt;
+  To  : Tyson Lloyd Thwaites &lt;<I><A HREF="mailto:tysonlt@webmedia.com.au">tysonlt@webmedia.com.au</A></I>&gt;
+  Date: Sat, 22 Sep 2001 17:13:33 +0930
+</PRE>
+<H1>Re: Help with Asus A7VL-VM - vga setup</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Tyson Lloyd Thwaites wrote:
+
+&gt; It uses the VIA
+&gt; KL133 chipset, and has integrated SavagePro vga. I am using RH6.2. (I tried
+&gt; RH7.1, but had no more luck, and I don't like it :)
+
+
+Ah, but RH7.1 comes with XFree86 4.0.3, which is much nicer than the 
+3.3.6 version that comes with RH6.2! :-) I'd strongly recommend the 
+upgrade to the newer version of XFree86, if you can cope with RH7.1 Once 
+you start getting over the little differences from 6.2, it starts to 
+feel like home again :-) (But hey, stick with 6.2 if you're happy with 
+it [clap your hands?])
+
+
+&gt; A Linux X server (SVGA) actually comes on the CD (nice surprise!), but it
+&gt; seems to make no difference. Xconfigurator fails to detect the card, but I
+&gt; tell it to use to use the SVGA server, with 16Mb, etc etc.
+
+
+Note that <A HREF="http://www.xfree86.org/current/Status28.html">http://www.xfree86.org/current/Status28.html</A>#28 lists the 
+current S3 chipsets that are supported, and the SavagePro isn't 
+specifically listed, but at a guess, in XFree86 3.3.6 you'd want to try 
+the s3_savage driver (not really sure, never used one of those cards 
+before). Set that in the Device section of your XF86Config file, and see 
+how it goes. I also generally find leaving the driver to decide how much 
+RAM is on the video card works better.
+
+However, that said, if it's still not finding the video card, you can 
+try setting the BusID in the Device section to tell X where the card 
+"is". For example, when I do 'scanpci' I get the following (snipped):
+
+pci bus 0x0 cardnum 0x08 function 0x0000: vendor 0x121a device 0x0005
+  3Dfx Interactive Voodoo3
+
+pci bus 0x1 cardnum 0x00 function 0x0000: vendor 0x10de device 0x0028
+  NVidia Riva TNT2
+
+As a result, I have the following in XF86Config:
+
+Section "Device"
+     Identifier  "TNT2"
+     Driver      "nv"
+     BusID       "PCI:1:0:0"
+EndSection
+
+Section "Device"
+     Identifier  "Voodoo3"
+     Driver      "tdfx"
+     BusID       "PCI:0:8:0"
+EndSection
+
+That way, X finds that Voodoo3 card when it normally only finds my TNT2 
+card. YMMV.
+
+&gt; I would love to get this working. I would be happy to just use the virge,
+&gt; though X is a *tiny bit 'fuzzy' (or is that just X?).
+
+
+I've had a similar problem with two different video cards in the past 
+that were "fuzzy," and the way that I solved the problem was to remove 
+all the ModeLine settings from the Monitor section(s) of your XF86Config 
+file, and let X sort it all out by probing the video card (Make sure 
+your monitor H & V rate settings are right, of course!). I've also found 
+that having the DPMS turned on (if your card/monitor support it) also 
+helps. Add the line
+
+   Options "dpms"
+
+to your Monitor section. Beats me why that should make a difference, but 
+it did. *shrug*
+
+&gt; Any experience or advice would be *greatly appreciated!
+
+
+Well, there's my experiences. Hope it's of use :-)
+
+Cheers,
+
+-- 
+Andrew Hill
+"RAID - Don't believe the hype." -- 2001-09-22
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

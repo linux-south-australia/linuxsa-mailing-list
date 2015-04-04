@@ -1,0 +1,106 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Followup to C library calls on Linux" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="Paul Malcolm Bailey" -->
+<!-- ToEmail="pmbailey@senet.com.au" -->
+<!-- Date="Thu, 19 Oct 2000 15:56:17 +0930" -->
+<!-- Id="39EE9409.51C5F05B@aarnet.edu.au" -->
+<!-- Reference="39EE7664.DF2CE909@senet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Followup to C library calls on Linux</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Paul Malcolm Bailey &lt;<I><A HREF="mailto:pmbailey@senet.com.au">pmbailey@senet.com.au</A></I>&gt;
+  Date: Thu, 19 Oct 2000 15:56:17 +0930
+</PRE>
+<H1>Re: Followup to C library calls on Linux</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Paul Malcolm Bailey wrote:
+&gt; 
+&gt; Now, I understand that the functions strcpy() and strlen() require me to
+&gt; have the string.h header files for compilation to work.
+
+This isn't strictly true.  Prototypes were an enhancement to the
+language added in ANSI C.  Before then, an undeclared function
+was assumed to have the prototype:
+
+  int function(int, int, ...)
+
+Thinking about it in assembler terms on a 32 bit machine, this means
+that the caller assumed all the arguments were word (32 bit) items
+and placed them onto the stack.  The function was then called.  The
+function was assumed to have placed a word on the stack before it
+would exit.
+
+You'll note that the string functions do exactly this, especially
+if we assume that a "char *" is the same as an "int".
+
+strcpy(a, b) loads the 32bits of the pointer "b" onto the stack,
+then the 32bits of the pointer "a", then calls strcpy.  It expects
+to see 32bits returned.
+
+  PUSH X
+  PUSH B
+  PUSH A
+  CALL STRCPY
+  POP X
+
+Of course, moving away from 32-bit machines into more complex
+architectures, that isn't true.  So ANSI introduced prototypes,
+allowed non-integers to be function arguments, insisted that an
+"int" and "char *" were perhaps not represented in the same
+number of bits, and so on.
+
+Of course, the library functions were designed for the older C
+without prototypes, so they still work without a prototype on
+a 32-bit architecture.
+
+This doesn't make the use of them without including the header
+correct, as your code may be compiled on a machine with 32bit
+ints and 64bit addresses, in which case it will break.  In
+your case, running on an machine where sizeof(int) == sizeof(char *),
+it just happens to work.
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

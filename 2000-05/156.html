@@ -1,0 +1,95 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IPC for Apache module child processes (technical)" -->
+<!-- FromName="Daryl Tester" -->
+<!-- FromEmail="dt@picknowl.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Sun, 07 May 2000 15:54:32 +0930" -->
+<!-- Id="39150C20.E098ED6@picknowl.com.au" -->
+<!-- Reference="20000506061913.A17376@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IPC for Apache module child processes (technical)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  To  : <A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A>
+  Date: Sun, 07 May 2000 15:54:32 +0930
+</PRE>
+<H1>Re: IPC for Apache module child processes (technical)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Alan Kennington wrote:
+
+&gt; But it looks like all that semaphore stuff
+&gt; resides in the kernel, and every time I want to
+&gt; access the shared memory, I have to do a system call,
+&gt; which has a fair amount of overhead, I assume.
+
+With all respect, don't assume.
+
+&gt; Each time I go into critical code, I have to do
+&gt; 
+&gt; ===========================================
+&gt; get exclusive access (system call)
+&gt; do critical stuff
+&gt; relinquish exclusive access (system call)
+&gt; ===========================================
+&gt; 
+&gt; This can't be the most efficient solution surely.
+
+You're considering doing two system calls per page access, on
+top of the ones that Apache is doing already (there are some
+figures regarding this on Apache's web site, IIRC).  For each
+component in the URL, consider that not only does Apache have
+to stat() each directory/file, but also possible .htaccess
+files as well.  If the end component is just a directory,
+then it has to attempt to access index.html, index.htm, and
+maybe even index.cgi (plus whatever else you may have added).
+All of these stat()'s involves the file system, so the kernel
+has to look in its cache for the blocks in question, and then
+retrieve them off of disk if they aren't resident.
+
+And _you're_ worried about adding an extra two system calls to
+that entire process that doesn't involve any disk I/O, and would
+therefore "most likely" execute very quickly in kernel space, on
+a module that's designed to limit throughput in the first place?
+Consider that any user space locking mechanism you come up with
+probably won't be portable to other architectures anyway.
+
+
+Regards,
+  Daryl Tester
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

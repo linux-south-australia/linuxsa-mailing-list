@@ -1,0 +1,90 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IPFWADM rules for allowing ports into a computer" -->
+<!-- FromName="Michael Neuling" -->
+<!-- FromEmail="mneuling@radlogic.com.au" -->
+<!-- ToName="Michael Kratz" -->
+<!-- ToEmail="michael_kratz@hotmail.com" -->
+<!-- Date="Mon, 14 Aug 2000 10:54:01 +0930" -->
+<!-- Id="200008140124.KAA24249@roach.radnet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IPFWADM rules for allowing ports into a computer</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Neuling &lt;<I><A HREF="mailto:mneuling@radlogic.com.au">mneuling@radlogic.com.au</A></I>&gt;
+  To  : Michael Kratz &lt;<I><A HREF="mailto:michael_kratz@hotmail.com">michael_kratz@hotmail.com</A></I>&gt;
+  Date: Mon, 14 Aug 2000 10:54:01 +0930
+</PRE>
+<H1>Re: IPFWADM rules for allowing ports into a computer</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; I would like to know what do I type into a script with IPFWADM to let a 
+&gt; certain port from an external machine (through the internet) connect to a 
+&gt; computer behind a firewall.
+
+I'm not sure if you got this answered?
+
+Do you have real (rout-able) IP addresses behind the firewall??  If so
+then you need to put a rule in the forward chain to allow these
+packets (assume your default is deny).
+
+	ipfwadm -F -a -P tcp -d &lt;internal ip&gt; &lt;internal port&gt; \
+		-W &lt;internal interface name&gt; accept
+	ipfwadm -F -a -P tcp -s &lt;internal ip&gt; &lt;internal port&gt; \
+		-W &lt;external interface name&gt; accept
+
+First rule appends (-a) an accept rule to the forward chain (-F) for
+incoming packets to a particular IP (-d ip port -W iface) with
+protocol tcp (-P tcp).  The second rule deals with out going packets.
+If you want UDP ports you will need to do the same thing but with the
+UDP.  My syntax may not quite be correct as I don't have a 2.0 machine
+with ipfwadm handy.
+
+If you don't have real (rout-able) IP addresses behind the firewall
+then you will need to use port forwarding.  You can do this at the
+kernel level (need a patch for a 2.0 kernel I believe.  Became
+standard in 2.2) or you can use a user-space port redirector.  Here is
+a link to a user-space TCP port redirector on Freshmeat.
+
+<A HREF="http://freshmeat.net/appindex/1999/03/14/921462694.html">http://freshmeat.net/appindex/1999/03/14/921462694.html</A>
+
+Regards,
+Michael
+--
+Michael Neuling                        <A HREF="mailto:mneuling@radlogic.com.au">mneuling@radlogic.com.au</A> (o_ 
+RADLogic Pty Ltd, Adelaide, South Australia ph: +61 8 8373-3990 //\ 
+<A HREF="http://www.radlogic.com.au">http://www.radlogic.com.au</A>                  fx: +61 8 8373-3251 V_/_
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

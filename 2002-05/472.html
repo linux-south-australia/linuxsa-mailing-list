@@ -1,0 +1,110 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Configuring DHCP-DDNS on RHL7.2" -->
+<!-- FromName="'Michael WARDLE'" -->
+<!-- FromEmail="michael.wardle@adacel.com" -->
+<!-- ToName="'Chandrasekar V'" -->
+<!-- ToEmail="vcs7173@yahoo.co.in" -->
+<!-- Date="Wed, 15 May 2002 12:06:49 +1000" -->
+<!-- Id="003701c1fbb5$2cc561b0$354ba8c0@wodonga.adacel.com.au" -->
+<!-- Reference="20020507043517.12881.qmail@web8105.in.yahoo.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Configuring DHCP-DDNS on RHL7.2</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael WARDLE &lt;<I><A HREF="mailto:michael.wardle@adacel.com">michael.wardle@adacel.com</A></I>&gt;
+  To  : Chandrasekar V &lt;<I><A HREF="mailto:vcs7173@yahoo.co.in">vcs7173@yahoo.co.in</A></I>&gt;
+  Date: Wed, 15 May 2002 12:06:49 +1000
+</PRE>
+<H1>Re: Configuring DHCP-DDNS on RHL7.2</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Chandrasekar V wrote:
+&gt; Now I need to configure DDNS so that whenever the IP
+&gt; Address are leased to the client the Machine name
+&gt; should be automatically added to the DNS Server.
+
+The procedure isn't as well documented as it should be.
+
+To make your DHCP server automatically update your DNS database...
+
+DHCPD configuration file (/etc/dhcpcd.conf):
++ ddns-update-style interim;
++ ddns-updates on;
+
+DNS configuration file (/etc/named.conf):
+zone "mydomain.com" IN
+{
+    type master;
+    file &lt;zonefile&gt;;
++   allow-update { &lt;hosts&gt; };
+}
+
+(and similarly for the reverse zone)
+
+You can also enable logging, hostname checking, update ACLs (deciding
+which machines updates will be accepted from), and some other useful
+features.  I'd try a web search using a search engine such as Google
+for more details...
+&lt;<A HREF="http://www.google.com/search?hl">http://www.google.com/search?hl</A>=en&q=DHCP&gt;
+&lt;<A HREF="http://www.google.com/search?hl">http://www.google.com/search?hl</A>=en&q=DHCP+DDNS&gt;
+
+In some situations, you may also need to get your hosts to say what
+hostname they want.  On Unix systems, this is handled by the DHCP
+client daemon such as pump or dhcpcd.  On my Red Hat 7.2 system, I had
+to add "DHCP_HOSTNAME=&lt;hostname&gt;" to the dynamically configured
+interface's configuration file
+(/etc/sysconfig/network-scripts/ifcfg-eth0 in this case).
+
+It's all pretty straightforward when you know what to do. :-)
+
+The Webmin web-based administration tool &lt;<A HREF="http://www.webmin.com&gt">http://www.webmin.com&gt</A>; has a
+dynamic DNS configuration module that might be useful.
+
+This group must've had a presentation on this very topic some time
+ago, as there are notes here
+&lt;<A HREF="http://www.linuxsa.org.au/meetings/ddns-dhcp/ddns-dhcp.txt&gt">http://www.linuxsa.org.au/meetings/ddns-dhcp/ddns-dhcp.txt&gt</A>;.  The
+notes are quite brief, so I'm not sure how useful you'll find them.
+
+I hope this helps
+
+--
+MICHAEL WARDLE
+SGI Desktop & Admin Software
+Adacel Technologies Limited
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

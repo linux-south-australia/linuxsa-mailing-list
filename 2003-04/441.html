@@ -1,0 +1,131 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: CBQ - Class Based Queuing" -->
+<!-- FromName="'Rick Harris'" -->
+<!-- FromEmail="rickharris@mightylegends.zapto.org" -->
+<!-- ToName="'Matt Pearce'" -->
+<!-- ToEmail="linux@mattpearce.org" -->
+<!-- Date="15 Apr 2003 22:40:43 +0930" -->
+<!-- Id="1050412243.1803.2.camel@SCOOBY.localnet" -->
+<!-- Reference="000401c30343$615098f0$0300000a@p4" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: CBQ - Class Based Queuing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Rick Harris &lt;<I><A HREF="mailto:rickharris@mightylegends.zapto.org">rickharris@mightylegends.zapto.org</A></I>&gt;
+  To  : Matt Pearce &lt;<I><A HREF="mailto:linux@mattpearce.org">linux@mattpearce.org</A></I>&gt;
+  Date: 15 Apr 2003 22:40:43 +0930
+</PRE>
+<H1>Re: CBQ - Class Based Queuing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hey Matt,
+
+You may get some ideas from the wshaper bash script.
+
+<A HREF="http://lartc.org/wondershaper/">http://lartc.org/wondershaper/</A>
+
+I use this to great affect on our small DSL network.
+
+Regards,
+Rick
+
+
+
+On Tue, 2003-04-15 at 21:07, Matt Pearce wrote:
+&gt; Hi Guy's and Gal's
+&gt; 
+&gt; I'm wondering if anyone has had any success in using CBQ on their Linux Box,
+&gt; here's what I'm trying to achieve:
+&gt; 
+&gt; I have a 512/128 ADSL Link, I would like to Limit the rate throughput to
+&gt; enable a decent QoS ping time (specifically under 100ms) whilst downloading
+&gt; (either on my Linux Box or Windows PC (using Squid)
+&gt; 
+&gt; I am currently achieving minimal or no success in obtaining anything like
+&gt; the results as suggested on various websites (see below)
+&gt; 
+&gt; I have had some success with the following command :
+&gt; 
+&gt; /sbin/tc qdisc add dev eth0 root tbf rate 57Kbit latency 50ms burst 1540 - I
+&gt; do however still see large ping spikes, I have tried various combinations of
+&gt; lower throughput and latency settings.
+&gt; 
+&gt; Here's what I'm trying with the CBQ script and Config <A HREF="file:">file:</A>
+&gt; 
+&gt; I am using the CBQ script which utilises the "tc" command, my configuration
+&gt; file is:
+&gt; 
+&gt; DEVICE=eth0,100Mbit,1Mbit
+&gt; RATE=450Kbit
+&gt; WEIGHT=4Kbit
+&gt; PRIO=5
+&gt; RULE=10.0.0.0/24
+&gt; 
+&gt; When I compile my configuration file (/etc/rc.d/init.d/cbq compile) it shows
+&gt; the following config to be loaded at execution:
+&gt; 
+&gt; tc qdisc del dev eth0 root
+&gt; tc qdisc add dev eth0 root handle 1 cbq bandwidth 100Mbit avpkt 1000 cell 8
+&gt; tc class change dev eth0 root cbq weight 1Mbit allot 1514
+&gt; 
+&gt; tc class add dev eth0 parent 1: classid 1:f cbq bandwidth 100Mbit rate
+&gt; 450Kbit weight 4Kbit prio 5 allot 1514 cell 8 maxburst 20 avpkt 1000 bounded
+&gt; tc qdisc add dev eth0 parent 1:f handle f tbf rate 450Kbit buffer 10Kb/8
+&gt; limit 15Kb mtu 1500
+&gt; tc filter add dev eth0 parent 1:0 protocol ip prio 100 u32 match ip dst
+&gt; 10.0.0.0/24 classid 1:f
+&gt; 
+&gt; Points of reference:
+&gt; <A HREF="http://lartc.org/howto/lartc.ratelimit.single.html">http://lartc.org/howto/lartc.ratelimit.single.html</A>
+&gt; <A HREF="http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html">http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html</A> single/Adv-Ro
+&gt; uting-HOWTO.html#s8
+&gt; 
+&gt; My network configuration:
+&gt; 
+&gt; Router (10.0.0.138) (Alcatel Speed Touch Pro)
+&gt; Switch
+&gt; Linux Box (10.0.0.3) - Redhat 9.0
+&gt; Windows Box (10.0.0.3) (XP)
+&gt; 
+&gt; Both use default gateway of 10.0.0.138
+&gt; 
+&gt; Many thanks in advance.
+&gt; 
+&gt; Matt Pearce
+
+<A HREF="441_signature.asc">signature.asc</A>
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

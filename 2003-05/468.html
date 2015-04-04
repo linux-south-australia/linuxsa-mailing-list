@@ -1,0 +1,97 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IP identifier field for linux UDP/IP equals zero??!" -->
+<!-- FromName="'Mark Newton'" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="'Alan Kennington'" -->
+<!-- ToEmail="ak.linuxsa@topology.org" -->
+<!-- Date="Thu, 15 May 2003 08:48:35 +0930" -->
+<!-- Id="20030515084834.A46550@atdot.dotat.org" -->
+<!-- Reference="20030515073132.A3366@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IP identifier field for linux UDP/IP equals zero??!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  Date: Thu, 15 May 2003 08:48:35 +0930
+</PRE>
+<H1>Re: IP identifier field for linux UDP/IP equals zero??!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, May 15, 2003 at 07:31:32AM +0930, Alan Kennington wrote:
+
+ &gt; Concerning linux UDP/IP implementation, there seems to be a very inconvenient
+ &gt; and incorrect choice for the "Identifier" field.
+ &gt; Every packet is supposed to have a different 16-bit Identifier field for
+ &gt; a given src/dst pair of IP addresses for some period of time.
+ &gt; However, I've just discovered that linux sends UDP/IP packets which
+ &gt; have their DF (Don't Fragment) bit set with all identifier fields equal
+ &gt; to zero!
+
+The "Identification" (aka Fragment ID) field is only used for fragmentation.
+Setting the DF bit turns off fragmentation, so the fragment ID isn't 
+used.
+
+See the field definitions in IETF STD5 (which you can download from
+<A HREF="ftp://ftp.rfc-editor.org/in-notes/std/std5.txt">ftp://ftp.rfc-editor.org/in-notes/std/std5.txt</A> ):
+
+  Identification:  16 bits
+    An identifying value assigned by the sender to aid in assembling the
+    fragments of a datagram.
+
+While I'm sure it'd be convenient for your application if the standard
+required more from the Identification field, it actually doesn't.  It's
+possible that some TCP/IP stacks set it on every IP packet, but they're
+going above and beyond the requirements of the TCP/IP spec in doing so.
+
+ &gt; Does anyone out there happen to know if there is some official
+ &gt; excuse for why linux doesn't seem to do quite the right thing here?
+
+You're making assumptions again :-)
+
+Incidentally, you're probably seeing lots of packets with the DF bit set
+because the IP stack is attempting to use Path MTU discovery (RFC 1191,
+<A HREF="ftp://ftp.rfc-editor.org/in-notes/rfc1191.txt">ftp://ftp.rfc-editor.org/in-notes/rfc1191.txt</A> )
+
+  - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

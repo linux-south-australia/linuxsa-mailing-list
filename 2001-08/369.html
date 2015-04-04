@@ -1,0 +1,144 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Slow "Internet" (was: [OT] Can't Think of a Subject)" -->
+<!-- FromName="'Mark Newton'" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="'michael'" -->
+<!-- ToEmail="michael@home.lyppard.com.au" -->
+<!-- Date="Thu, 9 Aug 2001 17:03:34 +0930" -->
+<!-- Id="20010809170334.A59594@atdot.dotat.org" -->
+<!-- Reference="Pine.LNX.4.10.10108091628380.6657-100000@sandwich.home.lyppard.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Slow "Internet" (was: [OT] Can't Think of a Subject)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : michael &lt;<I><A HREF="mailto:michael@home.lyppard.com.au">michael@home.lyppard.com.au</A></I>&gt;
+  Date: Thu, 9 Aug 2001 17:03:34 +0930
+</PRE>
+<H1>Re: Slow "Internet" (was: [OT] Can't Think of a Subject)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, Aug 09, 2001 at 04:43:14PM +0930, michael wrote:
+
+ &gt; &gt; Let's propose that that IIS server gets infested by a CodeRed worm 
+ &gt; &gt; on the Internet, through the NAT gateway.  So it'll start merrily
+ &gt; &gt; spamming the crap out of the entire Internet -- Including that portion
+ &gt; &gt; of the entire Internet that shares the first 16 bits of its IP address,
+ &gt; &gt; which is 192.168.x.y.
+ &gt; 
+ &gt; Mark, are you sure about this? That makes the 192.168.x.x 'private',
+ &gt; non-routable schema very broken. For instance, how would I route a packet
+ &gt; on port 80 over the internet to 'your' 192.168.1.1 web server rather than
+ &gt; Alan's or whoever?
+ 
+Perhaps I wasn't clear enough.
+
+NAT gateway.  One external IP address, 203.1.2.3.  DNS says
+www.broken.com.au IN A 203.1.2.3, so anyone who tries to look
+at www.broken.com.au is vectored to port 80 on that IP address.
+
+NAT gateway has a static mapping:  203.1.2.3:80 -&gt; 192.168.1.2:80.
+192.168.1.2 is an IIS server, so everyone in the world who visits
+www.broken.com.au gets content served from that IIS server.
+
+There are other IIS servers which the rest of the world can't see
+at all in 192.168.0.0/16 behind the same NAT gateway.  Everyone at 
+Broken Pty Ltd (broken.com.au) has an NT system on their desk, and
+they're running IIS because they don't know any better.  Out of the
+box configuration 'n' all that.  
+
+So when the worm probes www.broken.com.au, which is the same as
+203.1.2.3, which is the same as 192.168.1.2, the externally-visible
+IIS server is compromised.  That server starts sprouting CodeRed
+probes to all and sundry.
+
+CodeRed v2 (and the v3 variant which seems to have appeared today:
+look for AAAAA's in the payload instead of NNNN's or XXXXXX's) focuses
+most of its efforts on the 16-bit network which hosts the compromised
+IIS server, which, in this case, is 192.168.1.2.  So 80% of the probes
+coming out of that IIS server are for random 192.168 addresses, i.e.,
+they never get back out through the NAT gateway again, they're totally
+internal to Broken Pty Ltd's network.
+
+So, at random, the IIS servers on everyone's desktops at Broken Pty Ltd
+will succomb to the worm.  They'll also spend 80% of their time scanning
+192.168.0.0/16, so the problem will accellerate.  Pretty soon all of the
+IIS servers at Broken Pty Ltd will be, well, broken.
+
+So they're all spending 80% of their time on 192.168.0.0/16.  What 
+are they doing for the other 20% of the time?  They're hitting on 
+other random IP addresses.  So they're making TCP connections out 
+everywhere.
+
+All of these IIS servers have a default route pointing at the NAT 
+gateway, and when it sees a HTTP request for, say, 24.9.8.7, it'll
+create a NAT mapping for it so that the 192.168.0.0/16 machine which
+is making the request can send it to the world at large.  So 
+24.9.8.7 will get a probe, but its logs will show that the probe is
+really coming from 203.1.2.3 (the external IP address on the NAT 
+gateway).
+
+So if Broken Pty Ltd has 100 workstations running IIS behind their
+NAT-based firewall, that single externally-routable IP address will
+end up creating 100 times the normal number of probes for a single
+instance of CodeRed, because it'll be "hiding" 100 CodeRed instances.
+
+We've seen a couple like this now.  Some of them burst at several
+megabits for a few minutes then stop for a minute or two.  We're
+surmising that the stoppages are due to the NAT gateway crashing
+(because NAT gateways have an upper bound on the number of simultaneous
+translations they can handle) and rebooting.  Whatever.
+
+Does that clarify?
+
+   - mark
+
+ &gt; Nope, I don't think so. Certainly, webservers in your own 192.168.x.x
+ &gt; network are attackable by Code red on an internal or gateway webserver,
+ &gt; but not to other private networks.
+
+They are if the CodeRed worm makes it inside the NAT world, via a 
+static mapping which points to an IIS server.
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

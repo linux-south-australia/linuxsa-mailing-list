@@ -1,0 +1,96 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Puzzle in C" -->
+<!-- FromName="'Stephen White'" -->
+<!-- FromEmail="spwhite@chariot.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 20 Jul 2001 01:56:28 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0107200144070.807-100000@localhost.localdomain" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Puzzle in C</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Stephen White &lt;<I><A HREF="mailto:spwhite@chariot.net.au">spwhite@chariot.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 20 Jul 2001 01:56:28 +0930 (CST)
+</PRE>
+<H1>Puzzle in C</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I'm trying to write a C library wrapper for Ruby, using dlopen, dlsym
+and dlclose. Everything's going very well except for callbacks.
+
+The C library expects to be passed a function pointer conforming to a
+type declaration (eg, a Gtk+ callback). To create these functions, I've
+made a pool of functions like:
+
+  void *func_001(void *args) {}
+  void *func_002(void *args) {}
+  void *func_003(void *args) {}
+
+which are then allocated with a Handle::set_callback("PIIS"). The "PIIS"
+defines the arguments, so Ruby knows what to expect in the stack frame and
+how to parse it (with va_args).
+
+There are two problems here...
+
+  va_start expects at least one known argument, so I have no control over
+  what the first parameter is going to be.
+
+  I can't control the return value of these functions.
+
+To get around this problem, I've had to create multiple pools of functions
+which differ only in their parameter types.
+
+Is there a way of defining a function so I can transparently pass through
+the arguments and return types? What I'm after is something like:
+
+  void *func_001(...) {
+    return(actual_func(va_args);
+  }
+
+where "args" will pass all the arguments given to func_001 and return
+whatever actual_func returned, whether it's float, int, struct, pointer
+or pointer to pointer...
+
+Is this even possible?
+
+-- 
+  <A HREF="mailto:spwhite@chariot.net.au">spwhite@chariot.net.au</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

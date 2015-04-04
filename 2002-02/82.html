@@ -1,0 +1,172 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: RAID1 with RH7.2" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Stephen Donaldson'" -->
+<!-- ToEmail="steelrat@dingoblue.net.au" -->
+<!-- Date="Mon, 4 Feb 2002 11:13:36 +1030" -->
+<!-- Id="20020204111336.G1578@bush" -->
+<!-- Reference="6A94QLGBQO07IGNNKICUTOIEBN4.3c5b867b@sorceror" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: RAID1 with RH7.2</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Stephen Donaldson &lt;<I><A HREF="mailto:steelrat@dingoblue.net.au">steelrat@dingoblue.net.au</A></I>&gt;
+  Date: Mon, 4 Feb 2002 11:13:36 +1030
+</PRE>
+<H1>Re: RAID1 with RH7.2</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On 2002.02.02 16:56 Stephen Donaldson wrote:
+&gt; I set up raid on my local server and all seemd to go well with no
+&gt; problems. I've ran a simulation and recovered a lost drive, my
+&gt; question is what happens if the bootable drive fails.
+
+I can't advise, merely tell you what we've done.  Now that disks
+are cheap we RAID-1 or RAID-5 everything.
+
+I recently configured software RAID-1 over two IDE drives.  These
+drives were the boot and root partition and boot device.
+
+During testing I found the following:
+
+  - the HOWTO lists issues that have subsequently been solved, setting
+    up a software RAID boot partition is now done exactly the same
+    as setting up any other partition.
+
+  - LILO recognises the RAID and writes to the MBR of both drives.
+
+  - the BIOS will only boot from one of the first two IDE drives.
+
+  - be careful how you configure the BIOS, our's had a "fast boot"
+    option that didn't scan for new drives.  So when a drive failed
+    it didn't take it out of the list of bootable drives and boot
+    from the next hard disk.
+
+  - The BIOS viewed the CDROM as a drive, so the IDE cabling matters
+    (arrrgh!).  The disks have to be found first.  The cabling that
+     worked for us was:
+
+                   Controller    IDE0
+                   |
+                   Slave
+                   |
+                   Master        Disk 1 (jumpered to master with no slave)
+
+                   Controller    IDE1
+                   |
+                   Slave         CD-ROM (jumpered to slave)
+                   |
+                   Master        Disk 2 (jumpered to master with slave)
+
+     From which we guessed that this BIOS scans the drives in the order
+     IDE0 Master, IDE0 Slave, IDE1 Master, IDE1 Slave.
+
+     It's not clear if the CD-ROM works if Disk 2 fails to come up on
+     the IDE bus.  This would be a rare failure mode for the disk.
+
+  - We had to update the CD-ROM to a model that used the same PIO mode
+    as the disks to get maximum performance.  If you can, do without a
+    CD-ROM drive or use a third IDE controller.
+
+  - You need an initrd.  It contains the kernel modules for software RAID.
+
+Some of the above shows clearly why SCSI is the better disk bus.
+
+&gt; Would it be as simple as adding a drive and installing the OS with the
+&gt; same partions for the raid, updating the raidtab and running raidhotadd
+&gt; 'path'?
+
+If the machine keeps trying to boot from the corrupted half of
+the mirror, then I'd boot from boot floppy, raidhotremove and
+swapoff the corrupted half, and reboot ejecting the floppy.
+
+If the disk fails completely the BIOS should automatically
+boot from the second drive.
+
+&gt; Finally Redhat let me setup /boot as an RAID but when using the command
+&gt; to recover a simulated failure it tells me the disk is too small why 
+&gt; during
+&gt; install and not for recovery?
+
+I don't understand this at all, what tells you the disk is too
+small?
+
+Our partitioning on both disks is
+
+    Device Boot     Blocks   Id  System                  Mounted as
+/dev/hda1   *      307408+  fd  Linux raid autodetect     /boot
+/dev/hda2         5120136   fd  Linux raid autodetect     /tmp and others
+/dev/hda3         1024128   82  Linux swap
+/dev/hda4        91234080    f  Win95 Ext'd (LBA)
+/dev/hda5        91234048+  fd  Linux raid autodetect     /
+
+/boot is 250MB simply because the disk is so big at 100GB.  Now we
+don't have to repartition when upgrading to RHL13.0 :-)
+
+The swap partition is 1GB because the maximum memory this motherboard
+takes is 3 128MB cards.  Double that for the recommended swap.  Rounding
+up that's about 1GB.  In normal operation there is 2GB of swap (it's
+software RAID so the operating system sees two swap partitions).  Remember
+to use swapoff and to update the swap entries in /etc/fstab when
+using raidhotremove or updating /etc/raidtab.
+
+We made sure /boot was in a primary partition.  Not sure if this
+was necessary but seemed a wise precaution.  We made /boot a
+seperate parition, although this was not strictly necessary
+for our BIOS.  This allows a drive to be booted on another
+machine should that be needed for some fix or another.
+
+/tmp, /var/tmp, /var/log, /var/spool are in a seperate
+partition to increase machine stability.  This probably
+lowers performance.  It is important to be to use relative
+symlinks when sending multiple directories into one
+partition.
+
+Regards,
+Glen
+
+
+-- 
+  Glen Turner                                 Network Engineer
+  (08) 8303 3936      Australian Academic and Research Network
+  <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+  The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

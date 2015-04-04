@@ -1,0 +1,122 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Firewalling / ipchains" -->
+<!-- FromName="'Matthew Geddes'" -->
+<!-- FromEmail="mgeddes@xavier.sa.edu.au" -->
+<!-- ToName="'Mick Collins'" -->
+<!-- ToEmail="mickwell@bigpond.com" -->
+<!-- Date="Mon, 23 Apr 2001 09:31:45 +0930" -->
+<!-- Id="3AE370E9.6C418789@xavier.sa.edu.au" -->
+<!-- Reference="000f01c0c99d$e383fba0$0201a8c0@home.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Firewalling / ipchains</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@xavier.sa.edu.au">mgeddes@xavier.sa.edu.au</A></I>&gt;
+  To  : Mick Collins &lt;<I><A HREF="mailto:mickwell@bigpond.com">mickwell@bigpond.com</A></I>&gt;
+  Date: Mon, 23 Apr 2001 09:31:45 +0930
+</PRE>
+<H1>Re: Firewalling / ipchains</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Mick Collins wrote:
+&gt; 
+&gt; Hello Again Group.For the last say 48 hours I have been reading (something I
+&gt; never do) a linux 6.0 administration guide. I have been reading security and
+&gt; firewalling issue's I might accure. Some how I still cant determine how I
+&gt; can affectivley lock my system down so no nasty little bitches get in.
+
+Try the HOWTOs (<A HREF="http://www.linuxdoc.org/">http://www.linuxdoc.org/</A>). There are a few that deal
+with firewalls and ipchains (either the firewall or ipchains - cant
+remember which - HOWTO should be more than ample).
+
+&gt; 
+&gt; I am currently trying to use this command to log all inbound traffic on
+&gt; wierd ports
+&gt; 
+&gt; /sbin/ipchains -A input -p tcp -y -l -d 192.168.1.1
+
+This is a private IP address, traffic from the outside should never
+touch this interface (well, without NAT at least). Instead of using -d
+192.168.1.1, try something like (this will be in the man page somewhere)
+-i ppp0.
+
+&gt; but this only works on the internal network. I cant use the line -i ppp0 for
+&gt; some reason It wont log the device. Any suggestions?
+
+Perhaps there is noone making a connection from outside to the ppp0
+interface on your machine.
+
+&gt; Also I have recently seen ./hack.sh in the folder /dev/.lib/
+&gt; Is this an exploit ? because it has happened on a few rh6 boxes of mine.
+
+Quite probably. What's in /dev/.lib? I saw something like that once that
+was a bunch of trojan binaries. You should really do a proper security
+audit on your machines. Here's a quick list of things to try:
+
+1	Turn off all unnecessary services in /etc/inetd.conf and restart
+inetd. You could even turn off inetd (not a bad idea, unless you
+specifically need it).
+2	Turn off all unnecessary services in /etc/rc.d/rcX.d/. Where X is the
+current runlevel. You can use the ntsysv tool for this on RH-based
+systems.
+3	Use a deny-by-default style firewall (this is in the HOWTO). I think I
+e-mailed this before, but:
+
+	#DENY by default
+	ipchains -P input DENY
+	#Allow our traffic
+	ipchains -A input -s 192.168.1.0/24 -j ACCEPT
+	ipchains -A input -i lo -j ACCEPT
+	#Allow access to a few services from the outside
+	ipchains -A input -i ppp0 -p tcp -y --destination-port 80 -j ACCEPT
+#We're a web server
+	ipchains -A input -i ppp0 -p tcp -y --destination-port 25 -j ACCEPT
+#and an SMTP server
+	#also Allow us to respond to connections
+	ipchains -A input -i ppp0 -p tcp ! -y -j ACCEPT
+
+	It's not the best firewall in the world, but it's better than leaving
+yourself unguarded.
+
+4	Perhaps use something like tripwire next time you freshly install your
+machine. Tripwire can help you to determine which files are changed and
+even send you notification. This is documented elsewhere.
+
+Hope it helps,
+Matt
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,107 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba Permissions" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="omegasys@adam.com.au" -->
+<!-- Date="Wed, 26 Apr 2000 22:44:45 +0930" -->
+<!-- Id="3906EBC5.B97E5D68@aarnet.edu.au" -->
+<!-- Reference="3906b671.ad.0@adam.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba Permissions</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:omegasys@adam.com.au">omegasys@adam.com.au</A>
+  Date: Wed, 26 Apr 2000 22:44:45 +0930
+</PRE>
+<H1>Re: Samba Permissions</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Jeremy Ervine wrote:
+&gt; 
+&gt; Hi all,
+&gt; 
+&gt; I am having a small problem with Samba File Permissions. I have created a small
+&gt; network with about 10 users, and these ten users all have their own home directory,
+&gt; plus they need full access a shared, samba share. My problem is, each user who
+&gt; writes a file to that share is only writable to that user, but read only to
+&gt; everyone else.
+&gt; 
+&gt; I have tried all the samba docos, I have set in Linuxconf 777 to be the default
+&gt; permission for all files written, but still no luck.
+
+I find it best to force the permissions of the created files
+on shares that are owned by the group.  For example, if
+all users in the UNIX group 'office' exchange files through
+the 'office' share, then I put the following into smb.conf
+
+[office]
+   comment = office.smb.example.edu.au
+   path = /home/samba/office
+   browseable = Yes
+   writeable = Yes
+   read list = @office
+   write list = @office
+   force group = +office
+   create mask = 0660
+   directory mask = 0770
+   force create mode = 0660
+   force directory mode = 0770
+
+Similarly, a web server's HTML directory is:
+
+[www]
+   comment = www.example.edu.au
+   path = /home/httpd/html
+   browseable = Yes
+   writable = Yes
+   read list = @html
+   write list = @html
+   force group = +html
+   create mask = 0664
+   directory mask = 0775
+   force create mode = 0664
+   force directory mode = 0775
+
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ Earth is a single point of failure
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

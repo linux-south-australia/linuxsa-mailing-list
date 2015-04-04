@@ -1,0 +1,112 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IDENTD is it really needed for sendmail?" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'Michael Kratz'" -->
+<!-- ToEmail="michael_kratz@hotmail.com" -->
+<!-- Date="Sun, 6 May 2001 14:08:51 +0930" -->
+<!-- Id="20010506140851.A18647@dog.topology.org" -->
+<!-- Reference="F34EBBJA6NyGhQHC9C60001304e@hotmail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IDENTD is it really needed for sendmail?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : Michael Kratz &lt;<I><A HREF="mailto:michael_kratz@hotmail.com">michael_kratz@hotmail.com</A></I>&gt;
+  Date: Sun, 6 May 2001 14:08:51 +0930
+</PRE>
+<H1>Re: IDENTD is it really needed for sendmail?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, May 06, 2001 at 01:45:12PM +0930, Michael Kratz wrote:
+&gt; 
+&gt; on a system that is running sendmail a its primary MTA does one really have 
+&gt; to run IDENTD? Normally I do, but I have setup a 2 server setup a couple of 
+&gt; weeks ago and realised that I didnt allow for IDENTD transactions through 
+&gt; the firewall... the machine that sends mail is behind the firewall and it 
+&gt; can still send mail, albeit I think it takes a bit longer... are there any 
+&gt; fors and againsts to using or not using IDENTD??
+
+Michael,
+
+There's often been discussion of this over the years.
+The arguments against permitting auth/ident access
+are that it permits, like finger, the discovery of
+user names on a remote machine, and tha means that remote
+users could use the names to help in login attempts
+with guessed passwords, or it could help in assembling
+spam lists.
+
+I haven't permitted ident for a few years.
+But with my old default-accept firewall scripts,
+the absence of ident in my /etc/inetd.conf file
+(or whatever) meant that the kernel generated a 
+TCP reset-packet in reponse to any SYN to that port.
+That speeds up sendmail's sending to your machine.
+
+I my current default-drop scripts, I found that
+remote MTAs were generating several lines in my log file
+every time I was receiving e-mail. That slows down e-mail
+and wastes space in the log files. (And my time/effort while
+I check to see if it's a hack attempt.)
+
+So now I put a non-logging reject rule in my firewall script
+for the ident port.
+I think that this generates an ICMP packet response to the sender
+rather than a TCP reset-packet.
+But for most set-ups, this should have the same effect.
+
+In purely protocol-theoretic terms, I think the "best"
+solution is to not use ident at all, and let the kernel
+generate the TCP reset-packet. But that's more bother,
+and the result is about the same.
+So I'd just firewall it out with a non-logging reject target.
+Then you can still use ident locally on your LAN.
+
+Cheers,
+Alan Kennington.
+
+--------------------------------------------------------------------
+    name: Dr. Alan Kennington
+  e-mail: <A HREF="mailto:akenning@topology.org">akenning@topology.org</A>
+ website: <A HREF="http://www.topology.org/">http://www.topology.org/</A>
+    city: Adelaide, South Australia
+  coords: 34.88051 S, 138.59334 E
+timezone: UTC+0930 <A HREF="http://www.topology.org/timezone.html">http://www.topology.org/timezone.html</A>
+ pgp-key: <A HREF="http://www.topology.org/key_ak2.asc">http://www.topology.org/key_ak2.asc</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

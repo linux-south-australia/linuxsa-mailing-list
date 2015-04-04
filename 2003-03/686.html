@@ -1,0 +1,151 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba Authentication [Was: Samba user management]" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="adam.smith@sageautomation.com" -->
+<!-- Date="Thu, 13 Mar 2003 10:55:30 +1030" -->
+<!-- Id="3E6FCFFA.8080406@aarnet.edu.au" -->
+<!-- Reference="20030312034300.GB20516@sageautomation.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba Authentication [Was: Samba user management]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A></I>&gt;
+  Date: Thu, 13 Mar 2003 10:55:30 +1030
+</PRE>
+<H1>Re: Samba Authentication [Was: Samba user management]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Adam Smith wrote:
+&gt; On Wed, Mar 12, 2003 at 01:51:13PM +1030, Ryan Verner said:
+&gt; 
+&gt;&gt;That samba mysql howto may work, but there's a much, much better way of 
+&gt;&gt;doing it.  I need to write up the howto/documentation for the guy who 
+&gt;&gt;wrote a dedicated samba mysql module, just keep running out of time :(
+&gt; 
+&gt; 
+&gt; I guess the problem is, what are the "standards" when it comes to this kind
+&gt; of thing?  Where my boss might be thinking he's comfortable with Windows, he
+&gt; knows that wherever he goes, Windows will be configured in a similar way,
+&gt; because the interface provides the standards (ie Active Directory, and
+&gt; that's about it.)
+&gt; 
+&gt; Under Unix, you have total flexibility, so you can do whatever you want.
+&gt; But is that always good?  Sure it is, if you have a complex setup or a
+&gt; problem you need to workaround, but I am trying to develop something from
+&gt; scratch, so I don't really have a lot of "integration issues" yet.  Because
+&gt; of this, I want to adhere to some 'standards.'  In this case, should I be
+&gt; following the Samba documentation, the PAM documentation, or something
+&gt; else?  It loses my confidence a little when I am stringing things together
+&gt; -- I'm trying to find a big solid guide that will help me build an
+&gt; environment with PAM, Samba & LDAP.
+
+There also the issues of standards and what works today.
+
+Basically the "standards" in the Unix world are are:
+
+  - local authentication on a Linux/Sun machine -- PAM
+
+  - directory services for people -- LDAP
+
+  - directory services for hosts -- DNS
+
+And you can make all of this work nicely.  For example,
+a local service will request PAM to do some authentication
+and PAM will satisfy this by doing a query against a
+remote LDAP.
+
+Interoperating with Windows can be done two ways -- pretend
+to be a Windows authentication server (various technologies,
+currently AD) or use Windows GINA API to replace Windows
+authentication with LDAP authentication.
+
+I can't comment on the first, Samba is a moving feast
+in this area.  I use the second on my home network
+(ie: easy to patch all hosts) and it works very well.
+
+If you are using LDAP search Google for "LDAP recipe"
+and "eduPerson".  This will tell you how to structure
+the LDAP database (the "schema").  Also remember that
+LDAP can do replication, so there's no need not to have
+the authentication subset of the LDAP database on lots
+of machines.
+
+There is one very big gotcha.  Once you have common
+authentication then if you expose someone's password
+then you've given the interceptor access to everything.
+
+So as part of the common authentication project you also
+need to roll out secure protocols and kill plain text
+passwords everywhere.  You should start this now, as
+I've found tat this takes the longest amount of time
+(as you need to get people to reconfigure their client
+software).
+
+On the plus side, once you have common authentication
+you can use authentication rather than access control
+for allowing use of SMTP servers and access to the
+"intranet".  This solves a whole stack of "roaming
+staff" issues -- your network's services are available
+no matter what path people take to get to the network.
+
+A minor gotcha is scheduled password changes.  We have
+a three month interval and it's amazing just how many
+programs salt away passwords (from e-mail clients to
+PPP).  If you are going to do password aging, think
+carefully about the time period.  It's probably better
+to give everyone infinite lifetime passwords and then
+at sometime when business isn't too frantic go and
+set everyone's password lifetime to a week, asking
+everyone to change their password in that week.
+
+Finally, think about user IDs.  These are a real pain
+as the desire to have them readable runs right up
+against the system's requirements that they be unique
+and unchanging.  If you're a hardarsed BOFH you'll make
+them random, avoiding a lot of policy issues at the
+cost of some user pain (not as much as you'd suppose
+as random userids in base 26 are short).  Again
+this is something you can fix now.
+
+-- 
+  Glen Turner                (08) 8303 3936 or +61 8 8303 3936
+  Australian Academic and Research Network   www.aarnet.edu.au
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

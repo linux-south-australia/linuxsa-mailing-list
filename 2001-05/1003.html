@@ -1,0 +1,123 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Various questions" -->
+<!-- FromName="'Michael Neuling'" -->
+<!-- FromEmail="Michael.Neuling@keyworks.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="marjon@mindless.com" -->
+<!-- Date="Tue, 29 May 2001 10:07:24 +0800" -->
+<!-- Id="20010529020724.3BC15109C4@vodka.keyworks.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Various questions</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Neuling &lt;<I><A HREF="mailto:Michael.Neuling@keyworks.com.au">Michael.Neuling@keyworks.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:marjon@mindless.com">marjon@mindless.com</A></I>&gt;
+  Date: Tue, 29 May 2001 10:07:24 +0800
+</PRE>
+<H1>Re: Various questions</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+John,
+
+&gt; 1. I need to set up my NIC on eth0 on a Debian 2.2 system; I know
+&gt; that I have to configure it via the /etc/network/interfaces file;
+&gt; however I am unsure as to what information and how to put it in. (ip
+&gt; address is 192.168.1.1)
+
+Try something like in /etc/network/interfaces
+
+---
+  auto lo eth0
+
+  # The loopback interface
+  iface lo inet loopback
+
+  # The ethernet interface, configured by etherconf
+  iface eth0 inet static
+	  address 192.168.1.1
+	  netmask 255.255.255.0
+	  gateway 192.168.1.2
+---
+
+Then run, as root, "ifdown -a; ifup -a".
+
+Debian provides some examples in the /usr/share/doc/ifupdown/examples
+directory (sorry this directory may be different for you as I'm
+running Progeny on this machine.  Try running "locate
+network-interface" if I'm wrong)
+
+&gt; 2. How can I set up pon, or pppd to log to another file?? I've looked at 
+&gt; syslog, but I am confused as to actually how to set it up...
+
+Check out /etc/syslog.conf.. 
+
+PPPD logs to facility daemon with level debug (from pppd man page).
+Therefore by default in Debian you will see PPPD messages appear
+/var/log/messages and /var/log/debug.  You'll need to pick these
+sections out of /etc/syslog.conf if you want to log to different files
+and restart syslogd.
+
+&gt; 3. If I want to set up my own firewall settings on a debian 2.2
+&gt; machine, how can I get them to load on boot?
+
+If you want to load them at boot then you should create a script with
+all of your rules and place it in the /etc/init.d directory.  Make
+sure it runs properly and then place a symbolic link from a file in
+the /etc/rcS.d directory to link to the actual file in /etc/init.d.
+Make sure it runs before the interfaces come up otherwise you may open
+your firewall up for a short time before the firewall scripts run
+(slightly pedantic I know).  Make sure the name of the link starts
+with a number less than the script that starts the interfaces
+(S40network configures interfaces on my Deb box so S35myfirewallscript
+is probably not be a bad choice).
+
+BTW IPChains will allow you to create rules for interfaces before they
+exist so should not be a problem.  
+
+&gt; Thankyou in advance, for any help or suggestions
+
+Regards in the present,
+Michael
+--
+"I'm ahead.... I'm advanced...
+ I'm the first mammal to wear pants"
+    Eddie Vedder
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

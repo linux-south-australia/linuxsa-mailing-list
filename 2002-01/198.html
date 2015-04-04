@@ -1,0 +1,165 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Recording radio at set schedules - mpeg compression on the fly" -->
+<!-- FromName="'Toby Corkindale'" -->
+<!-- FromEmail="tjcorkin@sa.pracom.com.au" -->
+<!-- ToName="'Aristotle'" -->
+<!-- ToEmail="aristotle@ihug.com.au" -->
+<!-- Date="Mon, 14 Jan 2002 10:49:54 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0201141037170.13053-100000@localhost.localdomain" -->
+<!-- Reference="3C414618.9040709@ihug.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Recording radio at set schedules - mpeg compression on the fly</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@sa.pracom.com.au">tjcorkin@sa.pracom.com.au</A></I>&gt;
+  To  : Aristotle &lt;<I><A HREF="mailto:aristotle@ihug.com.au">aristotle@ihug.com.au</A></I>&gt;
+  Date: Mon, 14 Jan 2002 10:49:54 +1030 (CST)
+</PRE>
+<H1>Re: Recording radio at set schedules - mpeg compression on the fly</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hmm,
+
+You could us "at" to set the time when it records easily enough.
+at 5 am
+&gt; recordradio.pl
+^D
+
+at 6 am
+&gt; stoprecording
+^D
+
+etc
+
+you'd then make the recordradio.pl script do something like
+
+#!/usr/bin/perl
+
+# record your PID so you can stop it later..
+open(FOO, "/var/run/radio.pid");
+print FOO "$$\n";
+close(FOO);
+
+# Record from line in to mpeg
+print "Recording to output.mp3..\n";
+# i'm guessing at the rec stuff, i haven't actualy tried it myself
+# the lame options are for the fm radio preset, plus VBR mode enable.
+system("rec --rate=44100 -t wav --size=w - | lame --preset fm --quiet
+-v - output.mp3");
+print "Recording has aborted for some reason.\n";
+# remove the pid file
+unlink("/var/run/radio.pid");
+exit;
+
+
+
+The stoprecording script would just need to be a bash script that does:
+kill `cat /var/run/radio.pid`
+
+
+
+i haven't tried this, but give it a go and see if it works.. I was thinking
+about this exact situation last week, because some ppl i know do a show on
+sunday mornings that i'd like to record, but am not in the mood at 9am!
+Unfortunately my radio reception when its next to the computer prevented me
+from actually trying out the stuff..
+
+Hope this helps, and if you debug it and get it working, please post back to
+the list..
+
+-Toby
+
+On Sun, 13 Jan 2002, Aristotle wrote:
+
+&gt; Hi people,
+&gt;
+&gt; I would like to set up my Mandrake 8.1 box to record the radio and mpeg
+&gt; compress it to set directories / dynamically updated filenames (by date)
+&gt; at set times - so for example I can record a show of Radio National at
+&gt; 5am or whatever.
+&gt;
+&gt; I figure I can plug a radio in the line in port on the soundcard and
+&gt; then pipe that to a mpeg compression application somehow although I have
+&gt; no idea how.
+&gt;
+&gt; If anyone is aware of a project already started up for this I would be
+&gt; appreciative to be pointed in the right direction - or if anyone is able
+&gt; to help me I would be happy.  Even if someone would like to come around
+&gt; one day and I will shout some pizza / beer / etc to sit down and nut
+&gt; this and some other Linux things out I would be very appreciative.
+&gt;
+&gt; It would be handy to extend this to a radio / tv card to record set
+&gt; programs - and just set up a monthly schedule.
+&gt;
+&gt; Would it be one day possible to route this through voice recognition
+&gt; software to keep an eye out for interesting topics - say listening for
+&gt; 'Afghanistan' on talk back radio or something - I jnow this is
+&gt; far-fetched but I thought I would ask anyhow.
+&gt;
+&gt; I am about to re-commence studies at Flinders University in politics
+&gt; (international relations) and a tool like this would be immensely
+&gt; helpful.  Perhaps later we can develop it to a point where other
+&gt; students / universities would find such a tool to be useful also -
+&gt; another way to get Linux on the map.
+&gt;
+&gt; Thanks in advance!!!
+&gt;
+&gt;
+
+-- 
+ Toby Corkindale
+ UNIX Developer, Core Tech R&D
+ Technology SA, Pracom Ltd
+ 288 Glen Osmond Road
+ Fullarton,	5063
+ South Australia
+ Tel: +61 8 8202 9075
+ Fax: +61 8 8202 9001
+ mailto:<A HREF="mailto:Toby.Corkindale@sa.pracom.com.au">Toby.Corkindale@sa.pracom.com.au</A>
+ <A HREF="http://www.sa.pracom.com.au/">http://www.sa.pracom.com.au/</A>
+
+                  PRIVILEGED - PRIVATE AND CONFIDENTIAL
+
+   Privileged/Confidential Information may be contained in this message.
+   If you are not the addressee indicated in this message, you may not
+   copy or deliver this message to anyone.  In such case, you should
+   destroy this message and notify the sender by reply email. Opinions,
+   conclusions and other information in this message that do not relate
+   to the official business of this organisation shall be understood as
+   neither given nor endorsed by it.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

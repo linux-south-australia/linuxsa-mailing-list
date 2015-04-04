@@ -1,0 +1,120 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: RAID upgrade" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="Ricky C" -->
+<!-- ToEmail="rceng@hotmail.com" -->
+<!-- Date="Thu, 22 Jun 2000 09:22:51 +0930" -->
+<!-- Id="39515553.417812CC@aarnet.edu.au" -->
+<!-- Reference="20000621100534.79440.qmail@hotmail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: RAID upgrade</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Ricky C &lt;<I><A HREF="mailto:rceng@hotmail.com">rceng@hotmail.com</A></I>&gt;
+  Date: Thu, 22 Jun 2000 09:22:51 +0930
+</PRE>
+<H1>Re: RAID upgrade</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Ricky C wrote:
+&gt; 
+&gt; hi All,
+&gt; 
+&gt; Last night presentation got me thinking...
+&gt; Lets say your current RAID 5 has the following setup.....
+&gt; 
+&gt; Bank 0:  Drive 1     p234    (9.1 GB)
+&gt;          Drive 2     1p34    (9.1 GB)
+&gt;          Empty slot
+&gt;          Empty slot
+&gt; Bank 1:  Drive 3     12p4    (9.1 GB)
+&gt;          Drive 4     123p    (9.1 GB)
+&gt;          Empty slot
+&gt;          Empty slot
+&gt; 
+&gt; 1) how easy it is to upgrade ??
+
+The usual technique is to upgrade all four disks simultaneously.
+
+This can be done without interuption if you have four empty slots:
+
+Start with:
+  raid5(bank0slot1, b0s2, b1s1, b1s2)
+
+Format the new disks:
+  raid5(b0s3, b0s4, b1s3, b1s4)
+
+Now mirror the old disks to the new disks:
+  raid1(raid5(b0s1, b0s2, b1s1, b1s2), raid5(b0s3, b0s4, b1s3, b1s4))
+
+And finally break the mirror to take the old disks off-line:
+  raid5(b0s3, b0s4, b1s3, b1s4)
+
+Where this breaks down under Linux at the moment is that we then need to
+increase the size of the newer RAID volume, but we don't have an LVM
+in a production kernel yet.
+
+So you'll need to do a tar copy.  Ouch.
+
+&gt; 2) do you have to use drives of the same geometry ?? for example, 9.1 GB all
+&gt; the way; or can I get a new 18GB and slot it in ??
+
+If you use a 18G, then if the other disks are 9GB you will only
+be able to use the first 9G of the 18G disk in a RAID5 configuration.
+
+If the drives don't have the same specification then performance
+will be, at least, less consistent and, at worst, much slower.
+
+&gt; 3) after the drives are installed, how long does it take to synchronise the
+&gt; new drives -- data copied to new drives + parity, .....etc
+
+The mirroring takes the same amount of time as a sequential
+copy as long as you don't congest the SCSI channel.
+
+Four drives will slightly congest Ultra SCSI2, but it obviously
+won't take too much longer than a full backup to tape.  The
+new drives will be faster, so the time should be dominated
+by the time to read the data from the older drive.
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

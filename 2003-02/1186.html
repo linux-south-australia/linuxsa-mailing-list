@@ -1,0 +1,150 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PS2 mouse problem - 1 second polling apparently" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="ak.linuxsa@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 25 Feb 2003 20:55:35 +1030" -->
+<!-- Id="20030225205535.A8472@dog.topology.org" -->
+<!-- Reference="20030225011551.GA59@Gromit" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PS2 mouse problem - 1 second polling apparently</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 25 Feb 2003 20:55:35 +1030
+</PRE>
+<H1>Re: PS2 mouse problem - 1 second polling apparently</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, Feb 25, 2003 at 11:45:51AM +1030, Richard wrote:
+&gt; On Mon, Feb 24, 2003 at 03:06:09AM +1030, Alan Kennington wrote:
+&gt; &gt; Has anyone had a problem with a PS/2 mouse showing a 1-second delay
+&gt; &gt; before the effect shows on the screen?
+&gt; 
+&gt; Do you have ps2 mouse support in the kernel?
+&gt; cat /proc/misc should show this
+&gt;   1 psaux
+&gt; cat /proc/interrupts should show something similar to this
+&gt;  12:       5685          XT-PIC  PS/2 Mouse
+&gt; 
+
+Richard,
+
+That's very interesting indeed. 
+The results I get are:
+
+=========================================================
+dingo:~ # cat /proc/misc
+135 rtc
+  1 psaux
+134 apm_bios
+dingo:~ # cat /proc/interrupts
+           CPU0
+  0:  260550110          XT-PIC  timer
+  1:       1335          XT-PIC  keyboard
+  2:          0          XT-PIC  cascade
+  4:     173463          XT-PIC  serial
+  5:       6747          XT-PIC  CS4236+
+  8:        122          XT-PIC  rtc
+  9:          0          XT-PIC  CS4236+ - MPU401
+ 10:   15942330          XT-PIC  eth0
+ 12:   14157495          XT-PIC  eth1, PS/2 Mouse
+ 14:    2147131          XT-PIC  ide0
+ 15:          4          XT-PIC  ide1
+NMI:          0
+ERR:          0                        
+=========================================================
+
+So eth1 (a local LAN, actually 100 Mbits/sec crossover cable)
+has the same interrupt as the PS/2 mouse.
+I wouldn't be at all surprised if that's causing the problem.
+Now I just need to put on my scuba gear and dive down into the
+world of interrupt allocations.
+I remember we used to do that on the old 286 machines with MS-DOS.
+I thought those days of manual IRQ configuration were over.
+It's a lost art, isn't it?
+
+My other machine with the identical mouse set-up has this:
+
+=========================================================
+<A HREF="mailto:akenning@shark">akenning@shark</A>&gt; cat /proc/misc
+175 agpgart
+135 rtc
+  1 psaux
+<A HREF="mailto:akenning@shark">akenning@shark</A>&gt; cat /proc/interrupts
+           CPU0
+  0:  152988866          XT-PIC  timer
+  1:     445084          XT-PIC  keyboard
+  2:          0          XT-PIC  cascade
+  4:      93038          XT-PIC  serial
+  8:         72          XT-PIC  rtc
+  9:          0          XT-PIC  acpi
+ 10:          0          XT-PIC  usb-uhci
+ 11:   11760443          XT-PIC  Ensoniq AudioPCI, eth0, <A HREF="mailto:i810@PCI">i810@PCI</A>:0:1:0
+ 12:    3154574          XT-PIC  PS/2 Mouse
+ 14:    2324699          XT-PIC  ide0
+ 15:         30          XT-PIC  ide1
+NMI:          0
+LOC:          0
+ERR:          0
+MIS:          0     
+=========================================================
+
+That's a very worrying combination on IRQ 11 there.
+But at least the PS/2 mouse works find on "shark".
+
+&gt; &gt; Now this doesn't seem to be an X window system specific thing.
+&gt; &gt; Exactly the same symptoms occur for "gpm -t ps2 /dev/psaux"
+&gt; &gt; with X not running at all - just plain text on the console.
+&gt; 
+&gt; try "gpm -t ps2 -m /dev/psaux"
+&gt; 
+
+Er, yes, that was a typo. The lack of "-m" makes "gpm"
+more uncooperative than Kim Jong-Il.
+
+Thanks for the hint. That gives me something to look into.
+
+By the way, the earlier suggestion that I should try "-t imps2"
+worked out much worse than "-t ps2".
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

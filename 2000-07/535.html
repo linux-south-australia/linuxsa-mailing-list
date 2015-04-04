@@ -1,0 +1,134 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Zombies?" -->
+<!-- FromName="Alex Garner" -->
+<!-- FromEmail="alex@netcraft.com.au" -->
+<!-- ToName="David Lloyd" -->
+<!-- ToEmail="lloy0076@rebel.net.au" -->
+<!-- Date="Thu, 13 Jul 2000 15:04:09 +0930 (CST)" -->
+<!-- Id="200007130534.PAA07229@Kara.netcraft.com.au" -->
+<!-- Reference="396C2140.6A33DB4@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Zombies?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alex Garner &lt;<I><A HREF="mailto:alex@netcraft.com.au">alex@netcraft.com.au</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  Date: Thu, 13 Jul 2000 15:04:09 +0930 (CST)
+</PRE>
+<H1>Re: Zombies?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Netscape blocks on resolver queries. I've finally managed to pin
+&gt; point where it hangs. If Netscape is using any reolver function, it
+&gt; won't paint to the screen AT ALL. Depending on the speed of the DNS
+&gt; servers you're making a query to/with, this can be quite a long
+&gt; time.
+&gt; 
+&gt; Furthermore, it hangs the Java Virtual Machine which apparently
+&gt; throws the towel down and crashes Netscape in the process. 
+&gt; 
+&gt; &gt; Anyone more exact about this observation?
+&gt; 
+&gt; It's been irritating me for quite a while. Whilst I've only taken a
+&gt; precursory glance at the resolver libraries, I'm sure a
+&gt; multi-threaded web browser should be able to:
+&gt; 
+&gt; * resolve DNS
+&gt; * accept input from the user (eg the user realises that
+&gt; "www.linuxzsa.org.au" is wrong)
+&gt; * paint the screen at the same time
+
+Wow. I just tried this and your absolutely correct. How utterly
+annoying. I've never noticed that before.
+
+I should point out that I always use a proxy server and for this
+reason alone I would suggest that everyone does. Squid comes with most
+good distros, and is set up by default to allow connections from
+localhost on port 3128. You can point your proxies in netscape to
+127.0.0.1:3128.
+
+If your ISP requires that you use a proxy as well you'll need to
+modify your cache_peer lines in /etc/squid/squid.conf to look like
+this...
+
+	cache_peer proxy.isp.net.au parent 8080 0 no-query default
+
+...where 'proxy.isp.net.au' is your isp's proxy and '8080' is the port
+your isp's proxy listens to. You'll also need to add the line...
+
+	never_direct allow all
+
+...to tell your cache not to fetch objects itself. If you want to
+bypass this for your local web server(s), you'll need an access-list
+describing them...
+
+	acl local-server dst 203.16.231.111/255.255.255.255
+
+or
+
+	acl local-server dstdomain www.example.com
+
+...for example. Then you need to allow these to be fetched...
+
+	always_direct allow local-server
+
+All this is on the web site in the FAQ (which may be in your distro's
+squid package).
+
+Proxy caches are generally "a good thing"(tm). Most peoples reluctance
+to use proxies are usually based on shitty ISPs. Good ISPs in
+Australia will always use proxies. The really good ones do this
+transparently to to the user with caching engines.
+
+&gt; I'm not convinced that resolver queries HAVE to be blocking.
+
+I'm not convinced that Netscape is the best coded app on the block!
+
+Cheers
+
+Alex!
+
+
+-- 
+
+Alex Garner &lt;<A HREF="mailto:alex@netcraft.com.au">alex@netcraft.com.au</A>&gt;
+
+NetCraft Australia
+Phone (08) 8370 3650
+<A HREF="http://www.netcraft.com.au">http://www.netcraft.com.au</A>
+
+"#define QUESTION ((bb) || !(bb)) // Shakespeare."
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

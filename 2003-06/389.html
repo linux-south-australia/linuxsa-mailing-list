@@ -1,0 +1,241 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Help with multiple monitors" -->
+<!-- FromName="'David Sexton'" -->
+<!-- FromEmail="david@dscomputing.au.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 11 Jun 2003 13:27:27 +0930" -->
+<!-- Id="200306111327.27803.david@dscomputing.au.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Help with multiple monitors</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Sexton &lt;<I><A HREF="mailto:david@dscomputing.au.com">david@dscomputing.au.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 11 Jun 2003 13:27:27 +0930
+</PRE>
+<H1>Help with multiple monitors</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi All,
+
+I'm having some issues with running multiple monitors on my machine. When I 
+had Mandrake 9.0, using KDE 3.0 (can't recall exactly which version of 
+XFree86 ... 4.something), it worked fine.
+I've since upgraded to Mandrake 9.1 - from images taken from the 'Node mirror 
+a couple of days ago.
+Now I have KDE 3.1 and XFree86 4.3.0.. and a no longer working multiple 
+monitor desktop.
+
+What I have is:
+1x  Cirrus Logic 5446 generic PCI 1Mb card running at 640x480 as my primary 
+display (for reasons related to Windoze which i dual boot once every blue 
+moon), connected to a Samsung SyncMaster 500s. Bus ID is PCI:0:5:0. This 
+screen only really handles email, and checking a couple of website designs at 
+this resolution.
+
+1x nVidia GF4 MMX440SE AGP - 64Mb DDR running as a secondary at 1280x1024 as 
+my secondary. This is connected to an LG Studioworks 700s.
+
+The problem: I've had various problems depending on what I do to the 
+XF86Config-4 file. At the moment the problem is that with both cards 
+physically in the machine, KDE starts to load, but I get nothing but blank 
+blue backgrounds on both screens, and nothing else happens.
+If I take out the PCI card, KDE loads fine on my GF4, at the required 
+resolution. Put the PCI card back, and the same problem occurs. 
+I've spent some time playing around with this - and almost had it working - 
+the displays were back the front (ie - the desktop for the primary monitor 
+was showing on the secondary and vice versa, and the mouse pointer was stuck 
+within the boundries of the secondary's screen). I went to change things 
+around and then I get back to my hanging with two blue screens.
+
+I've pasted a copy of XF86Config-4 below, so if anyone could point out exactly 
+which bits I've got wrong, and tell me what they should be, it would be most 
+appreciated. I've found a few other annoyances since the upgrade, but this 
+one is a real pain. 
+
+Cheers,
+David
+
+Section "Files"
+    # Multiple FontPath entries are allowed (they are concatenated together)
+    # By default, Mandrake 6.0 and later now use a font server independent of
+    # the X server to render fonts.
+    FontPath "unix/:-1"
+EndSection
+
+Section "ServerFlags"
+    #DontZap # disable &lt;Crtl&gt;&lt;Alt&gt;&lt;BS&gt; (server abort)
+    AllowMouseOpenFail # allows the server to start up even if the mouse 
+doesn't work
+    #DontZoom # disable &lt;Crtl&gt;&lt;Alt&gt;&lt;KP_+&gt;/&lt;KP_-&gt; (resolution switching)
+EndSection
+
+Section "Module"
+    Load "dbe" # Double-Buffering Extension
+    Load "v4l" # Video for Linux
+    Load "extmod"
+    Load "type1"
+    Load "freetype"
+    Load "glx" # 3D layer
+EndSection
+
+Section "InputDevice"
+    Identifier "Keyboard1"
+    Driver "Keyboard"
+    Option "XkbModel" "pc105"
+    Option "XkbLayout" "us"
+    Option "XkbOptions" ""
+EndSection
+
+Section "InputDevice"
+    Identifier "Mouse1"
+    Driver "mouse"
+    Option "Protocol" "IMPS/2"
+    Option "Device" "/dev/usbmouse"
+    Option "ZAxisMapping" "4 5"
+EndSection
+
+Section "Monitor"
+    Identifier "monitor0"
+    VendorName "Generic"
+    ModelName "1280x1024 @ 74 Hz"
+    HorizSync 31.5-79.0
+    VertRefresh 50-90
+
+    # Sony Vaio C1(X,XS,VE,VN)?
+    # 1024x480 @ 85.6 Hz, 48 kHz hsync
+    ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 
+-hsync -vsync
+
+    # TV fullscreen mode or DVD fullscreen output.
+    # 768x576 @ 79 Hz, 50 kHz hsync
+    ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+
+    # 768x576 @ 100 Hz, 61.6 kHz hsync
+    ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+EndSection
+
+Section "Monitor"
+    Identifier "monitor1"
+    VendorName "Generic"
+    ModelName "1280x1024 @ 70 Hz"
+    HorizSync 30.0-70.0
+    VertRefresh 50-160
+
+    # Sony Vaio C1(X,XS,VE,VN)?
+    # 1024x480 @ 85.6 Hz, 48 kHz hsync
+    ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 
+-hsync -vsync
+
+    # TV fullscreen mode or DVD fullscreen output.
+    # 768x576 @ 79 Hz, 50 kHz hsync
+    ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+
+    # 768x576 @ 100 Hz, 61.6 kHz hsync
+    ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+EndSection
+
+Section "Device"
+    Identifier "device1"
+    VendorName "nVidia Corporation"
+    BoardName "NVIDIA GeForce4 (generic)"
+    BusID "PCI:1:0:0"
+    Driver "nv"
+    Option "DPMS"
+EndSection
+
+Section "Device"
+    Identifier "device0"
+    VendorName "CL"
+    BoardName "CL 5446"
+    BusID "PCI:0:5:0"
+    Driver "cirrus"
+EndSection
+
+
+Section "Screen"
+    Identifier "screen1"
+    Device "device1"
+    Monitor "monitor1"
+    DefaultColorDepth 24
+
+    Subsection "Display"
+        Depth 8
+        Modes "1280x1024" "1280x960" "1152x864" "1024x768" "800x600" "640x480"
+    EndSubsection
+
+    Subsection "Display"
+        Depth 15
+        Modes "1280x1024" "1280x960" "1152x864" "1024x768" "800x600" "640x480"
+    EndSubsection
+
+    Subsection "Display"
+        Depth 16
+        Modes "1280x1024" "1280x960" "1152x864" "1024x768" "800x600" "640x480"
+    EndSubsection
+
+    Subsection "Display"
+        Depth 24
+        Modes "1280x1024" "1280x960" "1152x864" "1024x768" "800x600" "640x480"
+    EndSubsection
+EndSection
+
+Section "Screen"
+    Identifier "screen0"
+    Device "device0"
+    Monitor "monitor0"
+    DefaultColorDepth 16
+    Subsection "Display"
+         Depth 16
+	 Modes "640x480"
+    EndSubsection
+EndSection
+
+
+
+Section "ServerLayout"
+    Identifier "layout1"
+    InputDevice "Keyboard1" "CoreKeyboard"
+    InputDevice "Mouse1" "CorePointer"
+    Screen "screen0"
+    Screen "screen1" Rightof "Screen0"
+#    Option "Xinerama"
+EndSection
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

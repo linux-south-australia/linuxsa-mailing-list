@@ -1,0 +1,197 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: tapes" -->
+<!-- FromName="'Toby Corkindale'" -->
+<!-- FromEmail="tjcorkin@sa.pracom.com.au" -->
+<!-- ToName="'David Lloyd'" -->
+<!-- ToEmail="lloy0076@rebel.net.au" -->
+<!-- Date="Mon, 4 Jun 2001 11:36:57 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0106041110240.12146-100000@localhost.localdomain" -->
+<!-- Reference="3B1A35A3.55C05304@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: tapes</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@sa.pracom.com.au">tjcorkin@sa.pracom.com.au</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  Date: Mon, 4 Jun 2001 11:36:57 +0930 (CST)
+</PRE>
+<H1>Re: tapes</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sun, 3 Jun 2001, David Lloyd wrote:
+
+&gt;
+&gt; Robyn!
+&gt;
+&gt; &gt; Does anyone know where I can get some qic-80 type tapes.
+&gt;
+&gt; I have no idea about that.
+
+Try as I might to suggest a man page for me to say 'RTFM blah', I can't.. ;)
+How about RTFTP, or RTFE for the trading post and ebay, respectively?
+
+
+&gt; &gt; I have 2 tape drives
+&gt; &gt; here that I think take them and I'd like to try it out. The drives are the
+&gt; &gt; sort that connect to the floppy cable and both were setup fine in Windows.
+&gt;
+&gt; I'd get their exact model number and start searching on google to see if
+&gt; they have any drivers. If they were pure SCSI tape drives I'd say
+&gt; without doubt they work with Linux but I've never seen anything about
+&gt; tapes that connect to floppy drives. Perhaps a more specific model
+&gt; number and brand would be helpful...
+
+David, you've never heard of the ftape driver? it's been in linux for as
+long as i can remember.. Version 2 is dated 1994, but i guess version 1 was
+around a few years before that. I'm pretty sure if you did a search for
+'floppy drive' and 'tape drive' and 'linux', you'd get ftape in the first
+page of results.
+
+Anyway, its the floppy-tape driver, and works with the popular and
+well-known range of tape backup units using the horribly slow floppy
+interface. Amazingly, the various tape drives that use
+the floppy interface have some sort of standard they adhere to, because
+everyone i tried worked. Your mileage may vary.
+
+Its pretty easy to use, once the module is loaded just use /dev/ftape as the
+argument to tar..
+
+eg, to backup your home directory
+
+tar -clpzf /dev/ftape ~
+
+If your home is larger than the size of your tapes, you'll need to
+investigate the other tar options; there's quite a lot about tapes in there.
+--tape-length xxx is how you specify the amount of data you want to write to
+tape before you are prompted to change tapes. i guess thats the main thing
+you'd need to know? Its been quite a while since i've used it myself.
+
+Have fun. They make good streamers, in the party sense, once you realise
+you can burn a 650mb (or 1.2mb compressed, to compare to tape sizes) cdrom
+in around 8 to 9 minutes, and take a 40/80 mb tape takes bloody ages, and
+that the tape costs about 10x as much as a blank cd.
+ ;)
+
+Toby
+
+&gt;
+&gt; &gt; The only tapes I have are some 40MB 205feet and these wont work in these
+&gt; &gt; drives. I'm a newbie when it comes to tape drives. Can't I just specify the
+&gt; &gt; type and length of tape I'm using?
+&gt;
+&gt; When you can get Linux to speak to the device you probably don't need to
+&gt; specify that at all. Supposing that your tape drives will eventually
+&gt; behave like SCSI tape drives (DLT's, DAT's), my understanding is this:
+&gt;
+&gt; 1) Data on a tape is just a stream of bits
+&gt;
+&gt; File separators are either recognisable by the hardware, or might
+&gt; consist of some predetermined sequence. Whichever, the hardware or the
+&gt; driver will just "know" this so you don't have to worry.
+&gt;
+&gt; 2) Writing to a tape
+&gt;
+&gt; You just throw bits at the tape device and the tape will work. With SCSI
+&gt; tapes you have devices that will rewind after a command (/dev/st0 for
+&gt; example) and devices that will not rewind after a command (/dev/nst0). A
+&gt; non-rewindable device is useful if you just want to keep on adding stuff
+&gt; to the tape without having to worry about clobbering what's already on
+&gt; there.
+&gt;
+&gt; 3) Reading from a tape
+&gt;
+&gt; You get bits out of the tape device. You can use something like dd
+&gt; if=/dev/nst0 of=tape.dd with all the options that dd takes (man dd). It
+&gt; won't read past the file mark if it finds one, or the end of tape (for
+&gt; obvious reasons).
+&gt;
+&gt; 4) How do you determine end of tape?
+&gt;
+&gt; Well, according to the amanda distribution the most sane way is to
+&gt; assume that any EOF or error is actually the end of tape (that's a
+&gt; paraphrase by the way so don't quote me). In other words, you don't
+&gt; necessarily know. In addition because tape drives have the nasty of
+&gt; performing hardware compression you may not actually know either.
+&gt;
+&gt; Hence, you may not KNOW how large your tape is.
+&gt;
+&gt; 5) Sending commands to the tape drive
+&gt;
+&gt; Using the mt command with -f, eg:
+&gt;
+&gt; mt -f /dev/nst0 rewind
+&gt; mt -f /dev/nst0 status
+&gt; mt -f /dev/nst0 fsf
+&gt;
+&gt; Look up man mt.
+&gt;
+&gt; CAVEAT:
+&gt; Because your tape drives are _not_ SCSI tape drives and what I've said
+&gt; broadly applies to the SCSI tape drives I work with, they may have
+&gt; different characteristics; they're almost certainly not going to be
+&gt; called "/dev/st0 or /dev/nst0" but I may be proven wrong. I hope that
+&gt; what I've said will help you a little in understanding how tapes work.
+&gt;
+&gt; DSL
+&gt;
+&gt;
+
+-- 
+ Toby Corkindale
+ UNIX Developer, Core Tech R&D
+ Technology SA, Pracom Ltd
+ 288 Glen Osmond Road
+ Fullarton,	5063
+ South Australia
+ Tel: +61 8 8202 9075
+ Fax: +61 8 8202 9001
+ mailto:<A HREF="mailto:Toby.Corkindale@sa.pracom.com.au">Toby.Corkindale@sa.pracom.com.au</A>
+ <A HREF="http://www.sa.pracom.com.au/">http://www.sa.pracom.com.au/</A>
+
+                  PRIVILEGED - PRIVATE AND CONFIDENTIAL
+
+   Privileged/Confidential Information may be contained in this message.
+   If you are not the addressee indicated in this message, you may not
+   copy or deliver this message to anyone.  In such case, you should
+   destroy this message and notify the sender by reply email. Opinions,
+   conclusions and other information in this message that do not relate
+   to the official business of this organisation shall be understood as
+   neither given nor endorsed by it.
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

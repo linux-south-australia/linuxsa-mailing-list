@@ -1,0 +1,132 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: LVM and Software RAID (was: Re: New hdd installation)" -->
+<!-- FromName="'Greg Lehey'" -->
+<!-- FromEmail="grog@lemis.com" -->
+<!-- ToName="'Richard Watkins'" -->
+<!-- ToEmail="rcwatkins@bigpond.com.au" -->
+<!-- Date="Wed, 18 Apr 2001 08:51:20 +0930" -->
+<!-- Id="20010418085120.J66943@wantadilla.lemis.com" -->
+<!-- Reference="PAECJPBAEHBHIKLODGPNKEBBCGAA.rcwatkins@bigpond.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: LVM and Software RAID (was: Re: New hdd installation)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Greg Lehey &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  To  : Richard Watkins &lt;<I><A HREF="mailto:rcwatkins@bigpond.com.au">rcwatkins@bigpond.com.au</A></I>&gt;
+  Date: Wed, 18 Apr 2001 08:51:20 +0930
+</PRE>
+<H1>Re: LVM and Software RAID (was: Re: New hdd installation)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tuesday, 17 April 2001 at 21:51:54 +0930, Richard Watkins wrote:
+&gt; Hi Greg,
+&gt;
+&gt; I made the following comments today regarding RAID 5...
+&gt;
+&gt; [1] RAID 5 requires a minimum of 3 HDD's
+&gt;
+&gt; This is certainly the case with M$ products, and I assumed (possibly
+&gt; wrongly) that Linux would be the same.
+
+Agreed.  What I said was that the algorithms still work if you only
+have two drives.  I don't know what Linux does.  Here's the Vinum code
+which enforces the 3 subdisk minimum:
+
+  /*
+   * Check that our subdisks make sense.  For
+   * striped plexes, we need at least two
+   * subdisks, and for RAID-4 and RAID-5 plexes we
+   * need at least three subdisks.  In each case
+   * they must all be the same size.
+   */
+  if (plex-&gt;organization == plex_striped)
+    {
+    data_sds = plex-&gt;subdisks;
+    required_sds = 2;
+    }
+  else if (isparity (plex))				    /* RAID 4 or 5 */
+    {
+    data_sds = plex-&gt;subdisks - 1;
+    required_sds = 3;
+    }
+  else
+    required_sds = 0;
+  if (required_sds &gt; 0)					    /* striped, RAID-4 or RAID-5 */
+    {
+    if (plex-&gt;subdisks &lt; required_sds)
+      {
+      log (LOG_ERR,
+	   "vinum: plex %s does not have at least %d subdisks\n",
+	   plex-&gt;name,
+	   required_sds );
+      state = plex_faulty;
+      }
+
+&gt; You then mention that "Vinum" also has the 3 HDD restriction and
+&gt; that I am confusing what makes sense with what is possible. That's
+&gt; fine...as I previously mentioned ...I will concede that you are
+&gt; right because of your greater Linux knowledge...but can you tell me
+&gt; what command or utility I can use in Linux to create a RAID 5 setup
+&gt; with 2 HDD's (if I can't use Vinum).
+
+No, sorry, I don't know the Linux tools.
+
+&gt; [3] RAID 5 has better read performance than RAID 1
+&gt;
+&gt; You have sent me several emails debating this comment...yet when
+&gt; asked simply if RAID 1 is faster than RAID 5 when reading, writing,
+&gt; or both ...you answer writing...I never said this wasn't the
+&gt; case. It should be obvious to you why now I am a little
+&gt; confused. Please set me straight...
+
+Well, I did give you a number of URLs and a man page quotation.  A lot
+depends on how you use the volume: performance characteristics for
+swap will probably be different than for a file system.  For a file
+system which isn't completely empty, you'll spread the accesses
+relatively uniformly across the entire address space, modulo some
+potential conflicts between stripe size and cylinder group size.  This
+means that you end up with the read bandwidth of 2 * N drives, where N
+is the number of drives corresponding to the volume size.  With
+RAID-5, you also have the read bandwidth of all drives, but in this
+case it's N + 1, not 2 * N, so performance is not as good.
+
+Greg
+--
+Finger <A HREF="mailto:grog@lemis.com">grog@lemis.com</A> for PGP public key
+See complete headers for address and phone numbers
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

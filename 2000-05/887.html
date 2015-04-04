@@ -1,0 +1,245 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Package management in free OSs" -->
+<!-- FromName="Dan Shearer" -->
+<!-- FromEmail="dan@linuxcare.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 31 May 2000 16:52:25 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.10.10005311643080.1596-100000@localhost.localdomain" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Package management in free OSs</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@linuxcare.com">dan@linuxcare.com</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Wed, 31 May 2000 16:52:25 +0930 (CST)
+</PRE>
+<H1>Re: Package management in free OSs</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Well, I seem to have managed to send the last version before I finished.
+Here it is again, with minor changes.
+
+Dan
+
+
+Overview of Package Management in Free OSs
+------------------------------------------
+
+v1.1 31 May 00 
+<A HREF="mailto:dan@linuxcare.com">dan@linuxcare.com</A> 
+
+Package management is one of the most important (and potentially,
+expensive) things about an OS, when considering its use in commercial
+and/or large environments. I have some ideas I've formed through practical
+experience over where things are, and I'd be interested in other peoples'
+comments on what I'm forgetting or don't know about, which is probably a
+lot.
+
+There are quite a few free software package management tools around. In
+Linux there are I think five at the moment, with the big two being the apt
+system and rpm, Slakware having a bare-bones .tar.gz system and the other
+two being pretty much insignificant. In BSD there's the pkg system. I'm
+only going to consider rpm, app and pkg here.
+
+I think there are two parts to a package management system, firstly the
+quality of the tools and secondly the quality of the packages that are
+available. 
+
+Something that is clearly not good is having perhaps 10 different package
+specifications for things like GNU fileutils, which are required by all
+Linux and BSD distributions. That's 10 different pre-install/post-install
+scripts, 10 different approaches to permissions and file locations and 10
+different index entries and so on. And then these specification files are
+used by maybe 50 or more Linux and BSD distributions! Diversity is good
+(and different ideas about packaging for security and other reasons quite
+justifiable) but for a basic package whose contents everyone understands
+this is just silly. Fortunately www.freestandards.org and the BSD projects
+have clear standards for where files should go. But long-term this is a
+bad approach for free software.
+
+rpm
+---
+
+The first Linux packaging system of any consequence, and a significant
+advance on any commercial packaging tool including the Windows
+Installshield approach (which was not invented by Microsoft.) Originally
+developed by Red Hat employees, then taken on by quite a lot of other
+distributions (some of which are not based on the Red Hat distribution at
+all, such as SuSE.) 
+
+As far as I can tell all development work on rpm stopped 18 months or more
+ago.
+
+Features of RPM:
+
+    - a fairly comprehensive database system. You can ask questions like
+      "which package owns this file" or construct queries to check what
+      files exist that aren't in the database
+    - a library (rpmlib) for manipulating the database from programs
+    - many tools exist which use rpmlib, some of them very pretty ones
+    - the canonical commandline tool is "rpm", which of course was
+      developed as part of the base rpm system
+    - none of the tools are very strong on dependency chains, neither
+      is rpmlib
+    - reasonable but out-of-date documentation, including a book 
+      "Maximum RPM"
+    - ported to quite a lot of operating systems, including Solaris and
+      Irix
+
+The net effect for me is that when administering a system via the
+commandline "rpm" there are continual frustrations caused by chains of
+dependencies. There just isn't the intelligence to do what I clearly want
+to do (install package X plus whatever else it needs, being consulted if
+there are any clashes.)
+
+rpm has a huge number of switches. This indicates a lack of design
+thought.
+
+There isn't any open developement process in place for managing future
+development of rpm.
+
+rpmfind.net has a huge collection of binary and source rpms from:
+
+   1) Every (or many) rpm-based Linux distributions
+   2) Individual package contributors, ie people who repackage 
+      freely available software and put it up on rpmfind.net
+
+So the user is faced with the choice of 57 different rpm binaries, most
+(but not all) of which have a source rpm package as well. Which is a good
+one? Which has got really insecure, or distribution-dependent, or just
+plain un-peer-reviewed pre and post-install scripts? Remember that rpm
+must be run as root.
+
+apt
+---
+
+Or, "A Packaging Tool".
+
+apt consists of a back-end dpkg system that is very modular, with library
+interfaces and arbitrary methods for doing just about anything. There are
+several front-ends to this, including a user-unfriendly tool called
+dselect, a very impressive commandline tool called apt-get, a bare-bones
+tool called dpkg (ie it provides just about raw access to the dpkg
+libraries) and numerous other tools including apt_console.
+
+I suspect the apt designers knew about BSD's pkg. They certainly tried to
+learn from rpm, I remember hanging around at the time.
+
+There is less database-like functionality compared to rpm (and currently
+only one user can have the database open at a time!). I haven't heard of
+apt being ported to any non-Linux platform. At a developer level the
+documentation is very good, but there aren't any user-level books or other
+ancillary documents that I know of.
+
+The big thing about apt is dependencies. It very rare to come across a
+situtation that it can't resolve. This feature is exposed very nicely by
+the apt-get commandline tool (which doesn't have very many switches at
+all!) which allows a command such as "apt-get install xyz" to install xyz
+from either ftp, http, cdrom or other source media depending on which is
+most up to date and which has been configured in the global configuration
+file, including all dependencies without even asking except in case of
+disasters if that's what you want.
+
+The other thing about the apt system is that there is an extremely well
+thought-out design for structuring archives and specifying installation
+sources, so that even if you don't use Debian you can still use packages
+from the Debian package collection where that makes sense. There are
+very clear guidelines for how .deb package should be put together, and
+since there is some centralisation of the core packages there can be peer
+review of things like install scripts.
+
+pkg
+---
+
+I know the least about this, not being very experienced with BSD. It is a
+very simple system, with a basic list of installed packages in /var/db/pkg
+and commands like pkg_add and pkg_delete which handle a package
+description file that is bundled with a tar.gz of the binaries to be
+installed.
+
+pkg is not ported to any other OS that I know of. There is good
+documentation, although being so simple not a lot is needed. A good thing
+about pkg is that the collections of ports are maintained in a consistent
+way and there aren't that many ports collections. The rules for making a
+package are very clear. I don't _think_ there is too much in the way of a
+framework for digital package signing but it is such a simple thing to do
+that I presume I'm wrong :-)
+
+pkg appears to have similar base capabilities to apt with respect to
+location and retrieval methods, but much less flexibility with the current
+number of methods and ability to add in new methods [this might be wrong,
+corrections welcomed]. So pkg too can look for a package on the CD ROM,
+not find it and then go to a web/ftp site.
+
+Overall
+-------
+
+Although there are a lot of problems to solve when designing packaging
+tools, I think the big issue is maintaining the package archives. The fact
+that the program "alien" works very well in translating between the major
+Linux package formats proves that this isn't the major problem.
+
+In the archive maintainence area the apt and pkg approach is pretty good,
+with apt being quite an advance on the ports collection concept in that it
+is designed to be easily extended. The user can specify an arbitary number
+of repositries and their location, and OSs that have base packages in
+common just fit into the hierachy very neatly.
+
+Corel Linux is an example or how this idea of collections can be extended,
+where the relatively small number of packages Corel maintain is in its own
+tree, and Corel haven't had any need to repackage things like binutils or
+perl. They won't, either, unless Corel Linux suddenly become incompatible
+with the specifications of the Debian project - but the Debian project is
+adhereing to the standards being put out by www.freestandards.org, which
+include appropriate POSIX compliance and exceptions and so on.
+
+Conclusion
+----------
+
+So far I think apt has the best potential technology, but it needs to be
+improved to really live up to this potential. The addition of a multiple
+concurrent access and better database facilities will help. The ability to
+understand the rpm database might be a very good thing.
+
+rpm appears to have died, and there doesn't appear to be any kind of
+current effort to make pkg do more than BSD, or to make Linux packaging
+tools able to use the ports collection.
+
+Dan
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

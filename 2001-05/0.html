@@ -1,0 +1,164 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Sendmail Relay Question" -->
+<!-- FromName="'Corey Gilmore'" -->
+<!-- FromEmail="cfg@dln.uvm.edu" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 30 Apr 2001 14:33:17 -0400 (EDT)" -->
+<!-- Id="Pine.LNX.4.33.0104301428440.21690-100000@dln.uvm.edu" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Sendmail Relay Question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Corey Gilmore &lt;<I><A HREF="mailto:cfg@dln.uvm.edu">cfg@dln.uvm.edu</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 30 Apr 2001 14:33:17 -0400 (EDT)
+</PRE>
+<H1>Sendmail Relay Question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi All,
+
+I am trying to lock down sendmail once again (after upgrading), but I
+can't seem to fix one relaying technique.
+
+I've tried $ telnet mail-abuse.org
+which runs tests, and says that I am all set.
+
+If I check myself using www.abuse.net though, I fail on the first test.
+
+&lt;&lt;&lt; 220 mydomain ESMTP Sendmail 8.11.2/8.11.2; Mon, 30 Apr 2001
+13:57:28 -0400
+&gt;&gt;&gt; HELO www.abuse.net
+&lt;&lt;&lt; 250 mydomain Hello www.abuse.net [208.31.42.77], pleased to meet
+you
+
+
+Relay test 1
+&gt;&gt;&gt; RSET
+&lt;&lt;&lt; 250 2.0.0 Reset state
+&gt;&gt;&gt; MAIL FROM:&lt;<A HREF="mailto:spamtest@abuse.net">spamtest@abuse.net</A>&gt;
+&lt;&lt;&lt; 250 2.1.0 &lt;<A HREF="mailto:spamtest@abuse.net">spamtest@abuse.net</A>&gt;... Sender ok
+&gt;&gt;&gt; RCPT TO:&lt;<A HREF="mailto:user@mydomain">user@mydomain</A>&gt;
+&lt;&lt;&lt; 250 2.1.5 &lt;<A HREF="mailto:user@mydomain">user@mydomain</A>&gt;... Recipient ok
+&gt;&gt;&gt; DATA
+&lt;&lt;&lt; 354 Enter mail, end with "." on a line by itself
+&gt;&gt;&gt; (message body)
+&lt;&lt;&lt; 250 2.0.0 f3UHvSS21687 Message accepted for delivery
+
+the message goes through as well :/
+
+/etc/mail/access looks like
+localhost.localdomain           RELAY
+localhost                       RELAY
+127.0.0.1                       RELAY
+mydomain                        RELAY
+alias.my.mydomain               RELAY
+
+and my sendmail.mc file looks like (excuse the wrapping)
+
+divert(-1)
+dnl This is the sendmail macro config file. If you make changes to this
+file,
+dnl you need the sendmail-cf rpm installed and then have to generate a
+dnl new /etc/sendmail.cf by running the following command:
+dnl
+dnl        m4 /etc/mail/sendmail.mc &gt; /etc/sendmail.cf
+dnl
+include(`/usr/share/sendmail-cf/m4/cf.m4')
+VERSIONID(`linux setup for Red Hat Linux')dnl
+OSTYPE(`linux')
+define(`confDEF_USER_ID',``8:12'')dnl
+undefine(`UUCP_RELAY')dnl
+undefine(`BITNET_RELAY')dnl
+define(`confAUTO_REBUILD')dnl
+define(`confTO_CONNECT', `1m')dnl
+define(`confTRY_NULL_MX_LIST',true)dnl
+define(`confDONT_PROBE_INTERFACES',true)dnl
+define(`PROCMAIL_MAILER_PATH',`/usr/bin/procmail')dnl
+define(`ALIAS_FILE', `/etc/aliases')dnl
+define(`STATUS_FILE', `/var/log/sendmail.st')dnl
+define(`UUCP_MAILER_MAX', `2000000')dnl
+define(`confUSERDB_SPEC', `/etc/mail/userdb.db')dnl
+define(`confPRIVACY_FLAGS', `authwarnings,novrfy,noexpn,restrictqrun')dnl
+define(`confAUTH_OPTIONS', `A')dnl
+dnl TRUST_AUTH_MECH(`DIGEST-MD5 CRAM-MD5 LOGIN PLAIN')dnl
+dnl define(`confAUTH_MECHANISMS', `DIGEST-MD5 CRAM-MD5 LOGIN PLAIN')dnl
+dnl define(`confTO_QUEUEWARN', `4h')dnl
+dnl define(`confTO_QUEUERETURN', `5d')dnl
+dnl define(`confQUEUE_LA', `12')dnl
+dnl define(`confREFUSE_LA', `18')dnl
+dnl FEATURE(delay_checks)dnl
+FEATURE(`no_default_msa',`dnl')dnl
+FEATURE(`smrsh',`/usr/sbin/smrsh')dnl
+FEATURE(`mailertable',`hash -o /etc/mail/mailertable')dnl
+FEATURE(`virtusertable',`hash -o /etc/mail/virtusertable')dnl
+FEATURE(redirect)dnl
+FEATURE(always_add_domain)dnl
+FEATURE(use_cw_file)dnl
+FEATURE(use_ct_file)dnl
+FEATURE(local_procmail)dnl
+FEATURE(`access_db')dnl
+FEATURE(`blacklist_recipients')dnl
+EXPOSED_USER(`root')dnl
+dnl This changes sendmail to only listen on the loopback device 127.0.0.1
+dnl and not on any other network devices. Comment this out if you want
+dnl to accept email over the network.
+dnl DAEMON_OPTIONS(`Port=smtp,Addr=127.0.0.1, Name=MTA')
+dnl We strongly recommend to comment this one out if you want to protect
+dnl yourself from spam. However, the laptop and users on computers that do
+dnl not have 24x7 DNS do need this.
+dnl FEATURE(`accept_unresolvable_domains')dnl
+dnl FEATURE(`relay_based_on_MX')dnl
+MAILER(smtp)dnl
+MAILER(procmail)dnl
+
+
+Any ideas what I could do to fix the problem?
+Would it have something to do with this line
+dnl DAEMON_OPTIONS(`Port=smtp,Addr=127.0.0.1, Name=MTA')
+
+But shouldn't my access database override this?  I did rebuild both my
+sendmail.cf and access.db files after I changed them, and restarted
+sendmail as well.
+
+thanks,
+.cfg
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

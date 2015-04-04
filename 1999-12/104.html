@@ -1,0 +1,118 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: "Sorry, I've got Star Office..."" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Sun, 5 Dec 1999 11:17:36 +1030" -->
+<!-- Id="19991205111736.B28530@atdot.dotat.org" -->
+<!-- Reference="199912031600.CAA02700@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: "Sorry, I've got Star Office..."</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Sun, 5 Dec 1999 11:17:36 +1030
+</PRE>
+<H1>Re: "Sorry, I've got Star Office..."</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sat, Dec 04, 1999 at 02:30:12AM +1030, Alan Kennington wrote:
+
+ &gt; If BSD has the sort of file system that (almost) always
+ &gt; recovers nicely from sudden power failures, then maybe
+ &gt; BSD is for me. Any offers of advice on this?
+
+BSD doesn't have a journaled filesystem (which Matt has spoken about
+separately) -- it has something which is a bit like a cross between an
+async mount (which goes spectacularly fast) and a journaled filesystem
+(which is spectacularly stable), namely Kirk McKusick's SoftUpdates
+facility.
+
+SoftUpdates are enabled by building them into your kernel and setting
+a mount option on an existing filesystem (i.e.: you enable them on a 
+mount-by-mount basis:  using them doesn't make your filesystem incompatible
+with non-SoftUpdates).
+
+When you have SoftUpdates enabled, the buffer cache is used much more
+aggressively, much like in an async mount (where filesystem metadata
+is written to the cache instead of direct to disk -- Traditional 
+UNIX filesystems treat metadata like directories and inodes as special
+cases and write them through to disk, which is one reason why creating
+and deleting thousands of directories takes much longer than creating
+and deleting thousands of files).
+
+The difference between SoftUpdates and an async mount lies in the way
+the cache is flushed to disk:  In an async mount, the cache flushes are
+effectively random, leading to the case where the physical disk might 
+have inconsistencies (like the ones which hosed your filesystems this
+week).  With SoftUpdates enabled, the cache flushes are sorted and 
+clustered according to a dependency tree which makes sure that the 
+physical disk is always in a self-consistent state.
+
+For example, if you modify a file by appending to it, the modified
+version of the file's inode will be flushed to disk at the same time
+as the data you've appended, instead of what happens with an async mount,
+which is that the data might be flushed, and the inode might potentially
+be flushed many minutes later.
+
+This isn't as good as a true journaled filesystem, because there are 
+still race conditions where failures can occur, but it reduces those
+race conditions to windows lasting a few milliseconds instead of a few
+minutes, while permitting most of the performance benefits of an async
+mount to shine through.
+
+That being said, I've been using async mounts on my home server for
+years now and have never lost a file -- different strokes for different
+folks.  Keep good backups and enjoy the speed :-)
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-----BEGIN PGP SIGNATURE-----
+Version: PGPfreeware 5.0i for non-commercial use
+MessageID: g+uzgBt8lTYLq+wZvG1tFZLk8DaBCCRd
+
+iQA/AwUBOEm2JzVY9oBk/GJ4EQI0UACg+xrBkvFSK3hQ+eOpV50/+7f6150An0YL
+NAGR0a3o7XeYwmNOfcvWnqg3
+=vRpH
+-----END PGP SIGNATURE-----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

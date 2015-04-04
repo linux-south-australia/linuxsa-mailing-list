@@ -1,0 +1,127 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Opinions sought on requiring nmbd to be running to overcome aWindows NT bug :-)" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="LinuxSA@linuxsa.org.au" -->
+<!-- Date="Fri, 16 Feb 2001 12:48:41 +1000" -->
+<!-- Id="3.0.6.32.20010216124841.00b45200@203.16.214.248" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Opinions sought on requiring nmbd to be running to overcome aWindows NT bug :-)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:LinuxSA@linuxsa.org.au">LinuxSA@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 16 Feb 2001 12:48:41 +1000
+</PRE>
+<H1>Opinions sought on requiring nmbd to be running to overcome aWindows NT bug :-)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+I am soliciting input on ways to deal with the following problem.
+
+Before getting down and dirty, the background is that we (Caldera and I)
+want libsmbclient to work and for users to be able to use it easily without
+having to be technical experts and to do lots of funny things to get it to
+work.
+
+That being said, we are looking for the simplest way to achieve that, and I
+think that many of the people on this list can sympathize with that view
+and can offer useful advice.
+
+Now to the details.
+
+libsmbclient sends NetBIOS datagram requests to browse the network and find
+the SMB servers out there.
+
+When the programmers who wrote some parts of Windows NT and Windows 95 were
+coding, they made a mistake that causes problems now. Win2K has fixed this
+problem.
+
+The mistake was that when responding to a NetBIOS datagram, they always
+send it back to UDP port 138, regardless of the source port in the request. 
+
+This causes problems on two fronts:
+
+ 1. libsmbclient is a library that will mostly be run by ordinary users.
+    Ordinary users cannot get access to port 138, so they cannot see 
+    the responses, and thus cannot browse a NT- or Win9X-based workgroup.
+
+ 2. Even if a proxy were run as root to grab that port and ferry the 
+    responses to libsmbclient (which can be done with TDB), the user will
+    experience problems when trying to start Samba if they decide to
+    do so at a later stage.
+
+It turns out that I can code things to have nmbd receive the responses
+(which it will do if it is running) and give them to me via TDB (a facility
+in the latest version of Samba--2.2.0 and above).
+
+Now, please do not worry too much if you do not understand the technical
+details so far. They are fairly well established, both from tracing packets
+and talking on the various Samba lists.
+
+What I am now trying to get input on is:
+
+If a Linux distro is installing a package that uses libsmbclient, like say
+konqueror:
+
+1. Is it acceptable to require that Samba 2.2.0 or better also be installed
+and configured to run on the next reboot. We only actually need nmbd to
+run, and we would configure Samba so that it does not involve itself in any
+elections etc if it is not already installed and configured.
+
+We should probably add some obvious comments at the front of the master
+smb.conf file to ensure that if they later go to install and configure
+Samba, they can figure out what is going on.
+
+2. Is it acceptible to not touch anything and require the user to know what
+to do if konqueror hangs, and that they should then go and install Samba
+and configure it properly?
+
+
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.ethereal.com)
+Contributing author, SAMS Teach Yourself Samba in 24 Hours
+Author, Special Edition, Using Samba
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

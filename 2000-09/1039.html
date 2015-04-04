@@ -1,0 +1,152 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Debian and PPP" -->
+<!-- FromName="Dan Shearer" -->
+<!-- FromEmail="dan@tellurian.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 22 Sep 2000 07:16:45 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.10.10009220716270.1714-100000@localhost.localdomain" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Debian and PPP</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Fri, 22 Sep 2000 07:16:45 +1030 (CST)
+</PRE>
+<H1>Re: Debian and PPP</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, 22 Sep 2000, [iso-8859-1] Kieran Farrell wrote:
+
+&gt; I am using pppconfig and pon to connect to my ISP,
+&gt; however in pppconfig there is an option for
+&gt; nameservers but only ip numbers primary and secondary.
+&gt; Where do I put the name?
+
+You shouldn't ever have to put it anywhere. The problem you report is due
+to something else. Your ISP could change their name to blurgleblot and it
+would keep working.
+
+&gt; ie. I am with OneNet so I put in the Primary
+&gt; 203.17.224.11 and 203.17.224.12 in secondary. But
+&gt; there is no where to put the address one.net.au. So
+&gt; when I log on I can access adresses via IP numbers but
+&gt; not names.
+
+This problem indicates that the nameservers aren't being used, which might
+be because they aren't being written to resolv.conf. More likely it will
+be because the nameservers are incorrect, in which case you would get an
+error when running nslookup after connecting, like this:
+
+*** Can't find server name for address x.y.z.a: No response from server
+*** Default servers are not available      
+
+I suggest you try setting "dynamic dns" in pppconfig. If pppconfig doesn't
+let you do this then you have an old version (pppconfig --help should say
+version 2.0). Dynamic dns sets the usepeerdns switch in pppd.
+
+If this doesn't work (or you have an old version of pppconfig) and you are
+sure the IP addresses of the nameservers are correct then manually add the
+IP address of the first one to /etc/resolv.conf after you connect 
+like this:
+
+     nameserver 1.2.3.4
+
+then test by typing 'nslookup www.one.net.au' and a few other addresses,
+going further afield when you know that much is working.
+
+If the problem was an outdated version of pppconfig (or a pppd that
+can't do usepeerdns) then after fixing your resolv.conf do
+
+    apt-get install pppconfig
+
+which will upgrade pppconfig and everything that depends on it, such as
+pppd. However I doubt that this is the case unless you installed from a
+pretty old Debian CD set, in which case you should be looking to upgrade
+everything (one way to do this is put your computer on a fast network
+connection that you do not pay the bandwidth bill for and type
+'apt-get dist-upgrade', answer the question and then find something else
+to do for half an hour or so :-)
+
+You might have to set up /etc/apt/sources.list to point to a Debian
+archive. I use:
+
+deb <A HREF="http://ftp.au.debian.org/debian">http://ftp.au.debian.org/debian</A> unstable  main  contrib non-free
+deb <A HREF="http://ftp.au.debian.org/debian-non-US">http://ftp.au.debian.org/debian-non-US</A> unstable/non-US main  contrib non-free
+deb-src <A HREF="http://ftp.au.debian.org/debian">http://ftp.au.debian.org/debian</A> unstable main                               
+
+&gt; Is there any other program I can use (although pon and
+&gt; poff would be ideal if i can get them working.) Please
+&gt; keep in mind though that I need CHAP authentication
+&gt; not the more widely used PAP. 
+
+pppconfig handles CHAP, and the underlying ppp has handled CHAP for a long
+time.
+
+&gt; I used to use KPPP
+&gt; before I became a Debian Fanatic and lost KDE.
+
+Debian packages for KDE have been around for yonks. And since Qt went GPL
+KDE has been in the standard Debian package archive. Try 
+
+    apt-get install kdebase
+
+when you have an hour or two of download time to spare.
+
+&gt; PS. QT as a programming API is quite solid, if only it
+&gt; didn't cost over $2000 for non linux ports *8(
+
+If by non-linux you mean 'Microsoft Windows Only' then this is correct.
+The Qt Free Edition should work on anything that runs X, including OS/2.
+
+As I understand it the $2000+ is a one-off fee per developer, and you can
+do anything you like with any of the binaries and source that you produce.
+Incidentally I've heard that KDE will compile and run under Windows (or it
+did before the 2.0 development effort, presumably that will come back
+again.) But yes, if you don't have $2000 to spare then you can't produce
+Windows binaries. Perhaps that's a good thing and they should raise the
+price to $50 000 or so so that nobody does.
+
+This shouldn't be taken to mean that I think GTK isn't worth using.
+
+--
+Dan Shearer
+Open Source Manager
+<A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A>
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

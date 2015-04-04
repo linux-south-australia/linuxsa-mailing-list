@@ -1,0 +1,158 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Free software in bandwidth conservation [was Re: [OT] Telstra ADSL 'Unlimited' Introduces Download Limit]" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 11 Jun 2001 19:56:55 +0930" -->
+<!-- Id="20010611195655.A25542@dog.topology.org" -->
+<!-- Reference="Pine.LNX.4.21.0106111833220.22403-100000@calulu.shearer.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Free software in bandwidth conservation [was Re: [OT] Telstra ADSL 'Unlimited' Introduces Download Limit]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 11 Jun 2001 19:56:55 +0930
+</PRE>
+<H1>Re: Free software in bandwidth conservation [was Re: [OT] Telstra ADSL 'Unlimited' Introduces Download Limit]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Jun 11, 2001 at 06:59:40PM +0930, Dan Shearer wrote:
+&gt; On Mon, 11 Jun 2001, Alan Kennington wrote:
+&gt; 
+&gt; &gt; Dan, you could write the software and offer it to ISPs to do exactly what
+&gt; &gt; you want to be done with controlling/bounding your traffic.
+&gt; &gt; You could even get e-mail alerts to be generated when your budget
+&gt; &gt; is being stressed.
+&gt; 
+&gt; And you could do a great deal more than this too.
+&gt; 
+&gt; But something else occurs to me: cost isn't always the issue, although
+&gt; attemps are made to make everything have a cost. Bandwidth is finite and
+&gt; no user or supplier ever wants to see it all used up. So quite aside from
+&gt; charging for usage, what incentives can be built in that encourage frugal
+&gt; use of this resource? 
+
+Dan,
+
+That then brings you to the next level - token bucket arrays.
+But I won't foist the details on this list here.
+I did that recently here:
+<A HREF="http://www.linuxsa.org.au/mailing-list/2001-06/196.html">http://www.linuxsa.org.au/mailing-list/2001-06/196.html</A>
+
+In short, the way you get incentives to be frugal is to
+run down the user's credit (and decrease their priority) when
+they use too much. E.g. the ISP says "you get 100 kbits/sec
+average over any hour, and the user thinks "if I use up my hourly
+allocation, then my bit-rate response from the net will get poorer.
+So I'll minimise the useless demand on the network so that I can
+get a good response speed (high priority) later".
+
+Currently, there are no negative consequences for high demand apart
+from charging - and flat rate charging takes that incentive away.
+So you can replace the charging incentive with the QoS incentive.
+"The more you use the net, the lower your priority will be relative
+to other users when the net gets congested."
+
+We've all known about this from OS task scheduling for the last
+20 years or so. Well, why not apply this to the Internet.
+Every internet link is a task scheduler. Every packet is a task.
+But here the idea is to identify the common ownership of sequences
+of packets (e.g. static IP address) and apply a dynamic priority
+to each user, so that their packet scheduling priority depends on
+how well they fit their SLA. This is the "SLA comparator" concept where
+you modulate priority etc. according to SLA adherence.
+
+Every packet is analogous to a CPU time quantum.
+
+Every OS now gives priority to interactive I/O-bound processes
+as opposed to CPU-bound processes. The internet should do the same
+thing. I know that Cisco routers etc. give priority to telnet
+as opposed to file transfer protocols on a TCP port basis.
+But that's very crude indeed.
+
+&gt; Some data has a known, low cost to bandwidth
+&gt; saturation (incoming newsfeeds.) Other kinds are either rsync-cacheable or
+&gt; rsync-able if you know what you are doing. If all bandwidth consumers in
+&gt; Adelaide that these technologies were relevant to were able to use them, I
+&gt; think it is intuitive that the bandwidth requirements curve would flatten
+&gt; out a lot.
+[....]
+
+There are a zillion applications layer strategies for economizing on
+bandwidth, like compression, proxies, caches, mirrors, and all the
+other tricks that other people know more about than I do.
+I prefer the IP layer approach because it attacks the problem
+where it occurs - it can be applied throughout the internet
+in principle, on all IP routing points.
+If you can build in the _incentive_ in terms of prioritising
+SLA conformant traffic, then the user will _want_ to use
+compression, caches etc. etc. - and most important of all,
+if they don't really need to use the Internet, they won't.
+
+Remember that in companies and other big organisations, it's
+usually the Finance Officer who deals with the monthly bill,
+and they like to have fixed costs which are known (or limited)
+in advance. Hence they prefer flat rates.
+The employee who generates the Internet usage has no real
+cost incentive to minimize usage.
+But they user at the workstation _does_ have the incentive
+to get good QoS (i.e. bit-rate) by frugal usage of the net.
+
+And if you have 10 people using the same link, the ideas
+I propose will pinch off the bit-rate of all 10 users if
+one user is wasteful. Then it's up to the other 9 users to
+put pressure on each other to not run down their
+access priority.
+
+[Technical note: If you're using a Weighted Fair queueing
+(round robin) queueing algorithm, the SLA comparator
+modulates the queueing "weights". If you're using 
+token bucket style queueing, the SLA comparator modulates
+the bucket rates which limit the user bit-rate.]
+
+Once again, the linux relevance here is the fact that every
+linux 2.4.x box is a free, sophisticated router, shaper 
+and general bandwidth manager already,
+and you even get a free development environment into the
+bargain. Who could ask for anything more?
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

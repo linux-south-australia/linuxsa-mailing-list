@@ -1,0 +1,194 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Porting the Ports to Linux/Mass Package Development" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="'Linux SA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 22 Sep 2003 10:26:24 -0700" -->
+<!-- Id="3F6F30C0.6020003@pacbell.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Porting the Ports to Linux/Mass Package Development</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : Linux SA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 22 Sep 2003 10:26:24 -0700
+</PRE>
+<H1>Porting the Ports to Linux/Mass Package Development</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+(This is an in progress concept, I am having trouble using the ports, 
+but have not had trouble installing the system, keep that in mind before 
+diving in...)
+
+I. Mass production of .debs whilst sleeping
+
+If you made your own distribution[1], wouldn't it be nice to be able 
+mass produce .deb or .rpm files in a completely automated way? Well I am 
+trying to figure out if that is possible.....
+
+ From what I understand, apt-get can be used to download source files to 
+build .debs of primary and dependent packages with this command:  
+
+apt-get -b source packagename
+
+For example, if I wanted to create a .deb called ports, I would run
+
+apt-get -b source ports
+
+Also, from what I understand, if you have source files, I believe that 
+you would unzip the tarballs, and go into the package's main directory 
+and run:
+
+dpkg-build rfakeroot.
+
+But where to find a server that has a bunch of source files on it? 
+Didn't seem like there were any servers that had source repositories at 
+the sites listed in my /etc/apt/sources.list.   Perhaps FreeBSD's ports 
+system can provide an answer.  From what I understand, the FreeBSD ports 
+system tends to use source code to build packages. To install Open 
+Office using the ports in FreeBSD, I would:
+
+cd /usr/ports/editors/Openoffice
+make install clean
+
+Also, from what I understand about the ports, is that Source Code for 
+packages are and saved in /usr/ports/distfiles.  You could set up an FTP 
+server with /usr/ports/distfiles as FTP root on an internal server or.....
+
+.....you could install the ports system the Linux server that you use to 
+make .deb packages.
+
+
+Installing NetBSD's Packages System on Linux
+
+
+NetBSD has a page on the pkgsrc system at <A HREF="http://www.pkgsrc.org/,">http://www.pkgsrc.org/,</A> but 
+here is a summary of the process:
+
+A. Install the pkgsrc application
+B. Configure the behavior of the pkgsrc application
+C. Download the files pkgsrc uses to build applications with
+
+
+A. Install the pkgsrc application
+
+1. Download pkgsrc from here: 
+<A HREF="ftp://ftp.NetBSD.org/pub/NetBSD/packages/bootstrap-pkgsrc.tar.gz">ftp://ftp.NetBSD.org/pub/NetBSD/packages/bootstrap-pkgsrc.tar.gz</A>
+2. run shell command: gzip -dc bootstrap-pkgsrc.tar.gz | tar xvf -
+3. run shell command: cd bootstrap-pkgsrc
+4. run shell command: ./bootstrap
+5. Edit your $PATH (Note, only tested in SuSE Linux 8.2)---&gt; Use a text 
+editor to add this line to or edit the exisiting $PATH line in  .bashrc 
+to read: PATH=/usr/pkg/bin:/usr/pkg/sbin
+
+
+B. Configure the behavior of the pkgsrc application
+
+1. Log in as root---&gt; run shell command: su----&gt;supply password
+2. run shell command: cd bootstrap-pkgsrc
+3. run shell command: cp mk.conf.example /etc/mk.conf
+4. I kept the default settings, but you can edit as necessary
+
+C. Download the files pkgsrc uses to build applications with
+
+1. run shell command: ftp ftp.netbsd.org
+2. supply user name: anonymous
+3. supply password: anonymous
+4. run shell command: get pub/NetBSD-current/tar-files/pkgsrc.tar.gz
+5. run shell command: gzip -dc pkgsrc.tar.gz | tar xvf -
+6. Log in as root---&gt; run shell command: su----&gt;supply password
+7. mv /pkgsrc /usr/ports
+
+Ok, we have installed the ports system in Linux, so if they work, we can 
+build the deb packages in /usr/ports/distfiles.
+
+
+*  Problems I have had so far with the ports:
+
+Ok, lets try to build Hercules....
+
+cd /usr/ports/emulators/hercules
+
+I get a stop error saying that I am missing the /bin/unzip file. I run 
+which unzip, it tells me /usr/bin/unzip, so I make a symbolic link by 
+running this shell command:
+
+ln -s /usr/bin/unzip /bin/unzip
+
+The next stop error shows I am missing a marker. I edit the 
+/usr/ports/emulators/hercules/makefile by merely adding a tab to the 
+last line, and that error goes away.
+
+My last stop error said that I was missing /share/examples/hercules...so I:
+
+mkdir /share
+mkdir /share/examples
+mkdir /share/examples/hercules
+
+The last stop error I had showed a permission denied error in 
+/share/examples/hercules. That is where I had to stop.
+
+Hope this is helpful and/or interesting
+
+
+James Leone
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1] I don't, probably will not and could not :-)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,161 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: window lock-up -- keyboard input fails" -->
+<!-- FromName="'Greg 'groggy' Lehey'" -->
+<!-- FromEmail="grog@lemis.com" -->
+<!-- ToName="'Alan Kennington'" -->
+<!-- ToEmail="ak1.linuxsa@topology.org" -->
+<!-- Date="Sun, 17 Aug 2003 13:12:32 +0930" -->
+<!-- Id="20030817034232.GR15411@wantadilla.lemis.com" -->
+<!-- Reference="20030817122255.A4191@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: window lock-up -- keyboard input fails</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Greg  &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:ak1.linuxsa@topology.org">ak1.linuxsa@topology.org</A></I>&gt;
+  Date: Sun, 17 Aug 2003 13:12:32 +0930
+</PRE>
+<H1>Re: window lock-up -- keyboard input fails</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sunday, 17 August 2003 at 12:22:55 +0930, Alan Kennington wrote:
+&gt; On Sun, Aug 17, 2003 at 11:54:07AM +0930, Greg 'groggy' Lehey wrote:
+&gt;&gt;
+&gt;&gt; No, but you might be able to track it down.  Try running
+&gt;&gt;
+&gt;&gt;   stty &lt; /dev/pts/3 -a
+&gt;&gt;
+&gt;&gt; (assuming the window in question is /dev/pts/3) from another xterm
+&gt;&gt; window to see what the settings are.  You should also be able to set
+&gt;&gt; them that way, but Linux doesn't seem to let me do it:
+&gt;
+&gt; Greg,
+&gt;
+&gt; Many thanks for that. Unfortunately I just killed the current window giving me
+&gt; the problems. But the problem happens about once a day on some machine (since I
+&gt; have many dozens of such windows on multiple workstations).
+&gt;
+&gt; The problem nearly always occurs when doing an "ssh" from a workstation
+&gt; to a server. There are two "pts" objects involved.
+&gt; So which of the ttys should I monitor? Presumably both, I suppose.
+
+The one which the tail has open as stdin.
+
+&gt; It's a mystery to me as to the exact data path for my keyboard
+&gt; input.  Is it something like this:
+&gt;
+&gt; kbd -&gt; serial (or PS/2) driver
+
+Keyboard driver.
+
+&gt;     -&gt; TTY layer kernel module
+&gt;     -&gt; X software
+&gt;     -&gt; X application (such as xterm)
+
+So far, so good.
+
+&gt;     -&gt; local shell (e.g. /bin/tcsh)
+&gt;     -&gt; local ssh process
+
+Choose one.  Once you have your ssh running, the local shell is just
+waiting for it to stop.
+
+&gt;     -&gt; remote sshd process
+&gt;     -&gt; remote TTY layer
+
+IIRC this is the pty layer (network, not tty), but I'm a little hazy here.
+
+&gt;     -&gt; remote user shell (e.g. /bin/tcsh)
+&gt;     -&gt; "tail" program
+
+Again, chose one.
+
+The real issue here is that this is out-of-band communications.  The
+remote tail is talking to its pty layer and telling it that a ^C (for
+example) should cause it to receive a SIGINT signal.  Along the rest
+of the path, the processes involved (ssh/sshd) must not interpret the
+character, otherwise it will never get to the remote tail.  I suppose
+there's a possibility that that's what's happening, but watching the
+stty output will help.
+
+&gt; Anything involving a TTY "thing" (whatever it is) is a black art to me.
+&gt; In one example I'm looking at now, I see this in "w" on the workstation:
+&gt;
+&gt; akenning pts/20   -                11:31am 16:22   0.29s  0.15s  ssh xyz
+&gt;
+&gt; This is the process which I just restarted after clobbering the blocked process.
+&gt;
+&gt; On the server, I see this:
+&gt;
+&gt; akenning pts/9    xyz.domain.net   11:31am 28:27   0.44s  0.00s  tail -f ...
+
+I don't see anything of interest there; I'm not sure I would ever.
+
+&gt; Doing "stty -a" on these gives the usual info. I'll store that and
+&gt; wait for the problem to resurface.
+
+Good idea.
+
+&gt;&gt; You can also try killing the process with an appropriate signal:
+&gt;
+&gt; From memory, kill the remote process does not good at all.  If my
+&gt; memory's correct, the kbd input still goes nowhere.
+
+Remember that kill(1) invokes kill(2), arguably the worst named
+function in the system.  It just delivers a signal.  The example I
+showed delivers a SIGINT.  If your tail is blocking SIGINT, you need
+look no further.
+
+&gt; I.e. I still have to kill the local xterm (or other X window
+&gt; terminal emulator).
+
+Hmm.  I might be missing something here.
+
+Greg
+--
+Finger <A HREF="mailto:grog@lemis.com">grog@lemis.com</A> for PGP public key
+See complete headers for address and phone numbers
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.0 (FreeBSD)
+
+iD8DBQE/PvmoIubykFB6QiMRAruwAKCXcBlpQnABzqpedVfZx0yeKcM52gCfScer
+ln9YcM1ZPWCZ1c/anRWz16w=
+=LSoS
+-----END PGP SIGNATURE-----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

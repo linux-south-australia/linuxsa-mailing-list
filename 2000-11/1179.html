@@ -1,0 +1,120 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IPCHAINS AND FIREWALL" -->
+<!-- FromName="'Adam Hawes'" -->
+<!-- FromEmail="adam_hawes@dingoblue.net.au" -->
+<!-- ToName="'Mick Collins','Linux SA'" -->
+<!-- ToEmail="mickwell@bigpond.com,linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 29 Nov 2000 23:05:15 +1030" -->
+<!-- Id="3A24F803.43F1EFE2@dingoblue.net.au" -->
+<!-- Reference="002901c059fa$c5c39840$0201a8c0@home.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IPCHAINS AND FIREWALL</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adam Hawes &lt;<I><A HREF="mailto:adam_hawes@dingoblue.net.au">adam_hawes@dingoblue.net.au</A></I>&gt;
+  To  : Mick Collins &lt;<I><A HREF="mailto:mickwell@bigpond.com">mickwell@bigpond.com</A></I>&gt;<BR>        Linux SA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 29 Nov 2000 23:05:15 +1030
+</PRE>
+<H1>Re: IPCHAINS AND FIREWALL</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&lt;script&gt;
+#!/bin/sh
+
+# Flush chain
+/sbin/ipchains -F
+
+# Deny all
+/sbin/ipchains -P input deny
+/sbin/ipchains -P output deny
+/sbin/ipchains -P forward deny
+
+#
+# Network is pretty secure by here, can quit if we want real secure
+# &lt;GRIN&gt;
+#
+
+# Forward only port 8080
+/sbin/ipchains -A input -i eth0 -p tcp -s 192.168.1.0/24 --dport 8080 -j
+accept
+/sbin/ipchains -A forward -p tcp -s 192.168.1.0/24 --dport 8080 -j
+reject
+
+# Alternately, try IPPORTFW for transparent proxy
+#
+# Using this method you don't need to set a proxy.  All access to the
+# outside on 8080 will be transparently forwarded to port 8080 on the
+# gateway (squid I take it) and proxied.
+#
+#/usr/sbin/ipmasqadm portfw -a -P tcp -L 192.168.1.0/24 8080 -R gateway
+8080
+
+# Add the rest of your IPMASQ rules here
+
+&lt;/script&gt;
+
+The above script is pretty crappy but will do EXACTLY what you
+requested.  Of course, there may be some side-effects like all other
+traffic sort of... oh, i dunno... stopping... but you didn't specify you
+wanted _other_ traffic!
+
+Don't trust my script either; I have just really started getting into
+ipchains and don't fully unterstand it yet!
+
+That should fsck you for a while!
+
+Cheers,
+Adam
+
+-- 
+Adam Hawes
+
+Web:       <A HREF="http://overfiend.iwarp.com">http://overfiend.iwarp.com</A>
+Email:     <A HREF="mailto:adam_hawes@dingoblue.com.au">adam_hawes@dingoblue.com.au</A>
+ICQ:       2492016
+
+Voicemail: +61 (08) 8219-3238
+Fax:       +61 (08) 8219-3238
+
+-----BEGIN GEEK CODE BLOCK-----
+Version: 3.12
+GAT dpu s+: a-- C++++ UL++ P+ L+++ E W- N+++ o+ K- w--- 
+O- M V-- PS+ PE Y++ PGP++ t 5- X+++ R* tv b+ DI+ D---- 
+G e* h! r--- y** 
+------END GEEK CODE BLOCK------
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

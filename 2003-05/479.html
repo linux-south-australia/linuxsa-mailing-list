@@ -1,0 +1,168 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: IP identifier field for linux UDP/IP equals zero??!" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'Alan Kennington','Linuxsa Mailing List'" -->
+<!-- ToEmail="ak.linuxsa@topology.org,linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 15 May 2003 10:10:55 +0930" -->
+<!-- Id="003001c31a7a$a790c1c0$020120ac@skink" -->
+<!-- Reference="20030515090325.A3775@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: IP identifier field for linux UDP/IP equals zero??!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;<BR>        Linuxsa Mailing List &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 15 May 2003 10:10:55 +0930
+</PRE>
+<H1>RE: IP identifier field for linux UDP/IP equals zero??!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Gentlemen,
+
+&gt; On Thu, May 15, 2003 at 08:48:35AM +0930, Mark Newton wrote:
+&gt; &gt; 
+&gt; &gt; The "Identification" (aka Fragment ID) field is only used for 
+&gt; &gt; fragmentation. Setting the DF bit turns off fragmentation, so the 
+&gt; &gt; fragment ID isn't used.
+&gt; 
+&gt; Mark,
+&gt; 
+&gt; RFC 791, pages 8, doesn't seem to agree:
+&gt; 
+&gt; ===========================================
+&gt; The originating protocol module of
+&gt;     an internet datagram sets the identification field to a value that
+&gt;     must be unique for that source-destination pair and 
+&gt; protocol for the
+&gt;     time the datagram will be active in the internet system. 
+&gt; ===========================================
+
+What about the Context?
+
+------
+The identification field is used to distinguish the fragments of one
+    datagram from those of another.  The originating protocol module of
+    an internet datagram sets the identification field to a value that
+    must be unique for that source-destination pair and protocol for the
+    time the datagram will be active in the internet system.  The
+    originating protocol module of a complete datagram sets the
+    more-fragments flag to zero and the fragment offset to zero.
+-----
+
+I don't see that as meaning that it must set this in *every* case, only
+in cases where DF is not set.
+
+&gt; 
+&gt; Some humans have also informed me in the last hour that in 
+&gt; fact the linux implementation does contradict RFC 791. There 
+&gt; is no indication that I can find in RFC 791 that an exception 
+&gt; to the rule is made for packets with the DF bit set.
+
+The fact that this rule is only mentioned in the context of packets with
+the DF bit set might indicate that this is that case.
+
+&gt; 
+&gt; You're right about the stated purpose of the ID field.
+&gt; However, when someone writes a spec and people implement that 
+&gt; spec, then other people who write other specs assuming that 
+&gt; everyone will implement the IP protocol according to the 
+&gt; spec, it's very inconvenient when someone chooses to break 
+&gt; the spec for all machine using a particular operating system, 
+&gt; in this case linux. That's what's happened in this case. It's 
+&gt; an embarrassment that linux has acted on the assumption that 
+&gt; the RFC can be improved upon, in the just the same way that 
+&gt; MS-Windows "improves" TCP 3-way handshakes to 1-way 
+&gt; handshakes. In the linux case, this makes another IETF 
+&gt; protocol work at 50% efficiency because of the zero ID fields.
+
+That would, be bad, if it were the case. However, I don't think it is
+the case.
+
+&gt; 
+&gt; &gt; While I'm sure it'd be convenient for your application if 
+&gt; the standard 
+&gt; &gt; required more from the Identification field, it actually doesn't.  
+&gt; &gt; It's possible that some TCP/IP stacks set it on every IP 
+&gt; packet, but 
+&gt; &gt; they're going above and beyond the requirements of the 
+&gt; TCP/IP spec in 
+&gt; &gt; doing so.
+&gt; 
+&gt; Nope. It isn't "convenient" for my application. It's assumed 
+&gt; by another, more recent RFC.
+
+which one, and where?
+
+&gt; 
+&gt; &gt;  &gt; Does anyone out there happen to know if there is some 
+&gt; official  &gt; 
+&gt; &gt; excuse for why linux doesn't seem to do quite the right thing here?
+&gt; &gt; 
+&gt; &gt; You're making assumptions again :-)
+&gt; 
+&gt; Everybody makes assumptions. Some assumptions are correct, 
+&gt; and some are not. You can't function without assumptions in a 
+&gt; complex world. And notice that little word "seems". That's 
+&gt; not an assumption, is it.
+&gt; 
+&gt; &gt; Incidentally, you're probably seeing lots of packets with 
+&gt; the DF bit 
+&gt; &gt; set because the IP stack is attempting to use Path MTU 
+&gt; discovery (RFC 
+&gt; &gt; 1191, <A HREF="ftp://ftp.rfc-editor.org/in-notes/rfc1191.txt">ftp://ftp.rfc-editor.org/in-notes/rfc1191.txt</A> )
+&gt; 
+&gt; Nope. It's because I'm running "ohphone" to generate voice 
+&gt; RTP packets, which all use DF. They're coming out every 80 
+&gt; mSec, although I can set it to 20 mSec. This is less than the 
+&gt; "time the datagram will be active in the internet system"
+&gt; for even my 19200 bits/sec null modem in the lab.
+
+So why do you need a unique ID field? If they are set as DF, then you
+can tell which packets are which by the very fact that they aren't
+fragmented. What else are you using the ID field for?
+
+rr
+
+-- 
+Richard Russell
+Yellow Goanna P/L
+m: +61 412 827 805
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+w: <A HREF="http://www.yellowgoanna.com">http://www.yellowgoanna.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

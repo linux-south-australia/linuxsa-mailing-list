@@ -1,0 +1,137 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Hosting (Newbie Dumb Question)" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Damien Wilson" -->
+<!-- ToEmail="dwilson@ep.com.au" -->
+<!-- Date="Wed, 5 Jul 2000 09:08:12 +0930" -->
+<!-- Id="20000705090812.A9589@atdot.dotat.org" -->
+<!-- Reference="7170C97C07D6D311B50F0080C8FE2BA5010217@SERVER01" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Hosting (Newbie Dumb Question)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Damien Wilson &lt;<I><A HREF="mailto:dwilson@ep.com.au">dwilson@ep.com.au</A></I>&gt;
+  Date: Wed, 5 Jul 2000 09:08:12 +0930
+</PRE>
+<H1>Re: Hosting (Newbie Dumb Question)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, Jul 04, 2000 at 01:45:26PM +0930, Damien Wilson wrote:
+
+ &gt; You can assign multiple names to the one IP address within the DNS. It
+ &gt; doesn't even have to be your own DNS. It can be on the DNS of your ISP.
+ &gt; If all you are looking at is web hosting then there are some setting in
+ &gt; Apache's httpd.conf file to enable multiple addresses
+ &gt; If you also want multiple mail hosts then I suggest you look at Exim instead
+ &gt; of sendmail
+
+There's a nice feature in FreeBSD 4.x which deserves comment here.
+
+It's called "Jail", and it was written by Poul-Henning Kamp &lt;<A HREF="mailto:phk@freebsd.org">phk@freebsd.org</A>&gt;.
+It's basically an extension of chroot()  (hint:  man 2 chroot)
+
+The most obvious difference between a jail and a chroot()ed section of
+the filesystem is that a jail has its own hostname and IP address.  This
+can be used to set up virtual "sandboxes" for virtual servers which 
+require a bit more partitioning than http 1.1 can provide.
+
+For example, one of my freelance customers has a box which has 8 "jailed"
+domains.  Each domain runs its own instance of inetd, sendmail and apache
+on its own IP address.  When you "telnet" to one of the jailed IP addresses
+you end up on the same physical hardware as the other jailed IP addresses,
+but it "feels" like a completely independent machine.  Users belonging
+to the organizations served by the "jailed" domains can use their personal
+virtual-server's IP address as an SMTP server, HTTP server, and POP3 
+server;  They can use the same system's non-jailed IP address as a HTTP
+proxy (it's running squid).
+
+The are restrictions on what a jailed root user can do, to prevent root
+from breaking out of a jail.  There's a set of system calls which cannot
+be run by root (including the jail() system call itself), thereby preventing
+the kind of breakouts which are trivial to do on chroot()-based sandboxes.
+You can also use the kernel's IP filtering to determine what kind of 
+network traffic is acceptable to each jail (the root user inside a 
+jail does not have privileges to change the IP filter lists;  this must
+be done from a non-jailed context).
+
+It's by no means perfect, and the illusion of being on a separate machine
+is easily broken:  For example, "ps" shows a flag for each process in a 
+sandbox, so if someone has broken into a jail you can't really make them
+think they're on a non-jailed system.  But that isn't really the point.
+The feature makes it very easy to set up arbitrary virtual servers, even
+for services which don't lend themselves to virtualization (such as, say,
+POP3:  If you have the same system handling foo.com.au and bar.org.au
+mail domains, and both domains have a user called "quux", how does the 
+POP3 server know whether to hand over <A HREF="mailto:quux@foo.com.au">quux@foo.com.au</A>'s mail or
+<A HREF="mailto:quux@bar.org.au">quux@bar.org.au</A>'s mail when "quux" logs in on the POP3 server?  With Jail,
+the two domains have their own IP addresses, so it's easily worked out).
+
+When setting it up, you create a skeleton filesystem for each jailed
+environment;  It can be as complicated or as simplistic as you like.  For
+example, if your jail is ONLY going to run apache and nothing else, the 
+amount of stuff you need to put in the jail filesystem area is necessarily
+less than what you'd have to stuff in there if you wanted to handle incoming
+telnets from software developers (:-).  You can also do loopback mounts if,
+for example, you want to provide a jail with an exact copy of your 
+/usr or /usr/local filesystem.  Each jail usually gets a /proc mount so 
+"ps" and friends will work too.  
+
+I usually put a startup script which starts the daemons which are supposed
+to run the jail into /usr/jail/domain.name/etc/rc, then at boot time I
+arrange to have the system execute:
+
+   /usr/sbin/jail /usr/jail/domain.name domain.name 192.168.1.2 sh /etc/rc
+
+The "sh /etc/rc" bit is executed inside the jail, so it's really referring
+to /usr/jail/domain.name/etc/rc, which is my startup script.  Basically,
+any processes started by that script, and any of their descendents, will
+be limited to /usr/jail/domain.name, will receive the string "domain.name"
+from the gethostname() system call, and will be able to accept or originate
+network connections on 192.168.1.2.  Other jails for other domains are kept
+in /usr/jail/*;  there's no real limit on the number of jails which can
+be supported by a single system.
+
+<A HREF="http://slash.dotat.org/cgi-bin/man?name">http://slash.dotat.org/cgi-bin/man?name</A>=jail
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

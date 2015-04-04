@@ -1,0 +1,177 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: UDP port 752 does what?" -->
+<!-- FromName="Matthew Tippett" -->
+<!-- FromEmail="mtippett@ticons.com.au" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Sun, 7 Nov 1999 11:26:51 +1030 (CST)" -->
+<!-- Id="199911070056.LAA04752@matt.ticons.com.au" -->
+<!-- Reference="199911061423.AAA07436@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: UDP port 752 does what?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Tippett &lt;<I><A HREF="mailto:mtippett@ticons.com.au">mtippett@ticons.com.au</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Sun, 7 Nov 1999 11:26:51 +1030 (CST)
+</PRE>
+<H1>Re: UDP port 752 does what?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Matt,
+&gt; 
+&gt; Yet another sysadmin tool for me to learn!
+
+A few tools that make file really simple (and a lot easier to learn).
+
+	locate - run every night (after an initial run), gives you 
+		the location of files on your system.  It is the
+		same as a 'find . | grep portmap'.
+
+	rpm - Take a file from above and get the package.  Doing
+		a 'rpm -qf /etc/rc.d/rc2.d/K89portmap' would yield
+		portmap-4.0-15.   Then doing a 'rpm -ql portmap' 
+		yields all the files, applications and just about
+		everything else that the package contains.  And
+		then of course 'rpm -qa | grep port', yeilds other
+		information that may be useful.
+		
+		Of course this is for a RPM based system, dpkg based
+		systems (and even solaris through pkginfo) have similar 
+		mechanisms.
+
+	man - More importantly 'man -k' or 'apropros' on some systems.
+		'man -k rpc' yeilds lots of starting places that you
+		can dig around.
+
+My total feeling is a good sysadmin doesn't know all the information
+all of the time (well maybe a guru does, but I ain't one of them).  A
+good sysadmin knows bits and pieces of lots of systems, but more importantly
+knows how to string them together to get a real picture of what is going on.
+
+&gt; So I tried "rpcinfo" on a few machines, and was
+&gt; amazed to find that NFS is always the same
+&gt; (port 2049), but mountd is all over the place.
+&gt; 
+&gt;     100005    1   udp    752  mountd
+&gt;     100005    2   udp    752  mountd
+&gt;     100005    1   tcp    755  mountd
+&gt;     100005    2   tcp    755  mountd
+&gt;     100003    2   udp   2049  nfs
+&gt;     100003    2   tcp   2049  nfs
+&gt; 
+&gt; Do you happen to know if these ports are
+&gt; dynamically allocated?
+
+I believe they are, but there are 'preferences'.  So it would probably
+be more so 'give me this port, otherwise give me any port.'  (Paraphrasing
+mark, who posted a somewhat shorter message while I was composing this one.).
+
+&gt; If so, then it's pretty difficult to
+&gt; firewall/filter them out.
+
+Now we are moving into areas that I don't have complete understanding of.
+
+The RPC (remote procedure call) system (of Sun lineage) is what gives us
+our protocols of NFS, MOUNTD and a swag of other ones.  The general 
+procedure is
+
+	1) Work out what service you want to call.
+	2) Work out what version you want to call.
+	3) Work out what sort of connection you want to call (connection
+		oriented, or connectionless).
+
+	4) Contact the portmapper giving those three bits of
+		information.
+	5) The portmapper will respond with the appropriate port for
+		you to connect to.
+
+	6) Do your RPC stuff.
+
+Hence the rpcinfo command talks directly to the 'portmapper' to resolve
+things from one addressing scheme to another.  The flipside of course is
+that for bad people, the portmap gives a *very* convenient directory of
+what RPC servers are running on your machine. 
+
+An aside here, can be when I checked my ISP at one time with a fairly
+benign 'rpcinfo -p &lt;isp_server&gt;', nsfd and mountd turned out to be running
+on that machine.  An equally benign 'showmount -e &lt;isp_server&gt; yeilded
+that the entire '/' directory and below was open *READ* and *WRITE* to
+everybody.  I mounted it, created a test file to confirm the status and
+then ever so quickly emailed the ISP (who I knew the manager) and told him.
+
+The response had some colourful language in it, not directed at me, but 
+directed at how it got configured that way.  Anyway, needless to say
+it was fixed pretty quickly.
+
+Now this gets me onto one final point on this post.
+
+	SECURITY should always be RESTRICTIVE - block everything and
+		only allow things that you do know are fine.  This is
+		a principle, not an instruction.
+
+	To implement this, look at both your machines configuration
+		*AND* your firewall.  
+
+For your machines, turn of all extra services you don't want (through
+inetd.conf, 'netstat -a', and controlling init scripts.
+
+For you firewall, block everything unless you know what it does.
+
+There is also the possibility of locking down your network at each
+machine.  This can be done through 'tcpwrappers' and local input and output
+firewall rules (as opposed to forward rules on a firewall).  portmap
+as defined by a RH 6.0 man page has tcpwrappers compiled in.
+
+Of course security is also a sliding scale, so if understand the
+issues, understand the risks, and understand the possible consequences,
+a mid road can be followed.
+
+But it is *VERY* dangerous to lock down things as they get *HACKED* or
+*PROBED*.  If you know what you are doing, or you are leaving things
+open for a reason, then I guess that is the mid road again.
+
+In reality, nuff said.  Good luck!
+
+Regards,
+
+Matt
+
+-- 
++---[ Matthew Tippett ]-[ Ph:+61 416 006 047 ]-[ Fax:+61 414 000 694 ]---+
++---[ TICons ]-[ <A HREF="mailto:mtippett@ticons.com.au">mtippett@ticons.com.au</A> ]-[ <A HREF="http://www.ticons.com.au/">http://www.ticons.com.au/</A> ]--+
++-----[ Linux and Open Source Development, Consulting and Support ]------+
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

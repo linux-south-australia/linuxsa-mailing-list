@@ -1,0 +1,296 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Help With Mandrake" -->
+<!-- FromName="'Peter Langberg'" -->
+<!-- FromEmail="langberg@senet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 17 Apr 2003 19:54:28 +0930" -->
+<!-- Id="002001c304cb$88f11900$0301a8c0@sg2" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Help With Mandrake</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Peter Langberg &lt;<I><A HREF="mailto:langberg@senet.com.au">langberg@senet.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 17 Apr 2003 19:54:28 +0930
+</PRE>
+<H1>Help With Mandrake</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_001D_01C3051B.27CBCF30
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+I've just recently set-up a Linux gateway using ADSL with Mandrake 9 and =
+am using MRTG to monitor the network usage,
+When I open the page on my server, no graphs show only the title bar =
+with two email addresses on it and the coloured
+writing. I have set the files to run mrtg.conf in the crontab file every =
+10mins and are using a script made by atomic
+(magazine)
+
+
+#!/bin/sh
+#
+# Monthlystats script version 1.1.
+#
+# This is a simple script to tally the input/output totals of a=20
+# network card in megabytes, resetting on monthly boundaries, to
+# be passed onto MRTG for total throughput history graphing.
+#
+# Useful for keeping track of current and past broadband usage to
+# help stay under the ISP's cap.
+#
+# This script takes the card to monitor as argument and returns
+# the current total values. It keeps one non-growing log file in
+# order to build ongoing totals, and another to list completed
+# months. The script has reset protection in that if the server is
+# reset, or the /proc stats reset, it will simply pick up where it
+# left off. Free free to upgade kernels without resetting your stats!
+#
+# Should be used in conjuction with the Atomic MRTG configuration
+# file to graph total throughput statistics over time.
+#
+# Ashton Mills
+# Written for the Atomic Uber-Linux box guide,
+# Issue 21 of Atomic, Oct 2002.
+#
+
+NIC=3D$1
+LOG=3D"/var/log/$NIC-totals.log"
+TOTALS_LOG=3D"/var/log/$NIC-Monthly-Totals.log"
+
+IN_ETH=3D`echo $(cat /proc/net/dev |grep $NIC |cut -d : -f2 |awk '{print =
+$1}') / 1048576 |bc`
+OUT_ETH=3D`echo $(cat /proc/net/dev |grep $NIC |cut -d : -f2 |awk =
+'{print $9}') / 1048576 |bc`
+RESET=3D`date |awk '{print $2}'`=20
+
+if [ -s $LOG ]; then
+      IN_LOG=3D`cat $LOG |awk '{print $1}'`
+      OUT_LOG=3D`cat $LOG |awk '{print $2}'`
+      RESET_IN_LOG=3D`cat $LOG |awk '{print $3}'`
+      RESET_OUT_LOG=3D`cat $LOG |awk '{print $4}'`
+      MONTH_LOG=3D`cat $LOG |awk '{print $5}'`
+else
+      RESET_IN_LOG=3D0; RESET_OUT_LOG=3D0; IN_LOG=3D0
+      MONTH_LOG=3D$RESET
+fi
+
+if [ `expr $IN_ETH + $RESET_IN_LOG` -lt $IN_LOG ]; then      =
+RESET_IN_LOG=3D$IN_LOG; fi
+if [ `expr $OUT_ETH + $RESET_OUT_LOG` -lt $OUT_LOG ]; then =
+RESET_OUT_LOG=3D$OUT_LOG; fi
+     =20
+IN_ETH=3D`expr $IN_ETH + $RESET_IN_LOG`
+OUT_ETH=3D`expr $OUT_ETH + $RESET_OUT_LOG`
+
+echo $IN_ETH
+echo $OUT_ETH
+
+if [ $RESET !=3D $MONTH_LOG ]; then
+      echo "$(date |awk '{print $6}') $MONTH_LOG -- IN: $IN_ETH MBs  =
+OUT: $OUT_ETH MBs" &gt;&gt; $TOTALS_LOG
+      RESET_IN_LOG=3D$RESET_IN_LOG - $IN_ETH
+      RESET_OUT_LOG=3D$RESET_OUT_LOG - $OUT_ETH
+      IN_ETH=3D"0"
+      OUT_ETH=3D"0"
+fi
+
+echo $IN_ETH $OUT_ETH $RESET_IN_LOG $RESET_OUT_LOG $RESET &gt; $LOG
+
+
+Sorry if its long,
+
+I'm using MRTG - mrtg-2.9.22-1mdk.i586.rpm
+
+and it is all installed in /var/www/html/mrtg and running on the apache =
+websever, but no graphs show, I know that there is defiantly traffic =
+going through,
+
+your help is greatly appreciated
+
+Ben Langberg
+
+
+------=_NextPart_000_001D_01C3051B.27CBCF30
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"&gt;
+&lt;HTML&gt;&lt;HEAD&gt;
+&lt;META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1"&gt;
+&lt;META content=3D"MSHTML 6.00.2800.1141" name=3DGENERATOR&gt;
+&lt;STYLE&gt;&lt;/STYLE&gt;
+&lt;/HEAD&gt;
+&lt;BODY bgColor=3D#ffffff&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;Hi,&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;I've just recently set-up a Linux =
+gateway using=20
+ADSL with Mandrake 9&nbsp;and am using MRTG to monitor the network=20
+usage,&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;When I open the page on my server, no =
+graphs show=20
+only the title bar with&nbsp;two email addresses&nbsp;on it and the=20
+coloured&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;writing. I have set the files to run =
+mrtg.conf in=20
+the crontab file every 10mins and are using a script made by =
+atomic&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;(magazine)&lt;/FONT&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;&lt;/FONT&gt;&nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;FONT face=3DArial size=3D2&gt;&lt;/FONT&gt;&nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;
+&lt;P class=3DMsoPlainText style=3D"MARGIN: 0cm 0cm 0pt"&gt;&lt;SPAN=20
+style=3D"mso-fareast-font-family: 'MS Mincho'"&gt;&lt;FONT face=3D"Courier =
+New"=20
+size=3D2&gt;#!/bin/sh&lt;BR&gt;#&lt;BR&gt;# Monthlystats script version 1.1.&lt;BR&gt;#&lt;BR&gt;# =
+This is a=20
+simple script to tally the input/output totals of a &lt;BR&gt;# network card =
+in=20
+megabytes, resetting on monthly boundaries, to&lt;BR&gt;# be passed onto MRTG =
+for=20
+total throughput history graphing.&lt;BR&gt;#&lt;BR&gt;# Useful for keeping track of =
+current=20
+and past broadband usage to&lt;BR&gt;# help stay under the ISP's =
+cap.&lt;BR&gt;#&lt;BR&gt;# This=20
+script takes the card to monitor as argument and returns&lt;BR&gt;# the =
+current total=20
+values. It keeps one non-growing log file in&lt;BR&gt;# order to build ongoing =
+totals,=20
+and another to list completed&lt;BR&gt;# months. The script has reset =
+protection in=20
+that if the server is&lt;BR&gt;# reset, or the /proc stats reset, it will =
+simply pick=20
+up where it&lt;BR&gt;# left off. Free free to upgade kernels without resetting =
+your=20
+stats!&lt;BR&gt;#&lt;BR&gt;# Should be used in conjuction with the Atomic MRTG=20
+configuration&lt;BR&gt;# file to graph total throughput statistics over=20
+time.&lt;BR&gt;#&lt;BR&gt;# Ashton Mills&lt;BR&gt;# Written for the Atomic Uber-Linux box=20
+guide,&lt;BR&gt;# Issue 21 of Atomic, Oct=20
+2002.&lt;BR&gt;#&lt;BR&gt;&lt;BR&gt;NIC=3D$1&lt;BR&gt;LOG=3D"/var/log/$NIC-totals.log"&lt;BR&gt;TOTALS_=
+LOG=3D"/var/log/$NIC-Monthly-Totals.log"&lt;BR&gt;&lt;BR&gt;IN_ETH=3D`echo=20
+$(cat /proc/net/dev |grep $NIC |cut -d : -f2 |awk '{print $1}') / =
+1048576=20
+|bc`&lt;BR&gt;OUT_ETH=3D`echo $(cat /proc/net/dev |grep $NIC |cut -d : -f2 =
+|awk '{print=20
+$9}') / 1048576 |bc`&lt;BR&gt;RESET=3D`date |awk '{print $2}'` &lt;BR&gt;&lt;BR&gt;if [ -s =
+$LOG ];=20
+then&lt;BR&gt;&lt;SPAN style=3D"mso-tab-count: 1"&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
+&lt;/SPAN&gt;IN_LOG=3D`cat $LOG |awk '{print $1}'`&lt;BR&gt;&lt;SPAN=20
+style=3D"mso-tab-count: 1"&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+&lt;/SPAN&gt;OUT_LOG=3D`cat $LOG=20
+|awk '{print $2}'`&lt;BR&gt;&lt;SPAN=20
+style=3D"mso-tab-count: 1"&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+&lt;/SPAN&gt;RESET_IN_LOG=3D`cat=20
+$LOG |awk '{print $3}'`&lt;BR&gt;&lt;SPAN=20
+style=3D"mso-tab-count: 1"&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
+&lt;/SPAN&gt;RESET_OUT_LOG=3D`cat $LOG |awk '{print $4}'`&lt;BR&gt;&lt;SPAN=20
+style=3D"mso-tab-count: 1"&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+&lt;/SPAN&gt;MONTH_LOG=3D`cat=20
+$LOG |awk '{print $5}'`&lt;BR&gt;else&lt;BR&gt;&lt;SPAN=20
+style=3D"mso-tab-count: 1"&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+&lt;/SPAN&gt;RESET_IN_LOG=3D0;=20
+RESET_OUT_LOG=3D0; IN_LOG=3D0&lt;BR&gt;&lt;SPAN=20
+style=3D"mso-tab-count: 1"&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
+&lt;/SPAN&gt;MONTH_LOG=3D$RESET&lt;BR&gt;fi&lt;BR&gt;&lt;BR&gt;if [ `expr $IN_ETH + =
+$RESET_IN_LOG` -lt=20
+$IN_LOG ]; then&lt;SPAN style=3D"mso-tab-count: =
+1"&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
+&lt;/SPAN&gt;RESET_IN_LOG=3D$IN_LOG; fi&lt;BR&gt;if [ `expr $OUT_ETH + =
+$RESET_OUT_LOG` -lt=20
+$OUT_LOG ]; then RESET_OUT_LOG=3D$OUT_LOG; fi&lt;BR&gt;&lt;SPAN=20
+style=3D"mso-tab-count: 1"&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+&lt;/SPAN&gt;&lt;BR&gt;IN_ETH=3D`expr=20
+$IN_ETH + $RESET_IN_LOG`&lt;BR&gt;OUT_ETH=3D`expr $OUT_ETH + =
+$RESET_OUT_LOG`&lt;BR&gt;&lt;BR&gt;echo=20
+$IN_ETH&lt;BR&gt;echo $OUT_ETH&lt;BR&gt;&lt;BR&gt;if [ $RESET !=3D $MONTH_LOG ]; =
+then&lt;BR&gt;&lt;SPAN=20
+style=3D"mso-tab-count: 1"&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/SPAN&gt;echo =
+"$(date |awk=20
+'{print $6}') $MONTH_LOG -- IN: $IN_ETH MBs&lt;SPAN=20
+style=3D"mso-spacerun: yes"&gt;&nbsp; &lt;/SPAN&gt;OUT: $OUT_ETH MBs" &gt;&gt;=20
+$TOTALS_LOG&lt;BR&gt;&lt;SPAN style=3D"mso-tab-count: =
+1"&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
+&lt;/SPAN&gt;RESET_IN_LOG=3D$RESET_IN_LOG - $IN_ETH&lt;BR&gt;&lt;SPAN=20
+style=3D"mso-tab-count: 1"&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
+&lt;/SPAN&gt;RESET_OUT_LOG=3D$RESET_OUT_LOG - $OUT_ETH&lt;BR&gt;&lt;SPAN=20
+style=3D"mso-tab-count: 1"&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
+&lt;/SPAN&gt;IN_ETH=3D"0"&lt;BR&gt;&lt;SPAN=20
+style=3D"mso-tab-count: 1"&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=20
+&lt;/SPAN&gt;OUT_ETH=3D"0"&lt;BR&gt;fi&lt;BR&gt;&lt;BR&gt;echo $IN_ETH $OUT_ETH $RESET_IN_LOG=20
+$RESET_OUT_LOG $RESET &gt; $LOG&lt;/FONT&gt;&lt;/SPAN&gt;&lt;/P&gt;&lt;SPAN=20
+style=3D"mso-fareast-font-family: 'MS Mincho'"&gt;&lt;FONT face=3D"Courier =
+New"=20
+size=3D2&gt;&lt;/FONT&gt;&lt;/SPAN&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;SPAN style=3D"mso-fareast-font-family: 'MS Mincho'"&gt;&lt;FONT =
+face=3D"Courier New"=20
+size=3D2&gt;&lt;/FONT&gt;&lt;FONT face=3DArial size=3D2&gt;&lt;/FONT&gt;&lt;/SPAN&gt;&nbsp;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;SPAN style=3D"mso-fareast-font-family: 'MS Mincho'"&gt;&lt;FONT =
+face=3DArial=20
+size=3D2&gt;Sorry if its long,&lt;/FONT&gt;&lt;/SPAN&gt;&lt;/DIV&gt;
+&lt;DIV&gt;&lt;SPAN style=3D"mso-fareast-font-family: 'MS Mincho'"&gt;&lt;FONT =
+face=3DArial=20
+size=3D2&gt;&lt;/FONT&gt;&nbsp;&lt;/DIV&gt;
+&lt;P class=3DMsoPlainText style=3D"MARGIN: 0cm 0cm 0pt"&gt;&lt;FONT face=3DArial =
+size=3D2&gt;I'm=20
+using MRTG - mrtg-2.9.22-1mdk.i586.rpm&lt;/FONT&gt;&lt;/P&gt;
+&lt;P class=3DMsoPlainText style=3D"MARGIN: 0cm 0cm 0pt"&gt;&lt;FONT face=3DArial =
+size=3D2&gt;and it=20
+is all installed in /var/www/html/mrtg and running on the apache =
+websever, but=20
+no graphs show, I know that there is defiantly traffic going =
+through,&lt;/FONT&gt;&lt;/P&gt;
+&lt;P class=3DMsoPlainText style=3D"MARGIN: 0cm 0cm 0pt"&gt;&lt;FONT face=3DArial =
+size=3D2&gt;your=20
+help is greatly appreciated&lt;/FONT&gt;&lt;/P&gt;
+&lt;P class=3DMsoPlainText style=3D"MARGIN: 0cm 0cm 0pt"&gt;&lt;FONT face=3DArial =
+size=3D2&gt;Ben=20
+Langberg&lt;/FONT&gt;&lt;BR&gt;&lt;/P&gt;&lt;/SPAN&gt;&lt;/FONT&gt;&lt;/DIV&gt;&lt;/FONT&gt;&lt;/DIV&gt;&lt;/BODY&gt;&lt;/HTML&gt;
+
+------=_NextPart_000_001D_01C3051B.27CBCF30--
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

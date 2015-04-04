@@ -1,0 +1,153 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="routing" -->
+<!-- FromName="Daryl Pilkington" -->
+<!-- FromEmail="darylp@senet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 09 Oct 2000 05:30:08 +1100" -->
+<!-- Id="39E0BD2F.B6FA1F75@senet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: routing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Pilkington &lt;<I><A HREF="mailto:darylp@senet.com.au">darylp@senet.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 09 Oct 2000 05:30:08 +1100
+</PRE>
+<H1>routing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Greetings from Post Olympic Sydney, &lt;sigh&gt;.
+
+I've got a multi-homed OS/2 box that, (among other things), I want to
+use as a router.
+The stack is essentially ported from AIX, which is very BSDish.
+
+There is one physical LAN, running from a dumb 10MB hub, so there is 1
+collision domain.
+
+I'm throwing the question this way as none of my US OS/2 folks seem to
+know enough about routing to answer my questions, (!). One suggested I
+buy a hardware router, another wanted to explain to me what a router
+is...
+
+I can ping hosts from one net to the other, but I can't run telnet
+through the router.
+I suspect a particular packet type required by telnet isn't being
+routed, but wading through screens of iptrace, not knowing what I'm
+looking for didn't appeal, &lt;grin&gt;.
+
+Do I need NICs that can be forced into promiscuous mode?
+The NICs are 3Com 3c509b.
+Do I need to run routed on the router?
+
+ host #1                 router                host #2
+10.2.1.35              10.2.1.250           192.168.1.100
+                      192.168.1.250
+
+                             Ping?
+10.2.1.35 -&gt; 10.2.1.250        Y
+10.2.1.35 -&gt; 192.168.1.250     Y
+10.2.1.35 -&gt; 192.168.1.100     Y
+
+                            Telnet?
+10.2.1.35 -&gt; 10.2.1.250        Y
+10.2.1.35 -&gt; 192.168.1.250     N
+10.2.1.35 -&gt; 192.168.1.100     N
+
+
+HOST #1
+\mptn\bin\setup.cmd
+route -fh
+arp -f
+inetcfg -s synattack 1
+inetcfg -s keepalive 60
+inetcfg -s multidefrt 0
+ifconfig lo 127.0.0.1
+ifconfig lan0 10.2.1.35 netmask 255.255.255.0 mtu 1500
+route add -net 192.168.1.0 10.2.1.250 -netmask 255.255.255.0
+route add default 10.2.1.1
+ipgate off
+
+netstat -r
+destination router        netmask         metric flags intrf
+
+default     10.2.1.1      0.0.0.0         0      UGSP   lan0
+10.2.1      10.2.1.35     255.255.255.0   0      UC     lan0
+127.0.0.1   127.0.0.1     255.255.255.255 0      UH     lo
+192.168.1   10.2.1.250    255.255.255.0   0      UGSP   lan0
+
+ROUTER
+\mptn\bin\setup.cmd
+route -fh
+arp -f
+inetcfg -s synattack 1
+inetcfg -s keepalive 60
+inetcfg -s multidefrt 1
+ifconfig lo 127.0.0.1
+ifconfig lan0 10.2.1.250 netmask 255.255.255.0 mtu 1500
+route add default 10.2.1.250
+ifconfig lan1 192.168.1.250 netmask 255.255.255.0 mtu 1500
+route add default 192.168.1.250
+ipgate on
+
+netstat -r
+destination   router        netmask         metric flags intrf
+
+default       10.2.1.250    0.0.0.0         0      UCSP  lan0
+default       192.168.1.250 0.0.0.0         0      UCSP  lan1
+10.2.1        10.2.1.250    255.255.255.0   0      UC    lan0
+127.0.0.1     127.0.0.1     255.255.255.255 0      UH    lo
+192.168.1.250 192.168.1.250 255.255.255.0   0      UC    lan1
+
+I know there is some smart network people out there, any ideas?
+
+Regards, 
+
+Daryl  Pilkington 
+
+//// The PC Therapist, Business Computing Integration
+O&lt;O  AUSTRALIA
+\_/
+&lt;O&gt;  OS/2 Warp, Redhat Linux, DB2
+     IBM Certified Systems Expert
+
+        email: <A HREF="mailto:darylp@pc-therapist.com.au">darylp@pc-therapist.com.au</A>
+          ICQ: 91914134
+          Tel: +61-414-327-957
+Fax/Voicemail: +61-416-991-462
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

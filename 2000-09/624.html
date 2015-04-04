@@ -1,0 +1,144 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="SSH woes with old RedHat" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 14 Sep 2000 04:29:26 +0930" -->
+<!-- Id="20000914042926.A5784@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: SSH woes with old RedHat</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 14 Sep 2000 04:29:26 +0930
+</PRE>
+<H1>SSH woes with old RedHat</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Heap big trouble with SSH installation!
+
+Following numerous admonitions to remove all .rhosts files and
+use ssh instead, I allowed myself 30-60 minutes to install the
+latest SSH on my last machine with no SSH. Machine number 6.
+It did not go as well as expected!
+Here are some notes...
+I hope this doesn't pre-empt anything that Geoffrey is going to say.
+
+1.	First the standard OpenSSH is for BSD.
+	So I had to go fetch the portable version of SSH.
+
+2.	The correct portable source for linux went through the
+	./configure process,a nd got stuck because of lack of
+	the OpenSSL software.
+
+3.	So I fetched the OpenSSL software - a big bunch of software,
+	and installed it. No big problem.
+	And then I went back to the OpenSSH.
+	And that compiled fine. And it installed fine.
+	But....
+
+4.	When I tried to log in to the spanking new machine 
+	(the infamous and much maligned "rat"), it failed.
+	Hmmm. Look at the logs. Logs say that my account is 
+	expired. Too bad I just ran "pwconv" to get rid of all
+	the passwords in /etc/password to hide them in the
+	/etc/shadow file. 
+
+5.	I found a neat little tool "chage" to edit the /etc/shadow
+	file. It turns out that "chage" for old RedHat 5.2
+	has a Y2K bug. AT last, I found one!
+	(Try using RH 5.2 "chage" to set a year-2000 date...)
+	
+6.	No amount of manual editing of /etc/shadow fixed up the
+	PAM access problem. I reckon maybe even PAM is having
+	a Y2K problem. But that's pure conjecture.
+
+7.	So I recompiled OpenSSH with the --wihtout-pam option,
+	and after it failed and I ran "make clean",
+	the whole thing works!
+
+8.	Of course, "sshd" must then be put in /etc/rc.d/rc.local.
+
+9.	As a final blow, it turns out that my old RH 5.2 machine
+	with kernel 2.0.36 just happens to use TCP client ports
+	below 1024. Grrrrrr!
+	So now I have to change my firewall for this ancient machine.
+	Hmmm. Something screwy going on here. 
+	This is what /usr/include/netinet/in.h says:
+	-------------------------------------------
+        /* Ports less than this value are reserved for privileged processes. */
+        IPPORT_RESERVED = 1024,
+	-------------------------------------------
+
+Question:
+Does anyone know why "ssh" would be using ports around about 750-780
+to communicate with a remote sshd process?
+Surely this should be impossible.
+Maybe installing RH 5.2 over the top of RH 4.2 was not such a bright idea....
+[Rat by name. Rat by nature.]
+Here's a sample firewall line:
+
+Sep 14 04:10:42 dog kernel: IP fw-in deny ppp0 TCP 203.48.2.226:22 203.38.148.50:755 L=44 S=0x00 I=0 F=0x0040 T=61
+
+This took a mere 4 hours of playing around.
+Admittedly I did have some toast and tea during this time,
+but keeping out the pesky mongrel hackers is a
+time-consuming task, that's for sure.
+
+Moral of story:
+If you want to put OpenSSH on an old RH 5.2 machine,
+use the --without-pam option for ./configure.
+
+Cheers,
+Alan Kennington.
+
+PS.  My experiments with "ssh" and multiple sequences/trees of
+logins in conjunction with ssh-agent and ssh-add (and "ssh-add -d")
+have shown me that "ssh" is a truly amazing work.
+I hope that Geoffrey can bring out the full potential for
+excitement that "ssh" offers today's linux user.
+Tracking down all those SSH env variables and unix sockets
+is a task which rewards study.
+
+PPS. Life was much better before computers anyway.
+We were so much happier with typewriters, carbon paper [that's
+where Cc: comes from!], long division by hand, log books,
+slide rules, mental arithmetic, hand-written letters,
+pounds, shillings and pence, ....
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

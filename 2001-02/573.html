@@ -1,0 +1,136 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Routed I Think?" -->
+<!-- FromName="'Jake Hawkes'" -->
+<!-- FromEmail="jake@infinitylimited.net" -->
+<!-- ToName="'David Lloyd'" -->
+<!-- ToEmail="lloy0076@rebel.net.au" -->
+<!-- Date="Fri, 16 Feb 2001 02:07:17 +0000" -->
+<!-- Id="3A8C8B55.9295EE09@infinitylimited.net" -->
+<!-- Reference="001101c0abb2$8d78b380$0201a8c0@home.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Routed I Think?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  Date: Fri, 16 Feb 2001 02:07:17 +0000
+</PRE>
+<H1>Re: Routed I Think?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+David Lloyd wrote:
+&gt; 
+&gt; Mick!
+&gt; 
+&gt; &gt; Hello Group. I am experiencing problems with routed.
+&gt; 
+&gt; From what I glean below you're not running routed but you do have a
+&gt; routing problem. 
+
+right and wrong. Not a routing problem, an interface configuration
+problem. see below.
+
+
+&gt; &gt; Feb 13 21:27:29 graphite network: Bringing up interface lo succeeded
+&gt; &gt; Feb 13 21:27:30 graphite ifup: route: netmask doesn't match route address
+
+bingo! this is the root of your problems. The rest is a help message
+from the route command
+
+&gt; &gt; Feb 13 21:27:30 graphite ifup: Usage: route [-nNvee] [-FC] [&lt;AF&gt;]
+&gt; &gt; List
+&gt; &gt;  kernel routing tables
+&gt; &gt; Feb 13 21:27:30 graphite ifup:        route [-v] [-FC] {add|del|flush} ...
+
+&gt; hmmm, do a search for
+&gt; documentation on TCP/IP and routing.
+
+There's a pearl of advice
+
+&gt; &gt; Now I cant find anything that would be the problem apart from during the
+&gt; &gt; setup I setup the static ip on the linux machine
+&gt; &gt;
+&gt; &gt; IP : 192.168.1.1
+&gt; &gt; Netmask : 255.255.255.255
+&gt; &gt; Nameserver : 127.0.0.1
+&gt; 
+&gt; Shouldn't IP be IPADDR? Check that FIRST.
+
+well, I would check FIRST your netmask. It looks wrong. I think you want
+255.255.255.0
+
+
+&gt; &gt; Feb 13 21:28:34 graphite linuxconf:     Executing: /sbin/route add -net
+&gt; &gt; 255.255.255.255 netmask 255.255.255.255 dev eth0
+&gt; 
+&gt; That is an error. Big time. That says "broadcast to all umpteen million
+&gt; internet addresses". I'm sure we all love you but not _that_ much...look
+&gt; in /etc/sysconfig/network-scripts/ifcfg-eth0 or such.
+
+uh, only if his eth0 is connected to the internet, and with an ip of
+192.168.x.x, unless there was some big ipv4 oberhaul, there isn't going
+to be a problem.
+
+Generally, you set up your ethernet on a class C.
+
+IP: 192.168.1.x
+MASK: 255.255.255.0
+broadcast: 192.168.1.255
+netowrk: 192.168.1.0
+
+(generally, these days you do not need to supply the last two arguments,
+the tools can figure it out)
+
+
+and then, when it comes to the internet, you need to worry about default
+gateways, and extra interfaces and stuff ( you haven't mentioned how
+this is setup for you)
+
+Also, it looks as if linuxconf (shudder) is trying to get a DHCP address
+for you. If you are on a network with a DHCP server, this is good. If
+not tell linuxconf not to use DHCP or BOOTP.
+
+good luck,
+Jake
+
+
+--
+Jake Hawkes B.Eng, (CSE)
+
+LSD: melts in your mind, not in your hand.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

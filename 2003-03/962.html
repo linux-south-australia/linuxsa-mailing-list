@@ -1,0 +1,113 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="traceroute & iptables" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 19 Mar 2003 16:37:53 +1030" -->
+<!-- Id="20030319060753.GA24409@yellowgoanna.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: traceroute & iptables</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 19 Mar 2003 16:37:53 +1030
+</PRE>
+<H1>traceroute & iptables</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all...
+
+I just noticed something interesting why doing a traceroute to my server
+from elsewhere -- my server seems to be invisible to a traceroute...
+
+
+----
+[<A HREF="mailto:me@elsewhere">me@elsewhere</A>]$ /usr/sbin/traceroute www.myserver.com
+traceroute to www.myserver.com (X.X.X.X), 30 hops max, 38
+byte packets
+ 1  &lt;node&gt; (X.X.X.X)  1.651 ms  2.177 ms  1.623 ms
+ 2  &lt;node&gt; (X.X.X.X)  19.040 ms  20.852 ms  26.716 ms
+ 3  &lt;node&gt; (X.X.X.X)  19.192 ms
+    &lt;node&gt; (X.X.X.X)  27.915 ms
+    &lt;node&gt; (X.X.X.X)  16.689 ms
+ 4  &lt;node&gt; (X.X.X.X)  40.361 ms
+    &lt;node&gt; (X.X.X.X)  29.181 ms
+    &lt;node&gt; (X.X.X.X)  74.465 ms
+ 5  &lt;node&gt; (X.X.X.X)  58.129 ms 64.761 ms  61.320 ms
+ 6  &lt;node&gt; (X.X.X.X)  72.998 ms  24.561 ms  88.978 ms
+ 7  * * *
+ 8  * * *
+----
+
+I should be at position number 7 there... (the variances at positions 3
+and 4 are due to dynamic routing somewhere -- the IP addresses actually
+differ...)
+
+
+So, I did a tcpdump on my server while doing the traceroute:
+
+----
+<A HREF="mailto:me@myserver">me@myserver</A>:~$ sudo tcpdump  -i eth0 port \! 22 and host elsewhere.com
+tcpdump: listening on eth0
+16:30:50.163159 elsewhere.com.2069 &gt; myserver.com.33453:  udp 10 [ttl 1]
+16:30:55.146143 elsewhere.com.2069 &gt; myserver.com.33454:  udp 10 [ttl 1]
+16:31:00.191114 elsewhere.com.2069 &gt; myserver.com.33455:  udp 10 [ttl 1]
+16:31:05.222104 elsewhere.com.2069 &gt; myserver.com.33456:  udp 10
+16:31:10.165139 elsewhere.com.2069 &gt; myserver.com.33457:  udp 10
+16:31:15.146214 elsewhere.com.2069 &gt; myserver.com.33458:  udp 10
+16:31:20.153224 elsewhere.com.2069 &gt; myserver.com.33459:  udp 10
+
+9 packets received by filter
+0 packets dropped by kernel
+<A HREF="mailto:me@myserver">me@myserver</A>:~$
+----
+
+OK, what are these packets supposed to be? UDP packets to high ports?
+Surely it would make more sense to use something like ICMP (and yes, I'm
+aware of the -I option, which makes the traceroute work as expected),
+seeing as this is the kind of thing it's designed for...
+
+Anyway, It turns out that I've filtered these packets using iptables.
+However, I'm not convinced that I want to allow just any high-ported UDP
+packet in... What do other people do?
+
+rr
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

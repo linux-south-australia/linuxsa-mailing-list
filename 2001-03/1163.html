@@ -1,0 +1,84 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Files and redirection" -->
+<!-- FromName="'David Newall'" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="richardrussell@mail.com" -->
+<!-- Date="Wed, 28 Mar 2001 21:42:35 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0103282122150.1694-100000@smart-panel.tellurian.com.au" -->
+<!-- Reference="HKEMJGGDNENEDGGDCJBBOEPHCEAA.richard.russell@bigpond.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Files and redirection</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:richardrussell@mail.com">richardrussell@mail.com</A></I>&gt;
+  Date: Wed, 28 Mar 2001 21:42:35 +0930 (CST)
+</PRE>
+<H1>RE: Files and redirection</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Richard Russell &lt;<A HREF="mailto:richard.russell@bigpond.com">richard.russell@bigpond.com</A>&gt; wrote:
+&gt; If it opens the file fast enough, it will get it before the shell
+&gt; clobbers it.
+
+No, that's wrong.  There really is no race.  Whether you type:
+
+  cat file | grep -v pattern &gt; file
+
+or the more efficient:
+
+  grep -v pattern file &gt; file
+
+makes no difference.  Either is obviously wrong.  In the second case the
+shell will truncate the output file before it even starts running grep,
+so grep will always process an empty file.  In the first case it's up
+to the shell whether it starts grep before or after starting cat.  If it
+starts grep first (most unixes do) the file will be truncated before cat
+ever starts running, and the output file will always be empty.  If it
+starts cat first (Richard implies that his shell does this) there is a
+minor race, which ultimately cat cannot win.
+
+If the shell starts cat first then cat will immediately read a little
+bit from the file.  Very shortly after that the shell will truncate the
+file and starting grep.  The little bit that cat read from the file will
+be processed by grep, but only that little bit.  By that time the file
+will be empty and cat will have nothing else to read.  The rest of the
+data is guaranteed to be lost.  You might end up with about 8K of data
+(a common buffer size) being processed by grep, but no more than that.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

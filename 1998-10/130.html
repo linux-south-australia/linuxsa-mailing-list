@@ -1,0 +1,131 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Compiling as a.out instead of elf !" -->
+<!-- FromName="Stephen Baxter" -->
+<!-- FromEmail="steve@senet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 16 Oct 1998 11:19:13 +0930 (CST)" -->
+<!-- Id="Pine.LNX.3.96.981016111247.17156B-100000@quasar.senet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Compiling as a.out instead of elf !</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Stephen Baxter &lt;<I><A HREF="mailto:steve@senet.com.au">steve@senet.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Fri, 16 Oct 1998 11:19:13 +0930 (CST)
+</PRE>
+<H1>Compiling as a.out instead of elf !</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Does anybody know how to compile an application as a.out instead of ELF ?
+
+I have an application here that has a few bits to it, one of the bits is
+binary only and seems to complied as a.out, I think this because an nm of
+the library gives :
+
+__libisode.o:
+00002000 a __GOT_SIZE
+63d080fc A __GOT__Byteno
+63d080c4 A __GOT__Ecp
+63d08108 A __GOT__Fqb
+63d08104 A __GOT__Hqb
+63d080bc A __GOT__Len
+63d0846c A __GOT__NUMLINES
+63d08090 A __GOT__NullParm
+63d0823c A __GOT__NumEntries
+63d08264 A __GOT__NumMacro
+63d08258 A __GOT__OIDTable
+63d08464 A __GOT__PIC_LINESIZE
+63d080b4 A __GOT__PY_pepy
+63d0810c A __GOT__Qb
+63d08100 A __GOT__Qbrefs
+63d080c0 A __GOT__Qcp
+...
+...
+
+
+The other part of my app I am trying to compilegoes really well until
+it gets to the linking stage (I think) :
+
+quasar:/usr/local/src/hnms2# make
+cd /usr/local/src/hnms2/hnmsd; \
+                gcc -b i486-linuxaout -L/usr/X11R6/lib -L
+/usr/local/isode-8.0/lib -L /usr/local/src/hnms2/bin/i486 -o
+/usr/local/src/hnms2/bin/i486/hnmsd /usr/local/src/hnms2/bin/i486/hnmsd.o
+/usr/local/src/hnms2/bin/i486/server.o /usr/local/src/hnms2/bin/i486/io.o
+/usr/local/src/hnms2/bin/i486/rbip.o /usr/local/src/hnms2/bin/i486/sync.o
+/usr/local/src/hnms2/bin/i486/icmp.o /usr/local/src/hnms2/bin/i486/snmp.o
+/usr/local/src/hnms2/bin/i486/ll2.o
+/usr/local/src/hnms2/bin/i486/SNMP-types.o -lhnms -lisode -lXm -lXpm -lICE -lSM -lXt -lX11 -lm -lc
+/usr/local/src/hnms2/bin/i486/sync.o: In function `SYNC_read_objs':
+/usr/local/src/hnms2/hnmsd/sync.c:94: undefined reference to `oid_cmp'
+/usr/local/src/hnms2/hnmsd/sync.c:94: undefined reference to `oid_cmp'
+/usr/local/src/hnms2/hnmsd/sync.c:94: undefined reference to `oid_cmp'
+/usr/local/src/hnms2/hnmsd/sync.c:94: undefined reference to `oid_cmp'
+/usr/local/src/hnms2/hnmsd/sync.c:94: undefined reference to `oid_cmp'
+/usr/local/src/hnms2/bin/i486/sync.o:/usr/local/src/hnms2/hnmsd/sync.c:94:
+more undefined references to `oid_cmp' follow
+/usr/local/src/hnms2/bin/i486/sync.o: In function `SYNC_read_objs':
+/usr/local/src/hnms2/hnmsd/sync.c:121: undefined reference to `num2prim'
+/usr/local/src/hnms2/hnmsd/sync.c:128: undefined reference to `str2prim'
+/usr/local/src/hnms2/hnmsd/sync.c:136: undefined reference to `pe_free'
+/usr/local/src/hnms2/bin/i486/sync.o: In function `SYNC_write_var':
+/usr/local/src/hnms2/hnmsd/sync.c:163: undefined reference to `oid_cmp'
+
+
+As the function (for example) oid_cmp does exist in the suspected a.out
+version library :
+
+63d00cc0 A __PLT__oid_cmp
+63d00cc0 A _oid_cmp
+
+I am assuming that I have an a.out/ELF compatibility thing happening.
+
+Can anybody offer some advice here ?
+
+The library I have in a.out (ISO DEV) refuses to compile at all on many
+boxes tried so far and the docs included with it lead me to beleive that
+trying to get it do so may be wishfull thunking !
+
+
+
+
+------------------------------------------------------------------
+Stephen Baxter             SE Network Access/Big Networks Australia
+phone : +61 8 8221 5221    222 Grote Street 
+fax   : +61 8 8221 5220    Adelaide 5000, Australia
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

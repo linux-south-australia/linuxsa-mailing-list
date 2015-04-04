@@ -1,0 +1,111 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="trouble with dynamic allocation and freeing" -->
+<!-- FromName="Upendra Sharma (98307608)" -->
+<!-- FromEmail="upendra@ee.iitb.ernet.in" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 20 Jun 2000 08:32:12 +0530 (IST)" -->
+<!-- Id="Pine.GSO.3.96.1000620083144.1483D-100000@bhairav.ee.iitb.ernet.in" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: trouble with dynamic allocation and freeing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Upendra Sharma (98307608) &lt;<I><A HREF="mailto:upendra@ee.iitb.ernet.in">upendra@ee.iitb.ernet.in</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Tue, 20 Jun 2000 08:32:12 +0530 (IST)
+</PRE>
+<H1>trouble with dynamic allocation and freeing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+hi all,
+I've a small but really disturbing problem with these functions called
+float ***AllocClustStats(int,int,int,int);
+void FreeClustStats(void ***,int,int,int);
+
+when these functions are called in a small program they work without any
+trouble while if they are called in a big program where there is 
+a lot of dynamic memory allocation, besides this, it starts giving
+trouble. The FreeClustStats() routine dumps a core even though the 
+memory which I'm trying to free has been allocated using this function
+AllocClustStats().
+Can any-body suggest an off-shelf solution for this problem??
+
+I put the definitions of these functions down here and I'm using the
+following version of gcc
+gcc version egcs-2.91.66 19990314/Linux (egcs-1.1.2 release)
+
+/* --------------------------------------------------------------*/
+float *** AllocClustStats(int k,int vect_len,
+	int order,int type_size)
+{
+  float ***tmp;
+  int i1,i2,i3;
+  int l;
+  if((tmp=(float ***)calloc(k,sizeof(float **)))==NULL){
+    fprintf(stderr,"Fatal Error in AllocClustStats()\n");
+    return NULL;
+  }
+  for(i1=0;i1&lt;k;i1++){
+    if((tmp[i1]=(float **)calloc(order,sizeof(float *)))==NULL){
+      fprintf(stderr,"Fatal Error in AllocClustStats()\n");
+      return NULL;
+    }
+    for(i2=0;i2&lt;order;i2++){
+      l=(int )ceil(pow(vect_len,i2+1));
+      if((tmp[i1][i2]=(float *)calloc(l,type_size))==NULL){
+	fprintf(stderr,"Fatal Error in AllocClustStats()\n");
+	return NULL;
+      }
+    }
+  }
+  return (float ***)tmp;
+}
+/*---------------------------------------------------------------*/
+
+void FreeClustStats(void ***array,int k,int vect_len,int order)
+{
+  int i1,i2,i3;
+  for(i1=0;i1&lt;k;i1++){
+    for(i2=0;i2&lt;order;i2++)
+      free(array[i1][i2]);/* this is where coreis dumped i.e.
+i1=0,i2=0*/
+    free(array[i1]);
+  }
+}
+
+/*--------------------------------------------------------------*/
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

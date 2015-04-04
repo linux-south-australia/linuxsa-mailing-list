@@ -1,0 +1,140 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Wierd Magic with Masquerading" -->
+<!-- FromName="'Andrew Reid'" -->
+<!-- FromEmail="andrew.reid@plug.cx" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="22 Apr 2001 16:41:07 +0930" -->
+<!-- Id="987923469.5922.2.camel@percible.plug.cx" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Wierd Magic with Masquerading</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Reid &lt;<I><A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 22 Apr 2001 16:41:07 +0930
+</PRE>
+<H1>Wierd Magic with Masquerading</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hey All,
+
+I've got an interesting problem with the way our DMZ works. It's not
+been an issue until recently, so I'm keen to get it solved as soon as
+possible.
+
+We have approximately 60 (live) IP Addresses which we use for various
+hosting applications.
+
+One of those IP Addresses is assigned to the router/firewall (the main
+address for the internet-facing ethernet card) and all the others are
+aliased on this card.
+
+Our servers which sit behind the firewall in a private server network
+(DMZ) have private addresses (for the sake of the question, we'll say
+192.168.10.0)
+
+Lets take the mail server (192.168.10.3). It runs the MTA and POP/IMAP
+servers. The firewall runs rinetd which forwards the IP that reverse
+maps to mail.mydomain.com.
+
+Maybe this makes it a little clearer:
+
+Internet                                            DMZ
+                                      \
+           +------------------+       /   +---------------------+
+           |     Firewall     |       \   |     Mail Server     |
+           | 203.x.x.1:25  -----------------&gt; 192.168.10.3:25   |
+           | 203.x.x.1:110 -----------------&gt; 192.168.10.3:110  |
+           | 203.x.x.1:143 -----------------&gt; 192.168.10.3:143  |
+           | 203.x.x.1:22  -----------------&gt; 192.168.10.3:22   |
+&lt;----------- 203.x.x.2        |       /   |                     |
+           |                  |       \   |                     |
+           +------------------+       /   +---------------------+
+
+Now, connections to the Mail server va 203.x.x.1:(25|110|143|22) work in
+the mannar in which I want them  to. Connections out, however don't work
+the same way.
+
+When someone connects to 203.x.x.1:110 and do a reverse lookup of it, it
+returns mail.mydomain.com. When the Mail server connects out to the
+Internet to deliver mail, it connects with the IP of 203.x.x.2 which
+resolves to firewall.mydomain.com.
+
+Can you see my problem? Connections to the outside world _always_ seem
+to be comming from the Firewall. I want the connections to appear to
+come from the Mail Server (203.x.x.1) or my Web Server (203.x.x.3) or my
+Development Server (203.x.x.4) etc.
+
+My subject line of 'Weird Magic with Masquerading' was chosen because
+one of my colleuges said that "...it's extremely hard to make outgoing
+connections appear to come from anything other than the default address
+and requires some wierd voodoo magic..."
+
+I thought about this for a while and decided that he was right -- It
+_is_ going to be a pain in the neck to get it to work. But, nevertheless
+I am keen to see how I can do it anyway.
+
+During this period of thinking, I though about IPChains and how I could
+apply it to this problem.
+
+If we say that 203.x.x.1 (the Mail Server's External IP) has the kernel
+device of eth0:2, could I use IPChains to do something like this:
+
+ipchains -A output -p tcp -s 192.168.10.3 25 -d 0.0.0.0/0 &lt;send out via
+interface eth0:2&gt;
+
+Would that have the desired effect of the connection appearing to come
+from 203.x.x.1 rather than 203.x.x.2?
+
+If anyone has any experience or suggestions in this field, I'd be glad
+to hear what you have to say.
+
+TIA!
+
+   - Andrew
+
+-- 
+Andrew Reid                   email: <A HREF="mailto:andrew.reid@plug.cx">andrew.reid@plug.cx</A>
+                              www:   <A HREF="http://www.plug.cx">http://www.plug.cx</A>
+"If ignorance is bliss        phone: +61 401 946 813
+ why aren't there more 
+ happy people?"
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

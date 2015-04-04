@@ -1,0 +1,108 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: XF86Config question" -->
+<!-- FromName="Toby Corkindale" -->
+<!-- FromEmail="tjcorkin@steadycom.com.au" -->
+<!-- ToName="Benjamin Close" -->
+<!-- ToEmail="linux@senet.com.au" -->
+<!-- Date="Mon, 08 Feb 1999 03:32:14 +0000" -->
+<!-- Id="36BE5ABE.184FA2F1@steadycom.com.au" -->
+<!-- Reference="Pine.LNX.4.04.9902072100570.9584-100000@Bytes4u.nodomain.yet" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: XF86Config question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@steadycom.com.au">tjcorkin@steadycom.com.au</A></I>&gt;
+  To  : Benjamin Close &lt;<I><A HREF="mailto:linux@senet.com.au">linux@senet.com.au</A></I>&gt;
+  Date: Mon, 08 Feb 1999 03:32:14 +0000
+</PRE>
+<H1>Re: XF86Config question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Ben,
+
+the first idea that comes into my head is that you could make a
+suid-root shell script that changes a symbolic link in /etc/X11/ to make
+XF86Config point to, say, ~/.XF86Config, and then run startx.
+All users would call this script instead of startx.
+The script would check if a ~/.XF86Config existed, and if it doesn't, it
+points to a default XF86Config in /etc/X11
+This is slightly bodgy, because if two users simultaneously try to do
+this to load X, then you've got file locking and race problems, but with
+a little work, in perl or C, it'd be easy enough to say
+lock the link file
+if not able to, wait until you can, then lock it, then wait a couple of
+seconds anyway in case something's still loading from it.
+then change the link, and unlock it.
+
+if able to lock file, still delay a couple of seconds anyway incase the
+last person has already run the script.
+
+
+A better idea would be to lock the file, and then unlock it with an exec
+in the .xinitrc or something....but that's starting to get messy, but
+could still be done reasonably. Just the runcustomX script would need to
+lock file, change link, then fork off, and let X load. Then the now
+background process waits until it receives a signal, (probably sighup or
+something), and then unlocks the file and quits.
+in the .xinitrc you'd make a command there that sends the appropriate
+signal (eg. kill `cat /var/run/$USER_customx.pid` )
+
+Still, it demonstrates that you can get it done if you want it.
+
+Seeyas
+Toby
+
+Benjamin Close wrote:
+&gt; 
+&gt; Hi All,
+&gt;         Does anyone know of a way to let a user have an alternative
+&gt; XF86Config file without giving them root privilages?
+&gt; 
+&gt; For example:
+&gt; 
+&gt; One user wants a virtual desktop of 1024x768 and the other 800x600. Both
+&gt; users log in via the console but one knows what they are doing, the other
+&gt; has no idea hence I don't want to give them root permission (indicated
+&gt; as one way to have seperate XF86Config files in the man page).
+&gt; 
+&gt; Cheers,
+&gt; 
+&gt; --
+&gt; 
+&gt; * Benjamin Close
+&gt; * <A HREF="mailto:Benjsc@senet.com.au">Benjsc@senet.com.au</A>
+&gt; * Web Page: <A HREF="http://users.senet.com.au/~benjsc">http://users.senet.com.au/~benjsc</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

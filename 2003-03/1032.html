@@ -1,0 +1,104 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Arafura Connects iptrk 14.0.0 goes GPL (announcement)" -->
+<!-- FromName="'Jason Nunn'" -->
+<!-- FromEmail="jsno@arafura.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="21 Mar 2003 11:51:04 +0930" -->
+<!-- Id="1048213265.1550.0.camel@berkeley.arafura.net.au" -->
+<!-- Reference="003801c2eeef$89fc4140$020120ac@skink" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Arafura Connects iptrk 14.0.0 goes GPL (announcement)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jason Nunn &lt;<I><A HREF="mailto:jsno@arafura.net.au">jsno@arafura.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 21 Mar 2003 11:51:04 +0930
+</PRE>
+<H1>RE: Arafura Connects iptrk 14.0.0 goes GPL (announcement)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Russell,
+
+You did some work for Hallmark a few years ago didn't you ?.
+
+&gt; OK, I officially don't understand what the difference between this
+&gt; functionality and a packet sniffing tool like tcpdump or ethereal in
+&gt; promiscuous mode is... Anyone care to enlighten me?
+
+The kernel places limits on how big it's internal linked lists
+can grow (the sk_buff struct that queues frame data for the upper
+network levels to process). This limit is normally very small (see
+/proc/sys/net/core/hot_list_length and
+/proc/sys/net/core/netdev_max_backlog).
+
+A 300 or 128 sk_buff size limit is too small, because as soon as the
+user space monitoring program is starved of CPU (ie VM swap, or when a
+hacker ping floods machine), it will drop most of them.
+
+You could increase this size, but, the sk_buff facility uses kmalloc(),
+and you don't really want to use alot of this space as it can be
+unreliable in large qualities, plus it's uncertain what the kernel would
+do (behave) if i started using it for things it's wasn't designed for.
+
+Due to billing, and to get the exact events that happen on our networks,
+i was easier for me to modify the kernel and add the facility i wanted.
+It was very easy to do. So that at the network layer, cut down versions
+of the IP header and contents would be stored in a circular queue (60000
+entries). This size buffers most adverse events and all packets are
+accounted for.
+
+Accept for the occasional time when iptrk does an archive, the VM and FS
+operations will starve the iptrk program of CPU, and it won't be able to
+pull all the packets from the queue, and hence queue will overflow, but
+this is rare and happens in a short interval (once a week if you are
+lucky). Also, iptrk will tell you how often this overflows occur so you
+can either upgrade the hardware, segment the network, or increase queue
+size.
+
+Hope that helps ;).
+
+-- 
+Jason Nunn- Electronics Technician, Systems Programmer, Network Specialist 
+Arafura Connect & Arafura Internet Services - 1300 137 363
+Email: <A HREF="mailto:jsno@arafura.net.au">jsno@arafura.net.au</A>, Phone: 1300 137 363, Fax: 08 89412278
+Personal: <A HREF="http://jsno.arafuraconnect.com.au">http://jsno.arafuraconnect.com.au</A>
+
+	"and.. have a nice war ;)"
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

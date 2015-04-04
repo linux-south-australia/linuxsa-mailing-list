@@ -1,0 +1,203 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="X Window Error 111 (HOWTO)" -->
+<!-- FromName="David Lloyd" -->
+<!-- FromEmail="lloy0076@senet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 27 Jun 1999 12:15:29 +0930" -->
+<!-- Id="37759049.35B63F53@senet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: X Window Error 111 (HOWTO)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@senet.com.au">lloy0076@senet.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sun, 27 Jun 1999 12:15:29 +0930
+</PRE>
+<H1>X Window Error 111 (HOWTO)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+PURPOSE
+
+The purpose of this document is to help people fix a problem
+where the X Server reports:
+
+     "_X11TransSocketUNKIXConnect:Can't connect: errno=111"
+
+A specific report may look similar.
+
+
+BACKGROUND
+
+When the X server starts up, it looks in a file called
+"XF86Config" in /etc/X11 normally to determine a system's
+settings. Errors can either be non-fatal such as keyboard
+mapping problems, or fatal such as errno=111.
+
+
+DISCUSSION
+
+This error can mean that the X driver is not able to
+determine an appropriate monitor setting. X, rather than
+destorying your monitor, will not load until you rectify
+this problem. Because X is a GUI, not being able to display
+graphics is infeasible, hence X crashes.
+
+If you have an unknown monitor, Xconfigurator and XF86Setup
+bundled with RedHat 5.2 and earlier do not always configure
+the monitor quite correctly. None the less, be warned that
+manually configuring a monitor's hysnc and vsync ranges
+(more about these later) can potentially damage your monitor
+so the best policy is be conservative - it's like a new
+car...you drive slowly at first then work out gradually how
+fast you can drive gradually.
+
+
+MONITOR SECTION
+XF86Config contains a number of sections. One section is the
+monitor section. In that section there is a line which
+reads:
+
+    "HorizSync 31.5 - 35.2"
+
+The numbers can be replaced by a series of comma seperated
+values {31.5, 35.1, 44.9}. They're likely to look different
+on the XF86Config file on each system, however the value
+"HorizSync" is generally there.
+
+These are the "monitor dot clock" values. 
+
+MODE SECTION
+Further down in the document there are a very large number
+of lines which look similar to this:
+
+    # 800x600 @ 56 Hz, 35.15 kHz hsync
+    ModeLine "800x600"    36    800    824    1024    600   
+601    603    625
+
+You will need to note the name "800x600" and the next value
+"36". The 36 is the horizontal sync dot clock number. If it
+does not equal or fit into the range as specified by the
+setting above X will delete that mode and cycle to the next
+line. I understand that in the case that many ModeLines fit
+the range, that which is the highest quality is used by the
+server.
+
+X will refuse to use all modes which do not fit within the
+range of values specified by the "monitor dot clock value"
+[see section above]. Naturally, if X refuses to load any
+modes then you will get a server crash.
+
+
+VIDEO CARD SECTION
+This will appear under the Graphics device section. It will
+more than likely be called "My Video Card" in the Identifier
+field. Take note of this name. Here is an example
+(incidentally ignore any lines in your file starting with #
+- they're comments which are meant to be helpful):
+
+  Section "Device"
+     Identifier "My Video Card"
+     VendorName "Unknown"
+     BoardName "Unknown"
+  EndSection
+
+
+SCREEN SECTION
+Search this section for the section in which the Device is
+the equal to the name of your video card. Once you have
+found the appropriate section you will need to find out what
+modes you are attempting to load.
+
+These modes are in the section labeled "Modes" under
+"Display". You must correlate these values with the labeled
+modes in the mode section. For X to start at least ONE of
+these values must be able to be loaded. You can have
+multiple "Display" subsections - you normally can cycle
+through them all by press ctrl alt (numpad + or -) when X is
+running.
+
+Here is an example:
+
+  Section "Screen"
+    Drive "accel"
+    Device "My Video Card"
+    Monitor "My Monitor"
+    Subsection "Display"
+      Depth    32
+      Modes    "800x700"
+      ViewPort 0 0
+      Virtual 800x600
+    EndSubsection
+   EndSection
+
+The value displayed in "modes" corresponds to the values in
+the "mode section".
+
+
+WHAT TO DO
+Once you have discovered which modes your system is using,
+then adjust the horizSync CAUTIOUSLY so that it fits in with
+one of the modes. Xconfigurator normally enters a large
+amount of example "mode lines". My advice is to go with the
+slowest at first and adjust the horizSync values.
+
+Take a look at the above example. This is from my own system
+and if I set it up like this I get a server errno=111 and
+crash.
+
+To fix it, I need to manually adjust the HorizSync value
+from 
+
+  "HorizSync 31.5 - 35.2"
+
+To
+
+  "HorizSync 31.2 - 36.0"
+
+It is only "0.8" difference but it's the difference between
+crashing and not crashing. To fix this problem, simply
+adjust these values until you get no server crashes.
+
+AGAIN, start conservatively, even if you are certain your
+monitor will cope with a higher HorizSync value. You can
+physically damage your monitor doing this, so it's better to
+be safe than sorry.
+
+
+DAVID
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

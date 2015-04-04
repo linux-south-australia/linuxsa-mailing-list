@@ -1,0 +1,200 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: DNS server for internal and external addresses?" -->
+<!-- FromName="'Ian Hogben'" -->
+<!-- FromEmail="ianhogben@yahoo.com.au" -->
+<!-- ToName="'Anthony Symons'" -->
+<!-- ToEmail="ant@sa.pracom.com.au" -->
+<!-- Date="14 Mar 2002 12:00:48 +0800" -->
+<!-- Id="1016078452.16675.2.camel@csa.kalbould.wa.gov.au" -->
+<!-- Reference="GOEMLNICOMCOMGGLIKHFCEKHGDAA.john@davey.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: DNS server for internal and external addresses?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Ian Hogben &lt;<I><A HREF="mailto:ianhogben@yahoo.com.au">ianhogben@yahoo.com.au</A></I>&gt;
+  To  : Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  Date: 14 Mar 2002 12:00:48 +0800
+</PRE>
+<H1>RE: DNS server for internal and external addresses?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+And this would work for queries to host foo.internal etc?
+
+Thanks,
+
+Ian.
+On Thu, 2002-03-14 at 11:15, Anthony Symons wrote:
+&gt; Alternatively, I did it with bind 8 with a section like this:
+&gt; 
+&gt; zone "internal" {
+&gt;     type master;
+&gt;     file "named.local.internal";
+&gt;     allow-query{ localnets; 10.1.0.0/16 ; 10.2.0.0/16 };
+&gt;     allow-update{ none; };
+&gt;     allow-transfer{ 10.5.16.1; };
+&gt; };
+&gt; 
+&gt; 
+&gt; On Thu, 2002-03-14 at 12:16, John Davey wrote:
+&gt; &gt; Below is a working named.conf with  views
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; view "internal" {
+&gt; &gt;         match-clients {172.30.0.0/16; 127.0.0.0/8; };
+&gt; &gt;         recursion yes;
+&gt; &gt; 
+&gt; &gt;         zone "." {
+&gt; &gt;                 type hint;
+&gt; &gt;                 file "named.ca";
+&gt; &gt;         };
+&gt; &gt; 
+&gt; &gt;         zone "0.0.127.in-addr.arpa" {
+&gt; &gt;                 type master;
+&gt; &gt;                 file "named.local";
+&gt; &gt;         };
+&gt; &gt; 
+&gt; &gt;         zone "freddy.net.au" {
+&gt; &gt;                 type master;
+&gt; &gt;                 file "primary/freddy-internal.net.au.dns";
+&gt; &gt;         };
+&gt; &gt; 
+&gt; &gt;         zone "spam.block" {
+&gt; &gt;                 type master;
+&gt; &gt;                 file "primary/spam-internal.block.dns";
+&gt; &gt;         };
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; };
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; view "external" {
+&gt; &gt;         match-clients { any; };
+&gt; &gt; //        recursion no;
+&gt; &gt; 
+&gt; &gt;         zone "freddy.net.au" {
+&gt; &gt;                 type master;
+&gt; &gt;                 file "primary/freddy-external.net.au.dns";
+&gt; &gt;         };
+&gt; &gt; 
+&gt; &gt;         zone "spam.block" {
+&gt; &gt;                 type master;
+&gt; &gt;                 file "primary/spam-external.block.dns";
+&gt; &gt;         };
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; };
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; &gt; -----Original Message-----
+&gt; &gt; &gt; From: Ian Hogben [mailto:<A HREF="mailto:ianhogben@yahoo.com.au">ianhogben@yahoo.com.au</A>]
+&gt; &gt; &gt; Sent: Thursday, 14 March 2002 11:45 AM
+&gt; &gt; &gt; To: David Lloyd
+&gt; &gt; &gt; Cc: Andrew Reid; LinuxSA
+&gt; &gt; &gt; Subject: Re: DNS server for internal and external addresses?
+&gt; &gt; &gt; 
+&gt; &gt; &gt; 
+&gt; &gt; &gt; Bind 9.2
+&gt; &gt; &gt; 
+&gt; &gt; &gt; Still looking through the views documentation. My named fails to start
+&gt; &gt; &gt; when I apply them. Must be a typo somewhere. :)
+&gt; &gt; &gt; 
+&gt; &gt; &gt; Thanks,
+&gt; &gt; &gt; 
+&gt; &gt; &gt; Ian.
+&gt; &gt; &gt; 
+&gt; &gt; &gt; On Thu, 2002-03-14 at 07:39, David Lloyd wrote:
+&gt; &gt; &gt; &gt; 
+&gt; &gt; &gt; &gt; Andrew and Ian et al:
+&gt; &gt; &gt; &gt; 
+&gt; &gt; &gt; &gt; &gt; &gt; This *is* possible, isn't it? If not, how is it done, 
+&gt; &gt; &gt; other than to have
+&gt; &gt; &gt; &gt; &gt; &gt; two DNS servers?
+&gt; &gt; &gt; &gt; &gt; 
+&gt; &gt; &gt; &gt; &gt; You can use ACLs if you want -- apply them to the zones 
+&gt; &gt; &gt; that you want to
+&gt; &gt; &gt; &gt; &gt; be internally-visible only.
+&gt; &gt; &gt; &gt; &gt; 
+&gt; &gt; &gt; &gt; &gt; I get the feeling that views is a BIND 9 feature. I'm not 
+&gt; &gt; &gt; sure though.
+&gt; &gt; &gt; &gt; &gt; ACLs will do what you want, though.
+&gt; &gt; &gt; &gt; 
+&gt; &gt; &gt; &gt; Yes, "views" is a Bind 9 feature.
+&gt; &gt; &gt; &gt; 
+&gt; &gt; &gt; &gt; Ian, what version of Bind are you running?
+&gt; &gt; &gt; &gt; 
+&gt; &gt; &gt; &gt; DSL
+&gt; &gt; &gt; 
+&gt; &gt; &gt; 
+&gt; &gt; &gt; 
+&gt; &gt; &gt; _________________________________________________________
+&gt; &gt; &gt; Do You Yahoo!?
+&gt; &gt; &gt; Get your free @yahoo.com address at <A HREF="http://mail.yahoo.com">http://mail.yahoo.com</A>
+&gt; &gt; &gt; 
+&gt; &gt; &gt; -- 
+&gt; &gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on 
+&gt; &gt; &gt; irc.linux.org.au
+&gt; &gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt; 
+&gt; &gt; -- 
+&gt; &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt; 
+&gt; -- 
+&gt; Systems Administrator       
+&gt; Pracom Ltd.             
+&gt; +61 8 82029074 -=- +61 402 100 671 
+&gt; <A HREF="mailto:anthony.symons@sa.pracom.com.au">anthony.symons@sa.pracom.com.au</A>
+&gt; 
+&gt; PRIVILEGED - PRIVATE AND CONFIDENTIAL
+&gt; This electronic mail is solely for the use of the addressee and may
+&gt; contain information which is confidential or privileged.
+&gt; If you receive this electronic mail in error, please delete it from
+&gt; your system immediately and notify the sender by electronic mail or
+&gt; using any of the above contact details.
+
+
+
+_________________________________________________________
+Do You Yahoo!?
+Get your free @yahoo.com address at <A HREF="http://mail.yahoo.com">http://mail.yahoo.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

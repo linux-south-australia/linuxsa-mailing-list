@@ -1,0 +1,80 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="having too much time..." -->
+<!-- FromName="Geoffrey D. Bennett" -->
+<!-- FromEmail="g@netcraft.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 6 Jul 1997 02:35:48 +0930 (CST)" -->
+<!-- Id="199707051705.CAA18313@Mich.netcraft.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: having too much time...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Geoffrey D. Bennett &lt;<I><A HREF="mailto:g@netcraft.com.au">g@netcraft.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sun, 6 Jul 1997 02:35:48 +0930 (CST)
+</PRE>
+<H1>having too much time...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I got asked via private email what exactly I did to calculate the
+statistics on the age of the HOWTOs and kernel docs.  In case anyone
+is interested, here 'tis.  It's not exactly what I did before; I
+didn't write down what I did at the time, and I cleaned a couple of
+things up a bit this time around :).
+
+HOWTOs:
+
+First extract the names and dates from the files (this is for csh):
+cd /usr/doc/HOWTO
+foreach file (*.gz)
+echo -n $file
+zcat $file | head -5 | grep '199[0-9]'
+end
+I then copied the above output into a document using the mouse.
+
+Or if I was using zsh (or, theoretically bash, but it didn't work too
+well when I tried it) I would have done this:
+for file in *.gz; do
+echo -n $file
+zcat $file | head -5 | grep '199[0-9]'
+done &gt; /tmp/howto-dates
+
+Next I took a look through howto-dates and fixed the entry for
+TeTeX-HOWTO (the names were put in the file so that I could see what
+files any incorrectly extracted dates belonged too).
+
+Then came:
+vi /tmp/howto-dates
+:1,$ s/^.*, [0-9]* //         get rid of the filenames and day numbers
+:1,$ s/\(.*\) \(.*\)/\2 \1/   put the year before the month
+:1,$ !sort -r                 sort into reverse alphabetical order
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,150 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="DNS server problems" -->
+<!-- FromName="'Sam Pohlenz'" -->
+<!-- FromEmail="retrix@dingoblue.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 11 Feb 2002 22:52:36 +1030" -->
+<!-- Id="000801c1b2f6$cb3baff0$0200a8c0@retrixxp" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: DNS server problems</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Sam Pohlenz &lt;<I><A HREF="mailto:retrix@dingoblue.net.au">retrix@dingoblue.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 11 Feb 2002 22:52:36 +1030
+</PRE>
+<H1>DNS server problems</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+I am currently trying to set up a local DNS server for my home network on my
+Debian Potato box.
+
+My network looks like this:
+
+Domain: home
+                                                    |--retrix (192.168.0.2)
+gateway, www (192.168.0.1) ----|--dakonis (192.168.0.3)
+                                                    |--nick (192.168.0.4)
+
+The following is my attempt at setting up the configuration files.
+
+named.conf:
+
+options {
+        directory "/var/cache/bind";
+};
+
+zone "home" {
+        type master;
+        file "home.zone";
+};
+
+zone "0.0.127.in-addr.arpa" {
+        type master;
+        file "/etc/bind/db.0";
+};
+
+zone "." {
+        type hint;
+        file "/etc/bind/db.root";
+};
+
+
+home.zone:
+
+$TTL 3D
+@       IN      SOA     ns.home.        hostmaster.home. (
+                        2002021102
+                        8H
+                        2H
+                        4W
+                        1D )
+        IN      A       192.168.0.1
+                  TXT     "Retrix's home gateway DNS server"
+        IN      NS      ns.home.
+localhost       A       127.0.0.1
+ns              A       192.168.0.1
+gateway         A       192.168.0.1
+www             A       192.168.0.1
+
+retrix          A       192.168.0.2
+dakonis         A       192.168.0.3
+nick            A       192.168.0.4
+
+
+# dig home
+
+; &lt;&lt;&gt;&gt; DiG 8.3 &lt;&lt;&gt;&gt; home
+;; res options: init recurs defnam dnsrch
+;; got answer:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NXDOMAIN, id: 4
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 0
+;; QUERY SECTION:
+;;      home, type = A, class = IN
+
+;; AUTHORITY SECTION:
+.                       1D IN SOA       A.ROOT-SERVERS.NET.
+nstld.verisign-grs.c
+om. (
+                                        2002021100      ; serial
+                                        30M             ; refresh
+                                        15M             ; retry
+                                        1W              ; expiry
+                                        1D )            ; minimum
+
+
+;; Total query time: 369 msec
+;; FROM: gateway to SERVER: default -- 127.0.0.1
+;; WHEN: Mon Feb 11 21:44:46 2002
+;; MSG SIZE  sent: 22  rcvd: 97
+
+
+As you can see from the output of dig, I cannot see any of the other
+machines in the domain. Only the root DNS server.
+Where am I going wrong? I would like to be able to ping www.home,
+retrix.home, etc.
+This is primarily a learning exercise for me but it is giving me a lot of
+grief.
+
+Thanks in advance,
+Sam Pohlenz
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

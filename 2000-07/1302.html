@@ -1,0 +1,86 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: [OT] Timers in C" -->
+<!-- FromName="Dave Lawrence" -->
+<!-- FromEmail="philaw@camtech.net.au" -->
+<!-- ToName="Evan Bourlotos" -->
+<!-- ToEmail="evan@cs.adelaide.edu.au" -->
+<!-- Date="Mon, 24 Jul 2000 12:56:25 +0930" -->
+<!-- Id="397BB761.89C701AE@camtech.net.au" -->
+<!-- Reference="3.0.5.32.20000724124417.0098db20@chook.cs.adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: [OT] Timers in C</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dave Lawrence &lt;<I><A HREF="mailto:philaw@camtech.net.au">philaw@camtech.net.au</A></I>&gt;
+  To  : Evan Bourlotos &lt;<I><A HREF="mailto:evan@cs.adelaide.edu.au">evan@cs.adelaide.edu.au</A></I>&gt;
+  Date: Mon, 24 Jul 2000 12:56:25 +0930
+</PRE>
+<H1>Re: [OT] Timers in C</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Does anyone know of a function/s which will give me sub-second resolution
+&gt; intervals?
+&gt; or an equivalent function to sleep (n) where n is sub second interval
+
+usleep() if you have it, or use a trick of select()'ing a NULL file
+descriptor. This is documented in the select() manpage. Ie:
+
+#define USEC 1000000
+
+void my_usleep(unsigned long i)
+{
+	struct timeval tv;
+
+	tv.tv_sec = i / USEC;
+	tv.tv_usec = (i % USEC) * USEC;
+
+        select(0, NULL, NULL, NULL, &tv);
+
+}
+
+Now, someone else can answer my question. Why did the designers of the
+Unix API decide to make the programmer responsible for keeping track of
+the highest file descriptor in the select fd set? Why doesn't the kernel
+do it, or the FD_SET macro's set a library's extern value or something?
+Is there a reason for this?
+
+Dave Lawrence
+
+-- 
+I don't want to kill time -I want it to live
+I'm not wasting this life. I'm letting it in.
+		-Underworld "Mother Earth"
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

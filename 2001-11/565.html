@@ -1,0 +1,124 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: regular expression help" -->
+<!-- FromName="'Andrew Hill'" -->
+<!-- FromEmail="list@fornax.net" -->
+<!-- ToName="'Dan Kortschak'" -->
+<!-- ToEmail="dan.kortschak@adelaide.edu.au" -->
+<!-- Date="Tue, 20 Nov 2001 15:14:25 +1030" -->
+<!-- Id="3BF9DFA9.7090901@fornax.net" -->
+<!-- Reference="3BF9B455.F22FF838@adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: regular expression help</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Hill &lt;<I><A HREF="mailto:list@fornax.net">list@fornax.net</A></I>&gt;
+  To  : Dan Kortschak &lt;<I><A HREF="mailto:dan.kortschak@adelaide.edu.au">dan.kortschak@adelaide.edu.au</A></I>&gt;
+  Date: Tue, 20 Nov 2001 15:14:25 +1030
+</PRE>
+<H1>Re: regular expression help</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hmmmm, regular expressions and DNA. I know that I'm going to regret this 
+... :-)
+
+Dan Kortschak wrote:
+
+&gt; My first question is how do I ask the RE engine to
+&gt; return the longest $1 match (I remember seeing this in a manual somewhere, but I
+&gt; can't find it again.
+
+
+It would depend on the RE engine. Perl? By default, Perl will always 
+*try* to find the longest leftmost match. However, regexes will go for 
+leftmost *before* longest, and as Perl is a Traditional NFA engine, you 
+may not always get the longest match. It's a regex engine issue.
+
+See <A HREF="http://www.fornax.net/regex2/index.html">http://www.fornax.net/regex2/index.html</A> for my lecture to LinuxSA 
+that covered matching and longest/leftmost issues. It might help.
+
+ 
+&gt; The second question is how do I specify a string of triplets /(?:\S\S\S)*/
+
+
+Hmmm, your terminilogy here is a bit odd. This is a regex that is doing 
+  a match for a string of 3 non-whitespace characters, zero or more 
+times, without storing the matching characters in a variable. (Okay, I 
+guess you can call that a string of triplets, but to me, a string of 
+triplets is a string that has groups of threes in it it, like "TTTAAAGGG".)
+
+&gt; that
+&gt; does not contain /(?:TAA|TAG|TGA)/?
+
+
+You can use negative lookahead for the NOT part. This will search to 
+make sure the next characters do NOT match what you have asked for, but 
+without "consuming" characters for the matching. But you knew that... 
+It's the next bit that's ticky, right?
+
+&gt; If it were a single character, to avoid it
+&gt; would be easy, but I can't see a way to get this with frame-wise triplets of
+&gt; characters?
+
+
+How aboout:
+
+$seq = "TAG" . "AAA" . "TTT" . "GGG" . "TAG" . "AAA";
+if ($seq =~ 
+m/(?:\S\S\S)*?((?!(TAA|TAG|TGA))(?:\S\S\S)*)(?=(TAA|TAG|TGA))/) {
+   print "$1\n";
+}
+
+Hmmm, this is not perfect, as it assumes that there will be a TAA, TAG 
+or TGA sequence somewhere down the sequence from your searching point. 
+But you get the idea...
+
+(Start off by matching zero instances of 3 non-whitespace characters, 
+then make sure the next three characters are not TAA, TAG or TGA [if 
+they are, backtrack and match one instance of 3 non-whitespace 
+characters, and so on until you find a starting point that isn't one of 
+these 3 base sequences. Then match lots of 3 base sequences up to the 
+point where the next 3 base sequence would be one of the forbidden ones.)
+
+
+
+HTH,
+
+-- 
+Andrew Hill
+"RAID - Don't believe the hype." -- 2001-09-22
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

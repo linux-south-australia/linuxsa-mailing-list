@@ -1,0 +1,101 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Sendmail relay oddness" -->
+<!-- FromName="'Corey Gilmore'" -->
+<!-- FromEmail="cfg@dln.uvm.edu" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 13 Mar 2002 15:59:13 -0500 (EST)" -->
+<!-- Id="Pine.LNX.4.33.0203131553500.32009-100000@dln.uvm.edu" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Sendmail relay oddness</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Corey Gilmore &lt;<I><A HREF="mailto:cfg@dln.uvm.edu">cfg@dln.uvm.edu</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 13 Mar 2002 15:59:13 -0500 (EST)
+</PRE>
+<H1>Sendmail relay oddness</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+This morning I awoke to a 125 meg maillog, full of
+
+endmail[10954]: g2D7C6S00459: to=&lt;<A HREF="mailto:postmaster@americangirldolls.com">postmaster@americangirldolls.com</A>&gt;,
+delay=07:39:39, xdelay=00:03:09, mailer=esmtp, pri=5161834,
+relay=americangirldolls.com. [64.225.154.175], dsn=4.0.0, stat=Deferred:
+Connection timed out with americangirldolls.com.
+
+sendmail[10598]: g2D8eQS04439:
+to=&lt;<A HREF="mailto:jkd@arcanum.org">jkd@arcanum.org</A>&gt;,&lt;<A HREF="mailto:webmaster@arcanum.org">webmaster@arcanum.org</A>&gt;, delay=06:11:24,
+xdelay=00:03:09, mailer=esmtp, pri=7501833, relay=arcanum.org.
+[64.94.105.200], dsn=4.0.0, stat=Deferred: Connection timed out with
+arcanum.org.
+
+sendmail[11046]: g2D72TS32691: to=&lt;<A HREF="mailto:postmaster@algr.com">postmaster@algr.com</A>&gt;, delay=07:50:38,
+xdelay=00:00:00, mailer=esmtp, pri=4471835,
+relay=misdirected.buydomains.com. [192.168.1.1], dsn=4.0.0, stat=Deferred:
+misdirected.buydomains.com.: No route to host
+
+And the like.  This perplexes me because I have no open relays, and I've
+run all the tests at abuse.net, and relay-test.mail-abuse.org, and they
+confirm that I don't have an open relay.
+
+I am getting weird processes too... Usually stale "user open" processes
+occur when the MTA can't connect back to the original host, right?
+
+# ps fauxw | grep sendmail
+root     16711  0.0  0.3  1620  592 pts/4    S    15:43   0:00 \_ grep sendmail
+root     10742  0.0  1.2  5016 2016 ?        S    09:43   0:00 sendmail: accepting connections
+root     16680  0.0  1.4  5348 2368 ?        S    15:43   0:00  \_ sendmail: ./g2D72TS32691 algra.freeser.com.: user open
+
+What really pissed me off was
+sendmail[8543]: g2D8JRS03383:
+to=&lt;<A HREF="mailto:xx848679@anon.penet.fi">xx848679@anon.penet.fi</A>&gt;,&lt;<A HREF="mailto:xx848677@anon.penet.fi">xx848677@anon.penet.fi</A>&gt;,&lt;<A HREF="mailto:xx848689@anon.p">xx848689@anon.p</A>
+enet.fi&gt;,&lt;<A HREF="mailto:xx848687@anon.penet.fi">xx848687@anon.penet.fi</A>&gt;,&lt;<A HREF="mailto:xx848685@anon.penet.fi">xx848685@anon.penet.fi</A>&gt;,&lt;<A HREF="mailto:xx848683@anon.penet.fi">xx848683@anon.penet.fi</A>&gt;,&lt;<A HREF="mailto:xx848681@anon.penet.fi">xx848681@anon.penet.fi</A>&gt;,&lt;<A HREF="mailto:xx848678@anon">xx848678@anon</A>
+.penet.fi&gt;,&lt;<A HREF="mailto:xx848688@anon.penet.fi">xx848688@anon.penet.fi</A>&gt;,&lt;<A HREF="mailto:xx848686@anon.penet.fi">xx848686@anon.penet.fi</A>&gt;,&lt;<A HREF="mailto:xx848684@anon.penet.fi">xx848684@anon.penet.fi</A>&gt;,&lt;<A HREF="mailto:xx848682@anon.penet.fi">xx848682@anon.penet.fi</A>&gt;,&lt;<A HREF="mailto:xx848680@an">xx848680@an</A>
+on.penet.fi&gt;, delay=05:38:48, xdelay=00:00:00, mailer=esmtp, pri=25051833,
+relay=anon-mx.penet.fi., dsn=4.0.0, stat=Deferred: Connection refused by anon-mx.penet.fi.
+
+thousands of those.
+
+If anyone has any idea how these messages could be getting through, or if
+they aren't, I'd love to find out how to fix it :/
+
+Thanks,
+corey
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

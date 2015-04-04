@@ -1,0 +1,105 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Windows Netscape & Samba" -->
+<!-- FromName="Adrian Butterworth" -->
+<!-- FromEmail="adrian@econ-outlook.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="Richard Sharpe <sharpe@ns.aus.com>, linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 04 Mar 1999 19:04:57 +1030" -->
+<!-- Id="36DE45B1.2E58DD63@econ-outlook.com.au" -->
+<!-- Reference="199902252348.KAA24610@caemrad.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Windows Netscape & Samba</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adrian Butterworth &lt;<I><A HREF="mailto:adrian@econ-outlook.com.au">adrian@econ-outlook.com.au</A></I>&gt;
+  To  : <A HREF="mailto:Richard Sharpe <sharpe@ns.aus.com>">Richard Sharpe <sharpe@ns.aus.com></A>, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Thu, 04 Mar 1999 19:04:57 +1030
+</PRE>
+<H1>Re: Windows Netscape & Samba</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Richard
+re:
+&gt; Hmmm, every time a user logs on, or when they access a particular drive?
+&gt; 
+&gt; I didn't think there was anything that could be run when logon processing
+&gt; was happening, but you certainly can run preexec scripts for users when
+&gt; they access a particular drive, like say, netlogon.
+&gt; 
+&gt; Actually, I think all this can be done with roaming profiles as well.
+&gt; 
+
+
+If you use a preexec statement in the [netlogon] section
+it will execute at login time every time, because this share is
+always accessed. 
+It happens before the netlogon is offered (PREexec) so it can create the
+login batch file that is about to be read via the netlogon share.
+This is one of the things we generate on the fly from a template.
+
+It also less conveniently fires a second time a bit latter in the
+process so the script has to accomodate this.
+
+Here is a snip from a real life smb.conf calling the script
+I mentioned.
+
+&gt;  [netlogon]
+&gt;    root preexec = /root/scripts/smb pre %u %m %I
+&gt;    comment = Network Logon Service
+&gt;    path = /home/%u/.smb/netlogon/
+&gt;    guest ok = yes
+&gt;    writable = yes
+&gt;    share modes = no
+&gt;    write list = brian
+
+When called with "pre" as the first param this script does all the
+setup stuff I was mentioning. (It also does otherthings when
+called with other params for example when people log out)
+
+The sharing of the home directories if used is a nice point to do
+general login & logout processing such as firewall adjustments
+because the preexec & postexec are called only once each. Unfortunately
+this is too late in the process to use to create the batch file. 
+
+and yes we use all this stuff in conjunction with roving
+profiles/desktops where the client machines are 95/98.
+
+all in all pretty cool way to get linux into win/nt sites
+and its rock solid.
+
+Regards
+Adrian
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

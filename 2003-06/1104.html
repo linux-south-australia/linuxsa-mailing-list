@@ -1,0 +1,354 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Some Proposals for a Linux of The Future (tm) :)" -->
+<!-- FromName="'Damien Uern'" -->
+<!-- FromEmail="carrigan_2606@optusnet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 28 Jun 2003 01:19:15 +0930" -->
+<!-- Id="200306280119.15340.carrigan_2606@optusnet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Some Proposals for a Linux of The Future (tm) :)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Damien Uern &lt;<I><A HREF="mailto:carrigan_2606@optusnet.com.au">carrigan_2606@optusnet.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 28 Jun 2003 01:19:15 +0930
+</PRE>
+<H1>Some Proposals for a Linux of The Future (tm) :)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hey,
+
+I've been thinking about the various deficiencies in most GNU/Linux 
+distributions and I would like to detail some of my ideas for improvement 
+here for feedback. These are just notes and are by no means comprehensive, I 
+plan on writing more detailed papers on some possible designs/code etc..
+
+Anyway here they are:
+
+1) Standardised /etc filesystem
+
+- sane filetree:
+
+- e.g. (this is by no means comprehensive, just some ideas - sorry if the 
+indenting doesn't display properly):
+
+/etc/system/services/httpd
+                              /ppp
+                              /samba/smb.conf
+                              /sendmail/sendmail.conf
+                              /...
+                 /security/hosts.allow
+                              /hosts.deny
+                              /passwd
+                              /fam/fam.conf
+                              /...
+                /network/hosts
+                              /...
+      /boot/rc.d
+              /init.d
+              /lilo/lilo.conf
+              /grub/grub.conf
+              /...
+      /x11/x11.conf
+            /xdm/xdm.conf
+            /fonts/fonts.conf
+           /...
+      /...
+/etc/user/skeleton/
+             /applications/gnome
+                               /kde
+                               /ogle
+                               /...
+             /shells
+            /...
+
+-Standardised configuration file syntax with the following design goals:
+
+- Easily human readable and modifyable (so people can edit with vi if need be)
+- Syntax doubles as simple GUI layout guide
+    - entire /etc directory tree should be parseable by a GUI program
+      so that *all* configuration options for the *entire system* can
+      be modified/viewed via a GUI
+    - A GUI program need not know about say "sendmail" specifically in  order 
+to provide a GUI to the user.
+- A library (libetc) provided that can parse the /etc directory tree and the 
+files within it. This library should be cross platform (e.g. so BSD
+  can adopt if it wishes - this includes the structure of the /etc tree)
+
+** See Appendix for a glimpse at the various mish-mash of configuration styles 
+and  file locations currently found under /etc
+
+2) Unified reference distribution that augments the LSB.
+
+- Not a distribution in the common sense, but a specification for a 
+distribution.
+- The specification complies with the LSB, but fills in the blanks.
+     - This may include: library versions, compiler version, compile flags    
+       used, etc
+- A repository of packages packaged in a distribution independent format (e.g. 
+something  like "autopackage"). These packages should be able to be installed 
+painlessly on  "Official Reference Distribution" compliant system.
+- "Official Reference Distribution" compliance tested with software. Software 
+for this testing  is free and licensed under the GNU GPL.
+- Distribution companies can display a logo saying they are compatibile with 
+the reference distro  simply by passing the software tests. No fees are 
+charged (it is community supported after all).
+- Documentation repository.
+  - This includes:
+      - HOWTO's for best programming practices for developing and deploying 
+        software on a GNU/Linux system  (e.g. where to store data,
+        configuration data, command line options syntax, user interface guide,
+        when to use libraries, packaging, binary compatibility issues, etc).
+      - any other relevant documentation.
+
+The goal of this is to provide a consistent and unified standard for deploying 
+software on GNU/Linux system without worrying about binary incompatibility 
+issues and/or inconsistencies in the filesystem layout. It also provides 
+guides to programmers so that hopefully all programs on a GNU/Linux system 
+behave in a predictable and consistent manner. Programmers who's programs 
+pass the various guideline tests can display an icon on the webpage for their 
+project. All applications packaged for the "Official Reference Distribution" 
+comply with all defined standards.
+
+3) Protocol for the underlying system to communicate with the GUI
+
+- A device in the /dev filesystem should be available to facilitate such 
+communication. I nominate "/dev/pts/gui".
+- A process can gain exclusive read access to this file. Text piped into this 
+file is of a certain syntax so that it can be parsed and the desktop 
+environment can provide the user with a suitable notice (such as a flashing   
+icon in the system tray, or messagebox).
+- /dev/pts/gui should be owned by the controlling process (have same uid/gid 
+as the controlling process). If controlling process lacks sufficient 
+permissions to be notified of a message, the write to /dev/pts/gui is denied.
+- If there is no controlling process to /dev/pts/gui, the kernel buffers 
+messages until there is a controlling process  and then passes the messages 
+to it.
+
+The purpose of this is to provide the user with notification of certain things 
+the underlying system is doing that they may need to know about. Such 
+notifications include hardware detection changes at bootup, hotplug changes, 
+system shutdown, etc...
+
+
+APPENDIX:
+
+The following are small snippets from various configuration files in my /etc 
+directory (it details the various syntaxes currently in use):
+
+%/etc/samba/smb.conf
+
+# The following two entries demonstrate how to share a directory so that two
+# users can place files there that will be owned by the specific users. In 
+this
+# setup, the directory should be writable by both users and should have the
+# sticky bit set on it to prevent abuse. Obviously this could be extended to
+# as many users as required.
+;[myshare]
+;   comment = Mary's and Fred's stuff
+;   path = /usr/somewhere/shared
+;   valid users = mary fred
+;   public = no
+;   writable = yes
+;   printable = no
+;   create mask = 0765
+
+[DOWNLOADS]
+   path = /home/damien/downloads
+   comment = /home/damien/downloads
+   public = yes
+   guest ok = yes
+   writable = no
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%/etc/X11/XF86Config-4
+
+Section "Device"
+    Identifier "device1"
+    VendorName "nVidia Corporation"
+    BoardName "NVIDIA GeForce3 (generic)"
+    Driver "nvidia"
+    Option "DPMS" "True"
+    Option "CursorShadow" "True"
+    Option "NoLogo" "True"
+    Option "CursorShadowAlpha" "60"
+EndSection
+
+Section "Monitor"
+    Identifier "monitor1"
+    VendorName "Plug'n Play"
+    HorizSync 30-98
+    VertRefresh 50-160
+
+    # Sony Vaio C1(X,XS,VE,VN)?
+    # 1024x480 @ 85.6 Hz, 48 kHz hsync
+    ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 
+-hsync -vsync
+
+    # TV fullscreen mode or DVD fullscreen output.
+    # 768x576 @ 79 Hz, 50 kHz hsync
+    ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+
+    # 768x576 @ 100 Hz, 61.6 kHz hsync
+    ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+EndSection
+
+Section "Screen"
+    Identifier "screen1"
+    Device "device1"
+    Monitor "monitor1"
+    DefaultColorDepth 24
+
+    Subsection "Display"
+        Depth 8
+        Modes "1280x1024" "1280x960" "1152x864" "1024x768" "800x600" "640x480"
+    EndSubsection
+
+    Subsection "Display"
+        Depth 15
+        Modes "1280x1024" "1280x960" "1152x864" "1024x768" "800x600" "640x480"
+    EndSubsection
+
+    Subsection "Display"
+        Depth 16
+        Modes "1280x1024" "1280x960" "1152x864" "1024x768" "800x600" "640x480"
+    EndSubsection
+
+    Subsection "Display"
+        Depth 24
+        Modes "1280x1024" "1280x960" "1152x864" "1024x768" "800x600" "640x480"
+    EndSubsection
+EndSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%/etc/fonts/fonts.conf
+
+--&gt; &lt;dir&gt;/usr/share/fonts/default/Type1/&lt;/dir&gt;
+ &lt;dir&gt;/usr/share/fonts/ttf/decoratives/&lt;/dir&gt;
+ &lt;dir&gt;/usr/X11R6/lib/X11/fonts/TTF/&lt;/dir&gt;
+ &lt;dir&gt;/usr/X11R6/lib/X11/fonts/winttf/&lt;/dir&gt;
+&lt;!--
+  Enable sub-pixel rendering
+        &lt;match target="font"&gt;
+                &lt;test qual="all" name="rgba"&gt;
+                        &lt;const&gt;unknown&lt;/const&gt;
+                &lt;/test&gt;
+                &lt;edit name="rgba" mode="assign"&gt;&lt;const&gt;rgb&lt;/const&gt;&lt;/edit&gt;
+        &lt;/match&gt;
+--&gt;&lt;!--
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%/etc/oglerc
+
+&lt;ogle_conf&gt;
+  &lt;dvd&gt;
+    &lt;nav&gt;
+      &lt;defaults&gt;
+        &lt;DefaultMenuLanguage&gt;en&lt;/DefaultMenuLanguage&gt;
+        &lt;DefaultAudioLanguage&gt;en&lt;/DefaultAudioLanguage&gt;
+        &lt;DefaultSubtitleLanguage&gt;en&lt;/DefaultSubtitleLanguage&gt;
+        &lt;ParentalCountry&gt;US&lt;/ParentalCountry&gt;
+        &lt;ParentalLevel&gt;15&lt;/ParentalLevel&gt;
+        &lt;PlayerRegion&gt;1&lt;/PlayerRegion&gt;
+      &lt;/defaults&gt;
+    &lt;/nav&gt;
+    &lt;device&gt;
+      &lt;path&gt;/dev/dvd&lt;/path&gt;
+    &lt;/device&gt;
+  &lt;/dvd&gt;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%/etc/xinetd.conf
+
+defaults
+{
+        instances               = 60
+        log_type                = SYSLOG authpriv
+        log_on_success          = HOST PID
+        log_on_failure          = HOST
+        cps                     = 25 30
+}
+
+includedir /etc/xinetd.d
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%/etc/modules.conf
+
+probeall scsi_hostadapter ide-scsi
+alias eth0 8139too
+above snd-emu10k1 snd-pcm-oss
+alias sound-slot-0 snd-emu10k1
+probeall usb-interface usb-uhci
+#options ide-scsi ignore=hdd
+alias /dev/nvidia*   nvidia
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%/etc/man.config
+
+#
+# The below mappings are superfluous when the right hand side is
+# in the mandatory manpath already, but will keep man from statting
+# lots of other nearby files and directories.
+#
+MANPATH_MAP     /bin                    /usr/share/man
+MANPATH_MAP     /sbin                   /usr/share/man
+MANPATH_MAP     /usr/bin                /usr/share/man
+MANPATH_MAP     /usr/sbin               /usr/share/man
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%/etc/proftpd.conf
+
+# Set the user and group under which the server will run.
+User                            nobody
+Group                           nogroup
+
+# Normally, we want files to be overwriteable.
+&lt;Directory /&gt;
+  AllowOverwrite                on
+&lt;/Directory&gt;
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

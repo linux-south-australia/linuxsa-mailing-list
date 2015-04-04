@@ -1,0 +1,119 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba backup suggestions" -->
+<!-- FromName="'Dan Shearer'" -->
+<!-- FromEmail="dan@tellurian.com.au" -->
+<!-- ToName="'Matthew Geddes'" -->
+<!-- ToEmail="mgeddes@tellurian.com.au" -->
+<!-- Date="Thu, 12 Sep 2002 11:14:43 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0209120958330.31183-100000@calulu.shearer.org" -->
+<!-- Reference="20020912004037.GA4804@hilarious.tellurian.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba backup suggestions</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A></I>&gt;
+  To  : Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  Date: Thu, 12 Sep 2002 11:14:43 +0930 (CST)
+</PRE>
+<H1>Re: Samba backup suggestions</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, 12 Sep 2002, Matthew Geddes wrote:
+
+&gt; Given that each file system has it's own features and non-features,
+&gt; how would a dump alternative work? If it's supposed to stay right out
+&gt; of the file system internals, but it's still supposed to back up each
+&gt; filesystem's features and extensions, there's probably no easy way to
+&gt; do it. It's like you're trying to say "be low-level, but don't be
+&gt; low-level". :-)
+&gt; 
+&gt; Any ideas?
+
+Two, one already implemented and the other the subject of much debate and
+some code.
+
+First, stop these things being low-level by implementing features like
+extended attributes as Posix standards. For example, the getfacl and
+setfacl utilities work for ext2, xfs and jfs and presumably one day by all
+full-featured filesystems supported by Linux and BSD. These are extended
+attributes yet can be handled by the OS. So, no longer any need to have
+fs-specific tools to do clever things like extended attributes (which
+makes Samba people somewhat happier, because NT ACLs cannot be
+encapsulated with standard Unix permission bits and yet they don't wish to
+have special code for every filesystem type Samba might be used with.
+There are however problems Samba has to address beyond attributes.)
+
+Second, where the clever facilities you are talking about are specific to
+a filesystem, implement them in such a way that they are extensions to
+known access objects such as files and directories. An example is streams.
+This is currently more theory than practice. I remember Linus saying years
+ago that he wished filesystem permissions were done with standard metadata
+accessible to ordinary utilities, so that for example you could do a tar
+of particular directory on a filesystem and end up with just the
+permissions and attributes. Now Reiserfs is implementing things that look
+rather like this, but not in production. Quote from the latest Reiser4
+doc, complete with avant garde piccies:
+
+"In Reiser4 (but not ReiserFS 3) an object can be both a file and a
+directory at the same time. If you access it as a file, you obtain the
+named sequence of bytes. If you use it as a directory you can obtain files
+within it, directory listings, etc. There was a lengthy discussion on the
+Linux kernel about whether this was technically feasible to do. I won't
+reproduce it here except to summarize that Linus showed that this was
+feasible. Allowing an object to be both a file and a directory is one of
+the features necessary to to compose the functionality present in streams
+and attributes using files and directories."
+
+It looks like this is how at least the Linux kernel community sees
+implementing complex objects using just file and directory
+primitives.
+
+If you combine my two points you can see that the basic primitives are
+getting much more powerful as Posix includes new functionality, and then
+that hopefully these primitives can be combined in new ways in new
+filesystems.
+
+This doesn't help with current problems like backing up sparse files under
+JFS though. This remains the domain of specialist programs like Daryl
+pointed out, which can do this across multiple filesystems but only
+because the authors have put in a lot of lowlevel work to make it do so.
+
+How's this for a start?
+
+Dan
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

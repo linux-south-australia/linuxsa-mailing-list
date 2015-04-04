@@ -1,0 +1,352 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: sendmail and procmail troubles" -->
+<!-- FromName="Ian Hogben" -->
+<!-- FromEmail="ian@safcol.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 22 Mar 2000 16:59:51 +1030" -->
+<!-- Id="NDBBJCENILPHMJMEFMGNKEADCEAA.ian@safcol.com.au" -->
+<!-- Reference="38D8604C.EACBD693@aarnet.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: sendmail and procmail troubles</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Ian Hogben &lt;<I><A HREF="mailto:ian@safcol.com.au">ian@safcol.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Wed, 22 Mar 2000 16:59:51 +1030
+</PRE>
+<H1>RE: sendmail and procmail troubles</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hrm. Thanks for the reply, Glen:
+
+I read and re-read that same man page entry. I have an /etc/procmailrc file
+that's got 644 permissions. The recipe is attached, in case I've done
+something silly. But essentially it's stock standard stuff that works in the
+same form as a $HOME/.procmailrc file. I've restarted sendmail since, and
+even made sure that the following exists in sendmail.cf:
+
+######################*****##############
+###   PROCMAIL Mailer specification   ###
+##################*****##################
+
+#####  @(#)procmail.m4  8.6 (Berkeley) 4/30/97  #####
+
+Mprocmail,      P=/usr/bin/procmail, F=DFMSPhnu9, S=11/31, R=21/31,
+T=DNS/RFC822/X-Unix,
+                A=procmail -Y -m $h $f $u
+
+Any more ideas from anyone...? :)
+
+
+-+-+-+-+-+-+-+-+-+-
+Ian Hogben | Safcol Australia
+
+<A HREF="mailto:ian">mailto:ian</A>@safcol.com.au | fon:(08)82821082 | fax:(08)82821099
+-+-+-+-+-+-+-+-+-+-
+ Computer Zen:
+  The Tao that is seen
+  Is not the true Tao, until
+  You bring fresh toner.
+
+* -----Original Message-----
+* From: <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A> [<A HREF="mailto:glen.turner">mailto:glen.turner</A>@aarnet.edu.au]
+* Sent: Wednesday, 22 March 2000 4:25
+* To: Ian Hogben; <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+* Subject: Re: sendmail and procmail troubles
+*
+*
+* Ian Hogben wrote:
+*
+* &gt; I am configuring a procmail recipe that basically garbles incoming .exe
+* &gt; attachments by changing their name. It actually works quite well (I love
+* &gt; downloading ready-cooked stuff from the net...), but I'm having troubles
+* &gt; implementing it. When I set up my own .procmailrc file and put
+* it in there,
+* &gt; it works well. But I'm not actually clear on how to get it working as a
+* &gt; system-wide recipe. That is, no matter what account is on my
+* machine, that
+* &gt; recipe gets applied to it.
+*
+* man procmail says:
+*
+*   If no rcfiles and no -p have been specified on the command
+*   line,  procmail  will, prior to reading $HOME/.procmailrc,
+*   interpret  commands  from  /etc/procmailrc  (if  present).
+*
+* although it's probably nicer to your users to add a .procmailrc
+* to /etc/skel that contains something like:
+*
+* INCLUDERC=/usr/local/etc/procmail/exe.rc
+*
+* The .procmailrc is then installed when you create a new account,
+* but the odd user for whom the default recipes cause a problem can
+* fix it.
+*
+* --
+*  Glen Turner                                 Network Engineer
+*  (08) 8303 3936      Australian Academic and Research Network
+*  <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+* --
+*  Earth is a single point of failure
+
+# Lifted from wolfenet by <A HREF="mailto:ian@safcol.com.au">ian@safcol.com.au</A>
+#
+# &lt;<A HREF="mailto:jhardin@wolfenet.com">jhardin@wolfenet.com</A>&gt;
+# $Id: html-trap.procmail,v 1.56 1998-08-15 08:27:52-07 jhardin Exp $
+#
+# procmail snippet to defang active-content HTML tags to protect those
+# people foolish enough to read their mail from a web browser or
+# HTML-enabled mail client. Also mangles the attachment name on executable
+# attachments to prevent the same problem, at the cost of not being able to
+# run programs from within your mail client - which you shouldn't do anyway.
+# And protects against excessively long filenames in attachments, which can
+# cause nasty things to happen in some clients, and excessively long MIME
+# Content-Type: headers, which may crash some clients.
+#
+# NOTES
+#   This is a non-delivering filter recipe.
+#
+#
+# INVOCATION
+#   Insert
+#     INCLUDERC=$FILT/html-trap.procmail
+#   into your .procmailrc at the beginning or end
+#
+
+LINEBUF=4096
+
+#---------------------------------------------------------------------------
+# Grab some info for logging
+#
+SUBJ=""
+
+:0
+* ^Subject[ 	]*:[ 	]+\/.+$
+{
+  SUBJ=" in \"$MATCH\""
+}
+
+:0
+* ^From[ 	]*:[ 	]+\/.+$
+{
+  SUBJ="$SUBJ from $MATCH"
+}
+
+SUBJ="$SUBJ to $LOGNAME
+"
+
+#---------------------------------------------------------------------------
+# Defang HTML active-content tags
+#
+
+:0 B
+* \&lt;(meta|app|script|object|embed|body[ 	]+.*onload|frameset)
+{
+
+  LOG="Defanging active HTML content$SUBJ"
+
+  # Unfortunately the &lt;BODY  DEFANGED-ONLOAD="exploit"&gt; filter is still pretty easy
+  # to defeat. I am contemplating chucking it and just doing
+  # &lt;BODY...&gt;   -&gt;   &lt;BODY&gt;&lt;DEFANGED-BODY...&gt;
+  # You lose link colors and the other eye candy, but you *can't* get an
+  # exploit past it.
+
+  :0 fw
+  | perl -p -e '	#\
+	if (/&lt;/) {	#\
+		s/&lt;DEFANGED-META/&lt;DEFANGED-META/gi;	#\
+		s/&lt;DEFANGED-APP/&lt;DEFANGED-APP/gi;	#\
+		s/&lt;DEFANGED-SCRIPT/&lt;DEFANGED-SCRIPT/gi;	#\
+		s/&lt;DEFANGED-OBJECT/&lt;DEFANGED-OBJECT/gi;	#\
+		s/&lt;DEFANGED-EMBED/&lt;DEFANGED-EMBED/gi;	#\
+		s/&lt;DEFANGED-FRAMESET/&lt;DEFANGED-FRAMESET/gi;	#\
+		$sqstr = chr(39) . "[^" . chr(39) . "]*" . chr(39) unless $sqstr;	#\
+		while (s/&lt;BODY\s+((([^=\s]+\s+)|(\S+\s*=\s*("[^"]*"|${sqstr})\s+))*)ONLOAD/&lt;BODY $1 DEFANGED-ONLOAD/gio) {}	#\
+	}'
+}
+
+#---------------------------------------------------------------------------
+# Mangle HTML and executable attachment filenames enough that they won't
+# automatically execute, and limit the length of extremely long attachment
+# filenames and Content-Type headers to prevent buffer overflows and client
+# crashes (sigh). Adding ${$} to the mangling inserts a bit of randomness
+# so that an active-HTML or BO exploit can't just look for an attachment
+# named EXPLOIT.DEFANGED-EXE to get around the defanging.
+#
+# NOTE: the [ 	] has a tab embedded in it...
+#
+
+# UUE attachments
+:0 B
+* ^begin[ 	]+([0-9]+)?[ 	]+[^ 	]+
+{
+  :0 B
+  * ^begin[ 	]+([0-9]+)?[ 	]+\/[^ 	]....................................................................................................+$
+  {
+    LOG="Truncating extremely long attachment filename $MATCH$SUBJ"
+  
+    :0 fw
+    | perl -p -e 'if (/^begin\s+[0-9]*\s/i) {	#\
+	  ($mode, $filen) = /^begin\s+([0-9]*)\s+(.{64}).*$/i;	#\
+	  $mode = "666" unless $mode;	#\
+	  s/^.*$/begin $mode $filen.../ if $filen;	#\
+	  }'
+  }
+
+  :0 B
+  * ^begin[ 	]+([0-9]+)?[ 	]+\/[^ 	]+\.(html?|exe|com|cmd|bat)$
+  {
+    LOG="Mangling executable attachment filename $MATCH$SUBJ"
+  
+    :0 fw
+    | perl -p -e 's/\.(html?|exe|com|cmd|bat)$/.${$}DEFANGED-$1/i #\
+	  if /^begin\s+[0-9]*\s/i; '
+  }
+}
+
+# MIME attachments
+:0
+* ^Content-Type[ 	]*:.*multipart/[a-z]+;
+{
+  LOG="Sanitizing MIME attachment headers$SUBJ"
+
+  # Due to procmail not unwrapping MIME attachment headers,
+  # (they're in the message body) this perl script has to run against
+  # *every* message with MIME attachments to ensure security. Sorry.
+
+  # NOTE: I don't use the CPAN MIME module in order to keep this as simple
+  # as possible and to keep it self-contained (i.e. everything is *right
+  # here*).
+
+  # Make sure $LOGFILE exists so the shell doesn't barf
+  LOGFILE=${LOGFILE:-"/dev/null"}
+
+  # If you get "Out of memory" errors in your procmail log, try changing to
+  # the following:
+  # :0 fw
+  # | ulimit -d 15000; perl -p -e '     #\
+
+  :0 fw
+  | perl -p -e '	#\
+      if ($mimeboundary) {	#\
+        if (/^\s*$/) {	#\
+          $inmimehdr = 0;	#\
+        } elsif (/^--${mimeboundary}(--)?$/o) {	#\
+          $inmimehdr = 1;	#\
+          s/${mimeboundary}/${newboundary}/ if $boundarytoolong;	#\
+        } 	#\
+        if ($inmimehdr || $hdrcnt) {	#\
+          if (/^(\s+\S|(file)?name)/) {	#\
+            s/^\s*/ /;	#\
+            s/\s*\n$//;	#\
+            $hdrtxt .= $_;	#\
+            $_ = "";	#\
+          } else {	#\
+            if ($hdrtxt) {	#\
+              if ($hdrtxt =~ /^[-\w]+\s*:.*name\s*=\s*"(\\.|[^"])+$/i) {	#\
+                warn " Fixing missing close quote on filename.\n";	#\
+                $hdrtxt .= "\"";	#\
+              }	#\
+              while (($filen) = $hdrtxt =~ /^Content-[-\w]+\s*:.*name\s*=\s*([^"\s]\S+)/i) {	#\
+                $filen =~ s/\"/\\"/g;	#\
+                $hdrtxt =~ s/name\s*=\s*[^"\s]\S+/name="$filen"/i;	#\
+              }	#\
+              while (($filen) = $hdrtxt =~ /^Content-[-\w]+\s*:.*name\s*=\s*"((\\.|[^"]){64})(\\.|[^"]){16,}"/i) {	#\
+                warn " Truncating long filename.\n";	#\
+                $hdrtxt =~ s/name\s*=\s*"(\\.|[^"]){80,}"/name="$filen..."/i;	#\
+              }	#\
+              while (($filen) = $hdrtxt =~ /^Content-[-\w]+\s*:.*name\s*=\s*"((\\.|[^"])+\.(html?|exe|com|cmd|bat))"/i) {	#\
+                warn " Mangling executable filename \"$filen\".\n";	#\
+                $filen =~ s/\.([a-z]+)$/.${$}DEFANGED-$1/i;	#\
+                $hdrtxt =~ s/name\s*=\s*"(\\.|[^"])+"/name="$filen"/i;	#\
+              }	#\
+              if (($junk) = $hdrtxt =~ /^Content-Type\s*:\s+(.{128}).{100,}$/i) {	#\
+                warn " Truncating long Content-Type header.\n";	#\
+                $junk =~ s/"/\\"/g;	#\
+                $hdrtxt = "Content-Type: X-BOGUS\/X-BOGUS; originally=\"$junk...\"";	#\
+              }	elsif (($junk) = $hdrtxt =~ /^Content-Description\s*:\s+(.{128}).{100,}$/i) {	#\
+                warn " Truncating long Content-Description header.\n";	#\
+                $hdrtxt = "Content-Description: $junk...";	#\
+              }	elsif (($junk) = $hdrtxt =~ /^Content-[-\w]+\s*:\s+(.{128}).{100,}$/i) {	#\
+                warn " Truncating long MIME header.\n";	#\
+                $junk =~ s/"/\\"/g;	#\
+                $hdrtxt =~ s/^Content-([-\w]+)\s*:.*$/X-Overflow: Content-$1; originally="$junk..."/i;	#\
+              }	#\
+              print $hdrtxt, "\n";	#\
+              $hdrtxt = "";	#\
+            }	#\
+            if (/^\S/) {	#\
+              s/\s*\n$//;	#\
+              $hdrtxt = $_;	#\
+              $_ = "";	#\
+              $hdrcnt++;	#\
+            } else {	#\
+              $hdrcnt = 0;	#\
+              $hdrtxt = "";	#\
+            }	#\
+          }	#\
+        }	#\
+      } else {	#\
+        $pasthdr = 1 if /^\s*$/;	#\
+        unless ($pasthdr) {	#\
+          if (/^Content-Type\s*:\s.*multipart\/[a-z]+;/i) {	#\
+            $wanthdr = 1;	#\
+            print "X-Security: MIME headers sanitized on ", $ENV{"HOST"}, "\n";	#\
+            print "\tSee <A HREF="http://www.wolfenet.com/~jhardin/procmail-security.html">http://www.wolfenet.com/~jhardin/procmail-security.html</A>\n";	#\
+            print "\tfor details. \$Revision: 1.56 $x\$Date: 1998-08-15 08:27:52-07 $x\n";	#\
+          } elsif (/^\S/) {	#\
+            $wanthdr = 0;	#\
+          }	#\
+          if ($wanthdr) {	#\
+            if (($mimeboundary) = /boundary\s*=\s*((".+")|([^"]\S+))/i) {	#\
+              $mimeboundary =~ s/(^"|"$)//g;	#\
+              if ($boundarytoolong = (length($mimeboundary) &gt; 80)) {	#\
+                warn " Truncating long MIME body-part boundary string.\n";	#\
+                $newboundary = substr($mimeboundary,0,64);	#\
+                $mimeboundary = quotemeta($mimeboundary);	#\
+                s/${mimeboundary}/${newboundary}/;	#\
+              } else {	#\
+                $mimeboundary = quotemeta($mimeboundary);	#\
+              }	#\
+            }	#\
+          }	#\
+        }	#\
+      }	#\
+    ' 2&gt;&gt; $LOGFILE
+}
+
+#eof
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

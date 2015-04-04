@@ -1,0 +1,88 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba backup suggestions" -->
+<!-- FromName="'Matthew Geddes'" -->
+<!-- FromEmail="mgeddes@tellurian.com.au" -->
+<!-- ToName="'michael'" -->
+<!-- ToEmail="michael@home.lyppard.com.au" -->
+<!-- Date="Wed, 11 Sep 2002 16:02:28 +0930" -->
+<!-- Id="20020911063228.GB3414@hilarious.tellurian.com.au" -->
+<!-- Reference="Pine.LNX.4.10.10209111058210.11764-100000@sandwich.home.lyppard.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba backup suggestions</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  To  : michael &lt;<I><A HREF="mailto:michael@home.lyppard.com.au">michael@home.lyppard.com.au</A></I>&gt;
+  Date: Wed, 11 Sep 2002 16:02:28 +0930
+</PRE>
+<H1>Re: Samba backup suggestions</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Sep 11, 2002 at 11:10:40AM +0930, michael wrote:
+&gt; Hi.
+&gt; 
+&gt; We have a bunch of users using up to 2gb of filespace in it's own
+&gt; partition under /home/share/username(a,b,c,etc) and we'd like to back that
+&gt; data up to tape using an existing Win2k backupexec system on the network.
+&gt; 
+&gt; To achieve that, and make it work, is it neccesary to share the
+&gt; /home/share directory with root permissions so that the backup server can
+&gt; access all the private filespaces? (I'd rather not, but am wondering how
+&gt; this issue is normally addressed)
+
+Most people create a share that's accessible by a single user (in this case, the one that BackupExec connects to the share as) and allow it to read all of the files in the tree you want backed up. Typically this just involves making that same user a member of a group that all users are a member of (users or staff or something).
+
+&gt; I have thought of using tar from cron as root to create a .tar.gz archive,
+&gt; and then making that available to the backup server via samba with normal
+&gt; user permissions.
+
+This is not such a bad idea, if you can spare the necessary disk space. You could also get the Linux box to tar up the directory tree and write it directly to the Windows box over a share.
+
+&gt; As they say in the classics, Any suggestions?
+
+Yes. If you find a perfect solution, tell the world. As all of those that work in a heterogeneous environment know, backups are one of the hardest things to get working across a number of different platforms.
+
+You will run into problems with the file system permissions being lost if you don't deliberately back them up (tar and cpio back these up by default, but Samba can't really do all that good a job). We usually backup the Windows boxen from a UNIX box, but run cacls.exe over the tree first to write the ACLs (access control lists) to a text file before we back up. This way, when we restore, we have some way of restoring file system permissions / ACLs.
+
+Have a look into both tar and dump. I would recommend using tar, though, because of it's flexibility. You can then use tar to back up the unix file system and write that tar file to tape. Dump's a little messier.
+
+Just watch the 2GB file size limit that affects a number of operating systems (pre 2.4 linux kernels, some Windows versions and applications, etc).
+
+Hope it helps,
+Matt
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

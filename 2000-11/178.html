@@ -1,0 +1,108 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: restricted shell recommendation?" -->
+<!-- FromName="'John Edwards'" -->
+<!-- FromEmail="isplist@pinnacle.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="akenning@dog.topology.org,linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 6 Nov 2000 22:29:04 +1030" -->
+<!-- Id="004201c047e8$f651bab0$0800a8c0@duel.pinnacle.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: restricted shell recommendation?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: John Edwards &lt;<I><A HREF="mailto:isplist@pinnacle.net.au">isplist@pinnacle.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 6 Nov 2000 22:29:04 +1030
+</PRE>
+<H1>Re: restricted shell recommendation?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt;The real problem is that I want users to be able to
+&gt;use "scp" to do file transfers, but not to be able to
+&gt;wander around and look at everything and do nasty things
+&gt;like getting "r00t shellz".
+&gt;
+&gt;Unfortunately, scp uses ssh to execute an "scp" process on
+&gt;the server machine, or so it seems.
+&gt;So you can't turn off ssh if you want scp to be permitted.
+&gt;This is real problem, in my opinion, which reduces the
+&gt;security of ssh.
+
+ssh and scp do the same thing, just at different levels of interactivity,
+there's nothing to stop someone from using scp to form a jerky method of
+communicating by sending small files instead of tcp packets. Here's one way
+around it that's sure to have a dozen security holes:
+
+Perhaps you could have the home directories for these users on a partition
+mounted noexec, then have the only executable binaries available to them
+actually be setuid scripts (with an only slightly more privilidged UID)
+wrapping the programs you want. This is totally unproven, I made it up just
+now :)
+
+ie:
+---
+#!/bin/sh
+
+if [`echo "$1" | grep -c [^a-zA-Z0-9\:\.\/]` -gt 0]; then
+    exit
+fi
+
+if [`echo "$2" | grep -c [^a-zA-Z0-9\:\.\/]` -gt 0]; then
+    exit
+fi
+
+/path/to/scp $1 $2
+---
+
+You would then do something like "chmod +s nobody scp_wrapper.sh" so your
+users still don't have access to sh, grep, or scp/ssh, but "nobody" does.
+The litte bit of basic regex stuff there will prevent anything
+non-alphanumeric from finding it's way to scp, except for . and : which are
+required to make scp do something.
+
+Maybe leave "." out as well if you only want users to scp to systems that
+are in the hosts file (or those that can be reached as 8-octet hexadecimal
+IP's..)
+
+Tightening up shell access is hard if you want to let users having anything
+more than numeric menu options. Avoid offering shell access if possible :)
+
+John Edwards
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

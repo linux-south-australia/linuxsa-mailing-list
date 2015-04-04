@@ -1,0 +1,134 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: sensitive to the green" -->
+<!-- FromName="'No good Punk'" -->
+<!-- FromEmail="nogoodpunk@yahoo.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 1 Nov 2002 07:13:55 -0800 (PST)" -->
+<!-- Id="20021101151355.63146.qmail@web20507.mail.yahoo.com" -->
+<!-- Reference="20021101150658.85530.qmail@web20503.mail.yahoo.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: sensitive to the green</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: No good Punk &lt;<I><A HREF="mailto:nogoodpunk@yahoo.com">nogoodpunk@yahoo.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 1 Nov 2002 07:13:55 -0800 (PST)
+</PRE>
+<H1>Re: sensitive to the green</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Here is an interesting note about luminance in OpenGL
+from:
+<A HREF="http://www.opengl.org/developers/code/features/KilgardTechniques/oglpitfall/oglpitfall.html">http://www.opengl.org/developers/code/features/KilgardTechniques/oglpitfall/oglpitfall.html</A>
+
+You can use OpenGL's glReadPixels command to read back
+rectangular regions of a window into your program's
+memory space. While reading back a color buffer as RGB
+or RGBA values is straightforward, OpenGL also lets
+you read back luminance values, but it can a bit
+tricky to get what you probably expect. Retrieving
+luminance values is useful if you want to generate a
+grayscale image.
+
+When you read back luminance values, the conversion to
+luminance is done as a simple addition of the distinct
+red, green, and blue components with result clamped
+between 0.0 and 1.0. There is a subtle catch to this.
+Say the pixel you are reading back is 0.5 red, 0.5
+green, and 0.5 blue. You would expect the result to
+then be a medium gray value. However, just adding
+these components would give 1.5 that would be clamped
+to 1.0. Instead of being a luminance value of 0.5, as
+you would expect, you get pure white.
+
+A naive reading of luminance values results in a
+substantially brighter image than you would expect
+with a high likelihood of many pixels being saturated
+white.
+
+The right solution would be to scale each red, green,
+and blue component appropriately. Fortunately,
+OpenGL's pixel transfer operations allow you to
+accomplish this with a great deal of flexibility.
+OpenGL lets you scale and bias each component
+separately when you send pixel data through OpenGL.
+
+For example, if you wanted each color component to be
+evenly averaged during pixel read back, you would
+change OpenGL's default pixel transfer state like
+this:
+
+glPixelTransferf(GL_RED_SCALE,0.3333);
+glPixelTransferf(GL_GREEN_SCALE,0.3334);
+glPixelTransferf(GL_BLUE_SCALE,0.3333); 
+
+With OpenGL's state set this way, glReadPixels will
+have cut each color component by a third before adding
+the components during luminance conversion. In the
+previous example of reading back a pixel composed of
+0.5 red, 0.5 green, and 0.5 blue, the resulting
+luminance value is 0.5.
+
+However, as you may be aware, your eye does not
+equally perceive the contribution of the red, green,
+and blue color components. A standard linear weighting
+for combining red, green, and blue into luminance was
+defined by the National Television Standard Committee
+(NTSC) when the US color television format was
+standardized. These weightings are based on the human
+eye's sensitivity to different wavelengths of visible
+light and are based on extensive research. To set up
+OpenGL to convert RGB to luminance according to the
+NTSC standard, you would change OpenGL's default pixel
+transfer state like this:
+
+glPixelTransferf(GL_RED_SCALE, 0.299);
+glPixelTransferf(GL_GREEN_SCALE, 0.587);
+glPixelTransferf(GL_BLUE_SCALE, 0.114); 
+
+If you are reading back a luminance version of an RGB
+image that is intended for human viewing, you probably
+will want to use the NTSC scale factors.
+
+
+__________________________________________________
+Do you Yahoo!?
+HotJobs - Search new jobs daily now
+<A HREF="http://hotjobs.yahoo.com/">http://hotjobs.yahoo.com/</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

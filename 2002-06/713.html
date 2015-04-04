@@ -1,0 +1,154 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: VPN (IPSec or PPTP) over NAT" -->
+<!-- FromName="'Toby Corkindale'" -->
+<!-- FromEmail="tjc@lost.net.au" -->
+<!-- ToName="'Richard Russell'" -->
+<!-- ToEmail="richard@yellowgoanna.com" -->
+<!-- Date="Thu, 27 Jun 2002 04:01:27 +0930 (CST)" -->
+<!-- Id="20020627034936.A28217-100000@marbles.lost.net.au" -->
+<!-- Reference="20020626144035.E32547@yellowgoanna.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: VPN (IPSec or PPTP) over NAT</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjc@lost.net.au">tjc@lost.net.au</A></I>&gt;
+  To  : Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  Date: Thu, 27 Jun 2002 04:01:27 +0930 (CST)
+</PRE>
+<H1>Re: VPN (IPSec or PPTP) over NAT</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I've done exactly this before, but I just used ssh, ppp, iptables and
+route.
+
+You need a recent version of ppp that can deal with using a child program
+to transmit/receive the ppp stream. (Any recent distro should do)
+
+Use ssh as that child to make the connection over where the encrypted link
+goes. If neccessary you may need to do some port-forwarding with inverse
+masquerading at one end to get into the clients network, but thats not
+hard with iptables. (But its a FPITA to do with ipfwadm/ipchains)
+
+
+Now setup the routing and firewall rules as appropriate for this tunnelled
+ppp0 interface..
+
+And presto! you can do stuff like
+
+[192.168.1.99]$ telnet 192.168.2.66
+
+with no worries.
+
+
+
+I've tried using PPTP and GRE and IPsec and so on, but they always caused
+me grief. The tried-and-true ssh/ppp tunnel requires just one port open on
+your firewall, and works thru all types of NAT and port forwarding.
+(Or other tunnels for that matter)
+
+
+Some people have said it's inelegant -- but so far no one else has shown
+me another way to do it that works as well in those circumstances.
+
+I'm genuinely interested to hear if you manage to work this out using
+"industry standard" (ie. cisco compatible)  methods with ipsec or such.
+
+ta,
+
+Toby
+
+On Wed, 26 Jun 2002, Richard Russell wrote:
+
+&gt; Hi all,
+&gt;
+&gt; I have been under the impression that it is impossible to do IPSec or
+&gt; PPTP through a NAT gateway... However
+&gt; <A HREF="http://www.impsec.org/linux/masquerade/ip_masq_vpn.html">http://www.impsec.org/linux/masquerade/ip_masq_vpn.html</A> seems to
+&gt; indicate that one can masquerade both of them, with a few caveats.
+&gt;
+&gt; However, this document only applies to the 2.0 and 2.2 series kernels.
+&gt; Also, it appears to require patching the firewall itself (though I
+&gt; haven't read it thoroughly)...
+&gt;
+&gt; Does anyone know how I can do what I want... That is:
+&gt;
+&gt;   My LAN
+&gt; 192.168.1.0/24
+&gt;     |
+&gt;     |
+&gt; 192.168.1.1 (internal interface)
+&gt; My Linux 2.4
+&gt;  Gateway (does SNAT)
+&gt;  a.b.c.d (external real interface)
+&gt;     |
+&gt;     |
+&gt;  Internet-------\
+&gt;                 |
+&gt;              e.f.g.h (external real interface)
+&gt;         Some Clients' unknown
+&gt;         Gateway (does SNAT)
+&gt;            192.168.2.1 (internal interface)
+&gt;                 |
+&gt;                 |
+&gt;          192.168.2.0/24
+&gt;           Clients' LAN
+&gt;          with my laptop
+&gt;
+&gt; What I want to be able to do is communicate from within the client LAN
+&gt; to my gateway as if I were on my LAN. It needs to be encrypted all the
+&gt; way, and I can't really do much to the Clients' gateway (which could
+&gt; be Linux, Cisco or Windows or anything). I wouldn't really need to be
+&gt; on my own 192.168.1.0 range -- it would be ok to be on some other
+&gt; range, so there were no conflicts with the client LAN. All I want to
+&gt; do is ensure that I can do things like interact with my IMAP and SMTP
+&gt; mail servers without opening up an external port.
+&gt;
+&gt; Any ideas? Could I perhaps set up an unencrypted IP over IP tunnel
+&gt; through, and then run IPSec over that? That way, the IPSec packets
+&gt; would appear to be unnaffected by the SNATting.
+&gt;
+&gt; rr
+&gt;
+&gt;
+
+-- 
+we dance to the sound of sirens
+we watch genocide to relax
+we dance to the sound of sirens
+we are the heroes of self-deception
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,182 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="/boot/grub/stage2 file changes magically.. very weird! (LONG post!)" -->
+<!-- FromName="'Graham Smith'" -->
+<!-- FromEmail="linuxsalist@sonicresolutions.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 16 Jan 2003 10:08:11 +1030" -->
+<!-- Id="00df01c2bcef$2a703ec0$1400a8c0@sonicresolutions.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: /boot/grub/stage2 file changes magically.. very weird! (LONG post!)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Graham Smith &lt;<I><A HREF="mailto:linuxsalist@sonicresolutions.com">linuxsalist@sonicresolutions.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 16 Jan 2003 10:08:11 +1030
+</PRE>
+<H1>/boot/grub/stage2 file changes magically.. very weird! (LONG post!)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi everyone..
+
+This problem has really got me baffled and I would appreciate any ideas.  It
+all started 3 days ago when tripwire reported that /boot/grub/stage2 had
+changed (in the overnight integrity check).  The file dates, file size,
+permission were all identical.  Only the MD5 and CRC32 checksums were
+different.  That was the only file that showed up as suspicious in the
+tripwire report.  I thought it was incredibly unlikely that my system had
+been rooted and only a boot file like stage2 had been modified or caught by
+tripwire.
+
+So I felt (and still do, given what has occurred since) that the system had
+not been rooted as there was NO other evidence.  My log files, link traffic
+reports, etc all looked normal and nothing else was picked up by tripwire.
+Anyway, I decided to do a manual update of tripwire (tripwire -m c -I) to
+stop it from reporting stage2 the next day and I decided to wait and see
+what happened.
+
+The following night the tripwire report was clean, but then the next night,
+sure enough up comes /boot/grub/stage2 in the integrity report with a
+changed MD5 and CRC32.  Now what I noticed was that the MD5 and CRC32
+checksums had reverted back to what they were back 3 days ago.  So it
+appeared the file had "changed back" to exactly what it was prior to 3 days
+ago!  If I had not updated tripwire when it first reported the change, it
+would not have reported it this time around as the file had reverted back to
+it's original state, before tripwire first reported it, with it's original
+MD5 and CRC32.  Very strange!!  To illustrate this, here is the output of
+the tripwire MD5 and CRC32 lines for /boot/grub/stage2 the first time around
+(not that these are the only 2 properties that tripwire reported to have
+been changed):
+
+Modified object name:  /boot/grub/stage2
+Property:            Expected                    Observed
+  -------------        -----------                 -----------
+* CRC32                BezgOL                      A6zNgj
+* MD5                  A1Xwm8sAFkK2LuEfUl4roR      AN6kUxus/JAmbV3XlUMp0B
+
+
+And here it is 3 days later:
+Modified object name:  /boot/grub/stage2
+Property:            Expected                    Observed
+  -------------        -----------                 -----------
+* CRC32                A6zNgj                      BezgOL
+* MD5                  AN6kUxus/JAmbV3XlUMp0B      A1Xwm8sAFkK2LuEfUl4roR
+
+As you can see the MD5's and CRC32's swap around.  The file seems to be
+alternating between two states.
+
+At this point I decided to do some tests of my own using the cmp command.
+Firstly I made a copy of the stage2 file in the state it was currently in
+and verified that cmp reported no differences between it and the version
+stored in /boot/grub/.  Then I waited.. 10 minutes later I rechecked the two
+files with cmp, and the version of stage2 in /boot/grub had changed again..
+yep, magically it had changed and now cmp was reporting differences between
+the two files!  So now I had two ever so slightly different version.  The
+output of cmp is reporting this:
+
+stage2 /boot/grub/stage2 differ: char 536, line 5
+   536  50  57
+   537 150 147
+   538 144 162
+   539  60 165
+   540  54 142
+   541  60  57
+   542  51 147
+   543  57 162
+   544 147 165
+   545 162 142
+   546 165  56
+   547 142 143
+   548  57 157
+   549 147 156
+   550 162 146
+   551 165   0
+
+Now I made a second copy of /boot/grub/stage2 in this state also, so now I
+had both "states" of the file stored elsewhere so I could use them as
+references.  Basically at random it appears the original /boot/grub/stage2
+file changes from it's original state to the state above and then back
+again.  There seems to be no pattern that I can establish to the change.  It
+just happens.  Sometimes it won't change for a day, then it might change
+within an hour.  What I have determined beyond reasonable doubt is that it
+only ever alternates between these two states with no other variations to
+the file.
+
+Now for some technical specs:
+
+The system is running Redhat 7.2 with a 2.4.18-18.7.xcustom kernel using
+ext3 and software raid.  Now I am aware that there is a bug in the ext3 code
+of this kernel version according to Redhat but it should only effect systems
+that specifically mount with the data=journal option and only effects
+filesystems when unmounted.  This is not the default mode and my ext3
+filesystems are mounted with the default mode.  The errata documentation on
+the Redhat site confirms my system should definitely not be vulnerable to
+this bug and the symptoms don't match in either case.
+
+The system runs mirrored IDE drives using the software raid built into
+linux.  Is it possible the stage2 file has somehow ended up slightly
+different on each of the mirrored drives? It would explain why the file
+seems to alternate states.  Could the RAID system be alternating between the
+versions on the two drives??  I know in theory this should never happen and
+if it does, the system should resync the two drives.  Just a thought!
+
+I did a lot of searching around on the net and the only thing I could come
+up with is a news group post from somebody that interestingly enough
+reported that stage2 had changed and was reported by tripwire (I thought I
+had hit the jackpot solution).  The replies he got to his post suggested
+vague RAM problems but I can't work out why the file changes and then
+changes back again to it's original state?  One would think a RAM problem
+would cause the file to change permanently, in a more random nature (but
+perhaps someone will correct me on that point?).    Unfortunately this news
+thread ended abruptly after only a few suggestions and no real solution was
+posted other than "check your ram".  Because my system is running a
+webserver, I don't particularly want to jump straight to having to pull the
+thing offline to run memory testers if this turns out to be something other
+than a RAM problem and from my experience, it seems like a very odd
+incarnation of a memory issue.
+
+The first time I touched linux was about 18 months ago and I have undergone
+a huge learning curve since.  I love it and really enjoy using it but there
+is still a lot of holes in my knowledge.  So any ideas as to what might be
+causing this or how I could narrow it down further would be most
+appreciated!
+
+Many thanks,
+Graham Smith
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

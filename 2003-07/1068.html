@@ -1,0 +1,163 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Sound modules" -->
+<!-- FromName="'Andrew Lord'" -->
+<!-- FromEmail="andrewlord@internode.on.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 25 Jul 2003 01:29:21 +0930" -->
+<!-- Id="200307250129.22080.andrewlord@internode.on.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Sound modules</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Lord &lt;<I><A HREF="mailto:andrewlord@internode.on.net">andrewlord@internode.on.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 25 Jul 2003 01:29:21 +0930
+</PRE>
+<H1>Sound modules</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+I've been attempting to get sound running after a system - reinstall (Mandrake 
+9.1).  It's not a really happenning thing at the moment, however.
+
+Here's a printout of the various parameters:
+
+### Which driver does the card use by default ?  lspcidrake -v | fgrep AUDIO 
+
+es1371          : Ensoniq|ES1371 [AudioPCI-97] [MULTIMEDIA_AUDIO] (vendor:1274 
+device:1371) 
+
+### Which driver does it currently use ?   grep sound-slot /etc/modules.conf 
+alias sound-slot-0 es1371 
+
+### Is the module (driver) loaded or not ?   /sbin/lsmod 
+Module                  Size  Used by    Not tainted 
+ppp_deflate             4408   0 (autoclean) 
+zlib_deflate           21144   0 (autoclean) [ppp_deflate] 
+bsd_comp                5336   0 (autoclean) 
+isofs                  27988   0 (autoclean) 
+zlib_inflate           21156   0 (autoclean) [ppp_deflate isofs] 
+udf                    90464   0 (autoclean) 
+binfmt_misc             7020   1 
+autofs4                11540   2 (autoclean) 
+lp                      8096   0 
+parport_pc             25096   1 
+parport                34176   1 [lp parport_pc] 
+nfsd                   74256   8 (autoclean) 
+ppp_async               9216   1 
+ppp_generic            24060   3 [ppp_deflate bsd_comp ppp_async] 
+slhc                    6564   1 [ppp_generic] 
+af_packet              14952   0 (autoclean) 
+ip_vs                  83192   0 (autoclean) 
+sr_mod                 16920   0 (autoclean) 
+floppy                 55132   2 
+sis900                 15564   1 (autoclean) 
+nls_iso8859-1           3516   2 (autoclean) 
+nls_cp850               4316   2 (autoclean) 
+vfat                   11820   2 (autoclean) 
+fat                    37944   0 (autoclean) [vfat] 
+supermount             15296   4 (autoclean) 
+ide-cd                 33856   1 
+cdrom                  31648   0 [sr_mod ide-cd] 
+ide-scsi               11280   0 
+scsi_mod              103284   2 [sr_mod ide-scsi] 
+usb-ohci               20584   0 (unused) 
+usbcore                72992   1 [usb-ohci] 
+rtc                     8060   0 (autoclean) 
+
+### Are the sound services configured to be run on initlevel3 ?  
+/sbin/chkconfig --list sound 
+sound          	0:off	1:off	2:on	3:on	4:on	5:on	6:off 
+
+### Are the alsa services configured to be run on initlevel3 ?  
+/sbin/chkconfig --list alsa 
+alsa           	0:off	1:off	2:off	3:off	4:off	5:off	6:off 
+
+### Is the sound volume muted or not ?   aumix -q 
+aumix:  error opening mixer 
+
+### Which program uses the soundcard ?   /sbin/fuser -v /dev/dsp 
+/dev/dsp: No such file or directory 
+
+Also, when I run sndconfig 0.68, I get the following:
+
+#######################
+PCI Probe Results
+
+A PCI sound card was found in your system.  The details are:
+
+	Model: Ensoniq|ES1371 [AudioPCI-97]
+#######################
+
+ . . . and then . . . . .
+
+#######################
+Sound Card Test
+
+A sound sample will now be played to determine if your sound card has been 
+correctly configured.
+
+#######################
+
+ . . . and then . . . . .
+
+#######################
+The following error occurred running the modprobe program:
+
+/lib/modules/2.4.21-0.13mdk/kernel/drivers/sound/es1371.o.gz: init_module: No 
+such device
+modprobe: insmod
+/lib/modules/2.4.21-0.13mdk/kernel/drivers/sound/es1371.o.gz failed
+modpobe: insmod sound-slot-0 failed
+#######################
+
+This is despite es1371.o.gz being "present and accounted for" at the very same 
+directory that sndconfig says it is absent from.
+
+How do I go about getting the sound module to load ?
+
+Any suggestions as to whether this is the limit of the problem, or whether the 
+above info indicates another problem, would be much appreciated.
+
+Cheers,
+
+Andrew Lord
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,186 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Passing Options to loadable modules" -->
+<!-- FromName="Alex Garner" -->
+<!-- FromEmail="linuxsa@bourbon.lynx.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="tjcorkin@steadycom.com.au" -->
+<!-- Date="Mon, 12 Apr 1999 14:57:26 +0930" -->
+<!-- Id="4.1.19990412142533.00c87750@mail.lynx.net.au" -->
+<!-- Reference="4.1.19990412104032.00c4f460@mail.lynx.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Passing Options to loadable modules</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alex Garner &lt;<I><A HREF="mailto:linuxsa@bourbon.lynx.net.au">linuxsa@bourbon.lynx.net.au</A></I>&gt;
+  To  : <A HREF="mailto:tjcorkin@steadycom.com.au">tjcorkin@steadycom.com.au</A>
+  Date: Mon, 12 Apr 1999 14:57:26 +0930
+</PRE>
+<H1>Re: Passing Options to loadable modules</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Just as a followup to this, the problem was exactly as I outlined, a syntax
+error. I noticed when I was installing 4 ethernet cards into a linux box
+last month that although you pass the following options to the kernel if
+compiled into the driver  you specify them slightly different for a module
+in /etc/conf.modules. I simply extrapolated when I learned with the cards,
+and it of course didn't work!
+
+The reason I bring this up is I've yet to find a good source of information
+about /etc/conf.modules and /lib/modules/preferred/modules.dep Although
+/usr/src/linux/Documentation/modules.txt goes into quite a bit of detail as
+to HOW modules work, it lacks a fair bit on getting modules going with
+respect to the options in /etc/conf.modules Has anyone found any good
+reference yet?
+
+Also, to explain my reference to things working in X, that was to point out
+that my problem is not related to a /dev/cdrom symlink clash. If you run a
+couple of cdrom's always specify your drives explicitly (/dev/hdc) rather
+than using the /dev/cdrom symlink. The symlink is fine for single drive
+systems. It never occured to me that some people might consider that the
+GUI is part of the OS *shudder*. 
+
+With regard to the comments about the /lib/modules/preferred link, I
+recommend leaving it and using it. It is a good way of keeping different
+modules for different kernels around, and it follows the tradition of
+/usr/src/linux (this is a symlink to your current 'in use' kernel source
+tree). The problem with my system (as explained) was only syntactic.
+
+...But thanks for going into so much detail anyway. (I was only after that
+one line of text!!)  I'm sure it will be of use to people on this list.
+Getting modules working properly and effeciently can be a little tricky,
+but is a much better than hardcoding your kernel.
+
+At 13:45 12/04/99 , Toby Corkindale wrote:
+&gt;Alex Garner wrote:
+&gt;&gt; 
+&gt;&gt; I have an IDE cdrom (/dev/hdc) and a soundblaster cdrom running on the
+&gt;&gt; soundblaster card IDE port (/dev/sbpcd). I have both running happily in the
+&gt;&gt; same machine, one for data cds, and one for audio cds.
+&gt;&gt; 
+&gt;&gt; Both cdroms work fine for both data discs and audio discs, even in X.
+&gt;X doesn't affect your modules. It's just another userspace program like
+&gt;anything else. Only with graphics.
+&gt;M$ Windows uses different device drivers to M$ DOS, but under Linux the
+&gt;GUI is not part of the O/S.
+&gt;
+&gt;&gt; 
+&gt;&gt; The soundblaster cdrom is accessed via a loadable module. When a system
+&gt;&gt; call for the drive occurs (eg `mount /dev/sbpcd /mnt/cdrom`) the module
+&gt;&gt; starts to look for the drive with it's built-in auto probing sequence. Once
+&gt;&gt; it finds it (after about 2 minutes) everything is fine. If I want to I can
+&gt;&gt; pre-load the module and specify parameters manually `insmod
+&gt;&gt; /lib/modules/preferred/cdrom/sbpcd.o sbpcd=0x230,1` and this works fine
+&gt;&gt; without having to autoprobe, thus saving lots of time.
+&gt;You should be able to type merely
+&gt;insmod sbpcd sbpcd=0x230,1
+
+&gt;insmod usually does not require a path, since your modules should always
+&gt;be in the same place.
+&gt;If you can't, however, then I suspect either your modules path is odd,
+&gt;or your module probing on startup is not running and/or working.
+&gt;
+&gt;&gt; 
+&gt;&gt; A simple fix for this would be to compile the module as a driver into the
+&gt;&gt; kernel, and specify the options at compile time OR pass the parameters
+&gt;&gt; through lilo. However I would prefer to leave it as a module.
+&gt;If it's a module, you don't pass options thru lilo/loadlin - that's just
+&gt;for non-modular code.
+&gt;(I believe? Or does that still work?)
+&gt;
+&gt;&gt; 
+&gt;&gt; I want to know how to specify parameters so that when kerneld load the
+&gt;&gt; module automatically, it looks for the soundblaster at 0x230 straight away.
+&gt;&gt; 
+&gt;&gt; I've tried a few variations on "options sbpcd io=0x230 type=1" etc etc in
+&gt;&gt; /etc/conf.modules, but this just causes the module to dump out saying that
+&gt;&gt; it couldn't locate the module.
+&gt;You're using the right file.
+&gt;Above you said you needed to do insmod ..blah.. sbpcd=0x230,1
+&gt;So, enter into conf.modules:
+&gt;options sbpcd sbpcd=0x230,1
+&gt;since modprobe will just pass the rest of the line onto insmod, and
+&gt;apparently sbpcd=0x230,1 is the correct option.
+&gt;However, the error that it cannot find the module is suspicious. This is
+&gt;not due to your options being valid or invalid. Coupled with your
+&gt;requiring a full pathname for your module suggests that something is
+&gt;astray. Check that depmod -a is being run on start up. Thats the line
+&gt;that says "Generating module dependancies" or something similar, on boot
+&gt;in redhat linux.
+&gt;Try typing depmod -a manually, and see if there are any error messages.
+&gt;
+&gt;I am always a bit suspicious of the /lib/modules/preferred link that
+&gt;redhat creates. Try removing the link and rerunning depmod -a, then
+&gt;modprobe sbpcd.
+&gt;Out of interest, can you modprobe anything else without putting a full
+&gt;path in?
+&gt;Have you recompiled your kernel using newer sources than the
+&gt;alan-cox-special-edition kernel that comes with rh5.2? I'm pretty sure
+&gt;you want to remove the 'preferred' link if so.
+&gt;
+&gt;Can anyone else explain the nature of that link?
+&gt;The kernel's are smart enough to work out their version number, and
+&gt;change into that directory to access modules, so why the preferred link?
+&gt;I guess you could create multiple zimages and multiple corresponding
+&gt;sets of modules - but anyone who's likely to do that would be capable of
+&gt;making and breaking links on their own.
+&gt;Is it redhat specific, or in all recent kernels?
+&gt;
+&gt;Yours,
+&gt;Toby
+&gt;
+&gt;&gt; 
+&gt;&gt; Any ideas?
+&gt;&gt; 
+&gt;&gt; Cheers
+&gt;&gt; 
+&gt;&gt; Alex!
+&gt;&gt; 
+&gt;&gt; --
+&gt;&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt;&gt; To unsubscribe from the LinuxSA list:
+&gt;&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;-- 
+&gt;...Veni, Vidi, VC++. (I came, I saw, I kludged)
+&gt;&gt; 
+&gt;&gt; A simple fix for this would be to compile the module as a driver into the
+&gt;&gt; kernel, and specify the options at compile time OR pass the parameters
+&gt;&gt; through lilo. However I would prefer to leave it as a module.
+&gt;If it's a module, you don't pass options thru lilo/loadlin - that's just
+&gt;for non-modular code.
+&gt;(I believe? Or does that still work?)
+&gt;
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

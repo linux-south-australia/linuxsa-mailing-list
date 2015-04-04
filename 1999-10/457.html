@@ -1,0 +1,147 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: linux uses.." -->
+<!-- FromName="Toby Corkindale" -->
+<!-- FromEmail="tjcorkin@steadycom.com.au" -->
+<!-- ToName="MWP" -->
+<!-- ToEmail="hirm@chariot.net.au" -->
+<!-- Date="Wed, 27 Oct 1999 19:23:14 +0930" -->
+<!-- Id="3816CB8A.482BCFC2@steadycom.com.au" -->
+<!-- Reference="3815008E.45030E82@steadycom.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: linux uses..</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@steadycom.com.au">tjcorkin@steadycom.com.au</A></I>&gt;
+  To  : MWP &lt;<I><A HREF="mailto:hirm@chariot.net.au">hirm@chariot.net.au</A></I>&gt;
+  Date: Wed, 27 Oct 1999 19:23:14 +0930
+</PRE>
+<H1>Re: linux uses..</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+This is what I was getting at earlier.
+I know that car ECMs are extremely efficient, but even given the
+massively (relatively) worse efficiency of a fullblown O/S, you'd think
+that a 200+ MHz processor could handle a mere 8000rpm. (Which is only
+133 revs per second. Isnt a 200MHz processor doing 2 million things per
+second? Sure, some instructions take more than 1 Hz to execute, but
+still, you've got way, way more than you need..You'd think.)
+
+What someone else said though was that the standard kernel just doesn't
+allow you to usleep with enough accuracy. You can ask the processor to
+wake you up in 5 ms, but you're not guaranteed that it will be 5ms or
+5+ms.. Does anyone know how the rtlinux kernel goes at this though?
+If it can get accurate enough, you'd be okay. 
+
+One thought - use the timer interrupt, and write your own device driver
+that hooks on it.
+Thus, the kernel has a  /dev/ecm0 device. You can access it to read
+information, and write to it to set parameters, but the actual
+continual-engine-management process is done within the kernel.
+
+The thing is - what is the resolution of the timer interrupt?
+It goes without saying that of course you'd have to alter the
+block-interrupts function call used by other device drivers so that they
+didn't block the timer interrupt. And you'd have to make sure that your
+timer interrupt function was pretty quick to execute, and DID have the
+ability to block all other interrupts.
+
+You'd probably want a simple hardware board that did the
+analog-to-digital conversions for you, too. And then by the time you
+start building dedicated hardware, why not make that board do the engine
+management itself and just be configurable from the PC?
+And if you've done that, why bother to put it in a PC in the first place
+- just put it in a box in a car with a serial port on it, and call it a
+real ECM. hehe. Go back to step 1.
+
+
+MWP wrote:
+&gt; 
+&gt; Some car ECMs use 2Mhz motorola processors.... you cant tell me that a
+&gt; 200Mhz pentium couldnt do the job.
+&gt; 
+&gt; With a bit of dedicated hardware that efficently uses IRQ's and software
+&gt; that is well programed, the PC could act as an ECM.
+&gt; I wouldnt want the job of doing it though.
+&gt; 
+&gt; MWP
+&gt; 
+&gt; &gt; Toby Corkindale wrote:
+&gt; &gt; &gt;
+&gt; &gt; &gt; Heyas
+&gt; &gt; &gt; I was reading up on car engine management computers last nite - and I
+&gt; &gt; &gt; wondered how hard it would be to hook up a laptop running linux to
+&gt; &gt; &gt; control an engine... Engine computers are dedicated microprocessors
+&gt; &gt; &gt; running at just a few Mhz, so surely a 486 running at 33MHz with a
+&gt; &gt; &gt; minimal linux kernel would be able to keep up?
+&gt; &gt; &gt; Any thoughts?
+&gt; &gt;
+&gt; &gt; The December 1996 issue of Dr. Dobb's Journal had an article
+&gt; &gt; about embedded microcontrollers used in engine management
+&gt; &gt; systems, and the brief summary of that article is that it's
+&gt; &gt; quite hairy, even when you've got a completely dedicated
+&gt; &gt; microcontroller right on the scene.
+&gt; &gt;
+&gt; &gt; The hard real-time constraints are very tricky to schedule
+&gt; &gt; successfully.  You need to compute spark positioning to 0.5
+&gt; &gt; crankshaft degrees, or 10 microseconds at 8000 RPM.  This is
+&gt; &gt; so demanding that the hard real-time stuff is usually
+&gt; &gt; offloaded to a dedicated coprocessor, usually on the same
+&gt; &gt; chip as the CPU.
+&gt; &gt;
+&gt; &gt; Linux interfacing to the EMS?  Maybe.  Performing the
+&gt; &gt; real-time control?  No way -- the hardware (e.g. Intel
+&gt; &gt; or Alpha) simply isn't built to support it.
+&gt; &gt;
+&gt; &gt; behoffski
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; behoffski (Brenton Hoff) | Software Engineer, Grouse Software
+&gt; &gt; <A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A>  | <A HREF="http://www.grouse.com.au/">http://www.grouse.com.au/</A>
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; &gt;
+&gt; 
+&gt; --
+&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+..I started out with nothing...and I still have most of it left
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

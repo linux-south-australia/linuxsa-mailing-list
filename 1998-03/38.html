@@ -1,0 +1,102 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="ppp dialin script" -->
+<!-- FromName="Timothy Aslat" -->
+<!-- FromEmail="zaphod@unforgettable.com" -->
+<!-- ToName="linux SA mailing list" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 08 Mar 1998 22:57:29 +1030" -->
+<!-- Id="35028EB0.9FF5995A@unforgettable.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: ppp dialin script</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Timothy Aslat &lt;<I><A HREF="mailto:zaphod@unforgettable.com">zaphod@unforgettable.com</A></I>&gt;
+  To  : linux SA mailing list &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 08 Mar 1998 22:57:29 +1030
+</PRE>
+<H1>ppp dialin script</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+hi all,
+
+This will probably turn out to be one of those stupid questions again,
+but the only dumb question is the unasked one, right?
+
+I have a working ppp dialin script, but there's a minor snag, it won't
+redial.
+
+this is a copy of the ppp-on-dialler file (yes I'm using slackware and
+an x dialler interface won't work for what I need)
+
+#!/bin/sh
+#
+# This is part 2 of the ppp-on script. It will perform the connection
+# protocol for the desired connection.
+#
+exec /usr/sbin/chat -v                                  \
+        TIMEOUT         3                               \
+        ABORT           '\nBUSY\r'                      \
+        ABORT           '\nNO ANSWER\r'                 \
+        ABORT           '\nRINGING\r\n\r\nRINGING\r'    \
+        ''              \rAT                            \
+        'OK-+++\c-OK'   ATM1L1H0                        \
+        TIMEOUT         30                              \
+        OK              ATDT$TELEPHONE                  \
+        CONNECT         ''                              \
+
+
+the ppp-on script consists of this entry with the appropriate variable
+definitions at the start of the file
+
+exec /usr/sbin/pppd debug lock modem crtscts /dev/modem
+115200            \
+        user $LOGINNAME remotename $REMOTENAME
+\
+        noipdefault netmask $NETMASK defaultroute connect $DIALER_SCRIPT
+
+
+
+if anyone can give me a solution to enable the script to redial on no
+carrier and busy flags I would be much appreciative.
+
+I've already looked right through the pppd and chat man pages and all
+the docs I could find in the faq and howto directories with no success.
+
+thanks in advance
+
+Tim Aslat
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

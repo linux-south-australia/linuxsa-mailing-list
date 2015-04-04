@@ -1,0 +1,244 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: (Clarification) Re: Some Proposals for a Linux of The Future (tm) :)" -->
+<!-- FromName="'Adam Smith'" -->
+<!-- FromEmail="linuxsa@bugman.cx" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 1 Jul 2003 00:21:55 +0930" -->
+<!-- Id="20030630145155.GA1548@bugman.cx" -->
+<!-- Reference="" -->
+<!-- X-Face="$vsV$1FNbZN\JVpjV#&+/!oVW`Kw$j?w_,te\SS}(tKD21c+l$t%\RCS(r$G;XXk]6,(!N:&(N3EV0bY`3):UrgG7'*qsj3l.75IaHV1<`i*{[L\:F*l6fH##C:-p2]xW/R-Z:!bo;5g3GP-{I{}7O>tN}`Xm/=-:8NG?f-r'$Qc3y[aW-7'W_S<`KYU!_;`7K=kuC$-.7J2*kk=~`c@ADp+xhsv(!a@eW-R_5wtx+tC)(]%W+" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: (Clarification) Re: Some Proposals for a Linux of The Future (tm) :)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adam Smith &lt;<I><A HREF="mailto:linuxsa@bugman.cx">linuxsa@bugman.cx</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 1 Jul 2003 00:21:55 +0930
+</PRE>
+<H1>Re: (Clarification) Re: Some Proposals for a Linux of The Future (tm) :)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Jun 30, 2003 at 11:18:13PM +0930, Damien Uern said:
+&gt; Hello,
+
+Well Hi there!
+
+&gt; The separation of Administrator-modified configuration files and the default 
+&gt; files installed by the system makes sense to me. But having it in two totally 
+&gt; different locations doesn't, e.g. "/etc and /usr/local/etc". Forgetting about 
+&gt; Unix history for a moment and stepping outside of the box, if you were to 
+&gt; design the filestructure from scratch, where would you place these two 
+&gt; directories?
+
+Because it's the history of Unix that has held it together as a scalable
+operating system for so long.
+
+And it makes logical sense to me.
+
+/etc for your basic system config files that come with your operating
+system,
+
+/usr/local/etc for all the additional stuff you've added to the system that
+doesn't come as part of the underlying model.  'man hier' and look up
+/usr/local.
+
+I agree that it can be sometimes confusing, for example:
+
+/etc/named/named.conf
+/usr/local/etc/dhcpd.conf
+
+(Yes -- both services are fundamental to most networks, and while
+named.conf is a file and a service included with a generic install,
+dhcpd.conf is not, because it's installed, in freebsd's case, from the
+ports.
+
+&gt; So here are my revised goals:
+&gt; 
+&gt; 1. Design a logical directory structure within the /etc directory.
+&gt;    - it must be fairly simple for somebody to look through that directory to 
+&gt; find something without resorting to "locate" or "find".
+
+How?
+
+Any sort of mixing together of basic configuration files and configs for
+additional modules would take away the principles of the logical structure
+that Unix has today.  The same principle exists right now for /bin and
+/usr/local/bin.  Should we change that aswell?  /bin is for programs that
+need to be run in multi or single user mode, and /usr/local/bin is used for
+binaries for added on programs (because that's generally what your /usr
+partition is for.)
+
+It is only poor coding by some developers that make things inconsistent, or
+a user's customized personal preference (for example, some users like to
+store their applications in completely seperatated directories, including
+all data, config files and libraries.)
+
+&gt; 2. Design a unified configuration file format.
+&gt;   - This format must be simple enough to be easily understood by somebody 
+&gt; without them having to refer to a manual
+
+Some of what you say here is valid, because there are config files that set
+options differently, eg:
+
+-- from /etc/inetd.conf:
+ftp     stream  tcp     nowait  root    /usr/libexec/ftpd       ftpd -l
+
+-- from /etc/rc.conf:
+defaultrouter="10.0.0.254"
+hostname="host.domain.com"
+
+-- from /usr/local/etc/wine.conf
+;; Floppy Disk Drive
+[Drive A]
+"Path" = "/mnt/fd0"
+"Type" = "floppy"
+"Label" = "Floppy"
+"Filesystem" = "win95"
+"Serial" = "87654321"
+"Device" = "/dev/fd0"
+
+-- from /etc/named/named.conf
+
+options {
+        directory "/etc/namedb";
+        pid-file "/var/run/named/pid";
+	}
+
+&gt;   - All configuration files will have a common extension so they can easily be 
+&gt; seen as such (e.g: .conf).
+
+There are a few exceptions to this, but you'll probably find that most
+programs already use a .conf extension, and of those that aren't -- sloppy
+programming, most likely.
+
+&gt; 3. Design a simple (probably xml-based) layout file that allows an application 
+&gt; to display (graphically) the configuration options for a program.
+
+Most programs don't utilise a GUI interface because:
+
+a) They don't run in a GUI environment
+b) They have way too many options to display in a GUI
+c) Their configuration files have extended attributes or macros which are
+too difficult to display in a GUI
+d) They are too short to display in a GUI
+e) There's no point displaying them in a GUI because they are so straight
+forward.
+
+Are you proposing some sort of registry clone?
+
+&gt;   - The file format should be fairly easy to understand, but referring to a 
+&gt; manual in order to write one will be necessary (and possibly to read one and 
+&gt; understand it fully).
+
+I suggest we use a text-based format for easy reading, easy parsing, and
+easy portability from one platform or system to another.
+
+&gt;   - It should allow some interpretation by the GUI program so that all 
+&gt; configuration dialogs look consistent. The layout file shouldn't specify 
+&gt; things like "rectangle,200,200", but should just group configuration 
+&gt; variables and specify the type of value they take (like in a programming 
+&gt; language), amongst other things (such as a "display name", visibility, etc 
+&gt; etc). 
+
+I like consistency as much as the next guy!
+
+&gt; I believe something like this could be done if it is managed in stages:
+&gt; 
+&gt; 1) Discourage hard-coding paths to configuration files so that configuration 
+&gt; files can be placed wherever the user pleases.
+
+Above, you wanted a logical and consistent system that allowed us to not
+have to use tools like find and locate.  Now you say you want us to be able
+to put our configuration files anywhere we choose?
+
+&gt; Application accesses these files through a library "say libetc, or
+&gt; libconfig".
+
+So that when we're on a slow link we have to use annoying tools that slow
+us down.
+
+&gt; 3) Create layout file format and sample application that can parse the etc 
+&gt; tree and provide a GUI for config files that have an accompanying layout 
+&gt; file.
+
+I think Microsoft have tried this a few times, and they got their Registry
+Editor which is a most friendly application to get your head around, not to
+mention navigate.
+
+You may argue that once you get used to it, it's easy!  Sure, I know how to
+find some things in there, but I still find Unix's structure a lot more
+simplistic than a bloated and overly complicated GUI navigation tool.
+
+Let's not forget they tried sysconf.exe aswell, which ended up just loading
+several configuration files into editable windows (which seems logical to
+me!)
+
+Gnome2 have added a new registry-style configuration editor and I steer
+clear of that wherever possible.
+
+&gt; 4) ???
+
+???
+
+&gt; 5) Profit!! :)
+
+!
+
+&gt; Somewhere in those stages the layout of the /etc directory and the format of 
+&gt; the configuration/layout files should be attempted to be made a standard 
+&gt; (LSB) so as to encourage people to follow it.
+&gt; 
+&gt; For all those that say "the current system is fine once you know it", I say 
+&gt; how does that make the current system the best possible? How can we make 
+&gt; progress if we stay stationary? (and if you say "if it aint broke don't fix 
+&gt; it", I'm going to scream :) It *IS* broke :)
+
+Because it is scalable, and it makes logical sense.  Of all of the things you've
+described, it seems that it's only the application developers who are
+breaking the rules of where files should belong, and how they are laid out.
+Maybe you should explain to them the importance of a logical file system?
+
+I agree to some of what you have said, but certainly not all of it.
+
+&gt; 
+&gt; Cheers,
+
+man hier!
+
+Adam
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

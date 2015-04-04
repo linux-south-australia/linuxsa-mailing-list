@@ -1,0 +1,126 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Raid1 and Boot Drive Failure" -->
+<!-- FromName="'Mike O'Connor'" -->
+<!-- FromEmail="mike@pineview.net" -->
+<!-- ToName="'Stephen Donaldson'" -->
+<!-- ToEmail="steelrat@dingoblue.net.au" -->
+<!-- Date="Sat, 2 Feb 2002 18:35:06 +1030" -->
+<!-- Id="004801c1abc0$539dde10$1ef621cb@themaster" -->
+<!-- Reference="6A94QLGBQO07IGNNKICUTOIEBN4.3c5b867b@sorceror" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Raid1 and Boot Drive Failure</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mike O &lt;<I><A HREF="mailto:mike@pineview.net">mike@pineview.net</A></I>&gt;
+  To  : Stephen Donaldson &lt;<I><A HREF="mailto:steelrat@dingoblue.net.au">steelrat@dingoblue.net.au</A></I>&gt;
+  Date: Sat, 2 Feb 2002 18:35:06 +1030
+</PRE>
+<H1>Raid1 and Boot Drive Failure</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Stephen
+
+I've been looking at this problem and have found the answer.
+
+If we have two drives as a raid 1 mirror say /dev/hda1 & /dev/hdc1 with the
+raid device name of /dev/md0 we set up the drive partitions so that the
+active boot bit is set on both drives on the first partition. (using a boot
+bit is the way msdos and windows 9x boot)
+
+Then we configure lilo to use the /dev/md0 as the boot device
+(boot=/dev/md0) now we run /sbin/lilo lilo will actual write the boot data
+to both drives.
+
+If you were to take the second drive and put it in another machine it would
+boot in degraded raid mode, all you would need to do is write exactly the
+same partition table to the new second drive and use 'raidhotadd'
+
+By the way the easiest way to copy a partition table is to use sfdisk.
+
+sfdisk -d /dev/hda &gt; hda.map  # save partition map
+sfdisk /dev/hdc &lt; hda.map # write partition map
+
+Cheers
+   Mike O'Connor
+
+
+
+
+----- Original Message -----
+From: "Stephen Donaldson" &lt;<A HREF="mailto:steelrat@dingoblue.net.au">steelrat@dingoblue.net.au</A>&gt;
+To: &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Sent: Saturday, February 02, 2002 4:56 PM
+Subject: RAID1 with RH7.2
+
+
+&gt; I set up raid on my local server and all seemd to go well with no
+problems.
+&gt; I've ran a simulation and recovered a lost drive, my question is what
+happens if
+&gt; the bootable drive fails.
+&gt;
+&gt; The howto's and the IBM guides only give examples of 'non linux root'
+drives
+&gt; failing.
+&gt;
+&gt; My question is what what suggestions would you have to recover from a non
+&gt; bootable situation?
+&gt;
+&gt; Would it be as simple as adding a drive and installing the OS with the
+same
+&gt; partions for the raid, updating the raidtab and running raidhotadd 'path'?
+&gt;
+&gt; Finally Redhat let me setup /boot as an RAID but when using the command to
+&gt; recover a simulated failure it tells me the disk is too small why during
+install
+&gt; and not for recovery?
+&gt;
+&gt; Any suggestions or advice welcome
+&gt;
+&gt; Regards
+&gt;
+&gt; Steve D
+&gt;
+&gt;
+&gt;
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

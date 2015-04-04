@@ -1,0 +1,320 @@
+##########################################################################
+# Sample XF86Config file for NVIDIA XFree86 drivers.
+#
+# Refer to the XF86Config(4/5) man page for details about the format of
+# this file.
+#
+# Be sure to replace the monitor values with correct values for your
+# monitor!
+##########################################################################
+
+
+Section "Files"
+
+    RgbPath	"/usr/X11R6/lib/X11/rgb"
+
+    FontPath   "/usr/X11R6/lib/X11/fonts/local/"
+    FontPath   "/usr/X11R6/lib/X11/fonts/misc/"
+    FontPath   "/usr/X11R6/lib/X11/fonts/75dpi/:unscaled"
+    FontPath   "/usr/X11R6/lib/X11/fonts/100dpi/:unscaled"
+    FontPath   "/usr/X11R6/lib/X11/fonts/Type1/"
+    FontPath   "/usr/X11R6/lib/X11/fonts/Speedo/"
+    FontPath   "/usr/X11R6/lib/X11/fonts/75dpi/"
+    FontPath   "/usr/X11R6/lib/X11/fonts/100dpi/"
+
+# The module search path 
+    ModulePath "/usr/X11R6/lib/modules/"
+#    ModulePath "/usr/X11R6/lib/X11/AcceleratedX/modules/"
+
+EndSection
+
+
+##########################################################################
+# Server flags section.
+##########################################################################
+
+Section "ServerFlags"
+
+    # Uncomment this to cause a core dump at the spot where a signal is
+    # received.  This may leave the console in an unusable state, but may
+    # provide a better stack trace in the core dump to aid in debugging
+    #NoTrapSignals
+
+    # Uncomment this to disable the <Crtl><Alt><BS> server abort sequence
+    # This allows clients to receive this key event.
+    #DontZap
+
+    # Uncomment this to disable the <Crtl><Alt><KP_+>/<KP_-> mode switching
+    # sequences.  This allows clients to receive these key events.
+    #DontZoom
+
+    # This  allows  the  server  to start up even if the
+    # mouse device can't be opened/initialised.
+    AllowMouseOpenFail
+
+EndSection
+
+
+##########################################################################
+# Input devices
+##########################################################################
+
+#
+# Keyboard section
+#
+Section "InputDevice"
+
+    Identifier "Keyboard1"
+    Driver     "Keyboard"
+    Option     "AutoRepeat"  "250 30"
+
+    Option "XkbRules"  "xfree86"
+    Option "XkbModel"  "pc105"
+    Option "XkbLayout" "us"
+
+EndSection
+
+
+#
+# Pointer section
+#
+Section "InputDevice"
+
+    Identifier  "Mouse1"
+    Driver      "mouse"
+    Option      "Protocol"    "IMPS/2"
+    Option      "Device"      "/dev/mouse"
+#   Option	"Emulate3Buttons
+    Option      "ZAxisMapping" "4 5 "
+    Option      "Buttons" "3"
+
+EndSection
+
+
+##########################################################################
+# Module section
+##########################################################################
+
+Section "Module"
+
+    Load        "dbe"
+
+    # Load the glx module.
+    Load	"glx"
+
+    Load	"fbdevhw"
+    
+    # Load        "dga"
+
+    Load        "extmod"
+
+    # Load	"dri"
+
+    Load	"type1"
+    Load	"freetype"
+    Load        "speedo"
+
+EndSection
+
+
+##########################################################################
+# Monitor section
+##########################################################################
+
+Section "Monitor"
+
+    Identifier "Monitor[0]"
+    VendorName "Olympic"
+    ModelName  "DDC1/2B"
+	Option "DPMS"
+    HorizSync  30 - 72
+    VertRefresh 50 - 180
+	UseModes "Modes[0]"
+
+EndSection
+
+
+Section "Monitor"
+
+    Identifier "Monitor[1]"
+    VendorName "Goldstar"
+    ModelName  "1527"
+        Option "DPMS"
+    HorizSync  30 - 65
+    VertRefresh 50 - 120
+        UseModes "Modes[1]"
+
+EndSection
+
+
+##########################################################################
+# Modes section
+##########################################################################
+
+Section "Modes"
+	Identifier	"Modes[0]"
+	Modeline	"1280x1024"   108.00   1280 1328 1440 1660   1024 1025 1028 1054 +hsync +vsync
+EndSection
+
+
+Section "Modes"
+	Identifier	"Modes[1]"
+	Modeline	"1280x1024"   108.00   1280 1328 1440 1700   1024 1025 1028 1066 +hsync +vsync
+EndSection
+
+
+##########################################################################
+# Graphics device section(s)
+##########################################################################
+
+ Section "Device"
+    Identifier  "NV AGP"
+    VendorName  "nvidia"
+    Driver   "nvidia"
+    # update this with the PCI id of your card.  Consult the output
+    # of the 'lspci' command.
+    BusID       "PCI:1:00:0"
+
+    Option  "Nvagp" "2"
+    Option  "IgnoreDisplayDevices" "DFP, TV"
+    Option  "RenderAccel" "true"
+
+ EndSection
+
+
+
+ Section "Device"
+   Identifier "NV PCI"
+    VendorName "nvidia"
+    Driver "nvidia"
+    # update this with the PCI id of your card.  Consult the output
+    # of the 'lspci' command.
+    BusID       "PCI:0:08:0"
+
+    Option  "IgnoreDisplayDevices" "DFP, TV"
+    Option  "RenderAccel" "true"
+
+ EndSection
+
+
+
+Section "Device"
+    Identifier "NV TwinView"
+    VendorName "nvidia"
+    Driver "nvidia"
+    # update this with the PCI id of your card.  Consult the output
+    # of the 'lspci' command.
+    BusID       "PCI:1:0:0"
+
+    # sample twinview setup
+     Option "TwinView"
+    # be sure to replace the HorizSync and VertRefresh with correct values
+    # for your monitor!  
+     Option "SecondMonitorHorizSync"   "30-65"
+     Option "SecondMonitorVertRefresh" "50-120"
+     Option "TwinViewOrientation"      "RightOf"
+     Option "MetaModes"                "1024x768,1024x768; 800x600,800x600"
+     Option "ConnectedMonitor"         "crt,crt"
+ EndSection
+
+
+##########################################################################
+# Screen sections
+##########################################################################
+
+#
+# screen section for an nvidia AGP card
+#
+ Section "Screen"
+    Identifier "Screen AGP"
+    Device      "NV AGP"
+    Monitor     "Monitor[0]"
+    DefaultColorDepth 24
+
+#    Subsection "Display"
+#        Depth       16
+#        Modes       "320x240" "1280x1024" "1024x768" "800x600" "640x480"
+#    EndSubsection
+    Subsection "Display"
+        Depth       24
+        Modes       "1280x1024" "1024x768" "800x600" "640x480"
+    EndSubsection
+
+ EndSection
+
+
+#
+# screen section for an nvidia PCI card
+#
+Section "Screen"
+    Identifier "Screen PCI"
+    Device      "NV PCI"
+    Monitor     "Monitor[1]"
+    DefaultColorDepth 24
+
+#    Subsection "Display"
+#        Depth       16
+#        Modes       "1280x1024" "1024x768" "800x600" "640x480"  "320x240"  "256x224"
+#    EndSubsection
+
+    Subsection "Display"
+        Depth       24
+        Modes       "1280x1024" "1024x768" "800x600" "640x480"  "320x240"  "256x224"
+    EndSubsection
+
+#    Subsection "Display"
+#	Depth       32
+#	Modes       "1280x1024" "1024x768" "800x600" "640x480"  "320x240"  "256x224"
+#    EndSubsection
+EndSection
+
+
+##########################################################################
+# ServerLayout sections
+# (invoke using the '-layout' option of 'startx'.
+##########################################################################
+
+#
+# One agp card
+#
+ Section "ServerLayout"
+    Identifier  "AGP"
+    Screen      "Screen AGP"
+    InputDevice "Mouse1" "CorePointer"
+    InputDevice "Keyboard1" "CoreKeyboard"
+ EndSection
+
+#
+# One pci card
+#
+Section "ServerLayout"
+    Identifier  "PCI"
+    Screen      "Screen PCI"
+    InputDevice "Mouse1" "CorePointer"
+    InputDevice "Keyboard1" "CoreKeyboard"
+EndSection
+
+#
+# 2 cards, Xinerama
+#
+Section "ServerLayout"
+   Identifier  "Xinerama"
+   Screen      "Screen AGP"
+   Screen      "Screen PCI" RightOf "Screen AGP"
+   InputDevice "Mouse1" "CorePointer"
+   InputDevice "Keyboard1" "CoreKeyboard"
+   Option      "Clone" "off"
+   Option      "Xinerama"  "on"
+EndSection
+
+#
+# 2 cards, Seperate View
+#
+Section "ServerLayout"
+   Identifier  "Both"
+   Screen      "Screen AGP"
+   Screen      "Screen PCI" RightOf "Screen AGP"
+   InputDevice "Mouse1" "CorePointer"
+   InputDevice "Keyboard1" "CoreKeyboard"
+EndSection
+

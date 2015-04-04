@@ -1,0 +1,129 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: data - does network card record it all?" -->
+<!-- FromName="'Joseph Burford'" -->
+<!-- FromEmail="joseph@vintek.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 4 Aug 2003 18:50:41 +0930" -->
+<!-- Id="383145F4B99714438416873869BDC490043ACB@opal.VINTEK.LOCAL" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: data - does network card record it all?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Joseph Burford &lt;<I><A HREF="mailto:joseph@vintek.net">joseph@vintek.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 4 Aug 2003 18:50:41 +0930
+</PRE>
+<H1>RE: data - does network card record it all?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+A while ago....
+
+&gt; John Edwards wrote:
+&gt; 
+&gt; &gt; interface.h uses 'unsigned long' to define the byte counter 
+&gt; &gt; values for ifconfig.
+&gt; &gt;
+&gt; &gt; On an ordinary x86 system, this means that the maximum value it can 
+&gt; &gt; store before looping back to zero is 2^32-1. This is 4,294,967,295 
+&gt; &gt; bytes, or 4.3 gigabytes, so your counters have probably looped more 
+&gt; &gt; than once to arrive at your 12G usage.
+
+Then a short time later... 
+ 
+&gt; Actually, I think I was too hasty in my observation .. while 
+&gt; most of the  counters in interface.h are 'unsigned long', 
+&gt; the bytes and packets counters are 'unsigned long long', which
+&gt; is a 64 bit value.
+&gt; 
+&gt; So I guess it's possible that your counters are accurate after all.
+&gt; 
+&gt; John Edwards
+
+When I first saw this I thought John was wrong, but having looked
+through quite a few boxes with large uptimes, I was starting to think
+that John's initial idea was right :-)
+
+So for anyone who is still wondering, yes the interface stats will reset
+and loop over at about 4.3gb. I've tried this on RH 6.2 and 9.0
+
+For example:
+
+Lets have a quick look at lo...
+
+[<A HREF="mailto:root@dev1">root@dev1</A> root]# ifconfig lo | grep RX
+      RX packets:32140 errors:0 dropped:0 overruns:0 frame:0
+      RX bytes:15132859 (14.4 Mb)  TX bytes:15132859 (14.4 Mb)
+
+Now we do...
+
+[<A HREF="mailto:root@dev1">root@dev1</A> root]# ping -i .001 -s 65500 127.0.0.1
+
+And wait for a bit...
+
+Then look at stats for lo...
+
+[<A HREF="mailto:root@dev1">root@dev1</A> root]# ifconfig lo | grep RX
+      RX packets:346302 errors:0 dropped:0 overruns:0 frame:0
+      RX bytes:4290461038 (4091.7 Mb)  TX bytes:4290461038 (4091.7 Mb)
+
+Try the same again 5 seconds later...
+
+[<A HREF="mailto:root@dev1">root@dev1</A> root]# ifconfig lo | grep RX
+      RX packets:346670 errors:0 dropped:0 overruns:0 frame:0
+      RX bytes:633038 (618.2 Kb)  TX bytes:633038 (618.2 Kb)
+
+The packet count still keeps going. So that satisfied my curiosity :-)
+
+Regards,
+Joseph
+
+==============================
+VINTEK CONSULTING PTY LTD
+Email:  <A HREF="mailto:joseph@vintek.net">joseph@vintek.net</A>
+Web:    <A HREF="http://www.vintek.net">http://www.vintek.net</A>
+Tel:    (08) 8523 5035
+Fax:    (08) 8523 2104
+==============================
+ 
+
+
+Vintek Disclaimer Applies - <A HREF="http://www.vintek.net/email/disc.txt">http://www.vintek.net/email/disc.txt</A>
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

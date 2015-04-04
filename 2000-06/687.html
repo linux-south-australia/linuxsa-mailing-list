@@ -1,0 +1,104 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: RAID upgrade" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Glen Turner" -->
+<!-- ToEmail="glen.turner@aarnet.edu.au" -->
+<!-- Date="Thu, 22 Jun 2000 10:55:28 +0930" -->
+<!-- Id="20000622105528.B21965@atdot.dotat.org" -->
+<!-- Reference="39515553.417812CC@aarnet.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: RAID upgrade</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  Date: Thu, 22 Jun 2000 10:55:28 +0930
+</PRE>
+<H1>Re: RAID upgrade</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, Jun 22, 2000 at 09:22:51AM +0930, Glen Turner wrote:
+
+ &gt; &gt; Last night presentation got me thinking...
+ &gt; &gt; Lets say your current RAID 5 has the following setup.....
+ &gt; &gt; 
+ &gt; &gt; Bank 0:  Drive 1     p234    (9.1 GB)
+ &gt; &gt;          Drive 2     1p34    (9.1 GB)
+ &gt; &gt;          Empty slot
+ &gt; &gt;          Empty slot
+ &gt; &gt; Bank 1:  Drive 3     12p4    (9.1 GB)
+ &gt; &gt;          Drive 4     123p    (9.1 GB)
+ &gt; &gt;          Empty slot
+ &gt; &gt;          Empty slot
+ &gt; &gt; 
+ &gt; &gt; 1) how easy it is to upgrade ??
+ &gt; 
+ &gt; The usual technique is to upgrade all four disks simultaneously.
+ 
+The other technique is to concatenate the two RAID5 volumes:
+If you start with:
+
+    raid5(b0s1, b0s2, b1s1, b1s2)
+
+you end up with:
+
+    concat(raid5(b0s1, b0s2, b1s1, b1s2), raid5(b0s3, b0s4, b1s3, b1s4))
+
+Concatenation is sometimes called RAID0.
+
+The advantage of this approach is that you end up with the same amount
+of usable space as Glen's example, but the time taken to get there
+is negligible (at the cost of a slightly more complicated volume
+structure).  Basically you don't have to wait for a mirror to rebuild.
+On a very large filesystem, the time needed to do that can be quite
+significant, so there are occasions where the tradeoff between setup 
+time and configuration complexity is a worthwhile one.
+
+As in Glen's example, this increases the size of the volume, but the
+filesystem contained therein still has superblock parameters which
+tell the kernel about the old size.  Something like ext2resize is 
+needed to modify those parameters and create skeletal filesystem 
+metadata to span the new volume space.
+
+    - mark
+
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

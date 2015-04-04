@@ -1,0 +1,126 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Software RAID" -->
+<!-- FromName="Andrew Hill" -->
+<!-- FromEmail="list@fornax.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 12 Jul 2000 10:23:32 -0400" -->
+<!-- Id="396C7F63.2913CA59@fornax.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Software RAID</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Hill &lt;<I><A HREF="mailto:list@fornax.net">list@fornax.net</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Wed, 12 Jul 2000 10:23:32 -0400
+</PRE>
+<H1>Software RAID</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Okay, this is starting to annoy me a little :-)
+
+I've decided that setting up RAID 1 at install time (Red Hat 6.2) is not
+going to happen, so I have a working system, and am trying to create
+asoftware RAID 1 device to play around with.
+
+I've compiled a new kernel (2.2.16) with Multiple Devices Driver Support
+and RAID-1 (Mirroring) Mode, and rebooted.
+
+I've got two drives in the machine, /dev/sda and /dev/sdb. I've created
+a partition on each, /dev/sda2 and /dev/sdb2, both with the same start
+and end cylinders. Both are type "fd" (Linux raid autodetect). I then
+re-boot to ensure that the partitions are ready to rock.
+
+I've created a /etc/raidtab <A HREF="file:">file:</A>
+
+  raiddev /dev/md0
+  raid-level              1
+  nr-raid-disks           2
+  nr-spare-disks          0
+  persistent-superblock   1
+  chunk-size              4
+
+  device                  /dev/sda2
+  raid-disk               0
+  device                  /dev/sdb2
+  raid-disk               1
+
+Admittedly, I'm not sure about the "chunk-size" value here, because that
+only seems appropriate for striped sets to me, but if I use it without
+this value, I get an "invalid chunk-size (0kB)" error.
+
+Okay, so I think I'm all set up, so I:
+
+  # mkraid /dev/md0
+  handling MD device /dev/md0
+  analyzing super-block
+  disk 0: /dev/sda2, 811282kB, raid superblock at 811200kB
+  disk 1: /dev/sdb2, 811282kB, raid superblock at 811200kB
+  mkraid: aborted, see the syslog and /proc/mdstat for potential clues.
+
+There is nothing about the device in /var/log/messages, and in
+/proc/mdstat:
+
+  Personalities : [3 raid1]
+  read_ahead not set
+  md0 : inactive
+  md1 : inactive
+  md2 : inactive
+  md3 : inactive
+
+Which isn't really all that helpful, eh?
+
+Even doing a:
+
+  # dd if=/dev/sda2 of=/dev/sdb2
+
+or
+
+# dd if=/dev/zero of=/dev/sda2
+# dd if=/dev/zero of=/dev/sdb2
+
+(as I've seen suggested) before trying to make the RAID device makes no
+difference.
+
+Any suggestions on how to make this work would be appreciated.
+
+TIA,
+-- 
+
+Andrew Hill
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

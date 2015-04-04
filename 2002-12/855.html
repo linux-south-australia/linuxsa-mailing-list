@@ -1,0 +1,148 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Temperature" -->
+<!-- FromName="'Brian Marr'" -->
+<!-- FromEmail="cabernet@internode.on.net" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 18 Dec 2002 10:22:12 +1030" -->
+<!-- Id="200212181022.12067.cabernet@internode.on.net" -->
+<!-- Reference="957F5820F786D511AEDF0002A56B67FC07AC28A2@sagemsg0012.sagemsmrd01.sa.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Temperature</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Brian Marr &lt;<I><A HREF="mailto:cabernet@internode.on.net">cabernet@internode.on.net</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 18 Dec 2002 10:22:12 +1030
+</PRE>
+<H1>Re: Temperature</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Suse 8.0 box
+
+I have just had an excellent response from this software.
+Started here
+Gringo:/home/magpie # sensors-detect
+ This program will help you to determine which I2C/SMBus modules you need to
+ load to use lm_sensors most effectively..........blah blah.
+
+Followed the script as best I could. Lsmod is now showing
+
+Gringo:/home/magpie # lsmod
+Module                  Size  Used by    Tainted: PF
+i2c-dev                 3520   0  (unused)
+i2c-philips-par         1960   0  (unused)
+i2c-algo-bit            7052   0  [i2c-philips-par]
+i2c-piix4               3524   0  (unused)
+i2c-proc                6016   0  (unused)
+i2c-core               12320   0  [i2c-dev i2c-algo-bit i2c-piix4 i2c-proc]
+
+The script tells me that I need these
+# I2C adapter drivers
+modprobe i2c-isa
+# I2C chip drivers
+modprobe w83781d
+
+
+modprobe works ok
+Gringo:/home/magpie # modprobe i2c-isa
+Gringo:/home/magpie # modprobe w83781d
+
+Then I get this
+
+Gringo:/home/magpie # sensors
+w83781d-i2c-0-2d
+Adapter: SMBus PIIX4 adapter at 5000
+Algorithm: Non-I2C SMBus adapter
+VCore 1:   +2.01 V  (min =  +1.80 V, max =  +2.20 V)
+VCore 2:   +2.00 V  (min =  +1.80 V, max =  +2.20 V)
++3.3V:     +3.42 V  (min =  +2.97 V, max =  +3.63 V)
++5V:       +4.84 V  (min =  +4.50 V, max =  +5.48 V)
++12V:     +11.97 V  (min = +10.79 V, max = +13.11 V)
+-12V:     -11.54 V  (min = -10.78 V, max = -13.18 V)
+-5V:       -4.98 V  (min =  -4.50 V, max =  -5.48 V)
+fan1:        0 RPM  (min = 3000 RPM, div = 2)              ALARM
+fan2:     42187 RPM  (min = 3000 RPM, div = 2)
+fan3:        0 RPM  (min = 3000 RPM, div = 2)              ALARM
+temp1:    +32.0°C   (limit = +60°C, hysteresis = +50°C)
+temp2:    +36.5°C   (limit = +60°C, hysteresis = +50°C)
+temp3:    +39.0°C   (limit = +60°C, hysteresis = +50°C)
+vid:      +2.00 V
+alarms:   Chassis intrusion detection
+beep_enable:
+          Sound alarm disabled
+
+w83781d-isa-0290
+Adapter: ISA adapter
+Algorithm: ISA algorithm
+VCore 1:   +2.04 V  (min =  +1.80 V, max =  +2.20 V)
+VCore 2:   +2.00 V  (min =  +1.80 V, max =  +2.20 V)
++3.3V:     +3.42 V  (min =  +2.97 V, max =  +3.63 V)
++5V:       +4.84 V  (min =  +4.50 V, max =  +5.48 V)
++12V:     +11.78 V  (min = +10.79 V, max = +13.11 V)
+-12V:     -11.61 V  (min = -10.78 V, max = -13.18 V)
+-5V:       -4.98 V  (min =  -4.50 V, max =  -5.48 V)
+fan1:        0 RPM  (min = 3000 RPM, div = 2)              ALARM
+fan2:     35526 RPM  (min = 3000 RPM, div = 2)
+fan3:        0 RPM  (min = 3000 RPM, div = 2)              ALARM
+temp1:    +33.0°C   (limit = +60°C, hysteresis = +50°C)
+temp2:    +36.5°C   (limit = +60°C, hysteresis = +50°C)
+temp3:    +39.0°C   (limit = +60°C, hysteresis = +50°C)
+vid:      +2.00 V
+alarms:   Chassis intrusion detection
+beep_enable:
+          Sound alarm disabled
+
+Many thanks Peter !
+Brian Marr
+
+
+
+
+
+On Wednesday 18 December 2002 09:52, Freeman, Peter (ERHS) wrote:
+&gt; &gt;Unfortunately this box doesn't have the goods.
+&gt; &gt;
+&gt; &gt;<A HREF="mailto:magpie@Gringo">magpie@Gringo</A>:~&gt; sensors
+&gt; &gt;No sensors found!
+&gt;
+&gt; If I remember correctly there's a "sensors-conf" or something
+&gt; similar which you need to run before running sensors, it's an
+&gt; autodiscover util which decides if your board has any monitorable
+&gt; devices.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

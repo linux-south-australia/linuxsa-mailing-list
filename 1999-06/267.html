@@ -1,0 +1,121 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Superblocks" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Mike Earnshaw" -->
+<!-- ToEmail="mearnshaw@bigpond.com" -->
+<!-- Date="Wed, 16 Jun 1999 22:22:50 +0930 (CST)" -->
+<!-- Id="Pine.BSF.3.96.990616215351.7433H-100000@augustus.tellurian.com.au" -->
+<!-- Reference="00cc01beb7e8$5ef59100$0b01a8c0@lancelot" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Superblocks</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Mike Earnshaw &lt;<I><A HREF="mailto:mearnshaw@bigpond.com">mearnshaw@bigpond.com</A></I>&gt;
+  Date: Wed, 16 Jun 1999 22:22:50 +0930 (CST)
+</PRE>
+<H1>Re: Superblocks</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 16 Jun 1999, Mike Earnshaw wrote:
+&gt; What are 'superblocks' and their use is ....?
+
+Some blocks are quite boring.  Some are marginally interesting.  A very
+few are just super.  :-)
+
+No, seriously, Unix used to have very good documentation, which included
+amongst other things an excellent discussion of file systems.  Then
+along came GNU who decided that they didn't need to follow standards
+and off they went and developed their own type of documentation (info
+pages).  Personally I think GNU did a grave disservice to the world.
+One thing which put Unix head and shoulder above every other operating
+system was it's superior and CONSISTENT documentation.  Now it has
+documenation which is still quite good, but who can find it?
+
+Having got that rant out of the way -- but mind you: if you ever find
+yourself tempted to write an info page slap yourself down.  Repeat after
+me: Man pages, man pages, man pages.  In fact, write it out 100 times.
+By hand.
+
+The original Unix filesystem was composed of four sections: Boot blocks,
+which contain the secondary stage bootstrap loader; a super block, which
+I will describe in a minute; the i-node table, which contains i-nodes,
+and i-nodes are the complete file except for the data; and data plus
+indirect blocks.
+
+I-nodes are, as I said, the complete file except for the data.  That
+is, they describe who owns the file, when it was last accessed and
+modified, what the permissions are for the file, and the list of blocks
+which contain the data.  Side note: Unix files don't have names.  They
+have (i-node) numbers.  Directories are files which contain a number of
+filename, i-node number pairs; called links.
+
+Data blocks contain the file data.  Since i-nodes are of fixed size,
+obviously there is an upper limit to the number of data blocks which
+can be listed in the inode.  When an inode can no longer contain the
+list of data blocks, that list is moved to an indirect block, and the
+i-node is converted to contain a list of indirect blocks.  When the
+inode can no longer contain a list of indirect blocks, the list is moved
+to a double-indirect block and the inode then contains a list of
+double-indirect blocks.  I notice (/usr/include/linux/sysv_fs.h) that
+"traditional" filesystems now allow triple-indirect blocks, which just
+goes to show that even tradition is hard to keep up with.
+
+The super block describes the size of the inode-table and the size of
+the total file system.  It also contains a list of some recently freed
+data blocks, which is used to quickly find a free block when you want
+to allocate a new one.  Similarly there is a (partial) list of free
+inodes.
+
+I made the point that files don't have names, they have numbers, and
+that directories provide a map between names and numbers.  So how do
+you find the root of a filesystem?  The answer is that it is inode number
+two.  Inode 1 contains a list of bad blocks on the disk.
+
+One of the less desirable features of the traditional filesystem is that
+it has only one superblock, and if you lose that you are really stuffed.
+Look: You wouldn't even know where the inode table ended and the data
+table started.  As a remedy to that, when the BSD Fast File System was
+designed, it was given backup copies of the superblock.  So if you lost
+the main superblock you could mount using one of the backup copies (but
+you had to know where it was (but it's not to hard to find it.))
+
+Now don't you agree that from a filesystem perspective, data blocks are
+only marginally interesting, but that first block is just super?  ;-)
+
+David
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

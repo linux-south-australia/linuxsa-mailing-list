@@ -1,0 +1,176 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SMB Woes" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="LinuxSA@linuxsa.org.au" -->
+<!-- Date="Mon, 08 Nov 1999 01:03:07 +1000" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SMB Woes</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:LinuxSA@linuxsa.org.au">LinuxSA@linuxsa.org.au</A>
+  Date: Mon, 08 Nov 1999 01:03:07 +1000
+</PRE>
+<H1>Re: SMB Woes</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 12:31 AM 11/8/99 +1030, Darryl Ross &lt;<A HREF="mailto:rosdr001@lux.levels.unisa.edu.au">rosdr001@lux.levels.unisa.edu.au</A>&gt;
+wrote:
+&gt;Hey All,
+&gt;
+&gt;Having problems with SMB. Specifically, I can't connect to one of the SMB
+&gt;servers on my network.
+
+Hmmm, can you tell me what you have for security = in your smb.conf files
+on each of the Linux machines?
+
+It would seem that you have a pcguest account on DARRYL, since you got away
+without a password, and that you possibly have security=share.
+
+However, in einstein, it would seem that you have security=share.
+
+the smbclient request has to do a TreCon to the IPC$ share.  In the code
+that handles this in Samba (service.c in source/smbd), there is a complex
+set of goings on that depend on whether or not you are in share level
+security or user level security.  Samba 2.0 and above defaults to user
+level security.
+
+It is no surprise that Win95B works, because it defaults to security=share
+unless you change it. 
+
+If my diagnosis is correct, then either:
+
+   put security = share in the smb.conf for einstein, or use valid
+usernames and passwords on the smbclient request.
+
+&gt;When I use SMB client to look at my (SuSE 6.2) workstation machine, I get:
+&gt;
+&gt;========================================
+&gt;
+&gt;[<A HREF="mailto:root@einstein">root@einstein</A> /etc]# smbclient -L darryl
+&gt;Added interface ip=192.168.100.1 bcast=192.168.100.255 nmask=255.255.255.0
+&gt;Password: 
+&gt;Domain=[BACHBLUE] OS=[Unix] Server=[Samba 2.0.5a]
+&gt;
+&gt;        Sharename      Type      Comment
+&gt;        ---------      ----      -------
+&gt;        www            Disk      Bachblue Hosted Websites
+&gt;        downloads      Disk      Files downloaded from the Internet
+&gt;        temp           Disk      Temp Directory
+&gt;        IPC$           IPC       IPC Service (Samba 2.0.5a)
+&gt;
+&gt;        Server               Comment
+&gt;        ---------            -------
+&gt;        DARRYL               Samba 2.0.5a
+&gt;        JADE                 JADE HAYWARD
+&gt;
+&gt;        Workgroup            Master
+&gt;        ---------            -------
+&gt;        BACHBLUE             JADE
+&gt;
+&gt;========================================
+&gt;
+&gt;Note that I just hit enter for the password. When I do the same to 'jade'
+&gt;a Win95B machine, I get:
+&gt;
+&gt;========================================
+&gt;
+&gt;[<A HREF="mailto:root@einstein">root@einstein</A> /etc]# smbclient -L jade
+&gt;Added interface ip=192.168.100.1 bcast=192.168.100.255 nmask=255.255.255.0
+&gt;Password: 
+&gt;
+&gt;        Sharename      Type      Comment
+&gt;        ---------      ----      -------
+&gt;        A              Disk      
+&gt;        HARDDRIVE      Disk      
+&gt;        IPC$           IPC       Remote Inter Process Communication
+&gt;
+&gt;        Server               Comment
+&gt;        ---------            -------
+&gt;        DARRYL               Samba 2.0.5a
+&gt;        EINSTEIN             Samba 2.0.5a
+&gt;        JADE                 JADE HAYWARD
+&gt;
+&gt;        Workgroup            Master
+&gt;        ---------            -------
+&gt;        BACHBLUE             JADE
+&gt;
+&gt;========================================
+&gt;
+&gt;Again, I just hit enter for the password. Here is what I get when I try
+&gt;the same thing on the server:
+&gt;
+&gt;========================================
+&gt;
+&gt;[<A HREF="mailto:root@einstein">root@einstein</A> /etc]# smbclient -L einstein
+&gt;Added interface ip=192.168.100.1 bcast=192.168.100.255 nmask=255.255.255.0
+&gt;Password: 
+&gt;Domain=[BACHBLUE] OS=[Unix] Server=[Samba 2.0.5a]
+&gt;tree connect failed: ERRSRV - ERRbadpw (Bad password - name/password pair
+&gt;in a Tree Connect or Session Setup are invalid.)
+&gt;
+&gt;========================================
+&gt;
+&gt;I have copied the /etc/smb.conf file from 'darryl' to 'einstein', changing
+&gt;the netbios name and share definitions so they are appropriate. I also
+&gt;tried copying the binarys for smbd and nmbd so it is the same version on
+&gt;both machines, but it didn't make any difference.
+&gt;
+&gt;'einstein' is a RedHat 5.2 machine and 'darryl' is a SuSE 6.2 machine, if
+&gt;that helps.
+&gt;
+&gt;TIA, Dazz
+&gt;
+&gt;PS. If anyone wants, I can send the /etc/smb.conf file for einstein.
+&gt;
+&gt;-- 
+&gt;Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>, Master Linux Administrator :-),
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Co-author, SAMS Teach Yourself Samba in 24 Hours
+Author: First Australian 5-day, intensive, hands-on Linux SysAdmin course
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

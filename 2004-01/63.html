@@ -1,0 +1,233 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: ALSA, Debian, 2.6 kernel problems" -->
+<!-- FromName="'Romana Challans'" -->
+<!-- FromEmail="romana@timelady.com" -->
+<!-- ToName="'Brendan Grossman'" -->
+<!-- ToEmail="brendan@grossman.id.au" -->
+<!-- Date="Fri, 2 Jan 2004 15:39:56 +1030" -->
+<!-- Id="20040102050956.GF18799@hal" -->
+<!-- Reference="200401021520.51032.brendan@grossman.id.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: ALSA, Debian, 2.6 kernel problems</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Romana Challans &lt;<I><A HREF="mailto:romana@timelady.com">romana@timelady.com</A></I>&gt;
+  To  : Brendan Grossman &lt;<I><A HREF="mailto:brendan@grossman.id.au">brendan@grossman.id.au</A></I>&gt;
+  Date: Fri, 2 Jan 2004 15:39:56 +1030
+</PRE>
+<H1>Re: ALSA, Debian, 2.6 kernel problems</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+i remember reading about this on /.
+<A HREF="http://slashdot.org/comments.pl?sid">http://slashdot.org/comments.pl?sid</A>=89749&cid=7751888
+
+here is some moreinfo found with a quick look.....
+With kernel 2.6.0, you need to use the module-init-tools package for
+handling modules rather than the old modutils. Under Debian, just:
+apt-get install module-init-tools
+
+<A HREF="http://www.mail-archive.com/alsa-user">http://www.mail-archive.com/alsa-user</A>@lists.sourceforge.net/msg10914.html
+
+hth, r' who must finish her nice shiny new 2.6 kernel compile on sid soon...'
+:) 
+
+On Fri, Jan 02, 2004 at 03:20:50PM +1030, Brendan Grossman imparted:
+&gt; Hey,
+&gt; 
+&gt; I'm having trouble getting sound working under Debian using the 2.6 kernel. 
+&gt; I'm compiling the kernel 'the debian way'. I followed this guide here 
+&gt; exactly, except the kernel version:
+&gt; 
+&gt; <A HREF="http://www.sonic.net/~rknop/linux/debian_alsa.html">http://www.sonic.net/~rknop/linux/debian_alsa.html</A>
+&gt; 
+&gt; Anyway, everything is going fine until I have to make the modules image. 
+&gt; Here's what happens (i thought i'd paste it all just incase):
+&gt; 
+&gt; minerva:/usr/src/linux# make-kpkg --revision 1 --append-to-version "-bjg" 
+&gt; modules_image
+&gt; for module in /usr/src/modules/alsa-driver ; do                        \
+&gt;           if test -d  $module; then                                \
+&gt;     (cd $module;                                           \
+&gt;               if ./debian/rules KVERS="2.6.0-bjg" KSRC="/usr/src/linux" \
+&gt;                              KMAINT="Unknown Kernel Package Maintainer" 
+&gt; KEMAIL="<A HREF="mailto:unknown@unconfigured.in.etc.kernel-pkg.conf">unknown@unconfigured.in.etc.kernel-pkg.conf</A>"      \
+&gt;                              KPKG_DEST_DIR="/usr/src/linux/.."       \
+&gt;                              KPKG_MAINTAINER="Unknown Kernel Package 
+&gt; Maintainer"        \
+&gt;                              KDREV="1" kdist_image; then    \
+&gt;                   echo "Module $module processed fine";            \
+&gt;               else                                                  \
+&gt;                    echo "Module $module failed.";                  \
+&gt;                    echo "Hit return to Continue";                   \
+&gt;            read ans;                                        \
+&gt;               fi;                                                   \
+&gt;      );                                                     \
+&gt;   fi;                                                       \
+&gt;         done
+&gt; make[1]: Entering directory `/usr/src/modules/alsa-driver'
+&gt; /usr/bin/make -w -f debian/rules MODDIR=/usr/src/linux/.. binary-modules
+&gt; make[2]: Entering directory `/usr/src/modules/alsa-driver'
+&gt; cat debian/modules.d/control.source &gt; debian/control
+&gt; cat debian/modules.d/control.module-image &gt;&gt; debian/control
+&gt; /usr/bin/make
+&gt; make[3]: Entering directory `/usr/src/modules/alsa-driver'
+&gt; make[4]: Entering directory `/usr/src/modules/alsa-driver/acore'
+&gt; gcc -DALSA_BUILD -D__KERNEL__ -DMODULE=1 -I/usr/src/linux/include -I/usr/src/
+&gt; modules/alsa-driver/include -O2 -mpreferred-stack-boundary=2 -march=athlon 
+&gt; -DLINUX -Wall -Wstrict-prototypes -fomit-frame-pointer -pipe   
+&gt; -DEXPORT_SYMTAB -c timer.c
+&gt; In file included from /usr/src/linux/include/sound/driver.h:42,
+&gt;                  from ../alsa-kernel/core/timer.c:22,
+&gt;                  from timer.c:1:
+&gt; /usr/src/modules/alsa-driver/include/adriver.h:25:40: missing binary operator 
+&gt; before token "("
+&gt; /usr/src/modules/alsa-driver/include/adriver.h:28:41: missing binary operator 
+&gt; before token "("
+&gt; /usr/src/modules/alsa-driver/include/adriver.h:33:43: missing binary operator 
+&gt; before token "("
+&gt; /usr/src/modules/alsa-driver/include/adriver.h:40:31: linux/modversions.h: No 
+&gt; such file or directory
+&gt; In file included from /usr/src/linux/include/asm/processor.h:18,
+&gt;                  from /usr/src/linux/include/asm/thread_info.h:13,
+&gt;                  from /usr/src/linux/include/linux/thread_info.h:21,
+&gt;                  from /usr/src/linux/include/linux/spinlock.h:12,
+&gt;                  from /usr/src/linux/include/linux/capability.h:45,
+&gt;                  from /usr/src/linux/include/linux/sched.h:7,
+&gt;                  from /usr/src/linux/include/linux/module.h:10,
+&gt;                  from /usr/src/modules/alsa-driver/include/adriver.h:49,
+&gt;                  from /usr/src/linux/include/sound/driver.h:42,
+&gt;                  from ../alsa-kernel/core/timer.c:22,
+&gt;                  from timer.c:1:
+&gt; /usr/src/linux/include/asm/system.h: In function `__set_64bit_var':
+&gt; /usr/src/linux/include/asm/system.h:193: warning: dereferencing type-punned 
+&gt; pointer will break strict-aliasing rules
+&gt; /usr/src/linux/include/asm/system.h:193: warning: dereferencing type-punned 
+&gt; pointer will break strict-aliasing rules
+&gt; /usr/src/modules/alsa-driver/include/adriver.h:101:40: missing binary operator 
+&gt; before token "("
+&gt; /usr/src/modules/alsa-driver/include/adriver.h:104:40: missing binary operator 
+&gt; before token "("
+&gt; /usr/src/modules/alsa-driver/include/adriver.h:156:62: missing binary operator 
+&gt; before token "("
+&gt; In file included from /usr/src/linux/include/linux/irq.h:20,
+&gt;                  from /usr/src/linux/include/asm/hardirq.h:6,
+&gt;                  from /usr/src/linux/include/linux/interrupt.h:11,
+&gt;                  from /usr/src/linux/include/sound/timer.h:27,
+&gt;                  from ../alsa-kernel/core/timer.c:28,
+&gt;                  from timer.c:1:
+&gt; /usr/src/linux/include/asm/irq.h:16:25: irq_vectors.h: No such file or 
+&gt; directoryIn file included from /usr/src/linux/include/asm/hardirq.h:6,
+&gt;                  from /usr/src/linux/include/linux/interrupt.h:11,
+&gt;                  from /usr/src/linux/include/sound/timer.h:27,
+&gt;                  from ../alsa-kernel/core/timer.c:28,
+&gt;                  from timer.c:1:
+&gt; /usr/src/linux/include/linux/irq.h: At top level:
+&gt; /usr/src/linux/include/linux/irq.h:70: error: `NR_IRQS' undeclared here (not 
+&gt; in a function)
+&gt; In file included from /usr/src/linux/include/linux/irq.h:72,
+&gt;                  from /usr/src/linux/include/asm/hardirq.h:6,
+&gt;                  from /usr/src/linux/include/linux/interrupt.h:11,
+&gt;                  from /usr/src/linux/include/sound/timer.h:27,
+&gt;                  from ../alsa-kernel/core/timer.c:28,
+&gt;                  from timer.c:1:
+&gt; /usr/src/linux/include/asm/hw_irq.h:28: error: `NR_IRQ_VECTORS' undeclared 
+&gt; here (not in a function)
+&gt; /usr/src/linux/include/asm/hw_irq.h:31: error: `NR_IRQS' undeclared here (not 
+&gt; in a function)
+&gt; In file included from timer.c:1:
+&gt; ../alsa-kernel/core/timer.c: In function `dec_mod_count':
+&gt; ../alsa-kernel/core/timer.c:80: warning: implicit declaration of function 
+&gt; `__MOD_DEC_USE_COUNT'
+&gt; ../alsa-kernel/core/timer.c: In function `snd_timer_instance_new':
+&gt; ../alsa-kernel/core/timer.c:102: error: structure has no member named `in_use'
+&gt; ../alsa-kernel/core/timer.c:105: warning: implicit declaration of function 
+&gt; `try_inc_mod_count'
+&gt; In file included from timer.c:1:
+&gt; ../alsa-kernel/core/timer.c: At top level:
+&gt; ../alsa-kernel/core/timer.c:226: error: conflicting types for `snd_timer_open'
+&gt; /usr/src/linux/include/sound/timer.h:145: error: previous declaration of 
+&gt; `snd_timer_open'
+&gt; In file included from timer.c:1:
+&gt; ../alsa-kernel/core/timer.c: In function `snd_timer_stop':
+&gt; ../alsa-kernel/core/timer.c:410: error: structure has no member named `in_use'
+&gt; In file included from timer.c:1:
+&gt; ../alsa-kernel/core/timer.c: In function `snd_timer_interrupt':
+&gt; ../alsa-kernel/core/timer.c:529: error: structure has no member named `in_use'
+&gt; ../alsa-kernel/core/timer.c:564: error: too many arguments to function
+&gt; ../alsa-kernel/core/timer.c:570: error: too many arguments to function
+&gt; ../alsa-kernel/core/timer.c:573: error: structure has no member named `in_use'
+&gt; In file included from timer.c:1:
+&gt; ../alsa-kernel/core/timer.c: In function `snd_timer_user_tselect':
+&gt; ../alsa-kernel/core/timer.c:1049: warning: assignment from incompatible 
+&gt; pointer type
+&gt; In file included from timer.c:1:
+&gt; ../alsa-kernel/core/timer.c: In function `snd_timer_user_info':
+&gt; ../alsa-kernel/core/timer.c:1070: error: structure has no member named `ticks'
+&gt; make[4]: *** [timer.o] Error 1
+&gt; make[4]: Leaving directory `/usr/src/modules/alsa-driver/acore'
+&gt; make[3]: *** [compile] Error 1
+&gt; make[3]: Leaving directory `/usr/src/modules/alsa-driver'
+&gt; make[2]: *** [install-modules] Error 2
+&gt; make[2]: Leaving directory `/usr/src/modules/alsa-driver'
+&gt; make[1]: *** [kdist_image] Error 2
+&gt; make[1]: Leaving directory `/usr/src/modules/alsa-driver'
+&gt; Module /usr/src/modules/alsa-driver failed.
+&gt; Hit return to Continue
+&gt; 
+&gt; This is driving me insane! My card uses the cs46xx driver, and i've had it 
+&gt; working under Linux before. That time though i just downloaded the ALSA 
+&gt; source and compiled everything manually, something i'd prefer not to do since 
+&gt; I want to keep the system all Debianised.
+&gt; 
+&gt; Any ideas? Better yet, has anyone here got sound working using the inbuilt 
+&gt; ALSA support in the 2.6 kernel, doing it the debian way?
+&gt; 
+&gt; Cheers
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+??????????????????????????????????????????????????
+Romana Challans
+ITShare SA Inc / ComputerbankSA
+<A HREF="http://cai-sa.linunix.com/">http://cai-sa.linunix.com/</A>
+??????????????????????????????????????????????????
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,391 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PAM linking errors" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Jake Hawkes" -->
+<!-- ToEmail="jake@infinitylimited.net" -->
+<!-- Date="Wed, 12 Apr 2000 15:34:20 +0930 (CST)" -->
+<!-- Id="Pine.BSF.3.96.1000412153406.6726A-100000@augustus.tellurian.com.au" -->
+<!-- Reference="38F3FA6B.D7788AFE@infinitylimited.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PAM linking errors</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  Date: Wed, 12 Apr 2000 15:34:20 +0930 (CST)
+</PRE>
+<H1>Re: PAM linking errors</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 12 Apr 2000, Jake Hawkes wrote:
+&gt; this works. now I just have to fight with the rest of PAM - the doco is
+&gt; a pig.
+&gt; 
+&gt; Does anyone have some source I can get some tips from? 
+
+
+Okay, okay, I've had my little chuckle so now I'll offer some help.  First
+let me admit that I didn't read the original question so what I'm actually
+answering is, "Can someone explain how to use PAM?"
+
+This lecture is based around my password CGI.  Two functions are needed
+(but I wrote three to make error processing a little simpler).  The main
+function, update_pw, takes a user name, the current password and the
+desired password, and returns NULL on success or a list of errors on
+failure.
+
+
+struct errors {
+	char *msg;
+	struct errors *next;
+};
+
+struct errors *update_pw(const char *user, const char *curpas, const char *newpas)
+{
+	/* pam specific code */
+	...
+}
+
+
+You need to provide two PAM structures, one being for PAM to keep track of
+internal state, and the other being a pointer to a conversation function
+which communicates with the user.  PAM calls the conversation function to
+display prompts and get input from the user.
+
+
+static int passwd_conv(int num_msg, const struct pam_message **msgm,
+			struct pam_response **response, void *appdata_ptr)
+{
+	/* conversation function */
+	...
+}
+
+struct errors *update_pw(const char *user, const char *curpas, const char *newpas)
+{
+	pam_handle_t *pamh = NULL;
+	struct pam_conv conv = {
+		passwd_conv,
+		NULL
+	};
+
+	/* pam specific code */
+	...
+}
+
+
+Changing the password using PAM is delightfully simple, involving more or
+less just three steps:
+
+
+	retval = pam_start("passwd", user, &conv, &pamh);
+
+	if (retval == PAM_SUCCESS)
+		retval = pam_chauthtok(pamh, 0);
+
+	if (retval == PAM_SUCCESS)
+	{
+		retval = pam_end(pamh, PAM_SUCCESS);
+		pamh = 0;
+	}
+
+	if (retval == PAM_SUCCESS)
+		return 0;
+
+	if (pamh != NULL)
+		(void) pam_end(pamh, PAM_SUCCESS);
+
+
+	/* process error */
+	...
+
+
+The call to pam_chauthtok says that you want to change the password.  PAM
+configuration file determine what PAM modules must be called and in what
+order.  Those modules call the conversation function to ask the user for
+the old and new passwords.
+
+PAM calls the conversation function with a list of messages (prompts), and
+there could be a reply for each of them.  The messages are passed as an
+array of pointers (much like argv and envp, which we discussed earlier in
+this thread).
+
+The conversation function creates an array of pointers for the replies.
+It's reasonable to create a reply array big enough to hold one reply for
+each message.  Not all messages need a reply, so this is wasteful, but
+it's a trivial waste in exchange for much clearer code.
+
+
+static int passwd_conv(int num_msg, const struct pam_message **msgm,
+			struct pam_response **response, void *appdata_ptr)
+{
+	struct pam_response *reply=calloc(num_msg, sizeof(struct pam_response));
+
+	if (reply == 0)
+		return PAM_CONV_ERR;
+
+	*response = reply;
+	...
+}
+
+
+The conversation function displays each message in turn and, where
+appropriate, prompts for a reply.
+
+My need is for a function called by a CGI, so I can't actually interact
+with the user--CGI is "batch oriented".  I get all the answers up front and
+pass them to PAM, via the conversation function, in the right order.  Since
+I "know" that the prompts will be for the old password, followed by some
+number of prompts for the new password, I consider it ugly but expedient to
+code the conversation function accordingly.
+
+PAM doesn't necessarily ask for all passwords at the same time; it asks for
+them one at a time.  To handle this I keep my own state.  The old and new
+passwords are passed as parameters to update_pw, and stored in global
+variables for use by the conversation function.  The first reply is "known"
+to be the old password, and all subsequent replies are the new password.
+
+
+static const char *current;
+static const char *new;
+
+static int passwd_conv(int num_msg, const struct pam_message **msgm,
+			struct pam_response **response, void *appdata_ptr)
+{
+	...
+	static int given_current = 0;
+	...
+	for ( ; num_msg--; msg++) {
+		switch (msg-&gt;msg_style) {
+		case PAM_PROMPT_ECHO_OFF:
+		case PAM_PROMPT_ECHO_ON:
+			reply-&gt;resp = strdup(given_current ? new : current);
+			given_current = 1;
+			if (reply-&gt;resp == NULL)
+				return (PAM_CONV_ERR);
+			reply-&gt;resp_retcode = 0;
+			reply++;
+			break;
+		...
+		}
+	}
+	...
+}
+
+
+struct errors *update_pw(const char *user, const char *curpas, const char *newpas)
+{
+	...
+	current = curpas;
+	new = newpas;
+	...
+}
+
+
+Aside from prompts, the only other type of message we need to deal with in
+our conversation function is an error message.  These are returned via a
+global.
+
+
+static struct errors *errors = 0, *lasterror;
+
+static struct errors *add_error(const char *msg)
+{
+	struct error *e = malloc(e);
+	if (e == 0)
+		return 0;
+	if (errors)
+		lasterror-&gt;next = e;
+	else
+		errors = e;
+	e-&gt;msg = strdup(msg);
+	e-&gt;next = 0;
+	lasterror = e;
+	return errors;
+}
+
+static int passwd_conv(int num_msg, const struct pam_message **msgm,
+			struct pam_response **response, void *appdata_ptr)
+{
+		...
+		switch (msg-&gt;msg_style) {
+		...
+		case PAM_ERROR_MSG:
+			if (add_error(msg-&gt;msg) == NULL)
+				return (PAM_CONV_ERR);
+			break;
+		}
+		...
+}
+
+
+
+In my main CGI code I call update_pw like this:
+
+	static struct errors *e;
+	for (e = update_pw(user, oldpw, newpw); e; e = e-&gt;next)
+		printf("&lt;strong&gt;%s&lt;/strong&gt;&lt;p&gt;\n",e-&gt;msg);
+
+
+I compile with:
+
+	cc -g -o passwd.cgi passwd.cgi.c update-pw.c -lpam -ldl
+
+
+
+Here is the complete C and header <A HREF="file:">file:</A>
+
+---8&lt;------8&lt;------8&lt;------8&lt;------8&lt;------8&lt;------8&lt;------8&lt;------8&lt;----
+#ifndef __UPDATE_PW_H__
+#define __UPDATE_PW_H__
+
+struct errors {
+	char *msg;
+	struct errors *next;
+};
+
+struct errors *update_pw(const char *user, const char *curpas, const char *newpas);
+
+#endif /* __UPDATE_PW_H__ */
+
+---8&lt;------8&lt;------8&lt;------8&lt;------8&lt;------8&lt;------8&lt;------8&lt;------8&lt;----
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;security/pam_appl.h&gt;
+#include "update-pw.h"
+
+static const char *ident = "$Id: update-pw.c,v 1.3 1999/05/14 08:07:34 davidn Exp $";
+static const char *current;
+static const char *new;
+
+static struct errors *errors = 0, *lasterror;
+
+
+static struct errors *add_error(const char *msg)
+{
+	struct error *e = malloc(e);
+	if (e == 0)
+		return 0;
+	if (errors)
+		lasterror-&gt;next = e;
+	else
+		errors = e;
+	e-&gt;msg = strdup(msg);
+	e-&gt;next = 0;
+	lasterror = e;
+	return errors;
+}
+
+/*
+ * this conversation function expects the following questions:
+ *  -&gt; enter current password (followed by)
+ *  -&gt; enter new password (any number of times)
+ */
+static int passwd_conv(int num_msg, const struct pam_message **msgm,
+			struct pam_response **response, void *appdata_ptr)
+{
+	struct pam_response *reply=calloc(num_msg, sizeof(struct pam_response));
+	const struct pam_message *msg = *msgm;
+	static int given_current = 0;
+	struct error *e;
+
+	if (reply == 0)
+		return PAM_CONV_ERR;
+
+	*response = reply;
+
+	for ( ; num_msg--; msg++) {
+		switch (msg-&gt;msg_style) {
+		case PAM_PROMPT_ECHO_OFF:
+		case PAM_PROMPT_ECHO_ON:
+			reply-&gt;resp = strdup(given_current ? new : current);
+			given_current = 1;
+			if (reply-&gt;resp == NULL)
+				return (PAM_CONV_ERR);
+			reply-&gt;resp_retcode = 0;
+			reply++;
+			break;
+		case PAM_ERROR_MSG:
+			if (add_error(msg-&gt;msg) == NULL)
+				return (PAM_CONV_ERR);
+			break;
+		}
+	}
+	return PAM_SUCCESS;
+}
+
+
+struct errors *update_pw(const char *user, const char *curpas, const char *newpas)
+{
+	pam_handle_t *pamh = NULL;
+	struct pam_conv conv = {
+		passwd_conv,
+		NULL
+	};
+	int retval;
+
+	current = curpas;
+	new = newpas;
+	retval = pam_start("passwd", user, &conv, &pamh);
+
+	if (retval == PAM_SUCCESS)
+		retval = pam_chauthtok(pamh, 0);
+
+	if (retval == PAM_SUCCESS)
+	{
+		retval = pam_end(pamh, PAM_SUCCESS);
+		pamh = 0;
+	}
+
+	if (retval == PAM_SUCCESS)
+		return 0;
+
+	if (pamh != NULL)
+		(void) pam_end(pamh, PAM_SUCCESS);
+
+	switch(retval)
+	{
+	case PAM_USER_UNKNOWN:
+	case PAM_AUTH_ERR:
+		return add_error("What you typed for \"Login\" or \"Current Password\" is wrong");
+	case PAM_AUTHTOK_ERR:
+		return add_error("Try a different password");
+	}
+	return add_error(pam_strerror(retval));
+}
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

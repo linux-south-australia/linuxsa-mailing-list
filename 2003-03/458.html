@@ -1,0 +1,254 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: how to's for noob" -->
+<!-- FromName="'Peter Gossner'" -->
+<!-- FromEmail="gossner@arcom.com.au" -->
+<!-- ToName="'Fabian Mathews'" -->
+<!-- ToEmail="supagu@hotmail.com" -->
+<!-- Date="Mon, 10 Mar 2003 17:41:04 +1030" -->
+<!-- Id="20030310174104.696b0e73.gossner@arcom.com.au" -->
+<!-- Reference="F49HAaaz7EjQxzmWecm00015ba2@hotmail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: how to's for noob</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Peter Gossner &lt;<I><A HREF="mailto:gossner@arcom.com.au">gossner@arcom.com.au</A></I>&gt;
+  To  : Fabian Mathews &lt;<I><A HREF="mailto:supagu@hotmail.com">supagu@hotmail.com</A></I>&gt;
+  Date: Mon, 10 Mar 2003 17:41:04 +1030
+</PRE>
+<H1>Re: how to's for noob</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, 10 Mar 2003 06:31:53 +0000
+"Fabian Mathews" &lt;<A HREF="mailto:supagu@hotmail.com">supagu@hotmail.com</A>&gt; scribed:
+
+&gt; i do belive i have a smc SMC8013
+&gt; 
+&gt; and there didnt seem an appropriately named driver in the
+&gt; directory peter mentioned, so how else do i do this?
+&gt; 
+&gt; thanks
+&gt; 
+&gt; 
+&gt; ps. sorry peter, just replyed to you meant to reply to the
+&gt; group
+&gt; 
+No worries - I was wondering - 
+You may get some more card specific help as well. :)
+
+My best guess is that your card will use the ne.o module
+(see the other mail) but first just try:
+#insmod ne*
+
+Please tell us your kernel version and other stuff
+like this:
+
+#uname -a &gt; kernelversion
+(and send us the new file kernel version)
+
+There are lots of ways of finding if you have that module
+for your kernel here are two:
+
+1/ Look in the modules library for the kernel version you
+are running right now.
+#uname -r
+(I am running  2.4.19-petez)
+
+so I look in (deep breath)
+/lib/modules/2.4.19-petez/kernel/drivers/net/
+
+#cd /lib/modules/2.4.19-petez/kernel/drivers/net
+#ls 
+3c501.o    atp.o       e2100.o     hp.o        &lt;snipped&gt;
+
+2/ This is slightly cooler and involves using a really cool
+tool called grep (don't ask !)
+
+1 17:29:37 Mon Mar 10 <A HREF="mailto:pete@petesbox">pete@petesbox</A> / $ cd boot
+2 17:29:43 Mon Mar 10 <A HREF="mailto:pete@petesbox">pete@petesbox</A> /boot $ ls
+&lt;snip&gt;  config-2.4.19-petez       lost+found
+System.map-2.4.20dilli-a  config-2.4.20dilli-a     
+&lt;snipped&gt;    initrd.img-2.4.19-petez   vmlinuz-2.4.20dilli-a
+bootmess.text       initrd.img-2.4.20dilli-a 
+vmlinuz-2.4.20dilli-b
+
+#####This bit here to look for a line that mentions SMC in
+the config for a kernel ####
+
+3 17:29:46 Mon Mar 10 <A HREF="mailto:pete@petesbox">pete@petesbox</A> /boot $ grep SMC
+config-2.4.19-petez 
+CONFIG_NET_VENDOR_SMC=y
+CONFIG_SMC9194=m
+4 17:30:24 Mon Mar 10 <A HREF="mailto:pete@petesbox">pete@petesbox</A> /boot $ 
+And yes That kernel should have support for SMC and  at
+least one dynamic module 
+And  now looking for the NE2000 "card"
+6 17:36:48 Mon Mar 10 <A HREF="mailto:pete@petesbox">pete@petesbox</A> /boot $ grep NE2000
+config-2.4.19-petez 
+CONFIG_NE2000=m
+
+I also have the NE2000 card supported as a module
+
+I can crudely attempt to load it so:
+#insmod ne*
+If you get that far let us know as the rest is downhill :)
+
+
+
+
+
+
+
+&gt; 
+&gt; -------------------------------
+&gt; Fabian "SupaGu" Mathews
+&gt; 
+&gt; 
+&gt; 
+&gt; 
+&gt; 
+&gt; From: Peter Gossner &lt;<A HREF="mailto:gossner@arcom.com.au">gossner@arcom.com.au</A>&gt;
+&gt; Reply-To: <A HREF="mailto:gossner@arcom.com.au">gossner@arcom.com.au</A>
+&gt; To: "Fabian Mathews" &lt;<A HREF="mailto:supagu@hotmail.com">supagu@hotmail.com</A>&gt;
+&gt; CC: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; Subject: Re: how to's for noob
+&gt; Date: Mon, 10 Mar 2003 15:25:55 +1030
+&gt; 
+&gt; On Mon, 10 Mar 2003 04:26:54 +0000
+&gt; "Fabian Mathews" &lt;<A HREF="mailto:supagu@hotmail.com">supagu@hotmail.com</A>&gt; scribed:
+&gt; 
+&gt;  &gt; 00:00.0 host bridge:intel corp. 430vx - 82437vx [triton
+&gt;  &gt; vx] (rev 02) 00:07.0 isa bridge: intel corp. 82371sb
+&gt;  &gt; piix3 isa [natama/triton iii] (rev 01)
+&gt;  &gt; 00:07.0 ide interface: intel corp. 82371sb piix3 ide
+&gt;  &gt; [natama/triton iii] 00:13.0 vga compatiable controller:
+&gt;  &gt; trident microsystems tgui 9440 (rev e3)
+&gt; This looks like your video card so
+&gt;  &gt;
+&gt; Bummer no pci ethernet card.
+&gt; Your probably going to have to open your box and have a
+&gt; look.
+&gt; The ISA slots are generally thelongest  black edge
+&gt; connectors (normally there are 3 of them) grouped together
+&gt; at one end of the mother board.
+&gt; 
+&gt; You need to get the manufacturers name and model number
+&gt; off the card.
+&gt; If your reasonably lucky there will be driver for it in
+&gt; /lib/modules/kernel-version/kernel/net
+&gt; To get the Kernel and driver to set it up you type :
+&gt; (as root)
+&gt; # insmod driver
+&gt; (you can use wildcards)
+&gt; If that does not work .. let us know it's not hard just
+&gt; subject to a few different options.
+&gt; (You may need to add some addressing/interupt information
+&gt; for example).
+&gt; 
+&gt; You will need to identify at least the manufacturer.
+&gt; 
+&gt;  &gt;
+&gt;  &gt; -------------------------------
+&gt;  &gt; Fabian "SupaGu" Mathews
+&gt;  &gt;
+&gt;  &gt;
+&gt;  &gt;
+&gt;  &gt;
+&gt;  &gt;
+&gt;  &gt; From: David Lloyd &lt;<A HREF="mailto:dlloyd@microbits.com.au">dlloyd@microbits.com.au</A>&gt;
+&gt;  &gt; To: "Fabian Mathews" &lt;<A HREF="mailto:supagu@hotmail.com">supagu@hotmail.com</A>&gt;
+&gt;  &gt; CC: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt;  &gt; Subject: Re: how to's for noob
+&gt;  &gt; Date: Mon, 10 Mar 2003 13:32:36 +1030
+&gt;  &gt;
+&gt;  &gt;
+&gt;  &gt; Can you do me the following:
+&gt;  &gt;
+&gt;  &gt;   # lspci &gt; /tmp/lspci.output
+&gt;  &gt;
+&gt;  &gt; ..and post the contents of /tmp/lspci.out to us?
+&gt;  &gt;
+&gt;  &gt; This runs a command, lspci, and puts its output in
+&gt;  &gt; lspci.output. You can see the contents of that using
+&gt;  &gt; "vi","pico" or just plain "cat/tmp/lspci.output". This
+&gt;  &gt; will give us a clue as to what ethernet card you have.
+&gt;  &gt;
+&gt;  &gt;
+&gt;  &gt; DSL
+&gt;  &gt;
+&gt;  &gt;
+&gt;  &gt; ______________________________________________________
+&gt;  &gt; ___________ STOP MORE SPAM with the new MSN 8 and get 2
+&gt;  &gt; months FREE*
+&gt;  &gt; <A HREF="http://join.msn.com/?page">http://join.msn.com/?page</A>=features/junkmail
+&gt;  &gt;
+&gt;  &gt; --
+&gt;  &gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa
+&gt;  &gt; on irc.freenode.net To unsubscribe from the LinuxSA
+&gt;  &gt; list:
+&gt;  &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with
+&gt;  &gt;   "unsubscribe" as the subject
+&gt; 
+&gt; 
+&gt; --
+&gt; &lt;<A HREF="mailto:gossner@arcom.com.au">gossner@arcom.com.au</A>&gt;
+&gt; &lt;<A HREF="http://arcom.com.au/~gossner/&gt">http://arcom.com.au/~gossner/&gt</A>;
+&gt; &lt;<A HREF="http://bigbutton.com.au/~hazzaday&gt">http://bigbutton.com.au/~hazzaday&gt</A>;
+&gt; 
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on
+&gt; irc.freenode.net To unsubscribe from the LinuxSA list:
+&gt;    mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe"
+&gt;    as the subject
+&gt; 
+&gt; 
+&gt; _________________________________________________________
+&gt; ________ STOP MORE SPAM with the new MSN 8 and get 2
+&gt; months FREE* <A HREF="http://join.msn.com/?page">http://join.msn.com/?page</A>=features/junkmail
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on
+&gt; irc.freenode.net To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe"
+&gt;   as the subject
+
+
+-- 
+&lt;<A HREF="mailto:gossner@arcom.com.au">gossner@arcom.com.au</A>&gt;
+&lt;<A HREF="http://arcom.com.au/~gossner/&gt">http://arcom.com.au/~gossner/&gt</A>;
+&lt;<A HREF="http://bigbutton.com.au/~hazzaday&gt">http://bigbutton.com.au/~hazzaday&gt</A>;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

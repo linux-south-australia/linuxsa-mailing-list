@@ -1,0 +1,1367 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Still having problems getting DHCP working..." -->
+<!-- FromName="James Morgan" -->
+<!-- FromEmail="jmorgan@bigpond.net.au" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 15 Sep 1999 01:15:39 +1000" -->
+<!-- Id="37DE669B.713AF358@bigpond.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Still having problems getting DHCP working...</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Morgan &lt;<I><A HREF="mailto:jmorgan@bigpond.net.au">jmorgan@bigpond.net.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 15 Sep 1999 01:15:39 +1000
+</PRE>
+<H1>Still having problems getting DHCP working...</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Unfortunately I am still having problems getting dhcp client working
+under SuSE 6.2 and connecting via Telstra Big Pond Cable (I am starting
+to get desperate).
+
+DHCP (client) acts af if everything is fine when my computer starts up.
+Unfortunately I am not being assigned an IP address.
+
+This is the output of ifconfig:
+eth0      Link encap:Ethernet  HWaddr 00:AA:00:5B:9E:88
+          inet addr:192.168.1.254  Bcast:192.168.1.255
+Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:6 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:26 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:100
+          Interrupt:9 Base address:0x200
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:3924  Metric:1
+          RX packets:14 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:14 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+
+Dhcp seems to be assigning me a default IP address. I should expect
+something like: 24.192.10.46 (which is the IP I am assigned when I boot
+under windows)
+
+I believe that I have not configured something properly. I have read all
+the FAQs HOW-TOs etc. but I have found nothing that helps.
+
+I have included some config files and any log files that may be of
+assistance. I would be extremely appreciative of any one that can help
+me fix this problem.
+
+The thing that gets me is that everything worked fine under SuSE 6.1
+(even under the default install) and everything works fine under win95
+(I hate it when that happens).
+
+If anyone has the config files to suse 6.1 I would appreciate a look.
+Maybe there is some other fundamental difference between 6.1 and 6.2.
+Has any one had any troubles with DHCP (client) and 6.2?
+
+Thank you to every one who has already given me some suggestions.
+
+Sep 12 17:58:58 (none) dhclient: No DHCPOFFERS received.
+Sep 12 17:58:58 (none) dhclient: No working leases in persistent database - sleeping. 
+Sep 12 17:59:58 (none) dhclient: DHCPDISCOVER on eth0 to 255.255.255.255 port 67 interval 2
+Sep 12 18:00:00 (none) dhclient: DHCPDISCOVER on eth0 to 255.255.255.255 port 67 interval 3
+Sep 12 18:00:03 (none) dhclient: DHCPDISCOVER on eth0 to 255.255.255.255 port 67 interval 6
+Sep 12 18:00:09 (none) dhclient: DHCPDISCOVER on eth0 to 255.255.255.255 port 67 interval 6
+Sep 12 18:00:15 (none) dhclient: DHCPDISCOVER on eth0 to 255.255.255.255 port 67 interval 13
+Sep 12 18:00:28 (none) dhclient: DHCPDISCOVER on eth0 to 255.255.255.255 port 67 interval 12
+Sep 12 18:00:40 (none) dhclient: DHCPDISCOVER on eth0 to 255.255.255.255 port 67 interval 19
+Sep 12 18:00:59 (none) dhclient: No DHCPOFFERS received.
+Sep 12 18:00:59 (none) dhclient: No working leases in persistent database - sleeping. 
+
+# dhclient configuration file
+# see "man dhclient.conf" for further details
+# <A HREF="file:">file:</A> /etc/dhclient.conf
+#
+
+#send host-name "andare.fugue.com";
+#send dhcp-client-identifier 1:00:AA:00:5B:9E:88;
+#supersede domain-name "fugue.com home.vix.com";
+#prepend domain-name-servers 127.0.0.1;
+
+
+#fixed-address 24.192.10.46;
+
+send dhcp-lease-time 3600;
+request subnet-mask, broadcast-address, time-offset, routers,
+	domain-name, domain-name-servers, host-name;
+require subnet-mask, domain-name-servers;
+timeout 60;
+retry 60;
+reboot 10;
+select-timeout 5;
+initial-interval 2;
+script "/sbin/dhclient-script";
+
+#media "-link0 -link1 -link2", "link0 link1";
+#reject 192.33.137.209;
+
+# dhclient configuration file
+# see "man dhclient.conf" for further details
+# <A HREF="file:">file:</A> /etc/dhclient.conf
+#
+
+#send host-name "andare.fugue.com";
+#send dhcp-client-identifier 1:0:a0:24:ab:fb:9c;
+#supersede domain-name "fugue.com home.vix.com";
+#prepend domain-name-servers 127.0.0.1;
+
+#send dhcp-lease-time 3600;
+request subnet-mask, broadcast-address, time-offset, routers,
+	domain-name, domain-name-servers, host-name;
+#require subnet-mask, domain-name-servers;
+timeout 60;
+retry 60;
+reboot 10;
+select-timeout 5;
+initial-interval 2;
+script "/sbin/dhclient-script";
+
+#media "-link0 -link1 -link2", "link0 link1";
+reject 192.168.1.254;
+
+#
+# diphosts	This file describes a number of name-to-address
+#		mappings for the DIP program.  It is used to determine
+#		which host IP address to use for an incoming call of
+#		some user.
+#
+# Version:	@(#)diphosts		1.20	05/31/94
+#
+# Author:	Fred N. van Kempen, &lt;<A HREF="mailto:waltje@uwalt.nl.mugnet.org">waltje@uwalt.nl.mugnet.org</A>&gt;
+# Modified:     Uri Blumenthal      &lt;<A HREF="mailto:uri@watson.ibm.com">uri@watson.ibm.com</A>&gt;
+#
+# name : pwd : hostname : local server: netmask: comments : protocol,mtu
+#==================================================
+#sbonjovi::bonjovi:server1:netmask:MicroWalt "bonjovi" SLIP:SLIP,296
+#sroxette::roxette:server2:netmask:MicroWalt "roxette" SLIP:CSLIP,296
+
+#stephen:s/key:tuin:server3:netmask:S/Key Authenticated login:CSLIP,296
+
+# End of diphosts.
+
+
+KEYTABLE="us.map.gz"
+
+LANGUAGE="english"
+
+#
+# Some people don't want SuSEconfig to modify the system. With this
+# entry you can disable SuSEconfig completely. 
+# Please don't contact our support if you have trouble configuring your 
+# system after having disabled SuSEconfig.  (yes/no)
+#
+ENABLE_SUSECONFIG=yes
+
+
+#
+#
+# Local users will get RC_LANG as their default language,
+# i.e. the environment variable $LANG . $LANG is the default
+# of all $LC_*-variables, as long as $LC_ALL is not set, which
+# overrules all $LC_-variables. If empty, $LANGUAGE will be used.
+# Root uses this variable only if ROOT_USES_LANG is set to "YES"
+#
+#
+RC_LANG=""
+
+#
+# This variable will overrule all LC-variables!!
+# Again, ROOT_USES_LANG has to be set to YES in order
+# to get any effect for the superuser.
+#
+RC_LC_ALL=""
+
+#
+# This defines the locale in which messages of programs and
+# libraries with i18n-support should appear if a translated
+# message catalog for the library or the program is installed.
+# It also defines yes/no answers which are defined by the locale.
+#
+RC_LC_MESSAGES=""
+
+#
+# This defines the locale for character handling and classification.
+# The locale defined here is used by the libc in functions which
+# are used to qualify if this character is an charcater which may
+# be used in an text string, if the character is e.g. lowercase
+# and it defnes upper/lowercase-mapping of foreign characters
+#
+RC_LC_CTYPE=""
+
+#
+# This defines the locale for sorting strings and characters.
+# The locale defined here is used by the libc in functions which
+# are used to qualify if a character is befor or beyond an other
+# character in the alphabet. Note: sort(1) doesn't use these
+# functions, but other application such as databases may use it.
+#
+RC_LC_COLLATE=""
+
+#
+# This defines the locale for date and time output formats.
+# i.e.: 06/09/1999 vs. 09.06.1999
+#
+RC_LC_TIME=""
+
+#
+# This defines the locale for formatting and reading numbers.
+# i.e.: 1,234.56 vs. 1.234,56
+#
+RC_LC_NUMERIC=""
+
+#
+# This defines the locale for formatting and reading money values.
+#
+RC_LC_MONETARY=""
+
+#
+# This defines if the user "root" should use the locale settings
+# which are defined here.
+#
+ROOT_USES_LANG="no"
+
+#
+# SuSEconfig can mail reports (created by YaST or included in packages)
+# to you.  Here you can set the address.  If you don't want reports to
+# be send, then simply set it to "".
+#
+MAIL_REPORTS_TO="root"
+
+#
+# There are two levels of mailing.  If you set MAIL_LEVEL it to "warn"
+# you only get the important mails.  If you set it to "all", you get
+# logs also.
+#
+MAIL_LEVEL="warn"
+
+#
+# Which device is the mouse ? (e.g. "/dev/ttyS0")
+#
+MOUSE="/dev/ttyS0"
+
+#
+# Which device is the modem ? (e.g. "/dev/ttyS1")
+#
+MODEM=""
+
+#
+# Load this console font upon bootup:
+#
+CONSOLE_FONT=""
+
+#
+# Does your console font need a screenmap? Insert it into CONSOLE_SCREENMAP.
+#
+CONSOLE_SCREENMAP=""
+
+#
+# some fonts/keymap need a unicode map (TRANSLATION in former releases).
+# add it to CONSOLE_UNICODEMAP.
+#
+CONSOLE_UNICODEMAP=""
+
+#
+# for some fonts the console has to be initialized with CONSOLE_MAGIC.
+# CONSOLE_MAGIC can be empty or have the values "(B", ")B", "(K" or ")K".
+#
+CONSOLE_MAGIC=""
+
+
+#
+# keyboard repeat rate (2.0 - 30.0)
+# keyboard delay time in ms (250, 500, 750, 1000)
+# (If you want "kbdrate" to be executed, you have to set both of them.)
+#
+KBD_RATE=""
+KBD_DELAY=""
+
+#
+# NumLock on? ("yes" or "no")
+KBD_NUMLOCK="no"
+
+#
+# CapsLock on? ("yes" or "no")
+KBD_CAPSLOCK="no"
+
+#
+# tty's for NumLock and CapsLock 
+# example: "tty1 tty2"
+# "" for all tty's
+#
+KBD_TTY="tty1 tty2 tty3 tty4 tty5 tty6"
+
+
+#
+# Set to "-u" if your system clock is set to GMT, otherwise "".
+#
+GMT=""
+
+#
+# Timezone (e.g. CET)
+# (this will set /usr/lib/zoneinfo/localtime)
+#
+TIMEZONE="CET"
+
+#
+# start loopback networking? ("yes" or "no")
+#
+START_LOOPBACK="yes"
+
+#
+# networking
+#
+# number of network cards: "_0" for one, "_0 _1 _2 _3" for four cards
+#
+NETCONFIG="_0"
+
+#
+# IP Adresses 24.192.10.46
+#
+IPADDR_0="24.192.10.46"
+IPADDR_1=""
+IPADDR_2=""
+IPADDR_3=""
+
+#
+# network device names (e.g. "eth0")
+#
+NETDEV_0="eth0"
+NETDEV_1=""
+NETDEV_2=""
+NETDEV_3=""
+
+#
+# parameteres for ifconfig, if you put "bootp" into it, bootp will
+# be used to configure it
+# sample entry for ethernet:
+# IFCONFIG_0="192.168.81.38 broadcast 192.168.81.63 netmask 255.255.255.224"
+#
+IFCONFIG_0="netmask 255.255.252.0"
+IFCONFIG_1=""
+IFCONFIG_2=""
+IFCONFIG_3=""
+
+# 
+# setup dummy network device for IPADDR_0? this is useful for non permanent
+# network connections (e.g. SLIP, PPP). Some software needs a connection
+# to FQHOSTNAME (e.g. plp). (yes, no)
+SETUPDUMMYDEV="no"
+
+#
+# Do you want the "dynamic IP patch" to be enabled at bootup? (yes/no)
+#
+IP_DYNIP="yes"
+
+#
+# Enable syn flood protection (see /usr/src/linux/Documentation/Configure.help)
+# (yes/no)
+#
+IP_TCP_SYNCOOKIES=yes
+
+#
+# runtime-configurable parameter: forward IP packets.
+# Is this host a router? (yes/no)
+#
+IP_FORWARD=no
+
+
+#
+# SuSEconfig can do some checks and modifications in /etc/hosts. 
+# If this is not wanted, set the following variable to 'no' (yes, no).
+#
+CHECK_ETC_HOSTS=yes
+
+#
+# If CHECK_ETC_HOSTS is set to yes, SuSEconfig sorts your
+# /etc/hosts.  But in some cases this may be unwanted.  So here is a
+# flag, where you can configure if /etc/hosts should be "beautified".
+# (yes/no)
+#
+BEAUTIFY_ETC_HOSTS=yes
+
+#
+# if SORT_PASSWD_BY_UID is set to yes, SuSEconfig sorts your /etc/passwd
+# and /etc/group by uid/gid.
+#
+SORT_PASSWD_BY_UID=no
+
+
+#
+# hostname of the system (full name)
+# if zero, and bootp is used above, bootp will also set the hostname
+# (e.g. "riemann.suse.de" or "hugo.linux.de")
+# don't forget to also edit /etc/hosts for your system
+#
+FQHOSTNAME="morgs"
+
+#
+# SuSEconfig can create and check the /etc/host.conf for you. Should this
+# be done ("yes" or "no").
+#
+CREATE_HOSTCONF="yes"
+
+#
+# Shall SuSEconfig maintain /etc/resolv.conf (needed for DNS) ? 
+# If set to yes and one of SEARCHLIST and NAMESERVER is empty,
+# it is assumed, that no DNS is wanted and /etc/resolv.conf will
+# be deleted. If yes and both are filled out, it will be created.
+# "no" leaves /etc/resolv.conf untouched.
+#
+CREATE_RESOLVCONF=yes
+
+#
+# domain searchlist that should be used in /etc/resolv.conf
+# (e.g. "suse.de linux.de uni-stuttgart.de")
+# Attention! this has to be filled out, if you want to access a name server
+#
+SEARCHLIST=""
+
+#
+# space separated list of nameservers that should be used for /etc/resolv.conf
+# give a maximum of 3 IP numbers
+# (e.g. "192.168.116.11 192.168.7.7")
+#
+NAMESERVER="24.192.1.18"
+
+#
+# Used for News-Postings.
+#
+ORGANIZATION=""
+
+#
+# News server.
+#
+NNTPSERVER="news"
+
+#
+# space separated list of irc servers
+#
+IRCSERVER=""
+
+#
+# start the inet daemon in multi-user? ("yes" or "no")
+# this is needed, if you have to telnet/rlogin to your own machine.
+# It is also needed for the man page formatter in SuSE Help system
+# and for starting the plp lp daemon.
+#
+START_INETD="yes"
+
+#
+# have mail daemon on SMTP port? ("yes" or "no")
+# needed, if you receive email from other hosts via tcp/ip
+# not needed, if you have a uucp-only host or only out-going email.
+# If set to "yes", sendmail will be started as daemon.
+# As uucp site, you can get along with "SMTP=no", if you make
+# a "sendmail -q" call after each poll. (As rmail is queuing the mail only
+# and not delivering it...)
+#
+SMTP="yes"
+
+#
+# From:-Line in email and News postings
+# (otherwise the FQDN is used)
+#
+FROM_HEADER=""
+
+#
+# some programs (e.g. lynx, arena and wget) support proxies, if set in
+# environment.  SuSEconfig can add this environment variables to
+# /etc/SuSEconfig/* (sourced by /etc/profile etc.) - See
+# <A HREF="http://www.suse.de/Support/sdb_e/lynx_proxy.html">http://www.suse.de/Support/sdb_e/lynx_proxy.html</A> for more details.
+# Example: HTTP_PROXY="<A HREF="http://proxy.provider.de:3128/">http://proxy.provider.de:3128/</A>"
+HTTP_PROXY=""
+
+#
+# Example: FTP_PROXY="<A HREF="http://proxy.provider.de:3128/">http://proxy.provider.de:3128/</A>"
+#
+FTP_PROXY=""
+
+#
+# Example: GOPHER_PROXY="<A HREF="http://proxy.provider.de:3128/">http://proxy.provider.de:3128/</A>"
+#
+GOPHER_PROXY=""
+
+#
+# Example: NO_PROXY="www.me.de, do.main, localhost"
+#
+NO_PROXY="localhost"
+
+
+#
+# start kernel daemon? ("yes" or "no")
+#
+START_KERNELD="yes"
+
+#
+# start cron daemon? ("yes" or "no")
+# should be left unchanged to the default "yes" entry
+#
+CRON="yes"
+
+#
+# start portmap? ("yes" or "no")
+# this is needed, if the NFS server is started or if NIS is used
+# Caution! The portmapper will be started with no regard to
+# START_PORTMAP if NFS_SERVER is set to "yes"!
+#
+START_PORTMAP="yes"
+
+#
+# should the NFS server be started on this host? ("yes" or "no")
+# (needs activated portmapper)
+#
+NFS_SERVER="yes"
+
+#
+# should the kernel based NFS server be started on this host
+# (instead of the user space version) ? ("yes" or "no")
+# THIS NEEDS A 2.1 KERNEL WITH NFSD SUPPORT
+#
+USE_KERNEL_NFSD="no"
+
+#
+# the kernel nfs-server supports multiple server threads
+#
+USE_KERNEL_NFSD_NUMBER="4"
+
+#
+# translates userid and goupid between server and client
+# ("yes" or "no"). Needs to be started on NFS clients.
+#
+NFS_SERVER_UGID="yes"
+
+
+#
+# should imported NFS be reexported? ("yes" or "no")
+#
+REEXPORT_NFS="no"
+
+#
+# when shutting down routing, all net connection can be closed (not useful
+# in all cases).  If CLOSE_CONNECTIONS is set to "true" /sbin/init.d/route
+# scans /proc to search for network connections and sends a term signal
+# to the processes.
+#
+CLOSE_CONNECTIONS="false"
+
+#
+# start pcnfsd (for PCNFS clients; needs activated portmapper - 
+# see man pcnfsd) (yes/no)
+#
+START_PCNFSD=no
+
+#
+# start bwnfsd (pcnfs related) (yes/no)
+#
+START_BWNFSD=no
+
+#
+# pcnfsd and bwnfsd need spool directory for lpd. Set it here.
+#
+PCNFSD_LPSPOOL=/var/spool/lpd
+
+#
+# start rwhod? NOTE: rwhod broadcasts regularly, so dial
+# on demand connections (ISDN and/or diald) might be established
+# (yes/no)
+#
+START_RWHOD=no
+
+#
+# should gpm be started on this machine? ("yes" or "no")
+#
+START_GPM="yes"
+
+#
+# gpm will be started with these parameters
+# it won't be started in runlevel 3 (xdm)
+# (example: "-t msc -m /dev/mouse")
+#
+GPM_PARAM=" -t pnp -m /dev/mouse"
+
+#
+# start routed (for dynamic routing - see man routed) (yes/no)
+# ATTENTION:  starting routed causes net traffic every 30 seconds.
+# If your host is connected to internet via dial-up it makes absolutely
+# no sense to activate it.
+#
+START_ROUTED=no
+
+#
+# start the named (package bind)? You have to configure the named first,
+# before you can start it (man named).
+#
+START_NAMED=no
+
+#
+# should updatedb (for locate) be started by cron.daily ("yes" or "no")
+#
+RUN_UPDATEDB=yes
+
+#
+# should mandb and whatis be recreated by cron.daily ("yes" or "no")
+#
+REINIT_MANDB=yes
+
+#
+# updatedb has a parameter "--localuser". it runs the find as this user.
+# some people think, its a security hole to run it as root (because you
+# can get information about directories you can not read normally). Some
+# think its useful to hold all files in the database. If you want full
+# information in locate db, set RUN_UPDATEDB_AS=root. If you want security
+# use RUN_UPDATEDB_AS=nobody.
+#
+RUN_UPDATEDB_AS=nobody
+
+#
+# uptdatedb normally only scans local harddisks, but can include net paths
+# in database as well. If you specify directories here, they will be scanned.
+#
+UPDATEDB_NETPATHS=""
+
+#
+# uptdatedb can skip directories for its database. The following parameter
+# says which.
+#
+UPDATEDB_PRUNEPATHS="/S.u.S.E. /mnt /cdrom /tmp /usr/tmp /var/tmp /var/spool /proc"
+
+#
+# search net paths as ? (e.g. nobody)
+#
+UPDATEDB_NETUSER=""
+
+#
+# old corefiles? should they be deleted ("yes" or "no")
+# if set to no, cron.daily will tell you, if it finds old core files.
+# please note, that this feature needs RUN_UPDATEDB to be set to "yes".
+#
+DELETE_OLD_CORE=no
+
+#
+# how old are 'old' core files? (in days)
+#
+MAX_DAYS_FOR_CORE=7
+
+#
+# should old preformated man pages be deleted (/var/catman)
+# (yes/no)
+#
+DELETE_OLD_CATMAN=yes
+
+#
+# How old are OLD preformated man pages for you? (days)
+#
+CATMAN_ATIME=7
+
+
+#
+# we have a small script to generate usr/info/dir file. This needs perl..
+# ("yes" or "no")
+#
+CREATE_INFO_DIR="yes"
+
+# 
+# SuSEconfig can call chkstat to check permissions and ownerships for
+# files and directories (using /etc/permissions). 
+# Setting to "set" will correct it, "warn" produces warnings, if 
+# something strange is found. Disable this feature with "no".
+#
+CHECK_PERMISSIONS=set
+
+#
+# SuSE Linux contains two different configurations for
+# chkstat. The differences can be found in /etc/permissions.secure
+# and /etc/permissions.easy. If you create your own configuration
+# (e.g. permissions.foo), you can enter the extension here as well.
+#
+# (easy/secure local foo whateveryouwant).
+#
+PERMISSION_SECURITY="easy local"
+
+
+#
+# How long to store old log files. If set to 0, log files will be untouched.
+# The log files below will be checked by cron.daily. The number
+# after the name means the minimum size in k, the file has to have, before
+# it will be backed up (root gets a mail, if it happens).
+#
+# /tmp/log_mg.* (1024), /var/log/wtmp (400), /var/log/isdn (4096),
+# /var/lib/xdm/xdm-errors (200), /var/spool/uucp/Log (2048),
+# /var/spool/uucp/Stats (1024), /var/log/debug (1024), /var/log/warn (1024),
+# /var/log/messages (4096), /var/log/xferlog (4096), 
+# /local/www/logs/access_log (4096), /local/www/logs/error_log (1024)
+# /var/adm/isdn.log (1024), /var/log/isdncalls (1024)
+#
+MAX_DAYS_FOR_LOG_FILES=365
+
+#
+# cron.daily can make backup the rpm database. Set the path here, and
+# cron.daily will make backup everytime it is called and the db has
+# changed.  This backups are recommended.  If you don not want this
+# feature, set it to "".
+#
+RPMDB_BACKUP_DIR=/var/adm/backup/rpmdb
+
+#
+# here you can set the maximum number of backup files for the rpm
+# database.
+#
+MAX_RPMDB_BACKUPS=5
+
+#
+# cron.daily can check for old files in tmp-dirs. It will delete all files
+# not accessed for more than MAX_DAYS_IN_TMP. If MAX_DAYS_IN_TMP is not set
+# or set to 0, this feature will be disabled. 
+#
+MAX_DAYS_IN_TMP=0
+
+#
+# You can specify in TMP_DIRS_TO_CLEAR, which directories have to be 
+# searched for old files, to be deleted.
+#
+TMP_DIRS_TO_CLEAR="/tmp /var/tmp"
+
+#
+# In OWNER_TO_KEEP_IN_TMP, you can specify, whoms file shall not be deleted.
+#
+OWNER_TO_KEEP_IN_TMP="root"
+
+#
+# Do you want to have "." in root path?  This is not recommended, but
+# many people do prefer it (yes/no).
+#
+CWD_IN_ROOT_PATH="no"
+
+
+#
+# If you want to allow root logins from other machines, set ROOT_LOGIN_REMOTE
+# to "yes". 
+#
+ROOT_LOGIN_REMOTE="no"
+
+
+#
+# Some packages by SuSE include dynamically linked motif progs as well
+# as statically linked (*.SuSE-dynamic resp. *.SuSE-static). SuSEconfig 
+# can analyze your system and link the matching program to *.  If you
+# set this to "clean", the other binary will be deleted. (no/link/clean)
+#
+HOW_TO_HANDLE_COMMERCIAL_LIBS=link
+
+#
+# SuSEconfig can do some modifications to /etc/inittab.  If you don't want
+# this, set CHECK_INITTAB to no.  (yes/no)
+#
+CHECK_INITTAB=yes
+
+#
+# Here you can set the default Display manager (kdm/xdm/console).
+# Attention: CHECK_INITTAB has to be set to yes, to activate this feature.
+# If DISPLAYMANAGER is set to console, SuSEconfig will not bother you
+# with a missing XF86Config.
+#
+DISPLAYMANAGER="kdm"
+
+#
+# Here you can set the default window manager (kde, fvwm, ...)
+#
+DEFAULT_WM=kde
+
+#
+# CONSOLE_SHUTDOWN determines how ctrl-alt-del is handled.
+# Attention: CHECK_INITTAB has to be set to yes, to activate this feature.
+# (ignore/reboot/halt)
+#
+CONSOLE_SHUTDOWN=reboot
+
+#
+# Should isapnp be used to initialize your PNP at bootup?  (yes/no)
+#
+START_ISAPNP=yes
+
+#
+# run the Name Service Caching Daemon at boot time? (yes/no)
+#
+START_NSCD=yes
+
+umask 022
+
+#
+# Attention! This variable PATH is NOT setting the PATH for user or root
+# shells. It is only used internally for /sbin/init.d/*, SuSEconfig and 
+# cron.daily. Please do NOT change PATH here.
+#
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+
+##
+## Formating the boot script messages:
+##   The boot scripts should use the variables rc_done and rc_fail to
+##   symbolize their success.  See /sbin/init.d/skeleton for an example
+##   how to use these variables.
+##   rc_done_up and rc_failed_up do the same as rc_done and rc_failed
+##   but one line above (usefull for starting daemons who talk to user).
+##   The variable rc_reset is used by the master resource control script
+##   /sbin/init.d/rc to turn off all attributes and switch on the standard
+##   character set.
+##
+##    \033          is just ascii ESC
+##    \033[&lt;NUM&gt;G   move to column &lt;NUM&gt;
+##    \033[1m       switch bold on
+##    \033[31m      switch red on
+##    \033[32m      switch green on
+##    \033[33m      switch yellow on
+##    \033[m        switch color/bold off
+##
+     rc_done="\033[71G\033[32mdone\033[m"
+   rc_failed="\033[71G\033[31m\033[1mfailed\033[m"
+  rc_skipped="\033[71G\033[1mskipped\033[m"
+  rc_done_up="\033[1A$rc_done"
+rc_failed_up="\033[1A$rc_failed"
+   rc_unused="\033[71G\033[1munused\033[m"
+    rc_reset="\033[m\017"
+#
+# Should the ATD (at daemon) be started, for the execution of at jobs? (yes/no)
+#
+START_ATD=yes
+#
+# Update groff DESC to get page sizes correct? (yes/no)
+# 
+# If the correct page size isn't found in your printcap
+# you can set GROFF_PAGESIZE to the following values
+#
+#      letter, legal, a4, or b5
+#
+# supported by both groff *and* ghostscript
+#
+UPDATE_GROFF_CONF=yes
+GROFF_PAGESIZE=
+
+#
+# Should PCMCIA service be started at boottime? (yes/no)
+#
+START_PCMCIA="no"
+
+#
+# PCMCIA: This variable determines the used chipset. Valid Values are
+# "i82365" or "tcic". If it is left empty, pcmcia will not be startet
+# at boot up.
+#
+PCMCIA=""
+
+#
+# PCMCIA_PCIC_OPTS - socket driver timing parameters here. These
+# parameters are described in "man i82365" (or "man tcic").
+# For more information, look for "PCIC_OPTS" in the PCMCIA-HOWTO.
+# You can find it under /usr/doc/packages/pcmcia.
+#
+PCMCIA_PCIC_OPTS=""
+
+#
+# PCMCIA_CORE_OPTS - Put pcmcia_core options here. These options
+# are described in "man pcmcia_core"
+# For more information, look for "CORE_OPTS" in the PCMCIA-HOWTO.
+# You can find it under /usr/doc/packages/pcmcia.
+#
+PCMCIA_CORE_OPTS=""
+#
+# May SuSEconfig modify your perllocal.pod? (yes/no)
+#
+CREATE_PERLLOCAL_POD="yes"
+
+#
+# May SuSEconfig run h2ph when kernelsources have changed
+#
+GENERATE_PERL_SYSTEM_INCLUDES="yes"
+
+#
+# Default loglevel for klogd
+#
+KERNEL_LOGLEVEL=1
+
+#
+# if not empty: parameters for syslogd
+# for example SYSLOGD_PARAMS="-r -s my.dom.ain"
+#
+SYSLOGD_PARAMS=""
+#
+# Start process accounting (yes/no)? see man sa(8) for info
+#
+START_ACCT=no
+#
+# Start apmd? (yes/no)
+#
+START_APMD=no
+#
+# Turn on quotas? (yes/no)
+#
+START_QUOTA="no"
+#
+# SVGATEXTMODE comes from the package svgatext which allows 
+# higher text resolutions (up to 160x60) on SVGA cards.
+# The variable contains a valid mode from /etc/TextConfig.
+# Please configure this file to suit the needs of your graphics card.
+# How to do this is explained in /usr/doc/packages/svgatext.
+# Default is "". SVGATextMode will not be started then.
+# SVGATextMode resolutions are used in runlevel 1,2,3 and turned off 
+# in runlevel s.
+#
+SVGATEXTMODE=""
+
+# Set this to native, if you want *real* Multithreading,
+# e.g. in combination with SMP-systems
+
+JAVA_THREADS_TYPE="green"
+
+# Set this to native, if you want *real* Multithreading,
+# e.g. in combination with SMP-systems
+
+JAVARUNT_THREADS_TYPE="green"
+#
+# Should the Apache httpd be started at bootup? (yes/no)
+#
+START_HTTPD=yes
+#
+# Start the argus networkmonitoring tool?
+#
+START_ARGUS=no
+
+#
+# What interface should argus listen?
+#
+ARGUS_INTERFACE=eth0
+
+#
+# Where to write the argus logfile? (Remember to check this file
+# periodical, because it may become very large!!!)
+#
+ARGUS_LOGFILE="/var/log/argus.log"
+
+#
+# Shall auto mount daemon autofs be started? (yes/no)
+#
+START_AUTOFS=no
+#
+# Start the cipe-daemon for encrypted IPIP-Tunnel?
+#
+START_CIPED=no
+#
+DHCLIENT="yes"
+#
+# Shall dynamic host configuration Server DHCP be started? (yes/no)
+#
+START_DHCPD="no"
+#
+# Interface for dynamic host configuration Server DHCP
+#
+DHCPD_INTERFACE=""
+#
+# Shall DHCP relay agent be started? (yes/no)
+#
+START_DHCRELAY="no"
+#
+# DHCP servers to be used by DHCP relay agent
+#
+DHCRELAY_SERVERS="127.0.0.1 127.0.0.2"
+#
+# The name of the central server for the Online documentation
+# This should be a fully qualified host name, e.g. host.domain.top
+#
+DOC_HOST=""
+
+#
+# Set this to yes on the central documentation server
+# Then the online-help-system indices are automatically adjusted
+# and access to the http-rman service is allowed
+#
+DOC_SERVER="no"
+
+#
+# List auf host/domain patterns for use with /etc/hosts.allow
+# access restrictions on http-rman, e.g. ".mydomain.top" to
+# allow access from all hosts of domain mydomain.top
+#
+DOC_ALLOW="LOCAL"
+#
+# Firewall settings - See /usr/doc/packages/firewall
+#                     for a detailed description
+#
+FW_START="no"
+FW_LOCALNETS=""
+FW_FTPSERVER=""
+FW_WWWSERVER=""
+FW_SSLSERVER=""
+FW_SSLPORT="443"
+FW_MAILSERVER=""
+FW_DNSSERVER=""
+FW_NNTPSERVER=""
+FW_NEWSFEED=""
+FW_WORLD_DEV="eth1"
+FW_INT_DEV="eth0"
+FW_LOG_ACCEPT="no"
+FW_LOG_DENY="yes"
+FW_ROUTER=""
+FW_FRIENDS="no"
+FW_INOUT="no"
+FW_SSH="no"
+FW_TRANSPROXY_OUT=""
+FW_TRANSPROXY_IN=""
+FW_REDIRECT=""
+FW_TCP_LOCKED_PORTS="1:1023"
+FW_UDP_LOCKED_PORTS="1:1023"
+
+#
+# Masquerading settings - See /usr/doc/packages/firewall
+#                         for a detailed description
+#
+MSQ_START="no"
+MSQ_NETWORKS=""
+MSQ_DEV="eth0"
+MSQ_MODULES="ip_masq_cuseeme ip_masq_ftp ip_masq_irc ip_masq_quake ip_masq_raudio ip_masq_vdolive"
+
+#
+# It is important to run faxsetup before setting this to `yes`!!!
+#
+START_HYLAFAX=no
+#
+# Start the INN news server? (yes/no)
+#
+START_INN=no
+#
+# Shall the IRC-Server ircd be started? (yes/no)
+#
+START_IRCD="no"
+#
+# Start printer daemon lpd? (if you use plp, you can also disable it here
+# an enable it in /etc/inetd.conf) (yes/no)
+#
+START_LPD=yes
+#
+# Should the novell server emulator be started at bootup? (yes/no)
+#
+START_MARSNWE=no
+#
+# start netatalk? ("yes" or "no")
+# AppleTalk - File- and Printservices
+#
+START_ATALK="no"
+#
+# NIS(YP)/NIS+ domainname, ask the admin of the server.
+#
+YP_DOMAINNAME=""
+
+#
+# start the ntopd (yes|no)
+#
+START_NTOPD="no"
+
+#
+# Specifies the network interface used by ntop
+#
+NTOPD_IFACE="eth0"
+
+#
+# Supposing to start  ntop  at  the port  3000,
+# the  URL  to  access  is <A HREF="http://hostname:3000/">http://hostname:3000/</A>
+#
+# The file /root/.ntop  specifies  the
+# HTTP  user/password  of those people who are allowed to
+# access ntop. If the /root/.ntop file is missing no security
+# will be used hence everyone can access traffic informa-
+# tion. Please note that an HTTP server is NOT needed  in
+# order to use the program in interactive mode.
+#
+NTOPD_PORT="3000"
+#
+# Set this to 'yes', if you want to start the ldap server:
+#
+START_LDAP=no
+#
+# Start RADIUSD ? (yes/no)
+#
+START_RADIUSD=no
+#
+# Start the rinetd TCP redirector?
+#
+START_RINETD="no"
+#
+# start samba? ("yes" or "no")
+# Windows 95 / NT  -  File- and Printservices
+#
+START_SMB="no"
+#
+# do you want to generate a sendmail-configuration /etc/sendmail.cf from
+# parameters given in /etc/rc.config ("yes") or do you want to generate
+# your /etc/sendmail.cf yourself ("no") ?
+# (you could also use /etc/mail/linux.mc to do so.)
+#
+SENDMAIL_TYPE="yes"
+
+#
+# smarthost - this host gets all outgoing email from us
+# normally used for uucp-connected sites or for dialup connections
+# use "uucp-dom:server.uucp.com" to deliver all email to "server.uucp.com"
+#
+SENDMAIL_SMARTHOST=""
+
+#
+# sendmail assumes the following space-separated host-names to be
+# the local host (this must just be used for names differrent to the
+# hostname, for e.g. aliases like www.nowhere.com)
+#
+SENDMAIL_LOCALHOST="localhost"
+
+#
+# do not deliver any email locally, but send all email to another host
+# this can just be used with another system that has the same users on it
+# and you probably also want to set the FROM_HEADER to the other host
+#
+SENDMAIL_RELAY=""
+
+#
+# with what parameters should sendmail be started?
+# normal sites use "-bd -q30m -om". if you set SENDMAIL_EXPENSIVE and you
+# have a dialup ISDN connection, you probably want to set this to
+# "-bd -om" and run "sendmail -q" from your crontab.
+#
+SENDMAIL_ARGS="-bd -q30m -om"
+
+#
+# sendmail will only queue email in /var/spool/mqueue and will only start
+# to deliver it if "sendmail -q" is run
+#
+SENDMAIL_EXPENSIVE="no"
+
+#
+# sendmail will not try to canonify hostnames in your email
+# so much less DNS-queries are send
+# you probably want to enable this on a SENDMAIL_EXPENSIVE system
+#
+SENDMAIL_NOCANONIFY="yes"
+
+#
+# these domains can additional to the local domains be changed
+# in /etc/mail/genericstable
+#
+SENDMAIL_GENERICS_DOMAIN=""
+#
+# Shall the cmu snmpd be started at boot up ? (yes/no)
+#
+START_SNMPD=no
+#
+# Start the squid WWW-proxy ? (yes/no)
+#
+START_SQUID=no
+#
+# Should the thttpd webserver be started at bootup? (yes/no)
+#
+START_THTTPD=yes
+#
+# Set this to 'yes', if you want to start the webb500gw:
+#
+START_WEBGW=no
+#
+# Start WWW offline browser wwwoffle ?
+#
+START_WWWOFFLE="no"
+#
+# Start XNTPD? (yes/no)
+#
+START_XNTPD=no
+
+#
+# Usually it's a good idea to get the current time and date
+# from some other ntp server, before xntpd is started.
+# If we should do so, provide a space-separated list of 
+# ntp servers to query.
+#
+XNTPD_INITIAL_NTPDATE=""
+
+#
+# This allows you to alter the kernel TICK variable.
+# 
+# WARNING: YOU MUST NOT CHANGE THIS VARIABLE! 
+#
+# Believe me, it won't help to solve any problem you have 
+# if you set it. On the contrary, you will run into trouble!
+#
+# It's just here for those few, who know why they do not
+# believe me ;)  
+#
+XNTPD_KERNEL_TICK=""
+#
+# Should /etc/yp.conf be created automatically? ("yes" or "no")
+# If set to yes /etc/passwd and /etc/group will also be checked.
+#
+CREATE_YP_CONF="yes"
+
+#
+# YP-Servers. Attention! You've to fill in IP adresses, a name or a nick
+# name here. It must be defined in /etc/hosts (case sensitive).
+# DNS does not work with ypbind. (e.g. "192.168.116.11 192.168.7.7")
+#
+YP_SERVER=""
+
+#
+# start the ypbind daemon for NIS ? ("yes" or "no")
+# This entry is ignored if no YP_DOMAINNAME is set.
+# In this case, ypbind is not started.
+#
+START_YPBIND="yes"
+#
+# start the yp-server?
+#
+START_YPSERV="no"
+
+#
+# start ypxfrd?
+# this is only needed on the main yp-server if you also
+# have slave yp-servers. it speeds up the transfer of maps
+# to the slave servers
+#
+START_YPXFRD="no"
+
+#
+# start yppasswdd?
+#
+START_YPPASSWDD="no"
+
+#
+# YP Source directory for passwd, shadow and group. You could
+# give here an different directory as /etc where YP will search
+# the source files for the passwd and group tables.
+#
+YPPWD_SRCDIR=/etc
+#
+# Start scanlogd? (yes/no)
+#
+START_SCANLOGD=yes
+#
+# Start the ssh daemon ? (yes/no)
+#
+START_SSHD=yes
+
+#
+# KDM_SHUTDOWN determines who will be able to shutdown the 
+# system in kdm. Valid values are: "root", "all", "none", "local",
+#
+KDM_SHUTDOWN="root"
+
+#
+# space separated list of users for which icons should be shown in KDM
+# if empty, then take system defaults
+#
+KDM_USERS=""
+
+#
+# path of jpeg or xpm image to be shown in the background of kdm
+# or background color (color names from /usr/X11R6/lib/X11/rgb.txt)
+#
+KDM_BACKGROUND=/opt/kde/share/wallpapers/paper01.jpg
+
+#
+# title string of kdm, special string HOSTNAME displays name of computer
+#
+KDM_GREETSTRING=""
+
+#
+# Pixmap which appears on the top of a KDE window, do not specify full path
+# path name; it will be searched in KDE IconPath; no Gimmick if empty
+# just try: "chamelia.xpm"
+#
+KWM_GIMMICK_PIXMAP=""
+
+
+#
+# start applixware server axnet? ("yes" or "no")
+#
+START_AXNET="yes"
+#
+# Rplay needs a configuration file for all sounds (usr/etc/rplay.conf). 
+# To speed it up, it is not possible to add directories to this file.
+# Shall SuSEconfig create it using /usr/etc/rplay.files, which may contain
+# directories (as well as files). (yes/no)
+# 
+CREATE_RPLAY_CONF=yes
+#
+# SuSEconfig.wm can create a .fvwm2rc, .fvwmrc, .bowmanrc, .fvwm2rc95,
+# .mwmrc, .ctwmrc, depending on the installed packages. If
+# you want your systemwide wm config files to be updated after install
+# / removal of packages set SUSEWM_UPDATE to "yes", otherwise to "no"
+#
+SUSEWM_UPDATE="yes"
+
+#
+# This is the (space separated) list of window managers for which you 
+# want to generate the config file. Valid values are: 
+#   "fvwm", "fvwm2", "fvwm95", "bowman", "mwm", "ctwm", "kwm", "all".
+# Default setting is "all" which is for generating files for all wms.
+#
+SUSEWM_WM="all"
+
+#
+# If you want the look of the windows similar to mwm say "yes" else "no"
+# This is only applicable for fvwm derived window managers
+# if this variable is empty, the default is "no"
+#
+SUSEWM_MWM="yes"
+
+#
+# Your fvwm2/95 is slow? Don't want small pixmaps in menus? So set 
+# SUSEWM_XPM to "no", if pixmaps in menus are wanted set it to "yes", 
+# which is the default value. The package 3dpixms has to be installed.
+#
+SUSEWM_XPM="yes"
+
+#
+# These are additional source files always to be included
+# when SuSEconfig.wm is running, e.g. a local configuration
+#
+SUSEWM_ADD=""
+
+#
+# If susewm should conform to older versions of susewm, susefvwm or
+# fvwm95, set this to "yes". Otherwise to "no"
+#
+SUSEWM_COMPAT="yes"
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

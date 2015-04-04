@@ -1,0 +1,142 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="File descriptors (Was: Just a Quickie)" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Richard Watkins" -->
+<!-- ToEmail="richardw@chariot.net.au" -->
+<!-- Date="Mon, 9 Oct 2000 20:03:54 +0930 (CST)" -->
+<!-- Id="Pine.BSF.4.21.0010091918240.13165-100000@augustus.tellurian.com.au" -->
+<!-- Reference="200010090206.e9926VT05484@radon.cs.adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: File descriptors (Was: Just a Quickie)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Richard Watkins &lt;<I><A HREF="mailto:richardw@chariot.net.au">richardw@chariot.net.au</A></I>&gt;
+  Date: Mon, 9 Oct 2000 20:03:54 +0930 (CST)
+</PRE>
+<H1>File descriptors (Was: Just a Quickie)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt;&gt; ...in particular "2&gt;&1".
+&gt;
+&gt; tells the shell to redirect stand error (2) to the same place as
+&gt; standard output (1).
+
+More or less correct; and one of only two such (ie correct) answers.  The
+answer, by the way, is also in the manual.  Which page? as redirection is
+not done by the command that you are invoking it obviously is not that
+page.  The answer is "in the shell man page" (as others already pointed
+out.)
+
+Bash performs redirection in the order they appear, so
+
+  foo 2&gt;&1 &gt; foo.out
+
+is not the same as
+
+  foo &gt; foo.out 2&gt;&1
+
+The former puts stderr to the original stdout (which is probably where it
+was anyway), and then directs stdout to the file, foo.out.  The latter
+directs stdout to the file, foo.out, and then directs stderr to that same
+file.
+
+In fact "2&gt;&1" does not mean, "put stderr to the same place as stdout." It
+actually means, "make stderr use the same file descriptor as stdout." The
+difference is subtle but important.  Consider
+
+  foo &gt; foo.out 2&gt; foo.out
+
+suppose foo writes "line 1", "line 2" and "line 3" on stdout, and then
+writes "error" on stderr.  The content of foo.out will be:
+
+  error
+  1
+  line 2
+  line 3
+
+Every open file is represented (in the kernel) by a "file descriptor",
+which is a table entry that identifies the file, and the current position
+in the file (where the next read or write will occur), and whether you may
+read, write and such.  When you say
+
+  foo &gt; foo.out 2&gt;&1
+
+you have only one descriptor.  Both stdout and stderr share that
+descriptor.  When you say
+
+  foo &gt; foo.out 2&gt; foo.out
+
+you have two separate descriptors, both referring to the same file.
+Remember that I said the descriptor maintains the current file position?
+So when you write using stdout the position for stdout is updated: The next
+write occurs after the previous one.  But when you later write to stderr,
+it has it's own descriptor, thus it's own position in the file, and so it
+overwrites the output from stdout.  With the shared descriptor (ie 2&gt;&1)
+stdout and stderr become, in effect, aliases of each other; so it makes no
+difference which one your write to.
+
+
+ADVANCED NOTE FOR THOSE INTERESTED IN PROGRAMMING:
+
+Shared descriptors can be used as a sneaky inter-process communication
+facility.  Suppose you have two processes which share a file descriptor:
+They can communicate with each other by positioning that shared descriptor.
+(There doesn't even need to be any data written to disk.)  For example, if
+the descriptor is moved to offset 1 it might mean "process 1 has control of
+the modem"; and moving it to offset 2 might mean "process 2 has control of
+the modem"; and moving it back to offset 0 might mean "the modem is
+available."  (You could have more processes: offset 4 means "process 3 has
+the modem"; offset 8 means "process 4 has it"; and so on.)  To gain control
+of the modem simply advance the file offset by the appropriate number of
+bytes and check that it ended up at the right place.  If it ended up at the
+wrong place it means that the modem was already in use:
+
+   ...
+   lock = 1 &lt;&lt; (process - 1);
+   if (lseek(modemlock, lock, SEEK_CUR) != lock)
+   {
+      lseek(modemlock, -lock, SEEK_CUR);
+      /* modem already in use */
+   }
+   else
+   {
+      /* use the modem */
+      lseek(modemlock, -lock, SEEK_CUR); /* release the modem */
+   }
+   ...
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

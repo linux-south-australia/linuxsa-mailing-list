@@ -1,0 +1,884 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="[GNU Grep 2.5.1 patch] Use Self-Tuning Boyer-Moore for string search" -->
+<!-- FromName="'behoffski'" -->
+<!-- FromEmail="behoffski@grouse.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 16 Dec 2003 22:04:15 +1030" -->
+<!-- Id="3FDEEDB7.7040604@grouse.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: [GNU Grep 2.5.1 patch] Use Self-Tuning Boyer-Moore for string search</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: behoffski &lt;<I><A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 16 Dec 2003 22:04:15 +1030
+</PRE>
+<H1>[GNU Grep 2.5.1 patch] Use Self-Tuning Boyer-Moore for string search</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+G'day,
+
+The Self-Tuning Boyer-Moore (STBM) algorithm presented here is
+an improvement to the Tuned Boyer-Moore string search
+algorithm in grep.  I discovered this improvement in April
+1998 while porting Grouse Grep to Linux, and the STBM code
+was released as part of Grouse Grep in February 2000.
+
+The Boyer-Moore string search has a "skip" loop and a "match"
+loop, and gets its speed mainly as the skip loop is
+"sub-linear" -- it only examines a fraction of the buffer.
+For example, when searching for "fred", we look at the 4th
+character from the start: If it's "d", we might be able to
+match the other characters; if it's "e", we can skip forward
+1 position, if it "r", 2 positions, "f", 3 positions, and
+for any other character, we know we cannot match here and
+can skip forward 4 positions -- for a single table lookup.
+
+The Tuned Boyer-Moore (TBM) algorithm optimises the skip loop
+further by unrolling the skip loop (since multiple skip
+attempts on a matching last character simply stay at the
+correct position), and by adding a guard test to the skip
+loop (so that the search spends less time in the relatively
+expensive match loop).  GNU Grep simply uses the
+second-to-last character of the pattern as the guard.
+
+STBM improves on TBM by having a dynamically-chosen guard
+instead of a fixed guard.  A good-quality guard helps by
+minimising the time that the algorithm spends in the match
+loop.  Initially, the guard is the same as for TBM.  However,
+each time a match attempt fails, the character that mismatched
+is chosen as the new guard.  A "good" guard is one that
+prevents entries to the match loop; therefore, the algorithm
+will automatically tend to bias itself towards good guard
+characters, as the guard is changed whenever a match attempt
+fails.
+
+The improved guard comes at a cost, however: In order to give
+each potential guard character equal access, the search uses a
+round-robin discipline when performing the match, which requires
+two match loops (guard - 1 .. start, and end - 1 .. guard + 1).
+This is why a pattern length of at least 5 is chosen: Shorter
+patterns do not have sufficient variation to bring up good
+guards, and the additional loop setup cost is noticeable.
+
+The balance of the extra match overhead and the improved guard
+is fairly fine, and typically results in similar search times
+to TBM, although STBM can be a little slower in some cases and
+a little faster in others.
+
+However, the main reason for using STBM is that it makes
+certain pathological search cases where the TBM search slows
+down significantly less likely:
+
+$ perl -e 'for ($i=10000;$i--;){print "x" x 1024, "\n";}" &gt;x
+
+    11.5    9.6u    1.9s: grep       -c   xxxxxxxxxxxxxxxxxxxxxyx x
+    12.1   10.2u    2.0s: grep-stbm  -c   xxxxxxxxxxxxxxxxxxxxxyx x
+   154.5  151.9u    2.6s: grep       -c   yxxxxxxxxxxxxxxxxxxxxxx x
+    23.0   20.9u    2.1s: grep-stbm  -c   yxxxxxxxxxxxxxxxxxxxxxx x
+
+The performance results for the STBM patch here seem to be a
+little worse than what I expected given the tests I ran on my
+implementation of STBM in Grouse Grep... it's possible that the
+patch as it stands results in a function that's overly
+complicated, and so the compiler can't do a good job of
+allocating register variables.  However, large disruptions to
+the existing structure make me nervous, as I'm not sure how any
+code rearrangement will fare across a wide range of compilers
+and machine architectures.
+
+I've included two versions of the STBM patch here: One patch
+(stbm.pat) contains just the STBM changes, the other (stbm-ci.pat)
+combines the STBM changes with the case-insensitivity changes, as
+both patches alter kwset.c and interact such that applying both
+patches separately to the same source doesn't produce a valid
+result.
+
+cheers,
+
+behoffski
+
+-- 
+behoffski (Brenton Hoff)  | Software Engineer
+<A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A>   | Grouse Software Pty Ltd
+
+
+
+
+
+diff -urN g251-orig/src/kwset.c g251-stbmci/src/kwset.c
+--- g251-orig/src/kwset.c	Fri Feb  9 01:36:36 2001
++++ g251-stbmci/src/kwset.c	Sat Dec 13 21:35:21 2003
+@@ -46,6 +46,9 @@
+ #define obstack_chunk_alloc malloc
+ #define obstack_chunk_free free
+ 
++/* Char bitmask so we can unpack characters from unsigned ints */
++#define CHAR_BIT_MASK           ((1 &lt;&lt; CHAR_BIT) - 1)
++
+ /* Balanced tree of edges and labels leaving a given trie node. */
+ struct tree
+ {
+@@ -82,6 +85,8 @@
+   char *target;			/* Target string if there's only one. */
+   int mind2;			/* Used in Boyer-Moore search for one string. */
+   char const *trans;		/* Character translation table. */
++  int firstmapcount;            /* Chars mapping to first char for BM. */
++  char transfirstchar;          /* Translated first matching char */
+ };
+ 
+ /* Allocate and initialize a keyword set object, returning an opaque
+@@ -115,6 +120,8 @@
+   kwset-&gt;maxd = -1;
+   kwset-&gt;target = 0;
+   kwset-&gt;trans = trans;
++  kwset-&gt;firstmapcount = 0;
++  kwset-&gt;transfirstchar = 0;
+ 
+   return (kwset_t) kwset;
+ }
+@@ -378,10 +385,21 @@
+   register int i;
+   register struct trie *curr, *fail;
+   register char const *trans;
+-  unsigned char delta[NCHAR];
++  unsigned char *delta;
++  unsigned char deltatemp[NCHAR];
+   struct trie *last, *next[NCHAR];
++  unsigned char uch;
++  register unsigned char targetch;
++  int mapcount;
++  int transfirstchar;
+ 
+   kwset = (struct kwset *) kws;
++  trans = kwset-&gt;trans;
++
++  /* Build delta table in-place if no translation, else use temp table. */
++  delta = kwset-&gt;delta;
++  if (trans != 0)
++    delta = deltatemp;
+ 
+   /* Initial values for the delta table; will be changed later.  The
+      delta entry for a given character is the smallest depth of any
+@@ -395,13 +413,17 @@
+ 
+   /* Check if we can use the simple boyer-moore algorithm, instead
+      of the hairy commentz-walter algorithm. */
+-  if (kwset-&gt;words == 1 && kwset-&gt;trans == 0)
++  if (kwset-&gt;words == 1)
+     {
+       /* Looking for just one string.  Extract it from the trie. */
+       kwset-&gt;target = obstack_alloc(&kwset-&gt;obstack, kwset-&gt;mind);
+       for (i = kwset-&gt;mind - 1, curr = kwset-&gt;trie; i &gt;= 0; --i)
+ 	{
+-	  kwset-&gt;target[i] = curr-&gt;links-&gt;label;
++	  uch = curr-&gt;links-&gt;label;
++	  if (trans != 0) 
++	    uch = trans[uch];
++	  kwset-&gt;target[i] = uch;
++
+ 	  curr = curr-&gt;links-&gt;trie;
+ 	}
+       /* Build the Boyer Moore delta.  Boy that's easy compared to CW. */
+@@ -413,6 +435,24 @@
+       for (i = 0; i &lt; kwset-&gt;mind - 1; ++i)
+ 	if (kwset-&gt;target[i] == kwset-&gt;target[kwset-&gt;mind - 1])
+ 	  kwset-&gt;mind2 = kwset-&gt;mind - (i + 1);
++
++      /* Count how many characters map to the first character of the string. */
++      if ((trans != 0) && (kwset-&gt;mind == 1))
++        {
++          targetch = kwset-&gt;target[0];
++          mapcount = 0;
++          for (i = 0; i &lt; NCHAR; i++)
++          if (targetch == trans[i]) 
++            {
++              mapcount++;
++              transfirstchar = i;
++            }
++
++          /* Record this count as we can optimise if it's 0 or 1. */
++          kwset-&gt;firstmapcount = mapcount;
++          kwset-&gt;transfirstchar = transfirstchar;
++        }
++
+     }
+   else
+     {
+@@ -476,12 +516,9 @@
+     }
+ 
+   /* Fix things up for any translation table. */
+-  if ((trans = kwset-&gt;trans) != 0)
++  if (trans != 0)
+     for (i = 0; i &lt; NCHAR; ++i)
+       kwset-&gt;delta[i] = delta[(unsigned char) trans[i]];
+-  else
+-    for (i = 0; i &lt; NCHAR; ++i)
+-      kwset-&gt;delta[i] = delta[i];
+ 
+   return 0;
+ }
+@@ -496,6 +533,7 @@
+   register unsigned char const *d1;
+   register char const *ep, *sp, *tp;
+   register int d, gc, i, len, md2;
++  register int gi;
+ 
+   kwset = (struct kwset const *) kws;
+   len = kwset-&gt;mind;
+@@ -517,41 +555,119 @@
+   tp = text + len;
+ 
+   /* Significance of 12: 1 (initial offset) + 10 (skip loop) + 1 (md2). */
+-  if (size &gt; 12 * len)
+-    /* 11 is not a bug, the initial offset happens only once. */
+-    for (ep = text + size - 11 * len;;)
+-      {
+-	while (tp &lt;= ep)
+-	  {
+-	    d = d1[U(tp[-1])], tp += d;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    if (d == 0)
+-	      goto found;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    if (d == 0)
+-	      goto found;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    if (d == 0)
+-	      goto found;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    d = d1[U(tp[-1])], tp += d;
+-	  }
+-	break;
+-      found:
+-	if (U(tp[-2]) == gc)
+-	  {
+-	    for (i = 3; i &lt;= len && U(tp[-i]) == U(sp[-i]); ++i)
+-	      ;
+-	    if (i &gt; len)
+-	      return tp - len - text;
+-	  }
+-	tp += md2;
+-      }
++  if (size &lt;= 12 * len) 
++     goto BufferEnd;
++
++  if (len &gt;= 5) 
++    goto STBMSearch;
++
++  /* Tuned Boyer-Moore search loop */
++  /* 11 is not a bug, the initial offset happens only once. */
++  for (ep = text + size - 11 * len;;)
++    {
++      while (tp &lt;= ep)
++	{
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_tbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_tbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_tbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	}
++      break;
++
++    found_tbm:
++      if (U(tp[-2]) == gc)
++	{
++	  for (i = 3; i &lt;= len && U(tp[-i]) == U(sp[-i]); ++i)
++	    ;
++	  if (i &gt; len) 
++              return tp - len - text;
++	}
++      tp += md2;
++    }
++
++  goto BufferEnd;
++
++ STBMSearch:
++  /* Self-Tuning Boyer-Moore search loop */
++  /* 11 is not a bug, the initial offset happens only once. */
++  gi = -2;
++  for (ep = text + size - 11 * len;;)
++    {
++    SkipLoop:
++      while (tp &lt;= ep)
++	{
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_stbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_stbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_stbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	}
++      break;
++
++    found_stbm:
++      /* Avoid the match loop if the guard doesn't match */
++      if (U(tp[gi]) != gc) 
++        {
++          tp += md2;
++          goto SkipLoop;
++        }
++
++      /* Check for match from (guard - 1) to pattern start */
++      for (i = gi - 1; i &gt;= -len; i--) 
++        if (U(tp[i]) != U(sp[i]))
++          {
++            /* Mismatch found, use this place as the guard */
++            gi = i;
++            gc = U(sp[i]);
++            tp += md2;
++            goto SkipLoop;
++          }
++
++      /* Check for match from pattern end to (guard + 1) */
++      for (i = -2; i &gt; gi; i--)
++        if (U(tp[i]) != U(sp[i]))
++          {
++            /* Mismatch found, use this place as the guard */
++            gi = i;
++            gc = U(sp[i]);
++            tp += md2;
++            goto SkipLoop;
++          }
++
++      /* Found match */
++      return tp - len - text;
++
++    }
+ 
++  /* Revert to fixed guard for final few characters of the buffer */
++  gc = U(sp[-2]);
++  goto BufferEnd;
++  
++
++ BufferEnd:
+   /* Now we have only a few characters left to search.  We
+      carefully avoid ever producing an out-of-bounds pointer. */
+   ep = text + size;
+@@ -574,6 +690,274 @@
+   return -1;
+ }
+ 
++/* Scan for single character, including translation mapping. */
++static size_t
++memscantrans (char const *text, int c, size_t size, char const *transtable)
++{
++  register char const target = (char const) c;
++  register char const *tp, *ep, *trans;
++  register bufword;
++  register const unsigned int *pbufword;
++  register const unsigned int *pbufwordend;
++
++  /*Search character-by-character until word alignment achieved*/
++  tp = text;
++  ep = tp + size;
++  trans = transtable;
++
++  switch (((uint) tp) & 0x03) 
++    {
++    case 1:
++     if (tp == ep)
++       return -1;
++     if (target == trans[U(*tp++)])
++       return tp - text - 1;
++     /*FALLTHROUGH*/
++
++    case 2:
++     if (tp == ep)
++       return -1;
++     if (target == trans[U(*tp++)])
++       return tp - text - 1;
++     /*FALLTHROUGH*/
++
++
++    case 3:
++     if (tp == ep)
++       return -1;
++     if (target == trans[U(*tp++)])
++       return tp - text - 1;
++     /*FALLTHROUGH*/
++
++
++    case 0:
++    default:
++            break;
++
++    }
++
++  /* Read buffer in uint-sized words for speed */
++  pbufword = (const uint *) tp;
++  pbufwordend = (const uint *) (ep - (((uint) ep) & 0x03));
++
++  for (;;) 
++  {
++    if (pbufword == pbufwordend) 
++      {
++        break;
++      }
++
++     bufword = *pbufword++;
++     if (target == trans[(bufword                  ) & CHAR_BIT_MASK]) 
++         return ((char const *) pbufword) - text - 4;
++
++     if (target == trans[(bufword &gt;&gt;  CHAR_BIT     ) & CHAR_BIT_MASK]) 
++         return ((char const *) pbufword) - text - 3;
++
++     if (target == trans[(bufword &gt;&gt; (CHAR_BIT * 2)) & CHAR_BIT_MASK]) 
++         return ((char const *) pbufword) - text - 2;
++
++     if (target == trans[(bufword &gt;&gt; (CHAR_BIT * 3)) & CHAR_BIT_MASK]) 
++         return ((char const *) pbufword) - text - 1;
++
++  }
++
++  tp = (const char *) pbufword;
++
++  /* Scan last few characters (if any) byte-by-byte */
++  for (;;)
++    {
++      if (tp == ep)
++        return -1;
++      if (target == trans[U(*tp++)])
++        return tp - text - 1;
++    }
++
++  /* NOTREACHED */
++
++} 
++
++
++/* Fast boyer-moore search, including translation table. */
++static size_t
++bmexectrans (kwset_t kws, char const *text, size_t size)
++{
++  struct kwset const *kwset;
++  register unsigned char const *d1;
++  register char const *ep, *sp, *tp, *trans;
++  register int d, gc, i, len, md2;
++  register int gi;
++
++  kwset = (struct kwset const *) kws;
++  len = kwset-&gt;mind;
++  trans = kwset-&gt;trans;
++
++  if (len == 0)
++    return 0;
++  if (len &gt; size)
++    return -1;
++  if (len == 1)
++    {
++      switch (kwset-&gt;firstmapcount) 
++        {
++        case 0:
++          return -1;
++        case 1:
++          {
++            tp = memchr (text, kwset-&gt;target[0], size);
++            return tp ? tp - text : -1;
++          }
++        default:
++          return memscantrans (text, 
++                               kwset-&gt;transfirstchar, 
++                               size, 
++                               kwset-&gt;trans);
++        }
++    }
++
++  d1 = kwset-&gt;delta;
++  sp = kwset-&gt;target + len;
++  gc = U(sp[-2]);
++  md2 = kwset-&gt;mind2;
++  tp = text + len;
++
++  /* Significance of 12: 1 (initial offset) + 10 (skip loop) + 1 (md2). */
++  if (size &lt;= 12 * len)
++    goto BufferEnd;
++
++  if (len &gt;= 5) 
++    goto STBMSearch;
++
++  /* Tuned Boyer-Moore search loop */
++  /* 11 is not a bug, the initial offset happens only once. */
++  for (ep = text + size - 11 * len;;)
++    {
++      while (tp &lt;= ep)
++	{
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_tbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_tbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_tbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	}
++      break;
++    found_tbm:
++      if (trans[U(tp[-2])] == gc)
++	{
++	  for (i = 3; 
++               i &lt;= len && trans[U(tp[-i])] == U(sp[-i]); 
++               ++i)
++	    ;
++	  if (i &gt; len)
++	    return tp - len - text;
++	}
++      tp += md2;
++    }
++
++  goto BufferEnd;
++
++ STBMSearch:
++  /* Self-Tuning Boyer-Moore search loop */
++  /* 11 is not a bug, the initial offset happens only once. */
++  gi = -2;
++  for (ep = text + size - 11 * len;;)
++    {
++    SkipLoop:
++      while (tp &lt;= ep)
++	{
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_stbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_stbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_stbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	}
++      break;
++
++    found_stbm:
++      /* Avoid the match loop if the guard doesn't match */
++      if (trans[U(tp[gi])] != gc) 
++        {
++          tp += md2;
++          goto SkipLoop;
++        }
++
++      /* Check for match from (guard - 1) to pattern start */
++      for (i = gi - 1; i &gt;= -len; i--) 
++        if (trans[U(tp[i])] != U(sp[i]))
++          {
++            /* Mismatch found, use this place as the guard */
++            gi = i;
++            gc = U(sp[i]);
++            tp += md2;
++            goto SkipLoop;
++          }
++
++      /* Check for match from pattern end to (guard + 1) */
++      for (i = -2; i &gt; gi; i--)
++        if (trans[U(tp[i])] != U(sp[i]))
++          {
++            /* Mismatch found, use this place as the guard */
++            gi = i;
++            gc = U(sp[i]);
++            tp += md2;
++            goto SkipLoop;
++          }
++
++      /* Found match */
++      return tp - len - text;
++
++    }
++
++  /* Revert to fixed guard for final few characters of the buffer */
++  gc = U(sp[-2]);
++  goto BufferEnd;
++  
++
++ BufferEnd:
++  /* Now we have only a few characters left to search.  We
++     carefully avoid ever producing an out-of-bounds pointer. */
++  ep = text + size;
++  d = d1[U(tp[-1])];
++  while (d &lt;= ep - tp)
++    {
++      d = d1[U((tp += d)[-1])];
++      if (d != 0)
++	continue;
++      if (trans[U(tp[-2])] == gc)
++	{
++	  for (i = 3; i &lt;= len && trans[U(tp[-i])] == U(sp[-i]); ++i)
++	    ;
++	  if (i &gt; len)
++	    return tp - len - text;
++	}
++      d = md2;
++    }
++
++  return -1;
++}
++
+ /* Hairy multiple string search. */
+ static size_t
+ cwexec (kwset_t kws, char const *text, size_t len, struct kwsmatch *kwsmatch)
+@@ -744,9 +1128,15 @@
+ 	 struct kwsmatch *kwsmatch)
+ {
+   struct kwset const *kwset = (struct kwset *) kws;
+-  if (kwset-&gt;words == 1 && kwset-&gt;trans == 0)
++  if (kwset-&gt;words == 1)
+     {
+-      size_t ret = bmexec (kws, text, size);
++      size_t ret;
++
++      if (kwset-&gt;trans == 0)
++        ret = bmexec (kws, text, size);
++      else
++        ret = bmexectrans (kws, text, size);
++
+       if (kwsmatch != 0 && ret != (size_t) -1)
+ 	{
+ 	  kwsmatch-&gt;index = 0;
+
+
+
+diff -urN grep-2.5.1-original/src/kwset.c grep-2.5.1/src/kwset.c
+--- grep-2.5.1-original/src/kwset.c	Fri Feb  9 01:36:36 2001
++++ grep-2.5.1/src/kwset.c	Wed Sep  3 20:06:41 2003
+@@ -496,6 +496,7 @@
+   register unsigned char const *d1;
+   register char const *ep, *sp, *tp;
+   register int d, gc, i, len, md2;
++  register int gi;
+ 
+   kwset = (struct kwset const *) kws;
+   len = kwset-&gt;mind;
+@@ -517,41 +518,119 @@
+   tp = text + len;
+ 
+   /* Significance of 12: 1 (initial offset) + 10 (skip loop) + 1 (md2). */
+-  if (size &gt; 12 * len)
+-    /* 11 is not a bug, the initial offset happens only once. */
+-    for (ep = text + size - 11 * len;;)
+-      {
+-	while (tp &lt;= ep)
+-	  {
+-	    d = d1[U(tp[-1])], tp += d;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    if (d == 0)
+-	      goto found;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    if (d == 0)
+-	      goto found;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    if (d == 0)
+-	      goto found;
+-	    d = d1[U(tp[-1])], tp += d;
+-	    d = d1[U(tp[-1])], tp += d;
+-	  }
+-	break;
+-      found:
+-	if (U(tp[-2]) == gc)
+-	  {
+-	    for (i = 3; i &lt;= len && U(tp[-i]) == U(sp[-i]); ++i)
+-	      ;
+-	    if (i &gt; len)
+-	      return tp - len - text;
+-	  }
+-	tp += md2;
+-      }
++  if (size &lt;= 12 * len) 
++     goto BufferEnd;
+ 
++  if (len &gt;= 5) 
++    goto STBMSearch;
++
++  /* Tuned Boyer-Moore search loop */
++  /* 11 is not a bug, the initial offset happens only once. */
++  for (ep = text + size - 11 * len;;)
++    {
++      while (tp &lt;= ep)
++	{
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_tbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_tbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_tbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	}
++      break;
++
++    found_tbm:
++      if (U(tp[-2]) == gc)
++	{
++	  for (i = 3; i &lt;= len && U(tp[-i]) == U(sp[-i]); ++i)
++	    ;
++	  if (i &gt; len) 
++              return tp - len - text;
++	}
++      tp += md2;
++    }
++
++  goto BufferEnd;
++
++ STBMSearch:
++  /* Self-Tuning Boyer-Moore search loop */
++  /* 11 is not a bug, the initial offset happens only once. */
++  gi = -2;
++  for (ep = text + size - 11 * len;;)
++    {
++    SkipLoop:
++      while (tp &lt;= ep)
++	{
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_stbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_stbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	  if (d == 0)
++	    goto found_stbm;
++	  d = d1[U(tp[-1])], tp += d;
++	  d = d1[U(tp[-1])], tp += d;
++	}
++      break;
++
++    found_stbm:
++      /* Avoid the match loop if the guard doesn't match */
++      if (U(tp[gi]) != gc) 
++        {
++          tp += md2;
++          goto SkipLoop;
++        }
++
++      /* Check for match from (guard - 1) to pattern start */
++      for (i = gi - 1; i &gt;= -len; i--) 
++        if (U(tp[i]) != U(sp[i]))
++          {
++            /* Mismatch found, use this place as the guard */
++            gi = i;
++            gc = U(sp[i]);
++            tp += md2;
++            goto SkipLoop;
++          }
++
++      /* Check for match from pattern end to (guard + 1) */
++      for (i = -2; i &gt; gi; i--)
++        if (U(tp[i]) != U(sp[i]))
++          {
++            /* Mismatch found, use this place as the guard */
++            gi = i;
++            gc = U(sp[i]);
++            tp += md2;
++            goto SkipLoop;
++          }
++
++      /* Found match */
++      return tp - len - text;
++
++    }
++
++  /* Revert to fixed guard for final few characters of the buffer */
++  gc = U(sp[-2]);
++  goto BufferEnd;
++  
++
++ BufferEnd:
+   /* Now we have only a few characters left to search.  We
+      carefully avoid ever producing an out-of-bounds pointer. */
+   ep = text + size;
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

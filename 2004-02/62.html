@@ -1,0 +1,161 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: LCA 2004 - secure computer kiosks" -->
+<!-- FromName="'steve'" -->
+<!-- FromEmail="steve@smartfab.com.au" -->
+<!-- ToName="'Linuxsa'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="03 Feb 2004 02:31:34 +1030" -->
+<!-- Id="1075737676.17084.52.camel@lah" -->
+<!-- Reference="71478A90CD21D711B81D0007E9C5A8020C565A@KCSSERVER" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: LCA 2004 - secure computer kiosks</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: steve &lt;<I><A HREF="mailto:steve@smartfab.com.au">steve@smartfab.com.au</A></I>&gt;
+  To  : Linuxsa &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 03 Feb 2004 02:31:34 +1030
+</PRE>
+<H1>Re: LCA 2004 - secure computer kiosks</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Um , everything I mentioned previously about logging straight into X is
+a filthy lie.
+
+Those scripts that I posted before only half work.
+
+Its now 3am, and Im pleased to report that the new method works 100% of
+the time, and is much faster than using XDM.
+
+Basically, any attempt to shell script your way out of it is doomed to
+failure. I did not fully understand how low level everything is whilst
+the machine is chugging through the init process, prior to the login
+prompt. XDM actually does a lot of work connecting the output of
+processes to character devices such as /dev/console, and during init you
+are in a state where the tty command returns 'not a tty', so you cant
+just run startx back here. This is a job that calls for some sneaky C
+code.
+
+You need to adopt the attitude that regular Linux, especially such
+things as RedHat, are like mass-market cars. Powerful, stylish, quiet,
+comfortable, with big bouncy suspensions on them, so that can be used
+for a variety of purposes. I wont even attempt to describe where Windows
+fits into this analogy. Maybe an STA bus that is never running on time ?
+(Where do you want to go today ? asks the bus driver, like I have a
+choice about where the bus is going ? - Hey, if its not too much trouble
+Mr bus driver, howzabout you drop me off right out the front of .. oh
+never mind)
+
+A kiosk / dedicated app / turnkey solution  linux machine on the other
+hand is a racing car - we need to throw out anything that is there for
+comfort only, chop the panels down, harden the suspension, drop in a
+roll cage and generally push everything to the limit just so it can go
+an extra 1/10th of a second faster per lap around a specific track. When
+it comes time to tackle the next track, we just build another car from
+scratch. 
+
+--------------------------
+Getting straight to X as fast as you can ..
+
+Its a PITA - but here is what you need to do :
+
+1) Get a copy of autologin - 3k tarball of source code that is built for
+redhat systems.
+
+2) Strip out all the guff that uses PAM, since a stripped down distro
+wont have PAM (again, less dependencies is a good thing). Strip out the
+code related to utmp updates (since there is a 1:1 relationship between
+booting and logins, we dont care about login history), and then minimize
+the Makefile so that it does not need any libs at all.(-lpam -lutmp -dl
+can all go)
+
+3) Stick it straight into inittab as a respawn'ed task
+
+A bare /etc/inittab such as this :
+# Runlevel 3 - Straight into X with zero overhead
+id:3:initdefault
+i3:3:wait:/etc/rc.d/rc.3
+x3:3:respawn /sbin/autologin username startx
+
+the /etc/rc.d/rc.3 script fires off any processes that you need. If
+there are things such as starting up SQL servers, then you can use the &
+thingy in the rc.3 script to run them in the background, so the script
+returns immediately, and then X starts immediately.  Hopefully, the
+backgrounded commands have completed before the user types in their
+password.  
+
+Also, because your machine is just going to run a dedicated task, you
+dont need all that extra guff to load functions, check arguments, issue
+stops and statuses - just a few clean commands to fire up what you need
+is all you want in these init scripts.
+
+Note the total lack of anything else - you cannot ctrl-alt-del the
+thing, and you cannot Ctrl-Alt-F[1-10] to get a text console. All nice
+and lightweight, and immune to prying fingers on the keyboard.
+
+There is no runlevel 6, so the beast cannot be shutdown via the shutdown
+command.
+
+During bootup, it completely bypasses all of the normal rc scripts, and
+so it is way fast.
+
+
+----------
+For shutting the system down, I use a modified version of jwz's
+fastboot.c program available from his DNA lounge site - it tells
+postgresql to close up, syncs the disks, and goes straight for the
+kernel level power off function.   Powerdown safely in 2 seconds flat on
+any old pentium.
+
+--------------------------
+
+Now, the slowest part of the boot process is loading the linux kernel
+and doing stage1 hardware detection. Since the rest is so fast now, that
+hardware detection is getting annoying. Given that the hardware of the
+kiosk is not going to change, I reckon it must be possible to bypass all
+that as well .. any ideas ?
+
+Surely, something like lilo can load the kernel as it normally does, but
+then the kernel should be able to just init itself from a snapshot and
+skip all the hardware checks. I think linuxbios manages something like
+this (they flash the ROM bios with a tiny linux kernel so you go from
+powerup to login prompt in under 5 seconds).
+
+Anyone had any success with LinuxBios ??
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

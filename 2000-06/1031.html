@@ -1,0 +1,2872 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="outb_p usage" -->
+<!-- FromName="Adam Hawes" -->
+<!-- FromEmail="adam@overfiend.ace.net.au" -->
+<!-- ToName="Linux SA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 29 Jun 2000 17:10:31 +0930" -->
+<!-- Id="395AFD6F.47730B20@overfiend.ace.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: outb_p usage</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adam Hawes &lt;<I><A HREF="mailto:adam@overfiend.ace.net.au">adam@overfiend.ace.net.au</A></I>&gt;
+  To  : Linux SA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 29 Jun 2000 17:10:31 +0930
+</PRE>
+<H1>outb_p usage</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all.
+
+I have a perplexing problem.  I am using RedHat 6.2 (may be of
+significance, who knows).  What I am trying to do as a programming
+exercise is write a simple program to control an FM radio card in my
+computer.  I have the programming docs for the card, and all the info
+that I need.
+
+The problem is that I cannot _compile_ the program.  I am using the
+outb_p (DATA, PORT) to write a byte to an IO port.  When I compile the
+program, GCC complains about a problem with an = sign on the line of the
+outb_p instructions.  It does not matter what derivation of out I use, I
+get the same error, and cannot compile.  I have included the source
+file, the preprocessor output, and the error messages as attachments for
+those of interest/knowledge to peruse.
+
+I am using the command line "gcc -O -c radio.cpp" to compile the file to
+a .o file and use optomisations (I was advised that the compiler will
+not properly inline the out functions otherwise.
+
+To get the preprocessor output I used "gcc -E -O -c radio.cpp &gt;
+radio.processed", and for the errors, I simply piped stderr from the
+first command to a file.
+
+What tricks are involved in using the out functions.  I know the program
+must actually be executed as root, and it will crash my system if I make
+it poke around too much in the wrong places, but why won't it compile?
+
+
+Thanks in advance,
+Adam
+
+-- 
+Adam Hawes
+
+Web:       <A HREF="http://overfiend.iwarp.com">http://overfiend.iwarp.com</A>
+Email:     <A HREF="mailto:adam@overfiend.iwarp.com">adam@overfiend.iwarp.com</A>
+ICQ:       2492016
+
+Voicemail: +61 (08) 8219-3238
+Fax:       +61 (08) 8219-3238
+
+-----BEGIN GEEK CODE BLOCK-----
+Version: 3.12
+GAT dpu s+: a-- C++++ UL++ P+ L+++ E W- N+++ o+ K- w--- 
+O- M V-- PS+ PE Y++ PGP++ t 5- X+++ R* tv b+ DI+ D---- 
+G e* h! r--- y** 
+------END GEEK CODE BLOCK------
+#include &lt;asm/io.h&gt;
+#include &lt;stdio.h&gt;
+
+#define __KERNEL__
+//////////////////////////////////////////////////////////////////////////////
+//   
+// Use outb_p (port, value) to output one byte and a short delay
+//
+const unsigned long bits [24] = {0x000001, 0x000002, 0x000004, 0x000008,
+				 0x000010, 0x000020, 0x000040, 0x000080,
+				 0x000100, 0x000200, 0x000400, 0x000800,
+				 0x001000, 0x002000, 0x004000, 0x008000,
+				 0x010000, 0x020000, 0x040000, 0x080000,
+				 0x100000, 0x200000, 0x400000, 0x800000};
+				 
+  
+//////////////////////////////////////////////////////////////////////////////
+//   
+//   Base address of radio card
+//
+#define RADIO_BASE = 0x350;
+
+//////////////////////////////////////////////////////////////////////////////
+//   
+//   Bit locations in the radio card address for the different functions
+//
+//////////////////////////////////////////////////////////////////////////////
+
+// Held high on the card while writing data to its program port
+#define ENABLE_BIT      (unsigned char)0x02
+
+// Toggled high to clock in a bit of data
+#define CLOCK_BIT       (unsigned char)0x40
+
+// Data bit.  This is set, and the clock toggled to input data
+#define DATA_BIT        (unsigned char)0x80
+
+// Stereo indicator.  Low indicates stereo data when reading from the card
+#define STEREO_BIT      (unsigned char)0x01
+
+// Low indicated that the card is locked on a signal
+#define SIGNAL_LOCK     (unsigned char)0x02
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//   Define the frequencies for the radio card to use
+//
+//////////////////////////////////////////////////////////////////////////////
+#define MINFM         87500000      // Minimum FM Frequency (87.5 MHz)
+#define MAXFM         108000000     // Maximum FM Frequency (108 MHz)
+#define INTERM        10700000      // Intermediate freq (10.7 MHz)
+
+//////////////////////////////////////////////////////////////////////////////
+//   
+//   Send data word to the card (actually sends 24 bits).  The unsigned char*
+//   supplied should point to a unsigned char [3] array containing the data
+//
+void SendData (unsigned char* data) {
+
+  // Loop through all bits of the 3 bytes supplied
+  for (int byte = 0; byte &lt; 3; byte++) {
+    for (int bit = 0; bit &lt; 8; bit++) {
+
+      // Get the low bit
+      bool current_bit = *data % 2;
+      
+      // Get rid of the bit
+      *data = *data / 2;
+
+      // Send the current bit
+      if (current_bit) {
+	outb_p (ENABLE_BIT + DATA_BIT, RADIO_BASE);
+	outb_p (ENABLE_BIT + DATA_BIT + CLOCK_BIT, RADIO_BASE);
+      }else {
+	outb_p (ENABLE_BIT, RADIO_BASE);
+	outb_p (ENABLE_BIT + CLOCK_BIT, RADIO_BASE);
+      }
+    }
+    data++;
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//   
+//   Set the radio card's frequency bits
+//
+void SetFrequency (unsigned long frequency) {
+
+  unsigned char data [4] = {0,0,0};
+  unsigned long* p_data = (unsigned long*)data;
+  
+  // Check that the frequency is within FM range
+  if (frequency &lt; MINFM || frequency &gt; MAXFM)
+    printf ("Frequency %u is out of range, may break!\n\n", frequency);
+
+  // Generate the actual frequency
+  unsigned long actual_frequency = frequency + INTERM;
+
+  // Calculate the divider value
+  unsigned long divider = actual_frequency / 100000;
+
+  // Put the divider into the char array
+  for (int bit = 0; bit &lt; 14; bit++) {
+
+    if (divider %2) {
+      *p_data = *p_data | bits [bit];
+    }
+
+    divider /= 2;
+  }
+
+  // Don't bother with the bits that are always zero
+  *p_data = *p_data | bits [23];
+
+  // Write the data to the port
+  SendData ((unsigned char*) p_data);
+}
+
+
+int main () {
+
+  // Enable the data port for writing
+  ioperm (RADIO_BASE, 1, 1);
+  
+  SetFrequency (90000000);
+}
+
+
+
+radio.cpp: In function `void SendData(unsigned char *)':
+radio.cpp:72: parse error before `='
+radio.cpp:73: parse error before `='
+radio.cpp:75: parse error before `='
+radio.cpp:76: parse error before `='
+radio.cpp: In function `int main()':
+radio.cpp:123: parse error before `='
+
+# 1 "radio.cpp"
+# 1 "/usr/include/asm/io.h" 1 3
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+extern inline unsigned char  inb  (unsigned short port) { unsigned char  _v;  __asm__ __volatile__ ("in" "b" " %"  "w"  "1,%"   ""   "0"  : "=a" (_v) : "Nd" (port)   ); return _v; } extern inline unsigned char  inb_p (unsigned short port) { unsigned char  _v;  __asm__ __volatile__ ("in" "b" " %"  "w"  "1,%"   ""   "0"  "\noutb %%al,$0x80"   : "=a" (_v) : "Nd" (port)   ); return _v; } 
+
+
+extern inline unsigned short  inw  (unsigned short port) { unsigned short  _v;  __asm__ __volatile__ ("in" "w" " %"  "w"  "1,%"   ""   "0"  : "=a" (_v) : "Nd" (port)   ); return _v; } extern inline unsigned short  inw_p (unsigned short port) { unsigned short  _v;  __asm__ __volatile__ ("in" "w" " %"  "w"  "1,%"   ""   "0"  "\noutb %%al,$0x80"   : "=a" (_v) : "Nd" (port)   ); return _v; } 
+
+
+extern inline unsigned int  inl  (unsigned short port) { unsigned int  _v;  __asm__ __volatile__ ("in" "l" " %"  "w"  "1,%"   ""   "0"  : "=a" (_v) : "Nd" (port)   ); return _v; } extern inline unsigned int  inl_p (unsigned short port) { unsigned int  _v;  __asm__ __volatile__ ("in" "l" " %"  "w"  "1,%"   ""   "0"  "\noutb %%al,$0x80"   : "=a" (_v) : "Nd" (port)   ); return _v; } 
+
+
+extern inline void outb  (unsigned   char   value, unsigned short port) {  __asm__ __volatile__ ("out" "b" " %"   "b"   "0,%"  "w"  "1"  : : "a" (value), "Nd" (port)); } extern inline void outb_p (unsigned   char   value, unsigned short port) {  __asm__ __volatile__ ("out" "b" " %"   "b"   "0,%"  "w"  "1"  "\noutb %%al,$0x80"   : : "a" (value), "Nd" (port));} 
+extern inline void outw  (unsigned   short   value, unsigned short port) {  __asm__ __volatile__ ("out" "w" " %"   "w"   "0,%"  "w"  "1"  : : "a" (value), "Nd" (port)); } extern inline void outw_p (unsigned   short   value, unsigned short port) {  __asm__ __volatile__ ("out" "w" " %"   "w"   "0,%"  "w"  "1"  "\noutb %%al,$0x80"   : : "a" (value), "Nd" (port));} 
+extern inline void outl  (unsigned   int   value, unsigned short port) {  __asm__ __volatile__ ("out" "l" " %"      "0,%"  "w"  "1"  : : "a" (value), "Nd" (port)); } extern inline void outl_p (unsigned   int   value, unsigned short port) {  __asm__ __volatile__ ("out" "l" " %"      "0,%"  "w"  "1"  "\noutb %%al,$0x80"   : : "a" (value), "Nd" (port));} 
+
+extern inline void insb (unsigned short port, void * addr, unsigned long count) { __asm__ __volatile__ ("cld ; rep ; ins" "b" : "=D" (addr), "=c" (count) : "d" (port),"0" (addr),"1" (count)); } 
+extern inline void insw (unsigned short port, void * addr, unsigned long count) { __asm__ __volatile__ ("cld ; rep ; ins" "w" : "=D" (addr), "=c" (count) : "d" (port),"0" (addr),"1" (count)); } 
+extern inline void insl (unsigned short port, void * addr, unsigned long count) { __asm__ __volatile__ ("cld ; rep ; ins" "l" : "=D" (addr), "=c" (count) : "d" (port),"0" (addr),"1" (count)); } 
+
+extern inline void outsb (unsigned short port, const void * addr, unsigned long count) { __asm__ __volatile__ ("cld ; rep ; outs" "b" : "=S" (addr), "=c" (count) : "d" (port),"0" (addr),"1" (count)); } 
+extern inline void outsw (unsigned short port, const void * addr, unsigned long count) { __asm__ __volatile__ ("cld ; rep ; outs" "w" : "=S" (addr), "=c" (count) : "d" (port),"0" (addr),"1" (count)); } 
+extern inline void outsl (unsigned short port, const void * addr, unsigned long count) { __asm__ __volatile__ ("cld ; rep ; outs" "l" : "=S" (addr), "=c" (count) : "d" (port),"0" (addr),"1" (count)); } 
+
+# 186 "/usr/include/asm/io.h" 3
+
+
+
+# 1 "radio.cpp" 2
+
+# 1 "/usr/include/stdio.h" 1 3
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+# 1 "/usr/include/features.h" 1 3
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+# 138 "/usr/include/features.h" 3
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 196 "/usr/include/features.h" 3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+# 1 "/usr/include/sys/cdefs.h" 1 3
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+# 71 "/usr/include/sys/cdefs.h" 3
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+# 103 "/usr/include/sys/cdefs.h" 3
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+# 250 "/usr/include/features.h" 2 3
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+# 1 "/usr/include/gnu/stubs.h" 1 3
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 278 "/usr/include/features.h" 2 3
+
+
+
+
+# 27 "/usr/include/stdio.h" 2 3
+
+
+extern "C" { 
+
+
+
+# 1 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 1 3
+
+
+
+
+
+
+ 
+
+
+# 19 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+
+ 
+
+
+ 
+
+
+
+
+
+ 
+
+
+# 61 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+# 131 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef unsigned int size_t;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+# 271 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+# 283 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+ 
+
+ 
+
+# 317 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 33 "/usr/include/stdio.h" 2 3
+
+
+
+
+
+# 1 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stdarg.h" 1 3
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+typedef void *__gnuc_va_list;
+
+
+
+ 
+
+# 116 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stdarg.h" 3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 202 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stdarg.h" 3
+
+
+
+
+# 38 "/usr/include/stdio.h" 2 3
+
+
+# 1 "/usr/include/bits/types.h" 1 3
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+# 1 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 1 3
+
+
+
+
+
+
+ 
+
+
+# 19 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+
+ 
+
+
+ 
+
+
+
+
+
+ 
+
+
+# 61 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+# 131 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+ 
+
+ 
+
+
+# 188 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+# 271 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+# 283 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+ 
+
+ 
+
+# 317 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 29 "/usr/include/bits/types.h" 2 3
+
+
+ 
+typedef unsigned char __u_char;
+typedef unsigned short __u_short;
+typedef unsigned int __u_int;
+typedef unsigned long __u_long;
+
+__extension__ typedef unsigned long long int __u_quad_t;
+__extension__ typedef long long int __quad_t;
+# 48 "/usr/include/bits/types.h" 3
+
+typedef signed char __int8_t;
+typedef unsigned char __uint8_t;
+typedef signed short int __int16_t;
+typedef unsigned short int __uint16_t;
+typedef signed int __int32_t;
+typedef unsigned int __uint32_t;
+
+__extension__ typedef signed long long int __int64_t;
+__extension__ typedef unsigned long long int __uint64_t;
+
+typedef __quad_t *__qaddr_t;
+
+typedef __u_quad_t __dev_t;		 
+typedef __u_int __uid_t;		 
+typedef __u_int __gid_t;		 
+typedef __u_long __ino_t;		 
+typedef __u_int __mode_t;		 
+typedef __u_int __nlink_t; 		 
+typedef long int __off_t;		 
+typedef __quad_t __loff_t;		 
+typedef int __pid_t;			 
+typedef int __ssize_t;			 
+typedef long int __rlim_t;		 
+typedef __quad_t __rlim64_t;		 
+typedef __u_int __id_t;			 
+
+typedef struct
+  {
+    int __val[2];
+  } __fsid_t;				 
+
+ 
+typedef int __daddr_t;			 
+typedef char *__caddr_t;
+typedef long int __time_t;
+typedef long int __swblk_t;		 
+
+typedef long int __clock_t;
+
+ 
+typedef unsigned long int __fd_mask;
+
+ 
+
+
+ 
+
+
+
+
+ 
+typedef struct
+  {
+     
+
+
+
+
+
+    __fd_mask __fds_bits[1024  / (8 * sizeof (__fd_mask)) ];
+
+
+  } __fd_set;
+
+
+typedef int __key_t;
+
+ 
+typedef unsigned short int __ipc_pid_t;
+
+
+ 
+
+ 
+typedef long int __blkcnt_t;
+typedef __quad_t __blkcnt64_t;
+
+ 
+typedef __u_long __fsblkcnt_t;
+typedef __u_quad_t __fsblkcnt64_t;
+
+ 
+typedef __u_long __fsfilcnt_t;
+typedef __u_quad_t __fsfilcnt64_t;
+
+ 
+typedef __u_long __ino64_t;
+
+ 
+typedef __loff_t __off64_t;
+
+ 
+typedef long int __t_scalar_t;
+typedef unsigned long int __t_uscalar_t;
+
+ 
+typedef int __intptr_t;
+
+
+ 
+
+
+
+
+
+# 40 "/usr/include/stdio.h" 2 3
+
+
+
+
+
+
+
+ 
+typedef struct _IO_FILE FILE;
+
+
+
+
+
+
+
+
+# 1 "/usr/include/libio.h" 1 3
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 1 "/usr/include/_G_config.h" 1 3
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+# 1 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 1 3
+
+
+
+
+
+
+ 
+
+
+# 19 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+
+ 
+
+
+ 
+
+
+
+
+
+ 
+
+
+# 61 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+# 131 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+ 
+
+ 
+
+
+# 188 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef unsigned int  wint_t;
+
+
+
+
+ 
+
+ 
+
+# 317 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stddef.h" 3
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 14 "/usr/include/_G_config.h" 2 3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef int _G_int16_t __attribute__ ((__mode__ (__HI__)));
+typedef int _G_int32_t __attribute__ ((__mode__ (__SI__)));
+typedef unsigned int _G_uint16_t __attribute__ ((__mode__ (__HI__)));
+typedef unsigned int _G_uint32_t __attribute__ ((__mode__ (__SI__)));
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 30 "/usr/include/libio.h" 2 3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+# 1 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stdarg.h" 1 3
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+
+# 116 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stdarg.h" 3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 202 "/usr/lib/gcc-lib/i386-redhat-linux/egcs-2.91.66/include/stdarg.h" 3
+
+
+
+
+# 48 "/usr/include/libio.h" 2 3
+
+
+
+
+
+
+
+# 67 "/usr/include/libio.h" 3
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 98 "/usr/include/libio.h" 3
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+struct _IO_jump_t;  struct _IO_FILE;
+
+ 
+
+
+
+
+
+
+
+typedef void _IO_lock_t;
+
+
+
+ 
+
+struct _IO_marker {
+  struct _IO_marker *_next;
+  struct _IO_FILE *_sbuf;
+   
+
+   
+  int _pos;
+# 186 "/usr/include/libio.h" 3
+
+};
+
+struct _IO_FILE {
+  int _flags;		 
+
+
+   
+   
+  char* _IO_read_ptr;	 
+  char* _IO_read_end;	 
+  char* _IO_read_base;	 
+  char* _IO_write_base;	 
+  char* _IO_write_ptr;	 
+  char* _IO_write_end;	 
+  char* _IO_buf_base;	 
+  char* _IO_buf_end;	 
+   
+  char *_IO_save_base;  
+  char *_IO_backup_base;   
+  char *_IO_save_end;  
+
+  struct _IO_marker *_markers;
+
+  struct _IO_FILE *_chain;
+
+  int _fileno;
+  int _blksize;
+  __off_t   _old_offset;  
+
+
+   
+  unsigned short _cur_column;
+  signed char _vtable_offset;
+  char _shortbuf[1];
+
+   
+
+  _IO_lock_t *_lock;
+
+
+
+
+
+
+
+
+  __off64_t   _offset;
+   
+  int _unused2[16];
+
+};
+
+
+
+
+
+struct _IO_FILE_plus;
+extern struct _IO_FILE_plus _IO_2_1_stdin_;
+extern struct _IO_FILE_plus _IO_2_1_stdout_;
+extern struct _IO_FILE_plus _IO_2_1_stderr_;
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+typedef __ssize_t __io_read_fn  (void *  __cookie, char *__buf,
+				       size_t __nbytes)  ;
+
+ 
+
+
+
+
+
+typedef __ssize_t __io_write_fn  (void *  __cookie, __const char *__buf,
+				      size_t __n)  ;
+
+ 
+
+
+
+
+
+typedef int __io_seek_fn  (void *  __cookie, __off_t   __pos, int __w)  ;
+
+ 
+typedef int __io_close_fn  (void *  __cookie)  ;
+
+
+# 311 "/usr/include/libio.h" 3
+
+
+
+
+extern "C" {
+
+
+extern int __underflow  (_IO_FILE *)  throw ()  ;
+extern int __uflow  (_IO_FILE *)  throw ()  ;
+extern int __overflow  (_IO_FILE *, int)  throw ()  ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+extern int _IO_getc  (_IO_FILE *__fp)  throw ()  ;
+extern int _IO_putc  (int __c, _IO_FILE *__fp)  throw ()  ;
+extern int _IO_feof  (_IO_FILE *__fp)  throw ()  ;
+extern int _IO_ferror  (_IO_FILE *__fp)  throw ()  ;
+
+extern int _IO_peekc_locked  (_IO_FILE *__fp)  throw ()  ;
+
+ 
+
+
+
+extern void _IO_flockfile  (_IO_FILE *)  throw ()  ;
+extern void _IO_funlockfile  (_IO_FILE *)  throw ()  ;
+extern int _IO_ftrylockfile  (_IO_FILE *)  throw ()  ;
+
+
+
+
+
+
+
+
+
+
+
+
+extern int _IO_vfscanf  (_IO_FILE *  , const char *  ,
+			     __gnuc_va_list , int *  )  throw ()  ;
+extern int _IO_vfprintf  (_IO_FILE *  , const char *  ,
+			      __gnuc_va_list )  throw ()  ;
+extern __ssize_t   _IO_padn  (_IO_FILE *, int, __ssize_t  )  throw ()  ;
+extern size_t   _IO_sgetn  (_IO_FILE *, void *, size_t  )  throw ()  ;
+
+extern __off64_t   _IO_seekoff  (_IO_FILE *, __off64_t  , int, int)  throw ()  ;
+extern __off64_t   _IO_seekpos  (_IO_FILE *, __off64_t  , int)  throw ()  ;
+
+extern void _IO_free_backup_area  (_IO_FILE *)  throw ()  ;
+
+
+}
+
+
+
+# 57 "/usr/include/stdio.h" 2 3
+
+
+ 
+
+typedef __off_t  fpos_t;
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+# 1 "/usr/include/bits/stdio_lim.h" 1 3
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 110 "/usr/include/stdio.h" 2 3
+
+
+
+ 
+extern FILE *stdin;		 
+extern FILE *stdout;		 
+extern FILE *stderr;		 
+ 
+
+
+
+
+
+ 
+extern int remove  (__const char *__filename)  throw ()  ;
+ 
+extern int rename  (__const char *__old, __const char *__new)  throw ()  ;
+
+
+ 
+
+extern FILE *tmpfile  (void)  throw ()  ;
+
+
+
+
+
+
+
+
+
+
+ 
+extern char *tmpnam  (char *__s)  throw ()  ;
+
+
+ 
+
+extern char *tmpnam_r  (char *__s)  throw ()  ;
+
+
+
+
+ 
+
+
+
+
+
+
+extern char *tempnam  (__const char *__dir, __const char *__pfx)  throw ()  ;
+
+
+
+ 
+extern int fclose  (FILE *__stream)  throw ()  ;
+ 
+extern int fflush  (FILE *__stream)  throw ()  ;
+
+
+ 
+extern int fflush_unlocked  (FILE *__stream)  throw ()  ;
+
+
+
+
+
+
+
+
+
+ 
+extern FILE *fopen  (__const char *   __filename,
+			 __const char *   __modes)  throw ()  ;
+ 
+extern FILE *freopen  (__const char *   __filename,
+			   __const char *   __modes,
+			   FILE *   __stream)  throw ()  ;
+# 201 "/usr/include/stdio.h" 3
+
+
+
+
+
+
+
+
+
+
+ 
+extern FILE *fdopen  (int __fd, __const char *__modes)  throw ()  ;
+
+
+# 227 "/usr/include/stdio.h" 3
+
+
+
+ 
+
+extern void setbuf  (FILE *   __stream, char *   __buf)  throw ()  ;
+ 
+
+
+extern int setvbuf  (FILE *   __stream, char *   __buf,
+			 int __modes, size_t __n)  throw ()  ;
+
+
+ 
+
+extern void setbuffer  (FILE *   __stream, char *   __buf,
+			    size_t __size)  throw ()  ;
+
+ 
+extern void setlinebuf  (FILE *__stream)  throw ()  ;
+
+
+
+ 
+extern int fprintf  (FILE *   __stream,
+			 __const char *   __format, ...)  throw ()  ;
+ 
+extern int printf  (__const char *   __format, ...)  throw ()  ;
+ 
+extern int sprintf  (char *   __s,
+			 __const char *   __format, ...)  throw ()  ;
+
+ 
+extern int vfprintf  (FILE *   __s,
+			  __const char *   __format,
+			  __gnuc_va_list  __arg)  throw ()  ;
+ 
+extern int vprintf  (__const char *   __format,
+			 __gnuc_va_list  __arg)  throw ()  ;
+ 
+extern int vsprintf  (char *   __s,
+			  __const char *   __format,
+			  __gnuc_va_list  __arg)  throw ()  ;
+
+
+ 
+extern int snprintf  (char *   __s, size_t __maxlen,
+			  __const char *   __format, ...)  throw ()  
+     __attribute__ ((__format__ (__printf__, 3, 4)));
+
+extern int __vsnprintf  (char *   __s, size_t __maxlen,
+			     __const char *   __format,
+			     __gnuc_va_list  __arg)  throw ()  
+     __attribute__ ((__format__ (__printf__, 3, 0)));
+extern int vsnprintf  (char *   __s, size_t __maxlen,
+			   __const char *   __format,
+			   __gnuc_va_list  __arg)  throw ()  
+     __attribute__ ((__format__ (__printf__, 3, 0)));
+
+
+# 306 "/usr/include/stdio.h" 3
+
+
+
+ 
+extern int fscanf  (FILE *   __stream,
+			__const char *   __format, ...)  throw ()  ;
+ 
+extern int scanf  (__const char *   __format, ...)  throw ()  ;
+ 
+extern int sscanf  (__const char *   __s,
+			__const char *   __format, ...)  throw ()  ;
+
+# 334 "/usr/include/stdio.h" 3
+
+
+
+ 
+extern int fgetc  (FILE *__stream)  throw ()  ;
+extern int getc  (FILE *__stream)  throw ()  ;
+
+ 
+extern int getchar  (void)  throw ()  ;
+
+ 
+
+
+
+
+ 
+extern int getc_unlocked  (FILE *__stream)  throw ()  ;
+extern int getchar_unlocked  (void)  throw ()  ;
+
+
+
+ 
+extern int fgetc_unlocked  (FILE *__stream)  throw ()  ;
+
+
+
+ 
+extern int fputc  (int __c, FILE *__stream)  throw ()  ;
+extern int putc  (int __c, FILE *__stream)  throw ()  ;
+
+ 
+extern int putchar  (int __c)  throw ()  ;
+
+ 
+
+
+
+
+ 
+extern int fputc_unlocked  (int __c, FILE *__stream)  throw ()  ;
+
+
+
+ 
+extern int putc_unlocked  (int __c, FILE *__stream)  throw ()  ;
+extern int putchar_unlocked  (int __c)  throw ()  ;
+
+
+
+
+ 
+extern int getw  (FILE *__stream)  throw ()  ;
+
+ 
+extern int putw  (int __w, FILE *__stream)  throw ()  ;
+
+
+
+ 
+extern char *fgets  (char *   __s, int __n,
+			 FILE *   __stream)  throw ()  ;
+
+
+
+
+
+
+
+ 
+
+extern char *gets  (char *__s)  throw ()  ;
+
+
+# 424 "/usr/include/stdio.h" 3
+
+
+
+ 
+extern int fputs  (__const char *   __s,
+		       FILE *   __stream)  throw ()  ;
+
+
+
+
+
+
+
+ 
+extern int puts  (__const char *__s)  throw ()  ;
+
+
+ 
+extern int ungetc  (int __c, FILE *__stream)  throw ()  ;
+
+
+ 
+extern size_t fread  (void *   __ptr, size_t __size,
+			  size_t __n, FILE *   __stream)  throw ()  ;
+ 
+extern size_t fwrite  (__const void *   __ptr, size_t __size,
+			   size_t __n, FILE *   __s)  throw ()  ;
+
+
+ 
+extern size_t fread_unlocked  (void *   __ptr, size_t __size,
+				   size_t __n, FILE *   __stream)  throw ()  ;
+extern size_t fwrite_unlocked  (__const void *   __ptr,
+				    size_t __size, size_t __n,
+				    FILE *   __stream)  throw ()  ;
+
+
+
+ 
+extern int fseek  (FILE *__stream, long int __off, int __whence)  throw ()  ;
+ 
+extern long int ftell  (FILE *__stream)  throw ()  ;
+ 
+extern void rewind  (FILE *__stream)  throw ()  ;
+
+ 
+
+
+
+
+ 
+
+
+typedef __off_t off_t;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+extern int fgetpos  (FILE *   __stream,
+			 fpos_t *   __pos)  throw ()  ;
+ 
+extern int fsetpos  (FILE *__stream, __const fpos_t *__pos)  throw ()  ;
+# 523 "/usr/include/stdio.h" 3
+
+
+# 533 "/usr/include/stdio.h" 3
+
+
+ 
+extern void clearerr  (FILE *__stream)  throw ()  ;
+ 
+extern int feof  (FILE *__stream)  throw ()  ;
+ 
+extern int ferror  (FILE *__stream)  throw ()  ;
+
+
+ 
+extern void clearerr_unlocked  (FILE *__stream)  throw ()  ;
+extern int feof_unlocked  (FILE *__stream)  throw ()  ;
+extern int ferror_unlocked  (FILE *__stream)  throw ()  ;
+
+
+
+ 
+extern void perror  (__const char *__s)  throw ()  ;
+
+ 
+
+
+extern int sys_nerr;
+extern __const char *__const sys_errlist[];
+
+
+
+
+
+
+
+
+ 
+extern int fileno  (FILE *__stream)  throw ()  ;
+
+
+
+ 
+extern int fileno_unlocked  (FILE *__stream)  throw ()  ;
+
+
+
+
+
+ 
+extern FILE *popen  (__const char *__command, __const char *__modes)  throw ()  ;
+
+ 
+extern int pclose  (FILE *__stream)  throw ()  ;
+
+
+
+
+ 
+extern char *ctermid  (char *__s)  throw ()  ;
+
+
+
+
+
+
+
+
+
+# 607 "/usr/include/stdio.h" 3
+
+
+
+
+ 
+
+ 
+extern void flockfile  (FILE *__stream)  throw ()  ;
+
+ 
+
+extern int ftrylockfile  (FILE *__stream)  throw ()  ;
+
+ 
+extern void funlockfile  (FILE *__stream)  throw ()  ;
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+# 1 "/usr/include/bits/stdio.h" 1 3
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+inline  int
+vprintf (__const char *   __fmt, __gnuc_va_list  __arg) throw () 
+{
+  return vfprintf (stdout , __fmt, __arg);
+}
+
+ 
+inline  int
+getchar (void) throw () 
+{
+  return _IO_getc (stdin );
+}
+
+
+
+ 
+inline  int
+getc_unlocked (FILE *__fp) throw () 
+{
+  return (( __fp )-&gt;_IO_read_ptr &gt;= ( __fp )-&gt;_IO_read_end ? __uflow ( __fp ) : *(unsigned char *) ( __fp )-&gt;_IO_read_ptr++) ;
+}
+
+ 
+inline  int
+getchar_unlocked (void) throw () 
+{
+  return (( stdin  )-&gt;_IO_read_ptr &gt;= ( stdin  )-&gt;_IO_read_end ? __uflow ( stdin  ) : *(unsigned char *) ( stdin  )-&gt;_IO_read_ptr++) ;
+}
+
+
+
+ 
+inline  int
+putchar (int __c) throw () 
+{
+  return _IO_putc (__c, stdout );
+}
+
+
+
+ 
+inline  int
+fputc_unlocked (int __c, FILE *__stream) throw () 
+{
+  return (((  __stream )-&gt;_IO_write_ptr &gt;= (  __stream )-&gt;_IO_write_end) ? __overflow (  __stream , (unsigned char) ( __c )) : (unsigned char) (*(  __stream )-&gt;_IO_write_ptr++ = ( __c ))) ;
+}
+
+
+
+
+ 
+inline  int
+putc_unlocked (int __c, FILE *__stream) throw () 
+{
+  return (((  __stream )-&gt;_IO_write_ptr &gt;= (  __stream )-&gt;_IO_write_end) ? __overflow (  __stream , (unsigned char) ( __c )) : (unsigned char) (*(  __stream )-&gt;_IO_write_ptr++ = ( __c ))) ;
+}
+
+ 
+inline  int
+putchar_unlocked (int __c) throw () 
+{
+  return (((  stdout  )-&gt;_IO_write_ptr &gt;= (  stdout  )-&gt;_IO_write_end) ? __overflow (  stdout  , (unsigned char) ( __c )) : (unsigned char) (*(  stdout  )-&gt;_IO_write_ptr++ = ( __c ))) ;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+inline  int
+feof_unlocked (FILE *__stream) throw () 
+{
+  return ((( __stream )-&gt;_flags & 0x10 ) != 0) ;
+}
+
+ 
+inline  int
+ferror_unlocked (FILE *__stream) throw () 
+{
+  return ((( __stream )-&gt;_flags & 0x20 ) != 0) ;
+}
+
+
+
+
+
+
+ 
+
+# 149 "/usr/include/bits/stdio.h" 3
+
+
+# 165 "/usr/include/bits/stdio.h" 3
+
+
+ 
+
+# 635 "/usr/include/stdio.h" 2 3
+
+
+
+} 
+
+
+
+
+# 2 "radio.cpp" 2
+
+
+
+ 
+ 
+ 
+ 
+const unsigned long bits [24] = {0x000001, 0x000002, 0x000004, 0x000008,
+				 0x000010, 0x000020, 0x000040, 0x000080,
+				 0x000100, 0x000200, 0x000400, 0x000800,
+				 0x001000, 0x002000, 0x004000, 0x008000,
+				 0x010000, 0x020000, 0x040000, 0x080000,
+				 0x100000, 0x200000, 0x400000, 0x800000};
+				 
+  
+ 
+ 
+ 
+ 
+
+
+ 
+ 
+ 
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+ 
+ 
+ 
+
+
+
+
+ 
+ 
+ 
+ 
+ 
+void SendData (unsigned char* data) {
+
+   
+  for (int byte = 0; byte &lt; 3; byte++) {
+    for (int bit = 0; bit &lt; 8; bit++) {
+
+       
+      bool current_bit = *data % 2;
+      
+       
+      *data = *data / 2;
+
+       
+      if (current_bit) {
+	outb_p ((unsigned char)0x02  + (unsigned char)0x80 , = 0x350; );
+	outb_p ((unsigned char)0x02  + (unsigned char)0x80  + (unsigned char)0x40 , = 0x350; );
+      }else {
+	outb_p ((unsigned char)0x02 , = 0x350; );
+	outb_p ((unsigned char)0x02  + (unsigned char)0x40 , = 0x350; );
+      }
+    }
+    data++;
+  }
+}
+
+ 
+ 
+ 
+ 
+void SetFrequency (unsigned long frequency) {
+
+  unsigned char data [4] = {0,0,0};
+  unsigned long* p_data = (unsigned long*)data;
+  
+   
+  if (frequency &lt; 87500000  || frequency &gt; 108000000 )
+    printf ("Frequency %u is out of range, may break!\n\n", frequency);
+
+   
+  unsigned long actual_frequency = frequency + 10700000 ;
+
+   
+  unsigned long divider = actual_frequency / 100000;
+
+   
+  for (int bit = 0; bit &lt; 14; bit++) {
+
+    if (divider %2) {
+      *p_data = *p_data | bits [bit];
+    }
+
+    divider /= 2;
+  }
+
+   
+  *p_data = *p_data | bits [23];
+
+   
+  SendData ((unsigned char*) p_data);
+}
+
+
+int main () {
+
+   
+  ioperm (= 0x350; , 1, 1);
+  
+  SetFrequency (90000000);
+}
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

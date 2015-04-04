@@ -1,0 +1,154 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: managing configurations, not packages" -->
+<!-- FromName="'Michael Gratton'" -->
+<!-- FromEmail="mike@vee.net" -->
+<!-- ToName="'stephen white'" -->
+<!-- ToEmail="spwhite@chariot.net.au" -->
+<!-- Date="Wed, 11 Dec 2002 15:49:38 +1030" -->
+<!-- Id="3DF6CAEA.90700@vee.net" -->
+<!-- Reference="2D913234-0CBA-11D7-A992-000393B7D972@chariot.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: managing configurations, not packages</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Gratton &lt;<I><A HREF="mailto:mike@vee.net">mike@vee.net</A></I>&gt;
+  To  : stephen white &lt;<I><A HREF="mailto:spwhite@chariot.net.au">spwhite@chariot.net.au</A></I>&gt;
+  Date: Wed, 11 Dec 2002 15:49:38 +1030
+</PRE>
+<H1>Re: managing configurations, not packages</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+stephen white wrote:
+ &gt; The debate's still going in private email, so I thought I'd post what
+ &gt; I think the alternative is, for those of you interested in systems
+ &gt; management.
+
+Err, and then I replied:
+
+ &gt;
+ &gt; It is not necessarily bleeding edge if it's from CVS... you can
+ &gt; download from release tags.
+ &gt;
+
+But why bother when you can install the same release using the Debian 
+package? If it's only to tweak some compile-time options, then use 
+apt-src which compiles the software as you like it and builds the 
+package for you, which you then install.
+
+ &gt; You're making this into a straw man debate, where you make up
+ &gt; ridiculous solutions then demolish them.
+ &gt;
+
+Okay, yes, that was bad form. I was trying to suggest some alternatives 
+to using a central db for package management, but to be honest I can't 
+think of any better ways of doing it.
+
+Can you offer some better alternatives?
+
+ &gt; sendmail configured for SMTP is operationally a different program
+ &gt; than sendmail configured for UUCP. This is why you see
+ &gt; sendmail-smtp and sendmail-uucp in the Debian packages list.
+ &gt; This is an example of where the packaging system had to bend to
+ &gt; cope with the reality of the situation.
+
+
+If the only difference between the two is configuration, then it's just 
+been badly packaged. If there were significant compilation differences 
+between the two then I would argue that they are different programs, or 
+at least incompatible variants and so *should* be packaged separately.
+
+As an aside, the separate sendmail-foo packages don't exist anymore, the 
+one sendmail package does both SMTP and UUCP.
+
+ &gt; Dividing packages by program is subtly different than dividing
+ &gt; packages by functionality, and this is also seen in the Debian
+ &gt; packaging system with dummy packages like "x-windows" that
+ &gt; conceptually group multiple actual packages.
+
+
+Again, I think this issue has been resolved. Dummy packages have been 
+replaced with virtual tasks and packages, which is a much better way of 
+handling this.
+
+ &gt; It's been a while since I thought about this issue in depth, but I
+ &gt; recall that I was in favour of probing the filesystem to see what
+ &gt; programs were installed, then retrieving configuration files based on
+ &gt; the combinations.
+
+
+The first big problem with that approach is that it's just not robust 
+enough. If someone accidently deletes a file used by a package, there's 
+no longer a record of that file and any package-related information that 
+would normally be obtained from it is lost.
+
+For example, if I stored the package version and MD5 checksum on the 
+file /usr/bin/foo itself, or had to obtain the version by executing 
+/usr/bin/foo -v, but that file was deleted or overwritten with a 
+deifferent version, I would no longer be able to obtain that 
+package-related information.
+
+The other big problem is that there's no logical place to store metadata 
+about the package as a whole. This includes essential metadata such as 
+dependencies and conflicts, version information and a complete list of 
+files installed by the package. Other less essential bit still very 
+useful information is a description, the email address of the maintainer 
+and so on.
+
+If you don't already have that complete list of files installed by the 
+package, then you have no way to determine what that list is in an 
+efficient fashion and you need to know this when upgrading or removing a 
+package. You would have to examine every file in the filesystem to know 
+if it belongs to a particular package. This would make even minor 
+upgrades take hours or days.
+
+ &gt; So I'm more in favour of managing configurations than managing
+ &gt; packages.
+ &gt;
+
+Hmm, I think you should have a look at the debconf stuff, then. When a 
+debconfed package gets installed, it asks you pertinant configuration 
+questions and automatically configures the package for you. It remembers 
+your answers so you don't have to keep re-answering the same question 
+whenever you upgrade the package. Isn't this what you are after?
+
+/mike
+
+
+-- 
+Mike Gratton &lt;jabber:<A HREF="mailto:mjg@jabber.vee.net">mjg@jabber.vee.net</A>&gt; &lt;<A HREF="http://web.vee.net/&gt">http://web.vee.net/&gt</A>;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

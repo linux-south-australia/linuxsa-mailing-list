@@ -1,0 +1,203 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: software RAID versus hardware RAID" -->
+<!-- FromName="'Greg Lehey'" -->
+<!-- FromEmail="grog@lemis.com" -->
+<!-- ToName="'Martin Sandiford'" -->
+<!-- ToEmail="ms@mcdev.com.au" -->
+<!-- Date="Wed, 6 Jun 2001 07:49:35 +0930" -->
+<!-- Id="20010606074935.D95379@wantadilla.lemis.com" -->
+<!-- Reference="20010605222703.B8238@plugh.mccorp.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: software RAID versus hardware RAID</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Greg Lehey &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  To  : Martin Sandiford &lt;<I><A HREF="mailto:ms@mcdev.com.au">ms@mcdev.com.au</A></I>&gt;
+  Date: Wed, 6 Jun 2001 07:49:35 +0930
+</PRE>
+<H1>Re: software RAID versus hardware RAID</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tuesday,  5 June 2001 at 22:27:03 +0930, Martin Sandiford wrote:
+
+Can I send this reply on to the list?
+
+&gt; I was reading your comments on LinuxSA regarding HW/SW RAID and RAID in
+&gt; general.  I don't really understand the detailed whys and wherefores of
+&gt; RAID performance, so I was intrigued to see you make a statement that
+&gt; kind of went against my understanding of what gives good performance on
+&gt; multiple spindles:
+&gt;
+&gt; On Tue, 05 Jun 2001, Greg Lehey wrote:
+&gt;&gt; No, 32 kB is far too small.  An individual transfer should not be
+&gt;&gt; split across multiple spindles.  If empirical tests show that 32 kB is
+&gt;&gt; optimal, then it indicates some design problem in the software.  This
+&gt;&gt; kind of limitation is relatively common in hardware RAID, and may
+&gt;&gt; explain why the performance leaves something to be desired.
+&gt;
+&gt; Why should individual transfers not be split accross multiple spindles?
+&gt;
+&gt; My understanding is that this would improve concurrency and performance.
+&gt; What am I missing here?
+
+The global viewpoint.  Look at it from a bandwidth point of view.
+Setting up a transfer takes about 8 ms latency.  The transfer itself
+takes about 0.25 ms.  You want as few transfers as possible, and they
+should be as large as possible.
+
+In more detail, from vinum(8):
+
+   Performance considerations
+     A number of misconceptions exist about how to set up a RAID array for
+     best performance.  In particular, most systems use far too small a stripe
+     size.  The following discussion applies to all RAID systems, not just to
+     vinum.
+
+     The FreeBSD block I/O system issues requests of between .5kB and 128 kB;
+     a typical mix is somewhere round 8 kB.  You can't stop any striping sys-
+     tem from breaking a request into two physical requests, and if you make
+     the stripe small enough, it can be broken into several.  This will result
+     in a significant drop in performance: the decrease in transfer time per
+     disk is offset by the order of magnitude greater increase in latency.
+
+     With modern disk sizes and the FreeBSD I/O system, you can expect to have
+     a reasonably small number of fragmented requests with a stripe size
+     between 256 kB and 512 kB; with correct RAID implementations there is no
+     obvious reason not to increase the size to 2 or 4 MB on a large disk.
+
+     When choosing a stripe size, consider that most current UFS file systems
+     have cylinder groups 32 MB in size.  If you have a stripe size and number
+     of disks both of which are a power of two, it is probable that all
+     superblocks and inodes will be placed on the same subdisk, which will
+     impact performance significantly.  Choose an odd number instead, for
+     example 479 kB.
+
+     The easiest way to consider the impact of any transfer in a multi-access
+     system is to look at it from the point of view of the potential bottle-
+     neck, the disk subsystem: how much total disk time does the transfer use?
+     Since just about everything is cached, the time relationship between the
+     request and its completion is not so important: the important parameter
+     is the total time that the request keeps the disks active, the time when
+     the disks are not available to perform other transfers.  As a result, it
+     doesn't really matter if the transfers are happening at the same time or
+     different times.  In practical terms, the time we're looking at is the
+     sum of the total latency (positioning time and rotational latency, or the
+     time it takes for the data to arrive under the disk heads) and the total
+     transfer time.  For a given transfer to disks of the same speed, the
+     transfer time depends only on the total size of the transfer.
+
+     Consider a typical news article or web page of 24 kB, which will probably
+     be read in a single I/O.  Take disks with a transfer rate of 6 MB/s and
+     an average positioning time of 8 ms, and a file system with 4 kB blocks.
+     Since it's 24 kB, we don't have to worry about fragments, so the file
+     will start on a 4 kB boundary.  The number of transfers required depends
+     on where the block starts: it's (S + F - 1) / S, where S is the stripe
+     size in file system blocks, and F is the file size in file system blocks.
+
+     1.   Stripe size of 4 kB.  You'll have 6 transfers.  Total subsystem
+          load: 48 ms latency, 2 ms transfer, 50 ms total.
+
+     2.   Stripe size of 8 kB.  On average, you'll have 3.5 transfers.  Total
+          subsystem load: 28 ms latency, 2 ms transfer, 30 ms total.
+
+     3.   Stripe size of 16 kB.  On average, you'll have 2.25 transfers.
+          Total subsystem load: 18 ms latency, 2 ms transfer, 20 ms total.
+
+     4.   Stripe size of 256 kB.  On average, you'll have 1.08 transfers.
+          Total subsystem load: 8.6 ms latency, 2 ms transfer, 10.6 ms total.
+
+     5.   Stripe size of 4 MB.  On average, you'll have 1.0009 transfers.
+          Total subsystem load: 8.01 ms latency, 2 ms transfer, 10.01 ms
+          total.
+
+     It appears that some hardware RAID systems have problems with large
+     stripes: they appear to always transfer a complete stripe to or from
+     disk, so that a large stripe size will have an adverse effect on perfor-
+     mance.  vinum does not suffer from this problem: it optimizes all disk
+     transfers and does not transfer unneeded data.
+
+     Note that no well-known benchmark program tests true multi-access condi-
+     tions (more than 100 concurrent users), so it is difficult to demonstrate
+     the validity of these statements.
+
+     Given these considerations, the following factors affect the performance
+     of a vinum volume:
+
+     o   Striping improves performance for multiple access only, since it
+         increases the chance of individual requests being on different
+         drives.
+
+     o   Concatenating UFS file systems across multiple drives can also
+         improve performance for multiple file access, since UFS divides a
+         file system into cylinder groups and attempts to keep files in a sin-
+         gle cylinder group.  In general, it is not as effective as striping.
+
+     o   Mirroring can improve multi-access performance for reads, since by
+         default vinum issues consecutive reads to consecutive plexes.
+
+     o   Mirroring decreases performance for all writes, whether multi-access
+         or single access, since the data must be written to both plexes.
+         This explains the subdisk layout in the example of a mirroring con-
+         figuration above: if the corresponding subdisk in each plex is on a
+         different physical disk, the write commands can be issued in paral-
+         lel, whereas if they are on the same physical disk, they will be per-
+         formed sequentially.
+
+     o   RAID-5 reads have essentially the same considerations as striped
+         reads, unless the striped plex is part of a mirrored volume, in which
+         case the performance of the mirrored volume will be better.
+
+     o   RAID-5 writes are approximately 25% of the speed of striped writes:
+         to perform the write, vinum must first read the data block and the
+         corresponding parity block, perform some calculations and write back
+         the parity block and the data block, four times as many transfers as
+         for writing a striped plex.  On the other hand, this is offset by the
+         cost of mirroring, so writes to a volume with a single RAID-5 plex
+         are approximately half the speed of writes to a correctly configured
+         volume with two striped plexes.
+
+     o   When the vinum configuration changes (for example, adding or removing
+         objects, or the change of state of one of the objects), vinum writes
+         up to 128 kB of updated configuration to each drive.  The larger the
+         number of drives, the longer this takes.
+
+Greg
+--
+Finger <A HREF="mailto:grog@lemis.com">grog@lemis.com</A> for PGP public key
+See complete headers for address and phone numbers
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,116 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Ping vs Traceroute" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="rsharpe@ns.aus.com" -->
+<!-- ToName="'Richard Russell'" -->
+<!-- ToEmail="richard@yellowgoanna.com" -->
+<!-- Date="Mon, 1 Jul 2002 15:01:45 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0207011458370.3323-100000@ns.aus.com" -->
+<!-- Reference="20020701133244.A13280@yellowgoanna.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Ping vs Traceroute</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A></I>&gt;
+  To  : Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  Date: Mon, 1 Jul 2002 15:01:45 +0930 (CST)
+</PRE>
+<H1>Re: Ping vs Traceroute</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, 1 Jul 2002, Richard Russell wrote:
+
+&gt; Hi all,
+&gt; 
+&gt; I have a strange problem here -- there appears to be a difference
+&gt; between the ICMP ECHO used by `ping` and the ICMP ECHO used by
+&gt; `traceroute -I` ... observe:
+
+They do do different things ... typically, traceroute on UNIX does not 
+even send icmp echo requests, I believe, but UDP requests to high port 
+numbers with a TTL of 1 and incrementing the TTL.
+
+Windows tracert, however, does use icmp echo requests, but also sets the 
+TTL to 1 initially, and increments it.
+ 
+&gt; ----
+&gt; [<A HREF="mailto:richard@SERVER">richard@SERVER</A> richard]$ ping 172.16.x.y
+&gt; PING 172.16.x.y (172.16.x.y) from a.b.c.d : 56(84) bytes of
+&gt; data.
+&gt; 
+&gt; --- 172.16.x.y ping statistics ---
+&gt; 3 packets transmitted, 0 packets received, 100% packet loss
+&gt; [<A HREF="mailto:richard@SERVER">richard@SERVER</A> richard]$ /usr/sbin/traceroute -I 172.16.x.y
+&gt; traceroute to 172.16.x.y (172.16.x.y), 30 hops max, 38 byte packets
+&gt;  1  172.16.x.y (172.16.x.y)  208.039 ms  22.578 ms  39.929 ms
+&gt; [<A HREF="mailto:richard@SERVER">richard@SERVER</A> richard]$ ping 172.16.x.y
+&gt; PING 172.16.x.y (172.16.x.y) from a.b.c.d : 56(84) bytes of
+&gt; data.
+&gt; 
+&gt; --- 172.16.x.y ping statistics ---
+&gt; 2 packets transmitted, 0 packets received, 100% packet loss
+&gt; [<A HREF="mailto:richard@SERVER">richard@SERVER</A> richard]$
+&gt; ----
+&gt; 
+&gt; Note the "-I" flag in traceroute, and note that I cancelled the pings
+&gt; after a few seconds -- but no matter how long I run them for, they
+&gt; don't respond. Traceroute responds almost instantly. a.b.c.d is
+&gt; SERVER, and is a real IP address. 172.16.x.y is the remote client,
+&gt; which goes through a VPN over two routers. acls are set to allow
+&gt; traffic, SNAT is happenning correctly -- it's exactly the same as
+&gt; 172.16.x.y-1, which works correctly...
+&gt; 
+&gt; What's really confusing me is that ping and traceroute -I are giving
+&gt; different results... whyso?
+
+Which is to be expected.
+
+With ICMP echo, you are likely not getting the echo replies back, while 
+with traceroute, you are likely getting ICMP time exceeded responses from 
+intermediate routers.
+
+&gt; rr
+&gt; 
+&gt; 
+
+-- 
+Regards
+-----
+Richard Sharpe, <A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A>, <A HREF="mailto:rsharpe@samba.org">rsharpe@samba.org</A>, 
+<A HREF="mailto:sharpe@ethereal.com">sharpe@ethereal.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

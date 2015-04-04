@@ -1,0 +1,90 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: tcsh does not work as root shell in SuSE 7.1??" -->
+<!-- FromName="'David Newall'" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="'Alan Kennington'" -->
+<!-- ToEmail="akenning@topology.org" -->
+<!-- Date="Tue, 26 Jun 2001 21:35:02 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.10.10106262128430.474-100000@localhost.localdomain" -->
+<!-- Reference="20010625233118.A20662@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: tcsh does not work as root shell in SuSE 7.1??</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  Date: Tue, 26 Jun 2001 21:35:02 +0930 (CST)
+</PRE>
+<H1>Re: tcsh does not work as root shell in SuSE 7.1??</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+The usual reason why you get "No such file or directory" when the file is
+clearly there, is because some other file, needed to startup the image,
+is missing.  For example:
+
+  $ cat demo
+  #! /bin/nothere
+  echo "hello world"
+  $ ls -l demo
+  -rwxrwxr-x 1 davidn davidn  34 Jun 26 21:29 demo
+  $ ./demo
+  bash: ./demo: No such file or directory
+
+If you're trying to start a binary, particularly one that uses shared
+libraries (which your /bin/tcsh does), then it might be that shared
+library which doesn't exist.  Yet you say you can run it as an ordinary
+user.  Are you sure?  Is it possible you have /bin/tcsh and /usr/bin/tcsh
+and only one of them works?
+
+Try:
+
+  joe-user$ /bin/tcsh
+  tcsh%
+
+Then try:
+
+  root# /bin/tcsh
+
+Does it really work for one and not the other?  If it really works for
+both, make sure the shell really is set correctly in /etc/passwd:
+
+  $ grep root /etc/passwd
+  root:Khhl129V.298:0:0:Super User:/root:/bin/tcsh
+
+Have fun.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

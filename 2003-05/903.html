@@ -1,0 +1,85 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Postfix and minimalist MLM" -->
+<!-- FromName="'Michael Firkins'" -->
+<!-- FromEmail="michael@home.lyppard.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 25 May 2003 17:09:49 +0930 (CST)" -->
+<!-- Id="3014.192.168.1.200.1053848389.squirrel@toast.home.lyppard.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Postfix and minimalist MLM</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Firkins &lt;<I><A HREF="mailto:michael@home.lyppard.com.au">michael@home.lyppard.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 25 May 2003 17:09:49 +0930 (CST)
+</PRE>
+<H1>Postfix and minimalist MLM</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi.
+
+Just in case anyone comes across this problem:
+
+Postfix and Minimalist on Debian woody. Postfix pops a mail loop warning
+everytime someone posts to the list (messages still go out, but so do some
+messy messages)
+Turns out, one of the mail loop tests Postfix runs is against the
+'Delivered-To:' header, which gets added on original delivery to the list.
+I found lots of similar cases with other MLM's via google, but no specific
+answers apart from 'your MLM is broken' :(
+Eventually started digging in the MLM and I found some lines like this,
+removing 'conflicting' headers at around line 430:
+   # Remove conflicting headers
+
+   $header =~ s/x-mailing-list.*\n([ \t]+.*\n)*//ig;
+
+So I added one of my own:
+
+# remove Delivered-To: header
+
+   $header =~ s/Delivered-To: .*\n//ig;
+
+
+Everything is behaving again...
+
+Michael
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

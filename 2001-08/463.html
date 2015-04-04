@@ -1,0 +1,166 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Blocking Code Red ingress to your ISP network" -->
+<!-- FromName="'Simon Hackett'" -->
+<!-- FromEmail="simon@internode.com.au" -->
+<!-- ToName="'John Davey'" -->
+<!-- ToEmail="john@davey.net.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 11 Aug 2001 19:41:57 +0930" -->
+<!-- Id="p05100300b79ab4812365@[150.101.234.83]" -->
+<!-- Reference="GOEMLNICOMCOMGGLIKHFMEHNDJAA.john@davey.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Blocking Code Red ingress to your ISP network</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Simon Hackett &lt;<I><A HREF="mailto:simon@internode.com.au">simon@internode.com.au</A></I>&gt;
+  To  : John Davey &lt;<I><A HREF="mailto:john@davey.net.au">john@davey.net.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 11 Aug 2001 19:41:57 +0930
+</PRE>
+<H1>RE: Blocking Code Red ingress to your ISP network</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Why speculate? It's public information, read it for yourself :)
+
+<A HREF="http://www.cisco.com/warp/public/63/nbar_acl_codered.shtml">http://www.cisco.com/warp/public/63/nbar_acl_codered.shtml</A>
+
+Briefly - yes, their suggestion does indeed block the packet stream 
+without resetting it as such. But the worm doesn't retarget your 
+address over and over, it sprays requests to random IP's. So I doubt 
+its going to threaten the capacity of your connection table (which is 
+pretty big)
+
+What it -does- do is seriously threaten the connection tables of core 
+routers, NAT boxes and caches, all of which have their own various 
+approaches for mitigation of the problem:
+
+<A HREF="http://www.cisco.com/warp/public/63/ts_codred_worm.shtml">http://www.cisco.com/warp/public/63/ts_codred_worm.shtml</A>
+
+Simon
+
+At 9:41 PM +0930 10/8/01, John Davey wrote:
+&gt;Hi Simon,
+&gt;
+&gt;This is interesting.
+&gt;
+&gt;I've been following a similar thread on another list which leads
+&gt;me to a couple of questions.
+&gt;
+&gt;Since the 3 way handshake has already occurred the connection is
+&gt;established targeted web server is now waiting for a GET request
+&gt;if the GET /default.ida? request is blocked the web server
+&gt;will sit idle until the connection times out rather than returning
+&gt;a 404 (Apache or a patched IIS). So rather than CodeRed tying up
+&gt;resourses on the attacked server for a few seconds it will be
+&gt;several minutes until the session times out.
+&gt;
+&gt;This would actually lead to a worse DoS than letting the
+&gt;GET /default.ida? through.
+&gt;
+&gt;How do CISCO handle this? Does it use some 'Black Magic' to
+&gt;terminate the session with the targeted web server?
+&gt;
+&gt;Regards John
+&gt;
+&gt;&gt;  -----Original Message-----
+&gt;&gt;  From: Simon Hackett [mailto:<A HREF="mailto:simon@internode.com.au">simon@internode.com.au</A>]
+&gt;&gt;  Sent: Friday, 10 August 2001 12:08 AM
+&gt;&gt;  To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>; <A HREF="mailto:aussie-isp@aussie.net">aussie-isp@aussie.net</A>
+&gt;&gt;  Subject: Blocking Code Red ingress to your ISP network
+&gt;&gt;
+&gt;&gt;
+&gt;&gt;  Yay.
+&gt;&gt;
+&gt;&gt;  Daryl Collins here @ Internode has just installed the magic bullet
+&gt;&gt;  fix from Cisco, the one I posted to Aussie-Isp yesterday, which uses
+&gt;&gt;  'NBAR' (Network Based Application Recognition) - i.e. Stateful
+&gt;&gt;  inspection of incoming packet flows - to find, and kill, incoming
+&gt;&gt;  Code Red attacks before the 'get' finishes reaching the destination
+&gt;&gt;  web server.
+&gt;&gt;
+&gt;&gt;  So our customer base can finally stop counting Code Red sheep in
+&gt;&gt;  their web logs, and we can stop putting out new brush fires every day
+&gt;&gt;  when more of our customers get broken into and generate more attack
+&gt;&gt;  streams outbound.
+&gt;&gt;
+&gt;&gt;  The initial tcp connection still arrives on the customer machine, but
+&gt;&gt;  it gets suspended by IOS, just as the signature 'nasty' GET request
+&gt;&gt;  is about to be delivered. So they become harmless distractions.
+&gt;&gt;
+&gt;&gt;  [Pop quiz: Which of our customers had the highest number of
+&gt;&gt;  compromised machines? One that offers commercial MSCE courses. Argh]
+&gt;&gt;
+&gt;&gt;  Anyway - the blocking appears effective (so far) - and it is
+&gt;&gt;  effective -without- transparently proxying incoming web requests or
+&gt;&gt;  blocking all ingress to port 80 for our customers (ugh).
+&gt;&gt;
+&gt;&gt;  Got to love that Cisco IOS. The bugs drive you mad, but the features
+&gt;&gt;  actually do more than make up for it. The feature set underneath NBAR
+&gt;&gt;  is truly scary in its depth.
+&gt;&gt;
+&gt;&gt;  Interestingly, we're seeing around 60-90 kilobits per second of
+&gt;&gt;  blocked probes right now. It'll be interesting to see how high that
+&gt;&gt;  number gets at its peak.
+&gt;&gt;
+&gt;&gt;  If you can load a recent version of IOS onto your core router, think
+&gt;&gt;  about doing your bit to turn these damn things off. Put a wall up and
+&gt;  &gt; stop them (at last!)
+&gt;  &gt;
+&gt;  &gt; Cheers,
+&gt;  &gt; Simon
+&gt;  &gt; --
+&gt;  &gt;
+&gt;  &gt; ---
+&gt;  &gt; Simon Hackett, Technical Director, Internode Systems Pty Ltd
+&gt;  &gt; 31 York St [PO Box 284, Rundle Mall], Adelaide, SA 5000 Australia
+&gt;  &gt; Email: <A HREF="mailto:simon@internode.com.au">simon@internode.com.au</A>  Web: <A HREF="http://www.on.net">http://www.on.net</A>
+&gt;&gt;  Phone: +61-8-8223-2999          Fax: +61-8-8223-1777
+&gt;&gt;
+&gt;&gt;  --
+&gt;&gt;  LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on
+&gt;&gt;  irc.linux.org.au
+&gt;&gt;  To unsubscribe from the LinuxSA list:
+&gt;&gt;    mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+
+-- 
+
+---
+Simon Hackett, Technical Director, Internode Systems Pty Ltd
+31 York St [PO Box 284, Rundle Mall], Adelaide, SA 5000 Australia
+Email: <A HREF="mailto:simon@internode.com.au">simon@internode.com.au</A>  Web: <A HREF="http://www.on.net">http://www.on.net</A>
+Phone: +61-8-8223-2999          Fax: +61-8-8223-1777
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

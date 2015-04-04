@@ -1,0 +1,223 @@
+============================================================================
+SkyMedia-200D PC card Linux Driver & Applications version 2.01
+
+This distribution and instructions significantly modified by Greg
+Lehey, LEMIS, <grog@lemis.com>.  The following is an adaptation of the
+instructions to a simpler and more reliable method.
+
+============================================================================
+This is Linux software of SkyMedia-200D. 
+(Product No : SM200D, SM200DTP, SM200DPA)
+
+This version is modified to support new Skymedia-200D product - SM200DTP,
+SM200DPA - as well as SM200D.
+
+Some of this software is provided in source form in order to be able
+to adapt it to your configuration.
+
+System requirements are as follows:
+1. Pentium 133Mhz or higher
+2. 32Mbyte of system memory or more
+3. 3Mbyte of free space on hard drive
+4. Linux 2.4 kernel.  It is possible that the code will work with a
+   2.2 kernel, but this has not been tested.
+5. SkyMedia-200D card
+
+===========================================================================
+INSTALLATION
+
+To install Linux S/W for Skymedia-200D, 
+
+1. Download the file 'sm200d.tar.gz' into the build directory.  We
+   suggest /usr/src/skydata, but the name doesn't really make any
+   difference.
+
+2. Extract the data:
+
+     # tar xzvf sm200d.tar.gz
+
+   This will create a new directory called driver.
+
+3. Change to the new directory:
+
+     # cd driver
+
+4. (Optional step.  If you don't understand, don't worry.  You
+   probably never need to do this, but the information is supplied for
+   people who want to know).
+
+   If necessary, check the Makefiles.  By default, the following
+   software will be installed:
+
+   File		 Purpose		Location
+
+   sm200d	 start and monitor	/usr/local/bin
+   SkyUpgrade	 undocumented		/usr/local/bin
+   sm200	 start script		/usr/local/bin
+   R98.sm200	 system init script	/etc/rc3.d
+   config	 configuration file	/etc/sysconfig/sm200
+   sm200	 driver module		/lib/modules/<kernel>
+
+   <kernel> is the release number of the kernel.  For example, if you
+   are running kernel 2.4.9, the module will be installed in the
+   directory /lib/modules/2.4.9, which is where the system will look
+   for it.
+
+   If you want, change the names in sys/Makefile for the driver
+   module, and usr/Makefile for the others.
+
+5. Check also that you have a Linux source tree at /usr/src/linux; the
+   driver requires header files in this tree.
+
+6. Type 'make install'.  The software will be built and installed.
+  
+7. Configure the file /etc/sysconfig/sm200/config with the values
+   given to you by your service provider.
+
+   To load the driver and start the card, run the script
+   /usr/local/bin/sm200.  Normally, if you have /usr/local/bin in your
+   PATH, you can do this with just
+
+     # sm200
+
+   The module will be started automatically at boot time.   
+
+   The startup scripts assign a dummy address to the card; the driver
+   does not use this address, but you should avoid having it conflict
+   with any other interface in the system.
+
+===========================================================================
+
+Running sm200d
+--------------
+
+The main interface program is sm200d.  It performs two functions:
+
+1.  It initializes the connection by reading in the configuration file
+    (by default /etc/sysconfig/sm200/config) and setting the card
+    accordingly.  Perform this function like this:
+
+      # sm200d -i
+
+    If you want to use a different configuration file, just specify
+    its name:
+
+      # sm200d -i /var/tmp/testconfig
+
+2.  It displays the current state of the card and an indication of the
+    signal strength.  Run it like this:
+
+      # sm200d -s
+
+    In this mode, the program displays a status line every five
+    seconds:
+
+       Wed Oct 17 13:24:49 2001        Running AGC:  203
+
+    The text "Running" shows that the card is correctly set up and is
+    receiving a signal.  The AGC value 203 indicates the signal
+    strength.  Higher values indicate a stronger signal.  Typical
+    values range from 180 to 210, though values as low as 150 may be
+    acceptable.
+
+    To stop sm200d in this mode, press ^C.
+
+Differences between sm200d and SkyData
+--------------------------------------
+
+The original program was called SkyData.  It performed both functions
+in sequence.  It also required a file name.  Apart from that, and some
+minor format differences, the function is the same.  Note that sm200d
+requires either or both of the -i and -s flags.
+
+===========================================================================
+TROUBLESHOOTING
+
+Q: The software does not compile cleanly.
+A: Check if you have kernel source correctly installed.  This source
+   has only been tested with Linux kernel 2.4.9, and it may not
+   compile with a non-2.4 kernel.  Make sure that your kernel source
+   is located in or linked to /usr/src/linux directory.
+
+Q: When trying to load the driver, I get the following message:
+
+     # sm200
+     sm200: kernel-module version mismatch
+             sm200 was compiled for kernel version 2.4.0-0.26
+	     while this kernel is version 2.4.9.
+A: Your Linux userland has a different version from the kernel, and
+   you have included the userland header files.  This was a problem
+   with the original version of this driver from Telemann, but should
+   no longer occur.  Please check that you have the header file
+   directories /usr/src/linux/include/linux and
+   /usr/src/linux/include/asm.  Contact Greg Lehey <grog@lemis.com> if
+   you have these directories and you get this problem anyway.
+
+Q: I have installed the driver successfully but I cannot receive
+   internet data via satellite.
+
+A: Check:
+
+    1) The card LEDs
+       In normal operation, the green LED is on and the yellow LED
+       flashes when data is received.
+
+    2) The driver status 
+       After the driver is loaded, you should find an interface
+       'sm200d':
+
+	    sm200d    Link encap:Ethernet  HWaddr 00:90:BC:01:4D:B0  
+	              inet addr:10.0.0.1  Bcast:10.255.255.255  Mask:255.0.0.0
+	              UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+	              RX packets:1493 errors:0 dropped:0 overruns:0 frame:0
+	              TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+	              collisions:0 txqueuelen:100 
+	              Interrupt:10 Base address:0x1000 
+
+       Check that the second line (inet addr) is set; otherwise you
+       should assign an IP address.  This should happen automatically
+       with the startup script, but it will not happen if you just
+       load the driver manually.
+
+    3) The signal status 
+       Check if the satellite configuration is correct:
+
+         # sm200d -i
+	 SkyData V.2.02 started. (C) 1999 Diego Picciani
+	 E-Mail: d.picciani@novacomp.it
+	 Skymedia Product No.:      SM200DPA
+	 Skymedia Firmware Version: 1.02
+	 Skymedia Driver Version:   2.01
+	 Frequency:                 12560.137 Mhz
+	 Symbol Rate:               17.981 MSym/s
+	 Local Oscillator:          11300.000 Mhz
+	 Alignment:                 Horizontal
+	 LNB Mode:                  High
+	 LNB Power:                 On
+	 Tone Burst:                Off
+	 Diseqc Port:               Off
+	 Start Tuning ...
+	   (there is a significant pause here)
+	 Tuner Lock:                Ok
+	 QPSK Lock:                 Ok
+	 Viterbi Lock:              Ok
+	 Frame Lock:                Ok
+	 FEC Rate:                  7/8
+	 AGC Value:                 205
+	 Error 1:                   0
+	 Error 2:                   0
+	 MAC Address:               00:90:bc:01:4d:b0
+	 IP Address:                10.0.0.1
+	 Filtering:                 IP Address
+	 Data PID:                  0092 Multiprotocol Encapsulation
+   
+    4) PID settings
+       Check if the correct PIDs are set.
+
+    5) The network configuration. (especially for Debian package)
+       - type 'cat /proc/sys/net/ipv4/conf/sm200d/rp_filter'.
+       If it has the value other than '0', change it to 0.
+       - type 'echo 0 > /proc/sys/net/ipv4/conf/sm200d/rp_filter'
+       
+$Id: README,v 1.2 2001/10/17 03:57:30 grog Exp grog $
+

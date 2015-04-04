@@ -1,0 +1,141 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: mail wierdness update" -->
+<!-- FromName="'Darryl Ross'" -->
+<!-- FromEmail="dross@syc.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="mick@toolah.com" -->
+<!-- Date="Sun, 28 Jul 2002 12:54:14 +0930 (CST)" -->
+<!-- Id="1506.172.17.33.33.1027826654.squirrel@test.syc.net.au" -->
+<!-- Reference="3D403D05.4070705@pacbell.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: mail wierdness update</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Darryl Ross &lt;<I><A HREF="mailto:dross@syc.net.au">dross@syc.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:mick@toolah.com">mick@toolah.com</A></I>&gt;
+  Date: Sun, 28 Jul 2002 12:54:14 +0930 (CST)
+</PRE>
+<H1>Re: mail wierdness update</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Michael,
+
+&gt; Ok, well I do not think I have been r00ted, and if I have, I didn't
+&gt; enjoy  it.
+
+Doesn't hurt to rule out the possibility though.
+
+&gt; For starters I am rarely connected to the internet, just enough to
+&gt; download my e-mail each night.  I tried surfing with links and lynx but
+&gt;  too many websites hate us text browser users, and the fact that I am
+&gt; constantly getting 80% packet loss still.  I really would like to get
+&gt; that  solved, I tried pinging the IP address at the other end of the
+&gt; ppp link  and got 0% packet loss.  Its got me beat.
+
+Have a look into something called TCP Explicit Congestion Notification
+support in the kernel. You want it turned *OFF*. If it is compiled into
+the kernel (which it is in one version of RedHat, but I can't recall which
+one exactly) there is a line you can add to /etc/sysctl.conf to turn it
+off without recompiling the entire kernel.
+
+&gt; As to my config, I have pretty much a bog stock standard RH7.2 laptop
+&gt; install and therefore if there are scripts probing for weaknesses they
+&gt; would probably find them at my IP when I am connected.  I am pretty
+&gt; sure  that I left the firewall setting at the default 'medium' setting
+&gt; when I  did the install.  I could not tell you more about the firewall
+&gt; settings  unless you instruct me how to log them and send them to the
+&gt; list.
+
+[<A HREF="mailto:root@host">root@host</A> root]# iptables -L -nv
+
+&gt; At the moment my priority is learning e-mail and getting it working
+&gt; 100%  and knowing WHY it is working =)  All this does not explain the
+&gt; quantity  of e-mail being sent by sendmail.  I only discovered the log
+&gt; messages when  I ran pine as root by accident really.  I do not really
+&gt; know how to  analyse or parse log files etc.  I did 'less
+&gt; /var/log/maillog' and got  hundreds of pages of meaningless gibbish.
+&gt;
+&gt; I am still getting mail errors.  I have inserted one I recieved back
+&gt; today.
+
+&lt;snip&gt;
+
+&gt;&gt;    ----- The following addresses had permanent fatal errors -----
+&gt;&gt; &lt;<A HREF="mailto:mcampbell@toolah.com">mcampbell@toolah.com</A>&gt;
+&gt;&gt;     (reason: 550 5.1.1 User unknown)
+
+Do you have a user (or alias) for <A HREF="mailto:mcampbell@toolah.com">mcampbell@toolah.com</A>? The error message
+there would seem pretty obvious to me ;)
+
+Make sure that you don't have the alias for 'root' going to an account
+that doesn't exist, as if you do that you could experience the exact same
+symptoms that you've described. What will happen is the 'bounce' message
+will go to root, which will then be forwarded to a non-existant account,
+which will generate a bounce message to root... etc, etc. See where that's
+going?
+
+Obviously <A HREF="mailto:mick@toolah.com">mick@toolah.com</A> works, so alias mcampbell and root to mick. Read
+the man page for 'aliases'. In short you'd probably want something like
+this in /etc/aliases:
+
+root:       mick
+mcampbell:  mick
+
+Don't forget to run the command `newaliases` after changing the aliases
+file. You don't need to restart sendmail though.
+
+&gt; My last question is to verify if I have been rooted or not.  Can I run
+&gt; a  md5 check of /sbin/nologin to see if it has been trojaned?  Can
+&gt; someone  give me explict instructions on how to do this please?
+
+Simple, run this command and see if the sum is the same.
+
+[<A HREF="mailto:root@host">root@host</A> root]# md5sum /sbin/nologin
+467bb4acc8544eaa18046393e43b3a8f  /sbin/nologin
+
+Hope that helps
+Darryl
+
+
+-- 
+Darryl Ross
+Senior Network and Systems Administrator
+Service to Youth Council Inc
+<A HREF="mailto:dross@syc.net.au">dross@syc.net.au</A>
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

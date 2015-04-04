@@ -1,0 +1,142 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: system write(2) call bounds checking" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="Daryl Tester" -->
+<!-- ToEmail="dt@picknowl.com.au" -->
+<!-- Date="Mon, 19 Jun 2000 14:04:21 +0930" -->
+<!-- Id="20000619140421.A28120@dog.topology.org" -->
+<!-- Reference="394D855C.A9B1603C@picknowl.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: system write(2) call bounds checking</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  Date: Mon, 19 Jun 2000 14:04:21 +0930
+</PRE>
+<H1>Re: system write(2) call bounds checking</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, Jun 19, 2000 at 11:58:44AM +0930, Daryl Tester wrote:
+&gt; Daryl Tester wrote:
+&gt; 
+&gt; I'm still trying to figure out how the block driver fops maps to the
+&gt; correct device driver (eg, in my case, scsi/aic7xxx), but I'll leave
+&gt; that for a rainy day ...
+
+I guess that the write(2) command can end up passing on the command to
+either a chracter driver or a block driver.
+It looks like I might have found the reason for some of the behaviour.
+
+/usr/src/linux-2.2.16/kernel/sysctl.c
+----------------------------------------------------------------------
+static ssize_t do_rw_proc(int write, struct file * file, char * buf,
+                          size_t count, loff_t *ppos)
+{
+        int op;
+        struct proc_dir_entry *de;
+        struct ctl_table *table;
+        size_t res;
+        ssize_t error;
+
+        de = (struct proc_dir_entry*) file-&gt;f_dentry-&gt;d_inode-&gt;u.generic_ip;
+        if (!de || !de-&gt;data)
+                return -ENOTDIR;
+        table = (struct ctl_table *) de-&gt;data;
+        if (!table || !table-&gt;proc_handler)
+                return -ENOTDIR;
+        op = (write ? 002 : 004);
+        if (ctl_perm(table, op))
+                return -EPERM;
+
+        res = count;
+
+        /*
+         * FIXME: we need to pass on ppos to the handler.
+         */
+
+        error = (*table-&gt;proc_handler) (table, write, file, buf, &res);
+        if (error)
+                return error;
+        return res;
+}
+----------------------------------------------------------------------
+
+This function seems to get all write(2) calls out of the system call
+mapping table. I'm not totally certain about this.
+
+But this function clearly returns the number of bytes requested
+("res = count") if the device does not return an error.
+But /dev/null presumably ignores the "count" parameter.
+So it blindly returns a number -1, which is actually
+4G - 1. 
+
+There are two possible lines of argument here.
+1. It's okay for a "count" parameter to be an unsigned integer
+   in the range 2G to $G-1.
+   This sounds fair enough, except that a negative value
+   will then be returned by write(2), which will be interpreted
+   as an error condition.
+
+2. "count" values between 4G and 4G-1 should be flagged by
+   do_rw_proc as an error, in which case such values may not be
+   parameters to write(2).
+   And this would mean that the linux kernel code is erroneous.
+
+Whether you permit "count" values between 2G and 4G-1 or not,
+it looks like something bad will happen. If you do permit it,
+then the semantics of the return value is faulty.
+
+Therefore I conclude that unless the write(2) function's return
+value semantics is altered, then the "count" parameter
+should either be changed to ssize_t so that a negative value can
+be rejected, or else very large values should just be rejected anyway.
+
+A bit of a kludge would be for device drivers such as /dev/null's 
+should accept only 2G-1 bytes and write that to "res", in which
+case a second call (at least) has to be made to clear out the
+rest of the bytes.
+
+Executive summary:
+This all reinforces the view that the linux kernel
+is lucky kludgerama. I.e. the code is not "tight" in the sense
+of checking every function return value and all function arguments
+to ensure no errors.
+
+Cheerio,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

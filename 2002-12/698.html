@@ -1,0 +1,115 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Help with rsync and ISO updates" -->
+<!-- FromName="'Dan Shearer'" -->
+<!-- FromEmail="dan@tellurian.com.au" -->
+<!-- ToName="'michael'" -->
+<!-- ToEmail="michael@home.lyppard.com.au" -->
+<!-- Date="Sat, 14 Dec 2002 14:35:15 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0212131417440.25409-100000@calulu.shearer.org" -->
+<!-- Reference="Pine.LNX.4.10.10212131402290.1626-100000@sandwich.home.lyppard.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Help with rsync and ISO updates</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A></I>&gt;
+  To  : michael &lt;<I><A HREF="mailto:michael@home.lyppard.com.au">michael@home.lyppard.com.au</A></I>&gt;
+  Date: Sat, 14 Dec 2002 14:35:15 +1030 (CST)
+</PRE>
+<H1>Re: Help with rsync and ISO updates</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, 13 Dec 2002, michael wrote:
+
+&gt; As I understand it, rsync will compare the two files [...]
+
+Yes, rsync compares two files and transfers only the differences, without
+any one process having access to both files in order to do a conventional
+diff. So notionally maybe today I download a file containing AAA, and
+tomorrow it is changed on the master to be ABA. The rsync program (which
+implements the rsync algorithm, like many other programs with all sorts of
+different names) can notice patterns a bit like this and just transfer
+'B'.
+
+But imagine if the notional file containing AAA is compressed.  After the
+master is changed to ABA, it is compressed again. The way compression
+algorithms work, if you do a diff of the two compressed files there will
+be many differences throughout, even though just one little part of the
+file was changed from A to B. So, rsync doesn't really help for compressed
+files. What people could do in order to get very fast updates with
+minimum data transferred is never compress any files and never download
+files with anything other than rsync. But this doesn't sound terribly
+realistic, especially given that there is a CPU hit when running rsyncd as
+compared to ftpd or httpd. (Some might notice as well that this also
+involves people giving away a very small amount of information about what
+happens behind their firewall.)
+
+In the case of an ISO, rsync can help depending how much was updated in
+the image. If some compressed files were changed in contents without
+shifting other files around much then rsync may be able to just download
+the changed files (in their entirety, as shown.) But if many files were
+changed, or the file sizes changed such that the block layout of the ISO
+is quite different, rsync isn't going to be much of an improvement over
+wget and may be much worse overall given the CPU impact on the server.
+
+There are two practical answers. The first is a thing called jigdo
+(<A HREF="http://home.in.tum.de/~atterer/jigdo">http://home.in.tum.de/~atterer/jigdo</A>), which is a tool specially made for
+mirroring ISO images. It is a kind of a special-case solution to the
+compressed files problem. Its motivation was to avoid storing ISOs at all
+while still letting users download ISOs, but one of the benefits is that
+updates have rsync-like benefits. Jigdo isn't rsync, and runs over the
+HTTP or FTP protocols.
+
+The second is a new parameter to gzip callled "--rsyncable" which is very
+nearly as efficient as ordinary gzip, but does its compression within
+variable block sizes that match what rsync looks for. Improvements not far
+from those available for uncompressed files are possible. Search for
+"rsyncable" at
+<A HREF="http://samba.anu.edu.au/rsync/rsync-and-debian/rsync-and-debian.html">http://samba.anu.edu.au/rsync/rsync-and-debian/rsync-and-debian.html</A> for a
+description of how it works. More detail including a link to the code is
+at <A HREF="http://moin.conectiva.com.br/CompressedRsync.">http://moin.conectiva.com.br/CompressedRsync.</A> It isn't surprising that
+the two distros that rely completely on apt-get for maintenance are the
+ones keen on pushing this technology.
+
+--
+Dan Shearer
+Open Source Manager
+Mob: +61 411 49 1800
+Tel: +61 8 8130 3104
+<A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A>
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

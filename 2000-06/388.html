@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: no boot at all -- I give up!" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="akenning@dog.topology.org, LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 13 Jun 2000 22:33:37 +0900" -->
+<!-- Id="3.0.6.32.20000613223337.009e28b0@203.16.214.248" -->
+<!-- Reference="20000613202049.A11346@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: no boot at all -- I give up!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : akenning@dog.topology.org, LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 13 Jun 2000 22:33:37 +0900
+</PRE>
+<H1>Re: no boot at all -- I give up!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+At 08:20 PM 6/13/00 +0930, Alan Kennington wrote:
+&gt;After working away for a few days re-making various kernels
+&gt;on two different machines (and having success on a third one,
+&gt;updating to 2.2.16), I now have a problem which I just don't understand,
+&gt;and It's _very frustrating.
+&gt;The most frustrating problems are the ones where you _know_ that
+&gt;you have done the right thing, and the computer is still doing
+&gt;something that is impossible.
+&gt;Well, I've run out of ideas.
+&gt;
+&gt;
+&gt;Problem:
+&gt;I re-boot, and the BIOS just doesn't see anything on drive C
+&gt;(/dev/hda) to boot at all. It just goes straight to the CD-ROM.
+&gt;Or if I tell the BIOS to boot from C only, it just stops and
+&gt;says there's nothing there.
+
+I imagine that the BIOS is looking for the MBR signature, 0xAA55 in the
+last two bytes of the very first sector. Are they there? Perhaps they have
+been clobbered.
+
+You should be able to use dd to get them off and od to display them.
+
+&gt;Last time I had a similar problem, it turned out that I needed to
+&gt;mark one of the partitions as active - the partition with the
+&gt;lilo boot sector.
+&gt;But this time, the BIOS doesn't even get that far.
+&gt;And the right partition is marked active anyway.
+&gt;
+&gt;I've re-run "lilo" a dozen times, sometimes with
+&gt;/dev/hda1 as boot partition, sometime /dev/hda.
+&gt;
+&gt;"fdisk" shows this:
+&gt;
+&gt;=========================================
+&gt;Disk /dev/hda: 255 heads, 63 sectors, 788 cylinders
+&gt;Units = cylinders of 16065 * 512 bytes
+&gt;
+&gt;   Device Boot    Start       End    Blocks   Id  System
+&gt;/dev/hda1   *         1         1      8001   83  Linux
+&gt;/dev/hda2             2        17    128520   82  Linux swap
+&gt;/dev/hda3            18       788   6193057+  83  Linux
+&gt;=========================================
+&gt;
+&gt;/etc/lilo.conf has this:
+&gt;
+&gt;=========================================
+&gt;# LILO Konfigurations-Datei
+&gt;# Start LILO global Section
+&gt;# Modified by ak, 13 June 2000.
+&gt;boot=/dev/hda
+&gt;#compact       # faster, but won't work on all systems.
+&gt;vga = normal    # force sane state
+&gt;read-only
+&gt;prompt
+&gt;timeout=200
+&gt;# End LILO global Section
+&gt;#
+&gt;image = /boot/vmlinuz
+&gt;  root = /dev/hda3
+&gt;  label = linux
+&gt;
+&gt;# Original kernel.
+&gt;image = /boot/vmlinuz.orig
+&gt;  root = /dev/hda3
+&gt;  label = linux.orig
+&gt;
+&gt;# 2.3.99 kernel with atm.
+&gt;image = /boot/vmlinuz-atm2
+&gt;  root = /dev/hda3
+&gt;  label = atm2 
+&gt;=========================================
+&gt;
+&gt;The re-boot after re-building a kernel has worked fine before
+&gt;on this machine.
+&gt;
+&gt;By the way, I'm writing this e-mail from the machine which
+&gt;is affected. So everything works except that it doesn't boot
+&gt;with assistance from a bootable CD-ROM or floppy.
+&gt;
+&gt;Could anyone please tell me what other things I can try either
+&gt;with "fdisk" and/or "lilo" or some other tool?
+&gt;I get the impression that the magic word in the MBR must be wrong,
+&gt;but re-writing the partition table to the MBR doesn't seem
+&gt;to fix anything.
+&gt;
+&gt;Cheers,
+&gt;Alan Kennington.
+&gt;
+&gt;Attachment Converted: "c:\eudora\attach\no boot at all -- I give up!"
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Co-author, SAMS Teach Yourself Samba in 24 Hours
+Author: First Australian 5-day, intensive, hands-on Linux SysAdmin course
+Author: First Australian 2-day, intensive, hands-on Samba course
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,173 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: how to register a name server" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Jeremy Ervine" -->
+<!-- ToEmail="omegasys@adam.com.au" -->
+<!-- Date="Wed, 5 Apr 2000 21:05:38 +0930 (CST)" -->
+<!-- Id="Pine.BSF.3.96.1000405192156.22311A-100000@augustus.tellurian.com.au" -->
+<!-- Reference="38e9b013.d0.0@adam.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: how to register a name server</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Jeremy Ervine &lt;<I><A HREF="mailto:omegasys@adam.com.au">omegasys@adam.com.au</A></I>&gt;
+  Date: Wed, 5 Apr 2000 21:05:38 +0930 (CST)
+</PRE>
+<H1>Re: how to register a name server</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Jeremy,
+
+There are two parts to your question: Part 1 concerns DNS; and part 2 relates
+to SMTP.
+
+
+DNS
+===
+
+DNS is an internet convenience.  It's not necessary, and in fact was invented
+somewhat late in the piece.  When a program wishes to create an IP connection
+to another program it must provide the IP address of the computer that the
+other program runs on.  IP addresses are always 32 bit numbers, and are
+generally expressed using a four-part dotted number, for example 203.2.124.2.
+Numeric addresses are not so easy to remember and so DNS provides a way to
+associate a name with a number and vice versa.  DNS also provides a hierarchy
+of names, that is it provides domains with names "under" those domains.
+
+The DNS is a database.  You provide a key and type of record; if there's an
+entry for that matches you get the data.  For example you might ask for the
+address for eden.adam.com.au.  (It's 203.2.124.2.)  There are many types of
+records.  Four common types are A (address), NS (nameserver), CNAME (alias)
+and MX (mail exchanger).
+
+The DNS has a root, in which all top level domains are recorded.  A number of
+nameservers retain a distributed database containing all records for the root.
+When you want to find an address for a name, say eden.adam.com.au, you must
+first look at the right-most part of that name, au, and find a server which
+can resolve names under it.  You can query any of the root servers and find
+NS (nameserver) records for the au domain.  You then query to find the A
+(address) records for those nameservers -- you do that because you need to
+know the address of a computer before you can access it using IP.  Repeat the
+process, using any of the au nameservers, to find the nameserver for com.au,
+and again for adam.com.au.  Now you know which server (or servers) can answer
+requests about eden.adam.com.au.
+
+If you want to maintain your own nameserver for a domain you need to correctly
+configure a machine to respond to requests for that domain, and you need an
+appropriate record to be entered in the database for domain under which you
+domain would appear.  If you want to register the domain je.com.au you can't:
+it's already taken.  You could have jeremy.com.au or ervine.com.au -- if the
+owner of com.au permits it.
+
+You need to find the registrar (ie the organisations responsible for specific
+domains) who is authorative for the domain you want to be registered under.
+I shan't try to second guess you by telling you who has authority for any
+particular domain, but as a hint you can ask AltaVista "who is the registrar
+for some domain?".  I expect that the registrar you need to talk to has a web
+site with instructions for you to follow.
+
+Different registrars have different requirements for domains appearing under
+their domain.  Most are likely to require you to have the legal right for the
+domain.  (Don't waste your time trying to register cocacola.id because you'd
+surely be dragged through the Indonesian courts and ultimately lose.) The
+registrars are also likely to expect you to have one, or maybe even two,
+correctly configured, running and accessible nameservers.  This means you must
+configure a nameserver for the domain you want before you request that name,
+and it must be available for the registrars to test.  They might test it
+immediately; they might test it later.  If your nameserver is not on a
+permanent link you probably cannot have the domain.  (This is sensible: what
+point is there in having a domain if nobody can access that domain's
+nameserver?)  I doubt anybody cares, or even could find out, whether your
+nameserver is on the end of a T1 link or on a 300bps modem.  You should be
+find just so long as the nameserver is correctly configured and it can be
+queried.  A permanent 56k modem would be more than suitable for most low-volume
+domains.
+
+All nameservers MUST have a fixed IP address.
+
+When you are planning a domain you should attempt to have more than one
+nameserver and on more than one network.  Perhaps you might have one nameserver
+on Telstra's network and one on MCI's.  This provides redundancy in case of
+network failures.  You decide which nameservers will be primary or secondary
+for your domain.  It's probably not of great importance.  If you have a
+permanent link your ISP will probably be willing to act as a nameserver for
+your domain.  This is a good idea because it provides protection against your
+link being down, but is insufficient if your ISPs link is down.  You should
+still try to find other places to have more nameservers.
+
+Once you have registrered your domain you can create any A records that you
+wish.  You could have one machine with many names, or many different machines
+sharing the same name, or different machines with different names.  You can
+have sub-domains.  To create a name, such as www.your.domain, add an A record
+for www.your.domain.  To create a sub-domain, say hidden.your.domain, add an
+NS record.  (Remember to also create an A record for the nameserver.)
+
+
+SMTP
+====
+
+Talking about mail to <A HREF="mailto:me@something.whatever">me@something.whatever</A>: Let's assume that the mail will
+be transported using SMTP.  This is the dominant mail transport today.  In
+earlier times that message would have been delivered to a machine named
+something.whatever.  The DNS would have been consulted to find an A record
+for the machine and the message would have been transmitted directly to that
+address.  Now we have a layer of indirection, whereby something.whatever might
+be a mail domain.  Modern mail transports now consult the DNS for a MX record,
+and there can be many of them.  Each MX record has a numeric priority, with
+smaller numbers being more important.  Each MX record refers to a computer,
+and there must be an A record for that computer.  Each computer is tried in
+priority order until the message can be delivered to one of them.  That
+computer, if it is not the final computer, is responsible for delivering the
+message to the next hop.
+
+As with DNS, most ISPs are likely to be willing to collect and on-forward
+email for their permanent customers.  You do need to write these
+mail-exchangers into the DNS for that domain (so it's vitally important to
+have a clear understanding as to who will, and who will not, act as an MX.)
+
+If no MX record exists for the "host" part of an address, mail transports fall
+back to the old method.  That is, they look for an A record.  If there's
+neither MX nor A records the mail cannot be delivered.
+
+
+I hope this has been educational for you.
+
+Regards,
+
+David
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

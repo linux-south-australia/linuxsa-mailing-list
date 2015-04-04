@@ -1,0 +1,112 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Crash" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="ak.linuxsa@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 17 May 2003 07:41:30 +0930" -->
+<!-- Id="20030517074130.A23003@dog.topology.org" -->
+<!-- Reference="200305170818.06647.cabernet@ihug.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Crash</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 17 May 2003 07:41:30 +0930
+</PRE>
+<H1>Re: Crash</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sat, May 17, 2003 at 08:18:06AM +0930, Brian Marr wrote:
+&gt; Suse 8.0 kernel 2.4.18
+&gt; 
+&gt; May 16 11:24:33 Gringo kernel: Call Trace: [_wrapped_alloc_pages+112/660] 
+&gt; [kfree_skbmem+11/84] [__alloc_pages+15/140] [__get_free_pages+29/52] 
+&gt; [__pollwait+51/140]
+&gt; May 16 11:24:33 Gringo kernel:    [unix_poll+35/132] [sock_poll+35/40] 
+&gt; [do_select+226/476] [sys_select+842/1188] [system_call+51/64]
+
+
+Brian,
+
+I'm not an expert. Someone else hopefully will be. But anyway...
+
+That looks very much like what I used to get when some kernel module
+did something dodgy with the kernel memory allocation.
+I.e.
+
+-	kernel module X frees already freed memory or wrong address etc.,
+	just like in user space.
+-	then some other block of code Y goes to allocate some memory and
+	triggers an exception because the memory allocation structures
+	have lost their integrity.
+
+The problem is that module X damages the malloc structures well before
+the core dump. 
+So there is no record of the identity of the culprit.
+Even in user space, this delay between bug and crash makes bug location
+quite difficult, but in the kernel, it's even more difficult, especially
+if you're not developing module X yourself from source. 
+In user space, at least you know which program the malloc access bug is in.
+
+When this happens, you usually have to assume that it's the last
+piece of dodgy software you loaded up into the system.
+E.g. when I was writing experimental ATM card driver software, it was
+a fair bet that this was the cause of system crashes and hangs.
+But I still had to read several thousands of lines of someone else's original
+code to find the bug.
+
+If that VMware software has kernel modules with it, it's just possible
+that this is the cause. But that's just a wild guess.
+
+Is the bug reproducible? Looking at the "lsmod" output should narrow down the
+range of suspects a bit.
+What's the kernel module in that list which you least trust?
+That's the one to keep an eye on.
+
+But I'd have a fair confidence that you are indeed looking at a
+damaged malloc structure there because the crash has happened during
+a quite normal-looking call to __alloc_pages().
+
+Does anyone know if there is a kernel build option which sets traps for
+bad malloc/free function calls? That would be a boon.
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

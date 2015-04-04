@@ -1,0 +1,130 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: xlogin/xdm does not use securetty?" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="LinuxSA@linuxsa.org.au" -->
+<!-- Date="Sat, 03 Jun 2000 21:34:48 +0900" -->
+<!-- Id="3.0.6.32.20000603213448.00979d10@203.16.214.248" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: xlogin/xdm does not use securetty?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:LinuxSA@linuxsa.org.au">LinuxSA@linuxsa.org.au</A>
+  Date: Sat, 03 Jun 2000 21:34:48 +0900
+</PRE>
+<H1>Re: xlogin/xdm does not use securetty?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+I thought that this discussion might be of interest to some here. I have
+noticed problems with PAM with new kernels that use /dev/pts/n devices.
+
+This problem will get worse with devfs, as Thorsten says below. The quick
+solution is shown below, but a better solution is also mentioned. Now to
+get the keepers of util-linux to fix the problems in login.
+
+&gt;X-URL: <A HREF="http://www.redhat.com">http://www.redhat.com</A>
+&gt;Resent-date: Sat, 03 Jun 2000 09:37:16 +0000
+&gt;Date: Sat, 03 Jun 2000 11:32:45 +0200
+&gt;Resent-from: <A HREF="mailto:pam-list@redhat.com">pam-list@redhat.com</A>
+&gt;From: Thorsten Kukuk &lt;<A HREF="mailto:kukuk@suse.de">kukuk@suse.de</A>&gt;
+&gt;Subject: Re: xlogin/xdm does not use securetty?
+&gt;Resent-sender: <A HREF="mailto:pam-list-request@redhat.com">pam-list-request@redhat.com</A>
+&gt;To: <A HREF="mailto:pam-list@redhat.com">pam-list@redhat.com</A>
+&gt;Resent-cc: recipient list not shown: ;
+&gt;Reply-to: <A HREF="mailto:pam-list@redhat.com">pam-list@redhat.com</A>
+&gt;Organization: SuSE GmbH, Nuernberg, Germany
+&gt;X-Envelope-to: ns
+&gt;X-Mailer: Mutt 1.0.1i
+&gt;X-Loop: <A HREF="mailto:pam-list@redhat.com">pam-list@redhat.com</A>
+&gt;MBOX-Line: From <A HREF="mailto:pam-list-request@redhat.com">pam-list-request@redhat.com</A>  Sat Jun  3 05:37:16 2000
+&gt;X-Mailing-List: &lt;<A HREF="mailto:pam-list@redhat.com">pam-list@redhat.com</A>&gt; archive/latest/800
+&gt;Original-recipient: rfc822;<A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+&gt;
+&gt;On Sat, Jun 03, Richard Sharpe wrote:
+&gt;
+&gt;&gt; At 10:14 AM 6/3/00 +1000, a mole wrote:
+&gt;&gt; &gt;On Sat, 3 Jun 2000, Richard Sharpe wrote:
+&gt;&gt; &gt;
+&gt;&gt; &gt;&gt; I notice that under Linux 2.2.10 or so and above, that pseudo ttys have
+&gt;&gt; &gt;&gt; changed from ttyp0 to pst/0 and so on.
+&gt;&gt; &gt;&gt;
+&gt;&gt; &gt;&gt; However, PAM does not seem to understand the new syntax, so it means
+that
+&gt;&gt; &gt;&gt; you cannot allow root logins on a pseudo tty, which may be a bonus :-)
+&gt;&gt; &gt;
+&gt;&gt; &gt;The entry in /etc/securetty is the basename of the terminal - so for new
+&gt;&gt; &gt;style ttys you need to add "0", "1", "2" ect.
+&gt;&gt; 
+&gt;&gt; OK, I have checked this, and it is correct. 
+&gt;&gt; 
+&gt;&gt; However, in my opinion, this has been implemented incorrectly. Firstly, it
+&gt;&gt; is counter-intuitive and it breaks the principle of least surprise.
+&gt;
+&gt;Yes, this is definitiv wrong. Only think about the new devfs, you
+&gt;are not able to make a difference between the console (vc/1) and
+&gt;a terminal (pts/1).
+&gt;But the bug is not in PAM. As far as I can remember, the login 
+&gt;program from util-linux truncate everything before the last "/".
+&gt;If login would set the full device name, pts/1 would work.
+&gt;A working login is pam_login-3.1.1 on 
+&gt;<A HREF="ftp://ftp.suse.com/pub/people/kukuk/pam">ftp://ftp.suse.com/pub/people/kukuk/pam</A>
+&gt;
+&gt;  Thorsten
+&gt;
+&gt;-- 
+&gt;Thorsten Kukuk       <A HREF="http://www.suse.de/~kukuk/">http://www.suse.de/~kukuk/</A>       <A HREF="mailto:kukuk@suse.de">kukuk@suse.de</A>
+&gt;SuSE GmbH            Schanzaeckerstr. 10            90443 Nuernberg
+&gt;Linux is like a Vorlon.  It is incredibly powerful, gives terse,
+&gt;cryptic answers and has a lot of things going on in the background.
+&gt;
+&gt;-- 
+&gt;To unsubscribe: mail -s unsubscribe <A HREF="mailto:pam-list-request@redhat.com">pam-list-request@redhat.com</A> &lt; /dev/null
+&gt;
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Co-author, SAMS Teach Yourself Samba in 24 Hours
+Author: First Australian 5-day, intensive, hands-on Linux SysAdmin course
+Author: First Australian 2-day, intensive, hands-on Samba course
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

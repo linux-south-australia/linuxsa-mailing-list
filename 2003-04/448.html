@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: dns confusion" -->
+<!-- FromName="'Adam Smith'" -->
+<!-- FromEmail="adam.smith@sageautomation.com" -->
+<!-- ToName="'Dazz'" -->
+<!-- ToEmail="bofh@afoyi.com" -->
+<!-- Date="Wed, 16 Apr 2003 09:36:33 +0930" -->
+<!-- Id="20030416000633.GG5616@sageautomation.com" -->
+<!-- Reference="2372.202.6.150.241.1050372878.squirrel@webmail.fuzzitech.net" -->
+<!-- X-Face="$vsV$1FNbZN\JVpjV#&+/!oVW`Kw$j?w_,te\SS}(tKD21c+l$t%\RCS(r$G;XXk]6,(!N:&(N3EV0bY`3):UrgG7'*qsj3l.75IaHV1<`i*{[L\:F*l6fH##C:-p2]xW/R-Z:!bo;5g3GP-{I{}7O>tN}`Xm/=-:8NG?f-r'$Qc3y[aW-7'W_S<`KYU!_;`7K=kuC$-.7J2*kk=~`c@ADp+xhsv(!a@eW-R_5wtx+tC)(]%W+" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: dns confusion</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adam Smith &lt;<I><A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A></I>&gt;
+  To  : Dazz &lt;<I><A HREF="mailto:bofh@afoyi.com">bofh@afoyi.com</A></I>&gt;
+  Date: Wed, 16 Apr 2003 09:36:33 +0930
+</PRE>
+<H1>Re: dns confusion</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, Apr 15, 2003 at 11:44:38AM +0930, Dazz said:
+&gt; Adam,
+&gt; 
+&gt; &gt; This is now also becoming a problem because our DNS server appears to have
+&gt; &gt; cached the fact that i can't look up the host smtp01.seinf.abb.se.  This
+&gt; &gt; is causing email to stop going to that host, and in particular one user
+&gt; &gt; here needs to email that host with urgent information.
+&gt; 
+&gt; Is the name server caching the record or is it perhaps the MTA? Try using
+&gt; the 'host' command to look up the record:
+
+The MTA (I expect lots of dropped jaws from this,) is on the Windows
+platform at this time.  Using it's nslookup command I am still unable to
+resolve the host.
+
+&gt; $ host -t any smtp01.seinf.abb.se [NAMESERVER.ADDRESS]
+&gt; 
+&gt; and see what comes back. If you get the correct details back, then it
+&gt; could be the MTA doing the caching. Try stopping and starting your MTA.
+&gt; When I try it I do not get any MX records back, but I do get an A record.
+&gt; When I look up the parent domain I get different MX records:
+
+The remote mail host is es.abb.se, and the host command tells me that it's
+MX's are:
+
+# host es.abb.com
+es.abb.com mail is handled (pri=10) by smtp01.seinf.abb.se
+es.abb.com mail is handled (pri=20) by smtp02.seinf.abb.se
+es.abb.com mail is handled (pri=30) by sdas01.seinf.abb.se
+
+Running host -a tells me this:
+
+# host -a smtp02.seinf.abb.se
+Trying null domain
+rcode = 0 (Success), ancount=1
+The following answer is not authoritative:
+The following answer is not verified as authentic by the server:
+smtp02.seinf.abb.se     21425 IN        A       138.221.225.25
+For authoritative answers, see:
+seinf.abb.se    82528 IN        NS      dns6.telia.com
+seinf.abb.se    82528 IN        NS      sdas01.seinf.abb.se
+seinf.abb.se    82528 IN        NS      sdav01.seinf.abb.se
+Additional information:
+sdas01.seinf.abb.se     82528 IN        A       138.221.200.200
+sdav01.seinf.abb.se     82528 IN        A       138.221.200.99
+
+It tells me smtp02.seinf.abb.se is 138.221.225.25, and using dig I appear
+to be able to resolve it, but not with nslookup.
+
+smtp01 and smtp02 appear to point to the same IP address.  I'm confused as
+to why nslookup is having so much trouble resolving this with our local
+name server.
+
+It's been about 20 hours since I looked at this yesterday.
+
+<A HREF="mailto:bugman@jerome">bugman@jerome</A> /home/bugman # nslookup smtp01.seinf.abb.se
+Server:  jerome.sage
+Address:  192.168.0.3
+
+*** jerome.sage can't find smtp01.seinf.abb.se: Non-existent host/domain
+
+<A HREF="mailto:bugman@jerome">bugman@jerome</A> /home/bugman # nslookup smtp01.seinf.abb.se ns1.on.net
+Server:  ns1.on.net
+Address:  216.200.145.64
+
+Non-authoritative answer:
+Name:    smtp01.seinf.abb.se
+Address:  138.221.225.24
+
+&gt; &gt; I can not seem to purge the cache of our current DNS server, and it keeps
+&gt; &gt; returning "Non-existent host/domain" when every other name server I try
+&gt; &gt; can resolve the host name.
+&gt; 
+&gt; As others have said, doing a '/etc/init.d/named stop' and then
+&gt; '/etc/init.d/named start' should clear the cache (which is kept in memory
+&gt; IIRC).
+
+Doing that has no effect.
+
+&gt; Also, is your nameserver a slave for the remote? If it is perhaps it's not
+&gt; pulling down the updated zone file. Stop the nameserver as above and then
+&gt; remove the zone file for that zone and start it up again.
+
+I'm not quite sure what you are referring to, but there's no forwarders
+section in my named.conf if that's what you mean.
+
+After enabling the 'forwarders' section and specifying Internode's name
+server, I'm suddenly able to resolve the host.  This still begs the
+question as to why I have been unable to resolve it "on my own," without
+the benefit of an upstream cache :/
+
+
+-- 
+Adam Smith
+Information Technology Officer
+SAGE Automation Ltd.
+
+<A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A>
+<A HREF="http://www.sageautomation.com">http://www.sageautomation.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,152 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Routing Problem" -->
+<!-- FromName="'Andrew Pullin'" -->
+<!-- FromEmail="andrew@hotspurbgc.com.au" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 12 Jan 2004 22:19:39 +1000" -->
+<!-- Id="000c01c3d906$5cd80d00$c2de26cb@hotspurbgc.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Routing Problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Pullin &lt;<I><A HREF="mailto:andrew@hotspurbgc.com.au">andrew@hotspurbgc.com.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 12 Jan 2004 22:19:39 +1000
+</PRE>
+<H1>Routing Problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi All,
+    I am having a frustrating time getting a new server up and going. The
+problem seems to be strange entries in the routing table that are being
+automagically set, but I cannot identify from where, since I cannot find any
+config file that would be automagically loaded.
+
+    The server is a PII 266 with 64Mb RAM (I know - processing overkill and
+memory starved, but it is only temporary). I have two 10/100 PCI Ethernet
+cards, both RT8139 based (they were identical cards, but in the interests of
+frustration, I lashed out and bought a different one to try and solve the
+problem). These connect to a network switch and an ADSL router.
+
+    The software is a minimal install RH 9.0 (OK so I know RH better than
+any distro, it may not be the best, but I know it or thought I did). The
+installation went fine, and both network cards were correctly detected, and
+configured for a /28 subnet as follows:
+
+    eth0    203.*.*.162 mask 255.255.255.240 bcast 203.*.*.175
+    eth1    203.*.*.163 mask 255.255.255.240 bcast 203.*.*.175
+
+the idea being, 162 connects to the ADSL modem configured as 161, and 163
+being connected to the network switch and the box acting as a firewall
+webserver.
+
+ifconfig eth0 & eth1 both return the correct configuration and both cards
+are at different addresses and irqs so no conflicts there.
+
+Other config files are as such:
+
+/etc/sysconfig/network
+    NETWORKING=yes
+    FORWARD_IPV4=yes
+    HOSTNAME=machine.mydomain.com.au
+    GATEWAY=203.*.*.161
+
+/etc/sysctl.conf
+    net.ipv4.ip_forward=1
+    net.ipv4.ip_always_defrag=1
+
+Now the frustrating part. I can ping both interfaces and the home network
+from the firewall as I should be able to do. I can ssh into 162 ONLY which
+is partially correct as the bridge is not yet set up, but I CANNOT ssh into
+163. I have tried network cable swaps but to no avail. I have looked at the
+default routing table set up by the machine, and there are some strange
+entries I don't understand:
+
+route -n
+
+Dest                    Gateway        Genmask        Flags    Metric    REF
+USE
+203.*.*.160        0.0.0.0     255.255.255.240    U        0            0
+0        eth1
+203.*.*.160        0.0.0.0     255.255.255.240    U        0            0
+0        eth1
+169.254.0.0        0.0.0.0     255.255.0.0            U        0
+0        0        eth1
+127.0.0.0            0.0.0.0     255.0.0.0                U        0
+0        0        lo
+0.0.0.0        203.*.*.161     0.0.0.0                    UG     0
+0        0        eth1
+
+As you can see, there are two things that jump right out: where is eth0
+interface that is correctly set up elsewhere?, and where did 169.254.0.0
+come from? What is stranger is that when I manually delete everything except
+lo and create the correct entries and interfaces, eth0 still dissapears. The
+routing table I was expecting should look something like this:
+
+Dest                    Gateway        Genmask        Flags    Metric    REF
+USE
+203.*.*.162        0.0.0.0     255.255.255.240    U        0            0
+0        eth0
+203.*.*.163        0.0.0.0     255.255.255.240    U        0            0
+0        eth1
+127.0.0.0            0.0.0.0     255.0.0.0                U        0
+0        0        lo
+0.0.0.0        203.*.*.161     0.0.0.0                    UG     0
+0        0        eth0
+
+when I hook up the bridge, 162 and 163 should dissapear and be replaced by:
+
+203.*.*.162        0.0.0.0     255.255.255.240    U        0            0
+0        br0
+
+OK, what I need help with is, where are the config files that would produce
+the broken routing table, or how do I fix it. I know RH 7.2 has specific
+files that set up the routing table in /etc/sysconfig, but RH 9 doesn't seem
+to have this file.
+
+    I have been stewing over this a week now and just CANNOT get it going. I
+have RTFMed all sorts of FMs, but still no joy. Your help would be greatly
+appreciated.
+    TIA,
+        Cheers!
+            Andrew
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,148 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Performance with Raid 0 using IDE drives" -->
+<!-- FromName="Andrew Braund" -->
+<!-- FromEmail="abraund_news@mail.com" -->
+<!-- ToName="Linuxsa" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 30 Jun 2000 17:03:49 +0930" -->
+<!-- Id="395C4D5D.6E6E3A30@mail.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Performance with Raid 0 using IDE drives</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Braund &lt;<I><A HREF="mailto:abraund_news@mail.com">abraund_news@mail.com</A></I>&gt;
+  To  : Linuxsa &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 30 Jun 2000 17:03:49 +0930
+</PRE>
+<H1>Performance with Raid 0 using IDE drives</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I have just set up 2 "WD 15G 7200 RPM 9.6mS 2M cache" drives on Mandrake
+7.0 with RAID 0.
+
+I am experimenting to find the maximum performance I can get out of my
+Linux Box using IDE drives.
+In the HowTo they say 1 drive per controller. Does this mean active
+drives?
+i.e. if I have another IDE drive as slave in primary controller, but it
+is
+not used in the RAID array then will it effect performance. (The drive
+is a Maxtor 6G that
+contains windows stuff so isn't used under Linux except when I want to
+refer
+to Windows created documents).
+
+What about the CDROM drive which is slave on the secondary controller?
+
+
+[<A HREF="mailto:abraund@localhost">abraund@localhost</A> abraund]$ cat /proc/mdstat
+Personalities : [raid0]
+read_ahead 1024 sectors
+md0 : active raid0 hdc6[1] hda8[0] 16376320 blocks 64k chunks
+unused devices: &lt;none&gt;
+[<A HREF="mailto:abraund@localhost">abraund@localhost</A> abraund]$
+
+
+Booted to init 3 and had a go with hdparm, Initially hda and hdc were
+set as follows;
+
+[<A HREF="mailto:root@localhost">root@localhost</A> abraund]# hdparm -vi /dev/hda
+
+/dev/hda:
+ multcount    =  0 (off)
+ I/O support  =  0 (default 16-bit)
+ unmaskirq    =  0 (off)
+ using_dma    =  0 (off)
+ keepsettings =  0 (off)
+ nowerr       =  0 (off)
+ readonly     =  0 (off)
+ readahead    =  8 (on)
+ geometry     = 1870/255/63, sectors = 30043440, start = 0
+
+ Model=WDC WD153BA, FwRev=16.13Q16, SerialNo=WD-WMA1U1012036
+ Config={ HardSect NotMFM HdSw&gt;15uSec SpinMotCtl Fixed DTR&gt;5Mbs
+FmtGapReq }
+ RawCHS=16383/16/63, TrkSize=57600, SectSize=600, ECCbytes=40
+ BuffType=3(DualPortCache), BuffSize=2048kB, MaxMultSect=16, MultSect=16
+ DblWordIO=no, maxPIO=2(fast), DMA=yes, maxDMA=0(slow)
+ CurCHS=16383/16/63, CurSects=16514064, LBA=yes, LBAsects=30043440
+ WARNING 13529376 ORPHANED SECTORS :: KERNEL REPORTING ERROR
+ tDMA={min:120,rec:120}, DMA modes: mword0 mword1 mword2
+ IORDY=on/off, tPIO={min:120,w/IORDY:120}, PIO modes: mode3 mode4
+ UDMA modes: mode0 mode1 mode2 mode3 mode4
+ Drive Supports : ATA-1 ATA-2 ATA-3 ATA-4
+
+with hdc the same except for geometry;
+geometry     = 29805/16/63, sectors = 30043440, start = 0
+I not sure how this came about, I set up the dives during installation
+of Mandrake and thought I did everything the same. Is this important?
+
+Initially hda and hdc were reporting 80/3.8 MB/s transfer (hdparm -Tt
+/dev/hda ) and /dev/md0 gave 88.9/3.98.
+
+Then experimented;
+-d1 gave bad CRC
+-m16 gave /dev/hda 80/4.15
+-m16 -c1 gave /dev/hda 80/7.09 and /dev/md0 gave 89/7.92
+
+I couldn't find anything else I could change so now I think the best I
+can do is -m16 -c1
+
+What about -W Disable/enable  the  IDE  drive's  write-caching feature
+(usually OFF by default)
+
+The drive is now;
+dev/hda:
+ multcount    = 16 (on)
+ I/O support  =  1 (32 bit)
+ unmaskirq    =  0 (off)
+ using_dma    =  0 (off)
+ keepsettings =  0 (off)
+ nowerr       =  0 (off)
+ readonly     =  0 (off)
+ readahead    =  8 (on)
+ geometry     = 1870/255/63, sectors = 30043440, start = 0
+
+Why am I only getting 7.92 for my RAID0 drive as the HowTo says you
+should expect N*P
+i.e. md0 should be 2x performance of hda
+
+Any hints?
+
+Thanks in advance
+Andrew Braund
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

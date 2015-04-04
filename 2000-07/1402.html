@@ -1,0 +1,144 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Linux + DOS/Win + DDOs" -->
+<!-- FromName="Fraser Farrell" -->
+<!-- FromEmail="fraser@trilobytes.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 26 Jul 2000 04:07:49" -->
+<!-- Id="3.0.6.16.20000726040749.27f72bac@trilobytes.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Linux + DOS/Win + DDOs</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Fraser Farrell &lt;<I><A HREF="mailto:fraser@trilobytes.com.au">fraser@trilobytes.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Wed, 26 Jul 2000 04:07:49
+</PRE>
+<H1>Linux + DOS/Win + DDOs</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+How I got RH6.1 and DOS/Windows and Disk Manager to 
+work successfully on my old laptop.  Recounted in all its 
+tedious detail, in the hope that the information may actually 
+be useful to others in a similar situation.
+
+The objectives:
+- Replace an existing 120MB HDD in my Toshiba T1900 with a 2GB HDD. 
+- Transfer the existing DOS/Win from the old HDD to the new HDD.
+- Install a DOS/Win astronomy application that needed 700MB of disk 
+space onto the new HDD.  I know most of you won't need to do this ;-)
+- Install Disk Manager to allow the old Toshiba BIOS to see the new drive.
+- Install RedHat 6.1 onto the new HDD.  My Toshiba has 20MB RAM 
+which is okay for RedHat.
+
+Helpful ingredients:
+- an old 486 (desktop) computer with 20MB RAM, CDROM drive, floppy, etc 
+- an adaptor for attaching notebook HDD to standard IDE connector
+- Disk Manager 7 for Toshibas (this was a free download)
+- Partition Resizer  (free from <A HREF="http://members.xoom.com/Zeleps/">http://members.xoom.com/Zeleps/</A>)
+- DOS boot floppy with CD-ROM drivers, etc
+
+Procedure:
+1) XCOPY the contents of the old HDD to an empty DOS partition on 
+the desktop's HDD.
+Note: Toshiba laptop HDDs have a group of 4 pins adjacent to IDE Pin 1.  
+To make the Toshiba into a slave drive, you need to put a jumper on  
+the pins nearest to IDE Pin 1.
+
+2) Install the new Toshiba HDD as the _master_ drive on the desktop 
+computer. The desktop's own HDD was connected as a slave drive.
+
+3) Boot from DOS floppy and run Disk Manager on the new HDD.  I created 
+a 500MB DOS primary partition and a 700MB DOS drive in an extended partition.
+Disk Manager also did the formatting and made the new HDD bootable.
+
+4) Disk Manager actually created a 1.5GB extended partition with a 700MB 
+DOS drive in it.  As this left no room for Linux I then used Partition Resizer to 
+shrink the extended partition down to 700MB.  You can install Linux into an
+ extended partition but I chose not to.
+
+5) XCOPY the old DOS/Win installation from the desktop HDD to the new 
+500MB DOS partition.  Unfortunately Norton Ghost and Disk Manager don't 
+get along :(
+
+6) Install the huge astronomy program from CD into the new 700MB 
+extended DOS partition.  Disconnect the desktop's HDD.  Reboot to ensure 
+everything in DOS/Win works like it used to.
+
+7) Start the RedHat installation.  For simplicity I did a single partition for 
+everything except a 60MB swapfile.
+
+8) I didn't install LILO; because Disk Manager already occupied the Master 
+Boot Record, and my Linux / partition was located well above Cylinder 1024.  
+But I did create a Linux boot floppy during the install, for the next step.
+
+9) At this point I had a system that would boot to DOS/Win without problems 
+but not to Linux.  I created a C:\LINUX directory, and copied into it the LOADLIN 
+program off the RedHat CD.  Then I rebooted from the Linux boot floppy.
+
+10) After Linux started, I created a /mnt/DOS directory and then mounted the 
+DOS C: drive:
+    mount -t msdos /dev/hda1 /mnt/DOS
+
+I then copied the Linux kernel to the DOS C: drive:
+    cp /boot/vmlinuz-2-20-whatever  /mnt/DOS/linux/vmlinuz
+
+11) Then ran fdisk /dev/hda to check where my Linux partition was 
+located.  (Mine ended up on /dev/hda3)
+
+12) Removed the Linux boot floppy, rebooted to DOS, and then wrote 
+a small DOS batch file, basically just:
+    LOADLIN vmlinuz -v root=/dev/hda3
+
+13) Put the new HDD in the Toshiba, ran the batchfile - and it successfully 
+loaded RedHat 6.1 :-)
+
+14) Shut down again; then spent some time drilling new mounting holes 
+in the Toshiba's HDD cradle.  The old drive and the new drive have different 
+screw locations.  Fortunately the electrical connectors are identical!
+
+
+This setup works for my purposes.  Yours may vary, and I'm sure the above 
+procedure can be improved upon.
+
+
+
+
+cheers,
+Fraser Farrell
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

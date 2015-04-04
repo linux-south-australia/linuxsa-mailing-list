@@ -1,0 +1,121 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: IMAP and Windows clients" -->
+<!-- FromName="'John Edwards'" -->
+<!-- FromEmail="isplist@adam.com.au" -->
+<!-- ToName="'Dan Shearer'" -->
+<!-- ToEmail="dan@tellurian.com.au" -->
+<!-- Date="Wed, 02 Oct 2002 11:38:10 +0930" -->
+<!-- Id="3D9A550A.7060900@adam.com.au" -->
+<!-- Reference="Pine.LNX.4.21.0210021000210.15333-100000@calulu.shearer.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: IMAP and Windows clients</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: John Edwards &lt;<I><A HREF="mailto:isplist@adam.com.au">isplist@adam.com.au</A></I>&gt;
+  To  : Dan Shearer &lt;<I><A HREF="mailto:dan@tellurian.com.au">dan@tellurian.com.au</A></I>&gt;
+  Date: Wed, 02 Oct 2002 11:38:10 +0930
+</PRE>
+<H1>Re: IMAP and Windows clients</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Dan Shearer wrote:
+
+&gt;Batch mode rsync?
+&gt;
+Interesting, but rsync is probably not appropriate for this task.
+
+&gt;
+&gt;&gt;If you know of an open source filesystem that can perform similar 
+&gt;&gt;log-file replication of Maildir-style messages across a network on two 
+&gt;&gt;servers at once, I'd like to hear about it! (Software RAID over 
+&gt;&gt;Network-Block-Devices doesn't count).
+&gt;&gt;
+&gt;
+&gt;Can you draw a picture of this challenge? I aren't sure what you mean by
+&gt;"two servers at once". I suspect batch mode rsync might do it, but I may
+&gt;have misunderstood.
+&gt;
+Here's the outline:
+
+A large maildir-based mail server carries approximately 1 million files 
+(email messages).
+When mail is delivered, a file is created.
+When mail is read, a file is either moved (same partition), or moved and 
+then deleted.
+The contents of the file never change for the sake of this exercise.
+The filename may change as a result of IMAP tampering (read, replied, etc)
+The file may be read/moved by different applications using the maildir 
+standard
+
+Here's the challenge:
+
+When a file is created, create the same file on another server
+When a file is renamed, moved, or deleted, perform the same operation on 
+another server
+When the other server is unavailable, queue the operation to be 
+performed later.
+
+Intended result: a near-realtime mirror of a production mail server, for 
+redundancy and load-balancing purposes.
+
+What I don't want to do is run any tool (like rsync, tar, dump, find) 
+that needs to go and stat 1 million inodes every time it runs (except 
+potentially as a check in the middle of the night). It should be enough 
+that the creation/modification of a file can trigger a replication for 
+that file alone. It can also be assumed that the data in the file never 
+changes, so it's always a create/rename/destroy operation, and 
+calculating CRC for comparison etc is a waste of time.
+
+Because the data in each file doesn't change, there's an opportunity for 
+near-realtime backup that would be difficult with an mbox-style system.
+
+I envisage that something like this could be hacked into the mail server 
+and POP3/IMAP daemons (in fact, I've done it already as a limited test) 
+but it occurs to me that someone may have already done a better job of 
+this, and it's more flexible at the filesystem level (ie: I can manually 
+'rm' a big email, for example).
+
+The raid-over-network-block-device satisfies the criteria above, but 
+isn't very flexible when it comes to a server failure, or deliberate 
+downtime. Any system that involves a comparison method on a filesystem 
+of this size is going to be tricky to synchronise without suspending 
+mail delivery as well.
+
+John Edwards
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

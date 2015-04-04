@@ -1,0 +1,127 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: New not Syn packets from websites." -->
+<!-- FromName="'nik [tm]'" -->
+<!-- FromEmail="tmcruisin@visualspace.com.au" -->
+<!-- ToName="'linuxsa@linuxsa.org.au'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 06 Sep 2003 12:43:39 +0930" -->
+<!-- Id="3F5950E3.4060605@visualspace.com.au" -->
+<!-- Reference="200309052303.33612.carrigan_2606@optusnet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: New not Syn packets from websites.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: nik [tm] &lt;<I><A HREF="mailto:tmcruisin@visualspace.com.au">tmcruisin@visualspace.com.au</A></I>&gt;
+  To  : linuxsa@linuxsa.org.au &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 06 Sep 2003 12:43:39 +0930
+</PRE>
+<H1>Re: New not Syn packets from websites.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Damien Uern wrote:
+&gt; Hmm I can get there, but it's incredibly slow to grab the page. I don't know 
+&gt; what my settings are because I'm using IPCop :) 
+
+Damien,
+hmmm, interesting, a bit of T&A and I discovered that I can browse to 
+that page fine from the gateway machine itself, but not from any of the 
+internal network machines.
+&lt;<A HREF="http://www.ecom.transport.sa.gov.au&gt">http://www.ecom.transport.sa.gov.au&gt</A>;
+
+there is a redirect to put everything through a proxy that comes from 
+the internal network, but when I turned that off it makes no difference. 
+(with all the pages I tried, listed below)
+
+so is it then something to do with the masquerading??
+
+I then tried browsing to
+&lt;<A HREF="http://www.ecom.transport.sa.gov.au/e-Drivers/welcome.jsp&gt">http://www.ecom.transport.sa.gov.au/e-Drivers/welcome.jsp&gt</A>;
+and it worked on all machines, so thats not redirecting to the https site.
+so I then tried browsing to
+&lt;https://www.ecom.transport.sa.gov.au/e-Drivers/welcome.jsp&gt;
+and this only works from the gateway machine..
+
+so is it https?
+well, I use the Savings and loans Netbank which is https and this works 
+fine from any machine.
+&lt;https://netteller.savingsloans.com.au/805023.asp&gt;
+
+so I tried not filtering with the bad_tcp_packets chain but to no avail;
+
+# bad_packets chain
+
+$IPT -A bad_packets -p ALL -m state --state INVALID -j LOG \
+     --log-prefix "fp=bad_packets:1 a=DROP "
+
+$IPT -A bad_packets -p ALL -m state --state INVALID -j DROP
+
+# Then check the tcp packets for additional problems
+$IPT -A bad_packets -p tcp -j bad_tcp_packets
+
+# All good, so return
+$IPT -A bad_packets -p ALL -j RETURN
+
+# bad_tcp_packets chain
+$IPT -A bad_tcp_packets -p tcp -i $LOCAL_IFACE -j RETURN
+
+# $IPT -A bad_tcp_packets -p tcp -i $LOCAL_IFACE ! --syn -m state \
+#     --state NEW -j DROP
+
+#$IPT -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
+#    --log-prefix "fp=bad_tcp_packets:1 a=DROP "
+#$IPT -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
+
+# All good, so return
+$IPT -A bad_tcp_packets -p tcp -j RETURN
+
+
+so although I have a workaround for this site, I am really no nearer to 
+the solution and a lot more confused.
+does this information shed any more light on the problem?
+
+-- 
+regards
+nik [tm]
+
+<A HREF="mailto:tmcruisin@visualspace.com.au">tmcruisin@visualspace.com.au</A>
+www.visualspace.com.au
+
+·´¯`·.¸¸..&gt;&lt;((((º&gt;.·´¯`·.¸¸.·´¯`·.¸
+  &gt;&lt;((((º&gt;`·.¸¸.·´¯`·.¸&gt;&lt;((((º&gt;``·.¸
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,108 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Setting printer differently at work and home" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 09 Mar 2000 21:29:07 +1030" -->
+<!-- Id="38C783FB.F8E0B62E@aarnet.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Setting printer differently at work and home</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Thu, 09 Mar 2000 21:29:07 +1030
+</PRE>
+<H1>Setting printer differently at work and home</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+
+I you have a laptop and use it at work with ethernet and
+from home via dialup then you might find the attached file
+useful.  If looks to see if the default route is to the
+ethernet card, and exits with code 0 if it is.
+
+Then in ~/.bash_profile you can say:
+
+# lp0 - local line printer, /dev/lp0
+# lp1 - local NEC P7 24-pin printer, /dev/lp0
+# lp2 - remote PostScript printer, lp on somemachine.somewhere.edu.au
+if /usr/local/bin/atwork
+then
+    export PRINTER=lp2
+fi
+
+--------------------------------------------------------------
+
+Of course, this hack isn't much use if you have an ethernet
+network at home.
+
+Then you could check network of the default route's next hop
+address.  eg:
+
+   atnetwork 10.1.2.0/24
+
+could do the equivalent of "ip route list exact 0.0.0.0/0" which
+might say
+
+   default via 10.1.2.3 dev eth0
+
+and as the address 10.1.2.3 is in the network 10.1.2.0/24 you
+would know that you are on that network (work, home, whereever).
+
+Of course, a real solution would use the Service Location Protocol.
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ Earth is a single point of failure
+#!/bin/sh --
+#
+# Am I on the fast ethernet network at work?
+#
+# That is, is my default route through the ethernet card
+
+awk 'BEGIN { ethernet = 0 }
+    {   if ($2 == "00000000" && $1 == "eth0") {
+            ethernet = 1
+	}
+    }
+    END { exit (ethernet  == 0) }' /proc/net/route
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

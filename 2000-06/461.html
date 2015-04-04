@@ -1,0 +1,104 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Modem throughput issue" -->
+<!-- FromName="Mike Andrew" -->
+<!-- FromEmail="mikero@norfolk.nf" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 15 Jun 2000 11:20:55 +1130" -->
+<!-- Id="00061511321508.01896@mikero.nf" -->
+<!-- Reference="01BFD5E8.59436060.Dean.Gawler@equifax.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Modem throughput issue</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mike Andrew &lt;<I><A HREF="mailto:mikero@norfolk.nf">mikero@norfolk.nf</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Thu, 15 Jun 2000 11:20:55 +1130
+</PRE>
+<H1>Re: Modem throughput issue</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 14 Jun 2000, Dean Gawler wrote:
+&gt; Howdy All,
+&gt; 
+&gt; Prior to upgrading from a 2.0.36 kernel to a 2.2.x kernel, I
+&gt; could use a nifty little utility called 'irqtune' to increase 
+&gt; the interrupt priority of my serial port. This enabled the
+&gt; modem to get much better throughput rates when I was doing
+&gt; other stuff (eg. compiling, starting xterm sessions, etc..) 
+&gt; which caused moderate disk and CPU activity.
+&gt; 
+&gt; Now that I've got a 2.2.14 kernel, irqtune doesn't seem to
+&gt; work and even moderate disk/cpu activity causes the serial
+&gt; port to effectively "stall". The only way that I can get
+&gt; decent throughput (ie. 3.5kb/sec or faster with my 56K
+&gt; modem) is to stop doing anything that causes disk activity,
+&gt; otherwise I'm lucky to get 2-2.5kb/sec.
+
+serial interrupts are insignificant. No matter which hoop you jump thru,
+twiddling a character interrupt's priority is not meaningful. A character
+*must* be read, there and then, as a response to an interrrupt. Since these come
+in at a very steady rate, they have to be handled, there and then. This is a
+tiny white lie because a small amount of fifo buffering in the uart allows the
+interrupt which occurs for each character to be handled with some latency, but
+as an agregate, the entire character stream must be handled regardless,
+irrespective, and no matter what, when it wants the cpu to handle it and not
+the other way round.
+
+Secondly, as stated, 56k data rates are insignificant. A single serial channel
+swallows no practicable cpu crunch. There is oodles of time to go off disk
+crunching and other tasks. This area is not your problem.
+
+The likely culprit for poor transfer rates (note poor, not lost) is
+compression. Make sure you have BSD compression turned on in your kernel. Do
+this just after dialling up your isp
+
+tail /var/log/messages
+
+look for complaints from pppd that it can't find compression modules 21 and 25
+and change your /etc/modules.conf (cont.modules = redhat) to
+
+alias ppp_compress  bsd_on
+
+also check that 'setserial' has the option vspd_hi  (not 100% on that you will
+have to man setserial for the correct syntax.
+
+Anyway, not knocking your ideas about rasing the priority of handling _packets_
+of data on serial lines, but interrupts is not one of them.
+
+ -- 
+<A HREF="http://linux.nf/stepbystep.htm">http://linux.nf/stepbystep.htm</A> +mirrors
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

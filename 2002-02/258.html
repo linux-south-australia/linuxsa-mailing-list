@@ -1,0 +1,194 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: ipchains rules" -->
+<!-- FromName="'Wayne Simes'" -->
+<!-- FromEmail="wlsimes@tell.net.au" -->
+<!-- ToName="'Daniel Callan'" -->
+<!-- ToEmail="dcallan@wias.net.au" -->
+<!-- Date="Fri, 8 Feb 2002 20:33:45 +1030" -->
+<!-- Id="001e01c1b087$e7dc69e0$6401a8c0@jock" -->
+<!-- Reference="4.3.1.20020208133043.00dd6b70@mail.wias.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: ipchains rules</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Wayne Simes &lt;<I><A HREF="mailto:wlsimes@tell.net.au">wlsimes@tell.net.au</A></I>&gt;
+  To  : Daniel Callan &lt;<I><A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A></I>&gt;
+  Date: Fri, 8 Feb 2002 20:33:45 +1030
+</PRE>
+<H1>Re: ipchains rules</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Daniel,
+
+Thanks for your help. I guess it's just taking a while to get my head around
+the concept of accepting and then denying. I am so used to seeing the deny
+then accept syntax. I have tried doing the way you mentioned and things seem
+to be working, I have a pretty good idea on which tcp ports I need to
+'accept' but the udp I am not quite sure yet.
+Basically I am using apache, ftp, sshd, named and also need ports 81, 443,
+10000 and 25000 open also.
+
+Any hints on which udp ports may be related to any of the above services ?
+
+Thanks for taking the time to explain the rules, it has really helped.
+
+Regards
+
+Wayne
+----- Original Message -----
+From: "Daniel Callan" &lt;<A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A>&gt;
+To: "Wayne Simes" &lt;<A HREF="mailto:wlsimes@tell.net.au">wlsimes@tell.net.au</A>&gt;
+Sent: Friday, February 08, 2002 2:45 PM
+Subject: Re: ipchains rules
+
+
+&gt; Hi Wayne,
+&gt;
+&gt; Don't know if anyone actually answered this one for you properly.
+&gt; Forgive me if they already have ;-)
+&gt;
+&gt; At 04:51  7/02/02 +1030, you wrote:
+&gt; &gt;I have tried to run lokkit on my Redhat 7.2 box which generates the
+syntax
+&gt; &gt;for ipchains-restore. I selected to only allow access through on about
+&gt; &gt;five ports. But after restarting ipchains and testing it, I can still
+&gt; &gt;access ports which I have not nominated to allow through. ie, I am
+running
+&gt; &gt;apache on port 80 and 81. I have selected port 80 to allow through and
+&gt; &gt;have not mention 81 at all, but I can get to 81 with my browser on my
+&gt; &gt;workstation.
+&gt;
+&gt; I'm taking a guess here that the workstation is on the same subnet as the
+&gt; server's eth0 device?
+&gt; Any connection to port 81 made via some other network interface (eg: eth1,
+&gt; ppp0) should fail.
+&gt;
+&gt; &gt;
+&gt; &gt;I doesn't seem to be allowing access on only the selected ports, and
+&gt; &gt;denying the rest.
+&gt;
+&gt; Ahh, but it is not just on the basis of ports that you are ACCEPTing.
+&gt; You also have two rules which ACCEPT any packets from the network devices:
+&gt; lo (localhost) and eth0 (which was probably ticked in lokkit as a
+"Trusted"
+&gt; interface)
+&gt; I'll show you what I'm rambling about below:
+&gt;
+&gt; &gt;Please have a look at the script below and tell what looks wrong, or what
+&gt; &gt;I should be trying to fix the problem.
+&gt; &gt;
+&gt; &gt;# Firewall configuration written by lokkit
+&gt; &gt;# Manual customization of this file is not recommended.
+&gt;
+&gt; Here we have the default rules for each chain. They act as the
+&gt; bottom of the rule stack. ie: inbound,outbound or forwarded packets
+&gt; are 'sifted' down through the appropriate ipchain (list of rules) when
+&gt; they arrive/depart/forward. The packet checks each rule as goes down
+&gt; until it finds one that applies to it. At the bottom they find the default
+&gt; policy.
+&gt;
+&gt; &gt;:input ACCEPT
+&gt; &gt;:forward ACCEPT
+&gt; &gt;:output ACCEPT
+&gt;
+&gt; It is common (and safest) with firewalling to take the approach of:
+&gt; "Accept specifically what I want, then deny anything else"
+&gt; That's why the default DENY policy was suggested. However, it is
+&gt; already partially implied by the last 2 lines of you chain, which reject
+&gt; any non-established TCP connections and/or any UDP datagrams.
+&gt;
+&gt; Here is the "What we want" list of tcp services:
+&gt;
+&gt; &gt;-A input -s 0/0 -d 0/0 22 -p tcp -y -j ACCEPT
+&gt; &gt;-A input -s 0/0 -d 0/0 25 -p tcp -y -j ACCEPT
+&gt; &gt;-A input -s 0/0 -d 0/0 80 -p tcp -y -j ACCEPT
+&gt; &gt;-A input -s 0/0 -d 0/0 21 -p tcp -y -j ACCEPT
+&gt;
+&gt; Here are the "Who do we trust" interfaces:
+&gt; (Remove the second one to test your port 81 theory)
+&gt;
+&gt; &gt;-A input -s 0/0 -d 0/0 -i lo -j ACCEPT
+&gt; &gt;-A input -s 0/0 -d 0/0 -i eth0 -j ACCEPT
+&gt;
+&gt; This bit is just an exception to the udp deny rule, so as
+&gt; to allow DNS lookups to work properly:
+&gt;
+&gt; &gt;-A input -s 192.168.1.10 53 -d 0/0 -p udp -j ACCEPT
+&gt; &gt;-A input -s 192.168.1.5 53 -d 0/0 -p udp -j ACCEPT
+&gt;
+&gt; And finally, we have the psuedo-default REJECT for tcp/udp packets:
+&gt;
+&gt; &gt;-A input -s 0/0 -d 0/0 -p tcp -y -j REJECT
+&gt; &gt;-A input -s 0/0 -d 0/0 -p udp -j REJECT
+&gt;
+&gt; The default policy still applies to anything that makes it this far, but
+by now
+&gt; that will only be ICMP (ping, traceroute) packets and TCP packets which
+&gt; have the ACK bit set on them (in human terms, they are part of an
+established
+&gt; tcp stream) which are fairly safe because their non-ACK bit predecessors
+&gt; had to get
+&gt; past the firewall to begin with.
+&gt;
+&gt; The main reason lokkit didn't set your default policy to REJECT/DENY was
+&gt; because
+&gt; it might serious limit some (if not all) of the return traffic from a
+&gt; browser or ftp-client
+&gt; run _from_ that server. All of those miscilaneous ACK-bit tcp packets
+would
+&gt; not make
+&gt; it through the default DENY policy (and specifically enabling them would
+be
+&gt; a headache).
+&gt; They setup RedHat all geared for an X-based console these days, so they
+&gt; have to plan
+&gt; around it having the same traffic directions as a workstation too.
+&gt;
+&gt; I would personally just re-think the rule that allows any eth0 borne
+&gt; connections,
+&gt; and then just add more ACCEPT rules (eg: for port 81).
+&gt; Works for me (on RH 6.2, 7.1 & 7.2).
+&gt;
+&gt; Hope this helps,
+&gt;
+&gt; -Daniel
+&gt;
+&gt;
+&gt;
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

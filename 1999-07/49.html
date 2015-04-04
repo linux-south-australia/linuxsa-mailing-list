@@ -1,0 +1,149 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: An entry in inetd doesnt work.." -->
+<!-- FromName="John" -->
+<!-- FromEmail="john@fiend.securesys.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="tjcorkin@steadycom.com.au" -->
+<!-- Date="Sat, 3 Jul 1999 01:30:47 +0930 (CST)" -->
+<!-- Id="199907021600.BAA16992@fiend.securesys.com.au" -->
+<!-- Reference="377C69BD.8994B862@steadycom.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: An entry in inetd doesnt work..</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: John &lt;<I><A HREF="mailto:john@fiend.securesys.com.au">john@fiend.securesys.com.au</A></I>&gt;
+  To  : <A HREF="mailto:tjcorkin@steadycom.com.au">tjcorkin@steadycom.com.au</A>
+  Date: Sat, 3 Jul 1999 01:30:47 +0930 (CST)
+</PRE>
+<H1>Re: An entry in inetd doesnt work..</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; &gt;         A socket needs to be bound and listened on before you can
+&gt; &gt;         call select() on it. How else do you get the file descriptor
+&gt; &gt;         you need????
+&gt;
+&gt; Bound, yes, listened, I didn't think so.
+
+-------------------------------begin---screen---dump----
+cat &lt;&lt;EOF &gt; test.c
+#include &lt;stdio.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;netinet/in.h&gt;
+
+main() {
+  int sock,alen;
+  struct sockaddr_in home,addr;
+  
+  home.sin_family=AF_INET;
+  home.sin_port=htons(6666);
+  home.sin_addr.s_addr=0;
+
+  sock=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
+
+  if (bind(sock,(struct sockaddr*)&home,sizeof(home))) {
+    perror("bind");
+    exit(1);
+  }
+
+  addr.sin_family=AF_INET;
+  alen=sizeof(addr);
+
+  //listen(sock,5);
+
+  if (accept(sock,(struct sockaddr*)&addr,&alen)) {
+    perror("accept()");
+    exit(1);
+  }
+
+  exit(0);
+}
+EOF
+gcc test.c
+./a.out
+accept(): Invalid argument
+sed 's/\/\///' &lt; test.c &gt; test2.c
+gcc test2.c
+./a.out
+[runs fine]
+------------------end----screen--dump-------------
+
+
+Unless you call listen(), accept() will fail.
+Normal sockets can be bound before calling accept(): unix needs
+you to call listen() in order to differentiate between server and
+client sockets...
+
+&gt; Notice that netstat doesn't show any listens for most of the things
+&gt; inetd's checking for? This is my logic here, anyway.
+
+'netstat -a' shows a whole bunch of listening sockets.... 
+
+&gt; &gt;         Crap. Servers do the accept()ing. That's what makes them
+&gt; &gt;         servers. Clients do the connect().
+
+&gt; Terminology, terminology.
+
+	No: that's what differentiates between servers and clients...
+
+&gt; If inetd is a superserver, then the things like in.ftpd can be called
+&gt; clients, even if they're servers on an ordinary level. Makes sense to me
+&gt; 8)
+
+	Errrr...No. 
+ 
+&gt; &gt;         That's why servers called via inetd are different (code wise) than
+&gt; &gt;         standalone servers.
+&gt; What, even if it's not a TCP stream connection?
+
+	OK, UDP just creates the socket, and then passes it to select
+	(listen() is only used on stream sockets)...
+	(Nor does UDP accept(), so...)
+
+	
+&gt; &gt;         You really need to read up on TCP/IP.
+&gt; 
+&gt; You really didn't read what I just said in that paragraph, did you?
+&gt; At least, I can't find any relevance between what you said in reply
+&gt; there, to what I said.
+
+	Sorry, I was just on a general rant by this stage.
+	I think you still *do* need to read up on how the socket
+	API works, and I have certain opinions on replying to people's
+	requests for help when you're not really sure about the material
+	concerned....
+J.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

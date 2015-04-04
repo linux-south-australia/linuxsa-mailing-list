@@ -1,0 +1,115 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: sendmail security issue" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'John Edwards'" -->
+<!-- ToEmail="isplist@adam.com.au" -->
+<!-- Date="Fri, 07 Mar 2003 13:55:21 +1030" -->
+<!-- Id="3E681121.1040403@aarnet.edu.au" -->
+<!-- Reference="3E669AA2.8020303@adam.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: sendmail security issue</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : John Edwards &lt;<I><A HREF="mailto:isplist@adam.com.au">isplist@adam.com.au</A></I>&gt;
+  Date: Fri, 07 Mar 2003 13:55:21 +1030
+</PRE>
+<H1>Re: sendmail security issue</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+John Edwards wrote:
+
+&gt; I'm curious as to how you're defining a 'large deployment'. I have a 
+&gt; sendmail box and a qmail box each with a large number (&lt; 20,000) mail 
+&gt; accounts, and virus+spam filtering nearly cripples a 1.6Ghz system with 
+&gt; the kind of volume required by that many users. It would seem that the 
+&gt; answer is a 'toaster' style system with multiple front ends for SMTP, 
+&gt; but sendmail's mbox has a history of being less than ideal over NFS.
+
+The issue with mbox files on NFS is simply one of making sure
+that every thing that touches the mbox agrees on the mailbox
+locking mechanism.  That used to be really hard to do.  Nowdays
+there's only two processes involved -- the MTA's local delivery
+program and the IMAP mail store server -- so it's much easier.
+
+Also, sendmail will write to Maildir files if you use maildrop
+or procmail as the local delivery agent.  As RHL uses procmail
+you can write Maildir files using out-of-the-box sendmail
+in that distribution.
+
+The Maildir/mbox files do have differing I/O profiles, so
+you can pick that best one.
+
+&gt; I'd also be interested to hear how 'ideal' setups from a year ago are 
+&gt; handling the current volumes of spam. I'm seeing more than twice the 
+&gt; volume of bounced messages in the queue than the stats showed for 12 
+&gt; months ago.
+
+Spam checking isn't a huge hit, at least through sendmail's
+milter interface, as there's no disk I/O involved and current
+CPUs are ridiculously fast.
+
+Virus checking is a massive I/O hit.  Someone needs to take
+a cluestick to the virus scanner authors -- we're not interested
+in checking files anymore so much as MIME streams.  There's
+no reason for the Aho-Corasick state machine at the heart
+of the virus scanner to do disk I/O and there's no reason
+for the MIME detangling and file decompression to do file
+I/O either.
+
+My personal hope is that the free software virus scanners
+will build up a decent signature libarary so that it's worth
+someone's while to write a virus scanner specifically designed
+for MIME streams.
+
+&gt; Is having to fiddle with the source really a large issue by comparison 
+&gt; to the other problems to solve in a mail system handling thousands of 
+&gt; users?
+
+There's a difference between fiddling and merging a number
+of large patch sets (and this requiring an understanding
+of any recent API changes in Cyrus SASL and OpenLDAP).
+
+It can be done, but means that you're getting less bang for
+your sysadmin dollar.
+
+-- 
+  Glen Turner                (08) 8303 3936 or +61 8 8303 3936
+  Australian Academic and Research Network   www.aarnet.edu.au
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

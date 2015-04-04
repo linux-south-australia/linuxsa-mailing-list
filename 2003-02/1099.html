@@ -1,0 +1,138 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Fw: Re: linux from dos" -->
+<!-- FromName="'Daryl Tester'" -->
+<!-- FromEmail="Daryl.Tester@iocane.com.au" -->
+<!-- ToName="'Daniel Burke'" -->
+<!-- ToEmail="burito@airnet.com.au" -->
+<!-- Date="Mon, 24 Feb 2003 20:05:09 +1030" -->
+<!-- Id="3E59E74D.585CACAB@iocane.com.au" -->
+<!-- Reference="20030224181609.419f7122.burito@airnet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Fw: Re: linux from dos</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  To  : Daniel Burke &lt;<I><A HREF="mailto:burito@airnet.com.au">burito@airnet.com.au</A></I>&gt;
+  Date: Mon, 24 Feb 2003 20:05:09 +1030
+</PRE>
+<H1>Re: Fw: Re: linux from dos</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Nit Pickin' Time!
+
+Daniel Burke wrote:
+
+&gt;&gt; Need a tool to convert a text file to unix format from dos. I believe the EOL char
+&gt;&gt; is causing an issue for me.
+
+&gt; For starters there is no such thing as a "EOL" char. There is however Carrage Return
+&gt; (0x0A) and Line Feed (0x0D).
+
+That's Carriage Return (0x0d) and Line Feed (0x0a).
+
+&gt; Here is a C program to perform the conversion,
+
+The following program described adds carriage returns before line feeds.  To convert
+from DOS text format files to Unix text format, you need to remove the carriage
+returns.  "tr -d \\015" does this well.
+
+&gt; it will run pathetically slow on Microsoft platforms.
+
+Most character at a time I/O does.  Reading in larger blocks (at least, larger
+that what the Standard C library provides) improves the I/O, at the cost of
+complexity.  But this has to be weighed against the number of times the program
+is going to run anyway.
+
+&gt; int main (int argc, char argv[][])
+&gt; {
+&gt;         FILE * fin, fout;
+&gt;         char buf;
+&gt;         char lf=0x0D;
+&gt;         fin = fopen(argv[1], "r");
+&gt;         fout = fopen(argv[2], "w");
+
+Should check for argument count (otherwise fopen will probably segfault on
+NULL pointers if insufficient arguments are passed in) and that fopen
+returned non-null, otherwise the following calls will fail.
+
+&gt;         while(fread(&buf, 1, 1, fin))
+&gt;         {
+&gt;                 if(buf==0x0A)
+&gt;                         fwrite(&lf,1,1, fout);
+&gt;                 fwrite(&buf,1,1, fout);
+&gt;         }
+
+As noted above, the logic for this is incorrect for what was asked.
+
+To make it more like a traditional Unix filter, it would probably
+be preferable to use stdin and stdout (and have the shell/whatnot
+open the files for you).
+
+#include &lt;stdio.h&gt;
+
+#define CR  0x0d
+
+int
+main(int argc, char *argv[])
+{
+    int  ch;
+
+    /* Possible arg. checking here. */
+
+    while (ch = fgetc(stdin), ch != EOF) {
+        if (ch != CR) {
+            if (fputc(ch, stdout) == EOF) {
+                 perror("write");
+                 exit(1);
+            }
+        }
+    }
+
+    return 0;
+}
+
+Sans comments.
+
+
+-- 
+Regards,
+  Daryl Tester,  Software Wrangler and Bit Herder, IOCANE Pty. Ltd.
+
+"Um ... those are IP addresses the quarterback guy yells out, right?"
+"No, A.J. ... they're wild guesses at your I.Q." --  User Friendly
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

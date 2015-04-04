@@ -1,0 +1,158 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="HDD recovery" -->
+<!-- FromName="MIG" -->
+<!-- FromEmail="khaey001@lux.levels.unisa.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 5 May 2000 14:40:15 +0930 (GMT+9:30)" -->
+<!-- Id="Pine.SOL.4.20.0005051402140.23323-100000@lux.levels.unisa.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: HDD recovery</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: MIG &lt;<I><A HREF="mailto:khaey001@lux.levels.unisa.edu.au">khaey001@lux.levels.unisa.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Fri, 5 May 2000 14:40:15 +0930 (GMT+9:30)
+</PRE>
+<H1>HDD recovery</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi.
+
+This might not be the right place to ask such questions, but it happened
+when I was using linux so I'll ask. If anyone can point me in right
+direction please do! I realy want to recover data even if it costs me $$$.
+
+My HDD did wierd things and lost all data.
+
+I was editing a text file on a FAT16 when got this error:
+	hdb: irq timeout: status=0xff { Busy }
+	ide0: reset: success
+
+And everything seemed to work, so I continued working. About 10 sec later:
+	hdb: irq timeout: status=0xff { Busy }
+	ide0: reset: success
+
+I saved work, copied entire directory into another partition of same
+drive. Also FAT16 and rebooted, but:
+
+while rebooting, drive was doing same things but much more often now. and
+intead of "ide0: reset: success" it'd say something like "Busy" or so.
+
+After reboot nothing changed, drive was goint nuts, but this time it
+started cliking like it does when it spins up after stand-by mode. And
+after reboot all partitino messed up.
+
+HDD setup:
+hda no problems.
+hda1 /
+hda2 /home
+
+hdb 6.4 Gb SeaGate.
+   Device Boot    Start       End    Blocks   Id  System
+/dev/hdb1   *         1        39    313236    6  FAT16
+/dev/hdb2            49       790   5960115    5  Extended
+/dev/hdb3            40        48     72292+  82  Linux swap
+/dev/hdb5            49        61    104391    6  FAT16
+/dev/hdb6            62       272   1694826   f0  Unknown
+/dev/hdb7           273       531   2080386    6  FAT16
+/dev/hdb8           532       790   2080386    6  FAT16
+
+Only hdb1 was ok. The rest was gone. I recreated all partitions exactly as
+they were before, and:
+
+hdb1		ok
+hdb3		haven't looked at it yet. Running without swap now.
+hdb5		badly messed up but worked.
+hdb6 and hdb7	totaly gone
+hdb8		perfectly fine.
+
+I tried disk editor under dos to look at phsysical data on hdb6,7 but to
+my surprise I found that from track 1 there was plain text of the same
+text file that I was editing. As I randomly poked different sectors in
+hdb6 they were all filled with with that text file or directory entries
+from the directory that I copied.
+
+I did "dd if=/dev/hdb6 of=/mnt/f/hdb6.img" and it copied ok, no
+errors. But all it seems to contain that same text, spread over 1.5
+Gb. Maybe more. I did not check hdb7 much. hdb6 was the only vital one.
+
+After all this. I noticed something I never noticed before. When botting
+linux I get messages:
+
+hda: WDC AC2540F, ATA DISK drive
+hdb: ST36531A, ATA DISK drive
+hdc: no response (status = 0x80), resetting drive
+hdc: no response (status = 0x80)
+hdd: no response (status = 0x80), resetting drive
+hdd: no response (status = 0x80)
+
+those no responce things never appeared before. Now they appear if ide has
+no drives on it. If at least one is connected it does not say that.
+
+Now some of you gona scream "you @#$%@#$%" but I gotta say it cause this
+might be relavant to why this happened.
+
+That hdd has 4 position for jumber (master/slave/etc) and one of them is
+not labeled. Cause in slave there is no jumpers at all, I thought, that
+that positino is not used and stuck that pin in there so I don't lose
+it. Then I put drive into removable rack and inserted it in while computer
+was on. (!@#$%@#$^#@%^ &gt; /dev/null) No OS was loaded, it was going through
+Memory test etc. When it came to check HDD (set to AUTO in BIOS) it
+detected them all fine and worked.
+
+That's all I can think of that could have caused it. I was pluggin drives
+in and out for a while now. I thought that if no OS is loaded, it should
+be OK, and for long time it was, untill...
+
+It seems that somehow about 2 or so Gb of data got overwritten by same bit
+of info that I saved. How it could happen, I don't know. I did not notice
+any major disk activity. On other hand, when writes are sequential, it
+worx very quetly.
+
+I heared that Cops do some tricks by moving heads slitly off the track to
+read "spill". Thus reading overwritten data. Maybe I am talking rubbish.
+
+Anyway, If anyone can recover it for me, or tell me who can. I am prepared
+to pay. (Well, not unlimited of cource, but name the price)
+
+PLASE PLEASE PLEASE!!!
+
+I think I told u everything, but if not, tell me what to supply.
+
+Eugene
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

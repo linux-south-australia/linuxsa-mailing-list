@@ -1,0 +1,255 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: recompiling the Redhat 7.3 kernel 2.4.18-3 what dir structuredo I" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Kim Hawtin'" -->
+<!-- ToEmail="kim@freesolutions.net" -->
+<!-- Date="Mon, 03 Mar 2003 11:44:38 +1030" -->
+<!-- Id="3E62AC7E.8060902@aarnet.edu.au" -->
+<!-- Reference="20030302231931.GW12891@freesolutions.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: recompiling the Redhat 7.3 kernel 2.4.18-3 what dir structuredo I</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Kim Hawtin &lt;<I><A HREF="mailto:kim@freesolutions.net">kim@freesolutions.net</A></I>&gt;
+  Date: Mon, 03 Mar 2003 11:44:38 +1030
+</PRE>
+<H1>Re: recompiling the Redhat 7.3 kernel 2.4.18-3 what dir structuredo I</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Kim Hawtin wrote:
+&gt; Mornen all,
+&gt; 
+&gt; On Mon, Mar 03, 2003 at 08:03:48AM +1030, David Lloyd wrote:
+&gt; 
+&gt;&gt;man ln
+&gt;&gt;man hier
+&gt;&gt;man -k hier
+&gt; 
+&gt; 
+&gt; After browsing through this I read through all the /var entries.
+&gt; 
+&gt; Now, I've read various configuration guides as to how to split
+&gt; these file systems across disks/partitions, and I've wondered
+&gt; about whether or no to split /var off onto its own disk.
+&gt; Especially for a mail server or log server ...
+&gt; 
+&gt; Some guides say "don't do it", others are fairly vague on the issue.
+&gt; 
+&gt; So, the question is, what is the experience of the list on this?
+
+Partitioning varies according to machine application.  Which
+explains the vagueness -- what is suitable for a machine dedicated
+to web or database serving is totally unsuitable for a desktop
+machine.
+
+The tradeoffs are
+  - ease of administration
+  - robustness
+  - disk performance
+  - platform requirements.
+
+1) Ease of administration
+
+Compare having just / with having /, /home, /var, /var/log, /var/spool,
+/home, /usr, ...  In the second case you must size each of the partitions
+exactly so that the partitions fill nicely.  You don't want to
+repartition the disk because /home is 95% full but /var is 15% full.
+
+So for a machine where ease of administration is important there's
+a good argument for just one partition -- / -- and making a swap
+file rather than a swap partition.
+
+Linux is increasingly getting tools for resizing of partitions
+(LVM, ext2resize, etc), but these are not yet as convenient as
+one big partition.  If you going to have multiple partitions,
+then using LVM or similar is a good idea -- this might influence
+choice of distribution, distribution version and filesystems.
+
+2) Robustness
+
+You can improve robustness by use of partitions.  For example,
+you can prevent a mega e-mail or a large file upload or a
+process writing thousands of log messages from totally filling
+the disk by good use of partitions.
+
+For example, many production servers have /var/log and /var/spool
+on their own partitions.  The mail spool might fill, or writing
+log messages might fail, but the remainder of the system will
+continue to run.
+
+3) Disk performance
+
+Disk I/O is dominated by disk head movement.
+
+The primary objective is to keep disk head movement to a minimum.
+On a signle disk machine this argues for one big partition.
+
+It also argues for using the right filesystem for the job.
+So you might find using a swap partition or using a journalling
+filesystem gives better results.
+
+On a multiple disk system reducing head movement can be done
+by looking at the I/O patterns of the application.  For example,
+Apache serves a web page and writes a log message.  So the web
+pages and the system log should be on different disks -- otherwise
+the disk heads are guarrunteed to move for each web request.
+
+On a multiple disk system the secondary objective is to keep
+all disks and buses equally busy.  Then your system isn't
+constrained by the performance of one heavily used disk or
+bus.
+
+This is again done by
+
+  - looking at I/O patterns
+
+  - buying appropiate hardware
+
+     - you'll find high performance machines have lots of disks
+       and busses, to minimise applications waiting for disk
+       or bus availability
+
+  - using the right RAID mix
+
+     - if you need 2 disks to store your web pages, then using
+       striping rather than concatenation automatically shares
+       the I/O load across the disks.
+
+These interact somewhat.  For example a RAID5 system issues
+simultaneous I/Os to each disk in the RAID5 disk set.  So
+those disks should be spread about the buses so bus congestion
+is minimised.
+
+4) Platform requirements
+
+The IBM PC is a classic for this.  Old BIOSs can't boot
+a operating system image from anywhere on the disk.  This
+is fixed by puting all the boot-time data into the /boot
+partition and putting that partition in the disk sectors
+that the BIOS can address.
+
+Even if you have a new BIOS, there's a robustness argument
+for still having a /boot partition (as you can then fix an
+issue by dropping the disk into a spare machine and hacking
+at it).
+
+
+My personal preference for a desktop machine is
+  - 2 * IDE disk, configured
+      ide0 (controller) -- hda (disk, IDE master)
+      ide1 (controller) -- hdc (disk, IDE master) -- hdd (cd-rom, IDE secondary)
+  - each disk partitioned with
+      /boot -- 50MB
+      MS-DOS format -- 5MB for BIOS upgrades (in place of floppy)
+      swap -- 2 * maximum RAM supported by motherboard
+      / -- remaining capacity, ext3 filesystem (xfs when in stock kernel)
+  - software RAID to mirror /boot and / partitions, hda as first disk,
+    hdc as second
+  - swap partitions listed in priority hda, hdc.
+
+Paritions are mounted by disk label, so disks can change
+bus order without drama.
+
+I choose not to RAID the swap space, so a disk failure does
+interrupt the continued running of the machine but this
+is fixed with a reboot (which takes the failed disk off-line).
+That seems fine for a desktop machine.  This gives a massive
+amount of swap space available to applications on a normally
+running system.  Upgrading RAM doesn't require reparitioning
+the disk.
+
+My personal preference for a laptop machine is a single disk
+with:
+  /boot -- 50MB
+  MS-DOS format -- 5MB for BIOS upgrades (in place of floppy)
+  unused -- whatever your BIOS needs for "suspend to disk"
+  swap -- 2 * maximum RAM supported by motherboard
+  / -- remaining capacity, ext2 filesystem (ext3 drains batteries)
+
+I run FreeDOS in the MS-DOS partition.  The Dell BIOS updater
+seems OK with it.  You might be more cautious and use MS-DOS.
+If you have a floppy disk or if your PC boots from a USB
+storage device you can do without this.
+
+&gt; Is there a good reason not to split /var onto its own disk from
+&gt; the root volume? Like it needs to be mounted at boot time for
+&gt; XXX reason.
+
+The rules for booting are
+
+  - the files needed to load the image file containing the
+    Linux kernel are in /boot.
+
+  - once the image is started, the files need to boot the
+    Linux kernel are in /*, /etc, /bin, /sbin, /lib.  Nothing
+    in the directories /usr, /var, /opt, /home is needed.
+
+    This is why the shell is the file /bin/sh but the C
+    compiler is in /usr/bin/cc.  There's a hack (see dmesg)
+    so that errors which occur during kernel boot are written
+    to the log file /var/log/messages later on.
+
+  - once the Linux kernel is booted the init system is started.
+    This looks in /etc/inittab for its configuration, which
+    mentions the system startup scripts.
+
+    Those scripts mount the partitions in /etc/fstab
+    (including the partitions containing directories /usr, /var,
+    etc) and then run the application startup scripts in
+    /etc/rc.d/rc5.d/S* (if init is booting to run level 5).
+
+The fileysystem layout rules are a lot less vague then mentioned
+here -- search Google for "linux fhs" and "linux standard base".
+You can generally trust applications to follow the rules with two
+exceptions:
+
+  - trying to make / read-only after system startup.  Some
+    applications write to /etc rather than /var.
+
+  - puting files in /usr rather than in /opt.  In theory
+    distributions put files in /usr and third-party applications
+    put files in /opt.  In practice, everthing ends up in /usr.
+    Suggests that /usr and /opt should be on the same
+    partition.
+
+-- 
+  Glen Turner                (08) 8303 3936 or +61 8 8303 3936
+  Australian Academic and Research Network   www.aarnet.edu.au
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

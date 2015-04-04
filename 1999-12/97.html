@@ -1,0 +1,100 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: modem" -->
+<!-- FromName="Benjamin Close" -->
+<!-- FromEmail="linux@senet.com.au" -->
+<!-- ToName="Robyn Manning" -->
+<!-- ToEmail="robynman@ozemail.com.au" -->
+<!-- Date="Sun, 5 Dec 1999 00:56:52 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.10.9912050037070.824-100000@Bytes4u.nodomain.yet" -->
+<!-- Reference="99120222165200.00957@localhost.localdomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: modem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Benjamin Close &lt;<I><A HREF="mailto:linux@senet.com.au">linux@senet.com.au</A></I>&gt;
+  To  : Robyn Manning &lt;<I><A HREF="mailto:robynman@ozemail.com.au">robynman@ozemail.com.au</A></I>&gt;
+  Date: Sun, 5 Dec 1999 00:56:52 +1030 (CST)
+</PRE>
+<H1>Re: modem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, 2 Dec 1999, Robyn Manning wrote:
+
+&gt; chmod 777 /dev/modem (lrwxrwxrwx)
+&gt; chmod u+s /dev/ttyS1 (crwSr--r--)    
+
+you don't need to +s ttyS1
+
+&gt; chmod 777 /var/lock (drwxrwxrwx)
+&gt; chmod u+s /usr/sbin/pppd (-rwsr-xr-x)
+&gt; chmod u+s /etc/ppp/options (-rwSr--r--)
+
+You don't need to +s options
+ 
+&gt; I can still only log in as root. I set up another ISP (Dove) and entered the
+&gt; login name and password manually and this worked ok but Ozemail is still a
+&gt; problem. I deleted the old setup and set it up again and still no go. Is the
+&gt; fact that there is a little s and not a capital S in /usr/sbin/pppd my problem.
+
+No, this is not your problem. 
+Let me explain what happens a little more thouroly with the +s:
+
+You run kppp as a user. Kppp starts pppd. Since pppd is SUID root (the +s)
+the pppd runs as if root ran it. Any file it opens it opens as if it was
+root. This includes options, chat-secrets and pap-secrets. Hence adding
+the +s is only useful when a file can be executed.
+
+Now, pppd calls a program named 'chat' which does the actual dialing and
+login in to the isp.
+
+chat must obey the permissions on the device it uses (/dev/modem).
+/dev/modem is a link to /dev/ttyS1
+
+Your descriptions of the permsions of /dev/ttyS1 (crwSr--r--) indicate
+only root can write to the device (the w). Since chat is run as a user
+instead or root it fails.
+
+So chmod o+w /dev/ttyS1 should hopefully fix your problem. Also please
+check that /dev/modem does point to /dev/ttyS1 (use ls -l ) as the chmod
+777 of /dev/modem should have affected the permissions on ttyS1
+
+Cheers,
+--
+
+* Benjamin Close
+* <A HREF="mailto:Benjsc@senet.com.au">Benjsc@senet.com.au</A>
+* Web Page: <A HREF="http://users.senet.com.au/~benjsc">http://users.senet.com.au/~benjsc</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

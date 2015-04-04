@@ -1,0 +1,107 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Poptop vs MPPE" -->
+<!-- FromName="'Stuart Lowes'" -->
+<!-- FromEmail="Stuart@comcor.com.au" -->
+<!-- ToName="'Chris Trowbridge','Ryan Verner'" -->
+<!-- ToEmail="Chris.Trowbridge@unisa.edu.au,xfesty@computeraddictions.com.au" -->
+<!-- Date="Wed, 26 Nov 2003 14:52:10 +1030" -->
+<!-- Id="31377FCF823ED411BDF000E0292EBFB139F681@exadl01.comcor.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Poptop vs MPPE</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Stuart Lowes &lt;<I><A HREF="mailto:Stuart@comcor.com.au">Stuart@comcor.com.au</A></I>&gt;
+  To  : Chris Trowbridge &lt;<I><A HREF="mailto:Chris.Trowbridge@unisa.edu.au">Chris.Trowbridge@unisa.edu.au</A></I>&gt;<BR>        Ryan Verner &lt;<I><A HREF="mailto:xfesty@computeraddictions.com.au">xfesty@computeraddictions.com.au</A></I>&gt;
+  Date: Wed, 26 Nov 2003 14:52:10 +1030
+</PRE>
+<H1>RE: Poptop vs MPPE</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Chris,
+
+Chris Trowbridge wrote:
+&gt; OK, I've finally had a chance to try this VPN bit again 
+&gt; (after insmodding the ppp_mppe thankyou) and it still comes 
+&gt; back with the same error.
+&gt; 
+&gt; I am seeing the following  (please excuse the lengthy 
+&gt; /var/log/messages).  I've double spaced what I think is the 
+&gt; most relevant section.
+
+What is in your /etc/ppp/options.pptpd file?  Also which exact version of
+pppd are you using?  (Output of "rpm -qa | grep ppp" if you're using rpm, or
+the name of the original tarball file if you compiled from source.)
+
+I had a problem with poptop awhile back giving similar errors in the logs to
+yours.  Apparently there are two versions of ppp with mppe included.  There
+are patches to older versions of ppp (2.4.0, 2.4.1, I think) and a newer ppp
+with BSD licensed mppe built in (2.4.3+?).  The problem is that they use
+differently named options (i.e. in options.pptpd) to specify accepting 40-
+or 128-bit MPPE encryption and auth types to allow.
+
+
+PPP with MPPE patch would have something like the following in
+options.pptpd:
+
+-chap
+-chapms
++chapms-v2
+mppe-128
+mppe-stateless
+
+
+And the BSD licensed version would have:
+
+refuse-pap
+refuse-chap
+refuse-mschap
+require-mschap-v2
+require-mppe
+
+
+Your configuration may be using the wrong options for the ppp version you
+have.
+
+
+Cheers,
+
+
+Stuart Lowes
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

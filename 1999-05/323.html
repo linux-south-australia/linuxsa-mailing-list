@@ -1,0 +1,118 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="PRO: (c-code)writing and reading from pipes" -->
+<!-- FromName="Jake Hawkes" -->
+<!-- FromEmail="jake@eclectic.com.au" -->
+<!-- ToName="LinuxSA Mailing List" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 18 May 1999 16:34:42 +0930" -->
+<!-- Id="3741110A.E30FFEDA@eclectic.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: PRO: (c-code)writing and reading from pipes</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A></I>&gt;
+  To  : LinuxSA Mailing List &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 18 May 1999 16:34:42 +0930
+</PRE>
+<H1>PRO: (c-code)writing and reading from pipes</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+there, hope the subject line is helpfull ;)
+
+
+ok, two progs (proc A and procB) want to communicate with each other via
+a pipe, or pipes. The communications is to be 2-way. 
+
+here are the (relevant) code snippets...
+(error checking, #define removed)
+
+procA
+  pipe = open("/tmp/rip_pipe", O_RDWR);
+
+  count = write(pipe, buff, 2);
+
+  read(pipe, buff, 2));
+
+procB
+  pipe = open("tmp/rip_pipe", O_RDWR);
+
+while(1) {
+  FD_SET(pipe, &fdSet);
+  FD_ZERO(&fdSet);
+
+  select(pipe+1, &fdSet, NULL, NULL, NULL);
+
+  if(!FD_ISSET(pipe, &fdSet))
+     continue;
+
+  count = read(pipe, buff, 2);
+
+  /*logic stuff*/
+
+  count = write(pipe, buff, 2);
+} /* end while(1) */
+
+bash$&gt; mkfifo /tmp/rip_pipe
+
+this is what I think is happening.
+
+  o   procA writes to the pipe
+       \--&gt; the write is successfull (buffered is some magic kernel
+buffer ??)
+  o   procB isn't swapped in by the kernel, and so the select() doesn't
+get a chance         \--&gt; or something....
+  o   procA reads the pipe
+       \--&gt; the read is successfull, and the same data back as it wrote.
+
+As far as the reads and writes being successful, this is true. The bytes
+read and written have been checked, the data read is in fact the same as
+that written.
+
+Can anyone confirm/deny my guess as to what's happening?
+
+One alternative to this is to have 2 pipes (1 read and 1 write), but I'd
+like this solution better.
+
+If I haven't explained it well enough, I'd be glad to say it all again
+:).
+
+-- 
+
+Jake Hawkes, B. Eng (CSE)
+
+e-mail: <A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

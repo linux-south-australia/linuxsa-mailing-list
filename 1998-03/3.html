@@ -1,0 +1,94 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: ifconfig" -->
+<!-- FromName="Geoffrey D. Bennett" -->
+<!-- FromEmail="g@netcraft.com.au" -->
+<!-- ToName="Alex Garner" -->
+<!-- ToEmail="mlist@lynx.net.au" -->
+<!-- Date="Mon, 2 Mar 1998 13:18:28 +1030 (CST)" -->
+<!-- Id="199803020248.NAA11938@Mich.netcraft.com.au" -->
+<!-- Reference="3.0.3.32.19980302115545.00763e34@lynx.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: ifconfig</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Geoffrey D. Bennett &lt;<I><A HREF="mailto:g@netcraft.com.au">g@netcraft.com.au</A></I>&gt;
+  To  : Alex Garner &lt;<I><A HREF="mailto:mlist@lynx.net.au">mlist@lynx.net.au</A></I>&gt;
+  Date: Mon, 2 Mar 1998 13:18:28 +1030 (CST)
+</PRE>
+<H1>Re: ifconfig</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; OK, I've done a bit of IP-Aliasing, but it's all a bit crude. I get things
+&gt; going by sticking things like this in /etc/rc.d/rc.local, but I'm sure
+&gt; there's an 'official' way of doing it. I'm using redhat (SysV).
+&gt; 
+&gt;      #setting up IP alias interfaces
+&gt;      /sbin/ifconfig eth0:0 203.33.18.193
+&gt;      /sbin/ifconfig eth0:1 203.33.18.194
+&gt;      #setting up the routes
+&gt;      /sbin/route add -host 203.33.18.193 eth0:0
+&gt;      /sbin/route add -host 203.33.18.194 eth0:1
+&gt; 
+&gt; How do I do this 'officially'??
+
+You can of course use the netcfg tools to do it, but here's what the
+config files look like if you want to do it manually:
+
+/etc/sysconfig/network-scripts/ifcfg-eth0 (this is the main device)
+
+DEVICE=eth0
+IPADDR=a.b.c.d
+NETMASK=255.255.255.0
+NETWORK=a.b.c.0
+BROADCAST=a.b.c.255
+ONBOOT=yes
+
+/etc/sysconfig/network-scripts/ifcfg-eth0:0 (this is the first alias)
+
+DEVICE=eth0:0
+IPADDR=a.b.c.e
+NETMASK=255.255.255.0
+NETWORK=a.b.c.0
+BROADCAST=a.b.c.255
+ONBOOT=yes
+
+The differences are:
+Add :0 to the filename (the next ones are :1, :2, etc),
+Add :0 to the DEVICE= line,
+Change the IPADDR= line.
+
+Regards,
+-- 
+Geoffrey D. Bennett (<A HREF="mailto:geoffrey@netcraft.com.au">geoffrey@netcraft.com.au</A>)
+Computer Systems Manager, NetCraft Australia
+<A HREF="http://www.netcraft.com.au/geoffrey/">http://www.netcraft.com.au/geoffrey/</A>
+Red Hat Linux Resellers: <A HREF="http://www.netcraft.com.au/redhat/">http://www.netcraft.com.au/redhat/</A>
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

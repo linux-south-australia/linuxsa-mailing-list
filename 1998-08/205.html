@@ -1,0 +1,184 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="port numbers" -->
+<!-- FromName="Principe, Franco" -->
+<!-- FromEmail="franco.principe@dsto.defence.gov.au" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 21 Aug 1998 10:22:25 +0930" -->
+<!-- Id="8F990E3D9A6FD1118F3B0000F81EA1D80110FB7D@exchsa2.dsto.defence.gov.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: port numbers</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Principe, Franco &lt;<I><A HREF="mailto:franco.principe@dsto.defence.gov.au">franco.principe@dsto.defence.gov.au</A></I>&gt;
+  To  : 'LinuxSA' &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 21 Aug 1998 10:22:25 +0930
+</PRE>
+<H1>port numbers</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+I emailed the group a while ago regarding this problem, and since
+then I have continued my investigations resulting in the following
+discoveries and further questions.
+
+To refresh, I am having trouble with a Simulation package here at
+work which broadcasts and listens to ports 3000, 3001 and 3002.
+Unfortunately when I run this simulation on the Linux Boxes I find
+errors being reported.  The program compiled for SGI does work fine on
+the SGI boxes.
+
+I've done an strace of the application and found errors such as the
+following :
+
+Errors include :
+recvfrom( some info here) = -1 EAGAIN (Resource temporarily unavailable)
+sendto( some info here ) = -1 ECONNREFUSED (Connection refused).
+
+I understand that the first error is simply saying that the program was
+looking
+at that port but there was no data present (so really not an error).
+The sendto
+line is the strange one.
+
+Ok, so I delved a little further and started to play with some other
+networking
+tools such as ping whilst my app was running.   To my surprise I found
+the following :
+
+[cassiopeia /home/franco] &gt; ping -v scorpio
+PING scorpio.dsto.defence.gov.au (131.185.16.228): 56 data bytes
+64 bytes from 131.185.16.228: icmp_seq=0 ttl=255 time=0.6 ms
+ping: packet too short (56 bytes) from 131.185.2.113
+92 bytes from ssa-sun6.dsto.defence.gov.au (131.185.10.90): Destination
+Port Unreachable
+Vr HL TOS  Len   ID Flg  off TTL Pro  cks      Src      Dst Data
+ 4  5  00 cc00 eb24   0 0000  3f  11 be33 131.185.16.172  131.185.10.90
+UDP: from port 1532, to port 3000 (decimal)
+
+ping: packet too short (56 bytes) from 131.185.2.113
+64 bytes from 131.185.16.228: icmp_seq=1 ttl=255 time=0.6 ms
+ping: packet too short (56 bytes) from 131.185.2.113
+ping: packet too short (56 bytes) from 131.185.2.113
+64 bytes from 131.185.16.228: icmp_seq=2 ttl=255 time=0.6 ms
+ping: packet too short (56 bytes) from 131.185.2.113
+ping: packet too short (56 bytes) from 131.185.2.113
+ping: packet too short (56 bytes) from 131.185.2.113
+ping: packet too short (56 bytes) from 131.185.2.113
+ping: packet too short (56 bytes) from 131.185.2.113
+92 bytes from ssa-sun6.dsto.defence.gov.au (131.185.10.90): Destination
+Port Unreachable
+Vr HL TOS  Len   ID Flg  off TTL Pro  cks      Src      Dst Data
+ 4  5  00 cc00 0225   0 0000  3f  11 a733 131.185.16.172  131.185.10.90
+UDP: from port 1532, to port 3000 (decimal)
+
+64 bytes from 131.185.16.228: icmp_seq=3 ttl=255 time=0.6 ms
+ping: packet too short (56 bytes) from 131.185.2.113
+92 bytes from ssa-sun6.dsto.defence.gov.au (131.185.10.90): Destination
+Port Unreachable
+Vr HL TOS  Len   ID Flg  off TTL Pro  cks      Src      Dst Data
+ 4  5  00 8400 0825   0 0000  3f  11 e933 131.185.16.172  131.185.10.90
+UDP: from port 1532, to port 3000 (decimal)
+
+--- scorpio.dsto.defence.gov.au ping statistics ---
+4 packets transmitted, 4 packets received, 0% packet loss
+round-trip min/avg/max = 0.6/0.6/0.6 ms
+[cassiopeia /home/franco] &gt;
+
+I pinged from the SGI machine and got the following : 
+
+PING scorpio.dsto.defence.gov.au (131.185.16.228): 56 data bytes
+64 bytes from 131.185.16.228: icmp_seq=0 ttl=255 time=29.051 ms
+36 bytes from baloo.dsto.defence.gov.au (131.185.2.113): Destination
+Port Unreachable
+Vr HL TOS  Len   ID Flg  off TTL Pro  cks      Src	     Dst
+ 4  5  00 00ac 1e0c   0 0000  3b  11 0000  131.185.16.202  131.185.2.113
+
+UDP: from port 3006, to port 3000
+
+36 bytes from baloo.dsto.defence.gov.au (131.185.2.113): Destination
+Port Unreachable
+Vr HL TOS  Len   ID Flg  off TTL Pro  cks      Src	     Dst
+ 4  5  00 0084 1e0d   0 0000  3b  11 0000  131.185.16.202  131.185.2.113
+
+UDP: from port 3006, to port 3000
+
+And tcpdump gave this :
+
+11:44:44.237611 0:0:f8:e2:6:d7 Broadcast ip 146: cassiopeia.1644 &gt;
+131.185.16.255.3000: udp 104 (ttl 64, id 38700)
+11:44:44.237611 0:0:f8:e2:6:d7 Broadcast ip 146: cassiopeia.1644 &gt;
+131.185.16.255.3000: udp 104 (ttl 64, id 38701)
+11:44:44.237611 0:0:f8:e2:6:d7 Broadcast ip 146: cassiopeia.1644 &gt;
+131.185.16.255.3000: udp 104 (ttl 64, id 38702)
+11:44:44.237611 aa:0:4:0:fb:4 0:0:f8:e2:6:d7 ip 70: baloo &gt; cassiopeia:
+icmp: baloo udp port 3000 unreachable (ttl 254, id 25494)
+11:44:44.247611 aa:0:4:0:fb:4 0:0:f8:e2:6:d7 ip 70: baloo &gt; cassiopeia:
+icmp: baloo udp port 3000 unreachable (ttl 254, id 25495)
+11:44:44.247611 8:0:69:2:c9:a Broadcast ip 218: pleiades.2624 &gt;
+131.185.16.255.3000: udp 176 (ttl 60, id 45487)
+11:44:44.247611 aa:0:4:0:fb:4 0:0:f8:e2:6:d7 ip 70: baloo &gt; cassiopeia:
+icmp: baloo udp port 3000 unreachable (ttl 254, id 25497)
+
+Turns out that baloo is our helper DHCP server.  My question then, is
+why is this 
+happening and how can I fix it?  I am intrigued as to why it only
+happens on
+Linux boxes and not the SGI boxes.  
+
+I have also found that if I telnet to the Linux boxes on standard 
+unix ports such as 13, I get "Connection Refused" without the 
+time of day being reported.  My Linux networking setup
+is essentially "Out the Box Red Hat 5.0" with no routed or gated,
+running and standard gateway for our subnet etc. They are not
+bootp enabled either.
+
+If anybody could provide me with some help it would be greatly
+appreciated.  
+
+With thanks,
+
+Franco Principe
+
+Defence Science Technology Organisation
+<A HREF="mailto:Franco.Principe">mailto:Franco.Principe</A>@dsto.defence.gov.au
+Phone : +61-8-8259-5293  Fax : +61-8-8259-5055
+DSTO - LOD; PO Box 1500; Salisbury SA 5108; Australia.
+
+
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,114 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: kernel" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="Robyn Manning" -->
+<!-- ToEmail="robynman@dove.net.au" -->
+<!-- Date="Fri, 27 Oct 2000 05:58:17 +0930" -->
+<!-- Id="20001027055817.A9111@dog.topology.org" -->
+<!-- Reference="39F8325C.DC16D22@dove.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: kernel</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : Robyn Manning &lt;<I><A HREF="mailto:robynman@dove.net.au">robynman@dove.net.au</A></I>&gt;
+  Date: Fri, 27 Oct 2000 05:58:17 +0930
+</PRE>
+<H1>Re: kernel</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, Oct 26, 2000 at 11:02:12PM +0930, Robyn Manning wrote:
+&gt; 
+&gt; I tried updating glibc, is that what I should have done?
+&gt; 
+&gt; I'm still getting the same error.
+
+Robyn,
+
+Nope. Definitely updating glibc will make not a jot
+of difference.
+The compilation is not even getting as far as linking.
+It's the fact that the .S file assembler code is not
+recognized by the compiler.
+You need to hcange the compiler in some way.
+
+That fact that the "make" files are telling the
+compiler to run in "-traditional" mode could be
+a factor in this problem.
+I thought the problem could be fixable by setting the right values
+in the kernel configuration, but there's nothing there.
+
+The /usr/src/linux/Makefile file
+contains these lines:
+
+-------------------------------------------------------
+.S.s:
+        $(CC) -D__ASSEMBLY__ $(AFLAGS) -traditional -E -o $*.s $&lt;
+.S.o:
+        $(CC) -D__ASSEMBLY__ $(AFLAGS) -traditional -c -o $*.o $&lt; 
+-------------------------------------------------------
+
+So clearly "-traditional" is not an optional extra.
+
+And CC is defined by:
+
+-------------------------------------------------------
+CC      =$(CROSS_COMPILE)gcc -D__KERNEL__ -I$(HPATH) 
+-------------------------------------------------------
+
+So clearly it's going to use whatever is in the path as "gcc".
+
+The command "gcc -v" gives this:
+
+-------------------------------------------------------
+Reading specs from /usr/lib/gcc-lib/i486-linux/egcs-2.91.66/specs
+gcc version egcs-2.91.66 19990314/Linux (egcs-1.1.2 release)
+-------------------------------------------------------
+
+What does your system give?
+When I tried Linux Mandrake once, the compiler would hardly
+compile anything serious at all.
+I contacted the Mandrake development people, and they told me I had
+to download a special development package.
+Maybe something similar is happening here.
+
+My guess is that as someone else commented, you need to get a better 
+C compiler.
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

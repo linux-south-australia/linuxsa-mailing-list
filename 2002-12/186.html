@@ -1,0 +1,123 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="HELP! .htaccess won't run on rewritten subdomains" -->
+<!-- FromName="'Cobalt List'" -->
+<!-- FromEmail="cobalt@www.auzit.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 4 Dec 2002 14:19:16 +1000" -->
+<!-- Id="20021204041916.M62043@www.auzit.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: HELP! .htaccess won't run on rewritten subdomains</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Cobalt List &lt;<I><A HREF="mailto:cobalt@www.auzit.com">cobalt@www.auzit.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 4 Dec 2002 14:19:16 +1000
+</PRE>
+<H1>HELP! .htaccess won't run on rewritten subdomains</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I've been having some vast problems with my Sun Cobalt Raq4 in reguards to 
+mod_rewrite and .htaccess.
+
+I've setup the following in virtualhost to direct any incomming subdomain for 
+my domain to a respective folder.
+
+i.e. blah.domain.com or www.blah.domain.com goes 
+to /home/sites/site4/sites/blah/
+
+I have been able to get CGI to work on the re-written domains by allowing cgi-
+script however I cannot get it to process .htaccess files for rewritten 
+(mod_rewrite) subdomains (shown in httpd.conf below this message).
+
+When I access a .htaccess protected directory which has been rewritten I get 
+an error comming up (Cannot find server or DNS Error) in Internet Explorer.
+
+If I remove .htaccess it allows access (but I need .htaccess in this folder 
+as password protection). htaccess files work on domain.com but not on any re-
+written subdomains.
+
+I have tried everything within my newbie knowledge of apache and gotten 
+nowhere, I've added the following to access.conf to no avail.
+
+&lt;Directory /home/sites/site4&gt;
+AllowOverride All
+Options All
+&lt;/Directory&gt;
+
+Does anyone have any Ideas what I can do to get these .htaccess files to be 
+processed under a rewritten domain as I am really stuck.
+
+James Austin.
+
+The method for this is shown below using httpd.conf
+(I've removed all the domain & IP bits)
+========================================
+
+&lt;VirtualHost 2xx.xxx.xxx.xxx&gt;
+ServerName www.domain.com
+ServerAdmin admin
+DocumentRoot /home/sites/site4/web
+ServerAlias domain.com *.domain.com
+
+RewriteEngine on
+RewriteMap	lowercase	int:tolower
+RewriteCond ${lowercase:%{HTTP_HOST}}	(www\.|)[^.]+\.domain\.com$
+RewriteCond ${lowercase:%{HTTP_HOST}}	!^domain.com?$
+RewriteCond ${lowercase:%{HTTP_HOST}}	!^www.domain.com?$
+RewriteRule ^(.+)	${lowercase:%{HTTP_HOST}}$1	[C]
+RewriteRule ^(www\.|)([^.]+)\.domain\.com(.*)	/home/sites/site4/sites/$2$3
+RewriteOptions inherit
+
+AliasMatch  ^/~([^/]+)(/(.*))? /home/sites/site4/users/$1/web/$3
+
+AddType application/x-httpd-php .php3
+AddType application/x-httpd-php .php4
+AddType application/x-httpd-php .php
+# AddHandler chiliasp .asp
+# AddHandler chiliasp .asa
+AddHandler cgi-script .cgi
+AddHandler cgi-script .pl
+AddHandler cgi-wrapper .cgi
+AddHandler cgi-wrapper .pl
+AddHandler server-parsed .shtml
+AddType    text/html     .shtml
+&lt;/VirtualHost&gt;
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,106 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Size of database" -->
+<!-- FromName="'George Patterson'" -->
+<!-- FromEmail="george@visp.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="sam@urnonline.net" -->
+<!-- Date="Wed, 16 Apr 2003 19:55:29 +0930" -->
+<!-- Id="20030416195529.49bb8b04.george@visp.com.au" -->
+<!-- Reference="000901c303f8$926c2700$4608720a@lappy" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Size of database</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: George Patterson &lt;<I><A HREF="mailto:george@visp.com.au">george@visp.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:sam@urnonline.net">sam@urnonline.net</A></I>&gt;
+  Date: Wed, 16 Apr 2003 19:55:29 +0930
+</PRE>
+<H1>Re: Size of database</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 16 Apr 2003 18:44:15 +0930
+"Sam Silvester" &lt;<A HREF="mailto:sam@urnonline.net">sam@urnonline.net</A>&gt; wrote:
+
+&gt; Hi everyone!
+&gt; 
+&gt; I'm wanting to write some IP accounting data into a mysql database
+&gt; with 5 minute intervals...how can I work out how much disk space the
+&gt; database will need?
+
+And how long do you need to keep this information??
+&gt; 
+&gt; An example row might look like this:
+&gt; 
+&gt; Timestamp| IP Address | Bytes In | Bytes Out
+
+Hmmm... Short answer... stuff all... :-)
+
+/me pulls down a book on Mysql from shelf. (You could have looked on
+line and did a few calculations..:)
+
+A Mysql Timestamp is 4 bytes long (ends sometime in 2037!!), but only
+does whole seconds for the timestamp. If you need partial seconds for
+any reason, use a float. An IP address can be expressed as a 32 bit
+number which means another 4 bytes.
+
+Sam, you didn't say if the data in and out is acumulative or is reset
+every 5 minutes.
+
+Your data in and out depend on the bandwidth of the interface/filter
+rule that you are writing. Use an unsigned MediumInt (3 bytes each).
+
+Field		Bytes
+Timestamp	4
+IP Address	4
+Bytes In	3
+Bytes Out	3
+Total 		12 bytes
+
+There will be some overhead for indexes, permissions.
+
+Snort has a web based frontend called snorticus with a Mysql back end
+which stores this store of data very efficiently.
+
+When you have the database on a test server and you are logging data to
+it, consider re-optimising the table and the field size.
+
+&gt; 
+&gt; Cheers!
+&gt; 
+&gt; Sam.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

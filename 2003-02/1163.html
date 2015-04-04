@@ -1,0 +1,176 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Fw: Re: linux from dos" -->
+<!-- FromName="'Daniel Burke'" -->
+<!-- FromEmail="burito@airnet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 25 Feb 2003 15:17:02 +1030" -->
+<!-- Id="20030225151702.3dc7f802.burito@airnet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Fw: Re: linux from dos</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Burke &lt;<I><A HREF="mailto:burito@airnet.com.au">burito@airnet.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 25 Feb 2003 15:17:02 +1030
+</PRE>
+<H1>Fw: Re: linux from dos</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Begin forwarded message:
+
+Date: Tue, 25 Feb 2003 15:16:21 +1030
+From: Daniel Burke &lt;<A HREF="mailto:burito@airnet.com.au">burito@airnet.com.au</A>&gt;
+To: "Daryl Tester" &lt;<A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A>&gt;
+Subject: Re: linux from dos
+
+
+
+&gt; Most DOS' support the concept of stdin and stdout.  I've certainly
+&gt; used it under DOS with both C and Java programs.
+
+Hmm didn't know that. I always thought of DOS as a crippled child incapable of ever walking.
+
+&gt; &gt;&gt;     int  ch;
+&gt; 
+&gt; &gt; Using ints to store chars is naughty.
+&gt; 
+&gt; Using a char to store the result of fgetc(), which returns an int, is even
+&gt; naughtier.  I'm sure this is a C FAQ (it's certainly a C common error).
+&gt; See below.
+
+silly me.. I assumed the c in fgetc meant it returned a char
+&gt; 
+&gt; &gt;&gt;     while (ch = fgetc(stdin), ch != EOF) {
+&gt; 
+&gt; &gt; Checking for successful assignment is bad, you actually mean to check
+&gt; &gt; success of fgetc()
+&gt; 
+&gt; Erm, I'm not sure if I've read what you wrote correctly.  Bear in mind
+&gt; that I didn't have an issue with this, and what I've coded above is my
+&gt; own personal idiom (I always try to separate assignments from tests,
+&gt; even within looping constructs).
+&gt; 
+&gt; Semantically, "(ch = fgetc(stdin), ch != EOF)" is the same as
+&gt; "((ch = fgetc(stdin)) != EOF)".  They will even typically output the
+&gt; same byte codes (I have checked this on the compilers I used to
+&gt; use when I used to care about such things).  In the second
+&gt; construct, the side effect of (ch = fgetc(stdin)) is the value
+&gt; assigned to ch.  I've just split it up into an assignment, test
+&gt; sequence.  It is certainly *not* checking for "successful
+&gt; assignment"; the value returned by fgetc() is assigned to ch
+&gt; regardless.  It *is* checking that ch hasn't been assigned EOF
+&gt; (which is -1, but that's an implementation detail we're not
+&gt; supposed to know about).  However, if we've used a signed
+&gt; character, then we most certainly will care, because 0xff will
+&gt; be downcast to a -1, and neither of the above tests will work
+&gt; correctly for character files with 0xff in the stream.  Alternatively,
+&gt; if I'd used an unsigned char, then we will never be able to test
+&gt; the -1/EOF returned by fgetc(), and the loop will never
+&gt; terminate.  Using a char of any sort to store the result of
+&gt; fgetc(), then test against, is wrong.
+
+Negative. (ch = fgetc(stdin)) is a test, which will either return 1 or 0.
+It is testing assignment of the return value of fgetc to ch. It is NOT the return value of fgetc.
+In gcc you are right, on MSVC this is testing the success of the assignment (as if putting a value in a variable can fail, somehow MS manages it). I spent 4 years writting for MSVC so that explains why I have all these fucked up ideas about C. I write games. I would love to write linux only games, but for some reason a large bunch of dickheads think winblows is a good platform to play games on. I swear I'll go crazy... if I'm not already. When/If I finish my game, it will convert a lot of people to linux. On linux my game loads in about a quarter of a second, and about a minute on windows. Thank its memory management.
+
+&gt; 
+&gt; &gt;&gt;             if (fputc(ch, stdout) == EOF) {
+&gt; &gt;&gt;                  perror("write");
+&gt; &gt;&gt;                  exit(1);
+&gt; 
+&gt; &gt; exit() is bad karma..
+&gt; 
+&gt; As an exception mechanism, no it isn't.  It's bad karma
+&gt; inside libraries (where the user of the library should be
+&gt; offered the chance to terminate a program, not a library
+&gt; function), and for similar reasons that applies to lower
+&gt; level functions.  As this is the topmost function, it doesn't
+&gt; apply.
+&gt; 
+&gt; &gt; its unstable on at least one platform (though I forget
+&gt; &gt; which)
+&gt; 
+&gt; Non-ANSI compliance isn't a reason to not use a
+&gt; standard feature of a language.  And most compilers
+&gt; actually push the exit() function onto the stack as the
+&gt; epilogue to main (i.e. when main has finished executing,
+&gt; the return code from main is passed to exit or _exit,
+&gt; I forget which).
+
+exit is bad incase you ever decide to turn the program into a function... tell me you've never done that before
+
+&gt; 
+&gt; &gt; Commenting self explanatory programs is VERY evil. 
+&gt; 
+&gt; "Self explanatory" is in the eye of the beholder.  I've
+&gt; seen self explanatory programs that have had bugs
+&gt; in them - are those bugs in there by design, or by
+&gt; accident?  With no other supporting documentation,
+&gt; I couldn't tell.
+
+Yeah... I suppose I've just seen one too many programs with...
+	printf("hello world!"); /* printing the string "hello world!" */
+ 
+&gt; &gt; int *argv[] and int argv[][] are synonyms for each other.
+&gt; 
+&gt; I didn't say otherwise.  Incidently, I have seen one case where
+&gt; char * and char[] weren't interchangeable (i.e. char[] = "foo",
+&gt; then passed to function as char * which fouled up by pointing
+&gt; to the wrong segment), but that was compiler spackness from
+&gt; a major vendor.
+
+Um would that be borland's turbo c++? I recall similar behavior in some of the earlier versions.
+ 
+&gt; &gt; stdio.h is included by default in %95 of compilers.
+&gt; 
+&gt; A lot of compilers do things that aren't in The Standard.
+&gt; "//" as a comment isn't supported in ANSI C (yet - I
+&gt; believe there's moves afoot to include it), yet that doesn't
+&gt; stop a lot of programmers using it, then wondering why
+&gt; they get compiler errors on other platforms.  I tend to
+&gt; avoid all that grief up front.
+&gt; 
+&gt; 
+&gt; Regards,
+&gt;   Daryl Tester
+&gt; 
+
+I guess I should just shoot willy g and save myself the greif
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,140 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Printer Sharing" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="rbrandt@tumourbiology.com" -->
+<!-- Date="Mon, 31 Mar 2003 16:18:49 +0930" -->
+<!-- Id="3E87E4D1.3020209@aarnet.edu.au" -->
+<!-- Reference="20030331002105.843E6815F@voodoo.strato-webmail.de" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Printer Sharing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:rbrandt@tumourbiology.com">rbrandt@tumourbiology.com</A></I>&gt;
+  Date: Mon, 31 Mar 2003 16:18:49 +0930
+</PRE>
+<H1>Re: Printer Sharing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+<A HREF="mailto:rbrandt@tumourbiology.com">rbrandt@tumourbiology.com</A> wrote:
+&gt; I've installed on my SUSE server box a printer (Epson on CUPS) I'd like to
+&gt; share with client boxex also running linux. Can somebody tell me how to
+&gt; configure the server to make that printer public and how to access it from
+&gt; the client boxes
+
+It depends on the printing protocol you want to use.
+
+By default CUPS uses the Internet Printing Protocol
+with a CUPS-specific browsing protocol.  If your
+clients also run CUPS you simply may need to say
+
+  /etc/cups/client.conf
+     ServerName ipp.print.example.edu.au
+
+Newer Novell services also use IPP, and thus will
+talk with CUPS.  In a small network, manually
+configure each printer queue.  In a big network
+you'll need to install a Service Location Protocol
+server and configure the CUPS server to update the
+SLP server.
+
+MacOS X uses CUPS for printing but the UI designers
+forgot to allow an IPP tick-box in the printer
+configuration.  LPD works fine.
+
+Most UNIX and Linux clients currently don't run CUPS
+but use the older LPD protocol.  CUPS comes with a
+LPD/CUPS gateway.  Start this on the server with
+
+   vi /etc/xinetd.d/cups-lpd
+     disable = no
+   service xinetd reload
+   vi hosts.allow
+     cupsd, cups-lpd: 10.0.0.0/255.0.0.0
+
+On the LPD clients say
+
+   vi /etc/printcap
+     lp:rm=lpd.print.example.edu.au:rp=lp:sd=/var/spool/lp:lf=/dev/console:mx#0
+
+Windows boxes use SMB or SPOOLSS for printing.  Both are
+supported by Samba.  On the CUPS server say something like
+
+   /etc/samba/smb.conf
+     [global]
+        security = share
+        printing = CUPS
+        load printers = yes
+        hosts allow = 10.0.0.0/255.0.0.0
+        wins support = yes
+     [printers]
+        path = /var/spool/samba
+        browseable = no
+        guest ok = yes
+        guest only = yes
+        read only = yes
+        printable = yes
+   chkconfig smb on
+   service smb start
+
+Clients print to the share
+
+   \\smb.print.example.edu.au\lp
+
+There is no AppleTalk Printer Access Protocol to CUPS
+gateway that I know of.  So MacOS8 users are stuffed.
+
+Notice how we use DNS aliases (ipp.print, lpd.print, smb.print)
+so clients don't need to update their configurations if
+we move the print spooler to a new machine.
+
+Another good idea is to place all the printers with network
+interfaces on a private VLAN/subnet.  There are lots of bugs
+in printers, and allowing them on the corporate network
+let alone on the Internet is a big risk.  This also has
+the nice effect of
+  - forcing all printer traffic through the print spooler.
+  - allowing you to keep the printer configuration on
+    a TFTP server, making network-wide changes easy.
+
+-- 
+  Glen Turner                (08) 8303 3936 or +61 8 8303 3936
+  Australian Academic and Research Network   www.aarnet.edu.au
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

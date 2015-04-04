@@ -1,0 +1,188 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba Authentication [Was: Samba user management]" -->
+<!-- FromName="'Matthew Geddes'" -->
+<!-- FromEmail="mgeddes@tellurian.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="adam.smith@sageautomation.com" -->
+<!-- Date="12 Mar 2003 16:03:41 +1030" -->
+<!-- Id="1047447221.27414.78.camel@hilarious" -->
+<!-- Reference="347C66CAA5AEB948AA431B1C1BCF99BA01C22F92@adlex3.elderslimited.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba Authentication [Was: Samba user management]</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A></I>&gt;
+  Date: 12 Mar 2003 16:03:41 +1030
+</PRE>
+<H1>Re: Samba Authentication [Was: Samba user management]</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 2003-03-12 at 15:35, Adam Smith wrote:
+
+&gt; &gt; My recommendation for a Windows system would be to make use of it's own
+&gt; &gt; native protocols. Many applications make an assumption that this will be
+&gt; &gt; the case and it will save you much grief later.
+&gt; 
+&gt; When you say a "Windows system," are you talking about a purely Windows
+&gt; environment?  If so I couldn't agree more.
+
+Sorry, not really clear enough. I meant in any environment. So, I'd have
+my Windows clients authenticate against a UNIX/Samba PDC, instead of
+installing (say) NISGINA on each workstation and having them
+authenticate against a UNIX/NIS+ server.
+
+&gt; Encrypt passwords is set to yes.  I think with Windows XP it is a
+&gt; requirement for Samba to have "encrypt passwords" set to yes.  Is this a
+
+It's not required - there's a magic registry entry for turning it off at
+the client end. This can be put in a group policy file even :-). It's
+still advisable though.
+
+&gt; complication when authenticating with PAM, if so, how so, and what do you
+&gt; do about it?
+
+It stems from the fact that both Windows and the standard UNIX passwd
+files both make one-way hashes of their passwords. These are both
+incompatible, so when a Windows user authenticates using
+encrypted/hashed passwords, there is no way to convert that password
+into something that can successfully be compared against the contents of
+the /etc/passwd file. The only time Windows (in theory) sends the
+password across the network in plain text is when the password is being
+changed from the magic dialog box. It is possible for Samba to (before
+is hashes the password) write the password to the UNIX password database
+(/etc/passwd, NIS, LDAP, etc) in the form that it requires and then
+write it to the smbpasswd file in the NT-style hashes.
+
+&gt; &gt; This one kinda depends on what the modems are plugged into. If it's some
+&gt; &gt; kind of RADIUS speaking device, it can use RADIUS :-).
+&gt; 
+&gt; They're currently connected to a NT RAS server on serial ports, and they're
+&gt; just modems, but I'd like to move them to FreeBSD eventually.  I assume
+&gt; that if I configure that NT server to authenticate against the Samba
+&gt; domain, which authenticates to LDAP through PAM, those current RAS users
+&gt; can still authenticate against NT, through PAM to LDAP, right? :)  ...
+&gt; without any additional configurations.
+
+Yep. Should work :-)
+
+
+&gt; LDAP to me is the most difficult part at this time.  It's one of the
+&gt; reasons I never bothered with it when I began this project, because I
+&gt; didn't want to tackle too much at once.  It seems like something reasonably
+&gt; complicated.
+
+Do you have any specific questions?
+
+&gt; 
+&gt; &gt;   * Turn on password encryption on the Samba PDC
+&gt; 
+&gt; (as above) how does this integrate with PAM?
+
+(as above) see above :-)
+
+&gt; 
+&gt; &gt;   * Have Samba compiled and configured to store it's authentication in
+&gt; &gt; 	the same LDAP directory
+&gt; 
+&gt; Oh -- so Samba authenticates outside of PAM, directly into LDAP, whereas
+&gt; everything else authenticates through PAM into LDAP?
+
+Yes, sorry. Should have been more clear.
+
+&gt; 
+&gt; &gt;   * Configure Samba to update unix passwords (unix passwd sync smb.conf 
+&gt; &gt; 	option) in the LDAP directory when Samba password changes
+&gt; 
+&gt; Well that answers that, it must, or that wouldn't work.  If I turn on "unix
+&gt; password sync," is that all I need to do once Samba is compiled with
+&gt; --enable-ldap (or whatever it is?)
+
+It's a little less straightforward than that. You need to:
+
+ * compile with --enable-ldap
+ * configure the ldap* options in smb.conf (check smb.conf(5))
+ * configure turn on unix passwd sync
+ * configure the passwd chat smb.conf option to use a tool like
+ldappasswd to update the UNIX account info in the LDAP directory.
+
+All of this should be in the Samba HOWTO Collection, Samba PDC HOWTO
+and/or the Samba LDAP HOWTO. If not, do a search of the
+<A HREF="mailto:samba-ntdom@samba.org">samba-ntdom@samba.org</A> mailing list. There was a lady from a
+University(?) that published a detailed account of how she set this up.
+It was about 2-3 years ago and the LDAP code hadn't yet made it into a
+Samba release, but it's worth looking at if you can't find anything else
+(even if just for the ldappasswd / passwd chat stuff).
+
+&gt; 
+&gt; &gt;   * Let users change their passwords using the Windows control panel
+&gt; 
+&gt; Is there any functionality for strong passwording or forced password
+&gt; changes every n days, because as far as I know, PAM can do this.  Can Samba
+&gt; do it when querying LDAP directly, or do I still have to wait for Samba
+&gt; 3.x?
+
+See if this was answered in my last e-mail. I think it's possible to
+force a change every so often without too much drama. I haven't tried
+forcing a cracklib-style password policy, but let me know how you go :-)
+
+&gt; 
+&gt; &gt;   * Use Directory Administrator or some custom tool for your own
+&gt; &gt; 	management purposes.
+&gt; 
+&gt; Directory Administrator?  An LDAP tool?
+
+Yep. Sorry. It's a GUI tool that's handy for the day-to-day running of
+user accounts stored in an LDAP directory. It supports unix accounts,
+Samba accounts, mail routing and a few other things. It's designed to
+hide the gory details from your common user.
+
+&gt; 
+&gt; &gt;   * The dialup lines can use one or more of the above methods or you can
+&gt; &gt; 	set up FreeRADIUS on one of the UNIX machines and tell it to use
+&gt; &gt; 	PAM and therefore the LDAP directory.
+&gt; 
+&gt; That was the option I was considering for these users.
+&gt; 
+&gt; 
+&gt; Thanks for your input so far :)
+
+I hope that it helps.
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,288 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="ipfw vs. iptables (was: gentoo vs freebsd)" -->
+<!-- FromName="'Greg 'groggy' Lehey'" -->
+<!-- FromEmail="grog@lemis.com" -->
+<!-- ToName="'Richard Russell'" -->
+<!-- ToEmail="richard@yellowgoanna.com" -->
+<!-- Date="Mon, 2 Jun 2003 10:26:33 +0930" -->
+<!-- Id="20030602005633.GI73959@wantadilla.lemis.com" -->
+<!-- Reference="20030601030401.GB20360@skink.yellowgoanna.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: ipfw vs. iptables (was: gentoo vs freebsd)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Greg  &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  To  : Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  Date: Mon, 2 Jun 2003 10:26:33 +0930
+</PRE>
+<H1>ipfw vs. iptables (was: gentoo vs freebsd)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sunday,  1 June 2003 at 12:34:01 +0930, Richard Russell wrote:
+&gt; On Sun, Jun 01, 2003 at 04:07:10AM +0930, Richard Russell wrote:
+&gt;&gt;&gt; Hi all,
+&gt;&gt;
+&gt;&gt; Hi Richard (replying to my own post :)
+&gt;
+&gt; Me again,
+&gt;
+&gt; Further to the comparison, there are a few other major differences
+&gt; that I didn't mention -- focussing on "Linux" vs "FreeBSD" rather
+&gt; than "gentoo" vs "FreeBSD".
+&gt;
+&gt; Both appear to have a stateful firewall, though I am not familiar
+&gt; enough with freebsd's ipf and ipfw to be sure quite how to use them,
+&gt; or what the difference between them actually is. Certainly, on
+&gt; initial inspection, they appear equivalent to iptables in
+&gt; functionality. If anyone has found a decent comparison, I'd be keen
+&gt; to see it.
+
+I run both ipfw and iptables on my network.  ipfw is on the PPP
+gateway (echunga), and iptables is on the satellite receiver box
+(sat-gw).  The satellite card has only a Linux driver (in binary
+form), so I can't run FreeBSD on it.  echunga runs 4.7-STABLE, and
+sat-gw runs Red Hat 7.0 (I think) with a 2.4.16 kernel.
+
+I don't know what the problem is--could be the driver--but sat-gw
+hangs itself up every month or so.  I've asked Rusty if there's
+any known problem of that nature with iptables, and he says that he
+doesn't know of any.
+
+Comparing the syntax, I think that ipfw is simpler.  The rule sets on
+each system are similar.  Here are some of the ipfw rules on echunga:
+
+	# This stuff really belongs in rc.config
+	net=192.109.197.0/24
+	ppplink=139.130.136.138
+	mask=255.255.255.0
+	ip=192.197.109.137
+	oif=ppp0
+
+	# Stop RFC1918 nets on the outside interface
+	${fwcmd} add deny all from any to 10.0.0.0/8 via ${oif}
+	${fwcmd} add deny all from any to 172.16.0.0/12 via ${oif}
+	${fwcmd} add deny all from any to 192.168.0.0/16 via ${oif}
+
+	# Allow TCP through if setup succeeded
+	${fwcmd} add allow tcp from any to any established
+
+	# Allow outbound UDP
+	${fwcmd} add allow udp from ${net} to any
+	${fwcmd} add allow udp from ${ppplink} to any
+
+	# Allow ICMP in and out
+	${fwcmd} add allow icmp from any to any
+
+Here are the corresponding iptables rules:
+
+# This stuff really belongs in rc.config
+net=192.109.197.0/24
+ppplink=139.130.136.138
+mask=255.255.255.0
+ip=192.197.109.137
+oif=sm200d
+fwcmd=iptables
+
+# flush current rules
+
+${fwcmd} -F INPUT
+${fwcmd} -F FORWARD
+
+# Stop RFC1918 nets on the outside interface
+${fwcmd} -A INPUT -j DROP -d 10.0.0.0/8 -i ${oif}
+${fwcmd} -A FORWARD -j DROP -d 10.0.0.0/8 -i ${oif}
+${fwcmd} -A INPUT -j DROP -d 172.16.0.0/12 -i ${oif}
+${fwcmd} -A FORWARD -j DROP -d 172.16.0.0/12 -i ${oif}
+${fwcmd} -A INPUT -j DROP -d 192.168.0.0/16 -i ${oif}
+${fwcmd} -A FORWARD -j DROP -d 192.168.0.0/16 -i ${oif}
+
+# Allow TCP through if setup succeeded
+${fwcmd} -A INPUT -j ACCEPT -p tcp --tcp-flags ACK ACK
+${fwcmd} -A FORWARD -j ACCEPT -p tcp --tcp-flags ACK ACK
+${fwcmd} -A INPUT -j ACCEPT -p tcp --tcp-flags RST RST
+${fwcmd} -A FORWARD -j ACCEPT -p tcp --tcp-flags RST RST
+
+# Allow outbound UDP
+${fwcmd} -A INPUT -j ACCEPT -p udp -s ${net}
+${fwcmd} -A FORWARD -j ACCEPT -p udp -s ${net}
+${fwcmd} -A INPUT -j ACCEPT -p udp -s ${ppplink}
+${fwcmd} -A FORWARD -j ACCEPT -p udp -s ${ppplink}
+
+# Allow ICMP in and out
+${fwcmd} -A INPUT -j ACCEPT -p icmp
+${fwcmd} -A FORWARD -j ACCEPT -p icmp
+
+The most obvious difference is that you have two separate chains in
+iptables.  This isn't necessarily a bad idea, but it makes the file
+twice as long.  In addition, the TCP rules for iptables are much more
+difficult to specify and require an understanding of the protocol.
+I'm not even sure if I have it right!
+
+&gt; Linux has better FS support -- or rather, more options.
+
+Yes, more options :-)
+
+&gt; It has a journalling filesystem (or three -- ext3, reiserfs, XFS,
+&gt; with JFS to come, as I understand). FreeBSD has ufs with Soft
+&gt; Updates, which, as far as I can tell, appears to provide pretty much
+&gt; the same sort of bonuses anyway.
+
+It's also renowned for its stability.  This is probably one of the
+reasons why nobody had written anything else for BSD.
+
+&gt; SMP is rumoured to be more mature and faster under Linux, though
+&gt; this doesn't matter much to me anyway. I understand that FreeBSD 5.0
+&gt; brings major improvements, though I don't know if that means it's
+&gt; equal to Linux.
+
+My guess (as one of the authors of the new FreeBSD SMP code) is that
+Linux is still ahead in this area.  But I don't think it's very far
+ahead, and we're relatively happy with the FreeBSD code now.
+
+&gt; Software-wise, there is little to choose between them. They both
+&gt; have vast amounts of software, most of which will compile natively
+&gt; under either. FreeBSD also has a Linux emulation layer, which
+&gt; enables it to run Linux binaries if need be -- and I understand it
+&gt; does this with no performance penalty.
+
+Correct.  Some people claim--without substantiation--that FreeBSD can
+sometimes run Linux binaries faster than on a Linux box.  That's at
+least theoretically possible.
+
+&gt; Commercial software probably enjoys more support under Linux, but I
+&gt; doubt that gentoo would be considered supported by most vendors.
+
+Again, most of it runs on FreeBSD.
+
+&gt; FreeBSD's console doesn't have the ability to scroll, at least, it's
+&gt; not set up to do so by default.
+
+Yes, it does, and it's set up by default.  For reasons lost in the
+mists of antiquity, you need to press the ScrollLock key to enable it.
+
+&gt; The FreeBSD MBR is particularly simple, and I haven't yet found any
+&gt; place to configure it.
+
+/boot/loader.conf.
+
+&gt; Both have a devfs system.
+
+With very different semantics.
+
+&gt; FreeBSD names devices after their drivers -- eg fxp0 is the first Intel
+&gt; EtherExpress Pro 10/100 device, whereas rl0 is the first Realtek
+&gt; 8129/8139 device. 
+
+In fact, so does Linux, but Linux then maps the devices to specific
+names, and that's what you normally see.
+
+&gt; I'll have more to say about my FreeBSD experiences as I familiarise
+&gt; myself with it further. For now, I have come accross an odd situation
+&gt; where some of my installed ports appear to be more recent than those in
+&gt; the ports collection.
+&gt;
+&gt; Some of my unanswered questions (about both gentoo and FreeBSD, but
+&gt; focussing on FreeBSD at present) are:
+&gt;
+&gt; * Practically speaking, how well does the FreeBSD cvsup and ports system
+&gt; work?
+
+cvsup: very well.  Ports Collection: OK.
+
+&gt; How much attention does it need to keep up to date?
+
+cvsup: I have a daily cron job which updates my repository and one of
+the source trees.  Ports Collection: use portupgrade, which
+occasionally causes some surprises.  If I can believe the Debian
+people I know, Debian does it better.  My own experiences with Debian
+have been pretty harrowing, though.
+
+&gt; * Is there a way to make a canonical list of ports to have
+&gt; installed, and uninstall anything that isn't on that list or a
+&gt; dependency of something.  Something like Debian's debfoster.
+
+There's nothing standard, but it should be trivial to implement.
+Basically you just need a Makefile with something like:
+
+  PORTS = editors/emacs mail/mutt shells/bash2 mail/postfix
+
+  all:
+	for i in ${PORTS}; do \
+		(cd /usr/ports/$$i; make install); \
+	done
+
+&gt; * Assuming I had a machine to test the process on first, how easy would it
+&gt; be to automate the process of updating everything on a number of machines
+&gt; at once (perhaps using my own repository mirror, so as to maintain a
+&gt; consistent state to update to).
+
+Depends on what you mean by "everything".  I have my source trees on
+one machine (echunga) and they're NFS mounted on the others.  If
+you're keeping them in sync, you just need to build and install on
+one, then install on the others.
+
+&gt; * Can I create a package that consists of little more than config files
+&gt; and dependencies (whether as normal dependencies, or a canonical list as
+&gt; described above), and install that on a machine, and have the automated
+&gt; update process respect that?
+
+That's a little vague to give an unqualified "yes" answer to.  The
+question should be more like: "I have this little list.  How do I get
+it to run an automated update".  The answer would depend on the
+contents of the list, of course.
+
+&gt; If it sounds like I have some more specific goals in mind, that's
+&gt; because I have... :)
+
+Might I remind you that most of the people who can answer these
+questions are on BUGA?  See
+<A HREF="http://www.auug.org.au/mailman/listinfo/buga">http://www.auug.org.au/mailman/listinfo/buga</A> for more details.
+
+Greg
+--
+Finger <A HREF="mailto:grog@lemis.com">grog@lemis.com</A> for PGP public key
+See complete headers for address and phone numbers
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.0 (FreeBSD)
+
+iD8DBQE+2qDBIubykFB6QiMRAqS9AKCX45wYMBGXyReLHwpMTzANQLmHZQCcCvah
+QyN5DCaEmiEosa4aIq0qPiE=
+=b6Ml
+-----END PGP SIGNATURE-----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

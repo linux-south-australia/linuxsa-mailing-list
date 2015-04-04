@@ -1,0 +1,111 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: automation of apt-get" -->
+<!-- FromName="'Daniel Mundy'" -->
+<!-- FromEmail="djmunds@gmx.net" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 03 Feb 2002 15:38:23 +1030" -->
+<!-- Id="3C5CC5C7.19321C86@gmx.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: automation of apt-get</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daniel Mundy &lt;<I><A HREF="mailto:djmunds@gmx.net">djmunds@gmx.net</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 03 Feb 2002 15:38:23 +1030
+</PRE>
+<H1>Re: automation of apt-get</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I think I have gotten the script working nicely now, and have set up
+some basic logging so that I can keep track of it and make sure the
+error handling I have tried to code into it has actually worked. I just
+thought I would let people know what I have finally come up with, in
+case you want to use it yourself or are just curious :)
+
+- Once daily cron job deleting /tmp/autoupgrade and then running the
+script:
+0 6 * * * rm /tmp/autoupgrade; /usr/local/bin/autoupgrade
+
+- ip-up calls the script, in case ppp was not up at 6 when the script
+was first called (if it was though, the script will not re-run as
+/tmp/autoupgrade will exist).
+
+
+#!/bin/sh
+
+if [ ! -e /tmp/autoupgrade ]
+then
+        echo \(`date`\) about to perform today\'s upgrade &gt;&gt;
+/var/log/autoupgrade
+        exit_status=1
+        while [ $exit_status != 0 ]
+        do
+                echo attempting apt-get update &gt;&gt; /var/log/autoupgrade
+                /usr/sbin/pppstats
+                if [ $? = 1 ]
+                then
+                echo ppp is down, exiting &gt;&gt; /var/log/autoupgrade
+                        exit 0
+                        fi
+                apt-get update
+                exit_status=$?
+                echo update status $exit_status &gt;&gt; /var/log/autoupgrade
+                done
+        exit_status2=1
+        while [ $exit_status2 != 0 ]
+        do
+                echo attempting apt-get -dy upgrade &gt;&gt;
+/var/log/autoupgrade
+                /usr/sbin/pppstats
+                if [ $? = 1 ]
+                then
+                echo ppp is down, exiting &gt;&gt; /var/log/autoupgrade
+                        exit 0
+                        fi
+                apt-get -dy upgrade
+                exit_status2=$?
+                echo upgrade status $exit_status2 &gt;&gt;
+/var/log/autoupgrade
+                done
+
+        touch /tmp/autoupgrade
+        echo \(`date`\) done &gt;&gt; /var/log/autoupgrade
+        fi
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

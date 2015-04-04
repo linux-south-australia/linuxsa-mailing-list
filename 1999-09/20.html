@@ -1,0 +1,162 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: bash: ./agent.be: No such file or directory" -->
+<!-- FromName="Jake Hawkes" -->
+<!-- FromEmail="jake@eclectic.com.au" -->
+<!-- ToName="Phil Pittard" -->
+<!-- ToEmail="vk5ham@seol.net.au" -->
+<!-- Date="Wed, 01 Sep 1999 18:42:09 +0930" -->
+<!-- Id="37CCEDE9.824AA217@eclectic.com.au" -->
+<!-- Reference="37CCAF23.EA863DD2@eclectic.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: bash: ./agent.be: No such file or directory</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A></I>&gt;
+  To  : Phil Pittard &lt;<I><A HREF="mailto:vk5ham@seol.net.au">vk5ham@seol.net.au</A></I>&gt;
+  Date: Wed, 01 Sep 1999 18:42:09 +0930
+</PRE>
+<H1>Re: bash: ./agent.be: No such file or directory</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Martin Sandiford said:
+-----------------------------
+It may be linked against an ld-linux.so that you do not have on the
+Slackware install.  You could check for this thusly:
+
+$ strings agent.be | less
+
+Early on (probably the first line) should be something like:
+
+   /lib/ld-linux.so.&lt;n&gt;
+
+Where &lt;n&gt; is probably 2.  You will need to have this file/symlink
+for this program to start.
+
+I am no longer in touch with what happens in the Slackware world.  Is
+Slackware 2.0.0 libc5 or libc6?  The problems you describe are what I
+would expect to see on a libc5 system with a libc6 dynamically linked
+binary.
+
+------------------------------
+
+this turned out to be correct. the slackware libraries were old. I
+eventually copied all the required files from a RH6 box to make it work.
+
+Dodgey - and I think I will have some problems later, but we'll see what
+happens
+
+Jake 
+
+Phil Pittard wrote:
+&gt; 
+&gt; Hi... based on my experience, this error indicates that "agent.be" is
+&gt; trying to load another file and it cant find the file specified in its
+&gt; code in the current directory, and / or the file is not in the "path"
+&gt; 
+&gt; So, you need to find what file it is trying to load (it might be
+&gt; "agent.cfg" and it is meant to be elsewhere, /etc for eg, or
+&gt; - maybe agent.cfg needs -rw-rw-rw- instead of its current permissions..
+&gt; - or it could be after some other file altogether...
+&gt; 
+&gt; Anyway, just some semi-educated guesses!
+&gt; 
+&gt; Cheers, Phil
+&gt; --------------------
+&gt; Jake Hawkes wrote:
+&gt; &gt;
+&gt; &gt; this is a weird problem.
+&gt; &gt;
+&gt; &gt; i downloaded a binary, and it runs fine on my RH6 and RH5.2 but it will
+&gt; &gt; not run on the slackware 2.0.0 box
+&gt; &gt;
+&gt; &gt; here are some diagnostics
+&gt; &gt;
+&gt; &gt; $&gt;ls -l .
+&gt; &gt; -rwxr-xr-x   1 root     root         3922 Aug 30 15:10 a.out*
+&gt; &gt; -rwxr-xr-x   1 root     root        82744 Aug 30 16:05 agent.be*
+&gt; &gt; -rw-rw----   1 root     root         5468 Aug 30 14:43 agent.cfg
+&gt; &gt; -rw-r-----   1 root     root           79 Aug 30 14:46 agent.log
+&gt; &gt;
+&gt; &gt; $&gt;./a.out
+&gt; &gt; hello world
+&gt; &gt;
+&gt; &gt; $&gt; ./agent.be
+&gt; &gt; bash: ./agent.be: No such file or directory
+&gt; &gt;
+&gt; &gt; $&gt; file agent.be
+&gt; &gt; agent.be: ELF 32-bit LSB executable i386 (386 and up) Version 1
+&gt; &gt;
+&gt; &gt; $&gt; file a.out
+&gt; &gt; a.out: ELF 32-bit LSB executable i386 (386 and up) Version 1
+&gt; &gt;
+&gt; &gt; $&gt; strace agent.be
+&gt; &gt; strace: exec: No such file or directory
+&gt; &gt;
+&gt; &gt; $&gt; strace foo
+&gt; &gt; strace: foo: command not found
+&gt; &gt;
+&gt; &gt; the last 2 are weird. "strace foo" can't work (there is no file called
+&gt; &gt; foo), but "strace agent.be" returns that weird error. It's like the
+&gt; &gt; program is returning an error, but its not even starting up.
+&gt; &gt;
+&gt; &gt; ok, maybe a library error
+&gt; &gt;
+&gt; &gt; $&gt; ldd agent.be
+&gt; &gt; ldd: can't execute agent.be (No such file or directory)
+&gt; &gt;
+&gt; &gt; &lt;meek&gt;
+&gt; &gt;   help?
+&gt; &gt; &lt;/meek&gt;
+&gt; &gt; --
+&gt; &gt; Jake Hawkes, B. Eng (CSE)
+&gt; &gt;
+&gt; &gt; e-mail: <A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A>
+&gt; &gt;
+&gt; &gt; --
+&gt; &gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; &gt; To unsubscribe from the LinuxSA list:
+&gt; &gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt; 
+&gt; --
+&gt; Phil Pittard
+&gt; Amateur Radio Station: VK5HAM
+&gt; <A HREF="http://www.vk5ham.au.com">http://www.vk5ham.au.com</A>
+
+--
+Jake Hawkes, B. Eng (CSE)
+
+e-mail: <A HREF="mailto:jake@eclectic.com.au">jake@eclectic.com.au</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

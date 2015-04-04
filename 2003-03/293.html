@@ -1,0 +1,125 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: sendmail security issue" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="ak.linuxsa@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 6 Mar 2003 18:00:51 +1030" -->
+<!-- Id="20030306180051.A2276@dog.topology.org" -->
+<!-- Reference="3E6690B1.9030803@aarnet.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: sendmail security issue</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 6 Mar 2003 18:00:51 +1030
+</PRE>
+<H1>Re: sendmail security issue</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+This is a longish item on Postfix open-relay exploits.
+
+On Thu, Mar 06, 2003 at 10:35:05AM +1030, Glen Turner wrote:
+&gt; Alan Kennington wrote:
+&gt; 
+[...]
+&gt; 
+&gt; &gt; If my perception is right, then there's no need for sendmail to 
+&gt; &gt; hang around any more. It should go the museum of 1980s memorabilia.
+&gt; 
+&gt; I can't agree.  I want a "modern" sendmail configuration
+[...]
+
+It didn't take me long to find something painful in the Postfix mail software.
+The following problem description never happened with "sendmail" because
+sendmail sends error messages back to the SMTP client, not the From-address.
+
+I find this sort of stuff in my Postfix logs in /var/log/mail.
+It suggests that I've become an open relay although
+<A HREF="http://www.abuse.net/relay.html">http://www.abuse.net/relay.html</A>
+says that my mail server is open-relay free.
+
+Here's a log sample:
+===========================================================================
+Mar  6 16:47:00 dog postfix/smtpd[2028]: connect from unknown[212.72.55.184]
+Mar  6 16:47:10 dog postfix/smtpd[2028]: 496484C483: client=unknown[212.72.55.184]
+Mar  6 16:47:23 dog postfix/cleanup[2030]: 496484C483: message-id=&lt;00005a6a3168$000044a7$<A HREF="mailto:00004306@k0.k2.t.u-tokyo.ac.jp">00004306@k0.k2.t.u-tokyo.ac.jp</A>&gt;
+Mar  6 16:47:23 dog postfix/qmgr[24587]: 496484C483: from=&lt;<A HREF="mailto:M.Washington@uwasa.fi">M.Washington@uwasa.fi</A>&gt;, size=2739, nrcpt=1 (queue active)
+Mar  6 16:47:23 dog postfix/smtpd[2033]: connect from dog.topology.org[203.38.148.51]
+Mar  6 16:47:23 dog postfix/smtp[2032]: warning: host dog.topology.org[203.38.148.51] greeted me with my own hostname dog.topology.org
+Mar  6 16:47:23 dog postfix/smtp[2032]: warning: host dog.topology.org[203.38.148.51] replied to HELO/EHLO with my own hostname dog.topology.org
+Mar  6 16:47:23 dog postfix/smtp[2032]: 496484C483: to=&lt;<A HREF="mailto:20000608225624.a6115@dog.topology.org">20000608225624.a6115@dog.topology.org</A>&gt;, relay=dog.topology.org[203.38.148.51], delay=13, status=bounced (mail
+ for dog.topology.org loops back to myself)
+Mar  6 16:47:23 dog postfix/smtpd[2033]: lost connection after EHLO from dog.topology.org[203.38.148.51]
+Mar  6 16:47:23 dog postfix/smtpd[2033]: disconnect from dog.topology.org[203.38.148.51]
+Mar  6 16:47:23 dog postfix/cleanup[2030]: A4E778A3DD: message-id=&lt;<A HREF="mailto:20030306061723.A4E778A3DD@dog.topology.org">20030306061723.A4E778A3DD@dog.topology.org</A>&gt;
+Mar  6 16:47:23 dog postfix/qmgr[24587]: A4E778A3DD: from=&lt;&gt;, size=4378, nrcpt=1 (queue active)
+Mar  6 16:47:29 dog postfix/smtpd[2028]: disconnect from unknown[212.72.55.184]
+Mar  6 16:47:34 dog postfix/smtp[2036]: A4E778A3DD: to=&lt;<A HREF="mailto:M.Washington@uwasa.fi">M.Washington@uwasa.fi</A>&gt;, relay=jess.uwasa.fi[193.166.120.38], delay=11, status=sent (250 2.0.0 h266HTh31263 Me
+ssage accepted for delivery)
+============================================================================
+
+In the above, dog.toplogy.org (203.38.148.51) is a mail server with Postfix running on it.
+The above pattern has happened 3 times in the last 24 hours or so already.
+
+It looks like the computer at 212.72.55.184 sends me some sort of mail which
+is supposedly from <A HREF="mailto:M.Washington@uwasa.fi.">M.Washington@uwasa.fi.</A>
+But then I don't understand why the "smtpd" process gets this connection from my own machine?!
+I don't understand the rest of the garbage.
+But it ends up with an e-mail being sent to someone in Finland.
+
+This is the kind of problem that sendmail never had - sendmail always seems to
+bounce mail back to the STMP client, but this Postfix software has somehow been
+tricked into sending to a bogus From-address.
+
+Are there any experts out there who could save me a few hours' work be explaining
+what I'm doing wrong with Postfix?
+I don't want to spend days reading all the docs and faqs for yet another
+flaky chunk of software.
+I'm beginning to think I'll have to wipe the slate clean and
+start with a completely new sendmail set-up or something.
+A permanent connection to the Internet is such a pain.
+I'm beginning to think I should turn off the modem and just read my
+e-mail at an Internet cafe or something!
+I spend more than half my time fighting fires when I should be doing
+productive work.
+
+CHeers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

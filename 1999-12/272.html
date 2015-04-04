@@ -1,0 +1,147 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: NT and Linux user authentication" -->
+<!-- FromName="Andrew Speer" -->
+<!-- FromEmail="andrew.speer@isolutions.com.au" -->
+<!-- ToName="Nick Morrison <nickm@bhwb.nsw.gov.au>, linuxsa" -->
+<!-- ToEmail="nickm@bhwb.nsw.gov.au" -->
+<!-- Date="Tue, 14 Dec 1999 01:38:26 +1030" -->
+<!-- Id="" -->
+<!-- Reference="001c01bf4524$07aed220$4201010a@bhwb.local" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: NT and Linux user authentication</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Speer &lt;<I><A HREF="mailto:andrew.speer@isolutions.com.au">andrew.speer@isolutions.com.au</A></I>&gt;
+  To  : Nick Morrison &lt;nickm@bhwb.nsw.gov.au&gt;, linuxsa &lt;<I><A HREF="mailto:nickm@bhwb.nsw.gov.au">nickm@bhwb.nsw.gov.au</A></I>&gt;
+  Date: Tue, 14 Dec 1999 01:38:26 +1030
+</PRE>
+<H1>Re: NT and Linux user authentication</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hello Nick,
+
+I have had quite a bit of experience with a PAM module called pam_smb,
+originally written by David Airlie, and I believe still maintained by him.
+It may or may not be similar to the pam_ntdom module, but I think it will do
+what you want. My understanding is that pam_ntdom is/was a subset of the
+Samba development, but pam_smb was developed seperately. Maybe Richard
+Sharpe could shed some light on the lineage ?
+
+The last URL I had for pam_smb is: <A HREF="http://www.csn.ul.ie/~airlied/pam_smb/">http://www.csn.ul.ie/~airlied/pam_smb/</A>
+
+You do not mention what type of problems you have with the module. Are they
+compilation problems, or problems in the actual use of the module ? Can you
+give some examples of the problem, and also the version of pam_ntdom you are
+using ? Have you tried pam_smb ?
+
+The pam_smb module also comes with a daemon that caches passwords, making it
+work effectively with applications that (rightly or wrongly) repeatedly
+verifiy passwords at short intervals (earlier versions of squid were guilty
+of this). Caching successful password queries means that your NT or Samba
+servers do not get hammered with password verification requests. pam_smb can
+validate against a Samba daemon or NT (3.51/4.0) server/workstation.
+
+pam_smb also supports Unix &lt;-&gt; NT username translation (I wrote that part of
+the code. Well actually I shamelessly lifted the db example code and stuffed
+it into pam_smb ..), eg the mail account on the Linux box may be under the
+username "smithf", who is actually the NT User "GHERKIN\Fred_Smith". It *is*
+possible to have pam_smb authenticate people who have valid NT accounts (and
+passwords), but no Linux credentials, however this is not recommended unless
+you are particularly sure of what you are doing. I am not sure how this
+would work with mail. Does sendmail/procmail work if the mail user has no
+account on the target host ? Hmm ..
+
+I have successfully used pam_smb on a Linux server to validate NT user
+account information for people using POP mail, squid proxy servers and the
+Apache web server. Theoretically any application that is PAM enabled should
+work with pam_smb, although some applications will only support the Unix
+accounts as usernames. Eg in Squid I can use the username "Andrew_Speer" (my
+NT account), put with the POP server I can only use "aspeer" (but it is
+still translated to NTDOM\Andrew_Speer and passwd validated against an NT
+server)
+
+I don't see any reason why you can't do what you have requested in you
+email, and feel free to email me privately if you have problems getting
+pam_smb to work. Which you may have, as I believe that RH6.0 uses Berkeley
+DB2, and pam_smb was written for Berkeley DB1.85 - but I can probably help
+if you get to that bridge and want to cross it.
+
+
+Regards,
+
+Andrew Speer
+
+
+
+----- Original Message -----
+From: Nick Morrison &lt;<A HREF="mailto:nickm@bhwb.nsw.gov.au">nickm@bhwb.nsw.gov.au</A>&gt;
+To: linuxsa &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Sent: Monday, December 13, 1999 3:09 PM
+Subject: NT and Linux user authentication
+
+
+&gt; Hello everyone.
+&gt;
+[snip]
+&gt;
+&gt;  - I've seen a PAM module called pam_ntdom.  Now *that* is really what
+would
+&gt;    be the most useful for me for the immediate future - it is /supposed/
+to
+&gt;    authenticate user logins using a Windows NT Domain Controller.
+&gt;    Unfortunately, though, even after loads of discussion with the author,
+I
+&gt;    could *not* make it work correctly with my RedHat 6.0 system.  The
+author
+&gt;    gave up on me :(
+&gt;
+&gt;    Has anyone heard of anything similar?  Or in fact had pam_ntdom
+working?
+&gt;
+&gt;
+&gt; The main problem is the whole authentication thing.  I want everyone to
+have
+&gt; access to email, but they don't all have Linux accounts.  If their NT
+&gt; password changes, the Linux password has to be changed seperately.  Yuk.
+&gt;
+&gt; Thankyou for your time :)  All thoughts are /very/ welcome.
+&gt;
+&gt; Bye for now.
+&gt; __
+&gt; Nick Morrison
+&gt; <A HREF="mailto:nickm@bhwb.nsw.gov.au">nickm@bhwb.nsw.gov.au</A>
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

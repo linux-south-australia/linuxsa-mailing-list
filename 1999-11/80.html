@@ -1,0 +1,162 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: small GCC probs" -->
+<!-- FromName="mike andrew" -->
+<!-- FromEmail="mikero@norfolk.nf" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 4 Nov 1999 22:32:43 +1130" -->
+<!-- Id="9911042307530B.01088@mikero.home" -->
+<!-- Reference="38220C42.6B9611F8@grouse.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: small GCC probs</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: mike andrew &lt;<I><A HREF="mailto:mikero@norfolk.nf">mikero@norfolk.nf</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Thu, 4 Nov 1999 22:32:43 +1130
+</PRE>
+<H1>Re: small GCC probs</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, 05 Nov 1999, behoffski wrote:
+Excuse the length of replied section of this post, but your comments are
+pertinent, and I would like to back up what you say.  I have 30+ years
+experience of writing C only for embedded systems. 
+
+One of the salient features of many embedded projects is an almost total lack
+of debugging ability. You simply cannot breakpoint anywhere, and most embedded
+applications have no stdio of any kind. The concept of stdout is a little
+strange when you're switching traffic lights &lt;grin&gt;.
+
+To get round this, a viable method is to use a standard compiler (such as GNU)
+on a standard OS (such as linux) to test the embedded code. Typically, this
+involves wrapping the entire project inside (let's say) embedded_main() and
+calling it from main(). Everything inside main is #defined out on the embedded
+compile except for a single call to embedded_main(). You can then use stderr
+and other facilites to debug code.
+
+What is immutable in this picture, is that source code *must* be generic and
+standard. Very typically, a manufacturer of chip 'X' supplies a reasonable C
+compiler for it. You can be certain, it cannot have, and will never have, the
+advanced "lint" type features of GNU. It simply won't and can't find the really
+strange gotchas (missing include include include files, wrongly phrased int's
+when you meant shorts, etc ad infinitum. Australian Hitech compilers are
+perhaps the best crafted embedded compilers in the world. They are badge
+engineered in the US so the yanks think they're home grown, they don't lint
+very well at all).
+
+In my world, it is imperative to test my embedded C source with a real -world
+compiler such as gnu. I WANT the compiler to scream at me, I welcome it
+complaining very loudly about void main(void). The original author of this
+post, is, i think, missing the whole point of using good syntax to begin with.
+The last thing I would want to do, no matter how innocuous it would appear, is
+cripple a warning message when my embededd eprom is going to end up on a flight
+control system somewhere. They are awfully difficult to fix after the event.
+
+You are also quite correct about void functions being handled differently. In
+Hitech's case for HC11's and 68340's it is optimised to jumps, not call subs.
+This makes bugger all difference to all functions except main() and exit().
+The startup asm code makes wrong assumptions (it sets the stack incorrectly),
+and exit() pops the stack to oblivion.
+
+It's a case of shooting the messenger rather than fixing the fault! Fix the
+cause of the warning, don't cripple a warning message coz you dont like it.
+
+
+ &gt; MWP wrote:
+&gt; &gt; Im currently developing microcontroller progs using a X assembler version of
+&gt; &gt; GCC.
+&gt; &gt; In this application, the program NEVER stops running (has a while(1) loop
+&gt; &gt; inside) so i setup main to be "void main(void)".
+&gt; &gt; But of course, GCC doesnt like that and gives a warning saying main should
+&gt; &gt; return an int value.
+&gt; &gt; 
+&gt; &gt; Is there a way of disabling this 1 warning message?? It just gets annoying
+&gt; &gt; after a while, as im a "make a small change, recompile" type guy :P
+&gt; 
+&gt; We've discussed this before on this list.  Here's a brief summary:
+&gt; 
+&gt; - The ANSI standard says that main() must return an int to 
+&gt;   be a conforming program.  
+&gt; 
+&gt; - On some compilers+architectures, a function returning void is 
+&gt;   implemented differently to a function returning int, to the point 
+&gt;   where the wrong declaration may produce a program that crashes.  
+&gt;   main() is no exception.  
+&gt; 
+&gt; - GCC on Intel is more forgiving of this case, but that's not the 
+&gt;   point.  Do not use the compiler's behaviour in any given situation 
+&gt;   as a reference when trying to understand what's permitted.   
+&gt; 
+&gt; - The ANSI Standard is very much your friend.  Do everything you 
+&gt;   can to stay within its bounds.  Once you stray into using bizarre 
+&gt;   compilers on bizarre architectures (e.g. when developing embedded 
+&gt;   code), non-standard code tends to produce really, really obscure 
+&gt;   and costly bugs.  
+&gt; 
+&gt; - The whole Open Source movement is based on code sharing.  Code sharing 
+&gt;   is based on conformance to the standard.  (Although, to be fair, GCC 
+&gt;   is in many ways a de-facto standard in its own right.)  
+&gt; 
+&gt; - Stray from the standard only when you have tried extremely hard to 
+&gt;   conform, have checked your design and implementation with other 
+&gt;   experienced programmers, and am confident that the cost of 
+&gt;   writing and maintaining nonstandard code is outweighed by the 
+&gt;   benefits of doing so.  In the end, it's an engineering decision.  
+&gt; 
+&gt; - In this case, there's no cost in declaring the function as returning 
+&gt;   int, and adding an (unreached) return 0; statement, and so that is how 
+&gt;   you should address this issue.  
+&gt; 
+&gt; cheers,
+&gt; 
+&gt; Brenton
+&gt; 
+&gt; ps. If you wanted to suppress a particular warning, you could pipe the 
+&gt;     compiler output through a filter like awk, sed or perl, and have the 
+&gt;     filter delete the messages that you don't want to see.  But that's 
+&gt;     really an action of last resort.  
+&gt; 
+&gt; -- 
+&gt; behoffski (Brenton Hoff) | Software Engineer, Grouse Software
+&gt; <A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A>  | <A HREF="http://www.grouse.com.au/">http://www.grouse.com.au/</A>
+&gt; 
+&gt; -- 
+&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+--
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

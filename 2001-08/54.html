@@ -1,0 +1,123 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Help on upgrading Bind" -->
+<!-- FromName="'Alex Garner'" -->
+<!-- FromEmail="alex@netcraft.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 1 Aug 2001 23:52:37 +0930" -->
+<!-- Id="20010801235237.A6289@april.netcraft.com.au" -->
+<!-- Reference="20010801111429.46617.qmail@web8101.in.yahoo.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Help on upgrading Bind</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alex Garner &lt;<I><A HREF="mailto:alex@netcraft.com.au">alex@netcraft.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 1 Aug 2001 23:52:37 +0930
+</PRE>
+<H1>Re: Help on upgrading Bind</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; I have installed RedHat 7.1 and want to upgrade my
+&gt; Bind version from 9.1.0 to 9.1.3
+&gt; 
+&gt; If I try to upgrade using 
+&gt; rpm -Fvh Bind-9.1.3-3.i386.rpm
+&gt; I get some error like
+&gt; error: failed dependencies:
+&gt; libcrypto.so.2 is needed by Bind-9.1.3-3
+&gt; 
+&gt; How do I upgrade my Bind version.
+&gt; Can anyone help in this
+
+Either you don't have libcrypto libraries installed, or you do, but
+it is not a recent enough version.
+
+There are several ways of finding out.
+
+You can use your slocate database to see what you have on your system,
+like this...
+
+   [<A HREF="mailto:alex@heather">alex@heather</A> alex]$ locate libcrypto
+   /usr/lib/libcrypto.a
+   /usr/lib/libcrypto.so
+   /usr/lib/libcrypto.so.0.9.6
+   /usr/lib/libcrypto.so.1
+
+On my system I have libcrypto.so.1, which probably isn't going to
+work, as bind seems to need lybcrypto.so.2
+
+If we plug one of these into rpm, we can find the package it belongs
+to...
+
+   [<A HREF="mailto:alex@heather">alex@heather</A> alex]$ rpm -qf /usr/lib/libcrypto.so.0.9.6
+   openssl-0.9.6-3
+
+Looks like we need openssl-2. If it doesn't come with your version of
+redhat or 'rpm enabled' distribution, try using www.rpmfind.net to
+locate a newer openssl package.
+
+If 'locate libcrypto' doesn't produce anything because you have no
+libcrypto installed, you can always build an rpm file list using...
+
+'rpm -qilp /location_of_redhat_disc/RedHat/RPMS/*.rpm &gt; ~/rpmlist'.
+
+This will build a file that you can search through to find out what
+files are in all packages of a redhat disc.
+
+If you can't find a package that is built for your system, you will
+either need to grab the source rpm and rebuild it on your system, or
+start with a tarball.
+
+Cheers
+
+Alex!
+
+-- 
+
+Alex Garner &lt;<A HREF="mailto:alex@netcraft.com.au">alex@netcraft.com.au</A>&gt;
+
+NetCraft Australia
+Phone (08) 8338 0888
+<A HREF="http://www.netcraft.com.au">http://www.netcraft.com.au</A>
+
+"We have achieved the best possible performance by using
+the available power supply & holding the air velocity to
+a level which will allow it to heat to the highest
+temperature near dry hands could stand on a warm day."
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

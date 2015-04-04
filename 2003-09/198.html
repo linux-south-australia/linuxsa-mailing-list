@@ -1,0 +1,124 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Ooops! I deleted my partition table - How to restore." -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="'Linux group (E-mail)'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 03 Sep 2003 21:18:50 -0700" -->
+<!-- Id="3F56BD2A.3090604@pacbell.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Ooops! I deleted my partition table - How to restore.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : Linux group (E-mail) &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 03 Sep 2003 21:18:50 -0700
+</PRE>
+<H1>Ooops! I deleted my partition table - How to restore.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I have a partitioned 80 GB hard disk at home that includes Lindows.
+
+10 GB BeOS
+10 GB FreeBSD
+10BG NetBSD
+10 GB SuSE
+10 GB Red Hat
+10BG Mandrake
+10 GB Lindows
+500 MB Swap
+9.5 GB Storage
+
+I decided to boot into Lindows to test a how to on building .debs, but 
+was disappointed to find out that Lindows had overwritten my Master Boot 
+Record without asking me. I could tell it did this because I had Grub at 
+the bootloader, but I was presented with the telltale "LI."
+
+I used SuSE8.2's CD #1 to boot back into SuSE by first selecting 
+install/English/then boot installed system. I tried to go back into SuSE 
+8.2 and get its bootloader tool to overwrite my MBR, but no luck on 
+reboot, "LI" was still there. I don't have Windows on that hard disk, so 
+I searched around for a way to remove the Master Boot Record. I found 
+this article: <A HREF="http://www.linuxgazette.com/issue63/okopnik.html">http://www.linuxgazette.com/issue63/okopnik.html</A>
+I had not read the article closely, but picked out this command from the 
+article and ran it:
+
+**************************************************************
+
+dd if=/dev/zero of=/dev/hda bs=512 count=1
+
+DON'T run that unless you know what you are doing, it may delete your 
+partition table as well!
+
+**************************************************************
+
+
+I then tried to boot up with SuSE's CD#1, and boot the installed system 
+as I did before, SuSE could not detect that I had any partitrions at 
+all.  FreeBSD's Fdisk came up empty as well. Looks like the partitions 
+are gone! At this point, don't write anything to that hard disk, or you 
+could loose everything!
+
+Solution: gpart
+<A HREF="http://packages.debian.org/unstable/admin/gpart.html">http://packages.debian.org/unstable/admin/gpart.html</A>
+
+How to restore:
+Boot up with SuSE's CD #1 and select Rescue System.  At the console, type:
+
+gpart /dev/hda /dev/hda -W
+
+After typing the command, gpart displayed my primary partitions 
+correctly and showed my extended partition, but misidentified its 
+contents. I went ahead and confirmed that gpart should write the new 
+master boot record.
+
+I then used SuSE's CD#1 to boot the installed system, and it was there, 
+undamaged. In fact all of my partitions remained bootable, with the 
+exception of NetBSD's which seemed to repair itself when the reinstall 
+failed. All of my partitions are now bootable!
+
+James Leone
+
+
+
+
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

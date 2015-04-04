@@ -1,0 +1,171 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: hardware raid" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'dave'" -->
+<!-- ToEmail="notbob@tpg.com.au" -->
+<!-- Date="Wed, 16 Oct 2002 10:57:09 +0930" -->
+<!-- Id="3DACC06D.8050403@aarnet.edu.au" -->
+<!-- Reference="000a01c2745b$78357350$2b881dcb@windy" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: hardware raid</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : dave &lt;<I><A HREF="mailto:notbob@tpg.com.au">notbob@tpg.com.au</A></I>&gt;
+  Date: Wed, 16 Oct 2002 10:57:09 +0930
+</PRE>
+<H1>Re: hardware raid</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+One Dave wrote:
+
+ &gt; ...trying to get redhat 8 running on my hardware raid setup.
+ &gt; it keeps on having a fit when it comes to doing the partitioning.
+ &gt; it says that the data is unknown or something like that. it is
+ &gt; running windows xp on an epox motherboard. the hardware raid is
+ &gt; highpoint 370\372 onboard...
+
+Another David replied:
+
+&gt; I've seen onboard RAID which really were just two more IDE controllers.
+&gt; The drivers for Windows then performed SOFTWARE RAID over the two
+&gt; controllers...do you need SPECIAL drivers for it in Windows?
+
+Hello Davids,
+
+Special drivers would actually indicate hardware RAID, as
+the driver would be for the hardware RAID chip.
+
+Linux has support for the HighPoint IDE RAID controller,
+this is in the "htp" series of kernel modules (see /usr/src/
+linux/drivers/ide/).  It's not particularly great support,
+and the manufacturer has an alternative driver.
+
+The problem with installation is that the initial RAM disk
+of the installation version of Linux needs to have the
+HighPoint RAID controller modules.
+
+Let's have a look at the modules in the initial RAM disk on
+the Red Hat Linux 8.0 CD-ROM:
+    cp /mnt/cdrom/syslinux/initrd.img ~/initrd.img.gz
+    gzip -d ~/initrd.img.gz
+    mkdir /mnt/spare
+    mount ~/initrd.img /mnt/spare -t ext2 -o loop
+    cp /mnt/spare/modules/modules.cgz ~/modules.cpio.gz
+    umount /mnt/spare
+    rmdir /mnt/spare
+    gzip -d modules.cpio.gz
+    cpio -itv &lt; modules.cpio
+
+3c501.o 3c503.o 3c505.o 3c507.o 3c509.o 3c515.o 3c574_cs.o 3c589_cs.o
+3c59x.o 3w-xxxx.o 8139cp.o 8139too.o 82596.o 8390.o AM53C974.o
+BusLogic.o DAC960.o NCR53c406a.o a100u2w.o aacraid.o abyss.o ac3200.o
+acenic.o advansys.o aha152x.o aha152x_cs.o aha1542.o aic7xxx.o
+aic7xxx_old.o airo.o airo_cs.o aironet4500_core.o aironet4500_proc.o
+arlan.o at1700.o atp870u.o axnet_cs.o bcm5700.o cciss.o cpqarray.o
+cpqfc.o cs89x0.o de4x5.o de600.o de620.o depca.o dgrs.o dmfe.o
+dpt_i2o.o ds.o e100.o e1000.o e2100.o eata.o eata_dma.o eepro.o
+eepro100.o eexpress.o ehci-hcd.o epic100.o es3210.o eth16i.o ewrk3.o
+fdomain.o fdomain_cs.o fmvj18x_cs.o g_NCR5380.o gdth.o hamachi.o
+hermes.o hp-plus.o hp.o hp100.o i2o_block.o i2o_core.o i2o_pci.o
+i82092.o i82365.o ibmtr.o ibmtr_cs.o ide-cs.o ieee1394.o initio.o
+ips.o lance.o lanstreamer.o lne390.o lockd.o megaraid.o mii.o
+mptbase.o mptscsih.o natsemi.o ncr53c8xx.o ne.o ne2k-pci.o ne3210.o
+netwave_cs.o nfs.o ni5010.o ni52.o ni65.o nmclan_cs.o ns83820.o
+nsp_cs.o ohci1394.o olympic.o parport.o parport_pc.o pci2000.o
+pci2220i.o pcmcia_core.o pcnet32.o pcnet_cs.o plip.o qla1280.o
+qla2200.o qla2300.o qlogic_cs.o qlogicfas.o qlogicisp.o ray_cs.o
+sbp2.o scsi_mod.o sd_mod.o seagate.o sis900.o sk98lin.o smc-ultra.o
+smc-ultra32.o smc9194.o smc91c92_cs.o sr_mod.o sundance.o sunhme.o
+sunrpc.o sym53c8xx.o synclink_cs.o tcic.o tg3.o tlan.o tms380tr.o
+tmscsim.o tmspci.o tulip.o tulip_old.o u14-34f.o ultrastor.o
+usb-storage.o via-rhine.o wavelan.o wd.o winbond-840.o xirc2ps_cs.o
+xircom_cb.o xircom_tulip_cb.o yellowfin.o yenta_socket.o
+
+Nothing starting with "hpt" there, so you are out of luck.
+
+Except that Red Hat's installer is GPLed.  So you can re-build
+the initrd used by the installation CD, write another install
+CD, and see if it boots.  To do this you'll need to find another
+Red Hat Linux 8.0 machine, install the kernel source
+     cd /usr/src/linux-...
+     cp configs/kernel-...-i386-BOOT.config .config
+     make xconfig (tick boxes for HighPoint RAID)
+     make clean
+     make dep
+     make modules
+     make modules_install (noting that this might trash
+        your running system so it's probably best to
+        move /lib/modules/... somewhere safe)
+     mkinitrd ...
+
+Red Hat themselves probably have a special version of mkinitrd
+rather than writing the modules run the running system.  There
+might be an equivalent findable on freshmeat.net or google.com.
+
+Rather than stuff about with burning CDs, if you have a spare
+machine you can do a network-based install after booting
+from a floppy.  Same principles apply -- the initrd on the
+install floppy needs to contain the HighPoint RAID modules.
+
+With luck a time with Google might find a page describing all
+of this step-by-step.
+
+Alternatively, you might look at SuSE or Mandrake and see if
+they support HighPoint RAID out of the box.  I'd be surprised
+if one of the popular distributions didn't.  Then you could
+run Linux on your HighPoint system without needing to look
+under the bonnet to the extent that we did above.
+
+Another plan entirely would be to look into the HighPoint RAID.
+Does it (a) move the contents of an underlying partition onto a
+RAID device when it creates one, or does it (b) zero the new
+RAIDed partition?  (a) would allow you to break the RAID, install
+Linux, and re-establish RAID.
+
+Best wishes,
+Glen
+
+-- 
+  Glen Turner                                 Network Engineer
+  (08) 8303 3936      Australian Academic and Research Network
+  <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+  The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

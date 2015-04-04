@@ -1,0 +1,202 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Argh! Hard Drive Dying?" -->
+<!-- FromName="'Damien Uern'" -->
+<!-- FromEmail="carrigan_2606@optusnet.com.au" -->
+<!-- ToName="'Rick Harris','Linux SA'" -->
+<!-- ToEmail="rickharris@mightylegends.zapto.org,linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 15 Jul 2003 22:07:18 +0930" -->
+<!-- Id="200307152207.18871.carrigan_2606@optusnet.com.au" -->
+<!-- Reference="1058270250.22974.22.camel@SCOOBY.localnet" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Argh! Hard Drive Dying?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Damien Uern &lt;<I><A HREF="mailto:carrigan_2606@optusnet.com.au">carrigan_2606@optusnet.com.au</A></I>&gt;
+  To  : Rick Harris &lt;<I><A HREF="mailto:rickharris@mightylegends.zapto.org">rickharris@mightylegends.zapto.org</A></I>&gt;<BR>        Linux SA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 15 Jul 2003 22:07:18 +0930
+</PRE>
+<H1>Re: Argh! Hard Drive Dying?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hey,
+
+Argh!!! Not another dud! I downloaded smartmontools and had a look at the 
+SMART information reported from the drive, it appears the drive itself knows 
+about these errors, so it is most certainly not a linux or chipset problem. 
+Here are some snippets from the output (formatting may be wonky):
+
+Device Model:     ST380021A
+Serial Number:    3HV4A2P3
+Firmware Version: 3.75
+ATA Version is:   5
+ATA Standard is:  Unrecognized. Minor revision code: 0x00
+SMART support is: Enabled
+
+SMART overall-health self-assessment test result: PASSED
+
+Vendor Specific SMART Attributes with Thresholds:
+Revision Number: 10
+Attribute                    Flag     Value Worst Threshold Raw Value
+(  1)Raw Read Error Rate     0x000f   073   065   034       239826243
+(  3)Spin Up Time            0x0003   082   082   000       0
+(  4)Start Stop Count        0x0032   100   100   020       187
+(  5)Reallocated Sector Ct   0x0033   100   100   036       7
+(  7)Seek Error Rate         0x000f   072   060   030       18985135
+(  9)Power On Hours          0x0032   099   099   000       951
+( 10)Spin Retry Count        0x0013   100   100   097       0
+( 12)Power Cycle Count       0x0032   100   100   020       195
+(194)Temperature             0x0022   032   052   000       32
+(195)Hardware ECC Recovered  0x001a   073   065   000       239826243
+(197)Current Pending Sector  0x0012   100   100   000       3
+(198)Offline Uncorrectable   0x0010   100   100   000       3
+(199)UDMA CRC Error Count    0x003e   200   200   000       0
+(200)Unknown Attribute       0x0000   100   253   000       0
+(202)Unknown Attribute       0x0032   100   253   000       0
+
+ATA Error Count: 166 (only the most recent five errors are shown below)
+
+Acronyms used below:
+DCR = Device Control Register
+FR  = Features Register
+SC  = Sector Count Register
+SN  = Sector Number Register
+CL  = Cylinder Low Register
+CH  = Cylinder High Register
+D/H = Device/Head Register
+CR  = Content written to Command Register
+ER  = Error register
+STA = Status register
+
+Error Log Structure 1:
+Error occurred at disk power-on lifetime: 951 hours
+When the command that caused the error occurred, the device was active or 
+idle.
+After command completion occurred, registers were:
+ER:40 SC:00 SN:cd CL:2e CH:58 D/H:e5 ST:51
+Sequence of commands leading to the command that caused the error were:
+DCR   FR   SC   SN   CL   CH   D/H   CR   Timestamp
+ 00   00   08   cb   2e   58    e5   c8     14197.851
+ 00   00   08   e3   08   56    e5   ca     14197.851
+ 00   00   08   6b   42   55    e5   ca     14197.851
+ 00   00   08   f3   5e   54    e5   ca     14197.850
+ 00   00   08   6b   a5   4f    e5   ca     14197.850
+
+
+######## (there are 4 more errors logs shown)
+
+Hmm I'll have to see what 0x40 means in the Error register. Oh man what a 
+pain.
+
+Thanks,
+
+Damien
+
+On Tue, 15 Jul 2003 09:27 pm, Rick Harris wrote:
+&gt; Hi Damien,
+&gt;
+&gt; Back-up any important, non-corrupted data right now.
+&gt; The drive is on it's way out.
+&gt;
+&gt; It is possible to partition out bad HD areas, & these can be found with
+&gt; the 'badblocks' utility.
+&gt;
+&gt; However, chances are it's going to be a no-win, as more will probably
+&gt; occur.
+&gt;
+&gt; Your HD temperature looks fine. Another dud perhaps ?
+&gt;
+&gt; Your chipset is rock solid, as is reiserfs.
+&gt;
+&gt; Surprised that the Western Digital carked it, they're normally very
+&gt; good.
+&gt;
+&gt; Regards,
+&gt; Rick
+&gt;
+&gt; On Tue, 2003-07-15 at 20:34, Damien Uern wrote:
+&gt; &gt; Hey,
+&gt; &gt;
+&gt; &gt; I've been getting problems reading some large (say 40MB or greater)
+&gt; &gt; binary files occasionally on my box, I've been blaming Reiserfs for file
+&gt; &gt; corruption, but now I'm not so sure. The latest is when trying to access
+&gt; &gt; some part of the rpm database (which would be huge by now) I get this
+&gt; &gt; output from the program:
+&gt; &gt;
+&gt; &gt; [<A HREF="mailto:root@thebeast">root@thebeast</A> rpms]# rpm -i --test vice-1.11-4mdk.i586.rpm
+&gt; &gt; rpmdb: read: 0x400c25fc, 4096: Input/output error
+&gt; &gt; error: db4 error(5) from dbcursor-&gt;c_get: Input/output error
+&gt; &gt; error: error(5) getting "libncurses.so.5" records from Providename index
+&gt; &gt; rpmdb: read: 0x400d097c, 4096: Input/output error
+&gt; &gt; error: db4 error(5) from dbcursor-&gt;c_get: Input/output error
+&gt; &gt; error: error(5) getting "libpng.so.3" records from Providename index
+&gt; &gt; error: failed dependencies:
+&gt; &gt;         libncurses.so.5   is needed by vice-1.11-4mdk
+&gt; &gt;         libpng.so.3   is needed by vice-1.11-4mdk
+&gt; &gt;
+&gt; &gt; I've had similar input/output error messages from other programs (e.g
+&gt; &gt; cp). Looking in /var/log/messages I see this:
+&gt; &gt;
+&gt; &gt; Jul 15 20:14:56 thebeast kernel: hda: dma_intr: status=0x51 { DriveReady
+&gt; &gt; SeekComplete Error }
+&gt; &gt; Jul 15 20:14:56 thebeast kernel: hda: dma_intr: error=0x40 {
+&gt; &gt; UncorrectableError }, LBAsect=89665229, sector=665064
+&gt; &gt; Jul 15 20:14:56 thebeast kernel: end_request: I/O error, dev 03:07 (hda),
+&gt; &gt; sector 665064
+&gt; &gt;
+&gt; &gt; ... (8 more times)
+&gt; &gt;
+&gt; &gt; This harddrive I got replaced on warranty once before, it used to be a
+&gt; &gt; western digital caviar 40GB 7200rpm (it made strange clicking noises
+&gt; &gt; occasionally), but now it's a seagate 80GB 7200rpm drive:
+&gt; &gt;
+&gt; &gt; hda: ST380021A, ATA DISK drive
+&gt; &gt;
+&gt; &gt; Could the problem also be my motherboard (seems strange to have 2 hard
+&gt; &gt; drive failures in 1.5 years). This is my IDE chipset (MSI mobo - VIA
+&gt; &gt; kt266):
+&gt; &gt;
+&gt; &gt; VP_IDE: VIA vt8233 (rev 00) IDE UDMA100 controller on pci00:11.1
+&gt; &gt;
+&gt; &gt; Could my computer perhaps not have enough cooling in it (temperature
+&gt; &gt; hovers around 58-59 degrees with the case OFF and CPU idle!). Mobo temp
+&gt; &gt; at this very moment is 41 degrees, CPU is 58 (hovers around 61-62 idle
+&gt; &gt; when case on).
+&gt; &gt;
+&gt; &gt; I'm tired of having a flaky computer!! Any help would be most
+&gt; &gt; appreciated.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,171 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: .bash_profile .bashrc etc." -->
+<!-- FromName="Dan" -->
+<!-- FromEmail="dan.kortschak@adelaide.edu.au" -->
+<!-- ToName="Andrew Burrow" -->
+<!-- ToEmail="alburrow@cs.adelaide.edu.au" -->
+<!-- Date="Wed, 16 Aug 2000 12:30:34 +0930" -->
+<!-- Id="399A03D2.74F90041@adelaide.edu.au" -->
+<!-- Reference="200008140142.LAA07127@krypton.cs.adelaide.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: .bash_profile .bashrc etc.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan &lt;<I><A HREF="mailto:dan.kortschak@adelaide.edu.au">dan.kortschak@adelaide.edu.au</A></I>&gt;
+  To  : Andrew Burrow &lt;<I><A HREF="mailto:alburrow@cs.adelaide.edu.au">alburrow@cs.adelaide.edu.au</A></I>&gt;
+  Date: Wed, 16 Aug 2000 12:30:34 +0930
+</PRE>
+<H1>Re: .bash_profile .bashrc etc.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I've just had a chance to play around with this some more. Text only
+consoles work with my setup fine and if I set the --nologin option in
+the Gnome-terminal prefs they now work fine too (I was having a lot of
+problems after Netscape broke X authorisation quite badly [fixed now
+after reboot] and I couldn't shutdown as I had long and important
+processes running - after working for years on Macs and PC I've gotta
+say that it's nice to be abvkle to crash a machine and have it still
+continue to do the things you've asked it to even though crippled).
+
+About the presence of a .login file, I would have it shouldn't really
+make a difference (though I could easily change it's name) since both
+.bashrc and .bash_profile exist.
+
+The bit about fortune coming up at odd times (which is where all this
+started for me) is absolutely true; everytime I lessed a file before I
+put fortune into the .login file (it was origially in .bashrc with
+BASH_ENV set to ~/.bashrc) I'd get a fortune - sort of a zen/IChing kind
+of way to analyse files I guess.
+
+thanks for your help
+Dan
+
+Andrew Burrow wrote:
+&gt; 
+&gt; &gt; Hi, I'm having problems getting my .bash_profile to run properly. Here
+&gt; &gt; is what I have:
+&gt; 
+&gt; I think you have a subtle problem of timing here.  Namely, in
+&gt; "~/.bash_profile" you source "~/.login" before you actually export the
+&gt; variables.  Why not use
+&gt; 
+&gt;         export PATH=$PATH:$HOME/bin
+&gt;         export BASH_ENV=$HOME/.bashrc
+&gt;         export USERNAME="dkortsch"
+&gt; 
+&gt; so that the variables are exported at the same time as being changed.
+&gt; 
+&gt; On another point, why do you have a login file and a profile file?
+&gt; This could be causing problems in scripts that search for a profile or
+&gt; a login file, i.e., they might use only one of the files.  Read the
+&gt; section on "INVOCATION" in the bash manpage.  It suggests that they
+&gt; are alternatives.  It reads:
+&gt; 
+&gt;        Login shells:
+&gt;          On login (subject to the -noprofile option):
+&gt;                if /etc/profile exists, source it.
+&gt; 
+&gt;                if ~/.bash_profile exists, source it,
+&gt;                  else if ~/.bash_login exists, source it,
+&gt;                    else if ~/.profile exists, source it.
+&gt; 
+&gt;          On exit:
+&gt;                if ~/.bash_logout exists, source it.
+&gt; 
+&gt; And just to be super painfully pedantic ;-), there is a subtle problem
+&gt; with "~/.bashrc" in general.  Is it a feature, or a bug in the shell?
+&gt; Again from the bash manpage section on invocation:
+&gt; 
+&gt;        Non-login interactive shells:
+&gt;          On startup (subject to the -norc and -rcfile options):
+&gt;                if ~/.bashrc exists, source it.
+&gt; 
+&gt;        Non-interactive shells:
+&gt;          On startup:
+&gt;                if the environment variable ENV is non-null, expand
+&gt;                it and source the file it names, as if the command
+&gt;                        if [ "$ENV" ]; then . $ENV; fi
+&gt;                had been executed, but do not use PATH to search
+&gt;                for the pathname.  When not started in Posix mode, bash
+&gt;                looks for BASH_ENV before ENV.
+&gt; 
+&gt; From this it seems the practice of sourcing the files "~/.bashrc" in
+&gt; the profile files is a widespread mistake.  It means that
+&gt; non-interactive shells will still source these resource files, where
+&gt; they should only do so if "$ENV" or "$BASH_ENV" point to them.  This
+&gt; is a particular pain where you are doing the trick of running
+&gt; "fortune" to greet the user.  You will find that it often shows up in
+&gt; weird subprocesses.  For example, when compiling under emacs.  This
+&gt; scares me a little, it could easily confuse a script parsing the
+&gt; output.
+&gt; 
+&gt; My solution: don't set "ENV", but make the profile explicitly read
+&gt; "~/.bashrc" when it is an interactive login shell.  At the end of
+&gt; "~/.bash_profile" I have:
+&gt; 
+&gt; # Get aliases and functions.
+&gt; #
+&gt; # This is a strange peculiarity of the shell.  During a login shell
+&gt; # the resources are never read, even if the shell is interactive.
+&gt; # Therefore we test whether the PS1 variable is set to determine if
+&gt; # the shell is an interactive login shell --- not an uncommon
+&gt; # occurrence ;-).
+&gt; 
+&gt; if [ "${PS1:-NONE}" != "NONE" ] ; then
+&gt;     if [ -f ~/.bashrc ]; then
+&gt;         . ~/.bashrc
+&gt;     elif [ -f /etc/bashrc ]; then
+&gt;         . /etc/bashrc
+&gt;     fi
+&gt; fi
+&gt; 
+&gt; and then at the end of "~/.bashrc" I have
+&gt; 
+&gt; # Say Hello.
+&gt; #
+&gt; # In theory, this script is only called in interactive shells so we
+&gt; # might as well greet the user.  However, note that some evil login
+&gt; # scripts set ENV to the location of this file --- a barbarous act
+&gt; # which causes this file to be read in non-interactive shells ;-).
+&gt; 
+&gt; if type -path fortune &&gt; /dev/null ; then
+&gt;     fortune
+&gt; fi
+&gt; 
+&gt; Cheers,
+&gt; 
+&gt; Andrew
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

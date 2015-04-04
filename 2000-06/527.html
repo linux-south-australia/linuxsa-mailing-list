@@ -1,0 +1,98 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="system write(2) call bounds checking" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 18 Jun 2000 20:36:35 +0930" -->
+<!-- Id="20000618203635.A26531@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: system write(2) call bounds checking</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 18 Jun 2000 20:36:35 +0930
+</PRE>
+<H1>system write(2) call bounds checking</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Technical question about linux kernel.
+
+Does anyone happen to know anthing about how the
+system write(2) call should check bounds of its
+arguments?
+
+I've got a situation where a call to the system
+write(2) function with a parameter of 4294967295 bytes
+(i.e. -1 bytes accidentally converted to unsigned long
+due to someone _else's_ bug) is causing a system hang.
+Not just a crash - it's a complete hang. All activity stops.
+
+In the file /usr/src/linux/fs/read_write.c, I found this:
+
+=========================================================
+    ret = locks_verify_area(FLOCK_VERIFY_WRITE, inode, file,
+         file-&gt;f_pos, count);  
+=========================================================
+
+in the function 
+
+asmlinkage ssize_t sys_write(unsigned int fd, const char * buf, size_t count) 
+
+which I assume must be the kernel's write-function.
+This should really reject the count-value and
+life should go on.
+But it doesn't.
+
+Since this seems like a bit of a show-stopper for the
+linux reliability idea, I'm a bit worried about it.
+System calls with faulty arguments should not cause a
+system hang - even if running as root.
+
+By the way, the device driver for the device in question was
+the Nicstar ATM card driver, and I've notified the linux-ATM
+list. But it seems to me to be a bit more fundamental
+than just the ATM software.
+
+I once joined the linux kernel mailing list, but my disk drive
+was not large enough. So I unsubscribed.
+
+Cheers,
+Alan Kennington.
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

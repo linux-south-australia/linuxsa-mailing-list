@@ -1,0 +1,207 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: TFTP Worries" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Davis, Harvey'" -->
+<!-- ToEmail="Harvey.Davis@dsto.defence.gov.au" -->
+<!-- Date="Fri, 04 May 2001 10:41:23 +0930" -->
+<!-- Id="3AF201BB.BAD092A@aarnet.edu.au" -->
+<!-- Reference="DB0C881A51F5D311999F0090274DD43702E56DCC@salex003.dsto.defence.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: TFTP Worries</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Davis, Harvey &lt;<I><A HREF="mailto:Harvey.Davis@dsto.defence.gov.au">Harvey.Davis@dsto.defence.gov.au</A></I>&gt;
+  Date: Fri, 04 May 2001 10:41:23 +0930
+</PRE>
+<H1>Re: TFTP Worries</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+"Davis, Harvey" wrote:
+&gt; 
+&gt; I am currently having some problems getting tftp wo work properly under red
+&gt; hat 7.0
+&gt; 
+&gt; I have enabled the tftp service in the xinetd.d directory
+&gt; ie set disabled = no
+&gt; I am getting logged messages of tftp connections in the "secure" logfile
+&gt; Unfortunately though I get an access violation when I try to get a file.
+&gt; 
+&gt; The /tftpboot directory and all files are set to permission 755.
+&gt; 
+&gt; Would the violation be due to PAM? Or something else?
+
+
+THE ANSWER YOU WANT
+
+I went through this nightmare myself yesterday.  I don't think
+TFTP works at all as shipped by Red Hat in 7.0.
+
+I downloaded the 7.1 RPMs and installed them (if you want to
+be safe download the SRPMs and rebuild them).  I notice
+that there's quite a few changes from 7.0.
+
+
+A NEAT VARIATION ON THE STANDARD CONFIGURATION
+
+It just worked, and it's now chroot-ed as well which
+makes file naming easier.  My 7.1 configuration is
+slightly different from as shipped.  I have a directory
+/tftpboot with
+
+     user=root
+     group=tftp (which I created and put in the people that
+       I want to create TFTP files.)
+     access=rwxrwsr-x
+
+as this means that people do not need to become root to
+maintain the TFTP files, rather you can just do this if
+you are a member of the tftp group.  In turn that "tftp"
+group can be maintained by LDAP or NIS consistently across
+the organisation.
+
+Now put yourself into the "tftp" group, logout and in, and copy
+across the files you want people to be able to TFTP GET.  You
+can't symlink the files.  chmod them to rw-rw-r--.  To do this
+use the command
+
+  (umask 002; cp fred /tftpboot/fred)
+
+To TFTP PUT a file, it must already exist and be globally  readable.
+To do this firstly log into the TFTP server and say
+
+  (umask 000; touch /tftpboot/fred)
+
+this can be a one-liner
+
+  ssh tftp0.net.example.edu.au 'umask 0; touch /tftpboot/fred'
+
+and then write the file from the client
+
+  tftp tftp0.net.example.edu.au
+  tftp&gt; put fred fred
+  tftp&gt; quit
+
+
+MORE COMPLEX STUFF FOR REAL LIFE
+
+If the client is a Cisco router then the basic command in
+recent IOS is
+
+  copy slot0:fred t<A HREF="ftp://tftp0.net.example.edu.au/fred">ftp://tftp0.net.example.edu.au/fred</A>
+
+to backup a configuration before a change say
+
+  copy running-config t<A HREF="ftp://tftp0.net.example.edu.au/backup/router-20010504-1.cfg">ftp://tftp0.net.example.edu.au/backup/router-20010504-1.cfg</A>
+
+See how you can use subdirectories on the TFTP server to reduce clutter.
+Subdirectories also allow you to have different groups of users maintaining
+files on the TFTP server.
+
+xinetd uses TCP Wrapper to control access.  If you give all
+your routers loopback interfaces in the same range, say as host
+routes in 130.100.255.0 - 130.100.255.255 as in:
+
+  interface Loopback0
+    description router.net.example.edu.au
+    ip address 130.100.255.1 255.255.255.255
+    no ip directed-broadcast
+    no ip mroute-cache
+    snmp ifindex persist
+  router ospf 32700
+    network 130.100.255.1 0.0.0.0 area 0
+    passive-interface Loopback0
+  ip tftp source-interface Loopback0
+
+with a DNS saying
+
+  $ORIGIN net.example.edu.au.
+  router     IN  A      130.100.255.1
+             IN  HINFO  "CISCO-2599" "IOS12.0(15)ST-aarnet"
+             IN  TXT    "Serial=123223"
+  $ORIGIN router.net.example.edu.au.
+  loopback0  IN  CNAME  router.net.example.edu.au.
+  ethernet0  IN  A      130.100.1.254
+             IN  TXT    "OUI=112233445566"
+             IN  LOC    34 56 00.000 S 138 36 00.000 E 40.00m 1.00m 10000.00m 10
+  ethernet1  IN  A      130.100.2.254
+             IN  TXT    "OUI=223344556677"
+             IN  LOC    34 56 00.000 S 138 36 00.000 E 40.00m 1.00m 10000.00m 10
+
+so that traceroute, graphical traceroute and ssh work optimally.
+Recording the ethernet addresses for everything helps trace ethernet
+switching bugs and you need the model, IOS version and serial number
+to lodge a fault report with Cisco.
+
+[where 130.100.255.0/24 is the topmost subnet in your address
+ space 130.100.0.0/16 (loopback addresses should be at the
+ top of your address range).  You should *never* allocate
+ 130.100.255.255 to anything, as this is the broadcast address
+ pounded by idiots who won't use DHCP and who then misconfigure
+ the subnet mask.  As this makes 130.100.255.0/24 useless as a
+ standard subnet it is a good place to put the loopback addresses.]
+
+You can then say in /etc/hosts.allow
+
+  # Only routers can use TFTP
+  in.tftpd: 130.100.255. EXCEPT 130.100.255.0,130.100.255.255
+
+assuming a /etc/hosts.deny of
+
+  ALL: ALL
+
+rather than list every router individually.  Note
+that you need to use IP addresses rather than DNS
+name patterns, as there's a slight problem if the DNS
+is down because the router is down and the router
+needs a backup configuration restored :-)
+
+Finally, if you get some time, then modifying the TFTP
+daemon to run a filter when PUTing a file would be
+good.  You could then use it to zap passwords/secrets/
+community strings in configuration files.  At the moment
+you need to do this from a cron job or by hand.
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

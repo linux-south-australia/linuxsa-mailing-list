@@ -1,0 +1,81 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: INPUT chain" -->
+<!-- FromName="Daryl Tester" -->
+<!-- FromEmail="dt@picknowl.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 28 Aug 1999 18:18:54 +0930 (CST)" -->
+<!-- Id="199908280848.SAA01411@orac.picknowl.com.au" -->
+<!-- Reference="199908271313.NAA87142@out2.ibm.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: INPUT chain</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sat, 28 Aug 1999 18:18:54 +0930 (CST)
+</PRE>
+<H1>Re: INPUT chain</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Subba Rao wrote:
+
+&gt; For the modem interface, I setup the following rules,
+&gt; 
+&gt; $ ipchains -A input -i ppp0 -p 21 -j DENY
+&gt; $ ipchains -A input -i ppp0 -p 23 -j DENY
+&gt; $ ipchains -A input -i ppp0 -p 80 -j DENY
+
+"Inconcievable!" (paraphrased: I Do Not Think That Parameter Means
+What You Think It Means ...)
+
+-p specifies _protocol_, and should be tcp, udp, icmp or the numeric
+equivalent thereof.  I think you were really after port.  Also, REJECT
+is much friendlier than DENY, otherwise the connection from the outside
+world will appear to hang due to lack of ICMP message going back in the
+other direction (ie, it puts the "refused" in "<A HREF="telnet: Unable to connect
+">telnet: Unable to connect
+</A>to remote host: Connection refused").
+
+To wit, you want (nay, need) something like:
+
+    ipchains -D input -i ppp0 -p tcp --dport 23 -j DENY
+
+Where's that Rusty guy when you need him the most?  &lt;waves :-)&gt;
+
+Regards,
+  Daryl Tester
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,153 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Internet Sharing" -->
+<!-- FromName="Adam Hawes" -->
+<!-- FromEmail="adam@overfiend.ace.net.au" -->
+<!-- ToName="Linux SA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 21 Jun 2000 23:12:12 +0930" -->
+<!-- Id="3950C634.84D15CB@overfiend.ace.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Internet Sharing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adam Hawes &lt;<I><A HREF="mailto:adam@overfiend.ace.net.au">adam@overfiend.ace.net.au</A></I>&gt;
+  To  : Linux SA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 21 Jun 2000 23:12:12 +0930
+</PRE>
+<H1>Re: Internet Sharing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; No i dont have any idea with masquarding or whatever it is........... i will
+&gt; explain what happens.
+
+This is the problem; unless you own real-world IP addresses for the
+client machines in your house, and your ISP has set their routing table
+to send them all down your link to your Linux gateway then you'll get
+stuck.
+
+read the IP masq howto to see what IP masq is, and how to set it up.  I
+will give you a brief overview of how to set things up.
+
+1. Ensure your kernel (2.2.*) is compiled with network firewalls, and
+specifically anything to do with IP masq.  You may need to do this.  If
+it is a stock Redhat install then it will be ok.
+
+2. Make a shell script.  the shell script should set up the IP masq
+code.  The example below is how I do things.  You'll probably need to
+modify things to make it more secure/suit your needs.
+BTW, this script shoulw go on the Linux box that is your gateway.
+
+
+&lt;example&gt;
+#####
+#
+# set up internet masq
+#
+/sbin/ipchains -P forward REJECT
+/sbin/ipchains -A forward -j MASQ -s 192.168.1.0/24 -d 0.0.0.0/0
+echo "1" &gt; /proc/sys/net/ipv4/ip_forward
+
+#####
+#
+# Set ip IP Accounting
+/sbin/ipchains -A input  -i ppp0
+/sbin/ipchains -A output -i ppp0
+/sbin/ipchains -A input  -i ppp1
+/sbin/ipchains -A output -i ppp1
+
+## Set up ICQ proxy
+/sbin/insmod ip_masq_icq
+
+## Set the IRQ for the serial port
+/sbin/irqtune
+
+&lt;/example&gt;
+
+I use a masquerading proxy for ICQ to allow ICQ to work better
+(otherwise it works very intermittently in my setup).  I also use
+irqtune to bring up the serial port interrupt priority.  As I am running
+this through a 486 box that is also a Samba and NFS server for /home...
+
+I also set up IP accounting to keep track of how much traffic comes in
+and out of the link.  I haven't actually used this yet, so I can't say
+that the accounting works.
+
+I call this script on bootup, but it should ideally be called from the
+ip-up script for your internet interface.  You should also set up an
+equivalent script to disable masquerading when the link goes down.  I
+haven't done this yet.
+
+&gt; ill log on fine (the linux box) i have 5 client machines in the house
+&gt; windows 98
+
+First set up your Linux box.  Give the ethernet card an IP address of
+192.168.1.1 (one of the private address space IPs.
+
+Next, you need to set the TCP settings for all of the other boxes.  They
+should have addresses that are 192.168.1.* where * is anything from 2 to
+254.  Tell these boxes that their default gateway is 192.168.1.1.  They
+will now be able to access the internet (after you set up IP masq).
+
+
+An interesting program that you may like to use is (from memory)
+c-mserver.  There are client programs for Windows too.  c-mserver
+(search freshmeat) is a nifty little server that can start and kill ppp
+links.  It offers some other nice features too (like Windows inferfaces
+to the daemon).
+
+I hope this has been of some one out there.
+
+cheers,
+Adam
+
+-- 
+Adam Hawes
+
+Web:       <A HREF="http://overfiend.iwarp.com">http://overfiend.iwarp.com</A>
+Email:     <A HREF="mailto:adam@overfiend.ace.net.au">adam@overfiend.ace.net.au</A>
+ICQ:       2492016
+
+Voicemail: +61 (08) 8219-3238
+Fax:       +61 (08) 8219-3238
+
+-----BEGIN GEEK CODE BLOCK-----
+Version: 3.12
+GAT dpu s+: a-- C++++ UL++ P+ L+++ E W- N+++ o+ K- w--- 
+O- M V-- PS+ PE Y++ PGP++ t 5- X+++ R* tv b+ DI+ D---- 
+G e* h! r--- y** 
+------END GEEK CODE BLOCK------
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

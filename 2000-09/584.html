@@ -1,0 +1,155 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: failsafe bootloaders" -->
+<!-- FromName="Russell, Richard (DEH)" -->
+<!-- FromEmail="rrussell@deh.sa.gov.au" -->
+<!-- ToName="" -->
+<!-- ToEmail=""'- -'" <liokaq@yahoo.com>, linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 13 Sep 2000 10:39:50 +0930" -->
+<!-- Id="9F7323D0C702D4119B4C0008C70D427901720F42@mail.dehaa.sa.gov.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: failsafe bootloaders</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Russell, Richard (DEH) &lt;<I><A HREF="mailto:rrussell@deh.sa.gov.au">rrussell@deh.sa.gov.au</A></I>&gt;
+  To  : <A HREF="mailto:"'- -'" <liokaq@yahoo.com>">"'- -'" <liokaq@yahoo.com></A>, <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Wed, 13 Sep 2000 10:39:50 +0930
+</PRE>
+<H1>RE: failsafe bootloaders</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+er.. yes, that's nice, and thankyou for your input, but seeing as I could be
+a number of Kms away from the machine, I can't select which image to boot...
+The scenario is this: I have a new kernel to install. I install it, and set
+it as the default. I reboot the machine remotely. The kernel hangs. Without
+a watchdog card, that's the end of it, but supposing I had one, or some
+other means of doing a hard reset (a trained monkey perhaps), what would
+happen? The same kernel would boot. What I want is for the bootloader to
+notice that the kernel failed, and have it boot a backup kernel instead.
+Doing this shouldn't be _too_ hard... you need a watchdog card to reboot a
+hung machine, and then you need a "BOOT_SUCCESS" flag on the boot sector
+somewhere...
+
+pseudocode:
+
+Bootloader starts.
+if BOOT_SUCCESS=true
+  BOOT_SUCCESS=false
+  boot default kernel
+  kernel starts loading
+  kernel finishes loading successfully
+  BOOT_SUCCESS=true
+else
+  boot backup kernel
+end if
+
+make sense? I would have thought that this kind of thing would be easy to
+implement, and would be reasonably useful to a large number of people...
+even without a watchdog card, all you need is to remotely notice that after
+X minutes, your machine hasn't come up, and you need to call someone on site
+and tell them  to hit the button... :)
+
+I'm surprised that this doesn't already exist...
+
+anyway, if no-one knows about it, maybe it will exist shportly...
+
+rr
+
+&gt; -----Original Message-----
+&gt; From: - - [<A HREF="mailto:liokaq">mailto:liokaq</A>@yahoo.com]
+&gt; Sent: Tuesday, September 12, 2000 8:04 PM
+&gt; To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; Subject: Re: failsafe bootloaders
+&gt; 
+&gt; 
+&gt; --- "Russell, Richard (DEH)" &lt;<A HREF="mailto:rrussell@deh.sa.gov.au">rrussell@deh.sa.gov.au</A>&gt;
+&gt; wrote:
+&gt; &gt; is there such a thing as a bootloader that can have
+&gt; &gt; a backup boot image that
+&gt; &gt; is automatically engaged if the primary fails?
+&gt; Yes, lilo
+&gt; &gt; I want to have a system that I can remotely upgrade
+&gt; &gt; the kernel, and be
+&gt; &gt; pretty confident that if the kernel breaks, the old
+&gt; &gt; one will be used...
+&gt; &gt; 
+&gt; &gt; rr
+&gt; 
+&gt; If you check /etc/lilo.conf, there you should see
+&gt; entries such as:
+&gt; 
+&gt; image=/boot/bzImage (or /vmlinuz)
+&gt; label=linux
+&gt; read-only
+&gt; 
+&gt; or something similar. The above uses the bzImage
+&gt; kernel
+&gt; in /boot, and at the lilo prompt (asuming you put
+&gt; "prompt in /etc/lilo.conf), you enter in "linux"
+&gt; (from the label= entry above).
+&gt; You can have multiple kernel images with different
+&gt; labels, by adding more entries like:
+&gt; 
+&gt; image=/path_to_new_kernel
+&gt; label=new_kernel
+&gt; read-only
+&gt; 
+&gt; At the lilo prompt you will have the option to choose
+&gt; which kernel you want to load, and if you want a
+&gt; default kernel image you want to load then add
+&gt; 
+&gt; default=label_of_kernel_you_want_to_load
+&gt; 
+&gt; in /etc/lilo.conf, or you could just put the kernel
+&gt; entry that you want to load first, before all the
+&gt; other
+&gt; kernel entries (lilo heirachy - top -&gt; down)
+&gt; 
+&gt; Check the man page for more options
+&gt; 
+&gt; __________________________________________________
+&gt; Do You Yahoo!?
+&gt; Yahoo! Mail - Free email you can access from anywhere!
+&gt; <A HREF="http://mail.yahoo.com/">http://mail.yahoo.com/</A>
+&gt; 
+&gt; -- 
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on 
+&gt; irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as 
+&gt; the subject
+&gt; 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,125 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: DNS Question" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="Alex.Wilkinson@dsto.defence.gov.au" -->
+<!-- Date="Tue, 06 May 2003 16:38:15 +0930" -->
+<!-- Id="3EB75F5F.8050502@aarnet.edu.au" -->
+<!-- Reference="20030506115147.R91470@squirm.dsto.defence.gov.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: DNS Question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:Alex.Wilkinson@dsto.defence.gov.au">Alex.Wilkinson@dsto.defence.gov.au</A></I>&gt;
+  Date: Tue, 06 May 2003 16:38:15 +0930
+</PRE>
+<H1>Re: DNS Question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Wilkinson,Alex wrote:
+&gt; Howdy Crew,
+&gt; 
+&gt; Is there any such command that can be used to find out CNAME[s] for Pointer records ?
+&gt; Can't seem to do this with nslookup and dig.
+&gt; 
+&gt; Can this be confirmed please.
+
+Aliases point to hosts, not to reverse mappings.
+
+For example, the www.example.edu.au might be an alias for
+shiraz.example.edu.au.
+
+     www.example.edu.au.      IN  CNAME  shiraz.example.edu.au.
+     shiraz.example.edu.au.   IN  A      129.1.2.3
+
+In another file the reverse mapping is
+
+     3.2.1.129.in-addr.arpa.  IN  PTR    shiraz.example.edu.au.
+
+You read the CNAME line as "www.example.edu.au has a
+canonical name of shiraz.example.edu.au" or as "www.example.edu.au
+is an alias of shiraz.example.edu.au".
+
+The point of aliases being that www.example.edu.au can move
+to a another host without this being too visible to users
+of the service.  "Too visible" meaning that the results
+of a "traceroute" might be different by that users of
+applications see no effective difference.
+
+So if we move the web server to a hosting site we might see
+
+   traceroute www.example.edu.au
+   Tracing route to shiraz.example.edu.au (129.1.2.3)
+   ...
+
+changing to
+
+   traceroute www.example.edu.au
+   Tracing route to triathlon.example-hosting.com.au (130.4.5.6)
+   ...
+
+but the HTTP transaction will be the same.
+
+If you use an alias you may also need to configure the
+application to return the alias rather than the actual
+host name.
+
+In our example, /etc/httpd/conf/httpd.conf needs to say
+   ServerName www.example.edu.au:80
+and possibly
+   UseCanonicalName On
+
+
+
+As an alternative to aliases you can have multiple A
+records for a host.
+
+     www.example.edu.au.      IN  A      129.1.2.3
+     shiraz.example.edu.au.   IN  A      129.1.2.3
+     3.2.1.129.in-addr.arpa.  IN  PTR    shiraz.example.edu.au.
+
+I suggest that you don't do this.  There are cases where this
+will suck.
+
+-- 
+Glen Turner         Tel: (08) 8303 3936 or +61 8 8303 3936
+Network Engineer          Email: <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>
+Australian Academic & Research Network   www.aarnet.edu.au
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

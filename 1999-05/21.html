@@ -1,0 +1,120 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: email to printer as well as email?" -->
+<!-- FromName="Adrian Butterworth" -->
+<!-- FromEmail="adrian@econ-outlook.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 3 May 1999 23:44:08 +0930" -->
+<!-- Id="99050401371500.00626@groc.econ-outlook.com.au" -->
+<!-- Reference="372DA3BA.78E26654@bvm.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: email to printer as well as email?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Adrian Butterworth &lt;<I><A HREF="mailto:adrian@econ-outlook.com.au">adrian@econ-outlook.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 3 May 1999 23:44:08 +0930
+</PRE>
+<H1>Re: email to printer as well as email?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Ben
+you can pipe mail to any application! for example 
+
+add the following to your /etc/aliases file (with or without the comments)
+
+# send the body to the printer using sed to strip the headers
+# works for text and postscript files eg "mail printer &lt;sample.ps"
+printer:  |"sed -e '1,/^$/ d'"|/usr/bin/lpr
+
+then run "newaliases" to cause a reread of the file
+
+now any plaintext or postscript body you email to "<A HREF="mailto:printer@your.host">printer@your.host</A>"
+will get slapped in the printqueue.
+
+if you get your mail client to "cc" to "printer" any email it sends you'll
+end up with a hard copy.
+
+Note of warning: this simple filter will not decode html or binary attachments
+so don't "cc" anything your standard print filter can't swallow or you'll use
+a lot of paper.
+
+You'll most likely want something fancier than the sed above to preprocess the
+mail.
+
+an easy way to play around is to pipe into your own script e.g.
+  in /etc/aliases put
+  printer:  |/root/scripts/printmail
+
+  simple example for /root/scripts/printmail
+  (needs to be executable by everybody)
+  #!/bin/sh
+  cat - &gt; /tmp/print.this.text$$
+  printmail /tmp/print.this.text$$ | lpr 
+  rm /tmp/print.this.text$$
+
+there are all sorts of utilities you can use, formail, html2ps ...
+play till you find what you like
+
+regards
+Adrian Butterworth
+
+
+On Mon, 03 May 1999, Ben Donohue wrote:
+&gt; is there a way to setup email such that the email gets sent and also a
+&gt; copy gets printed on the printer?
+&gt; that is, the printer is at the sending end not the receiving. 
+&gt; the mail server sends the email to wherever but prints out what it has
+&gt; sent.
+&gt; 
+&gt; can someone point me in the right direction?
+&gt; maybe hylafax does this to a printer?
+&gt; not quite sure where to start.
+&gt; -- 
+&gt;                                                                   _|_
+&gt;                                                                    |
+&gt; Thanks,                                 B V M Solutions PTY Limited
+&gt; Ben Donohue                                    Web Hosting & Design
+&gt; <A HREF="mailto:donohueb@bvm.com.au">donohueb@bvm.com.au</A>                  Small Business Office Networks
+&gt; Mobile: 0417 018 600                          <A HREF="http://www.bvm.com.au">http://www.bvm.com.au</A>
+&gt; 
+&gt; Freedom isn't doing what you want...  Freedom is knowing what to do
+&gt; 
+&gt; -- 
+&gt; Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

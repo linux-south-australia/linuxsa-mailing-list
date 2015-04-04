@@ -1,0 +1,141 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: pppd goes mad!" -->
+<!-- FromName="Stephen Baxter" -->
+<!-- FromEmail="steve@senet.com.au" -->
+<!-- ToName="Alan Kennington" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="Tue, 22 Dec 1998 16:14:43 +1030 (CST)" -->
+<!-- Id="Pine.BSF.4.01.9812221602420.2224-100000@armageddon.senet.com.au" -->
+<!-- Reference="199812220530.QAA08810@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: pppd goes mad!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Stephen Baxter &lt;<I><A HREF="mailto:steve@senet.com.au">steve@senet.com.au</A></I>&gt;
+  To  : Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: Tue, 22 Dec 1998 16:14:43 +1030 (CST)
+</PRE>
+<H1>Re: pppd goes mad!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; Just pinging down my PPP link (over a PSTN line at 33 kbits/sec)
+&gt; with 139.130.140.14 at my end, and 139.130.140.1 at the telstra end,
+&gt; I get the following when I ping the telstra end:
+&gt; 
+&gt; ==========================================================================
+&gt; [<A HREF="mailto:akenning@dog">akenning@dog</A>]$ ping 139.130.140.1
+&gt; PING 139.130.140.1 (139.130.140.1): 56 data bytes
+&gt; 64 bytes from 139.130.140.1: icmp_seq=0 ttl=255 time=4829.6 ms
+&gt; 64 bytes from 139.130.140.1: icmp_seq=1 ttl=255 time=3841.1 ms
+&gt; 64 bytes from 139.130.140.1: icmp_seq=2 ttl=255 time=2861.0 ms
+
+[snipped a bit of stuff from here to keep the list police that seem to
+frequent this list from going overboard !]
+
+&gt; 64 bytes from 139.130.140.1: icmp_seq=3 ttl=255 time=1880.7 ms
+&gt; 64 bytes from 139.130.140.1: icmp_seq=4 ttl=255 time=891.0 ms
+&gt; 64 bytes from 139.130.140.1: icmp_seq=23 ttl=255 time=1100.6 ms
+&gt; 64 bytes from 139.130.140.1: icmp_seq=24 ttl=255 time=130.8 ms
+
+You do have an impressive spread of numbers there !
+
+Try tcpdump -i ppp0 to see if there is any other traffic over the 
+ppp link to make sure there is no other traffic over the link.
+
+Try "man tcpdump" for info on running tcpdump.
+
+&gt; [<A HREF="mailto:akenning@dog">akenning@dog</A>]$ ping 139.130.140.14
+&gt; PING 139.130.140.14 (139.130.140.14): 56 data bytes
+&gt; 64 bytes from 139.130.140.14: icmp_seq=0 ttl=64 time=1.6 ms
+
+[snip]
+
+&gt; 64 bytes from 139.130.140.14: icmp_seq=1 ttl=64 time=1.5 ms
+&gt; 64 bytes from 139.130.140.14: icmp_seq=8 ttl=64 time=1.5 ms
+&gt; 64 bytes from 139.130.140.14: icmp_seq=9 ttl=64 time=1.5 ms
+
+Any less and I would have to be worried !
+
+&gt; round-trip min/avg/max = 1.5/1.5/1.6 ms
+&gt; ==========================================================================
+&gt; 
+&gt; Question:
+&gt; How could I determine whether it is _my_ "pppd" or _telstra's_ "pppd"
+&gt; which is at fault?
+
+
+There are some good debug and kdebug options (not to sure if they have
+that one - pppd may be a little more stable then the last time we used it)
+in pppd (man pppd), if you like reading syslog output to determine the
+problem that may be a good place to start. Things that may be wrong if
+there is no other traffic over the link are mismatch in MTU/MRU (!), out
+of control LQP, perhaps something to do with compressors losing their
+dictionaries (if you use compressors in your pppd) or just plain broken
+pppd - been there before.
+
+&gt; 
+&gt; If I do traceroute to the telstra end, I get:
+&gt; 
+&gt; ==========================================================================
+&gt; [<A HREF="mailto:akenning@dog">akenning@dog</A>]$ /usr/sbin/traceroute -i ppp0 139.130.140.1
+&gt; traceroute to 139.130.140.1 (139.130.140.1), 30 hops max, 40 byte packets
+&gt;  1  * * gw.way7.Adelaide.telstra.net (139.130.140.1)  4759.635 ms
+&gt; [<A HREF="mailto:akenning@dog">akenning@dog</A>]$ !!
+&gt; /usr/sbin/traceroute -i ppp0 139.130.140.1
+&gt; traceroute to 139.130.140.1 (139.130.140.1), 30 hops max, 40 byte packets
+&gt;  1  * * *
+&gt;  2  * gw.way7.Adelaide.telstra.net (139.130.140.1)  4509.695 ms *
+&gt; [<A HREF="mailto:akenning@dog">akenning@dog</A>]$ !!
+&gt; /usr/sbin/traceroute -i ppp0 139.130.140.1
+&gt; traceroute to 139.130.140.1 (139.130.140.1), 30 hops max, 40 byte packets
+&gt;  1  gw.way7.Adelaide.telstra.net (139.130.140.1)  1925.882 ms *  4279.715 ms
+
+
+Tracerouting Cisco's sux - they discard every second packet they get that
+is destined for them and has TTL expired to prevent people trying to DOS
+them with expired TTL packets and therefore burning cycles on the CPU in
+process switch mode as it deals with the packet - hence the "*".
+
+
+
+
+
+------------------------------------------------------------------
+Stephen Baxter             SE Network Access/Big Networks Australia
+phone : +61 8 8221 5221    222 Grote Street 
+fax   : +61 8 8221 5220    Adelaide 5000, Australia
+
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,122 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba Permissions" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="Glen Turner <glen.turner@aarnet.edu.au>, omegasys@adam.com.au" -->
+<!-- Date="Thu, 27 Apr 2000 01:08:58 +0900" -->
+<!-- Id="3.0.6.32.20000427010858.0094d610@203.16.214.248" -->
+<!-- Reference="3906b671.ad.0@adam.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba Permissions</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:Glen Turner <glen.turner@aarnet.edu.au>">Glen Turner <glen.turner@aarnet.edu.au></A>, <A HREF="mailto:omegasys@adam.com.au">omegasys@adam.com.au</A>
+  Date: Thu, 27 Apr 2000 01:08:58 +0900
+</PRE>
+<H1>Re: Samba Permissions</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+At 10:44 PM 4/26/00 +0930, Glen Turner wrote:
+&gt;Jeremy Ervine wrote:
+&gt;&gt; 
+&gt;&gt; Hi all,
+&gt;&gt; 
+&gt;&gt; I am having a small problem with Samba File Permissions. I have created
+a small
+&gt;&gt; network with about 10 users, and these ten users all have their own home
+directory,
+&gt;&gt; plus they need full access a shared, samba share. My problem is, each
+user who
+&gt;&gt; writes a file to that share is only writable to that user, but read only to
+&gt;&gt; everyone else.
+&gt;&gt; 
+&gt;&gt; I have tried all the samba docos, I have set in Linuxconf 777 to be the
+default
+&gt;&gt; permission for all files written, but still no luck.
+&gt;
+&gt;I find it best to force the permissions of the created files
+&gt;on shares that are owned by the group.  For example, if
+&gt;all users in the UNIX group 'office' exchange files through
+&gt;the 'office' share, then I put the following into smb.conf
+&gt;
+&gt;[office]
+&gt;   comment = office.smb.example.edu.au
+&gt;   path = /home/samba/office
+&gt;   browseable = Yes
+&gt;   writeable = Yes
+&gt;   read list = @office
+&gt;   write list = @office
+&gt;   force group = +office
+&gt;   create mask = 0660
+&gt;   directory mask = 0770
+&gt;   force create mode = 0660
+&gt;   force directory mode = 0770
+&gt;
+
+Glen is right. The parameters he is pointing you at are:
+
+    force group = some group
+
+This group should be a group that all users who need write access to the
+share are in.
+
+   force create mode = 0660
+   force directory mode = 0770
+
+This makes sure that all files and directories created will have the
+correct permissions.
+
+You can also use force user = &lt;some user&gt; if you want just to keep things
+tidy.
+
+Under Samba 2.0.7 you may be able to use 
+
+   inherit permissions = yes
+
+on the share as well.
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>, Master Linux Administrator :-),
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Co-author, SAMS Teach Yourself Samba in 24 Hours
+Author: First Australian 5-day, intensive, hands-on Linux SysAdmin course
+Author: First Australian 2-day, intensive, hands-on Samba course
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

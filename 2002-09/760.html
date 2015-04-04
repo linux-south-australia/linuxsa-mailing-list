@@ -1,0 +1,164 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Memory use / application optimisation" -->
+<!-- FromName="'Anthony Symons'" -->
+<!-- FromEmail="ant@sa.pracom.com.au" -->
+<!-- ToName="'Mcleod, Ian'" -->
+<!-- ToEmail="ian.mcleod@eds.com" -->
+<!-- Date="18 Sep 2002 15:51:50 +0930" -->
+<!-- Id="1032330110.2032.192.camel@ant.internal" -->
+<!-- Reference="EBD5241959BE8E42B6846134DF0EAE2301616765@AUADM201" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Memory use / application optimisation</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Anthony Symons &lt;<I><A HREF="mailto:ant@sa.pracom.com.au">ant@sa.pracom.com.au</A></I>&gt;
+  To  : Mcleod, Ian &lt;<I><A HREF="mailto:ian.mcleod@eds.com">ian.mcleod@eds.com</A></I>&gt;
+  Date: 18 Sep 2002 15:51:50 +0930
+</PRE>
+<H1>RE: Memory use / application optimisation</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 2002-09-18 at 15:27, Mcleod, Ian wrote:
+&gt; I think the general consensus is to run Squid if you have a fast machine
+&gt; with adequate resources and bandwidth usage to lose sleep over (18/c / MB
+&gt; ever 16 seconds or so @ 512 / kb/s! - maybe around $30 / hr with a good site
+&gt; connection! Forgive me if I math is skewed - what ARE the correct figures to
+&gt; estimate cost?).
+
+Depends on your provider, and/or bandwidth included.
+ 
+&gt; I have a laptop @ 1.7GHz (1.2GHz on battery) with 512MB DDR RAM - I think
+&gt; Squid would be a good option?
+
+Its more about disk space. Squid is pretty efficient, but the more disk
+space you have the more stuff you can cache before you have to start
+throwing stuff out (which the cache manages automatically)! Even &lt;
+pentium 200 with 64 mb of ram would be enough provided it had a
+reasonable amount of disk space.
+
+&gt; I had no idea that only small files were cached!!!!  I am turning on Squid
+&gt; as soon as I get home.
+
+As always that is configurable in squid as well. I think Im caching &lt;
+4mb files here. Its particularly good for "net installs" like some of
+the HP printer driver we have here. The downloaded version is broken, so
+you have to check "check net for latest version", but dont get an option
+to locally save the files. These days it lives in the squid cache, so it
+still installs really quickly :) You can set up the proxy as a
+"transperent proxy" where you use iptables to redirect traffic to port
+80 in to squid instead. You tell squid to expect standard http requests
+to other people, and squid will answer instead. This way you can stop
+your users from simply turning of squid to try and avoid your reporting
+and/or wasting your bandwidth.
+
+As an aside, heres some chunks from one of the squid reports (one with
+no personal information :) that run here in our real world environment.
+You can see how many hits come from the cache, vs how much comes down
+the link. This reporting tool is not part of a standard squid install.
+
+                            SUMMARY OF SERVER USAGE
+
+                     UDP COUNTS        TCP COUNTS          TCP BYTES
+Server            counts %all %hit  counts %all %hit   Mbytes %all %hit
+----------------------- ----------------- ----------------- -----------
+<A HREF="http://au.com.steadycom0">http://au.com.steadycom0</A>    -    -   23543  27%   1%    37.91  10%   1% 
+<A HREF="http://10.2.2.30">http://10.2.2.30</A>       0    -    -    7454   9%  15%    17.19   4%   2% 
+<A HREF="http://au.com.realestat0">http://au.com.realestat0</A>    -    -    4953   6%  91%     4.18   1%  48% 
+<A HREF="http://239.145.242.251">http://239.145.242.251</A> 0    -    -    1655   2% 100%     1.15   0% 100% 
+<A HREF="http://au.com.realestat0">http://au.com.realestat0</A>    -    -    1428   2%  53%    12.30   3%  10% 
+<A HREF="http://info.austech.www0">http://info.austech.www0</A>    -    -    1149   1%  82%     3.44   1%  10% 
+<A HREF="http://com.worldwide.ww0">http://com.worldwide.ww0</A>    -    -    1125   1%  24%     0.52   0%  32% 
+<A HREF="http://au.com.whitepage0">http://au.com.whitepage0</A>    -    -    1115   1%  70%     3.15   1%  25% 
+<A HREF="http://com.ebay.pics">http://com.ebay.pics</A>   0    -    -    1095   1% 100%     0.33   0%  97% 
+<A HREF="http://au.com.pracom.ww0">http://au.com.pracom.ww0</A>    -    -     985   1%  96%     2.01   1%  75% 
+<A HREF="http://au.com.news.aust0">http://au.com.news.aust0</A>    -    -     894   1%  91%     2.82   1%  16% 
+<A HREF="http://com.netscape.ncm0">http://com.netscape.ncm0</A>    -    -     815   1%  89%     1.78   0%  11% 
+<A HREF="http://au.com.tradingpo0">http://au.com.tradingpo0</A>    -    -     781   1%  89%     2.17   1%  17% 
+<A HREF="http://com.atwolaf.are">http://com.atwolaf.are</A> 0    -    -     723   1%   5%     2.09   1%  10% 
+<A HREF="http://com.msn.hotmail.0">http://com.msn.hotmail.0</A>    -    -     691   1%  19%    15.07   4%  13% 
+<A HREF="http://com.aol.toolbar">http://com.aol.toolbar</A> 0    -    -     679   1%  63%     0.91   0%  19% 
+<A HREF="http://au.com.news.agse0">http://au.com.news.agse0</A>    -    -     590   1%    -     0.60   0%    - 
+<A HREF="http://net.doubleclick.0">http://net.doubleclick.0</A>    -    -     566   1%  20%     1.64   0%  32% 
+<A HREF="http://au.com.news.www">http://au.com.news.www</A> 0    -    -     557   1%  91%     1.28   0%  33% 
+<A HREF="http://com.netscape.cdn0">http://com.netscape.cdn0</A>    -    -     517   1%  94%     0.24   0%  45% 
+<A HREF="http://com.comics.www">http://com.comics.www</A>  0    -    -     512   1%  98%     1.76   0%  82% 
+<A HREF="http://com.msn.arc7">http://com.msn.arc7</A>    0    -    -     471   1%    -     0.20   0%    - 
+<A HREF="http://au.com.pamedia.a0">http://au.com.pamedia.a0</A>    -    -     465   1%  27%     1.20   0%  33% 
+<A HREF="http://au.com.zdnet.www0">http://au.com.zdnet.www0</A>    -    -     461   1%  79%     1.43   0%   6% 
+<A HREF="http://au.com.jumper.ww0">http://au.com.jumper.ww0</A>    -    -     455   1%  31%     1.28   0%  25% 
+----------------------- ----------------- ----------------- -----------
+
+                              SUMMARY OF URL TYPES
+
+                            UDP COUNTS        TCP COUNTS          TCP
+BYTES
+Type           counts %all %hit  counts %all %hit   Mbytes %all %hit
+----------------------- ----------------- ----------------- ---------
+Image              12  36%    -   42002  49%  62%    91.18  23%  36% 
+Other               9  27%    -   26527  31%  16%    96.12  24%   9% 
+Query               0    -    -   12972  15%   1%    81.05  20%   1% 
+HTML                1   3%    -    1633   2%  16%    17.61   4%   6% 
+Directory          11  33%   9%    1526   2%   8%    13.74   3%   1% 
+Lookup              0    -    -    1015   1%   1%     1.37   0%   3% 
+Applet              0    -    -     120   0%  90%     0.15   0%  66% 
+Bundle              0    -    -      22   0%   5%    48.85  12%   0% 
+PDF                 0    -    -      19   0%   5%    18.64   5%   0% 
+SHTML               0    -    -      19   0%    -     0.29   0%    - 
+Executable          0    -    -      15   0%  20%    22.91   6%   1% 
+Software            0    -    -      11   0%    -     0.16   0%    - 
+Text                0    -    -       7   0%  14%     0.20   0%  42% 
+Audio               0    -    -       2   0%  50%     0.00   0%  51% 
+----------------------- ----------------- ----------------- ---------
+
+Ant
+
+-- 
+Systems Administrator       
+Pracom Ltd.             
++61 8 82029074 -=- +61 402 100 671 
+<A HREF="mailto:anthony.symons@sa.pracom.com.au">anthony.symons@sa.pracom.com.au</A>
+
+PRIVILEGED - PRIVATE AND CONFIDENTIAL
+This electronic mail is solely for the use of the addressee and may
+contain information which is confidential or privileged.
+If you receive this electronic mail in error, please delete it from
+your system immediately and notify the sender by electronic mail or
+using any of the above contact details.
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

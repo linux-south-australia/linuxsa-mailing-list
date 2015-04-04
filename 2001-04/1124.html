@@ -1,0 +1,127 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Struggling with gv (GhostView)" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Richard Sharpe'" -->
+<!-- ToEmail="sharpe@ns.aus.com" -->
+<!-- Date="Fri, 27 Apr 2001 13:09:40 +0930" -->
+<!-- Id="3AE8E9FC.BECD3E99@aarnet.edu.au" -->
+<!-- Reference="3.0.6.32.20010425165204.00a4db30@10.0.2.1" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Struggling with gv (GhostView)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  Date: Fri, 27 Apr 2001 13:09:40 +0930
+</PRE>
+<H1>Re: Struggling with gv (GhostView)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+
+&gt; I seem to be struggling with GhostView (gv).
+&gt;
+&gt; Despite telling it that my pages are A4, it seems to want to use Letter,
+&gt; and the printer always asks for letter ... This screws up the printed page.
+&gt;
+&gt; Does anyone know how to resolve that?
+
+GV is just the viewer, so selecting the page size really just
+sets the ratio of long to short size on the screen, not on
+the GhostScript rendered printing.  It's indended for use
+when there is no DSC giving a media selection and the
+bounding box is ridiculous.
+
+There are a couple of ways:
+
+1)
+Find gs_init.ps from GhostScript (mine is at /usr/local/share/
+ghostsript/7.0/gs_init.ps) and uncomment the code on these
+lines:
+
+  % Optionally choose a default paper size other than U.S. letter.
+  % (a4) /PAPERSIZE where { pop pop } { /PAPERSIZE exch def } ifelse
+
+2)
+For more portable work, see the attached make include file
+(called /usr/local/include/ghostscript.mk on my system).
+
+It calls gs with the appropiate arguments rather than
+vector through the ps2pdf front end.  You might find
+this useful for maintaining a set of documents.
+
+To use it, say in the Makefile
+
+  include ghostscript.mk
+  my.pdf: my.ps
+
+3)
+Get GV to call GS setting the PAPERSIZE PostScript word.
+Set .Xresources to contain
+
+  GV*gsArguments: -sPAPERSIZE=a4
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+#
+# pstopdf.mk -- Makefile include for creating PDF files
+#
+# $Id: ghostscript.mk,v 1.1 2000/10/23 09:07:49 root Exp $
+
+# Configuration
+PAPER=a4
+
+# Programs
+GS=gs
+
+# Rules
+%.pdf : %.ps
+	$(GS) -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sPAPERSIZE=$(PAPER) -sOutputFile=$@ -c save pop -f $&lt;
+
+%.pdf : %.eps
+	$(GS) -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sPAPERSIZE=$(PAPER) -sOutputFile=$@ -c save pop -f $&lt;
+
+%.pnm : %.eps
+	$(GS) -q -dNOPAUSE -dBATCH -sDEVICE=pnm -sPAPERSIZE=a3 -sOutputFile=$@ -c save pop -f $&lt;
+
+# EOF
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

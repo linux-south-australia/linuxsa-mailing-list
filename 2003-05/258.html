@@ -1,0 +1,156 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Notes for configuring TFTP server on RHL9" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 07 May 2003 16:02:05 +0930" -->
+<!-- Id="3EB8A865.1050702@aarnet.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Notes for configuring TFTP server on RHL9</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 07 May 2003 16:02:05 +0930
+</PRE>
+<H1>Notes for configuring TFTP server on RHL9</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+
+These might be of use to people.  If not today, then when someone
+trawls the list archive.
+
+
+
+              CONFIGURING TFTP SERVER ON RED HAT LINUX 9
+
+
+The configuration of this TFTP server is optimised for recording
+network equipment configuration files (such as those from Cisco
+routers).  The out-of-the-box RHL configuration is optimised for
+serving boot images.
+
+
+INSTALL SOFTWARE
+
+Install TFTP server (in.tftpd)
+
+  # rpm -ivh tftp-server-0.32-4.i386.rpm
+
+Install TFTP client (tftp).  Not really needed but useful for testing.
+
+  # rpm -ivh tftp-0.32-4.i386.rpm
+
+
+CONFIGURE TCP WRAPPER
+
+Configure TCP Wrapper so that TFTP access can only occur from router
+adminstrative VLAN (in our case this has addresses in 10.255.0.0/16).
+
+  Alter /etc/hosts.deny
+    ALL: ALL
+
+  Alter /etc/hosts.allow
+    # Anything from IPv4 or IPv6 localhost
+    ALL: 127.0.0.0/255.0.0.0
+    ALL: [::1]/128
+
+    # TFTP from routers
+    in.tftpd: 10.255.0.0/255.255.0.0
+
+
+MODIFY CONFIGURATION TO ALLOW EASY FILE CREATION
+
+By default files must be manually created before they can be written
+to using TFTP, for example
+
+  # cd /tftpboot
+  # (umask 111; touch example.txt)
+
+wheras we wish to be able to remotely create files.
+
+  Alter /etc/xinetd.d/tftp
+    server_args = -s /tftpboot -c -p -u tftp -U 117 -v
+
+The umask 117 prevents users not in the "tftp" group from reading
+remotely created files.  Since router configurations contain passwords
+this is advisable.  Nothing prevents other routers (or even a Linux
+box with an interface in the router administrative VLAN) from remotely
+accessing the files, so it's not fantastic security.
+
+
+CREATE TFTP USER
+
+ [ This is for a local user.  It's better if the TFTP user and group
+   are created in NIS+, LDAP or whatever so that UIDs/GIDs are
+   consistent across machines.  This is particularly as the "tftp" user
+   will own files and we want to move them between machines (by NFS or
+   tape) correctly. ]
+
+  # groupadd -r tftp
+  # grep tftp /etc/group
+
+Note the created GID.  With luck this can will be free to be used as
+the UID, in our case 101.
+
+  # useradd -r -c 'Trival file transfer' -d /tftpboot -g tftp -s /sbin/nologin -u 101 tftp
+
+
+PLACE USERS THAT CAN LOCALLY WRITE TFTP FILES INTO TFTP GROUP
+
+  Alter /etc/group  [or NIS+, or LDAP, ...]
+    t<A HREF="ftp:x:101:root,example">ftp:x:101:root,example</A>
+
+Users will need to restart sessions before new group membership is
+visible (use the "id" commnd to see current group membership).
+
+
+CREATE TFTP DIRECTORY
+
+  # cd /
+  # mkdir /tftpboot
+  # chown t<A HREF="ftp:tftp">ftp:tftp</A> /tftpboot
+  # chmod u=rwx,g=rwxs,o= /tftpboot
+
+
+LOAD NEW XINETD CONFIGURATION
+
+To make a configuration change come into effect
+
+  # killall in.tftpd
+  # /sbin/service xinetd reload
+
+
+TEST
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

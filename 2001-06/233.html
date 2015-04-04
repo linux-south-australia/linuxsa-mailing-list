@@ -1,0 +1,127 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="getting multiline parameters for a perl CGI" -->
+<!-- FromName="'Dan Kortschak'" -->
+<!-- FromEmail="dan.kortschak@adelaide.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 6 Jun 2001 09:35:29 +0930 (CST)" -->
+<!-- Id="Pine.OSF.4.21.0106060924250.6696-100000@pene.science.adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: getting multiline parameters for a perl CGI</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Kortschak &lt;<I><A HREF="mailto:dan.kortschak@adelaide.edu.au">dan.kortschak@adelaide.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 6 Jun 2001 09:35:29 +0930 (CST)
+</PRE>
+<H1>getting multiline parameters for a perl CGI</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Everyone, I have recently translated a perl script I wrote for
+manipulating DNA sequences to be used as a CGI. The thing works, but I'm
+not entirely happy with the elegance (it's ugly) of how I have to get a
+multiline paramter from a text entry box:
+
+The paramter is a portion of text with the following format:
+&gt;sequence_id
+line1 of sequence
+line2 of sequence
+.
+.
+.
+linen of sequence
+
+
+an example of how I did it for the CGI (original shown below): 
+
+# get  parameters from form
+my @SEQUENCES = split (/\s+/,param("sequences"));
+
+[snip intervening script]
+
+# read sequences to be aligned into hash from sequences parameter
+my ($NAME);
+foreach (@SEQUENCES) {
+  chomp;
+  if (/^(&gt;\S+)/) {
+    $NAME = $_;
+    $NAME =~ s/\&gt;(\S+)/$1/;
+  } else {
+    $SEQUENCES{$NAME} .= uc $_;
+  }
+}
+
+how the command line version works:
+
+# read sequences to be aligned into hash from stdin
+while (&lt;&gt;) {
+  chomp;
+  my ($NAME,@SEQUENCE) = split "\n";    # split record into the &gt;id line and several seq lines
+  next unless $NAME =~ /^(\S+)/;                # look for the id at the beginning
+  foreach $BIT (@SEQUENCE) {
+    $SEQUENCES{$NAME} .= uc $BIT;
+  }
+}
+
+How can I get a multiline parameter passed into the CGI script so that
+line identities are retained - partly it's just that I think my CGI
+version is ugly, but also in anther context it has the potential to be a
+user screwable point (the instructions say what they can't do, but they
+will).
+I have looked around to see how to do it, but I can't think of really
+where to start.
+
+thanks for any help
+Dam
+
+-- 
+_____________________________________________________________   .`.`o     
+                                                         o| ,\__ `./`r
+  Dan Kortschak                                          &lt;\/    \_O&gt; O    
+  Genetics (DMB)          phone :+61 8 8303 4863          "|`...'.\
+  Adelaide University     fax   :+61 8 8303 7534           `      :\ 
+  Australia 5005          mailto:<A HREF="mailto:dan.kortschak@adelaide.edu.au">dan.kortschak@adelaide.edu.au</A>    : \
+
+If you were not sent this message, please delete and forget it. If you
+were, be aware that we don't guarantee it free of virus; the health of
+your system is your own responsibility, do what you feel is necessary.
+By replying to this email you implicitly accept that your response may
+be forwarded to other recipients.
+Permission is granted for fair use reproduction.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

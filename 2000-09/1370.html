@@ -1,0 +1,143 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Strange IPCHAINS Behaviour" -->
+<!-- FromName="David Lloyd" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="Daryl Tester" -->
+<!-- ToEmail="dt@picknowl.com.au" -->
+<!-- Date="Sat, 30 Sep 2000 18:13:11 +0930" -->
+<!-- Id="39D5A79F.4FD605F8@rebel.net.au" -->
+<!-- Reference="39D4D233.EB334333@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Strange IPCHAINS Behaviour</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  Date: Sat, 30 Sep 2000 18:13:11 +0930
+</PRE>
+<H1>Re: Strange IPCHAINS Behaviour</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Daryl et al:
+
+&gt; As long as I can remember, flush (-F) has _never_ reset the policy.
+&gt; In all my ipchain scripts, I've always set the policy manually
+&gt; before/after/during the flush.
+
+I've now concluded that you are correct. After four or five times
+reading of "Linux Firewalls" by Robert Ziegler and the man pages,
+ipchains -F should dump the rules not the policies....in my defenese
+Ziegler didn't state that he had assumed you had REBOOTED your computer
+before the ipchains -F which would of course cause the default ACCEPT
+policies to appear.
+
+&gt; &gt;  - I had allowed a syn connection out to any web server
+&gt; 
+&gt; Just curious; why not allow outbound connections to any port?
+
+Well, I was working on getting HTTP working. So I had been specifically
+talking about port 80. Once I was satisfied that HTTP/DNS were
+functioning correctly I would have progressively started allowing other
+things.
+
+&gt; &gt;   ipchains -A output -p tcp -i ppp+ -s ${MYIP} ${UNPRIVPORTS} -d any/0
+&gt; &gt; 80 -j ACCEPT
+&gt; 
+&gt; Where is your "-y" (if this is the rule matching the above description)?
+
+The book I mentioned doesn't have it. I think it should and I don't
+think it would break things if I added it. The rule that I mentioned is
+probably a little too lenient (read less secure) than with a -y...but
+less secure, in this sense, means that it is easier for a client to
+access the web (i.e., less hurdles or less flags to get wrong).
+
+&gt; What is UNPRIVPORTS set to?
+
+1025:65525 - the "non priviliged" ports.
+
+&gt; &gt;   --&gt; ipchains -A forward -i ppp+ -s ${LAN_ADDRESS_IN_CIDR} -j MASQ
+&gt; 
+&gt; I think putting an interface on a forwarding rule may be bogus,
+&gt; especially as the packets to be masqueraded are more likely to
+&gt; be hitting your NIC, no?
+
+Well, I've tried eth+ and removing the interface. Behaviour I've noticed
+is:
+
+SETUP:
+the LAN
+the FIREWALL (eth0 is to LAN, ppp0 is to internet)
+
+- specify the interface as eth0 and forwarding/masquerading doesn't work
+- specify the interface as ppp0 and forwarding/masquerading do work
+(provided one of your other firewall rules on the input/output/user
+specified chains don't deny or reject it)
+
+I guess that one doesn't need to specify the interface. But I have on
+other systems I've set up and it's worked (the forward chain seems to
+think the -i is the interface to send the packets TO if it decides to
+forward them....so, essentially that says if you see anything from the
+local LAN that can be routed to the Internet/ppp+ [i.e. doesn't fall
+foul of an input/output firewall rule] then masquerade it and send the
+packet out over ppp-).
+
+&gt; &gt; * the other machines on the network - Windows 9X machines - that could
+&gt; &gt; ping the localhost (firewall) machine, couldn't speak to the outside web
+&gt; &gt; servers but seemed to be able to resolve domain names
+&gt; 
+&gt; Haven't seen all your rules, so I can't comment.
+
+That's fair enough. In the end I decided enough was enough, I have set
+up a firewall on my own machine that I *know* works and have offered to
+sit my own machine as the router. I am still suspicious of the hardware
+that they are using. At least if I start with a machine and firewall
+rule set that WORKS, I'll have a better chance of working out what has
+killed these services.
+
+&gt; &gt; I'd be inclined to say Linux is broken...at least the -F flag doesn't
+&gt; &gt; work as documented....any ideas on this?
+&gt; 
+&gt; I'd like to see where you thought that behaviour was documented.
+
+As noted above I had misread the documentation.
+
+DAVID
+-- 
+Everything will come in time
+Why deny yourself?
+Don't just let life pass you by
+Like winter in July....
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

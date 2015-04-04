@@ -1,0 +1,144 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Bash script question." -->
+<!-- FromName="'Jake Hawkes'" -->
+<!-- FromEmail="jake@infinitylimited.net" -->
+<!-- ToName="'Philippe Doucet'" -->
+<!-- ToEmail="philippedoucet@hotmail.com" -->
+<!-- Date="Sun, 01 Apr 2001 17:30:11 +0000" -->
+<!-- Id="3AC765A3.9603B17D@infinitylimited.net" -->
+<!-- Reference="F20iz2Mb1s7nlT2NqFJ00011632@hotmail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Bash script question.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  To  : Philippe Doucet &lt;<I><A HREF="mailto:philippedoucet@hotmail.com">philippedoucet@hotmail.com</A></I>&gt;
+  Date: Sun, 01 Apr 2001 17:30:11 +0000
+</PRE>
+<H1>Re: Bash script question.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Philippe Doucet wrote:
+&gt; 
+&gt; Philippe Doucet wrote:
+&gt; 
+&gt; &gt;
+&gt; &gt; I have redhat 6.2 running bash
+&gt; &gt; I`m trying to writte a hangman script and I`m stuck with this
+&gt; problem.
+&gt; &gt;
+&gt; &gt; I have a file containing spaced out underscore ie. - - - - - - -
+&gt; &gt;
+&gt; &gt; The number of underscores represent the number of letter of the word
+&gt; &gt; to be discovered.
+&gt; &gt;
+&gt; &gt; Once a user makes a guess at the word, let`s say the letter A, and
+&gt; the
+&gt; &gt; user is right, I want that letter to replace the appropriate
+&gt; &gt; underscore. so let`s say that the letter A was the second letter of
+&gt; &gt; the word, after the user guesses the letter A, the file would be
+&gt; &gt; appended to  - A - - - - -
+&gt; need ... more ... info ....
+&gt; how are you storing the answer word?
+&gt; do you know that the 'a' is the second letter? What if there are more
+&gt; than 1 'a' iin the answer? How do you store that info?
+&gt; here's a tip, shell programming regular expressions sucks I reckon.
+&gt; I say regexp because that's how I'd do it.
+&gt; make a regexp that replaces the 2nd instance of "- " pattern with "A"
+&gt; --
+&gt; Jake Hawkes B.Eng, (CSE)
+&gt; Paul's Law: You can't fall off the floor.
+&gt; 
+&gt; Hmmm ok...well here it is...yes if there is more then one A i want it
+&gt; to replace it as well...so in my command i'll be using some $1 $2
+&gt; $3....for sure the word is stored in a file, that file is translated
+&gt; into all underscore and stored in another file. Now I prompt the user
+&gt; to enter a letter, I check if that letter exist in the word and also
+&gt; where it is situated in the word, that is all fine. Now i'm at where I
+&gt; take that letter and replace it in the right order into the underscore
+&gt; file. I was thinking of regular expression but all i can find is
+&gt; commands that will append line by line...since my whole word is on the
+&gt; same line i don't know how to act on each individual underscore. I"m
+&gt; sorry for the way i'm giving out information but i'm quite new to
+&gt; bash...like 4 weeks new ...i'm pretty sure a regexp would be the
+&gt; answer.
+ 
+
+Firstly some mailing tips:
+	- try paragraphs, they're great
+	- keep the same subject line, that way all the messages will be related
+and threads work
+	- loose the HTML :)
+
+The only way I know to do character based replacements for an entire
+file, is to do the replacement to a temporary file, then replace the
+origional file with it.
+
+so:
+
+sed s/// orig_file &gt; tmp_file
+mv tmp_file orig_file
+
+
+that I think is the only way without starting to get complicated.
+
+when you get the position of the A, I assume you get it as a number. so,
+the sed line would be something like this:
+
+&lt; _ represents a space &gt;
+
+sed s/(-\_){$i}(-\_)(-\_)*/($1)A\ ($3)/  orig_file &gt; tmp_file
+
+where $i is the index of the A minus 1. so if A was the second letter,
+$1 = 2-1=1
+
+so sed will match index-1 instances of -\_ (escape the space) then one
+instance of -\_ and then zero or more instance of -\_  
+
+then it will replace the second expression with A and leave the first
+and second expressions the same. (When you put () around and expression,
+you are saving it for later. Unfortunately, I am not 100% on the syntax
+for this in bash. I would suggest using perl, because your going to want
+to use it eventually anyway:))
+
+
+--
+Jake Hawkes B.Eng, (CSE)
+
+Some days it's not worth chewing through the leather straps.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

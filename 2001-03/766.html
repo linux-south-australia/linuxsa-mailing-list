@@ -1,0 +1,88 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: kernel 2.4 bug" -->
+<!-- FromName="'David Newall'" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="'Jeremy Ervine'" -->
+<!-- ToEmail="omegasys@adam.com.au" -->
+<!-- Date="Thu, 22 Mar 2001 16:16:45 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0103221608560.24831-100000@smart-panel.tellurian.com.au" -->
+<!-- Reference="BKEEIKOFKOKGFILAPFEBKECNCHAA.omegasys@adam.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: kernel 2.4 bug</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Jeremy Ervine &lt;<I><A HREF="mailto:omegasys@adam.com.au">omegasys@adam.com.au</A></I>&gt;
+  Date: Thu, 22 Mar 2001 16:16:45 +1030 (CST)
+</PRE>
+<H1>RE: kernel 2.4 bug</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Kieran Walters wrote:
+&gt; int main() { while(1) fork(); }
+
+Jeremy Ervine &lt;<A HREF="mailto:omegasys@adam.com.au">omegasys@adam.com.au</A>&gt; wrote:
+&gt; I've just tried it on my Mandrake 8.0beta box, running 2.4.2 kernel and it
+&gt; totally killed it!
+
+Jeremy, can you be a little bit more explicit?  What does it do?
+
+What it *should* do, on a correct system configured with no per-user
+process limit, is use up all available process slots, thus no new process
+can be created.  Most system processes need to create new processes to
+do useful work, and they won't be able to.  Cron jobs wont get run.
+Mail wont get received or sent.  Getty *will* be able to exec login,
+which will be able to exec your shell, but the processes that you try
+to run in /etc/profile won't execute.  When a shell exits init won't be
+able to fork a new process.
+
+This program should also keep the kernel busy, since each created process
+is a tight loop invoking a system call that will mostly fail.  The system
+will have a few tens of "real" processes competing with hundreds of these
+forking processes, and thus the forking processes will swamp the system,
+starving it of available CPU time.
+
+Keypresses should get echoed to the screen, but note that the system
+may be so CPU starved that the echo takes a long time to appear.
+
+In short, a correctly working unix system, configured with no per-user
+process and CPU time limits will appear to stop.  This is not a bug;
+it's an intentional feature.
+
+Is that what happens?  Does the system panic or does it "lock up"?
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

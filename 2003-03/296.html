@@ -1,0 +1,116 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: postfix config (was Re: sendmail security issue)" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="ak.linuxsa@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 6 Mar 2003 19:22:59 +1030" -->
+<!-- Id="20030306192259.A2391@dog.topology.org" -->
+<!-- Reference="1046937195.32524.281.camel@spiral" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: postfix config (was Re: sendmail security issue)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:ak.linuxsa@topology.org">ak.linuxsa@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 6 Mar 2003 19:22:59 +1030
+</PRE>
+<H1>Re: postfix config (was Re: sendmail security issue)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, Mar 06, 2003 at 06:23:14PM +1030, David Fitch wrote:
+&gt; On Thu, 2003-03-06 at 18:00, Alan Kennington wrote:
+&gt; &gt; But then I don't understand why the "smtpd" process gets this connection from my own machine?!
+&gt; 
+&gt; yes looks dodgy for sure.
+&gt; Have you got relayhost set pointing to yourself or something?
+&gt; (in /etc/postfix/main.cf)
+&gt; I'm not sure why else it would try to connect to itself again.
+&gt; 
+
+Dave,
+
+I didn't set relayhost to anything because I saw this in the readme files:
+
+"If you're behind a firewall, you should set up a relayhost."
+
+But my machine is right on the net. 
+It is itself my main mail server which is specified in the MX
+records for all the other machines.
+
+My guess is that the relayhost parameter is used for _outgoing_ mail,
+in this case from the postfix software itself to send the bounced message to
+the from-address.
+
+In the main.cf file, it says this:
+
+# The relayhost parameter specifies the default host to send mail to
+# when no entry is matched in the optional transport(5) table. When
+# no relayhost is given, mail is routed directly to the destination.
+
+It looks like the postfix "smtp" process is trying to bounce the mail
+back through the "smtpd" process on the same machine.
+As you say, this would happen if I set up "relayhost" to point to myself.
+But the above note claims that if no relayhost is given, then the
+bounce mail should go directly to the destination, which is exactly what
+happen with all mail which I send myself from "dog.topology.org".
+
+It's only this exploit-mail which is somehow tricking postfix into
+sending mail in this curious way from process to process until it gets to
+the bogus from-address.
+(Now I can see the advantage of sendmail being a single-process MTA as opposed to
+this complicated network of processes in the postfix software.)
+
+It looks like I've got two problems then:
+
+1.	Instead of bouncing directly to the original SMTP client,
+	the "smtp" process is bouncing to the bogus from-address.
+2.	Instead of bouncing to the bogus from-address directly,
+	the "smtp" process is relaying it via the "smtpd" process
+	on the same mail-server machine.
+
+None of the README files seem to give enough detail to figure this out.
+Further study of the online documents, the main.cf comments, the README
+files and the man-manuals doesn't yield anything comprehensible to me.
+
+What I'm really looking for is:
+How do I make postfix send bounce messages to the SMTP client - not the from-address.
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

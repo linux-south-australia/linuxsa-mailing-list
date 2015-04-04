@@ -1,0 +1,136 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: The Joy of Wireless RESTORED!! (i.e. resolved)." -->
+<!-- FromName="'Daryl Tester'" -->
+<!-- FromEmail="Daryl.Tester@iocane.com.au" -->
+<!-- ToName="'Greg 'groggy' Lehey'" -->
+<!-- ToEmail="grog@lemis.com" -->
+<!-- Date="Sat, 18 Jan 2003 17:11:39 +1030" -->
+<!-- Id="3E28F723.D4D60909@iocane.com.au" -->
+<!-- Reference="3E25FE00.382FA6D2@iocane.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: The Joy of Wireless RESTORED!! (i.e. resolved).</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Tester &lt;<I><A HREF="mailto:Daryl.Tester@iocane.com.au">Daryl.Tester@iocane.com.au</A></I>&gt;
+  To  : Greg  &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  Date: Sat, 18 Jan 2003 17:11:39 +1030
+</PRE>
+<H1>Re: The Joy of Wireless RESTORED!! (i.e. resolved).</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+*Note to all mailing-list newbies* - the reason I post this is to
+show what I've discovered, so that other people searching the
+mailing lists for similar issues can see the resolution rather
+than just a bunch of people with similar problems ...  I also
+intend to follow up in the linux-vlan mailing list, even though
+it's probably less appropriate for there.
+
+Earlier, Greg 'groggy' Lehey wrote:
+
+&gt;&gt;&gt; Just to help localize the problem, have you tried running this card
+&gt;&gt;&gt; with FreeBSD?
+
+No.  Because it's a "production" laptop (in that I use it daily, including
+weekends, for my work, including an on-call component) and had been in use
+for about two years, it has two year's worth of accumulated software on it.
+The worst case scenario was that I blew away either partition and would be
+unable to restore it (even from backups) in a timely manner.  So while I
+had considered installing FreeBSD, the risk currently was too great[1].
+Does FreeBSD have a CD-only running version?  I know I could muck around
+with mfsroot, but I don't have a system here capable of building it yet.
+
+Besides, it was FreeBSD's fault anyway.  :-)  (Read on).
+
+Subsequently, Greg 'groggy' Lehey wrote:
+
+&gt; It could also be related to hardware compatibility.  That's why I
+&gt; suggested it.
+
+A combination of a good night's sleep and some meditation on the problem
+this morning brought forth the answer, being that it was the Host AP box.
+I thought about possible points of failure, and realised I hadn't ruled
+out the AP (so "Nyah!" DSL, I *do* make mistakes! :-).  So while I was
+booting the AUUG Knoppix CD, I did some grepping of the wi driver code
+in the FreeBSD source tree (I'd already done this on Linux's drivers,
+thinking it was the problem), and came across this gem:
+
+zen# grep 120 *
+wi_hostap.h:#define WIHAP_DFLT_INACTIVITY_TIME	120 /* 2 minutes */
+
+(That symbolic name is a dead giveaway if ever I saw one.)  Grepping
+for that shows quite a few hits within wi_hostap.c.  When Knoppix had
+finished booting (this was happening concurrently), it loaded the
+orinoco_cs pcmcia driver, DHCP'd up the network fine, then disassociated
+after being idle for 2 minutes.  So that's two Linux drivers down for
+the count, so to speak.  Setting the wi interface to debug mode (which
+I've only just figured out, again from the source) reveals:
+
+Jan 18 16:49:35 zen /kernel: wi0: inactivity disassoc: 00:40:05:ae:f6:32
+Jan 18 16:49:35 zen /kernel: Sending deauth to sta 00:40:05:ae:f6:32
+
+
+I've been looking at the sources for wicontrol and ifconfig, and neither
+of them seem to be able to alter the timeout (so far), but the wi
+driver indicates host ap timeout changes should be supported through
+its ioctl() interface, which indicates that it's doable.  Short term
+fix is to cut me a knew kernel; longer term is to check the FreeBSD
+tree to see if wicontrol/ifconfig supports it now, or write a small
+util that ioctl()'s appropriate values to the appropriate interface.
+
+
+[1]  One of my back burner projects for a while now has been
+"Joe 90"[2], a set up where I can reload system images of various
+distributions via Etherboot/PXE onto a variety of machines.  I
+figured it was a way of maintaining configuration management while
+being able to cope with a lot more operating system configurations
+than machines.  The advantages for me would be a) being able to test
+software on a variety of machine configurations (NT/95 OS' included)
+(BTW, thanks for that link, MMC), and b) being able to restore
+machines to their previous state after just making hack 'n' slash
+changes to them.  Still need more time in the day.
+
+[2]  Of Gerry Anderson fame.
+
+
+-- 
+Regards,
+  Daryl Tester,  Software Wrangler and Bit Herder, IOCANE Pty. Ltd.
+
+"If you've studied your Floyd properly, you'd know that pigs could fly."
+  -- Primus
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

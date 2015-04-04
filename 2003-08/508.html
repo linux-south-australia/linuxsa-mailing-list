@@ -1,0 +1,231 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="alim15x3, WDC and (U)DMA" -->
+<!-- FromName="'Chris Doherty'" -->
+<!-- FromEmail="chris.doherty@adelaide.edu.au" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 08 Aug 2003 15:07:42 +0930" -->
+<!-- Id="3F333726.30703@adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: alim15x3, WDC and (U)DMA</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Chris Doherty &lt;<I><A HREF="mailto:chris.doherty@adelaide.edu.au">chris.doherty@adelaide.edu.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 08 Aug 2003 15:07:42 +0930
+</PRE>
+<H1>alim15x3, WDC and (U)DMA</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+hi,
+
+about 5 weeks ago i bought a WD2000JB
+(<A HREF="http://www.wdc.com/en/products/products.asp?DriveID">http://www.wdc.com/en/products/products.asp?DriveID</A>=38), installed it in my
+RH 9 box and set up LVM (for the first time) on it.  i've been wrestling with
+it on-and-off ever since.
+
+the problem is pretty simple: a hosed filesystem - details below.  at the
+moment the data i'm storing is expendable, which eases the pain somewhat and
+it's allowed me to blow away the filesystem and recreate it when it's become
+corrupt.  i'm pretty sure i've nailed down the problem to the alim15x3 driver
+for the IDE controller *possibly* in conjunction with a WDC drive using
+(U)DMA.  my knowledge of linux drivers is limited.
+
+i've decided to do a condensed dump of all the notes i've made during the
+process of trying to get this working reliably (please excuse the length and
+potential irrelevance of some of the content) in the hope that someone has
+some suggestions... and that future generations may learn something.
+
+here's a quick overview of the hardware:
+
+    Motherboard: Acer V58LA (<A HREF="http://www.uktsupport.co.uk/acer/mb/acv58la.htm">http://www.uktsupport.co.uk/acer/mb/acv58la.htm</A>)
+    CPU: Pentium-MMX 233
+    IDE Controller: Alladin IV (onboard)
+    RAM: 384MB generic brand (256 + 128)
+    Video: ATI Mach64 VT (onboard)
+    LAN: DLink DFE-528TX+
+    IDE1 Master: Seagate (oops, don't have the details with me)
+    IDE1 Slave:  Generic CD-ROM
+    IDE2 Master: WDC2000JB
+    IDE2 Slave:  Seagate
+
+if you would like to see the output of hdparm, the contents of /proc or
+something else please email and specify the command.
+
+i did have 3 Seagate's installed and working trouble free before i replaced
+one with the WD.
+
+    # mkfs -c (has never reported any bad blocks on the WD)
+
+the maximum memory this motherboard supposedly supports is 256MB, however
+memtest (<A HREF="http://www.memtest86.com">http://www.memtest86.com</A>) with all the extended tests activated
+reported no errors and i've never had problems in the past.
+
+because it's my first time using LVM, i initially thought that might have been
+the cause of the problem.  it's extremely doubtful that it is, but here's what
+i've been doing to create my LV, just in case:
+
+    # vi /etc/rc.sysinit (add vgscan, vgchange - once only)
+    # vi /etc/rc.d/init.d/halt (add vgchange - once only)
+    # fdisk -l /dev/hdc (set up the partition table)
+
+    Disk /dev/hdc: 200.0 GB, 200049647616 bytes
+    255 heads, 63 sectors/track, 24321 cylinders
+    Units = cylinders of 16065 * 512 = 8225280 bytes
+
+       Device Boot    Start       End    Blocks   Id  System
+    /dev/hdc1             1      3040  24418768+  8e  Linux LVM
+    /dev/hdc2          3041      6080  24418800   8e  Linux LVM
+    /dev/hdc3          6081      9120  24418800   8e  Linux LVM
+    /dev/hdc4          9121     24321 122102032+   5  Extended
+    /dev/hdc5          9121     12160  24418768+  8e  Linux LVM
+    /dev/hdc6         12161     15200  24418768+  8e  Linux LVM
+    /dev/hdc7         15201     18240  24418768+  8e  Linux LVM
+    /dev/hdc8         18241     21280  24418768+  8e  Linux LVM
+    /dev/hdc9         21281     24321  24426801   8e  Linux LVM
+
+    # pvcreate -ff /dev/hdc1 /dev/hdc2 /dev/hdc3 /dev/hdc5 /dev/hdc6 /dev/hdc7 /dev/hdc8 /dev/hdc9
+    # vgcreate -s 32M vg1 /dev/hdc1 /dev/hdc2 /dev/hdc3 /dev/hdc5 /dev/hdc6 /dev/hdc7 /dev/hdc8 /dev/hdc9
+    # vgdisplay | grep VG
+    VG Size               186 GB
+    # lvcreate -L 186G -n lv1 vg1
+    # mkfs -t ext3 /dev/vg1/lv1
+    # vi /etc/fstab (once only)
+
+    /dev/vg1/lv1            /mnt/data1              ext3    defaults        1 2
+
+anyway, onto the good stuff - this is what the file system corruption actually
+looks like:
+
+    # ls -la
+    total 6137963733
+    drwxr-xr-x   17 chris    chris        4096 Jul 31 01:54 ./
+    drwxrwxrwt    8 root     root         4096 Jul 31 01:50 ../
+    ?rwxr-S-wt  32767 354986359 1980964661 527431223 Oct 27  directory1
+    drwxr-xr-x    2 chris    chris        4096 Jul 31 01:54 directory2
+    &lt;snip&gt;
+    drwxr-xr-x    2 chris    chris        4096 Jul 31 00:45 directory8
+    ?----ws---  32767 698371637 1653296404 3470634407 Dec  3  1947 directory9
+    ?rwsrwxrwt  32767 2802999440 472206431 3590521037 Sep  9  1989 directory10
+    p-wSr-sr--  11805 3712363958 840319880        0 Oct 20  2024 directory11
+    &lt;snip&gt;
+    drwxr-xr-x    2 chris    chris        4096 Jul 30 21:44 directory16
+    drwxr-xr-x    2 chris    chris        4096 Jul 30 21:42 directory17
+
+this was on the 2nd attempt at configuring LVM.  i noted similar behaviour on
+the first attempt, both times were after i'd put about 36GB on the disk.
+
+on the third try, i got a trashed partition table, which has only happened
+once:
+
+    # fdisk -l /dev/hdc
+
+    &lt;snip&gt;
+    /dev/hdc9         21281     24321  24426801   8e  OS/2 hidden C: drive
+
+here's what happened when i tried to remove the directories, firstly through
+windows explorer (samba share):
+
+    Message from <A HREF="mailto:syslogd@connect4">syslogd@connect4</A> at Thu Jul 31 01:54:44 2003 ...
+    connect4 kernel: Kernel panic: EXT3-fs panic (device lvm(58,0)): load_block_bitmap: block_group &gt;= groups_count - block_group = 131071, groups_count = 1488
+
+which also locked up explorer, after killing it and restarting it i was still
+able to connect to the box and browse/edit files (including those on the LV).
+then i tried removing them from the command line:
+
+    # rm -rf directory1/
+    rm: cannot remove directory `directory17//directory17a': Read-only file system
+    rm: cannot chdir from `directory16//directory16a/.' to `directory16b': Not a directory
+
+the processes appeared to hang and could not be killed (not even with -KILL).
+this was worrying as well:
+
+    # pvdisplay /dev/hdc1 /dev/hdc2 /dev/hdc3 /dev/hdc5 /dev/hdc6 /dev/hdc7 /dev/hdc8 /dev/hdc9
+    pvdisplay -- no physical volume identifier on "/dev/hdc2"
+
+    --- Physical volume ---
+    PV Name               /dev/hdc1
+    VG Name               vg1
+    PV Size               23.29 GB [48837537 secs] / NOT usable 32.19 MB [LVM: 130 KB]
+    PV#                   1
+    PV Status             NOT available
+    Allocatable           yes (but full)
+    Cur LV                1
+    PE Size (KByte)       32768
+    Total PE              744
+    Free PE               0
+    Allocated PE          744
+    PV UUID               8kx7qV-0c14-UZ6o-AhRI-npyC-oItk-4P0ES6
+
+    etc... the other devices all appear to be ok
+
+attempting to browse one of the corrupt directories (directory9) crashed
+explorer (again restarting it and reconnecting posed no discernable problems).
+
+googling (eventually) led me to the conclusion that it was probably to do with
+the alim15x3 driver.  i compiled a clean 2.4.21 kernel (i hope that doesn't
+cause problems with vendor "lock outs" :) which booted fine and appears to
+work nicely - with the exception of this one drive - similar results to those
+i'd already experienced, including the apparent 36GB "corruption threshold".
+
+next on the list was to disable DMA:
+
+<A HREF="ftp://ftp.support.acer-euro.com/desktop/mainboard/V58LA/manual/ap5000dt_ug.zip">ftp://ftp.support.acer-euro.com/desktop/mainboard/V58LA/manual/ap5000dt_ug.zip</A>
+
+the wonderful thing about this particular BIOS is that there's no
+obvious "Disable DMA for this IDE device" option.  instead, it has this:
+
+    Hard Disk Block Mode ............ [ Auto ]
+    Advanced PIO Mode ............... [ Auto ]
+    Hard Disk Size &gt; 504MB .......... [ Auto ]
+    Hard Disk 32 Bit Access ......... [Enabled ]
+    CD-ROM Drive DMA Mode ........... [Enabled ]
+
+so i tried disabling "Hard Disk Block Mode" and "CD-ROM Drive DMA Mode", which
+actually showed signs of working.  the file system didn't become corrupt until
+i'd used around 90GB.  talk about progress! :)  i plan on testing "PIO Mode"
+over the weekend with high hopes - the UDMA mini HOWTO
+(<A HREF="http://www-scf.usc.edu/~vibber/linux/Ultra-DMA-9.html">http://www-scf.usc.edu/~vibber/linux/Ultra-DMA-9.html</A>) seems to point in this
+direction.
+
+once again, any help will be much appreciated.
+
+  - chris
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

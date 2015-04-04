@@ -1,0 +1,247 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: mouse" -->
+<!-- FromName="Stock, Nick" -->
+<!-- FromEmail="Nick.Stock@dsto.defence.gov.au" -->
+<!-- ToName="'Daniel'" <daniel@webmedia.com.au>, Andreja Zivkovic" -->
+<!-- ToEmail="daniel@webmedia.com.au" -->
+<!-- Date="Thu, 3 Jun 1999 14:42:57 +0930" -->
+<!-- Id="C15155CADE2FD211A4A300062B000EDDEA8C2C@exchsa5.dsto.defence.gov.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: mouse</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Stock, Nick &lt;<I><A HREF="mailto:Nick.Stock@dsto.defence.gov.au">Nick.Stock@dsto.defence.gov.au</A></I>&gt;
+  To  : 'Daniel'" &lt;daniel@webmedia.com.au&gt;, Andreja Zivkovic &lt;<I><A HREF="mailto:daniel@webmedia.com.au">daniel@webmedia.com.au</A></I>&gt;
+  Date: Thu, 3 Jun 1999 14:42:57 +0930
+</PRE>
+<H1>RE: mouse</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+If you don't like RTFM style answers then turn away now!
+
+In a normal console the mouse is accessed via gpm.
+vodka [4] [2:18pm] [~] -&gt; man gpm
+
+The only file that stores mouse details for gpm is;
+vodka [5] [2:19pm] [~] -&gt; more /etc/sysconfig/mouse 
+MOUSETYPE="ps/2"
+XEMU3=yes
+
+This file is referred to for initialising gpm at startup.
+vodka [6] [2:19pm] [~] -&gt; more /etc/rc.d/rc4.d/S85gpm
+
+
+
+Under X the details for controlling the mouse are stored in
+/etc/X11/XF86Config
+vodka [7] [2:20pm] [~] -&gt; more /etc/X11/XF86Config 
+
+&lt;cut&gt;
+# **********************************************************************
+# Pointer section
+# **********************************************************************
+
+Section "Pointer"
+    Protocol    "ps/2"
+    Device      "/dev/mouse"
+
+# When using XQUEUE, comment out the above two lines, and uncomment
+# the following line.
+
+#    Protocol   "Xqueue"
+
+# Baudrate and SampleRate are only for some Logitech mice
+
+#    BaudRate   9600
+#    SampleRate 150
+
+# Emulate3Buttons is an option for 2-button Microsoft mice
+# Emulate3Timeout is the timeout in milliseconds (default is 50ms)
+
+    Emulate3Buttons
+    Emulate3Timeout    50
+
+# ChordMiddle is an option for some 3-button Logitech mice
+
+#    ChordMiddle
+
+EndSection
+&lt;/cut&gt;
+
+
+In order to understand how to setup this section by hand... RTFM
+vodka [8] [2:22pm] [~] -&gt; man XF86Config
+
+&lt;cut&gt;
+       The  Pointer section is used to specify the pointer device
+       and parameters.  The entries available  for  this  section
+       are:
+
+       Protocol "protocol-type"
+               specifies  the  pointer device protocol type.  The
+               protocol types available are:
+
+                    Auto
+                    BusMouse
+                    GlidePoint
+                    GlidePointPS/2
+                    IntelliMouse
+                    IMPS/2
+                    Logitech
+                    Microsoft
+                    MMHitTab
+                    MMSeries
+                    Mouseman
+                    MouseManPlusPS/2
+                    MouseSystems
+                    NetMousePS/2
+                    NetScrollPS/2
+                    OSMouse
+                    PS/2
+                    SysMouse
+                    ThinkingMouse
+                    ThinkingMousePS/2
+                    Xqueue
+
+               One should specify BusMouse for the  Logitech  bus
+               mouse  and  bus  or InPort mice from Microsoft and
+               ATI.  The Logitech  protocol  is  for  old  serial
+               mouse  models  from Logitech.  Many newer Logitech
+               serial mice use either the Microsoft  or  MouseMan
+               protocol.   Xqueue  should be specified here if it
+               was used in the Keyboard section.  OSMouse  refers
+               to  the  event-driver mouse interface available on
+               SCO's SVR3, and the mouse interface  provided  for
+               OS/2.  This may optionally be followed by a number
+               specifying the number of buttons  the  mouse  has.
+               SysMouse   refers  to  the  system  mouse  device,
+               /dev/sysmouse, in FreeBSD.
+               The PS/2 and other XXXXPS/2 protocol types are for
+               PS/2  mice.  PS/2 should always work with any PS/2
+               mouse regardless of the model of the  PS/2  mouse.
+               The  other  XXXXPS/2 protocol types may or may not
+               be supported by your OS.
+
+               The rest of the  protocol  types  are  for  serial
+               mice.  If your serial mouse is of a relatively new
+               model, you may specify Auto,  then  the  X  server
+               will  try  to  select an appropriate protocol type
+               automatically.  The Auto protocol  type  may  also
+               work for the PS/2 and bus mice on some OSs.
+
+       Device "pointer-dev"
+               specifies  the  device  the server should open for
+               pointer input (eg, /dev/tty00 or  /dev/mouse).   A
+               device  should  not  be  specified  when using the
+               Xqueue or OSMouse protocols.
+
+       Port "pointer-dev"
+               is an alternate form of the Device entry.
+
+       BaudRate rate
+               sets the baudrate of the serial mouse to rate. For
+               mice  that  allow  dynamic speed adjustments (like
+               older Logitechs) the baudrate is  changed  in  the
+               mouse.   Otherwise  the  rate is simply set on the
+               computer's side to allow  mice  with  non-standard
+               rates  (the  standard  rate  is 1200).  For 99% of
+               mice you should not set  this  to  anything  other
+               than the default (1200).
+
+       Buttons N
+               This  option tells the X server the number of but-
+               tons on the mouse.  Currently there is no reliable
+               way  to  automatically  detect the correct number.
+               This option is the only means for the X server  to
+               obtain it.  The default value is three.  Note that
+               if you intend to assign Z axis movement to  button
+               events  using  the  ZAxisMapping option below, you
+               need to take account of those buttons into N  too.
+
+       Emulate3Buttons
+               enables  the  emulation  of the third mouse button
+               for mice which only  have  two  physical  buttons.
+               The third button is emulated by pressing both but-
+               tons simultaneously.
+
+       Emulate3Timeout timeout
+               sets the time (in milliseconds)  that  the  server
+               waits  before deciding if two buttons were pressed
+               ``simultaneously''  when  3  button  emulation  is
+               enabled.  The default timeout is 50ms.
+
+       ChordMiddle
+               handles mice which send left+right events when the
+               middle button is used (like some Logitech Mouseman
+               mice).
+
+       SampleRate rate
+               sets  the number of motion/button-events the mouse
+               sends per second.  This  is  currently  only  sup-
+               ported for some Logitech mice.
+
+       Resolution count
+               sets  the  resolution  of the device in counts per
+               inch.  This is not always  supported  by  all  the
+               mice.
+
+       ClearDTR
+               This option clears the DTR line on the serial port
+               used by the mouse.  This option is only valid  for
+               a  mouse  using  the  MouseSystems protocol.  Some
+               dual-protocol mice require DTR to  be  cleared  to
+               operate  in  MouseSystems mode.  Note, in versions
+               of XFree86 prior to 2.1, this option also  cleared
+               the  RTS  line.   A  separate  ClearRTS option has
+               since been added for mice which require this.
+
+       ClearRTS
+               This option clears the RTS line on the serial port
+               used  by the mouse.  This option is only valid for
+               a mouse using  the  MouseSystems  protocol.   Some
+               dual-protocol  mice require both DTR and RTS to be
+               cleared to operate in MouseSystems mode.  Both the
+               ClearDTR  and  ClearRTS options should be used for
+               such mice.
+&lt;/cut&gt;
+
+
+Nick Stock
+RJ-45 of all trades.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

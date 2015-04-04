@@ -1,0 +1,99 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Urgent Apache Config." -->
+<!-- FromName="Jake Hawkes" -->
+<!-- FromEmail="jake@infinitylimited.net" -->
+<!-- ToName="Kieran Farrell" -->
+<!-- ToEmail="kjfarrell@bigfoot.com" -->
+<!-- Date="Sun, 06 Aug 2000 12:24:37 -0600" -->
+<!-- Id="398DAD65.F90A87A6@infinitylimited.net" -->
+<!-- Reference="200008060112.e761COx20822@tbird.iworld.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Urgent Apache Config.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  To  : Kieran Farrell &lt;<I><A HREF="mailto:kjfarrell@bigfoot.com">kjfarrell@bigfoot.com</A></I>&gt;
+  Date: Sun, 06 Aug 2000 12:24:37 -0600
+</PRE>
+<H1>Re: Urgent Apache Config.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Kieran Farrell wrote:
+&gt; 
+&gt; Help *8)
+&gt; 
+&gt; Sorry if I'm asking a commonly asked question. I need to configure Apache to use users home directories. Also I need CGI capability again in users directory.
+&gt; 
+&gt; ie <A HREF="http://localhost/~kjfarrell">http://localhost/~kjfarrell</A>
+&gt; 
+
+ok, what you need are a few things:
+UserDir public_html 
+
+this means that to get at /~kjfarrell/foo.html, foo.html will have to be
+in ~/kjfarrell/public_html/foo.html
+
+then, you need to give permission for cgi scripts to be run from this
+directory:
+
+&lt;Directory /home/*/public_html&gt;
+    Options ExecCGI
+&lt;/Directory&gt;
+
+where "this may also be "None", "All", or any combination of "Indexes",
+ "Includes", "FollowSymLinks", "ExecCGI", or "MultiViews".  "
+
+you also need to tell apacfhe who to handle files with extension .cgi
+AddHandler cgi-script .cgi 
+
+note that here you can have anything:
+AddHandler cgi-script .freddyisthedevil
+
+then restart your apache server.
+su -c killall -HUP apache
+
+the permissions should be thus:
+chmod a+x ~/home/kjfarrel   
+chmod a+rx ~/home/kjfarrel/public_html
+
+HTH
+
+--
+Jake Hawkes B.Eng, (CSE)
+
+I was gratified to be able to answer promptly, and I did.  I said I      
+didn't know.  - Mark Twain
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

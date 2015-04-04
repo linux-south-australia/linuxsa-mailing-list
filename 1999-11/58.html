@@ -1,0 +1,111 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: small GCC probs" -->
+<!-- FromName="behoffski" -->
+<!-- FromEmail="behoffski@grouse.com.au" -->
+<!-- ToName="linuxsa" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 05 Nov 1999 09:14:18 +1030" -->
+<!-- Id="38220C42.6B9611F8@grouse.com.au" -->
+<!-- Reference="001101bf2615$b11e87c0$0201a8c0@comp" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: small GCC probs</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: behoffski &lt;<I><A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A></I>&gt;
+  To  : linuxsa &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 05 Nov 1999 09:14:18 +1030
+</PRE>
+<H1>Re: small GCC probs</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+MWP wrote:
+&gt; Im currently developing microcontroller progs using a X assembler version of
+&gt; GCC.
+&gt; In this application, the program NEVER stops running (has a while(1) loop
+&gt; inside) so i setup main to be "void main(void)".
+&gt; But of course, GCC doesnt like that and gives a warning saying main should
+&gt; return an int value.
+&gt; 
+&gt; Is there a way of disabling this 1 warning message?? It just gets annoying
+&gt; after a while, as im a "make a small change, recompile" type guy :P
+
+We've discussed this before on this list.  Here's a brief summary:
+
+- The ANSI standard says that main() must return an int to 
+  be a conforming program.  
+
+- On some compilers+architectures, a function returning void is 
+  implemented differently to a function returning int, to the point 
+  where the wrong declaration may produce a program that crashes.  
+  main() is no exception.  
+
+- GCC on Intel is more forgiving of this case, but that's not the 
+  point.  Do not use the compiler's behaviour in any given situation 
+  as a reference when trying to understand what's permitted.   
+
+- The ANSI Standard is very much your friend.  Do everything you 
+  can to stay within its bounds.  Once you stray into using bizarre 
+  compilers on bizarre architectures (e.g. when developing embedded 
+  code), non-standard code tends to produce really, really obscure 
+  and costly bugs.  
+
+- The whole Open Source movement is based on code sharing.  Code sharing 
+  is based on conformance to the standard.  (Although, to be fair, GCC 
+  is in many ways a de-facto standard in its own right.)  
+
+- Stray from the standard only when you have tried extremely hard to 
+  conform, have checked your design and implementation with other 
+  experienced programmers, and am confident that the cost of 
+  writing and maintaining nonstandard code is outweighed by the 
+  benefits of doing so.  In the end, it's an engineering decision.  
+
+- In this case, there's no cost in declaring the function as returning 
+  int, and adding an (unreached) return 0; statement, and so that is how 
+  you should address this issue.  
+
+cheers,
+
+Brenton
+
+ps. If you wanted to suppress a particular warning, you could pipe the 
+    compiler output through a filter like awk, sed or perl, and have the 
+    filter delete the messages that you don't want to see.  But that's 
+    really an action of last resort.  
+
+-- 
+behoffski (Brenton Hoff) | Software Engineer, Grouse Software
+<A HREF="mailto:behoffski@grouse.com.au">behoffski@grouse.com.au</A>  | <A HREF="http://www.grouse.com.au/">http://www.grouse.com.au/</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

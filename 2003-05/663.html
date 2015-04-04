@@ -1,0 +1,213 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RHL9 procedure: USB flash memory disk 'key'" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 20 May 2003 18:16:17 +0930" -->
+<!-- Id="3EC9EB59.90605@aarnet.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RHL9 procedure: USB flash memory disk 'key'</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 20 May 2003 18:16:17 +0930
+</PRE>
+<H1>RHL9 procedure: USB flash memory disk 'key'</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+These seem to be becoming cheap.  I got one with my new PC.
+
+Not sure about all aspects of this procedure, it still seems
+too hard even with the new hotplug/devlabel system.
+
+
+                    CONFIGURING A USB MEMORY DISK
+                          (Red Hat Linux 9)
+
+USB memory keys look like car keys but contain flash memory chips and
+a USB interface.  They appear to the operating system as a disk drive.
+They'll probably replace floppy disks, now that most files are bigger
+than 1.44MB.
+
+USB memory keys use SCSI commands over a USB bus, and so appear to
+Linux as SCSI drives.  Unlike most hard drives, they are often removed
+whilst the system is running.
+
+
+PARTITION AND FORMAT
+
+A lot of memory keys come pre-formatted.  If so, skip this bit.
+
+Insert the disk.  Look at /var/log/messages
+
+  Attached scsi removable disk sda at scsi1, channel 0, id 0, lun 0
+  SCSI device sda: 125952 512-byte hdwr sectors (64 MB)
+  sda: Write Protect is off
+  sda:
+
+From the messages, see that our USB disk appears as the SCSI drive
+/dev/sda.
+
+Partition the disk (one big primary MS-DOS partition)
+
+  # parted /dev/sda
+      mklabel msdos
+      print
+
+        Disk geometry for /dev/sda: 0.000-61.500 megabytes
+        Disk label type: msdos
+        Minor    Start       End     Type      Filesystem  Flags
+
+      mkpart primary fat16 0.000 61.500
+      set 1 boot on
+
+The 61.500 in the mkpart command comes from the output of the print
+command.
+
+Format the disk.  We use a MS-DOS filesystem, since USB memory disks
+are mainly for transferring files and MS-DOS is the most interoperable
+filesystem (FreeBSD; Linux; Mac and, no surprise here, Windows).
+
+  # mkfs -t vfat -F 16 -n usbdisk1 -v /dev/sda1
+
+    mkfs.vfat 2.8 (28 Feb 2001)
+    /dev/sda1 has 4 heads and 32 sectors per track,
+    logical sector size is 512,
+    using 0xf8 media descriptor, with 125920 sectors;
+    file system has 2 16-bit FATs and 4 sectors per cluster.
+    FAT size is 123 sectors, and provides 31410 clusters.
+    Root directory contains 512 slots.
+    Volume ID is 3ec97615, volume label usbdisk1   .
+
+
+ADD THE DISK TO DEVLABEL
+
+devlabel attempts to give the same device name to removable media,
+wherever they appear on the bus.  We want our memory disk to always
+appear as /dev/usbdisk1 no matter what USB bus it is on or what other
+USB disk might be present.
+
+
+  # devlabel printid -d /dev/sda1
+
+    S80:XXXXXXXXXXXXXXXXXXXX
+
+  # devlabel add -s /dev/usbdisk1 --partnum 1 -u 'S80:XXXXXXXXXXXXXXXXXXXX'
+
+    Created symlink /dev/usbdisk1 -> /dev/sda1
+    Added /dev/usbdisk1 to /etc/sysconfig/devlabel
+
+
+ADD THE DISK TO FILESYSTEM LIST
+
+Edit /etc/fstab, adding
+
+  /dev/usbdisk1 /mnt/usbdisk1 vfat noatime,nodev,noexec,nosuid,user,umask=077,fmask=177,dmask=077 0 0
+
+The noatime stops writing access times.  Flash memory has a large but
+limited number of writes and we don't want to use those maintaining
+file access times.
+
+The remaining parameters allow mere mortals to mount the disk and do
+their best to stop them shooting themselves in the foot.
+
+
+TEST
+
+Insert the memory key
+
+Look in /var/log/messages or use dmesg
+
+  hub.c: new USB device 00:01.0-1, assigned address 2
+  usb.c: USB device 2 (vend/prod 0x123/0x12) is not claimed by any active driver.
+  Initializing USB Mass Storage driver...
+  usb.c: registered new driver usb-storage
+  scsi1 : SCSI emulation for USB Mass Storage devices
+    Vendor: XXXXX     Model: XXXXXXXXXXXX      Rev: /W1.
+    Type:   Direct-Access                      ANSI SCSI revision: 02
+  WARNING: USB Mass Storage data integrity not assured
+  USB Mass Storage device found at 2
+  USB Mass Storage support registered.
+  Attached scsi removable disk sda at scsi1, channel 0, id 0, lun 0
+  SCSI device sda: 125952 512-byte hdwr sectors (64 MB)
+  sda: Write Protect is off
+   sda: sda1
+
+Mount the disk (an ordinary user can do this)
+
+  $ mount /mnt/usbdisk1
+
+Remember to unmount it.
+
+
+AUTOMOUNTER
+
+If you want the disk to automount add an entry to /etc/auto.misc
+
+  usbdisk1 -fstype=vfat,noatime,nodev,noexec,nosuid :/dev/usbdisk1
+
+  # /sbin/service autofs restart
+
+Test with
+
+  ls /misc/usbdisk1
+
+Because of ownership of files on the disk, automounting isn't as nice
+as explicit mounting.  If you're the only user of the machine you
+could hardcode these (using your numeric UID and GID)
+
+  usbdisk1 -fstype=vfat,noatime,nodev,noexec,nosuid,user,uid=500,gid=500,umask=077,fmask=177,dmask=077 :/dev/usbdisk1
+
+Although that also sucks (it would be nice if there was some way we
+could get the UID and GID of the console user into the command line).
+
+
+GNOME AND KDE
+
+Both have mount tools which sit on a toolbar.
+
+For RHL9 with GNOME, go to bottom toolbar, right mouse click, select
+Add to panel|Utility|Disk mounter.  Right-click on new disk icon, select
+Preferences.
+
+  Mount point: /mnt/usbdisk1
+  Icon: Jaz drive  (just soemthing which looks different from CD or floppy)
+  [ ] Scale size to panel
+  [ ] Eject on unmount
+  [X] Use automount friendly status test
+
+To mount, click on the icon.  To unmount, click again on the icon.
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

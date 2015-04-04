@@ -1,0 +1,93 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Networking two machines problem" -->
+<!-- FromName="Geoffrey D. Bennett" -->
+<!-- FromEmail="g@netcraft.com.au" -->
+<!-- ToName="Justin Hawkins" -->
+<!-- ToEmail="justin@tardis.apana.org.au" -->
+<!-- Date="Mon, 16 Mar 1998 15:46:11 +1030 (CST)" -->
+<!-- Id="199803160516.PAA07738@Mich.netcraft.com.au" -->
+<!-- Reference="Pine.LNX.3.96.980316132355.187A-100000@tardis.apana.org.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Networking two machines problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Geoffrey D. Bennett &lt;<I><A HREF="mailto:g@netcraft.com.au">g@netcraft.com.au</A></I>&gt;
+  To  : Justin Hawkins &lt;<I><A HREF="mailto:justin@tardis.apana.org.au">justin@tardis.apana.org.au</A></I>&gt;
+  Date: Mon, 16 Mar 1998 15:46:11 +1030 (CST)
+</PRE>
+<H1>Re: Networking two machines problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; [Summary: WD ethernet driver sees the card at IO address 0x300 but
+&gt; ifconfig says 0x310]
+
+&gt; It says that the card is base address 0x310??? Why?? I try to get ifconfig
+&gt; to use a different address:
+&gt; 
+&gt; [root] tardis:/usr/doc/faq/howto# ifconfig eth0 io_addr 0x300
+&gt; SIOCSIFMAP: Operation not supported on transport endpoint
+&gt; 
+&gt; Anyone got any ideas on how to fix this? I'm assuming that this 0x310
+&gt; address difference is the reason none of my packets get out.
+
+Hi Justin,
+
+0x310 is correct.  Although the base address of the card is 0x300, the
+address of the 8390 chip is 0x10 above it which is what ifconfig
+shows.
+
+If you're interested, the relevant code is in wd.c:
+
+-----8&lt;-----8&lt;-----8&lt;-----8&lt;-----8&lt;-----8&lt;-----8&lt;-----8&lt;-----8&lt;-----8&lt;-----
+#define WD_NIC_OFFSET   16      /* Offset to the 8390 from the base_addr. */
+
+[...]
+
+        /* The 8390 isn't at the base address -- the ASIC regs are there! */
+        dev-&gt;base_addr = ioaddr+WD_NIC_OFFSET;
+-----8&lt;-----8&lt;-----8&lt;-----8&lt;-----8&lt;-----8&lt;-----8&lt;-----8&lt;-----8&lt;-----8&lt;-----
+
+I presume you assigned an IP address to the card with ifconfig even
+though you didn't say so in your message?  That would certainly cause
+no packets to be sent out from the card.
+
+Regards,
+-- 
+Geoffrey D. Bennett (<A HREF="mailto:geoffrey@netcraft.com.au">geoffrey@netcraft.com.au</A>)
+Computer Systems Manager, NetCraft Australia
+<A HREF="http://www.netcraft.com.au/geoffrey/">http://www.netcraft.com.au/geoffrey/</A>
+Red Hat Linux Resellers: <A HREF="http://www.netcraft.com.au/redhat/">http://www.netcraft.com.au/redhat/</A>
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,136 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Interesting followup from an earlier question" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 18 Oct 1999 21:57:01 +0930 (CST)" -->
+<!-- Id="199910181227.VAA17456@atdot.dotat.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Interesting followup from an earlier question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 18 Oct 1999 21:57:01 +0930 (CST)
+</PRE>
+<H1>Interesting followup from an earlier question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Wayne Simes posted a message to the list this morning about CGI scripts
+not working on an RH6 system.  I directed his attention to the #! line
+at the beginning of each script and thought nothing more of it.
+
+Unfortunately, though, Wayne still couldn't get the scripts working,
+and he asked me to login to his system to have a look at
+it for him.  I thought that what I found was interesting enough to
+share it with the rest of this list, a note of warning as it were.
+
+As it turned out, the problem was caused by a malformed #! line
+at the start of each script, but in a very subtle way.  Visual 
+examination of the scripts didn't uncover any problems at all,
+and even the three line perl-script Wayne was using was failing; 
+it said something like this:
+
+    #!/usr/bin/perl
+
+    print "Content-Type: text/plain\n\n";
+    print "Hello\n";
+    exit 0;
+
+... which looks fair enough, so what's the problem?
+
+It turns out it's a problem with RH's "vi" (Vim).
+
+Wayne had installed the script on his RH box by copying it from
+a Windows server.  When the script was last edited on the Windows
+box, it had been saved with the Windows line termination convention,
+with "CR/LF" suffixed to each line.  Every "vi" implementation I've
+seen on every version of UNIX I've ever worked with would display
+such a file like this:
+
+    #!/usr/bin/perl^M
+    ^M
+    print "Content-Type: text/plain\n\n";^M
+    print "Hello\n";^M
+    exit 0;^M
+
+... but not RH's.  Instead, it puts a small annotation on the bottom
+of the screen about the fact that the file is in "dos mode", then 
+presents it to the user looking like the first example above, the one
+without the ^M's.  When you save the file, the "dos mode" semantics
+dictate that it should write the file back with ^M's at the end of
+each line, so hey presto, you end up with CR's everywhere, even though
+you've had no clue on your screen to hint at their existance.
+
+What's wrong with this picture?  Well, ^M is a legal character in a 
+filename, so the script above is instructing the Linux kernel to 
+look for an interpreter called /usr/bin/perl^M to run the script...
+which, of course, it is doomed to never find.
+
+So how do you work out that this has happened?  "cat -v" will display
+a file with unprintable characters rendered in ^-style notation, so
+it'll show the ^M's all over the place.  If you have a script that 
+obviously exists but which announces "no such file or directory" when
+you run it, "cat -v" might be a good place to start.
+
+How do you fix it?  Load the file into vi and type:
+
+     :set fileformat=unix
+
+... then save the file again.  That'll switch the vi kludge from one
+which silently inserts ^M's into a file into one which silently removes
+them (is this better?  Go figure...), and will fix the problem at hand.
+
+Ultimately, this is a vi bug.  The CR characters *are* in the file, 
+and vi should bloody-well show them.  To bury a "dos mode" annunciation
+away briefly at the bottom of the screen and then let you carry on 
+editing what is essentially a corrupted file without giving you any
+hint about the bogus data it contains (and will continue to contain,
+even though visual inspection suggests otherwise) is bad behaviour.
+
+In the meantime, calling vi with a "-b" parameter might be recommended,
+because that makes it assume it's editing binary files and stops it 
+from doing stupid sneaky conversions on the data it's touching.
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

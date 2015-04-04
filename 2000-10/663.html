@@ -1,0 +1,141 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Need help to setup second 3c509b network card in redhat 6.2" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="Matthew Geddes <mgeddes@xavier.sa.edu.au>, tangk@basf-nz.co.nz" -->
+<!-- Date="Fri, 20 Oct 2000 11:08:47 +0900" -->
+<!-- Id="3.0.6.32.20001020110847.00acf180@203.16.214.248" -->
+<!-- Reference="4825697E.00032DF0.00@gws01.drc2.basf-sea.com.sg" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Need help to setup second 3c509b network card in redhat 6.2</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:Matthew Geddes <mgeddes@xavier.sa.edu.au>">Matthew Geddes <mgeddes@xavier.sa.edu.au></A>, <A HREF="mailto:tangk@basf-nz.co.nz">tangk@basf-nz.co.nz</A>
+  Date: Fri, 20 Oct 2000 11:08:47 +0900
+</PRE>
+<H1>Re: Need help to setup second 3c509b network card in redhat 6.2</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+At 11:01 AM 10/20/00 +0930, Matthew Geddes wrote:
+&gt;<A HREF="mailto:tangk@basf-nz.co.nz">tangk@basf-nz.co.nz</A> wrote:
+&gt;&gt; 
+&gt;&gt; Hi,
+&gt;&gt; Can somebody help me to setup second 3c509b network card in redhat 6.2?
+My first
+&gt;&gt; 3c509b is working fine. What parameters do I have to put in
+/etc/conf.modules to
+&gt;&gt; make the second network card go? (eth0 io=300 irq=10, eth1 io=320 irq=5)
+&gt;
+&gt;
+&gt;Try:
+&gt;
+&gt;alias eth0 3c509
+
+Actually, you only need:
+
+alias eth0 3c509
+options 3c509 io=0x300,0x320 [irq=10,5]
+
+because the driver only loads once, and probes both devices when it loads
+and creates both eth0 and eth1 from the options. The IRQ stuff is optional,
+in my experience, because as long as the driver can find the device behind
+the IO ports, it will figure out the IRQs.
+
+modprobe is never called for the second device, because eth1 already exists
+by that stage.
+
+&gt;alias eth1 3c509
+&gt;
+&gt;And it should be OK. You may also want to:
+&gt;
+&gt;options eth0 io=0x300,irq=10
+&gt;options eth1 io=0x320,irq=5
+&gt;
+&gt;or similar.
+&gt;
+&gt;You can also add a line to lilo.conf to pass parameters to the kernel:
+&gt;
+&gt;append="ether=0x300,10,eth0 ether=0x320,5,eth0"
+&gt;
+&gt;Hope it helps,
+&gt;Matt
+&gt;
+&gt;&gt; 
+&gt;&gt; Thanks
+&gt;&gt; 
+&gt;&gt; &lt;Disclaimer&gt; : This e-mail is confidential.  If you are not the intended
+&gt;&gt; recipient  you must not disclose, distribute or use the information in
+it as
+&gt;&gt; this could be a breach of confidentiality.  If you have received this
+message in
+&gt;&gt;  error, please advise us immediately by return e-mail and delete the
+document.
+&gt;&gt; The address from which this message has been sent is strictly for
+business mail
+&gt;&gt; only and the company reserves the right to monitor the contents of
+&gt;&gt; communications and take action where and when it is deemed necessary.
+Thank you
+&gt;&gt; for your co-operation.
+&gt;&gt; 
+&gt;&gt; --
+&gt;&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;&gt; To unsubscribe from the LinuxSA list:
+&gt;&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;-- 
+&gt;
+&gt;Matthew Geddes
+&gt;Network Manager
+&gt;Xavier College
+&gt;Gawler, SA
+&gt;
+&gt;-- 
+&gt;LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt;To unsubscribe from the LinuxSA list:
+&gt;  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Contributing author, SAMS Teach Yourself Samba in 24 Hours
+Author, Special Edition, Using Samba
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

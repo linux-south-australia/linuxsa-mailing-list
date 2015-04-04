@@ -1,0 +1,191 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: link errors" -->
+<!-- FromName="'David Sambell'" -->
+<!-- FromEmail="sambelld@chariot.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 3 Aug 2002 23:13:33 +0930" -->
+<!-- Id="005701c23af3$c358dd00$0500a8c0@celery" -->
+<!-- Reference="3D4BCE90.CFCB746B@iocane.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: link errors</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Sambell &lt;<I><A HREF="mailto:sambelld@chariot.net.au">sambelld@chariot.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 3 Aug 2002 23:13:33 +0930
+</PRE>
+<H1>RE: link errors</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+ok Daryl, I'm not sure how helpful this will be
+and its possibly moving beyond the realms of linux and into programming,
+but since there is a wealth of knowledge here, I'm willing to give it a go
+
+---------------------------------------------
+this compiles and links: menu.cgi.cc
+---------------------------------------------
+#include &lt;string&gt;
+#include "./DB/DBAccount.h"
+#include "./Parameters/Entity.h"
+#include "./global/global.h"
+
+string global_remoteUser = "not set";
+
+int main(int argc, char *argv[])
+{
+  DBAccount account = DBAccount();
+  string mystring = intToStr( 3 );
+  Entity* ent = new Entity( "abc", 3 );
+
+  return 0;
+}//end-main
+---------------------------------------------
+this compiles but not links :  menu.cgi.cc
+everything else being equal.
+---------------------------------------------
+int main(int argc, char *argv[])
+{
+//  DBAccount account = DBAccount();
+  string mystring = intToStr( 3 );
+//  Entity* ent = new Entity( "abc", 3 );
+
+  return 0;
+}//end-main
+---------------------------------------------
+this is the Makefile command
+---------------------------------------------
+MENU_OBJ = menu.cgi.o
+
+menu.cgi: $(MENU_OBJ) $(STAGE_LIB)
+	$(CPP) $(CPPFLAGS) $(CPPDEFS) -DNDEBUG $&lt; -o $@ -lc -lm -lcrypt \
+		  $(SQLAPI_LIB) $(STAGE_LIB) $(CGICC_LIB) -lcgicc -ldl
+
+---------------------------------------------
+this is the error generated
+---------------------------------------------
+g++ -Wall -DSA_NO_TRIAL -DLINUX -DNDEBUG -DSQLAPI_oraClient -DSQLAPI_infClie
+nt -
+DSQLAPI_sybClient -DSQLAPI_ibClient -DSQLAPI_db2Client -DSQLAPI_myClient -DS
+QLAP
+I_pgClient -DSQLAPI_odbcClient -DNDEBUG menu.cgi.o -o
+menu.cgi -lc -lm -lcrypt \
+          /usr/local/SQLAPI/lib/libsqlapi.a ./Parameters/libparameter
+./Entities
+/libentity ./HTML/libhtml ./DB/libdb
+./global/libglobal -I/usr/lib -lcgicc -ldl
+./global/libglobal(global.o): In function
+`getDefaultEntityId(basic_string&lt;char,
+ string_char_traits&lt;char&gt;, __default_alloc_template&lt;true, 0&gt; &gt;)':
+global.o(.text+0xf12): undefined reference to `SACommand::SACommand(void)'
+global.o(.text+0xf8d): undefined reference to `DBTableIn::getCell(SACommand
+&, c
+har const *)'
+global.o(.text+0xf9c): undefined reference to `SACommand::FetchNext(void)'
+global.o(.text+0xfbf): undefined reference to `SAString::SAString(char const
+*)'
+global.o(.text+0xfd2): undefined reference to `SACommand::Field(SAString
+const &
+)'
+global.o(.text+0xfdd): undefined reference to `SAValueRead::asLong(void)
+const'
+global.o(.text+0xff7): undefined reference to `SAString::~SAString(void)'
+---------------------------------------------
+snippet from global.h
+---------------------------------------------
+extern string global_remoteUser;
+
+enum picSize { small, medium, large };
+
+string intToStr( int id );
+---------------------------------------------
+snippet from global.cc
+---------------------------------------------
+#include "global.h"
+#include "../global/DFile.h"
+#include "../HTML/HTMLRadioButton.h"
+
+string intToStr( int num )
+{
+  char buf[20];
+  sprintf( buf, "%d", num );
+  string s = buf;
+  return s;
+}//end-intToStr
+---------------------------------------------
+
+I could go on like this, but I dont think its that helpful.
+You might prove me wrong. I hope so.
+
+thanks,
+David
+
+-----Original Message-----
+From: <A HREF="mailto:dt@zen.localdomain">dt@zen.localdomain</A> [mailto:<A HREF="mailto:dt@zen.localdomain">dt@zen.localdomain</A>]On Behalf Of Daryl
+Tester
+Sent: Saturday, 3 August 2002 10:08 PM
+To: David Sambell
+Cc: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+Subject: Re: link errors
+
+
+David Sambell wrote:
+
+&gt; I'm building my own c++ project on Linux RedHat 7.3 using gcc 2.96-110.
+
+[...]
+
+&gt; Any ideas?
+
+Code demonstrating the problem would be handy.
+
+
+--
+Regards,
+  Daryl Tester,  Software Wrangler and Bit Herder, IOCANE Pty. Ltd.
+
+"So Lord I see you grinnin', must be grand always winning,
+ How proud are you being able, to gather faith from fable?"
+ --  God Am, Alice In Chains (R.I.P. Layne Staley).
+
+--
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

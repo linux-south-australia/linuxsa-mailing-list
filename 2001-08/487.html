@@ -1,0 +1,130 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RH 7.1 Processes" -->
+<!-- FromName="'Jim O'Halloran'" -->
+<!-- FromEmail="jim@kendle.com.au" -->
+<!-- ToName="'linuxsa@linuxsa.org.au'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 13 Aug 2001 08:54:21 +0930" -->
+<!-- Id="C16C7A51BA30D51187EE0000E8D8C997078513@KCSSERVER" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RH 7.1 Processes</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jim O &lt;<I><A HREF="mailto:jim@kendle.com.au">jim@kendle.com.au</A></I>&gt;
+  To  : linuxsa@linuxsa.org.au &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 13 Aug 2001 08:54:21 +0930
+</PRE>
+<H1>RH 7.1 Processes</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi...  I've got a Red Hat 7.1 box running here as primary DNS and mail
+server for our domains.  Looking at the process tree (ps axf) for this
+machine there seem to be a lot of things running on the box.  Problem is,
+I'm not 100% sure exactly what I need, and what I don't.  Obviously, the
+named and sendmail processes are essential, as is xinetd (qpopper runs under
+that).  I need crond for a few scheduled jobs.  
+
+Of the rest, which do I need (ps axf output is below)?  Are portmap, apmd
+automount, etc required for the correct operation of the system, or can
+these be disabled.
+
+Thanks in advance.
+
+Jim.
+
+Output from a 'ps axf' taken at 3am this morning by a cron job.
+
+  PID TTY      STAT   TIME COMMAND
+    1 ?        S      1:36 init [3] 
+    2 ?        SW     0:00 [keventd]
+    3 ?        SW     0:02 [kapm-idled]
+    4 ?        SW   141:11 [kswapd]
+    5 ?        SW     0:28 [kreclaimd]
+    6 ?        SW     2:23 [bdflush]
+    7 ?        SW     0:19 [kupdated]
+    8 ?        SW&lt;    0:00 [mdrecoveryd]
+  418 ?        S     14:30 syslogd -m 0
+  423 ?        S      0:26 klogd -2
+  437 ?        S      0:00 portmap
+  536 ?        S      0:00 /usr/sbin/apmd -p 10 -w 5 -W -P
+/etc/sysconfig/apm-sc
+  585 ?        S      0:04 /usr/sbin/automount --timeout 60 /misc file
+/etc/auto
+  597 ?        S      0:03 /usr/sbin/atd
+  612 ?        S      0:14 /usr/sbin/sshd
+  632 ?        S     10:19 xinetd -stayalive -reuse -pidfile
+/var/run/xinetd.pid
+  677 ?        S      1:16 crond
+ 2473 ?        S      0:00  \_ CROND
+ 2474 ?        S      0:00  |   \_ /bin/bash /usr/bin/run-parts
+/etc/cron.hourly
+ 2476 ?        S      0:00  |       \_ awk -v
+progname=/etc/cron.hourly/sysstat 
+ 2481 ?        S      0:00  \_ CROND
+ 2482 ?        S      0:00      \_ /bin/bash /usr/bin/run-parts
+/etc/cron.daily
+ 2593 ?        S      0:00          \_ /bin/bash /usr/bin/run-parts
+/etc/cron.da
+ 2595 ?        S      0:00          |   \_ /bin/bash /usr/bin/run-parts
+/etc/cro
+ 2606 ?        R      0:00          |   |   \_ ps axf
+ 2596 ?        S      0:00          |   \_ /usr/lib/sendmail -t
+ 2594 ?        S      0:00          \_ awk -v
+progname=/etc/cron.daily/statusrep
+  708 tty1     S      0:00 /sbin/mingetty tty1
+  709 tty2     S      0:00 /sbin/mingetty tty2
+  710 tty3     S      0:00 /sbin/mingetty tty3
+  711 tty4     S      0:00 /sbin/mingetty tty4
+  712 tty5     S      0:00 /sbin/mingetty tty5
+  713 tty6     S      0:00 /sbin/mingetty tty6
+17599 ?        S      6:01 sendmail: accepting connections
+11810 ?        S      0:00 named -u named
+11811 ?        S      0:00  \_ named -u named
+11812 ?        S      1:16      \_ named -u named
+11815 ?        S      0:00      \_ named -u named
+11816 ?        S      0:05      \_ named -u named
+ 2477 ?        S      0:00 /bin/sh /usr/lib/sa/sa1 600 6
+ 2479 ?        S      0:00  \_ /usr/lib/sa/sadc 600 6 /var/log/sa/sa13
+
+---
+Jim O'Halloran
+Kendle Computer Services Pty. Ltd.
+Phone: (08) 8354 1600   (intl. +61-8-8354-1600)
+Fax: (08) 8354 1900 (intl. +61-8-8354-1900)
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

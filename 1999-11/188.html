@@ -1,0 +1,101 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Running the CDRW as SCSI" -->
+<!-- FromName="lloy0076" -->
+<!-- FromEmail="lloy0076@senet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 12 Nov 1999 06:57:50 +1030" -->
+<!-- Id="382B26C6.39C42F3B@senet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Running the CDRW as SCSI</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: lloy0076 &lt;<I><A HREF="mailto:lloy0076@senet.com.au">lloy0076@senet.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Fri, 12 Nov 1999 06:57:50 +1030
+</PRE>
+<H1>Running the CDRW as SCSI</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi!
+
+I recently purchased an Olympic Technologies CDRW (24/4/2). It works
+fine under Windows and I have just managed to successfully burn a backup
+image of my /usr/local. Consulting the CD Writing HOWTO here are the
+steps I attempted:
+
+1) I compiled SCSI support and IDE as SCSI support into my kernel
+2) I added to conf.modules:
+	alias scd0 sr_mod
+	alias scsi_hostadaptor ide-scsi
+	options ignore=hdc
+
+For those who don't know, CDRECORD requires you to work the CDRW device
+as SCSI. Part two flatly refuses to function. I readjusted my fstab and
+did all sorts of wierd and wonderful methods to convince it to. I tried:
+
+* mount -t [blah] /dev/scd[x] /mnt/rw
+* cdrecord -scanbus
+
+Neither of which produced a sensible result. They either failed outright
+or reported no bus at all. In desperation I went to
+/lib/modules/2.2.5-15/scsi/ and did an insmod sr_mod; insmod ide-scsi.
+The next time I attempted cdrecord -scanbus it reported my CDRW drive
+perfectly.I then managed to burn a CD image.
+
+However, the SCSI emulation has taken over my secondary IDE interface. I
+now have to mount both my CD drives as SCSI devices; I don't have a
+problem with this except I've kludged things a little by adding the
+line:
+
+* insmod /lib/modules/2.2.5-15/scsi/ide-scsi.o
+
+To my /etc/local/rc.d/rc.local file. I have a number of questions:
+
+1) What am I doing wrong in conf.modules which would stop kerneld from
+loading my SCSI emulation dynamically?
+
+2) How come when I manually insmod the ide-scsi emulation it hijacks my
+whole secondary IDE interface?
+
+DAVID
+-- 
+Don't forget about the Linux C Mailing Lists!
+  <A HREF="mailto:linuxCprogramming-subscribe">mailto:linuxCprogramming-subscribe</A>@listbot.com
+The Linux C++ Mailing Lists - a Linux C++ resource for you...
+  <A HREF="mailto:tuxCPProgramming-subscribe">mailto:tuxCPProgramming-subscribe</A>@listbot.com
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

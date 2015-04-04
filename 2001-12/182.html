@@ -1,0 +1,144 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Help? linux can't see out all of a sudden pt 1" -->
+<!-- FromName="'Andrew Lord'" -->
+<!-- FromEmail="apdl@bigpond.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 9 Dec 2001 23:31:43 +1030" -->
+<!-- Id="200112091259.XAA13072@jessica.netcraft.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Help? linux can't see out all of a sudden pt 1</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrew Lord &lt;<I><A HREF="mailto:apdl@bigpond.com">apdl@bigpond.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 9 Dec 2001 23:31:43 +1030
+</PRE>
+<H1>Re: Help? linux can't see out all of a sudden pt 1</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Richard, Hi Dave.  Thanks very much for your responses.
+
+
+&gt; On Sat, Dec 08, 2001 at 07:23:12PM +1030, Richard Russell wrote:
+&gt;&gt; Try looking at `ifconfig -a`, `netstat -rn` and so on -- see what your
+&gt;&gt; ppp connection is connecting to (Point to Point Protocol -- it connectes
+&gt;&gt; you (say 1.2.3.4) to the server (say 1.2.3.5))... See if you can ping
+&gt;&gt; the other end of your ppp connection... See if your routing tables are
+&gt;&gt; correct... 
+&gt;&gt; 
+&gt;&gt; What you describe (with ping) sounds as if your system has an incorrect
+&gt;&gt; route set up.
+&gt; 
+&gt; it does.  Have you got the "defaultroute" option set to ppp also?
+&gt; 
+
+
+In shell, I typed ifconfig -a and got the following
+[<A HREF="mailto:root@localhost">root@localhost</A> root]# ifconfig -a
+eth0    Link encap:Ethernet HWaddr 00:07:95:08:80:5C
+        inet adr:127.0.0.0  Bcast:127.0.0.255   Mask:255.255.255.0
+        UP BROADCAST MULTICAST MTU:1500 Metric:1
+        RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+        TX packets:3 errors:0 dropped:0 overruns:0 carrier:0
+        collisions:0 txqueuelen:100
+        RX bytes:0 (0.0 b) TX bytes:126 (126.0 b)
+        Interrupt:5 Base address:0xcc00
+
+lo      Link encap:Locl Loopback
+        inet addr:127.0.0.1 Mask:255.0.0.0
+        UP LOOPBACK RUNNING MTU:16436   Metric:1
+        RX packets:625 errors:0 dropped:0 overruns:0 frame:0
+        TX packets:625 errors:0 dropped:0 overruns:0 carrier:0
+        collissions:0 txqueuelen:0
+        RX bytes:62144 (60.5 Kb) TX bytes:62144 (60.6 Kb)
+
+ppp0    Link encap:Point-to-Point Protocol
+        inet addr:144.134.80.53 P-t-P:144.130.44.230    Mask:255.255.255.255
+        UP POINTOPOINT RUNNING NOARP MULTICAST MTU:1524 Metric:1
+        RX packets:3 errors:0 dropped:0 overruns:0 frame:0
+        TX packets:34 errors:0 dropped:0 overruns:0 carrier:0
+        collissions:0 txqueuelen:3
+        RX bytes:66 (66.0 b) TX bytes:2607 (2.5 Kb)
+
+
+In shell I typed   netstat -rn and got the following
+[<A HREF="mailto:root@localhost">root@localhost</A> root]# netstat -rn
+Kernel IP routing table
+Destination     Gateway     Genmask         Flags   Mss Window  irtt    Iface
+144.130.44.230  0.0.0.0     255.255.255.255 UH      40  0       0       ppp0
+127.0.0.0       0.0.0.0     255.255.255.0   U       40  0       0       eth0
+127.0.0.0       0.0.0.0     255.0.0.0       U       40  0       0       lo
+0.0.0.0         127.0.0.1   0.0.0.0         UG      40  0       0       lo
+
+In shell I typed route and got the following
+[<A HREF="mailto:root@localhost">root@localhost</A> root]# route
+Kernel IP routing table
+Destination     Gateway     Genmask         Flags Metric Ref  Use    Iface
+144.130.44.230  0.0.0.0     255.255.255.255 UH      0  0       0       ppp0
+127.0.0.0       0.0.0.0     *               U       0  0       0       eth0
+127.0.0.0       0.0.0.0     *               U       0  0       0       lo
+0.0.0.0        127.0.0.1    localhost.local UG      0  0       0       lo
+
+
+Following finding the above and discussing with a friend, I checked 
+K&gt;Configuration&gt;Networking&gt;Netconf and found what I believe were 
+inconsistencies between Netconf settings and those of KPPP.
+
+PPP/SLIP/PLIP
+    ppp0:Hardware: line connection speed was different to that I'd set in 
+KPPP, so I reset the Netconf speed to be the same
+    Modem port was set to /dev/modem in netconf, whereas KPPP was set to 
+/dev/ttySO so again I reset the Netconf to be same as KPPP
+
+ROUTING & GATEWAYS
+   Defaults:  Routing was not enabled, so I enabled it.
+
+HOST NAME & IP DEVICES
+    Host name: was listed as 'localhost', whereas the computer's server is 
+supposed to be called 'localhost.localdomain' so I reset it to the later
+    Adaptor 1 contained primary name + domain of 'localhost' instead of 
+localhost.localdomain so I reset it to the later
+    Adaptor 1 contained net device of 'eth0' & I reset it to 'ppp0'
+    Adaptor 1 contained IP address (my computer) of 127.0.0.0 and I reset it 
+to 127.0.0.1
+
+After making these changes and rebooting the system, and dialing up, the 
+computer can again see the outside world.  Somehow 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

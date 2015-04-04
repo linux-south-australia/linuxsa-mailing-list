@@ -1,0 +1,200 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Problems with Microsoft MSRPC implementation" -->
+<!-- FromName="Richard Sharpe" -->
+<!-- FromEmail="sharpe@ns.aus.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="LinuxSA@linuxsa.org.au" -->
+<!-- Date="Mon, 01 Nov 1999 07:30:53 +1000" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Problems with Microsoft MSRPC implementation</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  To  : <A HREF="mailto:LinuxSA@linuxsa.org.au">LinuxSA@linuxsa.org.au</A>
+  Date: Mon, 01 Nov 1999 07:30:53 +1000
+</PRE>
+<H1>Problems with Microsoft MSRPC implementation</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+This may be of interest.  I imagine we will see a new round of
+'buffer-overflow' style attacks against WinNT mediated via port 139 as a
+result of the disclosure of this information.
+
+&gt;Date: Mon, 01 Nov 1999 20:11:30 +0000
+&gt;From: Luke Kenneth Casson Leighton &lt;<A HREF="mailto:lkcl@SAMBA.ORG">lkcl@SAMBA.ORG</A>&gt;
+&gt;Subject: Re: Fwd: RFP9906 - RFPoison (fwd)
+&gt;Sender: Windows NTBugtraq Mailing List &lt;<A HREF="mailto:NTBUGTRAQ@LISTSERV.NTBUGTRAQ.COM">NTBUGTRAQ@LISTSERV.NTBUGTRAQ.COM</A>&gt;
+&gt;X-Sender: <A HREF="mailto:lkcl@mailhost.cb1.com">lkcl@mailhost.cb1.com</A>
+&gt;Approved-by: <A HREF="mailto:Russ.Cooper@RC.ON.CA">Russ.Cooper@RC.ON.CA</A>
+&gt;To: <A HREF="mailto:NTBUGTRAQ@LISTSERV.NTBUGTRAQ.COM">NTBUGTRAQ@LISTSERV.NTBUGTRAQ.COM</A>
+&gt;Reply-to: Luke Kenneth Casson Leighton &lt;<A HREF="mailto:lkcl@SAMBA.ORG">lkcl@SAMBA.ORG</A>&gt;
+&gt;Comments: cc: "MIS Department - CI Holding Group, Inc." &lt;<A HREF="mailto:mis@CIHOLDING.COM">mis@CIHOLDING.COM</A>&gt;
+&gt;X-Authentication-warning: mailhost.cb1.com: lkcl owned process doing -bs
+&gt;Original-recipient: rfc822;<A HREF="mailto:sharpe@NS.AUS.COM">sharpe@NS.AUS.COM</A>
+&gt;
+&gt;rfp, thank you very much for reporting this.  i was hoping that someone
+&gt;else would spot this sooner or later and be the first to mention it on
+&gt;ntbugtraq.
+&gt;
+&gt;&gt; &gt;         Interesting on how things go around/come around.
+&gt;
+&gt;isn't it just? :-)
+&gt;
+&gt;&gt; &gt;Recently Luke
+&gt;&gt; &gt;Kenneth Casson Leighton posted a message on NTBugtraq in response to SP6
+&gt;&gt; &gt;not fixing the LSA denial of service.  He states that this problem is
+&gt;&gt; &gt;essentially "due to marshalling/unmarshalling MSRPC code being unable to
+&gt;&gt; &gt;cope with a NULL policy handle."  He also states that they reported this
+&gt;&gt; &gt;problem to Microsoft around February 1999.
+&gt;&gt; &gt;
+&gt;&gt; &gt;         Well, no, I did not 'rediscover' the LSA denial of service (ala
+&gt;&gt; &gt;the AEDebug advisory earlier this month).  I did, however, discover a
+&gt;&gt; &gt;different denial of service based out of services.exe.  When sent a
+&gt;&gt; &gt;specific packet, it's possible to get srvsvc.dll to choke, and cause
+&gt;&gt; &gt;services.exe to reference a bad memory location.  For those geeks in the
+&gt;&gt; &gt;crowd, essentially srvsvc_netrshareenum in srvsvc.dll uses
+&gt;&gt; &gt;rpcrt4_ndrcomplexstructunmarshall to tweak a string, but returns a NULL.
+&gt;&gt; &gt;srvsvc_netrshareenum doesn't check for return value, adds four to the
+&gt;&gt; &gt;pointer, and passes it up a function stack until finally that memory is
+&gt;&gt; &gt;read (address 00000004).  Blam...Dr. Watson.
+&gt;&gt; &gt;
+&gt;&gt; &gt;         So we have another problem due to marshalling/unmarshalling MSRPC
+&gt;&gt; &gt;code.  This was found independantly of Luke's info and the LSA
+&gt;&gt; &gt;vulnerability.
+&gt;
+&gt;&gt; &gt;It's hoped that between the services.exe and the lsass.exe denial of
+&gt;&gt; &gt;services, both based on bad RPC code, Microsoft will find this problem
+&gt;&gt; &gt;worthy of fixing.
+&gt;
+&gt;ok, seeing as you found and reported this independently, i'm going to take
+&gt;that as a green light for me to be able to report what i haven't been able
+&gt;to say to anyone outside of microsoft before now.
+&gt;
+&gt;issues
+&gt;------
+&gt;
+&gt;the MSRPC marshalling code (DCOM) in NT 4.0, all service packs, is very
+&gt;badly written.  it is susceptible to all sorts of out-of-bounds issues.
+&gt;the areas that are particularly bad are:
+&gt;
+&gt;- string handling (any MSRPC service where a UNICODE string is sent, and
+&gt;that's basically all of them).
+&gt;
+&gt;- arrays-of-structures handling (for example, an array of shares in
+&gt;NetrShareEnum; array of transports in NetrServerTransportEnum; array of
+&gt;SIDs in LsarLookupSids (this one may have been fixed in one of the
+&gt;hotfixes, now in latest service pack)).
+&gt;
+&gt;- dynamic-item-count in structures (for example, the number of RIDs in a
+&gt;SID is dynamic).
+&gt;
+&gt;- enumeration-containers (indicating that an info level is going to
+&gt;exist, then passing a NULL pointer to the actual structure indicated by
+&gt;the info level).
+&gt;
+&gt;- policy handle management (for example, sending NULL policy handles in
+&gt;function calls instead of a previously-obtained policy handle, e.g
+&gt;OpenService(NULL, "service name", ...) instead of OpenSCMAN("server",
+&gt;&pHnd, ...); OpenService(&pHnd, "service name", ...).
+&gt;
+&gt;there used to be some issues in Service Pack 1 with the actual MSRPC
+&gt;headers themselves, which got fixed (you can anonymously crash NT4 no SP
+&gt;by sending garbage MSRPC headers).  there were also some issues to do with
+&gt;MSRPC authentication that were fixed in Service Pack 4 (evidence of this
+&gt;shown through samba code breaking when SP4 beta RCs were made available
+&gt;:-)
+&gt;
+&gt;consequences
+&gt;------------
+&gt;
+&gt;all of these things have various dire consequences, namely termination of
+&gt;services or even overwriting kernel memory in the case of the registry
+&gt;service, as that's where the registry MSRPC service is implemented, for
+&gt;speed gains.  this results in unpredictable behaviour that will eventually
+&gt;result in a blue screen.  fortunately, the registry is not accessible
+&gt;remotely without an authenticated user connection.
+&gt;
+&gt;there may be other MSRPC-based services that are implemented in the
+&gt;kernel, for speed gains.  i do not know what they are.
+&gt;
+&gt;the poor quality of the marshalling / unmarshalling code affects _all_
+&gt;MSRPC / DCOM services, including any services written by third party
+&gt;developers (as DCOM is MSRPC-based, the code being generated by a MIDL
+&gt;compiler).
+&gt;
+&gt;so, that includes Exchange, SQL, NT printing, NETLOGON, Event Log, srvsvc,
+&gt;wkssvc, winreg, winsif, winsadmin, browsess, svcctl, atsvc, samr, lsa.
+&gt;
+&gt;solution
+&gt;--------
+&gt;
+&gt;there is empirical evidence to show that microsoft has resolved these
+&gt;problems at a coding level, however it requires a *TOTAL*, recompile of
+&gt;*ALL* MSRPC-based services to use the much-improved MSRPC marshalling /
+&gt;unmarshalling code.  plus testing, plus a massive hotfix or series of
+&gt;hotfixes or a new service pack.
+&gt;
+&gt;basically, microsoft is working really hard at fixing / rewriting all of
+&gt;these things, and they've done a heck of a lot.  it just hasn't seen the
+&gt;light of day, yet, in a released version of NT.
+&gt;
+&gt;decision
+&gt;--------
+&gt;
+&gt;so, it's up to you, the users of windows nt, to determine whether you
+&gt;think this is important enough or not.  do you want NT4 fixed now, with
+&gt;the consequences that NT5, which has a _far_ superior MSRPC code-base, may
+&gt;be delayed, or do you want to upgrade all your NT4 systems to NT5 when
+&gt;it's available?
+&gt;
+&gt;luke (samba team)
+&gt;
+&gt;&lt;a href="<A HREF="mailto:<A HREF="mailto:lkcl@samba.org">lkcl@samba.org</A>">mailto:<A HREF="mailto:lkcl@samba.org">lkcl@samba.org</A></A>"   &gt; Luke Kenneth Casson Leighton    &lt;/a&gt;
+&gt;&lt;a href="<A HREF="http://www.cb1.com/~lkcl">http://www.cb1.com/~lkcl</A>"&gt; Samba and Network Development   &lt;/a&gt;
+&gt;&lt;a href="<A HREF="http://samba.org">http://samba.org</A>"        &gt; Samba Web site                  &lt;/a&gt;
+&gt;
+
+Regards
+-------
+Richard Sharpe, <A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A>, Master Linux Administrator :-),
+Samba (Team member, www.samba.org), Ethereal (Team member, www.zing.org)
+Co-author, SAMS Teach Yourself Samba in 24 Hours
+Author: First Australian 5-day, intensive, hands-on Linux SysAdmin course
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

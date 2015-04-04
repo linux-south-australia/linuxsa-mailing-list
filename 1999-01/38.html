@@ -1,0 +1,274 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="SYN flood attack?" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="LinuxSA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 5 Jan 1999 07:11:05 +1030" -->
+<!-- Id="199901042041.HAA17603@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: SYN flood attack?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 5 Jan 1999 07:11:05 +1030
+</PRE>
+<H1>SYN flood attack?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+[Warning: this e-mail is long and technical.]
+[Best viewed in a wide window.]
+
+Linux security experts,
+
+This morning, I got a strange behaviour on my internet nodes here.
+A message
+
+Jan  5 05:44:42 dog kernel: Warning: possible SYN flood from 206.132.153.48 on 203.38.148.51:111.  Sending cookies.
+
+appeared in the system log file.
+(206.132.153.48 turns out to be h-206-132-153-48.globalcenter.net.
+The address <A HREF="http://www.globalcenter.net">http://www.globalcenter.net</A> shows that this is
+some sort of mega-ISP organisation.)
+I checked my "tcpdump" log, and found the appended information.
+(My apologies for the great length of the listing.)
+All three of my home machines went "beep".
+
+This looks like it may be some sort of attack on my machines.
+
+Question 1:
+Can anyone tell me if this is an attack or just something innocent?
+I've never seen anything like this before.
+
+Question 2:
+Is it a good idea to turn off all incoming accesses to the "sunrpc" 
+port (using the IP firewall)?
+
+Summary of observed behaviour.
+
+First I got calls (one TCP SYN packet per centisecond) on all "sunrpc" ports on
+all IP addresses in my allocated range, which is:
+
+=======================================================
+; List of hosts in the topology.org domain.
+badger  IN A    203.38.148.49           ; sparc station: SunOS 4.1.3
+rat     IN A    203.38.148.50           ; PC pentium 133: redhat 5.2
+dog     IN A    203.38.148.51           ; PC AMD 486DX-66: redhat 5.2
+emu     IN A    203.38.148.52           
+x5      IN A    203.38.148.53           
+x6      IN A    203.38.148.54          
+x7      IN A    203.38.148.55
+x8      IN A    203.38.148.56
+x9      IN A    203.38.148.57
+x10     IN A    203.38.148.58
+x11     IN A    203.38.148.59
+x12     IN A    203.38.148.60           ; pseudo-host (port 80 =&gt; dog:8012)
+x13     IN A    203.38.148.61           ; pseudo-host (port 80 =&gt; dog:8013)
+x14     IN A    203.38.148.62           ; pseudo-host (port 80 =&gt; dog:8014)
+=======================================================
+
+Then I got continuations of the TCP connections for the real IP
+addresses. And for the non-existent IP addresses (no machine yet there)
+I got repeat SYN packets. Then there was further communication
+on each of the real IP address "sunrpc" TCP sockets, followed in
+each case by a ping packet. For nodes "dog" and "rat" there was
+some other incomprehensible communication ("udp 56" ??).
+
+Then there was an attempt to open a TCP connection to the
+"mount" socket on "rat". Then there is an attempt to
+open a connection to port 10752 (0x2a00), which does not currently
+(well after the event) occur in /proc/net/tcp.
+
+=======================================================
+Annotated log of packets to/from  h-206-132-153-48.globalcenter.net:
+
+Accesses to all "sunrpc" TCP ports in my IP address space:
+
+05:44:23.410159 h-206-132-153-48.globalcenter.net.15156 &gt; 203.38.148.48.sunrpc: S 3531850852:3531850852(0) win 512 &lt;mss 1460&gt;
+05:44:23.430159 h-206-132-153-48.globalcenter.net.15157 &gt; badger.topology.org.sunrpc: S 3972553819:3972553819(0) win 512 &lt;mss 1460&gt;
+05:44:23.430159 badger.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.15157: S 354560000:354560000(0) ack 3972553820 win 4096
+05:44:23.440159 h-206-132-153-48.globalcenter.net.15159 &gt; dog.topology.org.sunrpc: S 1776648389:1776648389(0) win 512 &lt;mss 1460&gt;
+05:44:23.440159 dog.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.15159: S 3181010646:3181010646(0) ack 1776648390 win 32736 &lt;mss 1460&gt;
+05:44:23.470159 h-206-132-153-48.globalcenter.net.15158 &gt; rat.topology.org.sunrpc: S 1451715216:1451715216(0) win 512 &lt;mss 1460&gt;
+05:44:23.470159 h-206-132-153-48.globalcenter.net.15160 &gt; emu.topology.org.sunrpc: S 596265491:596265491(0) win 512 &lt;mss 1460&gt;
+05:44:23.470159 rat.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.15158: S 3082517396:3082517396(0) ack 1451715217 win 32736 &lt;mss 1460&gt;
+05:44:23.480159 h-206-132-153-48.globalcenter.net.15161 &gt; x5.topology.org.sunrpc: S 2816357280:2816357280(0) win 512 &lt;mss 1460&gt;
+05:44:23.490159 h-206-132-153-48.globalcenter.net.15162 &gt; x6.topology.org.sunrpc: S 458005247:458005247(0) win 512 &lt;mss 1460&gt;
+05:44:23.490159 h-206-132-153-48.globalcenter.net.15163 &gt; x7.topology.org.sunrpc: S 1814057616:1814057616(0) win 512 &lt;mss 1460&gt;
+05:44:23.500159 h-206-132-153-48.globalcenter.net.15164 &gt; x8.topology.org.sunrpc: S 3657180727:3657180727(0) win 512 &lt;mss 1460&gt;
+05:44:23.510159 h-206-132-153-48.globalcenter.net.15165 &gt; x9.topology.org.sunrpc: S 470483860:470483860(0) win 512 &lt;mss 1460&gt;
+05:44:23.520159 h-206-132-153-48.globalcenter.net.15166 &gt; x10.topology.org.sunrpc: S 3649136213:3649136213(0) win 512 &lt;mss 1460&gt;
+05:44:23.520159 h-206-132-153-48.globalcenter.net.15167 &gt; x11.topology.org.sunrpc: S 525457598:525457598(0) win 512 &lt;mss 1460&gt;
+05:44:23.530159 h-206-132-153-48.globalcenter.net.15168 &gt; x12.topology.org.sunrpc: S 3774386289:3774386289(0) win 512 &lt;mss 1460&gt;
+05:44:23.530159 h-206-132-153-48.globalcenter.net.15169 &gt; x13.topology.org.sunrpc: S 594534238:594534238(0) win 512 &lt;mss 1460&gt;
+
+Communications on the existing "sunrpc" ports:
+
+05:44:23.910159 h-206-132-153-48.globalcenter.net.15157 &gt; badger.topology.org.sunrpc: . ack 1 win 32120 (DF)
+05:44:23.920159 h-206-132-153-48.globalcenter.net.15159 &gt; dog.topology.org.sunrpc: . ack 1 win 32120 (DF)
+05:44:23.920159 h-206-132-153-48.globalcenter.net.15157 &gt; badger.topology.org.sunrpc: F 1:1(0) ack 1 win 32696
+05:44:23.920159 badger.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.15157: . ack 2 win 4096
+05:44:23.930159 h-206-132-153-48.globalcenter.net.15159 &gt; dog.topology.org.sunrpc: F 1:1(0) ack 1 win 32120
+05:44:23.930159 dog.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.15159: . ack 2 win 32735 (DF)
+05:44:23.940159 h-206-132-153-48.globalcenter.net.15158 &gt; rat.topology.org.sunrpc: . ack 1 win 32120 (DF)
+05:44:23.950159 h-206-132-153-48.globalcenter.net.15158 &gt; rat.topology.org.sunrpc: F 1:1(0) ack 1 win 32120
+05:44:23.950159 rat.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.15158: . ack 2 win 32735 (DF)
+05:44:23.950159 rat.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.15158: F 1:1(0) ack 2 win 32736
+05:44:24.070159 badger.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.15157: F 1:1(0) ack 2 win 4096
+05:44:24.160159 dog.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.15159: F 1:1(0) ack 2 win 32736
+05:44:24.340159 h-206-132-153-48.globalcenter.net.15158 &gt; rat.topology.org.sunrpc: . ack 2 win 32120 (DF)
+05:44:24.460159 h-206-132-153-48.globalcenter.net.15157 &gt; badger.topology.org.sunrpc: . ack 2 win 32695 (DF)
+05:44:24.550159 h-206-132-153-48.globalcenter.net.15159 &gt; dog.topology.org.sunrpc: . ack 2 win 32120 (DF)
+
+Repeat SYN packets for all non-existent IP hosts:
+
+05:44:26.420159 h-206-132-153-48.globalcenter.net.15160 &gt; emu.topology.org.sunrpc: S 596265491:596265491(0) win 32120 &lt;mss 1460&gt;
+05:44:26.430159 h-206-132-153-48.globalcenter.net.15161 &gt; x5.topology.org.sunrpc: S 2816357280:2816357280(0) win 32120 &lt;mss 1460&gt;
+05:44:26.440159 h-206-132-153-48.globalcenter.net.15162 &gt; x6.topology.org.sunrpc: S 458005247:458005247(0) win 32120 &lt;mss 1460&gt;
+05:44:26.450159 h-206-132-153-48.globalcenter.net.15163 &gt; x7.topology.org.sunrpc: S 1814057616:1814057616(0) win 32120 &lt;mss 1460&gt;
+05:44:26.460159 h-206-132-153-48.globalcenter.net.15164 &gt; x8.topology.org.sunrpc: S 3657180727:3657180727(0) win 32120 &lt;mss 1460&gt;
+05:44:26.460159 h-206-132-153-48.globalcenter.net.15156 &gt; 203.38.148.48.sunrpc: S 3531850852:3531850852(0) win 32120 &lt;mss 1460&gt;
+05:44:26.480159 h-206-132-153-48.globalcenter.net.15165 &gt; x9.topology.org.sunrpc: S 470483860:470483860(0) win 32120 &lt;mss 1460&gt;
+05:44:26.480159 h-206-132-153-48.globalcenter.net.15166 &gt; x10.topology.org.sunrpc: S 3649136213:3649136213(0) win 32120 &lt;mss 1460&gt;
+05:44:26.490159 h-206-132-153-48.globalcenter.net.15167 &gt; x11.topology.org.sunrpc: S 525457598:525457598(0) win 32120 &lt;mss 1460&gt;
+05:44:26.490159 h-206-132-153-48.globalcenter.net.15168 &gt; x12.topology.org.sunrpc: S 3774386289:3774386289(0) win 32120 &lt;mss 1460&gt;
+05:44:26.500159 h-206-132-153-48.globalcenter.net.15169 &gt; x13.topology.org.sunrpc: S 594534238:594534238(0) win 32120 &lt;mss 1460&gt;
+05:44:26.500159 h-206-132-153-48.globalcenter.net.15170 &gt; x14.topology.org.sunrpc: S 4182347484:4182347484(0) win 32120 &lt;mss 1460&gt;
+05:44:26.510159 h-206-132-153-48.globalcenter.net.15171 &gt; 203.38.148.63.sunrpc: S 2394349228:2394349228(0) win 32120 &lt;mss 1460&gt;
+
+Continued "sunrpc" port communications:
+
+05:44:39.730159 h-206-132-153-48.globalcenter.net.29636 &gt; badger.topology.org.sunrpc: S 748941745:748941745(0) win 4660
+05:44:39.730159 badger.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.29636: S 356736000:356736000(0) ack 748941746 win 4096
+05:44:39.750159 h-206-132-153-48.globalcenter.net.29637 &gt; badger.topology.org.sunrpc: S 748941745:748941745(0) ack 0 win 4660
+05:44:39.750159 badger.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.29637: R 0:0(0) win 4096
+05:44:39.770159 h-206-132-153-48.globalcenter.net.29638 &gt; badger.topology.org.sunrpc: F 748941745:748941745(0) win 4660
+05:44:39.780159 h-206-132-153-48.globalcenter.net.29639 &gt; badger.topology.org.sunrpc: F 748941745:748941745(0) ack 0 win 4660
+05:44:39.780159 badger.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.29639: R 0:0(0) win 4096
+05:44:39.800159 h-206-132-153-48.globalcenter.net.29640 &gt; badger.topology.org.sunrpc: SF 748941745:748941745(0) win 4660
+05:44:39.800159 badger.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.29640: . ack 748941747 win 4096
+05:44:39.820159 h-206-132-153-48.globalcenter.net.29641 &gt; badger.topology.org.sunrpc: P win 4660
+05:44:39.840159 h-206-132-153-48.globalcenter.net.29642 &gt; badger.topology.org.sunrpc: S 748941745:748941745(0) win 4660
+05:44:39.840159 badger.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.29642: S 356864000:356864000(0) ack 748941746 win 4096
+05:44:40.130159 h-206-132-153-48.globalcenter.net.29636 &gt; badger.topology.org.sunrpc: R 748941746:748941746(0) win 0
+05:44:40.160159 h-206-132-153-48.globalcenter.net.29640 &gt; badger.topology.org.sunrpc: R 748941747:748941747(0) win 0
+05:44:40.190159 h-206-132-153-48.globalcenter.net.29642 &gt; badger.topology.org.sunrpc: R 748941746:748941746(0) win 0
+05:44:41.920159 h-206-132-153-48.globalcenter.net.6109 &gt; dog.topology.org.sunrpc: S 188736590:188736590(0) win 4660
+05:44:41.920159 dog.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.6109: S 3992871872:3992871872(0) ack 188736591 win 32736 &lt;mss 536&gt;
+05:44:41.940159 h-206-132-153-48.globalcenter.net.6110 &gt; dog.topology.org.sunrpc: S 188736590:188736590(0) ack 0 win 4660
+05:44:41.940159 dog.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.6110: R 0:0(0) win 0
+05:44:41.950159 h-206-132-153-48.globalcenter.net.6111 &gt; dog.topology.org.sunrpc: F 188736590:188736590(0) win 4660
+05:44:41.970159 h-206-132-153-48.globalcenter.net.6112 &gt; dog.topology.org.sunrpc: F 188736590:188736590(0) ack 0 win 4660
+05:44:41.970159 dog.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.6112: R 0:0(0) win 0
+05:44:41.990159 h-206-132-153-48.globalcenter.net.6113 &gt; dog.topology.org.sunrpc: SF 188736590:188736590(0) win 4660
+05:44:41.990159 dog.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.6113: SF 2269339066:2269339066(0) ack 188736591 win 32736 &lt;mss 536&gt;
+05:44:42.010159 h-206-132-153-48.globalcenter.net.6114 &gt; dog.topology.org.sunrpc: P win 4660
+05:44:42.020159 h-206-132-153-48.globalcenter.net.6115 &gt; dog.topology.org.sunrpc: S 188736590:188736590(0) win 4660
+05:44:42.020159 dog.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.6115: S 6631578:6631578(0) ack 188736591 win 32736 &lt;mss 512&gt;
+05:44:42.280159 h-206-132-153-48.globalcenter.net.6109 &gt; dog.topology.org.sunrpc: R 188736591:188736591(0) win 0
+05:44:42.340159 h-206-132-153-48.globalcenter.net.6113 &gt; dog.topology.org.sunrpc: R 188736591:188736591(0) win 0
+05:44:42.360159 h-206-132-153-48.globalcenter.net.6115 &gt; dog.topology.org.sunrpc: R 188736591:188736591(0) win 0
+
+ping to "dog":
+
+05:44:44.920159 h-206-132-153-48.globalcenter.net &gt; dog.topology.org: icmp: echo request
+05:44:44.920159 dog.topology.org &gt; h-206-132-153-48.globalcenter.net: icmp: echo reply
+
+more "sunrpc" stuff:
+
+05:44:45.300159 h-206-132-153-48.globalcenter.net.929 &gt; dog.topology.org.sunrpc: udp 56
+05:44:45.410159 alanke.lnk.telstra.net.sunrpc &gt; h-206-132-153-48.globalcenter.net.929: udp 28
+
+Access to port 10752:
+
+05:44:50.790159 h-206-132-153-48.globalcenter.net.16425 &gt; dog.topology.org.10752: S 1702064244:1702064244(0) win 512 &lt;mss 1460&gt;
+05:44:50.790159 dog.topology.org.10752 &gt; h-206-132-153-48.globalcenter.net.16425: R 0:0(0) ack 1702064245 win 0
+
+More "sunrpc" stuff:
+
+05:44:51.180159 h-206-132-153-48.globalcenter.net.24323 &gt; rat.topology.org.sunrpc: S 662430823:662430823(0) win 4660
+05:44:51.180159 h-206-132-153-48.globalcenter.net.24324 &gt; rat.topology.org.sunrpc: S 662430823:662430823(0) ack 0 win 4660
+05:44:51.180159 rat.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.24323: S 2035696181:2035696181(0) ack 662430824 win 32736 &lt;mss 536&gt;
+05:44:51.180159 rat.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.24324: R 0:0(0) win 0
+05:44:51.200159 h-206-132-153-48.globalcenter.net.24325 &gt; rat.topology.org.sunrpc: F 662430823:662430823(0) win 4660
+05:44:51.220159 h-206-132-153-48.globalcenter.net.24326 &gt; rat.topology.org.sunrpc: F 662430823:662430823(0) ack 0 win 4660
+05:44:51.220159 rat.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.24326: R 0:0(0) win 0
+05:44:51.240159 h-206-132-153-48.globalcenter.net.24327 &gt; rat.topology.org.sunrpc: SF 662430823:662430823(0) win 4660
+05:44:51.240159 rat.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.24327: SF 3091166296:3091166296(0) ack 662430824 win 32736 &lt;mss 536&gt;
+05:44:51.260159 h-206-132-153-48.globalcenter.net.24328 &gt; rat.topology.org.sunrpc: P win 4660
+05:44:51.280159 h-206-132-153-48.globalcenter.net.24329 &gt; rat.topology.org.sunrpc: S 662430823:662430823(0) win 4660
+05:44:51.280159 rat.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.24329: S 6513018:6513018(0) ack 662430824 win 32736 &lt;mss 512&gt;
+05:44:51.540159 h-206-132-153-48.globalcenter.net.24323 &gt; rat.topology.org.sunrpc: R 662430824:662430824(0) win 0
+05:44:51.590159 h-206-132-153-48.globalcenter.net.24327 &gt; rat.topology.org.sunrpc: R 662430824:662430824(0) win 0
+05:44:51.620159 h-206-132-153-48.globalcenter.net.24329 &gt; rat.topology.org.sunrpc: R 662430824:662430824(0) win 0
+
+ping to "rat":
+
+05:44:53.930159 h-206-132-153-48.globalcenter.net &gt; rat.topology.org: icmp: echo request
+05:44:53.930159 rat.topology.org &gt; h-206-132-153-48.globalcenter.net: icmp: echo reply
+
+More "sunrpc" stuff:
+
+05:44:54.310159 h-206-132-153-48.globalcenter.net.934 &gt; rat.topology.org.sunrpc: udp 56
+05:44:54.330159 rat.topology.org.sunrpc &gt; h-206-132-153-48.globalcenter.net.934: udp 28
+
+Access to "mount" TCP port:
+
+05:44:54.840159 h-206-132-153-48.globalcenter.net.935 &gt; rat.topology.org.mount: udp 1068
+05:44:55.240159 rat.topology.org.mount &gt; h-206-132-153-48.globalcenter.net.935: udp 28
+
+Access to port 10752:
+
+05:45:00.600159 h-206-132-153-48.globalcenter.net.16426 &gt; rat.topology.org.10752: S 982183157:982183157(0) win 512 &lt;mss 1460&gt;
+05:45:00.600159 rat.topology.org.10752 &gt; h-206-132-153-48.globalcenter.net.16426: R 0:0(0) ack 982183158 win 0
+
+End of accesses by globalcenter node.
+
+Cheers, and thanks in advance for any help.
+
+Alan Kennington.
+
+--------------------------------------------------------------------
+Dr. Alan Kennington
+ e-mail: <A HREF="mailto:akenning@mail.topology.org">akenning@mail.topology.org</A>
+    web: <A HREF="http://www.topology.org">http://www.topology.org</A>
+ coords: 34.89744 S, 138.58970 E
+tel/fax: +61 8 8342 1689
+ mobile: +61 417 881 823
+ office: +61 8 8259 6384
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

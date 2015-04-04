@@ -1,0 +1,183 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="no --rebuild on ppc arch with pdflib-3.02-1" -->
+<!-- FromName="'Dan Kortschak'" -->
+<!-- FromEmail="dan.kortschak@adelaide.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 19 Nov 2000 09:59:25 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0011190935170.14134-100000@sunya.adelaide.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: no --rebuild on ppc arch with pdflib-3.02-1</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Kortschak &lt;<I><A HREF="mailto:dan.kortschak@adelaide.edu.au">dan.kortschak@adelaide.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sun, 19 Nov 2000 09:59:25 +1030 (CST)
+</PRE>
+<H1>no --rebuild on ppc arch with pdflib-3.02-1</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Everyone. I have been trying to install the grace plotting 
+package. I've rebuilt the SRPM for grace for ppc architecture without any
+problems, but I can't get pdflib (one of graces dependecies) to rebuild
+properly. The problem seems to be that make is installing in /usr/lib (see
+below) while RPM is looking on the right place (/tmp/pdflib-root/usr) and
+so fails to find it. I've spoken to the packegaer and he gave the anserws
+you can see below. What he is suggesting seems to be right, but I can't
+figure out how to fix it. Does anyone have a good grasp of makefile
+authoring that can help me? Also, sort of on the same line, is there
+anywhere I can find a good description of spec file authoring (it's
+probably about time I learnt)?
+
+Sorry about the length of this.
+
+thanks
+Dan Kortschak
+
+[ snipped compile output ]
+
+PATH="$PATH:/sbin" ldconfig -n /usr/lib
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /usr/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,--rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+
+[ snipped compile output ]
+
+--
+
+Date: Mon, 13 Nov 2000 11:01:49 +0100
+From: <A HREF="mailto:Henrik.Seidel@schering.de">Henrik.Seidel@schering.de</A>
+To: <A HREF="mailto:dan.kortschak@adelaide.edu.au">dan.kortschak@adelaide.edu.au</A>
+Subject: Antwort: no --rebuild on ppc arch with pdflib-3.02-1
+
+
+Hi Dan,
+
+there seems to be something wrong with your "make" version. Usually, configure
+should create Makefiles which use a variable called "prefix". And usually the
+value of that variable can be overridden by adding arguments to the "make
+install" call. This is what happens in the SRPM rebuild as well:
+
+make prefix=/tmp/pdflib-root/usr install
+
+Make then enters the pdflib subdirectory and "sub-calls" make in that
+subdirectory
+
+cd pdflib && make install
+
+Usually the "prefix=..." argument should set the "prefix" environment variable
+to the specified value for all "sub-calls" of make. That's why the "make
+install" in the pdflib directory should have set "prefix" to "
+/tmp/pdflib-root/usr" as well --- although you can't see it on the command line
+(it is just a "make install"), the make in the pdflib subdirectory should know
+from the "prefix" environment variable that it has to install the files in
+/tmp/pdflib-root/usr instead of the default /usr, and this environment variable
+should be set by the initial "parent" make.
+
+So I suppose that for some reason your installation of the make program does not
+correctly convey command line arguments of a parent "make" as environment
+variables to the child "make"s.
+
+This is not a problem of the pdflib SRPM but rather of your make environment.
+Try upgrading the make RPM, or search the Linux PPC news groups if you can find
+something about this problem.
+
+Regards
+
+Henrik
+
+--
+
+Date: Wed, 15 Nov 2000 09:10:46 +0100
+From: <A HREF="mailto:Henrik.Seidel@schering.de">Henrik.Seidel@schering.de</A>
+To: Dan Kortschak &lt;<A HREF="mailto:dan.kortschak@adelaide.edu.au">dan.kortschak@adelaide.edu.au</A>&gt;
+Subject: Antwort: no --rebuild on ppc arch with pdflib-3.02-1
+  
+
+Hi Dan,
+
+I don't really know why the make works with grace while it doesn't with
+pdflib.
+It is difficult for me to figure that out since on my machine things are
+workingas they should. All I know is that make should use the environment
+variable
+MAKEFLAGS to convey any variable set on the command line to
+"sub-makes". So
+maybe you can try to add a line to the Makefile in the pdflib subdirectory
+(directly below the line beginning with "install", and don't forget the
+leading
+tab in that line) which echoes this variable ("echo MAKEFLAGS ==&gt;
+$(MAKEFLAGS)")to see if they were defined correctly.
+
+Regards
+
+Henrik
+
+-- 
+_____________________________________________________________   .`.`o     
+                                                         o| ,\__ `./`r
+  Dan Kortschak                                          &lt;\/    \_O&gt; O    
+  Genetics (DMB)          phone :+61 8 8303 4863          "|`...'.\
+  Adelaide University     fax   :+61 8 8303 4399           `      :\ 
+  Australia 5005          mailto:<A HREF="mailto:dan.kortschak@adelaide.edu.au">dan.kortschak@adelaide.edu.au</A>    : \
+
+Employer required disclaimer (sorry for the bandwidth):
+If you were not sent this message, please delete and forget it. If you
+were, be aware that we don't guarantee it free of virus; the health of
+your system is your own responsibility, do what you feel is necessary.
+
+Check out the Munchkins: <A HREF="http://www.geocities.com/yellow_cake_road/">http://www.geocities.com/yellow_cake_road/</A>
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

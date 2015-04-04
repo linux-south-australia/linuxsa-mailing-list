@@ -1,0 +1,207 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="ALSA, Debian, 2.6 kernel problems" -->
+<!-- FromName="'Brendan Grossman'" -->
+<!-- FromEmail="brendan@grossman.id.au" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 2 Jan 2004 15:20:50 +1030" -->
+<!-- Id="200401021520.51032.brendan@grossman.id.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: ALSA, Debian, 2.6 kernel problems</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Brendan Grossman &lt;<I><A HREF="mailto:brendan@grossman.id.au">brendan@grossman.id.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 2 Jan 2004 15:20:50 +1030
+</PRE>
+<H1>ALSA, Debian, 2.6 kernel problems</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hey,
+
+I'm having trouble getting sound working under Debian using the 2.6 kernel. 
+I'm compiling the kernel 'the debian way'. I followed this guide here 
+exactly, except the kernel version:
+
+<A HREF="http://www.sonic.net/~rknop/linux/debian_alsa.html">http://www.sonic.net/~rknop/linux/debian_alsa.html</A>
+
+Anyway, everything is going fine until I have to make the modules image. 
+Here's what happens (i thought i'd paste it all just incase):
+
+minerva:/usr/src/linux# make-kpkg --revision 1 --append-to-version "-bjg" 
+modules_image
+for module in /usr/src/modules/alsa-driver ; do                        \
+          if test -d  $module; then                                \
+    (cd $module;                                           \
+              if ./debian/rules KVERS="2.6.0-bjg" KSRC="/usr/src/linux" \
+                             KMAINT="Unknown Kernel Package Maintainer" 
+KEMAIL="<A HREF="mailto:unknown@unconfigured.in.etc.kernel-pkg.conf">unknown@unconfigured.in.etc.kernel-pkg.conf</A>"      \
+                             KPKG_DEST_DIR="/usr/src/linux/.."       \
+                             KPKG_MAINTAINER="Unknown Kernel Package 
+Maintainer"        \
+                             KDREV="1" kdist_image; then    \
+                  echo "Module $module processed fine";            \
+              else                                                  \
+                   echo "Module $module failed.";                  \
+                   echo "Hit return to Continue";                   \
+           read ans;                                        \
+              fi;                                                   \
+     );                                                     \
+  fi;                                                       \
+        done
+make[1]: Entering directory `/usr/src/modules/alsa-driver'
+/usr/bin/make -w -f debian/rules MODDIR=/usr/src/linux/.. binary-modules
+make[2]: Entering directory `/usr/src/modules/alsa-driver'
+cat debian/modules.d/control.source &gt; debian/control
+cat debian/modules.d/control.module-image &gt;&gt; debian/control
+/usr/bin/make
+make[3]: Entering directory `/usr/src/modules/alsa-driver'
+make[4]: Entering directory `/usr/src/modules/alsa-driver/acore'
+gcc -DALSA_BUILD -D__KERNEL__ -DMODULE=1 -I/usr/src/linux/include -I/usr/src/
+modules/alsa-driver/include -O2 -mpreferred-stack-boundary=2 -march=athlon 
+-DLINUX -Wall -Wstrict-prototypes -fomit-frame-pointer -pipe   
+-DEXPORT_SYMTAB -c timer.c
+In file included from /usr/src/linux/include/sound/driver.h:42,
+                 from ../alsa-kernel/core/timer.c:22,
+                 from timer.c:1:
+/usr/src/modules/alsa-driver/include/adriver.h:25:40: missing binary operator 
+before token "("
+/usr/src/modules/alsa-driver/include/adriver.h:28:41: missing binary operator 
+before token "("
+/usr/src/modules/alsa-driver/include/adriver.h:33:43: missing binary operator 
+before token "("
+/usr/src/modules/alsa-driver/include/adriver.h:40:31: linux/modversions.h: No 
+such file or directory
+In file included from /usr/src/linux/include/asm/processor.h:18,
+                 from /usr/src/linux/include/asm/thread_info.h:13,
+                 from /usr/src/linux/include/linux/thread_info.h:21,
+                 from /usr/src/linux/include/linux/spinlock.h:12,
+                 from /usr/src/linux/include/linux/capability.h:45,
+                 from /usr/src/linux/include/linux/sched.h:7,
+                 from /usr/src/linux/include/linux/module.h:10,
+                 from /usr/src/modules/alsa-driver/include/adriver.h:49,
+                 from /usr/src/linux/include/sound/driver.h:42,
+                 from ../alsa-kernel/core/timer.c:22,
+                 from timer.c:1:
+/usr/src/linux/include/asm/system.h: In function `__set_64bit_var':
+/usr/src/linux/include/asm/system.h:193: warning: dereferencing type-punned 
+pointer will break strict-aliasing rules
+/usr/src/linux/include/asm/system.h:193: warning: dereferencing type-punned 
+pointer will break strict-aliasing rules
+/usr/src/modules/alsa-driver/include/adriver.h:101:40: missing binary operator 
+before token "("
+/usr/src/modules/alsa-driver/include/adriver.h:104:40: missing binary operator 
+before token "("
+/usr/src/modules/alsa-driver/include/adriver.h:156:62: missing binary operator 
+before token "("
+In file included from /usr/src/linux/include/linux/irq.h:20,
+                 from /usr/src/linux/include/asm/hardirq.h:6,
+                 from /usr/src/linux/include/linux/interrupt.h:11,
+                 from /usr/src/linux/include/sound/timer.h:27,
+                 from ../alsa-kernel/core/timer.c:28,
+                 from timer.c:1:
+/usr/src/linux/include/asm/irq.h:16:25: irq_vectors.h: No such file or 
+directoryIn file included from /usr/src/linux/include/asm/hardirq.h:6,
+                 from /usr/src/linux/include/linux/interrupt.h:11,
+                 from /usr/src/linux/include/sound/timer.h:27,
+                 from ../alsa-kernel/core/timer.c:28,
+                 from timer.c:1:
+/usr/src/linux/include/linux/irq.h: At top level:
+/usr/src/linux/include/linux/irq.h:70: error: `NR_IRQS' undeclared here (not 
+in a function)
+In file included from /usr/src/linux/include/linux/irq.h:72,
+                 from /usr/src/linux/include/asm/hardirq.h:6,
+                 from /usr/src/linux/include/linux/interrupt.h:11,
+                 from /usr/src/linux/include/sound/timer.h:27,
+                 from ../alsa-kernel/core/timer.c:28,
+                 from timer.c:1:
+/usr/src/linux/include/asm/hw_irq.h:28: error: `NR_IRQ_VECTORS' undeclared 
+here (not in a function)
+/usr/src/linux/include/asm/hw_irq.h:31: error: `NR_IRQS' undeclared here (not 
+in a function)
+In file included from timer.c:1:
+../alsa-kernel/core/timer.c: In function `dec_mod_count':
+../alsa-kernel/core/timer.c:80: warning: implicit declaration of function 
+`__MOD_DEC_USE_COUNT'
+../alsa-kernel/core/timer.c: In function `snd_timer_instance_new':
+../alsa-kernel/core/timer.c:102: error: structure has no member named `in_use'
+../alsa-kernel/core/timer.c:105: warning: implicit declaration of function 
+`try_inc_mod_count'
+In file included from timer.c:1:
+../alsa-kernel/core/timer.c: At top level:
+../alsa-kernel/core/timer.c:226: error: conflicting types for `snd_timer_open'
+/usr/src/linux/include/sound/timer.h:145: error: previous declaration of 
+`snd_timer_open'
+In file included from timer.c:1:
+../alsa-kernel/core/timer.c: In function `snd_timer_stop':
+../alsa-kernel/core/timer.c:410: error: structure has no member named `in_use'
+In file included from timer.c:1:
+../alsa-kernel/core/timer.c: In function `snd_timer_interrupt':
+../alsa-kernel/core/timer.c:529: error: structure has no member named `in_use'
+../alsa-kernel/core/timer.c:564: error: too many arguments to function
+../alsa-kernel/core/timer.c:570: error: too many arguments to function
+../alsa-kernel/core/timer.c:573: error: structure has no member named `in_use'
+In file included from timer.c:1:
+../alsa-kernel/core/timer.c: In function `snd_timer_user_tselect':
+../alsa-kernel/core/timer.c:1049: warning: assignment from incompatible 
+pointer type
+In file included from timer.c:1:
+../alsa-kernel/core/timer.c: In function `snd_timer_user_info':
+../alsa-kernel/core/timer.c:1070: error: structure has no member named `ticks'
+make[4]: *** [timer.o] Error 1
+make[4]: Leaving directory `/usr/src/modules/alsa-driver/acore'
+make[3]: *** [compile] Error 1
+make[3]: Leaving directory `/usr/src/modules/alsa-driver'
+make[2]: *** [install-modules] Error 2
+make[2]: Leaving directory `/usr/src/modules/alsa-driver'
+make[1]: *** [kdist_image] Error 2
+make[1]: Leaving directory `/usr/src/modules/alsa-driver'
+Module /usr/src/modules/alsa-driver failed.
+Hit return to Continue
+
+This is driving me insane! My card uses the cs46xx driver, and i've had it 
+working under Linux before. That time though i just downloaded the ALSA 
+source and compiled everything manually, something i'd prefer not to do since 
+I want to keep the system all Debianised.
+
+Any ideas? Better yet, has anyone here got sound working using the inbuilt 
+ALSA support in the 2.6 kernel, doing it the debian way?
+
+Cheers
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

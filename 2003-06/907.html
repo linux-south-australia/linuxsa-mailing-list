@@ -1,0 +1,150 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Grep 2.5 Qu" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="" -->
+<!-- ToEmail="andrewlord@internode.on.net, "'Geoffrey D. Bennett'" <g@netcraft.com.au>" -->
+<!-- Date="Wed, 25 Jun 2003 01:05:12 +0930" -->
+<!-- Id="008801c33a66$463d17f0$020120ac@skink" -->
+<!-- Reference="200306250035.03453.andrewlord@internode.on.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Grep 2.5 Qu</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:andrewlord@internode.on.net">andrewlord@internode.on.net</A></I>&gt;<BR>        &lt;<I><A HREF="mailto: "'Geoffrey D. Bennett'" <g@netcraft.com.au>"> "'Geoffrey D. Bennett'" <g@netcraft.com.au></A></I>&gt;
+  Date: Wed, 25 Jun 2003 01:05:12 +0930
+</PRE>
+<H1>RE: Grep 2.5 Qu</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&lt;snip&gt;
+
+&gt; Yes.  I do have files starting with '-' under /home/andrew.
+&gt; 
+&gt; Thanx 4 the tip.  I tried what you suggested and it worked a 
+&gt; treat.  I don't 
+&gt; understand why files starting with '-' would trip grep up 
+&gt; though.  I'm 
+
+It's because the - is interpreted by grep as an option, not a filename. You
+had a file beginning with -d, right?
+
+from grep(1):
+
+       -d ACTION, --directories=ACTION
+              If an input file is a directory, use ACTION to pro-
+              cess  it.   By default, ACTION is read, which means
+              that directories are read  just  as  if  they  were
+              ordinary files.  If ACTION is skip, directories are
+              silently skipped.  If ACTION is recurse, grep reads
+              all  files  under each directory, recursively; this
+              is equivalent to the -r option.
+
+
+Your file wasn't a valid action name, so it caused an error. I would think
+it could be even more confusing if you happenned to have a file called
+-dskip, or -dread, or even just -d ...
+
+Remember that your command "grep -o -R -e 'search phrase' *" is passed to
+grep with the * expanded by the shell... the grep program gets the arguments
+as an array of string pointers, and processes them one by one. So if you had
+the files "-dtest" and "file", grep would get the commandline just as if you
+had written "grep -o -R -e 'search phrase' -dtest file" ... ie it has the
+following arguments:
+
+"-o"
+"-R"
+"-e"
+"search phrase"
+"-dtest"
+"file"
+
+It goes through them all, looking for arguments starting with '-', and
+processes these as options. The remaining arguments are filenames. The "--"
+option, when processed by grep tells grep that all following arguments are
+not to be processed as options, but as files. It's a common option in many
+programs... So, the new commandline, "grep -o -R -e 'search phrase' -- *",
+gives grep the following arguments:
+
+"-o"
+"-R"
+"-e"
+"search phrase"
+"--"
+"-dtest"
+"file"
+
+Grep processes the first four as you'd expect, gets to "--", and then
+interprets "-dtest" and "file" as filenames. the purpose of this is for
+precisely this situation -- when you have a file that looks like an option.
+Try to delete a file called "-rf" ...  :)
+
+
+&gt; guessing it might be used at the start of files/directories 
+&gt; in special 
+&gt; circumstances ?  I'm wondering this because I've been able to 
+&gt; create files & 
+&gt; directories beginning with '-' via my GUI (KDE) but am unable 
+&gt; to create them 
+&gt; at the command line, either in the manner 'mkdir '-dirname' 
+&gt; or by renaming 
+&gt; existing directories in the manner 'mv dirname '-dirname'  '. 
+&gt;  Either that, 
+&gt; or it's a glitch in KDE (or bash) that allows (or doesn't 
+&gt; allow) this ?
+
+Again, use the "--" option, and you will be able to create them. The quotes
+only change how the shell passes the argument to the program (specifically
+in terms of spaces and other field separators, and variable and wildcard
+expansion), not how the program interprets them. KDE probably shouldn't let
+you create filenames starting with - (or $, ;, and a bunch of other problem
+symbols), but I guess it doesn't actually affect KDE, only command-line
+utitilies (or programs run from shell scripts).
+
+The best thing to do is to refrain from creating files that start with - ...
+
+rr
+
+-- 
+Richard Russell
+Yellow Goanna P/L
+m: +61 412 827 805
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+w: <A HREF="http://www.yellowgoanna.com">http://www.yellowgoanna.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

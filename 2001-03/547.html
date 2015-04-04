@@ -1,0 +1,92 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Perl script/setuid" -->
+<!-- FromName="'Martin de Koning'" -->
+<!-- FromEmail="m1d2k3@camtech.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 17 Mar 2001 20:39:33 +1030" -->
+<!-- Id="20010317203933.6f9f6f9c.m1d2k3@camtech.net.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Perl script/setuid</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Martin de Koning &lt;<I><A HREF="mailto:m1d2k3@camtech.net.au">m1d2k3@camtech.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 17 Mar 2001 20:39:33 +1030
+</PRE>
+<H1>Perl script/setuid</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+Working on a script for easy ppp on/off in perl:
+
+#!/usr/bin/perl -w
+# PPP connect/disconnect script in Perl.
+# Written badly by Martin de Koning
+
+print "PPP Connect/Disconnect Script\n" ;
+
+if ( -e "/var/run/ppp0.pid") {
+	print "Ending current connection\n";
+	`killall -INT pppd` ;
+	
+	exit;
+	}
+else {
+	print "Creating PPP connection\n";
+	`pppd connect "chat -f /etc/ppp/camtech-chat\n"`;
+	
+	exit;
+	}
+
+I want to be able to run it from all user accounts:
+[<A HREF="mailto:root@lister">root@lister</A> ppp]# ls -l ppp-connect 
+-rwsr-xr-x    1 root     root          350 Mar 17 19:59 ppp-connect
+
+However, when running it from a non-root account I get this (This is with ppp0 up or down for that matter):
+[<A HREF="mailto:mdk@lister">mdk@lister</A> ppp]$ ./ppp-connect 
+PPP Connect/Disconnect Script
+Ending current connection
+Insecure $ENV{PATH} while running setuid at ./ppp-connect line 9.
+
+With the permissions I've set, the script should run with root permissions and therefore everything it calls should be called root permissions right? I know it's not the best security wise, but I should be able to do this I think. What do I have to change?
+
+mdk.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

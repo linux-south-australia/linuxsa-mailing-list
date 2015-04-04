@@ -1,0 +1,94 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Basic NFS Question" -->
+<!-- FromName="'Stephen White'" -->
+<!-- FromEmail="spwhite@chariot.net.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 3 Jul 2001 12:23:03 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.21.0107031200040.792-100000@localhost.localdomain" -->
+<!-- Reference="20010702230709.A25009@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Basic NFS Question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Stephen White &lt;<I><A HREF="mailto:spwhite@chariot.net.au">spwhite@chariot.net.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 3 Jul 2001 12:23:03 +0930 (CST)
+</PRE>
+<H1>Re: Basic NFS Question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, 2 Jul 2001, Alan Kennington wrote:
+
+&gt; Where symbolic links and NFS become interesting is where you
+&gt; make a symbolic link outside a file system on the _exporting_
+&gt; side of the NFS relation. Then can the importing side follow
+&gt; that link into the file system which is _not_ mounted
+&gt; by the importing host and _not_ exported by the exporting side?
+
+Let's take a step back...
+
+All files have no names, only inodes.
+
+A directory entry maps a name to an inode.
+
+A hard link maps another name to the same inode.
+
+A soft link maps a name to a text string. Eg:
+
+[<A HREF="mailto:steve@localhost">steve@localhost</A> steve]$ ln -s "some random text" a; ls -l a
+lrwxrwxrwx    1 steve    steve          16 Jul  3 12:09 a -&gt; some random text
+
+The C library and parts of the OS will automatically re-apply the text
+string as a filename, thus achiving a linking effect.
+
+So when considering imports, exports, and NFS mounts, the only question
+that needs to be asked is "is the filename valid when it's accessed?".
+
+So to answer your question, the answer is "yes". I used this technique
+to switch groups of consoles from one baseline to another, by setting
+softlinks on the NFS server that pointed to local files on the client
+hard drives. The server couldn't access those files itself.
+
+I wouldn't recommend this as a general purpose solution, since it's not
+a terribly nice combination of centralised configuration and distributed
+dependency. If the NFS server kicks the bucket, everything does.
+
+-- 
+  <A HREF="mailto:spwhite@chariot.net.au">spwhite@chariot.net.au</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

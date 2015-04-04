@@ -1,0 +1,156 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Blocking Code Red ingress to your ISP network" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@topology.org" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 11 Aug 2001 00:01:01 +0930" -->
+<!-- Id="20010811000101.A15460@dog.topology.org" -->
+<!-- Reference="GOEMLNICOMCOMGGLIKHFGEHODJAA.john@davey.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Blocking Code Red ingress to your ISP network</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@topology.org">akenning@topology.org</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Sat, 11 Aug 2001 00:01:01 +0930
+</PRE>
+<H1>Re: Blocking Code Red ingress to your ISP network</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, Aug 10, 2001 at 09:47:16PM +0930, John Davey wrote:
+&gt; iptables -I INPUT -i eth0 -p tcp --tcp-flags ACK ACK --dport 80 \
+&gt;  -m string --string '/default.ida?' -j REJECT --reject-with tcp-reset
+&gt; 
+&gt; But it will leave your web server in an idle state waiting for the
+&gt; GET.
+&gt; 
+&gt; Regards John
+
+
+John,
+
+It might be worse than that.
+After thinking a bit longer, I think that it is not possible
+to reduce byte load on a link through detection of the GET command.
+
+Here is a typical sequence:
+
+Let C = code-red-infected host.
+Let V = victim host with open port 80.
+
+C -&gt; V	SYN
+V -&gt; C	SYN/ACK
+C -&gt; V	ACK
+C -&gt; V	1500 bytes data	(segment 1)
+V -&gt; C	ACK
+C -&gt; V	1500 bytes data (segment 2)
+V -&gt; C	ACK
+C -&gt; V	938 bytes data (push) (segment 3)
+V -&gt; C	ACK
+V -&gt; C	1500 bytes data
+V -&gt; C 	90 bytes (push)
+V -&gt; C	FIN/ACK
+C -&gt; V	ACK
+C -&gt; V	RST
+C -&gt; V	RST
+
+This is from a particular packet trace.
+
+The first packet which indicates that this is a bad host is
+the 4th packet.
+Suppose the host IP C is blocked after this packet.
+Then you have two cases - either you block output to C also
+or you don't.
+
+If you block both directions, then C will continue to send the rest.
+From past experience, it might look like this:
+
+C -&gt; V	1500 bytes	segment 2
+C -&gt; V	938 bytes	segment 3
+[waiting....]
+C -&gt; V	1500 bytes  	segment 1
+{waiting....]
+C -&gt; V	1500 bytes	segment 1
+
+this typically goes on for a couple of minutes, with the
+retransmission time doubling on each transmission.
+(Linux does that anyway.)
+
+The result is clearly that I get more bytes of packets than I would
+if I hadn't blocked it.
+
+If I don't block output packets from host V, then host V will send
+ACKs for a while, and I think that C will also respond to these ACKs.
+I've seen this happen many times when I've blocked bad hosts
+on INPUT but not on OUTPUT.
+
+=======================================
+Conclusion:
+The profit in this sort of thing only comes when the same
+host C comes back.
+But Code Red I never used to return.
+Code Red II probes the same subnet, and even the same host,
+often.
+So the best strategy would be to add the host C to the list of
+blocked hosts _after_ it has finished probing one host.
+Then you won't get any more data bytes from it - just SYN packets.
+
+There are other problems of collateral damage:
+-	Suppose you get CR probes from host C which is
+	a proxy for 1000 employees.
+	Then you block all of them from your website!
+-	Suppose host C gets fixed.
+	Then you're still blocking that site to
+	genuine access after it's fixed.
+
+=======================================
+So.... 
+What exactly does the Cisco algorithm do?
+I imagine it just does a simple block as above
+on INPUT only, without building up a list of
+bad hosts.
+If so, then it is bad on the incoming link to the Cisco router,
+but good on the downstream.
+And it would protect IIS servers which have not been patched.
+
+It's not clear what it does.
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

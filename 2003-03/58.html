@@ -1,0 +1,124 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Filesystem hierarchy (was RE: recompiling the Redhat 7.3 kernel 2.4.18-3 what dir structure do I)" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richard@yellowgoanna.com" -->
+<!-- ToName="'Kim Hawtin'" -->
+<!-- ToEmail="kim@freesolutions.net" -->
+<!-- Date="Mon, 3 Mar 2003 10:16:45 +1030" -->
+<!-- Id="000f01c2e115$fd071da0$020120ac@skink" -->
+<!-- Reference="20030302231931.GW12891@freesolutions.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Filesystem hierarchy (was RE: recompiling the Redhat 7.3 kernel 2.4.18-3 what dir structure do I)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A></I>&gt;
+  To  : Kim Hawtin &lt;<I><A HREF="mailto:kim@freesolutions.net">kim@freesolutions.net</A></I>&gt;
+  Date: Mon, 3 Mar 2003 10:16:45 +1030
+</PRE>
+<H1>Filesystem hierarchy (was RE: recompiling the Redhat 7.3 kernel 2.4.18-3 what dir structure do I)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Kim, all,
+
+Kim Hawtin wrote:
+&gt; Mornen all,
+&gt; 
+&gt; On Mon, Mar 03, 2003 at 08:03:48AM +1030, David Lloyd wrote:
+&gt; &gt; man ln
+&gt; &gt; man hier
+&gt; &gt; man -k hier
+&gt; 
+&gt; After browsing through this I read through all the /var entries.
+&gt; 
+&gt; Now, I've read various configuration guides as to how to 
+&gt; split these file systems across disks/partitions, and I've 
+&gt; wondered about whether or no to split /var off onto its own 
+&gt; disk. Especially for a mail server or log server ...
+&gt; 
+&gt; Some guides say "don't do it", others are fairly vague on the issue.
+
+Hmm... surprised to hear guides saying "don't do it", unless these are
+for desktop systems...
+
+&gt; 
+&gt; So, the question is, what is the experience of the list on this?
+&gt; 
+&gt; For a mail server for example, should /var be a separate 
+&gt; disk, or should the IMAP/POP server have its mail folders in 
+&gt; home on its own disk ... or is there a better scheme?
+&gt; 
+&gt; Is there a good reason not to split /var onto its own disk 
+&gt; from the root volume? Like it needs to be mounted at boot 
+&gt; time for XXX reason.
+
+/var is commonly separate from /. This is because you do NOT, under any
+circumstances want to fill / up. That would be bad. Filling /var up is
+also bad, but won't kill your server entirely, just most of the daemons.
+/var does need to be mounted as daemons come up, but usually it would
+come up at a similar time to /usr, and most daemons would be run from
+/usr... so it should be fine...
+
+One thing to think about is that if a server has a specific other
+function, like it's a proxy, or a mail server, then the relevant
+directory there could be made its own partition with some real benefit.
+For eg, /var/spool/mail or /var/cache/squid could be separate. This
+means that if that particular function goes wrong somehow, and the
+partition fills up, everything else keeps working, so it's easier to
+fix.
+
+Also consider backups -- you may not want to backup /var/cache/squid at
+all... and if you're using dump, putting it on a separate partition
+helps. Perhaps there are different file access patterns, and you want to
+use reiser for the squid cache, as it's fast for small files, and ext3
+on a software RAID mirror for reliability...
+
+Of course, you must balance this with the simplicity and flexibility of
+one partition for everything, esp on a insignificant server or a
+desktop...
+
+Anyway, that's some food for thought.
+
+rr
+
+-- 
+Richard Russell
+Yellow Goanna Pty Ltd
+e: <A HREF="mailto:richard@yellowgoanna.com">richard@yellowgoanna.com</A>
+m: +61 412 827 805
+f: +61 8 8462 2362
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

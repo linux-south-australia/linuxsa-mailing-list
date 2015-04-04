@@ -1,0 +1,136 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: NIS or LDAP" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="Linux SA" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 04 Feb 2000 02:00:13 +1030" -->
+<!-- Id="38999F05.9761E81D@aarnet.edu.au" -->
+<!-- Reference="000e01bf6dff$eaa78b40$c2de26cb@asimov.hotspurbgc.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: NIS or LDAP</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Linux SA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 04 Feb 2000 02:00:13 +1030
+</PRE>
+<H1>Re: NIS or LDAP</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Andrew Pullin wrote:
+&gt; 
+&gt;     I have been considering setting up NIS for my home
+&gt; network (I also enjoy banging my head against walls). I was
+&gt; talking about this to someone the other day and they
+&gt; suggested that LDAP might be a better way to go. I have had
+&gt; a look at both the HOWTOs for NIS and LDAP and they "seem"
+&gt; straight forward enough to set up so basically I am left
+&gt; with the decision of which one. O.K. I suppose that my
+&gt; question now becomes "Which One?". Which is easier to set up
+&gt; and maintain? Which is more secure? Why is one better than
+&gt; the other? What other pros and cons are there to worry about
+&gt; that I may not have thought of?
+
+LDAP is a directory service.  To use that directory service
+you need to be authenticated, and LDAP provides a mechanism
+for doing this.  So you authenticate a user by seeing if
+you can access one of their private LDAP entries by using the
+password they supplied you.
+
+Problem, you need a password to do this.  No application in its
+right mind sends plain text passwords across the net.
+
+So its important to look for an LDAP server that supports a wide
+range of password authentication types: MD4 (for NT), MD5-digest
+(for WWW), CRAM-MD5 (for IMAP), Kerberos and so on.  OpenLDAP
+is not yet that server, but it probably will be by the end of the
+year.
+
+LDAP also sucks with notebooks.  You need to run a local
+LDAP server and replicate the tree containing the user
+attributes of the users that will use that machine.
+But the important thing is that you can: Kerberos just
+doesn't work with notebooks at all.
+
+NIS+ is solid, secure and here now.  But LDAP will replace it
+in the longer term.  NIS+ makes all sorts of assumptions
+about the operating system that effectively tie it to UNIX.
+
+
+To see where we are headed, a future corporate desktop machine
+will look like this:
+
+Boot
+
+ - gets IP address using DHCP.
+
+ - DHCP response contains the IP address of a Service Location
+   Protocol Server.
+
+ - desktop securely updates DNS to reflect the machine's new
+   IP address.
+
+Login
+
+ - location of root LDAP server requested from SLP.
+
+ - authenticates user against LDAP.  An LDAP ACL controls the machines,
+   times, etc that they can log in.
+
+ - if LDAP says 'yes' but there is no home directory, then one is
+   created and the initial files populated from looking up LDAP.
+   (or, alternatively, you could use a networked drive).
+
+ - User's preferred settings for "lp" and so on are retrived
+   from LDAP, verified against SLP, and set.
+
+Applications
+
+ - when you start an e-mail client, it looks up the address of the
+   IMAP server in SLP, and connects you to it.  Your IMAP password is
+   chceked against LDAP.
+
+ - you compose a message.  Your private key is fetched from LDAP to
+   sign the message.  Your recipient will check the message's veracty
+   by following the tree of LDAP servers, eventually asking your
+   LDAP server for your public key.
+
+As you can see, LDAP plays a major role in the future IETF corporate
+IP networking model.
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ Earth is a single point of failure
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

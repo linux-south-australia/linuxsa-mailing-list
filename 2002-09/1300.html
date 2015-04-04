@@ -1,0 +1,100 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Samba 2.2.5 + OpenLDAP 2.x - Caveats?" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="rsharpe@ns.aus.com" -->
+<!-- ToName="'Matthew Geddes'" -->
+<!-- ToEmail="mgeddes@tellurian.com.au" -->
+<!-- Date="Mon, 30 Sep 2002 11:55:30 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0209301149150.2822-100000@ns.aus.com" -->
+<!-- Reference="20020930005123.GP1406@hilarious.tellurian.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Samba 2.2.5 + OpenLDAP 2.x - Caveats?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A></I>&gt;
+  To  : Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  Date: Mon, 30 Sep 2002 11:55:30 +0930 (CST)
+</PRE>
+<H1>Re: Samba 2.2.5 + OpenLDAP 2.x - Caveats?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, 30 Sep 2002, Matthew Geddes wrote:
+
+&gt; On Mon, Sep 30, 2002 at 10:06:18AM +0930, Freeman, Peter (ERHS) wrote:
+&gt; &gt; Were there any issues in migrating existing users, ie: file permissions,
+&gt; &gt; profiles, etc?
+&gt; 
+&gt; It should be a straight migration from your old config to the new, with the
+&gt; exception of the additions to the config file to do with ldap and the config
+&gt; file options that can be moved into the LDAP directory (login script, home
+&gt; directory, profile path, etc)
+
+If you are planning to merge what are currently separate domains, with 
+different SIDs, into one domain, then you might have some problems with 
+profiles.
+
+Secondly, there is no support yet in the 2.2.x stream for changing your 
+domain SID, and since the SID is stored in the secrets.tdb file, this 
+might create problems (they need the same DOMAIN SID) as you might have to 
+use a binary editor on those files.
+
+Were you planning to create one domain with one Samba server as a PDC and 
+the others as BDCs? This is possible. However, a number of things have to 
+be right and have to be set up. Profiles are one issue in this case, but 
+there is code in Wine that might be usable to rummage through the 
+NTUSER.dat and change the security descriptor so that the SID of the user 
+matches the new domain.
+
+Under the soon to be released Samba 3.0.0 (Nov/Dec looks good at the 
+moment), you will be able to do:
+
+  net setlocalsid S-1-5-21-x-y-z 
+
+to set the SID on a machine, and 
+
+  net getlocalsid [NAME] 
+
+to retrieve the SID of the current name or any past name of the server 
+(which is handy in those cases where you needed to change the name of your 
+PDC, but don't want to have to rejoin the domain on all your clients).
+
+Regards
+-----
+Richard Sharpe, <A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A>, <A HREF="mailto:rsharpe@samba.org">rsharpe@samba.org</A>, 
+<A HREF="mailto:sharpe@ethereal.com">sharpe@ethereal.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

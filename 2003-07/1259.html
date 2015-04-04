@@ -1,0 +1,256 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="[OT] FreeBSD Newb-blog Part II" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 28 Jul 2003 20:07:19 -0700" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: [OT] FreeBSD Newb-blog Part II</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 28 Jul 2003 20:07:19 -0700
+</PRE>
+<H1>[OT] FreeBSD Newb-blog Part II</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Mutt
+
+Although I was able to get Mutt to work I just have to figure out how to get 
+emacs to wrap at 75 characters. In the meantime, I am using Kmail.
+
+Upgrade to KDE.
+
+I am not surprised this didn't work, SuSE was chucking wobblies with QT as 
+well.
+
+Basically I ran this command and received this output:
+
+&gt;FreeBSD# cd /usr/ports/x11/kde3/
+&gt;FreeBSD# make install clean
+&gt;===&gt;  Configuring for kdepim-3.1.2
+&gt;checking for Qt... configure: error: Qt (&gt;= Qt 3.1.0) (library qt-mt) not 
+&gt;found. Please check your installation!
+&gt;For more details about this problem, look at the end of config.log.
+&gt;Make sure that you have compiled Qt with thread support!
+&gt;===&gt;  Script "configure" failed unexpectedly.
+&gt;      Please report the problem to <A HREF="mailto:kde@FreeBSD.org">kde@FreeBSD.org</A> [maintainer] and attach
+&gt;      the "/usr/ports/deskutils/kdepim3/work/kdepim-3.1.2/config.log" 
+&gt;including
+&gt;      the output of the failure of your make command. Also, it might be a
+&gt;      good idea to provide an overview of all packages installed on your
+&gt;      system (e.g. an `ls /var/db/pkg`).
+&gt;*** Error code 1
+&gt;
+&gt;Stop in /usr/ports/deskutils/kdepim3.
+&gt;*** Error code 1
+&gt;Stop in /usr/ports/x11/kde3.
+
+I wrote the maintainer <A HREF="mailto:kde@FreeBSD">kde@FreeBSD</A> and he told me to run:"pkg_info | grep -i 
+qt" to find out what version of QT I had. He also said that I may have to add 
+packages manually. When I ran the command I got back: qt-3.0.5_5, so I tried 
+to do what I did with SuSE, remove the package. I looked in Grog's book and I 
+found package_delete, so I tried to remove it and I got this:
+
+&gt;FreeBSD# pkg_delete qt-3.0.5_5
+&gt;pkg_delete: package 'qt-3.0.5_5' is required by these other packages
+&gt;and may not be deinstalled:
+&gt;KSubeditor-0.13.r1
+&gt;arts-1.0.4,1
+&gt;es-kde-i18n-3.0.4
+&gt;kde-3.0.5
+&gt;kdebase-3.0.5
+&gt;kdegames-3.0.4
+&gt;kdegraphics-3.0.4
+&gt;kdelibs-3.0.5_1
+&gt;kdemultimedia-3.0.4
+&gt;kdenetwork-3.0.5
+&gt;kdeutils-3.0.4_1
+&gt;koffice-1.2,1
+&gt;kwatch-2.3.0_1
+&gt;mkultra-0.2.1
+&gt;qinx-0.4
+&gt;qt-bluecurve-theme-0.47
+
+Then I looked up information on forcing the removal of the packages:
+
+FreeBSD# man pkg_delete
+
+     -f      Force removal of the package, even if a dependency is recorded or
+             the deinstall or require script fails.
+
+Ok, time to force:
+
+&gt;FreeBSD# pkg_delete -f qt-3.0.5_5
+&gt;pkg_delete: package 'qt-3.0.5_5' is required by these other packages
+&gt;and may not be deinstalled (but I'll delete it anyway):
+&gt;KSubeditor-0.13.r1
+&gt;arts-1.0.4,1
+&gt;es-kde-i18n-3.0.4
+&gt;kde-3.0.5
+&gt;kdebase-3.0.5
+&gt;kdegames-3.0.4
+&gt;kdegraphics-3.0.4
+&gt;kdelibs-3.0.5_1
+&gt;kdemultimedia-3.0.4
+&gt;kdenetwork-3.0.5
+&gt;kdeutils-3.0.4_1
+&gt;koffice-1.2,1
+&gt;kwatch-2.3.0_1
+&gt;mkultra-0.2.1
+&gt;qinx-0.4
+&gt;qt-bluecurve-theme-0.47
+&gt;pkg_delete: unable to completely remove directory '/usr/X11R6/plugins'
+&gt;pkg_delete: couldn't entirely delete package (perhaps the packing list is
+&gt;incorrectly specified?)
+
+There was an error, but I have seen errors like this before and its usually 
+not a problem in Linux, so I went back to trying the upgrade:
+
+&gt;FreeBSD# cd /usr/ports/x11/kde3/
+&gt;FreeBSD# make install clean
+&gt;===&gt;  Installing for kde-3.1.2_1
+&gt;qt-x11-free-3.1.2.tar.bz2 doesn't seem to exist in /usr/ports/distfiles/KDE.
+&gt; Attempting to fetch from <A HREF="ftp://ftp.trolltech.com/qt/source/.">ftp://ftp.trolltech.com/qt/source/.</A>
+&gt;Receiving qt-x11-free-3.1.2.tar.bz2 (13358932 bytes): 100% (ETA 00:00)
+&gt;13358932 bytes transferred in 93.8 seconds (139.14 kBps)
+&gt;===&gt;  Extracting for qt-3.1.2_1
+&gt; Checksum OK for KDE/qt-x11-free-3.1.2.tar.bz2.
+&gt;===&gt;  Patching for qt-3.1.2_1
+&gt;===&gt;  Applying FreeBSD patches for qt-3.1.2_1
+&gt;===&gt;   qt-3.1.2_1 depends on shared library: Xft.2 - not found
+&gt;===&gt;    Verifying install for Xft.2 in /usr/ports/x11-fonts/Xft
+&gt; xft-2.1.2.tar.gz doesn't seem to exist in /usr/ports/distfiles/.
+&gt; Attempting to fetch from <A HREF="http://fontconfig.org/fontconfig/release/.">http://fontconfig.org/fontconfig/release/.</A>
+&gt;Receiving xft-2.1.2.tar.gz (243680 bytes): 100%
+&gt;243680 bytes transferred in 1.9 seconds (126.74 kBps)
+&gt;===&gt;  Extracting for Xft-2.1.2
+&gt;Checksum OK for xft-2.1.2.tar.gz.
+&gt;===&gt;  Patching for Xft-2.1.2
+&gt;===&gt;  Applying FreeBSD patches for Xft-2.1.2
+&gt;===&gt;  Building for Xft-2.1.2
+&gt;gmake  all-am
+&gt;cc -DHAVE_CONFIG_H -I. -I. -I. -I/usr/X11R6/include -I/usr/X11R6/include 
+&gt;-I/usr/local/include/freetype2 -I/usr/local/include -I/usr/X11R6/include -O 
+&gt;-pipe -mcpu=pentiumpro -MT xftdpy.lo -MD -MP -MF .deps/xftdpy.Tpo -c 
+&gt;xftdpy.c  -fPIC -o .libs/xftdpy.o
+&gt;xftdpy.c: In function `XftDefaultSubstitute':
+&gt;xftdpy.c:484: `FC_RGBA_UNKNOWN' undeclared (first use in this function)
+&gt;xftdpy.c:484: (Each undeclared identifier is reported only once
+&gt;xftdpy.c:484: for each function it appears in.)
+&gt;gmake[1]: *** [xftdpy.lo] Error 1
+&gt;gmake[1]: Leaving directory `/usr/ports/x11-fonts/Xft/work/xft-2.1.2'
+&gt;gmake: *** [all] Error 2
+&gt;*** Error code 2
+&gt;
+&gt;Stop in /usr/ports/x11-fonts/Xft.
+&gt;*** Error code 1
+&gt;
+&gt;Stop in /usr/ports/x11-toolkits/qt31.
+&gt;*** Error code 1
+&gt;
+&gt;Stop in /usr/ports/deskutils/kdepim3.
+&gt;*** Error code 1
+&gt;
+&gt;Stop in /usr/ports/x11/kde3.
+&gt;FreeBSD#
+
+Hmmmm. Looks like that isn't going to work. I don't know much about compilers. 
+I decideed to reinstall QT3.0.5 from the FTP site, and it went smoothly. I 
+retried the upgrade same error.
+
+So far, here is what happened:
+
+1. The set up program on the cd showed a message indicating that the 
+Xconfiguration failed in the setup screen. I picked the most conservative 
+settings, rebooted my machine and copied over my Linux Xf86config file, and 
+went with the syntax that looked native to FreeBSD if there was a difference. 
+Although I am happy with the resolution, the color is definitely off and the 
+graphics are fuzzy.
+
+2. I didn't have an option during setup to choose KDE and its window manager, 
+as my default login environment. As a result, I had to go into Linux to use 
+my web browser to research and set up KDE as my window manager.
+
+3. Sendmail had a strange sleeping error that has gone away but I don't know 
+how
+
+4. After changing my settings to use KDM to log in with, I could not log in at 
+all, and was forced to simply shut the machine off. I went back into Linux 
+and found a command to let me back in, and then I had to run fsck. After 
+that, my printer settings had gone vanilla and I no longer was required to 
+supply a root password. (Security Anyone?)
+
+5. I don't know how to add Reiser file sysyem support
+
+6. I can't set up the cups printers because I am not authorized even though I 
+am logged into the web page as root. In Netscape it just does a Netscape 7 
+search when I press on anything and I get 997000 search results.
+
+7. I am hopeful about the Netware Client but I haven't tried that yet.
+
+8. Samba Client, I have to look up syntax of /etc/fstab entries
+
+9. I have not tried a WineX or cross over office installations.
+
+10. The command I run in Linux to mount the FreeBSD partition does not work. 
+My source is Red Hat verified by the LDP:
+
+<A HREF="http://www.redhat.com/archives/redhat-install-list/2003-June/msg01624.html">http://www.redhat.com/archives/redhat-install-list/2003-June/msg01624.html</A>
+<A HREF="http://tldp.org/HOWTO/Linux+FreeBSD-5.html">http://tldp.org/HOWTO/Linux+FreeBSD-5.html</A>#ss5.1
+
+11. Mutt's word wrap is not behaving
+12. I have no sound, nothing in the book about it, so I will search the web.
+
+James Leone
+
+
+
+
+
+
+
+
+
+-- 
+Emailed from FreeBSD
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

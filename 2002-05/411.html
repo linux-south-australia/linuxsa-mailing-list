@@ -1,0 +1,150 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: your mail" -->
+<!-- FromName="'Richard Sharpe'" -->
+<!-- FromEmail="rsharpe@ns.aus.com" -->
+<!-- ToName="'Linh Yeung'" -->
+<!-- ToEmail="Linh.Yeung@aspect.com.au" -->
+<!-- Date="Mon, 13 May 2002 12:28:15 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0205131219170.1725-100000@ns.aus.com" -->
+<!-- Reference="3ACAE1985976D411857500A0C9D8E0D7390D66@aspadl02.adl.aspect.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: your mail</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Sharpe &lt;<I><A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A></I>&gt;
+  To  : Linh Yeung &lt;<I><A HREF="mailto:Linh.Yeung@aspect.com.au">Linh.Yeung@aspect.com.au</A></I>&gt;
+  Date: Mon, 13 May 2002 12:28:15 +0930 (CST)
+</PRE>
+<H1>Re: your mail</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, 13 May 2002, Linh Yeung wrote:
+
+&gt; Thanks David,
+&gt; 
+&gt; I've tried the following and this is what I get:
+&gt; 
+&gt; [linh]% dd if=/dev/nst0 of=tape.dd
+&gt; dd: /dev/nst0 device or resource busy
+
+Oh boy, you have come across one of the hardest areas of UNIX. Tape 
+handling :-)
+
+It is not clear what sequence of operations you have tried up to this 
+point, so it might be better to rewind the tape, which you should be able 
+to do with:
+
+   mt -f /dev/st0 rewind
+
+Then you should wait for the tape to finish rewindning, and try to check 
+the type of files on there.
+
+How many tar archives do you think are on each tape?
+
+If they were labelled, there will be a small label file at the front of 
+each tape.
+
+You can dd them off with the non-rewinding device, /dev/nst0, as david 
+suggested. The non-rewinding device does not rewind the tape when you 
+finish: it leaves the tape where it is. However, /dev/st0 always rewinds 
+when you close the device, so doing multiple tar commands or dd commands 
+will always get the same first file.
+ 
+You will also find that there is a zero-length file mark at the end of 
+each file.
+
+So, the following commands might help:
+
+  dd if=/dev/nst0 of=tape.1
+
+dd will tell you how big the file was (in blocks) as well with those two 
+funny numbers.
+
+  dd if=/dev/nst0 of=tape.2
+
+  dd if=/dev/nst0 of=tape.3
+
+and so on. At some point you will get an error since you will go past the 
+last file on the device.
+
+Then look at the sizes of the files, and issue the file command on the 
+larger of them:
+
+   file tape.3
+
+If it tells you that it is a gzip'd tar file or a tar file, you can use 
+the appropriate command on that <A HREF="file:">file:</A>
+
+   tar ztvf tape.3
+
+if the file is a gzip'd tar file, or
+
+   tar tvf tape.3
+
+if it is an ordinary tar file.
+
+&gt; [linh]% file tape.dd
+&gt; tape.dd: can't stat 'tape.dd' (No such file or directory)
+&gt; 
+&gt; [linh]% tar tf tape.dd
+&gt; tar: tape.dd: No such file or directory
+&gt; tar: error is not recoverable: exiting now
+&gt; 
+&gt; What does all this mean ? Sorry, I am very new to Linux, so you really have
+&gt; to hold my hand. Thanks for your quick reply.
+&gt; 
+&gt; 
+&gt; Linh Yeung
+&gt; Aspect Computing Pty Ltd
+&gt; 290 Glen Osmund Rd, Fullarton 5063
+&gt; Tel:8379 0466
+&gt; 
+&gt; 
+&gt; 
+&gt; ************************************************************************
+&gt; MIMEsweeper has been used to check this email for security
+&gt; ************************************************************************
+&gt; 
+&gt; 
+
+-- 
+Regards
+-----
+Richard Sharpe, <A HREF="mailto:rsharpe@ns.aus.com">rsharpe@ns.aus.com</A>, <A HREF="mailto:rsharpe@samba.org">rsharpe@samba.org</A>, 
+<A HREF="mailto:sharpe@ethereal.com">sharpe@ethereal.com</A>
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

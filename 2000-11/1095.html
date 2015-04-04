@@ -1,0 +1,77 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: a bevy of security announcements!!" -->
+<!-- FromName="'Martin Sandiford'" -->
+<!-- FromEmail="ms@mcdev.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="akenning@dog.topology.org" -->
+<!-- Date="27 Nov 2000 22:12:53 +1030" -->
+<!-- Id="m3lmu57i9u.fsf@plugh.mccorp.com.au" -->
+<!-- Reference="20001127141852.A694@dog.topology.org" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: a bevy of security announcements!!</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Martin Sandiford &lt;<I><A HREF="mailto:ms@mcdev.com.au">ms@mcdev.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  Date: 27 Nov 2000 22:12:53 +1030
+</PRE>
+<H1>Re: a bevy of security announcements!!</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Alan,
+
+This is really a design defect in the kernel definition/implementation
+of sys_write, rather than a bug in /dev/null.  It only shows up with
+/dev/null because you would need in excess of 4Gb of memory to achieve
+the same effect with a real device.
+
+As you probably know, 429496729 * 10 = -6 (in signed 32 bit numbers).
+Hence the 6 in errno.
+
+sys_write from the kernel returns -ve error values when an error occurs.
+The -ve value is assigned to errno on return.  This also applies with
+unsigned (size_t) counts are used that yield negative numbers when used
+as signed values.
+
+Here is (an approximation of) the ASM stub that is used for write calls
+in glibc:
+
+.text
+  ENTRY (write)
+    DO_CALL (3, write);
+    cmpl $-4095, %eax;
+    jae SYSCALL_ERROR_LABEL;
+  L(pseudo_end):
+
+The problem occurs with the "cmpl $-4095, %eax / jae SYSCALL_ERROR_LABEL".
+This means that return codes -4095..-1 will be processed as an error.
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

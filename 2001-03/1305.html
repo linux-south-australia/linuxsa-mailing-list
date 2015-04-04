@@ -1,0 +1,192 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: email message body" -->
+<!-- FromName="" -->
+<!-- FromEmail="ian_hogben@computercorp.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="davidn@rebel.net.au" -->
+<!-- Date="Fri, 30 Mar 2001 14:21:42 +0800" -->
+<!-- Id="8D502BF004AFD4119D8200508BB0F744110568@PERMAIL01" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: email message body</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: &lt;<I><A HREF="mailto:ian_hogben@computercorp.com.au">ian_hogben@computercorp.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  Date: Fri, 30 Mar 2001 14:21:42 +0800
+</PRE>
+<H1>RE: email message body</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+This one goes down in my list of "excellent references". It is really well
+laid out and descriptive. Thanks!
+
+PS: I recommend you read this, even if you are *not* Essy Ren! Why should he
+get all the good stuff? :]
+
+* -----Original Message-----
+* From: David Newall [mailto:<A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A>]
+* Sent: Friday, 30 March 2001 14:16
+* To: Essy Ren
+* Cc: <A HREF="mailto:qmail-help@list.cr.yp.to">qmail-help@list.cr.yp.to</A>; <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+* Subject: Re: email message body
+* 
+* 
+* Warning: quite tedious tutorial follows.  I recommend you skip this
+* email if you are not Essy Ren.
+* 
+* 
+* &gt; #!/bin/bash
+* &gt; perl /home/essy/public_html/perl/http -r www.ojolali.com &gt; hasil12;
+* &gt; grep -i 200 /home/essy/public_html/perl/hasil12 &gt; 
+* /usr/backup/error12;
+* &gt; if grep -i 200 /usr/backup/error12; then
+* &gt; {
+* &gt; (cat /usr/backup/error12 | uuencode error12 ; echo "ojolali 
+* oke") | /var/qmail/bin/qmail-inject <A HREF="mailto:essy@plexis.local">essy@plexis.local</A>
+* &gt; }
+* &gt; fi
+* 
+* The beauty of unix is that it has real pipelines.  The first 
+* two commands
+* (above) run quicker if expressed as:
+* 
+*   perl /.../http -r www.ojolali.com | grep -i 200 &gt; 
+* /usr/backup/error12
+* 
+* The grep expression matches lines that contain the string 
+* "200".  It does
+* so use case-insensitive matching, but of course 200 is the 
+* same in upper
+* and lower cases, so maybe it's easier to wrap your head around this:
+* 
+*   perl /.../http -r www.ojolali.com | grep 200 &gt; /usr/backup/error12
+* 
+* You don't need braces around the statements in the then 
+* clause of if.  It's
+* the same to write:
+* 
+*  if grep -i 200 /usr/backup/error12; then
+*  (cat /.../error12 | uuencode error12 ; echo "ojolali oke") | 
+* /.../qmail-inject ...
+*  fi
+* 
+* Uuencode can take it's input from stdin or from a named file.  You've
+* made a common mistake: using cat to send a file as stdin to a command
+* that could have read the file for itself.  It's less efficient to do
+* that.  Your then statements work faster like this:
+* 
+*  (uuencode /usr/backup/error12 error12 ; echo "ojolali oke") | ...
+* 
+* Grep only returns a zero result code if it finds a match, so the if
+* statement is really saying, "if 200 can be found in 
+* /usr/backup/error12.
+* Of course every line in that file contains the string 200.  The file
+* necessarily is either empty or it contains 200.  Your script 
+* writes the
+* lines containing 200 to stdout as well as mailing them (using qmail).
+* Probably you really meaned to say, "if /usr/backup/error12 is 
+* not empty",
+* which you do using test -s:
+* 
+*   if test -s /usr/backup/error12; then
+* 
+* Many people prefer to use '[' instead of test.  (That's an actual
+* command, folks.  It's in /usr/bin.)  They'd write:
+* 
+*   if [ -s /usr/backup/error12 ]; then
+* 
+* Both are the same.
+* 
+* Looking again at your original use of grep in the if 
+* statement.  There's
+* nothing wrong with using a commands' return code like that.  
+* Your script
+* would be quite correct written like this:
+* 
+*   if perl /.../http -r www.ojolali.com | grep -i 200 &gt; 
+* /.../error12; then
+*   (uuencode /usr/backup/error12 error12 ; echo "ojolali oke") 
+* | /.../qmail-inject ...
+*   fi
+* 
+* This just removes the obvious faults with your code.  If it 
+* didn't work
+* before it still won't work.  What it will do is email the 
+* line "ojolali
+* oke" preceeded by a uuencoded copy of all lines that contain 
+* the string
+* 200.  I doubt that's what you really wanted.
+* 
+* A guess: Are you trying to retrieve www.ojolali.com and email it to
+* yourself?  That's not what your code does.  For example if the server
+* returns a redirect and a datestamp, you will match the datestamp (e.g.
+* 31 April, 2001).  To email the page if the server returns code 200 you
+* must check only the first line of the output file.
+* 
+*   perl /home/essy/public_html/perl/http -r www.ojolali.com &gt; hasil12;
+*   if head -1 hasil12 | grep '200'; then
+*     ...
+*   fi
+* 
+* Did you want the subject line to be "ojolali oke" if the 
+* server returned
+* 200?  I don't know how you would do that using qmail, but you 
+* could use
+* the standard unix mail program like this:
+* 
+*   uuencode hasil12 hasil12 | mail -s "ojolali oke" <A HREF="mailto:essy@plexis.local">essy@plexis.local</A>
+* 
+* Don't forget to remove the temporary file when you exit.  Do 
+* this using
+* a trap.  Thus:
+* 
+*   trap 'rm -f hasil12; exit' 0
+*   perl /home/essy/public_html/perl/http -r www.ojolali.com &gt; hasil12;
+*   if head -1 hasil12 | grep '200'; then
+*     uuencode hasil12 hasil12 | mail -s "ojolali oke" <A HREF="mailto:essy@plexis.local">essy@plexis.local</A>
+*   fi
+* 
+* -- 
+* LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on 
+* irc.linux.org.au
+* To unsubscribe from the LinuxSA list:
+*   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as 
+* the subject
+* 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

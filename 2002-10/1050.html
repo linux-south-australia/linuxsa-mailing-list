@@ -1,0 +1,177 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: DNS Lookups" -->
+<!-- FromName="'Michael Kratz'" -->
+<!-- FromEmail="mkratz@agile.com.au" -->
+<!-- ToName="'Jim O'Halloran','Andrew Pullin'" -->
+<!-- ToEmail="jim@kendle.com.au,andrew@hotspurbgc.com.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Thu, 17 Oct 2002 15:46:30 +0930" -->
+<!-- Id="0a5801c275a4$c1cf9b90$cae753c0@internode.com.au" -->
+<!-- Reference="C16C7A51BA30D51187EE0000E8D8C9972F88F6@int-gw.kendle.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: DNS Lookups</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Michael Kratz &lt;<I><A HREF="mailto:mkratz@agile.com.au">mkratz@agile.com.au</A></I>&gt;
+  To  : Jim O &lt;<I><A HREF="mailto:jim@kendle.com.au">jim@kendle.com.au</A></I>&gt;<BR>        Andrew Pullin &lt;<I><A HREF="mailto:andrew@hotspurbgc.com.au">andrew@hotspurbgc.com.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Thu, 17 Oct 2002 15:46:30 +0930
+</PRE>
+<H1>Re: DNS Lookups</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Jim, probably good to add a few more lines in so its like this:
+
+options {
+        directory "/var/named";
+        version "None of your business";
+        forward first;
+        listen-on {
+                127.0.0.1;
+      };
+        forwarders {
+                139.130.4.4;
+                203.50.2.71;
+      };
+
+
+FYI 203.50.2.71 is the secondary after 139.130.4.4 (for Telstra
+InternetDirect customers)
+
+Regards,
+
+Michael
+
+
+----- Original Message -----
+From: "Jim O'Halloran" &lt;<A HREF="mailto:jim@kendle.com.au">jim@kendle.com.au</A>&gt;
+To: "'Andrew Pullin'" &lt;<A HREF="mailto:andrew@hotspurbgc.com.au">andrew@hotspurbgc.com.au</A>&gt;; &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Sent: Thursday, October 17, 2002 3:24 PM
+Subject: RE: DNS Lookups
+
+
+&gt; Andrew,
+&gt;
+&gt; I was recently setting up an RH7.3 machine as a NAT gateway...  I found I
+&gt; could ping domain names from the Linux box itself, but named on the
+gateway
+&gt; didn't seem to be working.  which meant that  I couldn't ping domain names
+&gt; from a windows box on the "private" side of the NAT box.  I ended up
+adding
+&gt; a forwarders line in my /etc/named.conf file like so...
+&gt;
+&gt;
+&gt; options {
+&gt;         directory "/var/named";
+&gt;         forwarders { 139.130.4.4; };
+&gt; };
+&gt;
+&gt; ... so that the named on this machine will forward all queries to
+Telstra's
+&gt; DNS for resolution.
+&gt;
+&gt; Hope that helps.
+&gt;
+&gt; Jim.
+&gt;
+&gt; -----Original Message-----
+&gt; From: Andrew Pullin [mailto:<A HREF="mailto:andrew@hotspurbgc.com.au">andrew@hotspurbgc.com.au</A>]
+&gt; Sent: Thursday, 17 October 2002 15:10
+&gt; To: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; Subject: DNS Lookups
+&gt;
+&gt;
+&gt; Hi All,
+&gt;     Before I start my new question, thanks to all who helped
+&gt; with my Apache problem. It still doesn't work 100% the way
+&gt; it was supposed to, but the important bit does. It was
+&gt; solved by individually listing the <A HREF="http://server.site">http://server.site</A> , and
+&gt; <A HREF="http://www.site">http://www.site</A> separately on the Telstra DNS servers.
+&gt;
+&gt;     Speaking of DNS, I have run across this problem before
+&gt; and forgotten how to fix it, and it sounds similar to the
+&gt; "Internet access" thread that has been running today, but
+&gt; the suggestions haven't fixed this problem.
+&gt;
+&gt;     I have just installed a dual boot machine with RH7.3,
+&gt; (yeah I know RH8.0 is out but it was handy at the time and
+&gt; was adequate for the task). Now normally I don't have any
+&gt; problems setting up a new machine and getting it working,
+&gt; but this is the first time I have set up 7.3 and so I am
+&gt; sure that this problem is something turned off by default I
+&gt; am not aware of or something that has changed.
+&gt;
+&gt;     Basically what is happening is that the Windoze side
+&gt; works fine (ie. mail, surfing etc.), but when I dual boot
+&gt; into Linux, routing is working (I can ping IP addresses),
+&gt; but DNS lookups are not (I cannot ping domain names, or surf
+&gt; or nslookup etc).
+&gt;
+&gt;     I have checked my /etc/resolve.conf file and it has the
+&gt; name servers correctly. I have checked /etc/hosts,
+&gt; /etc/hosts.allow and /etc/hosts.deny and they are set up
+&gt; properly. Routing is working properly and route -n returns
+&gt; the correct gateway information. The gateway server is set
+&gt; up correctly to let requests through from this machine (well
+&gt; it works for windoze and has worked for Linux using the same
+&gt; IP addresses before).  The machine in question has an IP
+&gt; allocated to this network and Telstra DNS "knows" about this
+&gt; machine.
+&gt;
+&gt;     From the similar discussion on the "Internet access"
+&gt; thread, I have turned off iptables (the gateway firewall is
+&gt; keeping people out that need to be at present). I have set
+&gt; up ipchains on the dual boot machine just in case. shorewall
+&gt; is not installed, and prelude seems to refer to the scheme
+&gt; interpreter and nothing else. Now I know this is a simple
+&gt; fix and I will probably say "Doh!" when I see it, but your
+&gt; help would be greatly appreciated. TIA.
+&gt;     Cheers!
+&gt;         Andrew.
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on
+&gt; irc.openprojects.net
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on
+irc.openprojects.net
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

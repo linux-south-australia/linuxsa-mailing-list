@@ -1,0 +1,208 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="DNS naming practice (was: DNS problem)" -->
+<!-- FromName="Glen Turner" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="Linuxsa" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 28 Aug 2000 15:47:55 +0930" -->
+<!-- Id="39AA0413.883B0F70@aarnet.edu.au" -->
+<!-- Reference="NDBBJCENILPHMJMEFMGNCEGFCNAA.ian@safcol.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: DNS naming practice (was: DNS problem)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Linuxsa &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Mon, 28 Aug 2000 15:47:55 +0930
+</PRE>
+<H1>DNS naming practice (was: DNS problem)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Robert Wuttke wrote:
+&gt; 
+&gt; Actually the domain is mapped into the DNS server. This is allowed and is
+&gt; used a lot. Remember www is just a convenience, nothing else, just like ftp,
+&gt; gohper, nntp, etc...
+&gt; 
+&gt; The domain is also a valid machine name.
+
+Afraid not.
+
+The delegation is done by NS records, these are not the same as the
+A records that translate names into IP address.
+
+Nor is "ftp", "www", etc a convenience.  It's an attempt to allow
+a service to be moved without having to inform the whole world.
+
+For example, AARNet once told the world to get their FTP files
+from
+   plaza.aarnet.edu.au.  IN  A  1.2.3.4
+but this machine is a very old DEC station and was retired.  Five years
+later we still get e-mails to <A HREF="mailto:postmaster@aarnet.edu.au">postmaster@aarnet.edu.au</A> complaining that
+plaza is down.
+
+Now we put our HTTP files on one of our public access servers, say
+  tiny-teddy.aarnet.edu.au.  IN  A  203.21.37.30
+and point the public names to it
+  www.aarnet.edu.au.  IN  CNAME  tiny-teddy.aarnet.edu.au.
+
+So we can now move the web site from tiny-teddy to, say, timtam
+without having to tell the whole world, change documentation, etc.
+
+            -----------------------------------
+
+To answer the original poster's question, the best (but not the
+only) way to set up your DNS is:
+
+1.  Put your server into DNS as usual:
+
+&gt; $ORIGIN aarnet.edu.au.
+&gt; tiny-teddy	IN      A       203.21.37.30
+&gt; ; Mail
+&gt; 		IN      MX      10 tiny-teddy.aarnet.edu.au.
+&gt;         	IN      MX      20 quandong.itd.adelaide.edu.au.
+&gt; 		IN	MX	30 wildthing.internet2.edu.
+&gt; ; Hardware and operating system architectures
+&gt;         	IN      HINFO   "IBM-PC" "UNIX"
+&gt; ; E-mail of machine owner
+&gt;               IN      RP      gdt.rp.aarnet.edu.au.
+&gt; ; Longitude/Latitude for visual traceroute
+&gt;         	IN      LOC     34 56 00.000 S 138 36 00.000 E 40.00m 1.00m 10000.00m 10
+&gt; ; Ethernet address
+&gt;		IN	NSAP	0x00.0000.00.000000.0000.0000.0000.00.00e214253c.00
+
+Note that each machine is named following a theme.  For AARNet
+that is Arnott's biscuits.  Internet2 uses song titles.  Don't
+name machines after: people, places, organisational units.  A
+machine should have the same name from initial purchase to disposal.
+
+2. Set up aliases for the services that the server provides:
+
+&gt; $ORIGIN aarnet.edu.au.
+&gt; www		IN	CNAME	tiny-teddy.aarnet.edu.au.
+&gt; syslog	IN	CNAME	tiny-teddy.aarnet.edu.au.
+&gt; lists		IN	CNAME	tiny-teddy.aarnet.edu.au.
+&gt; $ORIGIN office.aarnet.edu.au.
+&gt; ftp		IN	CNAME	tiny-teddy.aarnet.edu.au.
+
+The "office" sub-domain allows us to have a different internal
+server and external server for each protocol -- for example
+a public and "office" FTP server.
+
+In the case above, tiny-teddy is also the "aarnet.edu.au" mail
+server:
+
+&gt; $ORIGIN office.aarnet.edu.au.
+&gt; smtp		IN	CNAME	tiny-teddy.aarnet.edu.au.
+&gt; imap		IN	CNAME	tiny-teddy.aarnet.edu.au.
+&gt; $ORIGIN edu.au.
+&gt; aarnet	IN	MX	10 tiny-teddy.aarnet.edu.au.
+&gt; 		IN	MX	20 quandong.itd.adelaide.edu.au.
+&gt; 		IN	MX	30 wildthing.internet2.edu.
+
+3. Configure the servers to cope with having a differing external name
+   from their reverse-DNS name:
+
+Apache: /etc/httpd/conf/httpd.conf
+&gt; ServerAdmin <A HREF="mailto:webmaster@aarnet.edu.au">webmaster@aarnet.edu.au</A>
+&gt; ServerName www.aarnet.edu.au
+
+WU-FTP: /etc/ftpaccess
+email <A HREF="mailto:webmaster@aarnet.edu.au">webmaster@aarnet.edu.au</A>
+hostname ftp.office.aarnet.edu.au
+greeting text FTP server ftp.office.aarnet.edu.au ready
+banner /etc/issue.net
+message /etc/motd LOGIN
+
+Sendmail: /etc/aliases
+&gt; webmaster: gdt
+Sendmail: /etc/sendmail.mc
+&gt; FEATURE(`masquerade_entire_domain')
+&gt; FEATURE(`masquerade_envelope')
+&gt; MASQUERADE_AS(aarnet.edu.au)
+&gt; MASQUERADE_DOMAIN(tiny-teddy.aarnet.edu.au)
+&gt; EXPOSED_USER(root)
+&gt; ### Local Ruleset 1, rewrite sender header & envelope ##
+&gt; ########################################################
+&gt; #Thanks to Bjart Kvarme &lt;<A HREF="mailto:bjart.kvarme@usit.uio.no">bjart.kvarme@usit.uio.no</A>&gt;
+&gt; S1
+&gt; R$-                     $1 &lt; @ $j . &gt;                   user =&gt; <A HREF="mailto:user@localhost">user@localhost</A>
+&gt; R$- &lt; @ $=w . &gt; $*      $: $1 &lt; @ $2 . &gt; $3 ?? $1       <A HREF="mailto:user@localhost">user@localhost</A> ?
+&gt; R$+ ?? $+               $: $1 ?? $(userdb $2:mailname $: @ $)
+&gt; R$+ ?? @                $@ $1                           Not found
+&gt; R$+ ?? $+               $&gt;3 $2                          Found, rewrite
+
+4. Optionally, set up an alias for people that use the name of the domain.
+   My personal view is that it is best to allow this to fail, as although
+   the web might be popular today, it may not be in five years time and
+   then you'll have to place the web and future server on the same machine.
+
+&gt; $ORIGIN edu.au.
+&gt; aarnet	IN	CNAME	tiny-teddy.aarnet.edu.au.
+
+You can also use A records rather than CNAME records to point
+to a service.  I suggest you don't do this.  Things work
+as expected if you have just only A record for hosts with
+a matching PTR record:
+
+&gt; $ORIGIN aarnet.edu.au.
+&gt; sao		IN	A	1.2.3.4
+
+&gt; $ORIGIN 3.2.1.in-addr.arpa.
+&gt; 4		IN	PTR	sao.aarnet.edu.au.
+
+For hosts with multiple interfaces, list then multiple
+times with the same machine name and things will work
+as you expect:
+
+&gt; $ORIGIN aarnet.edu.au.
+&gt; sao		IN	A	1.2.3.4
+&gt; sao		IN	A	5.6.7.8
+
+&gt; $ORIGIN 3.2.1.in-addr.arpa.
+&gt; 4		IN	PTR	sao.aarnet.edu.au.
+
+&gt; $ORIGIN 7.6.5.in-addr.arpa.
+&gt; 5		IN	PTR	sao.aarnet.edu.au.
+
+
+-- 
+ Glen Turner                                 Network Engineer
+ (08) 8303 3936      Australian Academic and Research Network
+ <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>          <A HREF="http://www.aarnet.edu.au/">http://www.aarnet.edu.au/</A>
+--
+ The revolution will not be televised, it will be digitised
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

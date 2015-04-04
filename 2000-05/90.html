@@ -1,0 +1,98 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Various questions" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Mark Phillips" -->
+<!-- ToEmail="mark@ist.flinders.edu.au" -->
+<!-- Date="Wed, 3 May 2000 10:03:32 +0930" -->
+<!-- Id="20000503100331.B60154@atdot.dotat.org" -->
+<!-- Reference="E12mlj5-0006DP-00@localhost" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Various questions</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Mark Phillips &lt;<I><A HREF="mailto:mark@ist.flinders.edu.au">mark@ist.flinders.edu.au</A></I>&gt;
+  Date: Wed, 3 May 2000 10:03:32 +0930
+</PRE>
+<H1>Re: Various questions</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, May 03, 2000 at 08:35:09AM +0930, Mark Phillips wrote:
+
+ &gt; Is it true that _every_ process has three files opened associated with
+ &gt; that process: stdin, stdout and stderr?
+ 
+Usually, yes.  But it's only a convention:  If you do the following:
+
+     close(0);
+     close(1);
+     close(2);
+
+then fork() a new process, the new process will inherit an environment
+which doesn't include stdin, stdout and stderr (what it'll usually do,
+of course, is to open /dev/null or /dev/console to provide them, but,
+again, that's not mandatory).
+
+ &gt; When a cron job starts a process, what is used for stdin, stdout and
+ &gt; stderr?
+
+stdin:    /dev/null
+stdout, stderr:  An unnamed pipe connected to the "mail" command, so that
+output and errors find their way back to the user who owns the cronjob
+(it's actually a bit more complicated than that - the pipe is really 
+connected to crond, which only starts up the "mail" command if the 
+cronjob actually generates output -- no mail is sent if the job works
+silently).
+
+ &gt; How does a shell know whether to be interactive or not, and what
+ &gt; causes a shell to change from non-interactive mode to interactive, or
+ &gt; vice versa?
+
+Look at the manpage for "isatty()", which a process can use to determine
+whether stdin is a terminal device or not.  
+
+Shells don't change from non-interactive mode to interactive mode;  they're
+invoked in one mode or the other, and stay that way for the duration of
+their runtime.
+
+    - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

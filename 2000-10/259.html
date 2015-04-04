@@ -1,0 +1,154 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: routing" -->
+<!-- FromName="Leigh Hart" -->
+<!-- FromEmail="hart@dotat.com" -->
+<!-- ToName="Daryl Pilkington" -->
+<!-- ToEmail="darylp@senet.com.au" -->
+<!-- Date="Mon, 09 Oct 2000 07:41:47 +0930" -->
+<!-- Id="200010082211.HAA22972@at.dotat.com" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: routing</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Leigh Hart &lt;<I><A HREF="mailto:hart@dotat.com">hart@dotat.com</A></I>&gt;
+  To  : Daryl Pilkington &lt;<I><A HREF="mailto:darylp@senet.com.au">darylp@senet.com.au</A></I>&gt;
+  Date: Mon, 09 Oct 2000 07:41:47 +0930
+</PRE>
+<H1>Re: routing</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Daryl,
+
+Daryl Pilkington &lt;<A HREF="mailto:darylp@senet.com.au">darylp@senet.com.au</A>&gt; wrote:
+&gt;
+&gt; There is one physical LAN, running from a dumb 10MB hub, so there is 1
+&gt; collision domain.
+
+This is probably why you are seeing confusing results - try running
+with host #1 and the router in the hub, and host #2 linked to the
+router with a crossover ethernet cable - you have two seperate NICs
+in the router, why not use them?  :)
+
+&gt;  host #1                 router                host #2
+&gt; 10.2.1.35              10.2.1.250           192.168.1.100
+&gt;                       192.168.1.250
+&gt; 
+&gt;                              Ping?
+&gt; 10.2.1.35 -&gt; 10.2.1.250        Y
+&gt; 10.2.1.35 -&gt; 192.168.1.250     Y
+&gt; 10.2.1.35 -&gt; 192.168.1.100     Y
+&gt; 
+&gt;                             Telnet?
+&gt; 10.2.1.35 -&gt; 10.2.1.250        Y
+&gt; 10.2.1.35 -&gt; 192.168.1.250     N
+&gt; 10.2.1.35 -&gt; 192.168.1.100     N
+&gt; 
+&gt; 
+&gt; HOST #1
+&gt; \mptn\bin\setup.cmd
+&gt; route -fh
+&gt; arp -f
+&gt; inetcfg -s synattack 1
+&gt; inetcfg -s keepalive 60
+&gt; inetcfg -s multidefrt 0
+&gt; ifconfig lo 127.0.0.1
+&gt; ifconfig lan0 10.2.1.35 netmask 255.255.255.0 mtu 1500
+&gt; route add -net 192.168.1.0 10.2.1.250 -netmask 255.255.255.0
+&gt; route add default 10.2.1.1
+&gt; ipgate off
+&gt; 
+&gt; netstat -r
+&gt; destination router        netmask         metric flags intrf
+&gt; 
+&gt; default     10.2.1.1      0.0.0.0         0      UGSP   lan0
+&gt; 10.2.1      10.2.1.35     255.255.255.0   0      UC     lan0
+&gt; 127.0.0.1   127.0.0.1     255.255.255.255 0      UH     lo
+&gt; 192.168.1   10.2.1.250    255.255.255.0   0      UGSP   lan0
+&gt; 
+&gt; ROUTER
+&gt; \mptn\bin\setup.cmd
+&gt; route -fh
+&gt; arp -f
+&gt; inetcfg -s synattack 1
+&gt; inetcfg -s keepalive 60
+&gt; inetcfg -s multidefrt 1
+&gt; ifconfig lo 127.0.0.1
+&gt; ifconfig lan0 10.2.1.250 netmask 255.255.255.0 mtu 1500
+&gt; route add default 10.2.1.250
+&gt; ifconfig lan1 192.168.1.250 netmask 255.255.255.0 mtu 1500
+&gt; route add default 192.168.1.250
+&gt; ipgate on
+
+You have two default routes here - pick one and remove the other
+and disable multidefrt.
+
+You don't need two default routes, all that does is cause the
+router to load share packets to destinations the router doesn't
+have a routing entry for via the two seperate default routes, ie
+in two different directions each time it sees packets!
+
+Utterly useless and just adds to the confusion :)
+
+&gt; netstat -r
+&gt; destination   router        netmask         metric flags intrf
+&gt; 
+&gt; default       10.2.1.250    0.0.0.0         0      UCSP  lan0
+&gt; default       192.168.1.250 0.0.0.0         0      UCSP  lan1
+&gt; 10.2.1        10.2.1.250    255.255.255.0   0      UC    lan0
+&gt; 127.0.0.1     127.0.0.1     255.255.255.255 0      UH    lo
+&gt; 192.168.1.250 192.168.1.250 255.255.255.0   0      UC    lan1
+&gt; 
+&gt; I know there is some smart network people out there, any ideas?
+
+Try the above (seperate collision domains, one default route) and
+you'll probably find that either that the pings will stop working,
+or telnet will work.
+
+I'm not familiar enough with OS/2 to guess which one will be most
+likely here :-)
+
+Good luck!
+
+Cheers
+
+Leigh
+-- 
+| "By the time they had diminished | Leigh Hart, <A HREF="mailto:hart@dotat.com">hart@dotat.com</A> |
+|  from 50 to 8, the other dwarves | CCNA: <A HREF="http://www.cisco.com">http://www.cisco.com</A> |
+|  began to suspect 'Hungry' ..."  | PO Box 3057 Newton SA 5074 |
+|   -- Gary Larson, "The Far Side" | <A HREF="http://www.dotat.com/hart/">http://www.dotat.com/hart/</A> |
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

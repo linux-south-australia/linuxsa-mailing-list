@@ -1,0 +1,273 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: who is dialed up?  pppd server" -->
+<!-- FromName="'nik [tm]'" -->
+<!-- FromEmail="tmcruisin@sond.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="mwestern@affairs.net.au,linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 17 Apr 2002 16:51:54 +0930" -->
+<!-- Id="00d801c1e5e0$8ceaaef0$0301a8c0@nick" -->
+<!-- Reference="FD14944A4C95D211AF350004AC4C55A4058607D5@MX" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: who is dialed up?  pppd server</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: nik [tm] &lt;<I><A HREF="mailto:tmcruisin@sond.com.au">tmcruisin@sond.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:mwestern@affairs.net.au">mwestern@affairs.net.au</A></I>&gt;<BR>        &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 17 Apr 2002 16:51:54 +0930
+</PRE>
+<H1>Re: who is dialed up?  pppd server</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi all,
+
+I have a similar config pppd & mgetty and I found that w does show both the
+a_ppp and the users referenced to that dial up..
+
+16:48:55 root ~ &gt; w
+  4:49pm  up 56 days,  1:02,  4 users,  load average: 0.16, 0.03, 0.01
+USER     TTY      FROM              LOGIN@   IDLE   JCPU   PCPU  WHAT
+a_ppp    ttyS0    38400             4:49pm  3.00s  0.06s   ?     -
+nick     ttyS0    ppp00             4:49pm  3.00s  0.06s   ?     -
+
+I did find also that a;
+grep pppd /var/log/messages | grep user
+
+Apr 14 15:54:09 station pppd[27539]: user c-grind logged in
+Apr 16 11:22:33 station pppd[32026]: user c-grind logged in
+Apr 16 19:23:28 station pppd[421]: user c-grind logged in
+Apr 17 09:59:20 station pppd[2014]: user nick logged in
+Apr 17 12:53:48 station pppd[2342]: user c-grind logged in
+Apr 17 16:49:36 station pppd[2780]: user nick logged in
+
+shows the user who connected at what time - but doesnt say who is currently
+connected
+
+a;
+16:51:59 root ~ &gt; grep pppd /var/log/messages | grep "Connection terminated"
+Apr 14 16:13:28 station pppd[27539]: Connection terminated.
+Apr 16 11:24:09 station pppd[32026]: Connection terminated.
+Apr 16 19:25:27 station pppd[421]: Connection terminated.
+Apr 17 10:00:21 station pppd[2014]: Connection terminated.
+Apr 17 12:55:22 station pppd[2342]: Connection terminated.
+Apr 17 16:51:03 station pppd[2780]: Connection terminated.
+
+shows disconnected times
+
+but it is strange that w doesnt show the user and mine does..
+how is your pppd configured? maybe there is something in there to say
+display it like that??
+
+nik [tm]
+
+·´¯`·.¸¸..&gt;&lt;((((º&gt;.·´¯`·.¸¸.·´¯`·.¸
+ &gt;&lt;((((º&gt;`·.¸¸.·´¯`·.¸&gt;&lt;((((º&gt;`·.¸
+
+----- Original Message -----
+From: "Matthew Western" &lt;<A HREF="mailto:mwestern@affairs.net.au">mwestern@affairs.net.au</A>&gt;
+To: &lt;<A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>&gt;
+Sent: Wednesday, April 17, 2002 4:46 PM
+Subject: RE: who is dialed up? pppd server
+
+
+&gt; Hmm,
+&gt; Still no luck, anybody else got any ideas?  i can cat /var/log/messages
+and
+&gt; see who has logged in and out in the past nicely, but w or who doesn't
+show
+&gt; anything.  very sad....
+&gt;
+&gt; i might mention that i'm using the mgetty that is on netcrafts site as the
+&gt; latest rpm with redhat has a problem or two and netcraft so kindly pointed
+&gt; me to their compiled one.
+&gt;
+&gt; sounds like i might have to investigate portslave/radius setup, but it
+seems
+&gt; a bit of an over kill for our 7 modems.
+&gt;
+&gt; anyway, thanks all for replying before, gave me a lot to work with...
+&gt; thanks
+&gt; Matthew
+&gt;
+&gt; -----Original Message-----
+&gt; From: Matthew Western [mailto:<A HREF="mailto:mwestern@affairs.net.au">mwestern@affairs.net.au</A>]
+&gt; Sent: Wednesday, April 17, 2002 10:13 AM
+&gt; To: 'Justin Hawkins'; 'Matthew Western'
+&gt; Cc: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; Subject: RE: who is dialed up? pppd server
+&gt;
+&gt;
+&gt; ah. i do recall something like that.  i followed the 'Pocket ISP' howto
+from
+&gt; memory but i've played around with it a bit to get stuff going
+&gt; my login.config reads:
+&gt; --------line that counts-----
+&gt; /AutoPPP/ -     -       /usr/sbin/pppd auth +chap +pap login debug
+&gt; ------------------------------
+&gt;
+&gt; -----------full file-----------
+&gt; # login.config
+&gt; #
+&gt; # This is a sample "login dispatcher" configuration file for mgetty
+&gt; #
+&gt; # Format:
+&gt; #       username userid utmp_entry login_program [arguments]
+&gt; #
+&gt; # Meaning:
+&gt; #       for a "username" entered at mgettys login: prompt, call
+&gt; #       "login_program" with [arguments], with the uid set to "userid",
+&gt; #       and a USER_PROCESS utmp entry with ut_user = "utmp_entry"
+&gt; #
+&gt; # username may be prefixed / suffixed by "*" (wildcard)
+&gt; #
+&gt; # userid is a valid user name from /etc/passwd, or "-" to not set
+&gt; #  a login user id and keep the uid/euid root (needed for /bin/login)
+&gt; #
+&gt; # utmp_entry is what will appear in the "who" listing. Use "-" to not
+&gt; #  set an utmp entry (a must for /bin/login), use "@" to set it to the
+&gt; #  username entered. Maximum length is 8 characters.
+&gt; #
+&gt; # login_program is the program that will be exec()ed, with the arguments
+&gt; #  passed in [arguments]. A "@" in the arguments will be replaced with the
+&gt; #  username entered. Warning: if no "@" is given, the login_program has
+&gt; #  no way to know what user name the user entered.
+&gt; #
+&gt; #
+&gt; # SAMPLES:
+&gt; # Use this one with my Taylor-UUCP and Taylor-UUCP passwd files.
+&gt; #  (Big advantage: tuucp can use the same passwd file for serial dial-in
+&gt; #   and tcp dial-in [uucico running as in.uucpd]). Works from 1.05 up.
+&gt; #
+&gt; #U*     uucp    @       /usr/lib/uucp/uucico -l -u @
+&gt;
+&gt; #
+&gt; # Use this one for fido calls (login name /FIDO/ is handled specially)
+&gt; #
+&gt; # You need Eugene Crosser's "ifmail" package for this to work.
+&gt; #  mgetty has to be compiled with "-DFIDO", otherwise a fido call won't
+&gt; #  be detected.
+&gt; #
+&gt; #/FIDO/ uucp    fido    /usr/local/lib/fnet/ifcico @
+&gt;
+&gt; #
+&gt; # Automatic PPP startup on receipt of LCP configure request (AutoPPP).
+&gt; #  mgetty has to be compiled with "-DAUTO_PPP" for this to work.
+&gt; #  Warning: Case is significant, AUTOPPP or autoppp won't work!
+&gt; #  Consult the "pppd" man page to find pppd options that work for you.
+&gt; #
+&gt; #  NOTE: for *some* users, the "-detach" option has been necessary, for
+&gt; #        others, not at all. If your pppd doesn't die after hangup, try
+it.
+&gt; #
+&gt; #  NOTE2: "debug" creates lots of debugging info.  LOOK AT IT if things
+&gt; #         do not work out of the box, most likely it's a ppp problem!
+&gt; #
+&gt; #  NOTE3: "man pppd" is your friend!
+&gt; #
+&gt; #  NOTE4: max. 9 arguments allowed.
+&gt; #
+&gt; /AutoPPP/ -     -       /usr/sbin/pppd auth +chap +pap login debug
+&gt;
+&gt; #
+&gt; #
+&gt; # An example where no login name in the argument list is desired:
+&gt; #  automatically telnetting to machine "smarty" for a given login name
+&gt; #
+&gt; #telnet-smarty  gast    telnet  /usr/bin/telnet -8 smarty
+&gt; #
+&gt; # This is the "standard" behaviour - *dont* set a userid or utmp
+&gt; #  entry here, otherwise /bin/login will fail!
+&gt; #  This entry isn't really necessary: if it's missing, the built-in
+&gt; #  default will do exactly this.
+&gt; #
+&gt; #*      -       -       /bin/login @
+&gt; #/AutoPPP/ -     -       /usr/sbin/pppd
+&gt; -----Original Message-----
+&gt; From: Justin Hawkins [mailto:<A HREF="mailto:justin@internode.com.au">justin@internode.com.au</A>]
+&gt; Sent: Wednesday, April 17, 2002 9:30 AM
+&gt; To: Matthew Western
+&gt; Cc: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+&gt; Subject: RE: who is dialed up? pppd server
+&gt;
+&gt;
+&gt; On Wed, 17 Apr 2002, Matthew Western wrote:
+&gt;
+&gt; &gt; err, i am using mgetty which calls pppd.
+&gt; &gt;
+&gt; &gt; i am now dialed up using an account.
+&gt; &gt;
+&gt; &gt; w shows:
+&gt; &gt;
+&gt; &gt; [<A HREF="mailto:root@____">root@____</A> usr]# w
+&gt; &gt;   8:56am  up 2 days, 0 min,  3 users,  load average: 1.11, 1.06, 1.02
+&gt; &gt; USER     TTY      FROM              LOGIN@   IDLE   JCPU   PCPU  WHAT
+&gt; &gt; root     tty1     -                Tue 4pm 16:54m 16:53m 16:53m  -bash
+&gt; &gt; root     tty2     -                Tue 4pm 16:44m  0.73s  0.01s  man
+pppd
+&gt; &gt; root     pts/0    xxxxxxxxxxxx      8:33am  0.00s  0.19s  0.02s  w
+&gt; &gt;
+&gt;
+&gt; There are configuration items specific to this in login.config (an mgetty
+&gt; configuration file) - what does yours look like?
+&gt;
+&gt; - Justin
+&gt;
+&gt; --
+&gt; Justin Hawkins
+&gt; Internode Professional Access
+&gt;
+&gt; My theology, briefly, is that the universe was dictated but not
+&gt; signed.
+&gt; -- Christopher Morley
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt; --
+&gt; LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+&gt; To unsubscribe from the LinuxSA list:
+&gt;   mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+&gt;
+&gt;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

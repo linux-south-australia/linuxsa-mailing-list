@@ -1,0 +1,138 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Upgrading to Raid 1" -->
+<!-- FromName="'Toby Corkindale'" -->
+<!-- FromEmail="tjcorkin@sa.pracom.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 20 Feb 2002 18:08:35 +1030 (CST)" -->
+<!-- Id="Pine.LNX.4.33.0202201751500.11121-100000@localhost.localdomain" -->
+<!-- Reference="000e01c1b9dc$708c6f80$1ef621cb@themaster" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Upgrading to Raid 1</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Toby Corkindale &lt;<I><A HREF="mailto:tjcorkin@sa.pracom.com.au">tjcorkin@sa.pracom.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 20 Feb 2002 18:08:35 +1030 (CST)
+</PRE>
+<H1>Re: Upgrading to Raid 1</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+No, that should work just fine.
+
+Also, you can convert NTFS or FAT32 partitions to ext2 or reiser easily with
+a similar method:
+
+Just set the partition type away from 06 (fat16) to 83 (linux), then run
+mkfs.ext2 -S /dev/hda1
+(-S means "only re-create superblocks)
+It might say you should make backups n stuff, but eh, who ever makes those?
+
+;)
+
+&lt;/sarcasm&gt;
+
+Umm, anyway.... in case you haven't realised, you won't be able to use your
+method to swap to RAID. Before you can mount the /dev/md0 device, you have
+to make a filesystem upon it - either ext2, ext3, reiserfs, even iso9660.
+As you know, creating a new filesystem will depreciate your ability to
+access the previous filesystem's data. This rule holds true in situations
+involving RAID as well.
+
+Sorry, but you'll need to do the dump/restore method of converting to raid
+instead.
+
+RAID can be confusing, and the doco isn't always brilliant... its pretty out
+of date too in places, just increasing the confusion.
+
+TC
+
+On Wed, 20 Feb 2002, Mike O'Connor wrote:
+
+&gt; Hi All
+&gt;
+&gt; I want to upgrade a box to a raid 1 mirror, I do not want to remove all the
+&gt; software and create the raid and copy the software back.
+&gt;
+&gt; So I want the list opinion the following upgrade plan. (for this example I
+&gt; have only two partitions '/' and swap)
+&gt;
+&gt; 1. Modify the hda to have a partition type of fd (auto raid)
+&gt; 2. Copy partition table to hdc (using sfdisk)
+&gt; 3. Create raidtab file so that hda1 and hdc1 are part of a raid 1 mirror
+&gt; 4. Run mkraid /dev/md0
+&gt;         From my reading this creates a superblock on both drives and parts
+&gt; copying all the data on hda to hdc.
+&gt;         Do I need to do this from a boot cd or floppy so that hda1 is not
+&gt; mounted ?
+&gt; 5. Adjust fstab to have '/' point at /dev/md0
+&gt;     Adjust fstab to have swap point look like this
+&gt;         /dev/hda2       swap           swap    defaults,pri=1   0 0
+&gt;         /dev/hdc2       swap           swap    defaults,pri=1   0 0
+&gt; 6. Reboot
+&gt;
+&gt; Does any one see any problems with this ?
+&gt;
+&gt; Thanks
+&gt;     Mike O'Connor
+&gt;
+&gt;
+&gt;
+
+-- 
+ Toby Corkindale
+ UNIX Developer, Core Tech R&D
+ Technology SA, Pracom Ltd
+ 288 Glen Osmond Road
+ Fullarton,	5063
+ South Australia
+ Tel: +61 8 8202 9075
+ Fax: +61 8 8202 9001
+ mailto:<A HREF="mailto:Toby.Corkindale@sa.pracom.com.au">Toby.Corkindale@sa.pracom.com.au</A>
+ <A HREF="http://www.sa.pracom.com.au/">http://www.sa.pracom.com.au/</A>
+
+                  PRIVILEGED - PRIVATE AND CONFIDENTIAL
+
+   Privileged/Confidential Information may be contained in this message.
+   If you are not the addressee indicated in this message, you may not
+   copy or deliver this message to anyone.  In such case, you should
+   destroy this message and notify the sender by reply email. Opinions,
+   conclusions and other information in this message that do not relate
+   to the official business of this organisation shall be understood as
+   neither given nor endorsed by it.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

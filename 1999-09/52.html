@@ -1,0 +1,157 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: SuSE" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="" -->
+<!-- ToEmail="newton@atdot.dotat.org" -->
+<!-- Date="Thu, 2 Sep 1999 10:05:51 +0930" -->
+<!-- Id="199909020035.KAA06699@dog.topology.org" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: SuSE</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+  Date: Thu, 2 Sep 1999 10:05:51 +0930
+</PRE>
+<H1>Re: SuSE</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Topic: NTP functionality on linux boxes.
+
+===================================================================
+Mark,
+
+To confirm what you said about xntpd replacing rdate, I've just had
+the response back from the SuSE support people (in the US).
+
+------------------------------------------------------------------
+SuSE comes with `ntpdate' (package `xntp') that will allow you to query
+NTP-timeservers in the Internet. This is considered to be the standard
+solution for time synchronization.
+------------------------------------------------------------------
+
+I knew about NTP before, and I've read up on the RFC(s) for this,
+but I had thought of this as a protocol for big organisational
+computers rather than PCs on desktops.
+Obviously once again, I'm being dragged into the modern world.
+
+It seems credible then, that redhat are supporting "rdate"
+for backwards compatibility or something.
+That's what used to burden (and still greatly burdens)
+the likes of microsoft - the need to keep stone-age users happy.
+(The fact that the first ISA cards still work on modern
+mainboards is a similar phenomenon.)
+
+This makes me even more happy that I've made the change out of RH.
+
+But now how do I find a suitable NTP client out there in the
+real world to sync to?
+With "rdate", I was running a cron job once every 24 hours
+(or 6 hours for my least accurate PC) out to augean with:
+
+-------------------------------------------------------------------
+25 2,8,14,20 * * * /usr/bin/rdate -s augean.eleceng.adelaide.edu.au
+-------------------------------------------------------------------
+
+So now:
+
+1.	Where do I get a list of the accurate NTP servers
+	with which I can sync?
+	[I'm aware of the list at
+	<A HREF="http://www.eecis.udel.edu/~mills/ntp/servers.htm">http://www.eecis.udel.edu/~mills/ntp/servers.htm</A>
+	which gives primary and secondary NTP server lists.
+	But I suspect these lists may be incomplete.]
+	(Since my bigpond link emerges into the real world
+	in Melbourne somewhere, I guess I need to use a
+	Melbourne machine. traceroute gives:
+
+--------------------------------------------------------------------
+[<A HREF="mailto:akenning@dog">akenning@dog</A>]$ traceroute augean.eleceng.adelaide.edu.au
+traceroute: Warning: Multiple interfaces found; using 203.38.148.51 @ eth0
+traceroute to augean.eleceng.adelaide.edu.au (129.127.28.4), 30 hops max, 40 byt
+e packets
+ 1  gw.way7.Adelaide.telstra.net (139.130.140.1)  238.774 ms  131.105 ms  118.21
+9 ms
+ 2  Ethernet1-0.way1.Adelaide.telstra.net (139.130.237.65)  127.082 ms  141.073 
+ms  118.189 ms
+ 3  Fddi0-0.way-core2.Adelaide.telstra.net (139.130.237.229)  127.023 ms  121.41
+1 ms  128.133 ms
+ 4  Atm1-0-1.lon-core1.Melbourne.telstra.net (203.50.6.5)  197.034 ms  189.798 m
+s  358.207 ms
+ 5  FastEthernet0-0-0.lon14.Melbourne.telstra.net (139.130.239.235)  367.103 ms 
+ 201.083 ms  198.241 ms
+ 6  optvm.lnk.telstra.net (139.130.55.2)  197.039 ms  201.397 ms  188.125 ms
+ 7  atm2-0-19.mb1.optus.net.au (192.65.89.138)  187.786 ms  191.863 ms  188.110 
+ms
+ 8  aarnet-sa.mb1.optus.net.au (192.65.88.226)  367.084 ms  371.820 ms  378.066 
+ms
+ 9  lis255.atm2-0.ntce.adelaide.gw.saard.net (203.21.37.3)  277.225 ms  211.627 
+ms  248.063 ms
+10  * * *
+11  augean.eleceng.adelaide.edu.au (129.127.28.4)  348.718 ms  361.561 ms *
+------------------------------------------------------------------------------
+
+	I.e. it goes out over some pretty wierd looking subnets
+	to Melbourne and back.
+	I realise that the difference in accuracy is purely
+	academic in my case!)
+
+2.	Do you need to get some sort of permission and/or
+	configuration to do an NTP sync to someone's
+	NTP host? 
+
+Cheers,
+Alan Kennington.
+
+=======================================================================
+PS. Traceroute chose the wrong interface eth0!
+
+PPS. I've just answered some of my query.
+Running "ntpdate" on my new machine correctly modifies the
+date like "rdate", and also gives this output:
+
+-----------------------------------------------------------------
+emu /var/spool# ntpdate augean.eleceng.adelaide.edu.au
+ 2 Sep 09:55:38 ntpdate[31306]: step time server 129.127.28.4 offset 51.116448 sec
+-----------------------------------------------------------------
+
+This means I can stay back in the stone age by just
+running "ntpdate" once every 24 hours on all 4 machines.
+But my questions above refer to the _real_ NTP.
+I.e. the 24 hr/day daemon which keeps permanent sync going.
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

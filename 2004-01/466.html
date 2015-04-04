@@ -1,0 +1,177 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Routing Problem" -->
+<!-- FromName="'John Edwards'" -->
+<!-- FromEmail="isplist@adam.com.au" -->
+<!-- ToName="'Andrew Pullin'" -->
+<!-- ToEmail="andrew@hotspurbgc.com.au" -->
+<!-- Date="Tue, 13 Jan 2004 09:34:46 +1030" -->
+<!-- Id="4003280E.20003@adam.com.au" -->
+<!-- Reference="000c01c3d906$5cd80d00$c2de26cb@hotspurbgc.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Routing Problem</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: John Edwards &lt;<I><A HREF="mailto:isplist@adam.com.au">isplist@adam.com.au</A></I>&gt;
+  To  : Andrew Pullin &lt;<I><A HREF="mailto:andrew@hotspurbgc.com.au">andrew@hotspurbgc.com.au</A></I>&gt;
+  Date: Tue, 13 Jan 2004 09:34:46 +1030
+</PRE>
+<H1>Re: Routing Problem</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Andrew,
+
+If you want to set this PC up as an ethernet bridge, only one Interface 
+needs an IP address. The other will simply bridge packets to the single 
+IP. It's never a great idea to have more than one interface in the same 
+subnet, as the routing tables for most OS's only allow one 
+best-destination per route.
+
+169.254.0.0 is defined in 
+
+<A HREF="http://www.ietf.org/proceedings/00dec/I-D/draft-ietf-zeroconf-ipv4-linklocal-01.txt">http://www.ietf.org/proceedings/00dec/I-D/draft-ietf-zeroconf-ipv4-linklocal-01.txt</A>
+
+This is used for a host to give itself an IP address when there is not 
+one configured on an interface and no DHCP server can be found. Often 
+you'll see it as the address on Windows PC's that can't connect to a Lan.
+
+John Edwards
+
+
+Andrew Pullin wrote:
+
+&gt;Hi All,
+&gt;    I am having a frustrating time getting a new server up and going. The
+&gt;problem seems to be strange entries in the routing table that are being
+&gt;automagically set, but I cannot identify from where, since I cannot find any
+&gt;config file that would be automagically loaded.
+&gt;
+&gt;    The server is a PII 266 with 64Mb RAM (I know - processing overkill and
+&gt;memory starved, but it is only temporary). I have two 10/100 PCI Ethernet
+&gt;cards, both RT8139 based (they were identical cards, but in the interests of
+&gt;frustration, I lashed out and bought a different one to try and solve the
+&gt;problem). These connect to a network switch and an ADSL router.
+&gt;
+&gt;    The software is a minimal install RH 9.0 (OK so I know RH better than
+&gt;any distro, it may not be the best, but I know it or thought I did). The
+&gt;installation went fine, and both network cards were correctly detected, and
+&gt;configured for a /28 subnet as follows:
+&gt;
+&gt;    eth0    203.*.*.162 mask 255.255.255.240 bcast 203.*.*.175
+&gt;    eth1    203.*.*.163 mask 255.255.255.240 bcast 203.*.*.175
+&gt;
+&gt;the idea being, 162 connects to the ADSL modem configured as 161, and 163
+&gt;being connected to the network switch and the box acting as a firewall
+&gt;webserver.
+&gt;
+&gt;ifconfig eth0 & eth1 both return the correct configuration and both cards
+&gt;are at different addresses and irqs so no conflicts there.
+&gt;
+&gt;Other config files are as such:
+&gt;
+&gt;/etc/sysconfig/network
+&gt;    NETWORKING=yes
+&gt;    FORWARD_IPV4=yes
+&gt;    HOSTNAME=machine.mydomain.com.au
+&gt;    GATEWAY=203.*.*.161
+&gt;
+&gt;/etc/sysctl.conf
+&gt;    net.ipv4.ip_forward=1
+&gt;    net.ipv4.ip_always_defrag=1
+&gt;
+&gt;Now the frustrating part. I can ping both interfaces and the home network
+&gt;from the firewall as I should be able to do. I can ssh into 162 ONLY which
+&gt;is partially correct as the bridge is not yet set up, but I CANNOT ssh into
+&gt;163. I have tried network cable swaps but to no avail. I have looked at the
+&gt;default routing table set up by the machine, and there are some strange
+&gt;entries I don't understand:
+&gt;
+&gt;route -n
+&gt;
+&gt;Dest                    Gateway        Genmask        Flags    Metric    REF
+&gt;USE
+&gt;203.*.*.160        0.0.0.0     255.255.255.240    U        0            0
+&gt;0        eth1
+&gt;203.*.*.160        0.0.0.0     255.255.255.240    U        0            0
+&gt;0        eth1
+&gt;169.254.0.0        0.0.0.0     255.255.0.0            U        0
+&gt;0        0        eth1
+&gt;127.0.0.0            0.0.0.0     255.0.0.0                U        0
+&gt;0        0        lo
+&gt;0.0.0.0        203.*.*.161     0.0.0.0                    UG     0
+&gt;0        0        eth1
+&gt;
+&gt;As you can see, there are two things that jump right out: where is eth0
+&gt;interface that is correctly set up elsewhere?, and where did 169.254.0.0
+&gt;come from? What is stranger is that when I manually delete everything except
+&gt;lo and create the correct entries and interfaces, eth0 still dissapears. The
+&gt;routing table I was expecting should look something like this:
+&gt;
+&gt;Dest                    Gateway        Genmask        Flags    Metric    REF
+&gt;USE
+&gt;203.*.*.162        0.0.0.0     255.255.255.240    U        0            0
+&gt;0        eth0
+&gt;203.*.*.163        0.0.0.0     255.255.255.240    U        0            0
+&gt;0        eth1
+&gt;127.0.0.0            0.0.0.0     255.0.0.0                U        0
+&gt;0        0        lo
+&gt;0.0.0.0        203.*.*.161     0.0.0.0                    UG     0
+&gt;0        0        eth0
+&gt;
+&gt;when I hook up the bridge, 162 and 163 should dissapear and be replaced by:
+&gt;
+&gt;203.*.*.162        0.0.0.0     255.255.255.240    U        0            0
+&gt;0        br0
+&gt;
+&gt;OK, what I need help with is, where are the config files that would produce
+&gt;the broken routing table, or how do I fix it. I know RH 7.2 has specific
+&gt;files that set up the routing table in /etc/sysconfig, but RH 9 doesn't seem
+&gt;to have this file.
+&gt;
+&gt;    I have been stewing over this a week now and just CANNOT get it going. I
+&gt;have RTFMed all sorts of FMs, but still no joy. Your help would be greatly
+&gt;appreciated.
+&gt;    TIA,
+&gt;        Cheers!
+&gt;            Andrew
+&gt;
+&gt;
+&gt;
+&gt;  
+&gt;
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

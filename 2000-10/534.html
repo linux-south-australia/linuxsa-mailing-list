@@ -1,0 +1,86 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: A question about piping." -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Ian Hogben" -->
+<!-- ToEmail="ian@safcol.com.au" -->
+<!-- Date="Mon, 16 Oct 2000 16:00:03 +0930 (CST)" -->
+<!-- Id="Pine.BSF.4.21.0010161549480.24790-100000@augustus.tellurian.com.au" -->
+<!-- Reference="NDBBJCENILPHMJMEFMGNOEHODAAA.ian@safcol.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: A question about piping.</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Ian Hogben &lt;<I><A HREF="mailto:ian@safcol.com.au">ian@safcol.com.au</A></I>&gt;
+  Date: Mon, 16 Oct 2000 16:00:03 +0930 (CST)
+</PRE>
+<H1>Re: A question about piping.</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt;       uuencode [-m] [ file ] name
+&gt;&lt;snip&gt;
+&gt;       Uuencode reads file (or by default the standard input) and
+&gt;       writes an encoded version to  the  standard  output. [...]
+&gt;
+&gt; If I try "uuencode file.zip |mail ian", it just stalls the script, doing
+&gt; dothing.
+
+It's not doing nothing, Ian, it's reading the file on standard input, which
+is the default.  Look at the usage:  "uuencode [-m] [file] name".  What did
+you type?  "uuencode file.zip"; that does not have the  optional -m flag,
+nor the optional file; just "name".  So, as the manual says, it's reading
+standard input.
+
+I don't know why uuencode takes an optional file, and requires the name of the
+file as a separate parameter.  Perhaps that's so that you can use it in a pipeline
+where some program produces the 'file' on standard output, which you feed to
+uuencode.  You probably want the uuencoded data to carry a reasonable name, so
+you are allowed to say the name even if you didn't read from that file.  Damn!
+Too complicated.  Try this:
+
+  sql "select name, '|', balance from accounts" | uuencode trial-balance | mail
+
+The output of uuencode claims to contain a file named "trial-balance", but of
+course there never was such a file to start with.  You could have done it like
+this:
+
+  sql "select name, '|', balance from accounts" &gt; sql.out
+  uuencode sql.out trial-balance &gt; uuencode.out
+  mail &lt; uuencode.out
+
+There still never was a file, "trial-balance".
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

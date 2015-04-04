@@ -1,0 +1,1141 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Proxy Server" -->
+<!-- FromName="Nikolai Andreyevich Luzan" -->
+<!-- FromEmail="nikolai@Ukraine.humbug.org.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sat, 11 Jul 1998 10:47:41 +1000 (EST)" -->
+<!-- Id="Pine.LNX.3.96.980711104353.1115A-200000@Ukraine.humbug.org.au" -->
+<!-- Reference="005BE1D7D7CCD111B8E4006097D4FEFA032BCE@mercury.crystalcreative.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Proxy Server</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Nikolai Andreyevich Luzan &lt;<I><A HREF="mailto:nikolai@Ukraine.humbug.org.au">nikolai@Ukraine.humbug.org.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sat, 11 Jul 1998 10:47:41 +1000 (EST)
+</PRE>
+<H1>Re: Proxy Server</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, 10 Jul 1998, Don Brown wrote:
+
+&gt; Can anyone tell me how to configure my RH 5.0 Linux server as a Proxy
+&gt; server?  I'd like to cache my company's web access to reduce bandwidth
+&gt; usage.
+get the squid rpm or source and instlall it. Then just vi /etc/squid.conf
+the file is pretty straight forward and contains good explanations and
+examples of what to do. Failing that I am attaching a copy of my
+squid.conf
+
+have fun
+Nikolai
+
+# Generated automatically from squid.conf.pre.in by configure.
+#
+# $Id: squid.conf.pre.in,v 1.79 1996/12/06 22:12:49 wessels Exp $
+#
+
+#  TAG: http_port
+#	The port number where squid will listen for HTTP client
+#	requests.  Default is 3128, for httpd-accel mode use port 80.
+#	May be overridden with -a on the command line.
+#
+http_port 8080
+
+#  TAG: icp_port
+#	The port number where squid send and receive ICP requests to
+#	and from neighbor caches.  Default is 3130.  To disable use
+#	"0".  May be overridden with -u on the command line.
+#
+icp_port 3130
+#icp_port 0
+
+#  TAG: mcast_groups
+#       This tag specifies a list of multicast groups which your
+#       server should join to receive multicasted ICP requests.
+#
+#       Usage:  mcast_groups 239.128.16.128 224.0.1.20
+#
+#       By default, squid doesn't listen on any multicast groups.
+#
+#mcast_groups 239.128.16.128
+
+#  TAG: tcp_incoming_address
+#  TAG: tcp_outgoing_address
+#  TAG: udp_incoming_address
+#  TAG: udp_outgoing_address
+#
+#	Usage: tcp_incoming_address 10.20.30.40
+#	       udp_outgoing_address fully.qualified.domain.name
+#
+#	These tags have replaced 'bind_address' and 'outbound_address'
+#	to provide more control for multihomed hosts.
+#
+#	tcp_incoming_address	is used for the HTTP socket which accepts
+#				connections from clients and other caches.
+#	tcp_outgoing_address	is used for connections made to remote
+#				servers and other caches.
+#	udp_incoming_address	is used for the ICP socket receiving packets
+#				from other caches.
+#	udp_outgoing_address	is used for ICP packets sent out to other
+#				caches.
+#
+#	The defaults behaviour is to not bind to any specific address.
+#
+#	NOTE, udp_incoming_address and udp_outgoing_address can not have
+#	the same value since they both use port 3130.
+#
+#tcp_incoming_address 0.0.0.0
+#tcp_outgoing_address 0.0.0.0
+#udp_incoming_address 0.0.0.0
+#udp_outgoing_address 0.0.0.0
+
+
+# OPTIONS WHICH AFFECT THE NEIGHBOR SELECTION ALGORITHM
+#-----------------------------------------------------------------------------
+
+#  TAG: cache_host 
+#	To specify other caches in a hierarchy, use the format:
+#
+#	    hostname type http_port icp_port
+#
+#   For example,
+#
+#	#                                        proxy  icp
+#	#          hostname             type     port   port  options
+#	#          -------------------- -------- ----- -----  -----------
+#	cache_host bigserver.usc.edu    parent    3128  3130  [proxy-only]
+#	cache_host littleguy1.usc.edu   sibling   3128  3130  [proxy-only]
+#	cache_host littleguy1.usc.edu   sibling   3128  3130  [proxy-only]
+#
+#	      type:  either 'parent' or 'sibling'.
+#
+#	proxy_port:  The port number where the cache listens for proxy
+#	             requests.
+#
+#	  icp_port:  Used for querying neighbor caches about
+#	             objects.  To have a non-ICP neighbor
+#	             specify '7' for the ICP port and make sure the
+#	             neighbor machine has the UDP echo port
+#	             enabled in its /etc/inetd.conf file.
+#
+#	    options: proxy-only
+#		     weight=n
+#		     ttl=n
+#		     no-query
+#		     default
+#
+#		     use 'proxy-only' to specify that objects fetched
+#		     from this cache should not be saved locally.
+#
+#		     use 'weight=n' to specify a weighted parent.
+#		     The weight must be an integer.  The default weight
+#		     is 1, larger weights are favored more.
+#
+#                    use 'ttl=n' to specify a IP multicast TTL to use
+#                    when sending an ICP request to this address.
+#                    Only useful when sending to a multicast group.
+#                    multicast groups are treated like regular parents and
+#                    neighbo[u]rs, except that we don't expect to see any
+#                    replies from them.
+#
+#		     use 'no-query' to NOT send ICP queries to this
+#		     neighbor.
+#
+#		     use 'default' if this is a parent cache which can
+#		     be used as a "last-resort." You should probably
+#		     only use 'default' in situations where you cannot
+#		     use ICP with your parent cache(s).
+#
+#	NOTE: non-ICP neighbors must be specified as 'parent'.
+#
+#cache_host hostname type 3128 3130
+cache_host proxy.uq.net.au parent 80 0 weight=3
+cache_host lyrebird.cc.uq.edu.au parent 80 3130 weight=3
+cache_host bowerbird.cc.uq.edu.au parent 80 3130 weight=3
+cache_host proxy2.questnet.net.au parent 80 3130 weight=3
+cache_host proxy1.questnet.net.au parent 80 3130 weight=3
+
+#  TAG: cache_host_domain
+#	Use to limit the domains for which a neighbor cache will be queried.
+#	Usage:
+#
+#	cache_host_domain cache-host domain [domain ...]
+#	cache_host_domain cache-host !domain
+#
+#	For example, specifying
+#
+#		cache_host_domain bigserver.usc.edu	.edu
+#
+#	has the effect such that UDP query packets are sent to
+#	'bigserver' only when the requested object exists on a
+#	server in the .edu domain.  Prefixing the domainname
+#	with '!' means that the cache will be queried for objects
+#	NOT in that domain.
+#
+#	NOTE:	* Any number of domains may be given for a cache-host,
+#		  either on the same or separate lines.
+#		* When multiple domains are given for a particular
+#		  cache-host, the first matched domain is applied.
+#		* Cache hosts with no domain restrictions are queried
+#		  for all requests.
+#		* There are no defaults.
+#		* There is also a 'cache_host_acl' tag in the ACL
+#		  section.
+
+#  TAG: neighbor_type_domain
+#
+#	usage: neighbor_type_domain parent|sibling domain domain ...
+#
+#	Modifying the neighbor type for specific domains is now
+#	possible.  You can treat some domains differently than the the
+#	default neighbor type specified on the 'cache_host' line.
+#	Normally it should only be necessary to list domains which
+#	should be treated differently because the default neighbor type
+#	applies for hostnames which do not match domains listed here.
+#
+#EXAMPLE:
+#	cache_host  parent cache.foo.org 3128 3130
+#	neighbor_type_domain cache.foo.org sibling .com .net
+#	neighbor_type_domain cache.foo.org sibling .au .de
+
+#neighbor_type_domain proxy.bit.net.au sibling .bit.net.au
+
+#  TAG:	inside_firewall
+#	This tag specifies a list of domains inside your Internet
+#	firewall.
+#
+#	Usage: inside_firewall my.domain  [ my.other.domain ...]
+#
+#	The use of this tag affects the server selection algorithm in
+#	two ways.  Objects which do not match any of the listed domains
+#	will be considered "beyond the firewall."  For these:"
+#		- There will be no DNS lookups for the URL-host.
+#		- The object will always be fetched from one of
+#		  the parent or neighbor caches.
+#
+#	As a special case you may specify the domain as 'none' to force
+#	all requests to be fetched from neghbors and parents.
+#
+
+#inside_firewall uq.edu.au azure.humbug.org.au localnet
+
+#inside_firewall bit.net.au broken.humbug.org.au 
+
+#inside_firewall none
+
+#  TAG:	local_domain
+#	This tag specifies a list of domains local to your organization.
+#
+#	Usage: local_domain my.domain [ my.other.domain ...]
+#
+#	For URLs which are in one of the local domains, the object
+#	is always fetched directly from the source and never from a
+#	neighbor or parent.
+#
+#local_domain bigbucks.com
+
+local_domain localnet ukraine.humbug.org.au 
+
+#  TAG: local_ip
+#	This tag specifies a list of network addresses local to your
+#	organization.
+#
+#	Usage: local_ip ip-address
+#
+#	This tag is similar to local_domain, except that the IP-address
+#	of the URL-host is checked.  This requires that a DNS lookup
+#	be done on the URL-host.  For this reason, local_domain is
+#	preferred over local_ip.  By using local_domain it may be
+#	possible to avoid the DNS lookup altogether and deliver the
+#	object with less delay.
+#
+#local_ip 10.0.0.0
+#local_ip 172.16.0.0
+
+#  TAG: firewall_ip
+#
+#	Just like 'inside_firewall' but for IP addresses.  NOTE:
+#	firewall_ip and local_ip are mutually exclusive.  If you
+#	use firewall_ip then local_ip will be ignored.
+#
+#firewall_ip 10.0.0.0
+#firewall_ip 172.16.0.0
+
+#  TAG:	single_parent_bypass
+#	This tag specifies that it is okay to bypass the hierarchy
+#	"Pinging" when there is only a single parent for a given URL.
+#
+#	Usage: single_parent_bypass on|off
+#
+#	Before actually sending ICP "ping" packets to parents and 
+#	neighbors, we figure out which hosts would be pinged based
+#	on the cache_host_domain rules, etc.  Often it may be the
+#	case that only a single parent cache would be pinged.
+#
+#	Since there is only a single parent, there is a very good
+#	chance that we will end up fetching the object from that
+#	parent.  For this reason, it may be beneficial to avoid
+#	the ping and just fetch the object anyway.
+#
+#	However, if we avoid the ping, we will be assuming that the
+#	parent host is reachable and that the cache process is running.
+#	By using the ping, we can be reasonably sure that the parent
+#	host will be able to handle our request.  If the ping fails then
+#	it may be possible to fetch the object directly from the source.
+#
+#	To favor the resiliency provided by the ping algorithm,
+#	single_parent_bypass is 'off' by default.
+#
+#single_parent_bypass off
+
+#  TAG: source_ping
+#	If source_ping is enabled, then squid will include the source
+#	provider site in its selection algorithm.  This is accomplished
+#	by sending ICP "HIT" packets to the UDP echo port of the source
+#	host.  Note that using source_ping may send a fair amount of UDP
+#	traffic out on the Internet and may irritate paranoid network
+#	administrators.
+#
+#	Note that source_ping is incompatible with inside_firewall.
+#	For hosts beyond the firewall, source_ping packets will never
+#	be sent.
+#
+#	By default, source_ping is off.
+#
+#source_ping off
+
+#  TAG: neighbor_timeout (seconds)
+#	This controls how long to wait for replies from neighbor caches.
+#	If none of the parent or neighbor caches reply before this many
+#	seconds (due to dropped packets or slow links), then the object
+#	request will be satisfied from the default source.  The default
+#	timeout is two seconds.
+#
+#neighbor_timeout 2
+
+#  TAG: hierarchy_stoplist
+#	A list of words which, if found in a URL, cause the object to
+#	be handled directly by this cache.  In other words, use this
+#	to not query neighbor caches for certain objects.  You may
+#	list this option multiple times.
+#
+#	The default is to directly fetch URLs containing 'cgi-bin' or '?'.
+#
+hierarchy_stoplist cgi-bin ?
+
+#  TAG: cache_stoplist
+#	A list of words which, if found in a URL, cause the object to
+#	immediately removed from the cache.  In other words, use this
+#	to force certain objects to never be cached.  You may list this
+#	option multiple times.
+#
+#	The default is to not cache URLs containing 'cgi-bin' or '?'.
+#
+cache_stoplist cgi-bin ?
+
+#  TAG: cache_stoplist_pattern		# case sensitive
+#  TAG: cache_stoplist_pattern/i	# case insensitive
+#
+#	Just like 'cache_stoplist' but you can use regular expressions
+#	instead of simple string matching.  There is no default.
+#
+#cache_stoplist_pattern
+
+# OPTIONS WHICH AFFECT THE CACHE SIZE
+#-----------------------------------------------------------------------------
+
+#
+#  TAG: cache_mem (in megabytes)       
+#	Maximum amout of VM used to store objects in memory.
+#	This includes:
+#		in-transit objects,
+#		negative-cached objects,
+#		"hot" objects
+#	The value of cache_mem is an upper limit on the size of the
+#	"in-memory object data" pool.  This is a pool of 4k pages used
+#	to hold object data.
+#
+#	In-transit objects have priority over the others.  When
+#	additional space is needed for incoming data, negative-cached
+#	and hot objects will be released.  In other words, the
+#	negative-cached and hot objects will fill up any unused space
+#	not needed for in-transit objects.
+#
+#	The values of cache_mem_low and cache_mem_high (below) can be
+#	used to tune the use of the memory pool.  When the high mark is
+#	reached, in-transit and hot objects will be released to clear
+#	space.  When an object transfer is completed, it will remain in
+#	memory only if the current memory usage is below the low water
+#	mark.
+#
+#	The default is 8 Megabytes.
+#
+#cache_mem 4 
+
+#  TAG: cache_swap (in megabytes)
+#	Maximum about of disk space used by the cache.  The default is
+#	100 megabytes.  When the disk usage gets to this size, the cache
+#	uses LRU replacement to evict objects as new objects are cached.
+#	Note that cache_swap is set to: 
+#	        max(cache_mem, cache_swap_specified) 
+#	to guard against users' accidentally specifying a smaller
+#	cache_swap than cache_mem size.
+#	
+#cache_swap 100
+
+#  TAG: cache_swap_low  (percent, 0-100)
+#  TAG: cache_swap_high (percent, 0-100)
+#	The low- and high-water marks for cache LRU replacement.
+#	LRU replacement begins when the high-water mark is reached
+#	and ends when enough objects have been removed and the low-water
+#	mark is reached. Defaults are 75% and 90%.
+#	
+#cache_swap_low  75
+#cache_swap_high 90
+
+#  TAG: cache_mem_low  (in percent, 0-100)         
+#  TAG: cache_mem_high (in percent, 0-100)
+#	The low- and high-water mark for cache memory storage.  When
+#	the amount of RAM used by the hot-object RAM cache reaches this
+#	point, the cache starts throwing objects out of the RAM cache
+#	(but they remain on disk).  Defaults are 75% and 90%.
+#
+#cache_mem_low  75
+#cache_mem_high 90
+
+#  TAG: maximum_object_size
+#	Objects larger than this size will NOT be saved on disk.  The
+#	value is specified in kilobytes, and the default is 4MB.
+#
+maximum_object_size 8192
+
+#  TAG: ipcache_size (number of entries)
+#  TAG: ipcache_low  (percent)
+#  TAG: ipcache_high (percent)
+#	The size, low-, and high-water marks for the IP cache.
+#
+#ipcache_size 1024
+#ipcache_low  90
+#ipcache_high 95
+
+
+# LOGFILE PATHNAMES AND CACHE DIRECTORIES
+#-----------------------------------------------------------------------------
+
+#  TAG: cache_dir 
+#	Directory for on-disk cache storage.  The cache will change into
+#	this directory when running.  The default is
+#       /var/spool/squid.
+#
+#	You can specify multiple cache_dir lines to spread the
+#	cache among different disk partitions.
+#
+#cache_dir /var/spool/squid
+
+#  TAG: cache_access_log 
+#	Logs the client request activity.  Contains an entry for 
+#	every HTTP and ICP request received.
+#
+#cache_access_log /var/log/squid/access.log
+
+#  TAG: cache_log 
+#	Cache logging file.  Set logging levels with "debug_options" below.
+#
+#cache_log /var/log/squid/cache.log
+
+#  TAG:	cache_store_log
+#	Logs the activities of the storage manager.  Shows which
+#	objects are ejected from the cache, and which objects are
+#	saved and for how long.  To disable, enter "none".
+#
+#cache_store_log /var/log/squid/store.log
+
+#  TAG:	cache_swap_log
+#	Location for the cache "swap log."  This log file holds the
+#	metadata of objects saved on disk.  It is used to rebuild the
+#	cache during startup.  Normally this file resides in the first
+#	'cache_dir' directory, but you may specify an alternate
+#	pathname here.  Note you must give a full filename, not just
+#	a directory.
+#
+#cache_swap_log
+
+#  TAG: emulate_httpd_log
+#	The Cache can emulate the log file format which many 'httpd'
+#	programs use.  To disable/enable this emulation, set 
+#	emulate_httpd_log to 'off' or 'on'.  The default 
+#	is to use the native log format.
+#
+#emulate_httpd_log off
+
+#  TAG: log_mime_hdrs
+#	The Cache can record both the request and the response
+#	MIME headers for each HTTP transaction.  The headers are
+#	encoded safely and will appear as two bracketed fields
+#	at the end of the access log (for either the native
+#	or httpd-emulated log formats).  To enable this logging
+#	set log_mime_hdrs to 'on'.
+#
+#	NOTE: support for this may require you to define
+#	LOG_FULL_HEADERS before compiling.
+#
+#log_mime_hdrs off
+
+#  TAG: useragent_log
+#	If compiled with "-DUSE_USERAGENT_LOG=1" Squid will write
+#	the User-Agent field from HTTP requests to the filename
+#	specified here.  By default useragent_log is disabled.
+#
+#useragent_log useragent.log
+
+#  TAG: pid_filename
+#       A pathname to write the process-id to.  To disable, enter "none".
+#
+#pid_filename /var/run/squid.pid
+
+#  TAG: debug_options
+#	Logging options are set as section,level where each source file
+#	is assigned a unique section.  Lower levels result in less
+#	output,  Full debugging (level 9) can result in a very large
+#	log file, so be careful.  The magic word "ALL" sets debugging
+#	levels for all sections.  We recommend normally running with
+#	"ALL,1".
+#
+debug_options ALL,1
+
+#  TAG: ident_lookup
+#	If you wish to make an RFC931/ident lookup of the client username
+#	for each connection, enable this.  It is off by default.
+#
+#ident_lookup off
+
+#  TAG: log_fqdn
+#	Turn this on if you wish to log fully qualified domain names
+#	in the access.log.
+#
+log_fqdn on
+
+#  TAG: client_netmask
+#	A netmask for client addresses in logfiles and cachemgr output.
+#	Change this to protect the privacy of your cache clients.
+#
+#client_netmask 255.255.255.255
+
+
+# OPTIONS FOR EXTERNAL SUPPORT PROGRAMS
+#-----------------------------------------------------------------------------
+
+#  TAG: ftpget_program 
+#	Where to find the 'ftpget' program that retrieves FTP data (HTTP
+#	and Gopher protocol support are built into the cache).  
+#
+#	To disable ftpget and the ability to retrieve FTP objects, set
+#	this to "none".  Note that ftpget is automatically disabled for
+#	http_accel mode.
+#
+#ftpget_program /usr/lib/squid/ftpget
+
+#  TAG: ftpget_options
+#	Options for the 'ftpget' program.  Please run 'ftpget' without
+#	any arguments to see a list of options.  The default is
+#	no options.  An example is
+#	
+#	ftpget_options -n 60 -R -W
+#
+ftpget_options -p <A HREF="http://ukraine.humbug.org.au/">http://ukraine.humbug.org.au/</A> -s .gif
+
+# If you want the anonymous login password to be more informative
+# (and enable the use of picky ftp servers), set this to something
+# resonable for your domain, like www<A HREF="mailto:user@somewhere.net">user@somewhere.net</A>
+#
+# The reason why this is domainless by default is that the
+# request can be made on the behalf of a user in any domain,
+# depending on how the cache is used.
+# Some ftp server also validate that the email address is valid
+# (for example perl.com).
+#
+#ftp_user squid@
+
+#  TAG: cache_dns_program 
+#	Specify the location of the executable for dnslookup process.
+#
+#cache_dns_program /usr/lib/squid/dnsserver
+
+#  TAG: dns_children
+#	The number of processes spawn to service DNS name lookups.
+#	For heavily loaded caches on large servers, you should 
+#	probably increase this value to at least 10.  The maximum
+#	is 32.  The default is 5.
+#
+#	To disable dnsservers, set this to 0.  NOTE, this is very
+#	strongly discouraged.  If you disable dnsservers your Squid
+#	process will BLOCK on DNS lookups!
+#
+#dns_children 5
+
+#  TAG: redirect_program 
+#	Specify the location of the executable for the URL redirector.
+#	Currently, you must provide your own redirector program.
+#	See the Release-Notes for how to write one.
+#	By default, the redirector is not used.
+#
+#redirect_program /bin/false
+
+#  TAG: redirect_children
+#	The number of redirector processes to spawn.
+#
+#redirect_children 5
+
+
+# OPTIONS FOR TUNING THE CACHE
+#-----------------------------------------------------------------------------
+
+#  TAG: wais_relay
+#	Relay WAIS request to host (1st arg) at port (2 arg).  
+#
+#wais_relay localhost 8000
+
+#  TAG: request_size
+#	Maximum allowed request size in kilobytes.  If people are using
+#	POST to upload files, then set this to the largest acceptable
+#	filesize plus a few extra kbytes.
+#
+#request_size 100
+
+#  TAG: refresh_pattern		# case sensitive
+#  TAG: refresh_pattern/i	# case insensitive
+#
+#	usage: refresh_pattern regex min percent max
+#
+#	min and max are specified in MINUTES.
+#	percent is an integer number.
+#
+#	Please see the file doc/Release-Notes-1.1.txt for a full
+#	description of Squid's refresh algorithm.  Basically a
+#	cached object is:
+#
+#		FRESH if age &lt; min
+#		STALE if expires &lt; now
+#		STALE if age &gt; max
+#		FRESH if lm-factor &lt; percent
+#
+#	The refresh_pattern lines are checked in the order listed here.
+#	The first entry which matches is used.  If none of the entries
+#	match, then the default will be used.
+#
+#Default:
+#refresh_pattern 	.	0 20% 4320
+#refresh_pattern	.	30 80% 10080
+
+#  TAG: reference_age
+#	If set, objects which have not been referenced for this amount
+#	of time will be purged from the cache.  This is the only
+#	parameter for removing cache objects except when the disk space
+#	reaches the high water mark.  By default reference_age is 
+#	disabled.
+#reference_age 0
+
+#  TAG: quick_abort
+#	By default the cache continues to retrieve objects from
+#	aborted requests.  This may be undesirable on slow (e.g. SLIP)
+#	links and/or very busy caches.  Impatient users may tie up
+#	file descriptors by repeatedly aborting and re-requesting
+#	non-cachable objects.
+#	
+#	Usage: quick_abort    min-kbytes percent max-kbytes
+#
+#       When the user aborts a request, Squid will check the
+#	quick_abort values to the amount of data transfered until
+#	then.
+#
+#	If the transfer has less than 'min-kbytes' remaining, it
+#	will finish the retrieval.  Setting minlength to -1 will
+#	disable the quick_abort feature.
+#
+#	If the transfer has more than 'max-kbytes' remaining, it
+#	will abort the retrieval.
+#
+#	If more than 'percent' of the transfer has completed, it will
+#	finish the retrieval.
+#
+#quick_abort    -1 0 0
+
+#  TAG: negative_ttl (in minutes)         
+#	Time-to-Live (TTL) for failed requests.  Certain types of
+#	failures (such as "connection refused" and "404 Not Found") are
+#	negatively-cached for a small amount of time.  The default is 5
+#	minutes.  Note that this is different from negative caching of
+#	DNS lookups.
+#
+#negative_ttl 5
+
+#
+#  TAG: positive_dns_ttl (in minutes)         
+#	Time-to-Live (TTL) for positive caching of successful DNS lookups.
+#	Default is 6 hours (360 minutes).  If you want to minimize the
+#	use of Squid's ipcache, set this to 1, not 0.
+#
+#positive_dns_ttl 360
+
+#  TAG: negative_dns_ttl (in minutes)         
+#	Time-to-Live (TTL) for negative caching of failed DNS lookups.
+#
+#negative_dns_ttl 5
+
+
+# TIMEOUTS
+#-----------------------------------------------------------------------------
+
+#  TAG: connect_timeout (in seconds)
+#	Some systems (notably Linux) can not be relied upon to properly
+#	time out connect(2) requests.  Therefore the squid process
+#	enforces its own timeout on server connections.  This parameter
+#	specifies how long to wait for the connect to complete.  The
+#	default is two minutes (120 seconds).
+#
+#connect_timeout 120
+
+#  TAG: read_timeout (in minutes)         
+#	An active connection will be aborted after read_timeout minutes
+#	of no activity on that connection (i.e., assume the remote server
+#	or network connection died after the connection was established).
+#	The default is 15 minutes.
+#
+#read_timeout 15
+
+#  TAG: client_lifetime (in minutes)         
+#	The maximum amount of time that a client (browser) is allowed to
+#	remain connected to the cache process.  This protects the Cache
+#	from having alot of sockets (and hence file descriptors) tied up
+#	in a CLOSE_WAIT state from remote clients that go away without
+#	properly shutting down (either because of a network failure or
+#	because of a poor client implementation).  The default is three
+#	hours, 20 minutes.
+#
+#	NOTE:  The default value is designed with low-speed client
+#	connections in mind.  200 minutes should be plenty of time to
+#	transfer a 10M file at 1k/sec.  If you have high-speed client
+#	connectivity, or occasionally run out of file descriptors,
+#	we suggest you lower this value appropriately.
+#
+#client_lifetime 200
+
+#  TAG: shutdown_lifetime (in seconds)
+#
+#	When SIGTERM or SIGHUP is received, the cache is put into
+#	"shutdown pending" mode until all active sockets are closed.
+#	This value is the lifetime to set for all open descriptors
+#	during shutdown mode.  Any active clients after this many
+#	seconds will receive a 'lifetime expire' message
+#
+shutdown_lifetime 5
+
+#  TAG: clean_rate (in minutes)
+#	How often to force a full garbage collection.   Garbage collection
+#	involves checking the expire time of every object in the cache.
+#
+#	NOTE: this option is provided only for backwards compatibility.
+#	We recommend that you leave it disabled (i.e. set to -1).  Expired
+#	objects are removed from the cache little by little as a part of
+#	its normal operations.
+#
+#clean_rate -1
+
+
+# ACCESS CONTROLS
+#-----------------------------------------------------------------------------
+
+# Defining an Access List
+#
+# acl aclname acltype string1 ...
+# acl aclname acltype "file" ...
+#
+# when using "file", the file should contain one item per line
+#
+# acltype is one of src dst srcdomain dstdomain url_pattern urlpath_pattern
+#	            time port proto method browser
+# 
+# acl aclname src      ip-address/netmask ... (clients IP address)
+# acl aclname src      addr1-addr2/netmask ... (range of addresses)
+# acl aclname dst      ip-address/netmask ... (URL host's IP address)
+# acl aclname srcdomain   foo.com ... (taken from reverse DNS lookup)
+# acl aclname dstdomain   foo.com ... (taken from the URL)
+# acl aclname time     [day-abbrevs]  [h1:m1-h2:m2]
+#	day-abbrevs:
+#		S - Sunday
+#		M - Monday
+#		T - Tuesday
+#		W - Wednesday
+#		H - Thursday
+#		F - Friday
+#		A - Saturday
+#	h1:m1 must be less than h2:m2
+# acl aclname url_regex  ^<A HREF="http://">http://</A> ...	# regex matching on whole URL
+# acl aclname urlpath_regex  \.gif$ ...	# regex matching on URL path only
+# acl aclname port     80 70 21 ...
+# acl aclname proto    HTTP FTP ...
+# acl aclname method   GET POST ...
+# acl aclname browser  regexp
+
+acl manager proto cache_object
+acl localhost src 127.0.0.1/255.255.255.255
+acl all src 0.0.0.0/0.0.0.0
+
+acl SSL_ports port 443 563
+acl CONNECT method CONNECT
+
+# Allowing or Denying access based on defined access lists
+#
+# Access to the HTTP port:
+#     http_access allow|deny [!]aclname ...
+# 
+# Access to the ICP port:
+#     icp_access  allow|deny [!]aclname ...
+
+# Only allow access to the cache manager functions from the local host.
+http_access deny manager !localhost
+http_access deny CONNECT !SSL_ports
+
+# Allow everything else
+http_access allow  all
+
+# Reply to all ICP queries we receive
+icp_access  allow  all
+
+#  TAG: miss_access
+#       Use to force your neighbors to use you as a sibling instead of
+#	a parent.  For example:
+#
+#		acl localclients src 172.16.0.0/16
+#		miss_access allow localclients
+#		miss_access deny  !localclients
+#
+#	This means that only your local clients are allowed to fetch
+#	MISSES and all other clients can only fetch HITS.
+#
+#	By default, allow all clients who passed the http_access rules
+#	to fetch MISSES from us.
+miss_access allow  all
+
+#  TAG: cache_host_acl
+#	Just like 'cache_host_domain' but provides more flexibility by
+#	using ACL's.
+#
+#		cache_host_acl cache-host	[!]aclname ...
+#
+#	NOTE:	* Any number of ACL's may be given for a cache-host,
+#		  either on the same or separate lines.
+#		* When multiple ACL's are given for a particular
+#		  cache-host, the first matched ACL is applied.
+#               * Cache hosts with no domain or ACL restrictions are
+#		  queried for all requests.
+#		* There are no defaults.
+
+
+# ADMINISTRATIVE PARAMETERS
+#-----------------------------------------------------------------------------
+
+#  TAG: cache_mgr 
+#	Email-address of local cache manager who will receive
+#	mail if the cache dies.  The default is "webmaster."
+#
+#cache_mgr webmaster
+
+#  TAG: cache_effective_user
+#	If the cache is run as root, it will change its effective/real
+#	UID/GID to the UID/GID specified below.  The default is not to
+#	change UID/GID.
+#
+cache_effective_user proxy proxy
+
+#  TAG: visible_hostname
+#	If you want to present a special hostname in error messages, etc,
+#	then define this.  Otherwise, the return value of gethostname()
+#	will be used.
+#
+#visible_hostname www-cache.foo.org
+
+
+# OPTIONS FOR THE CACHE REGISTRATION SERVICE
+#-----------------------------------------------------------------------------
+
+#	This section contains parameters for the (optional) cache
+#	announcement service.  This service is provided to help
+#	cache administrators locate one another in order to join or
+#	create cache hierarchies.
+#
+#	An 'announcement' message is sent (via UDP) to the registration
+#	service by Squid.  By default, the annoucement message is NOT
+#	SENT unless you enable it with 'cache_announce' below.
+#
+#	The announcement message includes your hostname, plus the
+#	following information from this configuration <A HREF="file:">file:</A>
+#
+#		http_port
+#		icp_port
+#		cache_mgr
+#
+#	All current information is processed regularly and made
+#	available on the Web at <A HREF="http://www.nla">http://www.nla</A>nr.net/Cache/Tracker/.
+
+
+# This is how frequently to send cache announcements.  The default
+# is `0' which disables sending the announcement messages.
+#
+# To enable announcing your cache, just uncomment the line below.
+#
+#cache_announce 24
+
+# This is the hostname and portnumber where the registration message
+# will be sent.  
+#
+# Format:	announce_to   host[:port] [filename]
+#
+# Hostname will default to 'sd.cache.nlanr.net' and port will default
+# to 3131.  If the 'filename' argument is given, the contents of that
+# file will be included in the announce message.
+#
+#announce_to sd.cache.nlanr.net:3131
+
+
+# HTTPD-ACCELERATOR OPTIONS
+#-----------------------------------------------------------------------------
+
+#  TAG: httpd_accel 
+#	If you want to run squid as an httpd accelerator, define the
+#	host name and port number where the real HTTP server is.
+#
+#	If you want virtual host support then specify the hostname
+#	as "virtual".
+#
+#httpd_accel real_httpd_host real_httpd_port
+#httpd_accel virtual 80
+
+#  TAG: httpd_accel_with_proxy
+#	If you want to use squid as both a local httpd accelerator
+#	and as a proxy, change this to 'on'.
+#
+#httpd_accel_with_proxy on
+
+#  TAG: httpd_accel_uses_host_header
+#	HTTP/1.1 requests include a Host: header which is basically the
+#	hostname from the URL.  Squid can be an accelerator for
+#	different HTTP servers by looking at this header.  However,
+#	Squid does NOT check the value of the Host header, so it opens
+#	a big security hole.  We recommend that this option remain
+#	disabled unless you are sure of what you are doing.
+#
+#httpd_accel_uses_host_header on
+
+
+# MISCELLANEOUS
+#-----------------------------------------------------------------------------
+
+# The DNS tests exit as soon as the first site is successfully looked up
+#
+# If you want to disable DNS tests, do not comment out or delete this
+# list.  Instead use the -D command line option
+#
+#dns_testnames internic.net usc.edu cs.colorado.edu mit.edu yale.edu
+dns_testnames localhost humbug.org.au uq.edu.au debian.org
+
+#  TAG: logfile_rotate #
+#	Specifies the number of logfile rotations to make upon receiving
+#	a USR1 signal.  The default is 10, which will rotate with
+#	extensions 0 through 9.  Setting logfile_rotate to 0 will
+#	disable the rotation, but the logfiles are still closed and
+#	re-opened.  This will enable you to rename the logfiles yourself
+#	just before sending a USR1 signal to the squid process.
+#
+# Debian sets this to 0.
+logfile_rotate 0
+
+#  TAG: append_domain 
+#	Appends local domain name to hostnames without any dots in them.
+#	append_domain must begin with a period.
+#
+#append_domain .yourdomain.com
+
+#  TAG: tcp_recv_bufsize
+#	Size of receive buffer to set for TCP sockets.  Probably just
+#	as easy to change your kernel's default.  Set to zero to use
+#	the default buffer size.
+#
+#tcp_recv_bufsize 0
+
+
+#  TAG: ssl_proxy
+#	Specify the name of a 'cache_host' listed above, or a hostname
+#	and port number where all SSL requests should be forwarded to.
+#
+#	Usage: ssl_proxy cache_host
+#	       ssl_proxy host:port
+#
+#ssl_proxy none
+
+#  TAG: passthrough_proxy
+#	Specify the name of a 'cache_host' listed above, or a hostname
+#	and port number where all non-GET (i.e. POST, PUT) requests
+#	should be forwarded to.
+#
+#	Usage: passthrough_proxy cache_host
+#	       passthrough_proxy host:port
+#
+#passthrough_proxy none
+
+#  TAG: proxy_auth
+#	Usage: proxy_auth passwd_file [ ignore-domain ]
+#
+#	'passwd_file' is an apache-style file of passwords for
+#	authenticated proxy access Looks like user:password, with the
+#	password being standard crypt() format.  Proxy authentication
+#	is disabled by default.
+#
+#	'ignore-domain' is a domain name for which authorization will
+#	*not* be required.
+#
+#proxy_auth /dev/null
+
+#  TAG: err_html_text
+#	HTML text to include in error messages.  Make this a "mailto"
+#	URL to your admin address, or maybe just a link to your 
+#	organizations Web page.
+#
+#err_html_text
+
+#  TAG: deny_info
+#	deny_info URL acl1 acl2 ...
+
+#  TAG: udp_hit_obj on|off
+#	If set, Squid will request UDP_HIT_OBJ replies from its
+#	neighbors.  UDP_HIT_OBJ is nice because it saves bandwidth, but
+#	it can cause some other problems.  For one it complicates
+#	calculating hit rates.  Also, problems arise because the ICP
+#	query does not contain any HTTP request headers which may
+#	affect the reply.
+#
+#udp_hit_obj off
+
+#  TAG: memory_pools on|off
+#	If set, Squid will keep pools of allocated (but unused) memory
+#	available for future use.  If memory is a premium on your
+#	system, disable this.
+#
+#memory_pools on
+
+#  TAG: forwarded_for on|off
+#	If set, Squid will include your system's IP address or name
+#	in the HTTP requests it forwards.  By default it looks like
+#	this:
+#		Forwarded: by <A HREF="http://foo.org:31">http://foo.org:31</A>28/ for 192.1.2.3
+#	If you disable this, it will appear as
+#		Forwarded: by <A HREF="http://foo.o">http://foo.o</A>rg:3128/
+#
+#forwarded_for on
+
+
+#  TAG: minimum_direct_hops
+#	If using the ICMP pinging stuff, do direct fetches for sites
+#	which are no more than this many hops away.
+#
+minimum_direct_hops 4
+
+#  TAG: cachemgr_passwd
+#       Specify passwords for cachemgr operations.
+#
+#Usage: cachemgr_passwd password action action ...
+#
+#	valid actions are:
+#		shutdown *
+#		info
+#		stats/objects
+#		stats/vm_objects
+#		stats/utilization
+#		stats/ipcache
+#		stats/fqdncache
+#		stats/dns
+#		stats/redirector
+#		stats/io
+#		stats/reply_headers
+#		stats/filedescriptors
+#		stats/netdb
+#		log/status *
+#		log/enable *
+#		log/disable *
+#		log/clear *
+#		log *
+#		parameter
+#		server_list
+#		client_list
+#		squid.conf
+#
+#	* Indicates actions which will not be performed without a
+#	  valid password, others can be performed if not listed here.
+#
+#	To disable an action, set the password to "none".
+#
+#Examples:
+#
+#	cachemgr_passwd secret shutdown
+#	cachemgr_passwd lesssssssecret info stats/objects
+#
+#Defaults: none
+
+#  TAG: swap_level1_dirs
+#	Number of first-level directories to create for storing cached
+#	objects.  Minimum 1, maximum 256, default 16.
+#
+#swap_level1_dirs 8
+
+#  TAG: swap_level2_dirs
+#       Number of sub-directories to create under each first-level
+#	directory.  Minimum 1, maximum 256, default 256.
+#
+swap_level2_dirs 64
+
+#  TAG: store_avg_object_size
+#	Average object size, used to estimate number of objects your
+#	cache can hold.  See doc/Release-Notes-1.1.txt.  The default is
+#	20K.
+#store_avg_object_size 20
+
+#  TAG: store_objects_per_bucket 50
+#	Target number of objects per bucket in the store hash table.
+#	Lowering this value increases the total number of buckets and
+#	also the storage maintenance rate.  The default is 50.
+#store_objects_per_bucket 50
+efÙ-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

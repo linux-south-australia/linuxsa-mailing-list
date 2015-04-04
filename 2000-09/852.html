@@ -1,0 +1,104 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: sshd unreliable" -->
+<!-- FromName="Alan Kennington" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="John Brazel" -->
+<!-- ToEmail="john@tellurian.com.au" -->
+<!-- Date="Tue, 19 Sep 2000 10:33:56 +0930" -->
+<!-- Id="20000919103356.B19645@dog.topology.org" -->
+<!-- Reference="200009190053.KAA17965@tellurus.tellurian.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: sshd unreliable</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : John Brazel &lt;<I><A HREF="mailto:john@tellurian.com.au">john@tellurian.com.au</A></I>&gt;
+  Date: Tue, 19 Sep 2000 10:33:56 +0930
+</PRE>
+<H1>Re: sshd unreliable</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, Sep 19, 2000 at 10:23:40AM +0930, John Brazel wrote:
+&gt; 
+&gt; 	There are a set number of file descriptors _per-system_.
+&gt; 
+&gt; 	If some other process is opening a lot of files, then SSH may fail
+&gt; 	after opening only a handful of files.
+&gt; 
+&gt; 	(Ran a test: 8 processes opening 256 fds each on a redhat 6.1 box
+&gt; 	is enough to fill the file descriptor table. Binaries won't even run 
+&gt; 	because the dynamic linker uses the open(2) syscall at runtime. 
+&gt; 	Complete resource exhaustion).
+&gt; 	
+&gt; &gt; I tried killing off child processes of the "sshd" process.
+&gt; &gt; But that didn't help.
+&gt; 
+&gt; 	What other processes are you running on the box? What is the operating
+&gt; 	system, and what is the kernel optimised to do?
+
+John,
+
+I don't think it's a global fd bound problem.
+The other programs I ran on there had no difficulty getting fds.
+The fact that the "sshd" processes do keep accumulating fds
+seems to indicate that's the problem.
+
+Well, I just remembered the scientific method that Mrs. Carr told us
+about in year 9.
+I tried running "scp" a couple of times, and checked the fds in
+the /proc system.
+Results thus:
+
+-------------------------------------------------------------
+[<A HREF="mailto:root@dog">root@dog</A> ~]# ls -l /proc/19107/fd|wc
+     22     233    1537
+[<A HREF="mailto:root@dog">root@dog</A> ~]# ls -l /proc/19107/fd | wc
+     23     244    1610
+[<A HREF="mailto:root@dog">root@dog</A> ~]# ls -l /proc/19107/fd | wc
+     24     255    1683 
+-------------------------------------------------------------
+
+Well. That looks like a point or two in favour of my hypothesis.
+
+Conjecture:
+Anyone else who runs "scp" 1000-2000 times to sshd version 1.2 on
+an old 486 (kernel 2.0.36, RH5.2) will get the same thing.
+
+Cheerio,
+Alan Kennington.
+
+PS. Another test shows that "ssh" also causes a residual fd.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

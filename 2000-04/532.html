@@ -1,0 +1,113 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Protecting files against power failure" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Daryl Tester" -->
+<!-- ToEmail="dt@picknowl.com.au" -->
+<!-- Date="Fri, 28 Apr 2000 17:53:51 +0930 (CST)" -->
+<!-- Id="Pine.BSF.3.96.1000428165310.340A-100000@augustus.tellurian.com.au" -->
+<!-- Reference="3908CCFE.DB085B0@picknowl.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Protecting files against power failure</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Daryl Tester &lt;<I><A HREF="mailto:dt@picknowl.com.au">dt@picknowl.com.au</A></I>&gt;
+  Date: Fri, 28 Apr 2000 17:53:51 +0930 (CST)
+</PRE>
+<H1>Re: Protecting files against power failure</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; I suspect that if you could pass this descriptor into your favourite
+&gt; programming/scripting language, you could even rewind it back to the
+&gt; beginning of the non-existant file and replay its contents (although,
+&gt; of course, this shouldn't affect the shell's file descriptor - care
+&gt; to hazard a guess why?).
+
+File descriptors can be shared amongst different processes.  Consider these
+two command sequences:
+
+  bash$ some-process &lt; some-file & some-process &lt; some-file
+  bash$ (some-process & some-process) &lt; some-file
+
+Both run some-process twice, more or less at the same time; and both take
+their input from some-file.  But these are NOT equivalent.  In the second
+example both instances of some-process share the same file descriptor, and
+any change in the descriptor used by one process can (and does) impact the
+other.
+
+Shared file descriptors are a sort of shared memory device, as the
+following programs demonstrate:
+
+  bash$ cat print.c
+  #include &lt;unistd.h&gt;
+  #include &lt;stdio.h&gt;
+  main() {
+     long lastpos = 0, curpos;
+     for (;;)
+        if ((curpos = lseek(0, 0L, SEEK_CUR)) != lastpos)
+           printf("%ld\n", lastpos = curpos);
+  }
+  
+  bash$ cat set.c
+  #include &lt;unistd.h&gt;
+  main(int argc, char *argv[]) {
+     lseek(0, atol(argv[1]), SEEK_CUR);
+  }
+  
+  bash$ cc -o print print.c; cc -o set set.c
+  bash$ exec 5&gt; /dev/null
+  bash$ ./print &lt;&5 &
+  [1] 1234
+  bash$ ./set 100 &lt;&5
+  100
+  bash$ ./set -10 &lt;&5
+  90
+  bash$ ./set 12345 &lt;&5
+  12435
+
+The numbers are printed by print, but as a result of something which set
+does.  This is a clear example of how one process CAN impact another (even
+though the implicit promise of Unix is that all processes are isolated from
+all others.)
+
+If you had bypassed somebody's computer's security, and wanted to keep some
+files on their machine, but you didn't want them to find those files, you
+could use this technique to do so:  Leave a process running, which kept all
+of the files open but unlinked so they could not be found.  When you need
+access to a file you signal that process and have it pass a file descriptor
+(using send()) to you.  Well that's what you could do if you were evil.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

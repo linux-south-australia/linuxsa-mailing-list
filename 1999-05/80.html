@@ -1,0 +1,176 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="FW: DNS/hostname problems.." -->
+<!-- FromName="Neil Ridley" -->
+<!-- FromEmail="n.ridley@SACBH.com.au" -->
+<!-- ToName="'Linux SA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Fri, 7 May 1999 08:30:29 +0930" -->
+<!-- Id="c=AU%a=_%p=SACBH%l=HOSE007-990506230029Z-33801@hose007.sacbh.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: FW: DNS/hostname problems..</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Neil Ridley &lt;<I><A HREF="mailto:n.ridley@SACBH.com.au">n.ridley@SACBH.com.au</A></I>&gt;
+  To  : 'Linux SA' &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 7 May 1999 08:30:29 +0930
+</PRE>
+<H1>FW: DNS/hostname problems..</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+	Benjamin,
+	
+	Thankyou!!!
+
+&gt;----------
+&gt;From: 	Benjamin Close[SMTP:<A HREF="mailto:linux@senet.com.au">linux@senet.com.au</A>]
+&gt;Sent: 	Thursday, 6 May 1999 16:15
+&gt;To: 	Neil Ridley
+&gt;Subject: 	Re: DNS/hostname problems..
+&gt;
+&gt;On Thu, 6 May 1999, Neil Ridley wrote:
+&gt;
+&gt;&gt; I have added an 10/100 Nic card to my PC to run a small Network (2 pc's)
+&gt;&gt; for learning purposes. However I need to be able also to connect to my
+&gt;&gt; ISP. I am logging into my ISP however there are DNS problems, cannot
+&gt;&gt; resolve addresses
+&gt;&gt; for http and for my email account. I use RedHat 5.2 and the Control
+&gt;&gt; Panel in X to configure my Network and PPP properties... I have called
+&gt;&gt; my PC ".SIS"  192.168.0.0 in Hosts and I also still have the loopback
+&gt;&gt; 172.0.0.1. entry in Hostnames. I also have the ipaddresss for my ISP
+&gt;&gt; with the Domain NAME www.blah.com.au.. 
+&gt;&gt; 
+&gt;&gt; Is an ISP ipaddress compulsory when connecting to an ISP through Linux?
+&gt;&gt; Because when I log in through windows I dont require anything except for
+&gt;&gt; the phone number, username & password.
+&gt;&gt; 
+&gt;&gt; Does some one know what is required here?
+&gt;
+&gt;LOL 
+&gt;
+&gt;Boy you created a storm of emails :)
+&gt;Split the list/4 horse men, what's next a new list for each user :)
+&gt;
+&gt;Anyway, whilst the others are having great fun jamming the lists I'll
+&gt;answer your questions.
+&gt;
+&gt;Your problem sounds like a default gateway problem.
+&gt;
+&gt;Explaination:
+&gt;
+&gt;You type
+&gt;www.senet.com.au
+&gt;
+&gt;now the ip number for this must be found. So the inetd daemon asks the
+&gt;nameserver on the default gateway for the ip. Your problem sounds like
+&gt;your default gateway is the ethernet card (eth0).
+&gt;
+&gt;Since your other PC isn't on the net, it won't be able to find the ip so
+&gt;it timesout. Netscape will saysomething like "unable to find ipaddress for
+&gt;domain www.senet.com.au".
+&gt;
+&gt;The same happens if you type an ip address.
+&gt;It now knows the address so attempts to connect to the host. However
+&gt;once again it looks at eth0 and fails.
+&gt;
+&gt;You can check this as takingdown the eth0 interface using: 
+&gt;ifconfig eth0 down 
+&gt;
+&gt;(You will need to be root to do this)
+&gt;This should allow you to use the net again. (You can also check your
+&gt;gateways by typing: route      if it just hangs use: route -n  this one
+&gt;will only list ip numbers rather than names)
+&gt;
+&gt;Not using redhat control panel I cant help you to fix it graphically.
+&gt;However, redhat stores file to do with networking.
+&gt;
+&gt;Have a look in the file /etc/sysconfig/network
+&gt;Chances are it will have: 
+&gt;GATEWAY=196.something.some.some
+&gt;GATEWAYDEV=eth0
+&gt;
+&gt;make it say: 
+&gt;GATEWAY=
+&gt;GATEWAYDEV=
+&gt;
+&gt;This should fix your web problem.
+&gt;
+&gt;----------------------------------------
+&gt;Now the ppp question you had.
+&gt;
+&gt;No you don't need to have any ipaddresses. Like windows they can be
+&gt;dynamically assigned.
+&gt;
+&gt;edit /etc/sysconfig/network-scripts/ifcfg-ppp0
+&gt;
+&gt;You will probably find the following lines somewhere in it:
+&gt;DEFROUTE=no
+&gt;REMIP=someiphere
+&gt;IPADDR=someipheretoo
+&gt;
+&gt;Chonge it to:
+&gt;DEFROUTE=yes
+&gt;REMIP=
+&gt;IPADDR=
+&gt;
+&gt;For the best speed make sure the following read:
+&gt;LINESPEED=115200	
+&gt;MRU=1500		
+&gt;MTU=1500	
+&gt;
+&gt;----------------------
+&gt;All the above changes for both problems should also not affect the network
+&gt;interface redhat has - we are just altering thier files.
+&gt;
+&gt;Hopefully these should fix all your problems.
+&gt;If not let me know.
+&gt;
+&gt;Should I start a list:
+&gt;
+&gt;LinuxQuestions&<A HREF="mailto:AnswersOnly_NOFLAMES_NOOFFTOPICDISCUSSIONS@linuxsa.org.au">AnswersOnly_NOFLAMES_NOOFFTOPICDISCUSSIONS@linuxsa.org.au</A>
+&gt;;-)
+&gt;
+&gt;Remeber you may be new to Linux but we all were once :)
+&gt;
+&gt;Cheers, 
+&gt; --
+&gt;
+&gt;* Benjamin Close
+&gt;* <A HREF="mailto:Benjsc@senet.com.au">Benjsc@senet.com.au</A>
+&gt;* Web Page: <A HREF="http://users.senet.com.au/~benjsc">http://users.senet.com.au/~benjsc</A>
+&gt;
+&gt;
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

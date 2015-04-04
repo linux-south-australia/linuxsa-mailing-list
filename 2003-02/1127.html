@@ -1,0 +1,107 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Ownership of files in windows share" -->
+<!-- FromName="" -->
+<!-- FromEmail="Glen.Rosie@originenergy.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="mgeddes@tellurian.com.au" -->
+<!-- Date="Tue, 25 Feb 2003 12:04:49 +1030" -->
+<!-- Id="15923651D753D511973F00B0D0D0BA7206374E0A@enekingm07.originenergy.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Ownership of files in windows share</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: &lt;<I><A HREF="mailto:Glen.Rosie@originenergy.com.au">Glen.Rosie@originenergy.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  Date: Tue, 25 Feb 2003 12:04:49 +1030
+</PRE>
+<H1>RE: Ownership of files in windows share</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Thanks a lot Matt, that's greatly appreciated.
+
+It works a treat.
+
+Glen
+
+-----Original Message-----
+From: Matthew Geddes [mailto:<A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A>]
+Sent: Tuesday, February 25, 2003 11:28 AM
+To: Rosie, Glen
+Cc: <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+Subject: Re: Ownership of files in windows share
+
+
+On Tue, 2003-02-25 at 11:05, <A HREF="mailto:Glen.Rosie@originenergy.com.au">Glen.Rosie@originenergy.com.au</A> wrote:
+&gt; Hi all
+&gt; 
+&gt; This is a fairly newbie question, but I'll ask it anyway.
+&gt; 
+&gt; My Redhat 7.3 box has a samba link to a WinXP directory. This all works correctly, except I need to change the ownership of the files in this directory to something other than root.
+&gt; 
+&gt; Can this be done?
+&gt; 
+&gt; I'm simply trying to do the following:
+&gt; $ chown nobody.nobody create.txt
+&gt; chown: changing ownership of `create.txt': Operation not permitted
+
+When you mount the Windows XP share from the Linux box, you can specify
+an option to say which uid owns the files on that share. Something like:
+
+ mount -t smbfs -o \ 
+   uid=notroot,gid=notwheel,username=winuser,password=secret \
+   //windowsbox/c$ /mnt/remote
+
+may work. It's probably not entirely obvious what this does, so here's a
+quick explanation. It mounts the share called 'C$' on the machine called
+'windowsbox' under the '/mnt/remote' directory on the Unix machine using
+the 'smbfs' file system type (SMB/CIFS is the windows file sharing
+protocol). The *Unix* user called 'notroot' and the Unix group called
+'notwheel' "own" the files under that directory tree (at least as far as
+Unix is concerned). Any operations that are performed on files or
+directories below that point are done so on the Windows box as the user
+'winuser' (assuming the password is correct).
+
+I hope that this helps,
+Matt
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

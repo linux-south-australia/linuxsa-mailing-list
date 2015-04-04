@@ -1,0 +1,192 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="RE: Bash help" -->
+<!-- FromName="'Richard Russell'" -->
+<!-- FromEmail="richardrussell@internode.on.net" -->
+<!-- ToName="'Tim Riley'" -->
+<!-- ToEmail="tr@rebel.net.au" -->
+<!-- Date="Tue, 17 Jul 2001 23:34:42 +0930" -->
+<!-- Id="" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: RE: Bash help</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Richard Russell &lt;<I><A HREF="mailto:richardrussell@internode.on.net">richardrussell@internode.on.net</A></I>&gt;
+  To  : Tim Riley &lt;<I><A HREF="mailto:tr@rebel.net.au">tr@rebel.net.au</A></I>&gt;
+  Date: Tue, 17 Jul 2001 23:34:42 +0930
+</PRE>
+<H1>RE: Bash help</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; &gt; first question: why? I would have thought that there may be a reason why
+&gt; &gt; it's in three files (perhaps because putting it in one simply
+&gt; won't work...
+&gt; &gt; but more likely because you want to share some of these files
+&gt; around, but
+&gt; &gt; not all of them -- three files may be the most logical way to
+&gt; arrange the
+&gt; &gt; code.)
+&gt;
+&gt; I am extending protopkg to make it into a tool which will be used in the
+&gt; situation of a ports system.  The reason I want one file instead of
+&gt; three is becuase that way it is very easy to have multiple versions (ie.
+&gt; multuple files) of a port in its directory - better to have three files
+&gt; for three versions instead of nine.
+
+"ports" as in BSD?
+
+personally, I'd go for either different directories or a revision control
+system... :)
+
+&lt;snip&gt;
+
+&gt; In the case of the files which were separate from the prototype file
+&gt; originally, there was just text - for one, a URI and an MD5 checksum per
+&gt; line, and for the other, a keyword and a path to a file.  The text
+&gt; between the flags is handled by other functions in the protopkg script.
+
+Ah, I see...
+
+&gt;
+&gt; &gt;
+&gt; &gt; &gt; There is a read_rules() function that extracts the information between
+&gt; &gt; &gt; the flag name passed to it as an argument.  This is it below:
+&gt; &gt;
+&gt; &gt; where? in the prototype file?
+&gt;
+&gt; No.  The read_rules() function is in the protopkg script/program.  The
+&gt; prototype file itself is never run, its functions are called by
+&gt; protopkg.
+
+ah -- so there are four files, and you are merging three into one, and
+keeping the generic script... I see...
+
+&lt;snip&gt;
+
+&gt; No - read_rules() and the other functions are contained withing the
+&gt; `protopkg` script.  Essentially, the prototype file contains information
+&gt; on how to build the source code tarball in question, along with some
+&gt; other things.
+
+ahhhhh....
+
+&gt;
+&gt; An example would look like this:
+&gt;
+&gt; ------
+&gt;
+&gt; package:
+&gt; VERSION=2.0
+&gt; PROGNAME=xmms-$VERSION-$ARCH-$BUILD
+&gt; BUILD=1
+&gt; ARCH=`/bin/arch`
+&gt;
+&gt; DESC="\
+&gt; Info about \n \
+&gt; the package"
+&gt;
+&gt; STRIPBIN=y
+&gt; STIRPLIB=y
+&gt; SETATTR=y
+&gt;
+&gt; compile() {
+&gt;  tar zxvf $CWD/xmms-$VERSION
+&gt;  ./configure --prefix=/usr
+&gt;  make
+&gt; }
+&gt;
+&gt; install() {
+&gt;  make install
+&gt; }
+&gt;
+&gt; :package
+&gt;
+&gt; sources:
+&gt;  <A HREF="http://www.xmms.org/xmms-2.0.tar.gz">http://www.xmms.org/xmms-2.0.tar.gz</A>
+&gt; :sources
+&gt;
+&gt; conf:
+&gt;  /etc/xmms.conf
+&gt; :conf
+&gt;
+&gt; ---------
+&gt;
+&gt; The text between the 'package' flags is the stuff called by protopkg to
+&gt; compile and install the package. 100% bash.  The rest is not bash code,
+&gt; just lines of data that the protpkg scrip interprets.
+
+ok -- I notice that the "lines of data" between the sources and conf flags
+look like URLs and files respectively... I assume they could be lists of
+URLs/files -- if they are pretty regular data, then it should be easy:
+
+Personally, to provide what looks to me like the same functionality, I'd
+consider replacing them with a function like (note my syntax is very rusty):
+
+read_lines()
+{
+	if [$1 == "sources"]
+	then
+		cat &lt;&lt; EOF
+&lt;sources text&gt;
+EOF
+	elif [$1 == "conf"]
+	then
+		cat &lt;&lt; EOF
+&lt;sources text&gt;
+EOF
+	fi
+}
+
+...and removing the definition of read_lines() from the original script... I
+suppose it depends quite how `read_lines()` is used in the script itself...
+if all it does is set an environment variable, then just set that variable
+in the prototype <A HREF="file:">file:</A>
+
+$SOURCES = "source1\n\
+source2\n\
+source3"
+
+etc
+
+perhaps even make `read_lines_conf()` etc...
+
+does this help? I'm now interested in solving your problem, so you'd better
+tell me :)
+
+rr
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

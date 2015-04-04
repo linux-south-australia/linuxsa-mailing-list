@@ -1,0 +1,151 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Bad Magic Number in Superblock (long story)" -->
+<!-- FromName="'Luke Vanderfluit'" -->
+<!-- FromEmail="luke@chipcity.com.au" -->
+<!-- ToName="'tux penguin'" -->
+<!-- ToEmail="tuxpenguin@mail.com" -->
+<!-- Date="Tue, 17 Dec 2002 10:53:08 +1030" -->
+<!-- Id="200212171047.28167.luke@chipcity.com.au" -->
+<!-- Reference="20021216162342.43396.qmail@mail.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Bad Magic Number in Superblock (long story)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Luke Vanderfluit &lt;<I><A HREF="mailto:luke@chipcity.com.au">luke@chipcity.com.au</A></I>&gt;
+  To  : tux penguin &lt;<I><A HREF="mailto:tuxpenguin@mail.com">tuxpenguin@mail.com</A></I>&gt;
+  Date: Tue, 17 Dec 2002 10:53:08 +1030
+</PRE>
+<H1>Re: Bad Magic Number in Superblock (long story)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+A filesystem can be corrupted so it can't be mounted, the result of damage to 
+the filesystem's superblock. Any attempt to mount it will fail.
+The filesystem keeps backups of the superblock. 
+THere are backup copies of the superblock at block offsets 8193, 16385 (8192 x 
+2 + 1), 24577 (8192 x 3 +1)
+
+you can check for the size of superblocks with dumpe2fs &lt;device&gt; | more
+if the size is different use that in the formula above. 
+mine is Blocks per group: 32768
+
+you can run e2fsck using a copy of the superblock
+
+e2fsck -f -b &lt;offset&gt; &lt;device&gt;
+
+eg. e2fsck -f -b 16385 /dev/hda1
+
+(taken from 'running linux' by Matt Welsh and Lar Kaufmann)
+
+hope this helps,
+
+kind regards,
+
+Luke
+
+
+
+On Tuesday 17 December 2002 02:53, tux penguin wrote:
+=-&gt;    A little info about myself:
+=-&gt; I am using RH 7.3 on a PIII-550MHz, 96MB RAM, 2HDS (One 2.5GB for
+ windows,and a 4.3GB for Linux) =-&gt; I use GRUB, which is found on the linux
+ drive,(so if i take my linux drive out windows still loads up, good windows
+ &lt;no, not 'windows good'&gt;) =-&gt;
+=-&gt;    A little problem:
+=-&gt; Windows needed a little more space
+=-&gt;
+=-&gt;    A Solution!!!:
+=-&gt; linux had some to share
+=-&gt;
+=-&gt;     A BIG problem:
+=-&gt; I ran 'parted' and told my 4.3GB drive that a chunk (1GB) was to be
+ FAT32. 'parted' worked fine, told me to update my '/etc/fstab' and reboot. I
+ did. =-&gt; &lt;divergence of story: Windows can use the 1GB drive, its fine&gt;
+=-&gt;
+=-&gt; Now when i try to boot the following happens.
+=-&gt; &gt; la la la la [OK]
+=-&gt; &gt; mmmmmm ting [OK]   Standard linux loading stuff
+=-&gt; &gt; ding - dong [OK]
+=-&gt; &gt; Checking root filesystem
+=-&gt; &gt; /:The physical size (according to the superblock) is 992013 blocks
+=-&gt; &gt;   The physical size of the device is 736981 blocks
+=-&gt; &gt;   Either the superblock or the partition table is likely to be corrupt
+=-&gt; &gt; /: UNEXPECTED INCONSISTENCY; RUN fsck MANUALLY
+=-&gt; &gt;       (i.e. without -a or -p options)
+=-&gt; &gt;                                  [FAILED]
+=-&gt; &gt;
+=-&gt; &gt; ***an error occurred during the filesystem check
+=-&gt; &gt; ***dropping you to a shell. the system will reboot
+=-&gt; &gt; ***when you leave the shell
+=-&gt; &gt; Give root password for maintenance
+=-&gt; &gt; Or type Control-D for normal startup:
+=-&gt; &gt;
+=-&gt;
+=-&gt; Control-D just reboots.
+=-&gt; When i enter the root password, i get taken to a read only file system
+=-&gt;
+=-&gt; &gt; <A HREF="mailto:root@localhost">root@localhost</A>$ fsck /dev/hda
+=-&gt; &gt; Parallelizing fsck version 1.23 (15-Aug-2001)
+=-&gt; &gt; efsck 1.23, 15-Aug-2001 for EXT2 FS 0.5b, 95/08/09
+=-&gt; &gt;
+=-&gt; &gt; Couldn't find ext2 superblock, trying backup blocks...
+=-&gt; &gt;
+=-&gt; &gt;fsck.ext2: bad magic number in super-block while trying to open /dev/hda
+=-&gt; &gt;
+=-&gt; &gt; The filesystem superblock could not be read or does not describe a
+ correct ext2 filesystem. If the device is valid and it really contains an
+ ext2 filesystem (and not swap or ufs or something else), then the superblock
+ is corrupt, and you might try running e2fsck with an alternate superblock
+ =-&gt; &gt;         e2fsck -b 8193 &lt;device&gt;
+=-&gt;
+=-&gt; e2fsck does the same thing (i guess thats parallelizing for you)
+=-&gt; fdisk can see the partitions as they should be.
+=-&gt;
+=-&gt; I believe that my linux partitions are actually ext3 (not ext2) but i
+ can't find 'e3fsck' or similar. =-&gt;
+=-&gt;
+=-&gt;     THE ROUND UP:
+=-&gt; I need to manually change my superblock, or run a utility that fixes it
+ for me. How???
+
+-- 
+Luke Vanderfluit
+Phone: 08 8556 6112
+Mobile: 0421 276 282
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

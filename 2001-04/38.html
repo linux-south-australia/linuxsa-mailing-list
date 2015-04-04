@@ -1,0 +1,128 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: 520 Byte Sectors on IBM DCHS drives" -->
+<!-- FromName="'Greg Lehey'" -->
+<!-- FromEmail="grog@lemis.com" -->
+<!-- ToName="'Daniel Callan'" -->
+<!-- ToEmail="dcallan@wias.net.au" -->
+<!-- Date="Mon, 2 Apr 2001 08:46:55 +0930" -->
+<!-- Id="20010402084655.A73090@wantadilla.lemis.com" -->
+<!-- Reference="4.3.1.20010401185322.00a7ea30@mail.wias.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: 520 Byte Sectors on IBM DCHS drives</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Greg Lehey &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  To  : Daniel Callan &lt;<I><A HREF="mailto:dcallan@wias.net.au">dcallan@wias.net.au</A></I>&gt;
+  Date: Mon, 2 Apr 2001 08:46:55 +0930
+</PRE>
+<H1>Re: 520 Byte Sectors on IBM DCHS drives</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; X-Mailer: QUALCOMM Windows Eudora Version 4.3
+
+[Format recovered--see <A HREF="http://www.lemis.com/email/email-format.html">http://www.lemis.com/email/email-format.html</A>]
+
+Your message had alternate long and short lines.
+
+On Sunday,  1 April 2001 at 19:24:18 +1000, Daniel Callan wrote:
+&gt; Hi all,
+&gt;
+&gt; Has anyone out there had to overcome this little problem before: We
+&gt; have just aquired a bundle of IBM DCHS-34550-04F (4.5GB 50-pin SEF
+&gt; SCSI ) drives in an old HP disk array, and I am trying to make use
+&gt; of them individually for a bunch of SPARC Classic's (Running RH6.2)
+&gt; that we use as low-end webservers for small clients.
+&gt;
+&gt; They are detected as drives perfectly (in Linux bootup and even if I
+&gt; "Stop+A" to the ROM and do a "probe-scsi-all") The problem is that
+&gt; they refuse to talk to the system on the grounds that have 520 Byte
+&gt; sectors (during bootup it reports this just before refusing to
+&gt; reference it to /dev/sdX )
+&gt;
+&gt; I have been scouring various pages/archives online (IBM being the
+&gt; least helpful so far), but so far all I can find is a handful of
+&gt; other people with the exact same drive/problem EXCEPT that they are
+&gt; all running Solaris and the only suggestions they got were to
+&gt; low-level format them with "sformat" (Which is AFAIK just for
+&gt; Solaris....well there is lots of stuff at the homepage about how you
+&gt; might port it yourself but it is not within my range of talents I'm
+&gt; afraid).
+&gt;
+&gt; The irony of having these SUN boxes running RH but needing a Solaris
+&gt; program is not much comfort :-\ And even if I did, and ran sformat,
+&gt; is this the solution or just the only known kludge for it???
+&gt;
+&gt; Anyway, any help/advice/experience with this would be greatly
+&gt; appreciated!!
+
+I've had this problem before.  On FreeBSD, there are some incantations
+to do this.  To quote an earlier message,
+
+&gt; Yup, there's some other way to change it.  Set the current values,
+&gt; then immediately issue a format command:
+&gt; 
+&gt;   # camcontrol cmd da1 -v -c "15 10 0 0 v:i1 0" 12 -o 12 "0 0 0 8  0 0:i3 0 v:i3" 512
+&gt;   # camcontrol cmd -n da -u 1 -v -t 7200 -c "4 0 0 0 0 0"
+&gt;   # camcontrol modepage da1 -m 3
+&gt;   Tracks per Zone:  19
+&gt;   Alternate Sectors per Zone:  12
+&gt;   Alternate Tracks per Zone:  0
+&gt;   Alternate Tracks per Logical Unit:  38
+&gt;   Sectors per Track:  84
+&gt;   Data Bytes per Physical Sector:  512
+&gt;   Interleave:  1
+&gt;   Track Skew Factor:  13
+&gt;   Cylinder Skew Factor:  22
+&gt;   SSEC:  0
+&gt;   HSEC:  1
+&gt;   RMB:  0
+&gt;   SURF:  0
+
+'camcontrol cmd' issues direct SCSI commands to the drive (here
+/dev/da1, the second SCSI drive).  I don't know whether or what
+program under Linux would do the same thing.  I can give you the
+camcontrol man pages to aid with the translation if you like.
+
+Greg
+--
+When replying to this message, please take care not to mutilate the
+original text.
+For more information, see <A HREF="http://www.lemis.com/email.html">http://www.lemis.com/email.html</A>
+Finger <A HREF="mailto:grog@lemis.com">grog@lemis.com</A> for PGP public key
+See complete headers for address and phone numbers
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

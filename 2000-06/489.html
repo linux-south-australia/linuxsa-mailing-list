@@ -1,0 +1,187 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Postgresql vs MySQL" -->
+<!-- FromName="Mark Newton" -->
+<!-- FromEmail="newton@atdot.dotat.org" -->
+<!-- ToName="Carlo" -->
+<!-- ToEmail="carlo@active-ideas.com.au" -->
+<!-- Date="Fri, 16 Jun 2000 15:26:54 +0930" -->
+<!-- Id="20000616152654.A91419@atdot.dotat.org" -->
+<!-- Reference="3949AD97.59BE9BFB@active-ideas.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Postgresql vs MySQL</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Newton &lt;<I><A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A></I>&gt;
+  To  : Carlo &lt;<I><A HREF="mailto:carlo@active-ideas.com.au">carlo@active-ideas.com.au</A></I>&gt;
+  Date: Fri, 16 Jun 2000 15:26:54 +0930
+</PRE>
+<H1>Re: Postgresql vs MySQL</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, Jun 16, 2000 at 03:01:19PM +1030, Carlo wrote:
+
+ &gt; 1) From the Mysql manual:
+ &gt; The ISAM table handler -- Stable 
+ &gt;      This manages storage and retrieval of all data. In all MySQL
+ &gt; releases there hasn't been a single (reported) bug in this code. The
+ &gt; only known way to get a corrupted table is to kill the server in the
+ &gt; middle of an update. Even that is unlikely to destroy any data beyond
+ &gt; rescue, because all data are flushed to disk between each query. There
+ &gt; hasn't been a single bug report about lost data because of bugs in
+ &gt; MySQL, either. 
+ 
+You're missing the point.  The argument isn't that mysql is unstable
+and prone to data loss due to a failing in mysql's code quality.  The
+argument is that if you're doing a query which involves more than one
+sequential SQL statement you can't trust the results.
+
+Now, as Dan said, that's probably fine for a read-only database.  It's
+probably also fine for a read/write database... until that one occasion
+in 10,000,000 in which you have two people simultaneously doing SQL 
+queries in *just* the right order to make sure that one or both of them
+will get completely bogus results, which may then be written back to the 
+database.
+
+So it isn't a matter of mysql crashing, it's more a case of GIGO - 
+Garbage-In, Garbage-Out.  That's the kind of corruption we're talking about.
+
+To use the canonical example:  Consider a database of account balances.
+Whenever money is withdrawn, you do something like:
+
+     SELECT balance FROM accounts WHERE account_number=.....;
+
+... in DBI or something, then you do some sanity checking and business
+logic (is the balance high enough that this withdrawl won't attract fees? 
+Is there enough money in the account to satisfy the withdrawl? etc), then
+you do:
+
+     $newbalance = $balance - $amount;
+
+     UPDATE accounts SET balance = $newbalance WHERE account_number=.....;
+
+So this one operation has involved two SQL queries.  
+
+This will work fine for years and years and years:  Right up until the
+exact moment at which some random benefactor deposits to your account
+when you're right in the middle of doing a withdrawl.  
+
+Why?  (I know some might not be following at the moment...)  Well,
+consider a balance for account 53715 which starts at $100.  You're
+withdrawing $50, so you do this:
+
+  $dbt = $dbi-&gt;prepare("SELECT balance FROM accounts WHERE account_number=?");
+  $dbt-&gt;execute(53715);
+  # error checking elided
+  my ($balance) = $dbt-&gt;fetchrow();
+  $dbt-&gt;finish();
+
+  my $newbalance = $balance - 50;            ********
+
+  $dbt = $dbi-&gt;prepare("UPDATE accounts SET balance=? WHERE account_number=?");
+  $dbt-&gt;execute($newbalance, 53715);
+  # error checking elided
+  $dbt-&gt;finish();
+
+Now, at *******, the balance in the database is still $100 because we 
+haven't written back the modified amount.  If our benefactor chooses
+that moment to deposit $30 to our account, the database will then show
+$130.  But after the *******, the program above will write $balance-50 = $50
+back into the database, meaning that the poor sap with the account will
+be $30 out of pocket.
+
+That's just plain wrong.  It's like the deposit never happened, even 
+though both operations no doubt show fully extensive audit trails to 
+show that it bloody-well did happen.
+
+That's a freak occurrance;  but if you have several hundred thousand
+hits per day, how long is it going to take to happen?
+
+It's true that you could probably wrap this simple case into a single
+UPDATE statement and do the business logic as a combination of CONSTRAINTs
+and stored procedures -- But you can't always do that;  indeed, you can
+almost never do it completely.
+
+If you had a database which supported transactions, this corruption
+simply wouldn't happen.  The withdrawl would begin the transaction,
+the deposit would then not be able to operate on the same rows until
+after the withdrawl had been completely finished -- It would be simply
+impossible for a third party to alter 53715's balance at the ****** point.
+
+THAT is what the ACID test is all about.  THAT is why you need
+transactions.  And THAT is why we're not talking about bugs in mysql
+when we talk about database corruption.
+
+It isn't just limited to the "read, calculate, write-back" case either:
+Even web sites which do several SELECTs in a row will fall prone to
+the problem if there is something, somewhere doing an UPDATE or INSERT
+at the same time.  Usually it won't matter;  but every now and then
+it'll matter A LOT, and the amount of code you need to write to guard
+against it is vastly more complicated than the effort you need to go to
+to replace your back-end with a real database.
+
+ &gt; 2) The Mysql applications we write for the internet(including write
+ &gt; access to important data) run slow. To the extent that is nearly
+ &gt; unacceptable, not because of Mysql but because of the internet being
+ &gt; slow. If we were to use Postgres wich is over 10 times slower, some of
+ &gt; our applications simply would not be acceptable or be used. They would
+ &gt; stay with their traditional LAN administration.
+
+I submit that it's possible to design around that limitation, so you 
+can still have fast response.  The hundreds of thousands of ORACLE
+sites out there are proof of that;  ORACLE is even slower than 
+PostgreSQL on SME databases, yet the commercial world seems to think
+it's fast enough to drive all kinds of real-life applications, including
+web sites.
+
+ &gt; 3) Over the past 4 years we have used Mysql for many clients. Some that
+ &gt; use the SQL engine very heavily(read and write). After all that we have
+ &gt; had only one msyql crash in 4 years. Nothing an isamchk didn't fix(10
+ &gt; minutes work). And no data loss during this crash. All clients are
+ &gt; happy with there applications running on Mysql, that speaks for itself.
+
+Again, this misses the point.  It's about ACID, not software bugs.
+
+ &gt; I guess that still doesnt eliminate the possibility for data loss.
+
+Or GIGO.
+
+   - mark
+
+--------------------------------------------------------------------
+I tried an internal modem,                    <A HREF="mailto:newton@atdot.dotat.org">newton@atdot.dotat.org</A>
+     but it hurt when I walked.                          Mark Newton
+----- Voice: +61-4-1620-2223 ------------- Fax: +61-8-82231777 -----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,136 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Why ECC RAM?" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="'Mcleod, Ian'" -->
+<!-- ToEmail="ian.mcleod@eds.com" -->
+<!-- Date="Thu, 31 Oct 2002 17:41:47 +1030" -->
+<!-- Id="3DC0D7B3.4010406@aarnet.edu.au" -->
+<!-- Reference="B09017B65BC1A54BB0B76202F63DDCCA1159BE@auntm201" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Why ECC RAM?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : Mcleod, Ian &lt;<I><A HREF="mailto:ian.mcleod@eds.com">ian.mcleod@eds.com</A></I>&gt;
+  Date: Thu, 31 Oct 2002 17:41:47 +1030
+</PRE>
+<H1>Re: Why ECC RAM?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Mcleod, Ian wrote:
+&gt; What does 'registered' RAM mean?  That it is supported by the vendor?
+
+That the memory has a "register" facing the memory bus.  The
+register is a buffer that holds the data until it lines up
+precisely with the bus clock cycle, allowing a clean data read.
+
+"Holding the data" implies an hit of one clock cycle on the
+memory read, so registered memory is slower than buffered memory
+(which also holds the data, but doesn't try to line it up with a
+clock cycle) or unbuffered memory.
+
+It's difficult to know if you *need* this, it really
+depends upon the tolerances of the motherboard.  Certainly
+if the motherboard manufacturer says you need it, then you
+need it.  For example, they might be relying on the RAM
+having solid clocking to get away with a long memory bus
+serving 8 or so DIMMs.
+
+
+The point of ECC RAM isn't that it can detect errors, but
+that it can *correct* them.  Particularly, all one bit
+errors can be corrected by the DIMM itself.  All two bit
+errors can be detected by the DIMM (and potentially
+corrected in software).  Most other errors can also be
+detected.  Best of all, the software can be informed
+of the faulty DIMM, giving it the opportunity to take
+the DIMM out of service.
+
+For one bit errors the DIMM's electronics correct the
+one-bit fault.  The OS can be informed of the error.
+
+For two bit errors the operating system is informed of
+the error.  If the error is minor it can be fixed in
+software (at a performance penalty, as you have an
+interrupt for each read of that memory).
+
+If the error is major the operating system is still
+informed.  This gives the OS a chance to recover
+`gracefully'.  For example, it can kill all processes
+holding allocations in the faulty DIMM, and take
+the DIMM's memory out of the allocation pool.
+
+If the kernel is in the faulty DIMM, it can alter
+the kernel parameters to remove the faulty DIMM
+and do an IPL or reboot.
+
+Although all this is drastic, you still end up
+with a functioning system rather than a heap
+of useless silicon.  A better comparative outcome
+than the Non-Maskable Interrupt issued on a
+failure of a parity RAM DIMM.
+
+All of this makes ECC RAM and good choice for a
+high availability system.  You can probably afford
+your desktop system to be useless while you pop out
+to get some replacement RAM.
+
+Linux is slowly getting ECC functionality (every
+OS gets the one-bit errors corrected, even without
+full ECC support).
+
+   <A HREF="http://www.anime.net/~goemon/linux-ecc/">http://www.anime.net/~goemon/linux-ecc/</A>
+
+ECC costs more because you need to hold additional bits
+of error correcting code.  The code is reasonably complex
+and so some significant electronics is required on the
+DIMM to calculate the ECC.
+
+
+ECC memory is usually registered.  This is a sensible
+design and marketing choice.  Design-wise, having an
+output register gives you a place to shove the corrected
+value of a read of a memory cell with a one-bit error.
+Marketing-wise, people with high availability (read "server")
+needs are going to want both the registered and the ECC
+features.  Very few of them are only going to want one.
+
+
+Yet another mainframe technology arriving on PCs.  Scary.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

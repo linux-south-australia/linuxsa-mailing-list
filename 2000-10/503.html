@@ -1,0 +1,131 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: routing, resolution" -->
+<!-- FromName="Daryl Pilkington" -->
+<!-- FromEmail="darylp@senet.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Sun, 15 Oct 2000 19:10:49 +1100" -->
+<!-- Id="39E96689.55F19731@senet.com.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: routing, resolution</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Daryl Pilkington &lt;<I><A HREF="mailto:darylp@senet.com.au">darylp@senet.com.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Sun, 15 Oct 2000 19:10:49 +1100
+</PRE>
+<H1>Re: routing, resolution</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Folks,
+I have a resolution to my OS/2 router problem:
+
+For the clients, I had to configure another direct route in my SOCKS
+configuration!
+DOH!
+
+Obvious, wasn't it?
+
+CLIENTS:
+\mptn\etc\socks.cfg
+direct 10.2.1.0 255.255.255.0
+direct 192.168.1.0 255.255.255.0
+sockd @=10.2.1.1 0.0.0.0 0.0.0.0
+
+\mptn\bin\setup.cmd:
+route -fh
+arp -f
+inetcfg -s synattack 1
+inetcfg -s keepalive 60
+inetcfg -s multidefrt 0
+ifconfig lo 127.0.0.1
+ifconfig lan0 10.2.1.35 netmask 255.255.255.0
+route add -net 192.168.1.0 10.2.1.250 -netmask 255.255.255.0
+route add default 10.2.1.1
+ipgate off
+
+ROUTER:
+\mptn\bin\setup.cmd:
+route -fh
+arp -f
+inetcfg -s synattack 1
+inetcfg -s keepalive 60
+inetcfg -s multidefrt 0
+ifconfig lo 127.0.0.1
+ifconfig lan0 10.2.1.250 netmask 255.255.255.0
+ifconfig lan0 192.168.1.250 netmask 255.255.255.0 alias
+ipgate on
+
+Daryl Pilkington wrote:
+&gt; 
+&gt; I've got a multi-homed OS/2 box that, (among other things), I want to
+&gt; use as a router.
+&gt; 
+&gt; I can ping hosts from one net to the other, but I can't run telnet
+&gt; through the router.
+&gt; 
+&gt;  host #1                 router                host #2
+&gt; 10.2.1.35              10.2.1.250           192.168.1.100
+&gt;                       192.168.1.250
+&gt; 
+&gt;                              Ping?
+&gt; 10.2.1.35 -&gt; 10.2.1.250        Y
+&gt; 10.2.1.35 -&gt; 192.168.1.250     Y
+&gt; 10.2.1.35 -&gt; 192.168.1.100     Y
+&gt; 
+&gt;                             Telnet?
+&gt; 10.2.1.35 -&gt; 10.2.1.250        Y
+&gt; 10.2.1.35 -&gt; 192.168.1.250     N
+&gt; 10.2.1.35 -&gt; 192.168.1.100     N
+&gt; 
+
+-- 
+Regards, 
+
+Daryl  Pilkington 
+
+//// The PC Therapist, Business Computing Integration
+O&lt;O  AUSTRALIA
+\_/
+&lt;O&gt;  OS/2 Warp, Redhat Linux, DB2
+     IBM Certified Systems Expert
+
+        email: <A HREF="mailto:darylp@pc-therapist.com.au">darylp@pc-therapist.com.au</A>
+          ICQ: 91914134
+          Tel: +61-414-327-957
+Fax/Voicemail: +61-416-991-462
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

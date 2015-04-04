@@ -1,0 +1,105 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Quick linux gateway.." -->
+<!-- FromName="'Steven Wall'" -->
+<!-- FromEmail="wallclan@bigpond.com" -->
+<!-- ToName="'Gwyn Morfey'" -->
+<!-- ToEmail="gwyn@dezyne.net" -->
+<!-- Date="Sat, 11 May 2002 22:57:31 +0930" -->
+<!-- Id="200205111322.g4BDMa917074@jessica.netcraft.com.au" -->
+<!-- Reference="1021101444.6332.17.camel@localhost.localdomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Quick linux gateway..</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Steven Wall &lt;<I><A HREF="mailto:wallclan@bigpond.com">wallclan@bigpond.com</A></I>&gt;
+  To  : Gwyn Morfey &lt;<I><A HREF="mailto:gwyn@dezyne.net">gwyn@dezyne.net</A></I>&gt;
+  Date: Sat, 11 May 2002 22:57:31 +0930
+</PRE>
+<H1>Re: Quick linux gateway..</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi Gwyn
+
+	I have a gateway setup at home for 2 PCs through my "old_p100" which has 
+1.2G hdd and 8M RAM. I found that if I tried to install anything after RedHat 
+7.0 the install would not go ahead due to lack of memory even though I was 
+trying a text install. I successfully got RH 7.0 going. Next step was to set 
+up My NIC as it was not auto detected during setup. I added the line :
+ 
+insmod  /lib/modules/2.2.16-22/net/3c509.o
+
+to my /etc/rc.d/rc.local file
+
+following that I wrote a simple firewall and MASQ script called 
+steve.firewall and added the following lines to /etc/rc.d/rc.local
+
+## set up firewall and MASQ
+
+echo "1" &gt; /proc/sys/net/ipv4/ip_forward
+/etc/rc.d/steve.firewall
+
+file steve.firewall is as follows:
+
+#!/bin/sh
+
+#flush existing rules
+/sbin/ipchains -F forward
+
+#IP Masq -P = policy
+/sbin/ipchains -P forward DENY
+
+# -A = append, -s = source -j = jump MASQ = masquerade packets
+/sbin/ipchains -A forward -s 192.168.0.0/24 -j MASQ
+
+
+the comments are pretty easy to follow.
+
+I use wvdial to connect to internet by ssh from my everyday 'puter or if I'm 
+feeling energetic i lean over type it in manually. Hope this is of some help 
+to you. What I found was that there are a million ways to achieve the desired 
+result, I'm not sure how secure my setup is but it allows 2 PC's access from 
+the one modem. I haven't investigated proxy caching yet but thats on the 
+to-do list. Good luck with it.
+
+
+Regards Steve 
+
+
+
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,292 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="ALPHA ** Automagic Netware Client ***ALPHA .01" -->
+<!-- FromName="'James Leone'" -->
+<!-- FromEmail="LINUXCPA@netscape.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="LINUXSA@linuxsa.org.au" -->
+<!-- Date="Fri, 01 Nov 2002 10:51:13 -0800" -->
+<!-- Id="3DC2CD21.1080204@netscape.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: ALPHA ** Automagic Netware Client ***ALPHA .01</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Leone &lt;<I><A HREF="mailto:LINUXCPA@netscape.net">LINUXCPA@netscape.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:LINUXSA@linuxsa.org.au">LINUXSA@linuxsa.org.au</A></I>&gt;
+  Date: Fri, 01 Nov 2002 10:51:13 -0800
+</PRE>
+<H1>ALPHA ** Automagic Netware Client ***ALPHA .01</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+I have a close to if not working version of a Debian / Lindows Netware 
+Client.  It is a bash shell script.
+
+I HAVE ONLY WORKED ON THE LINDOWS AND DEBIAN VERSION SO FAR, TRY AT YOUR 
+OWN RISK.
+
+
+To use it, just create a file in your home directory and call it ipx.sh, 
+and copy the contents below the astricks onto the page.
+
+Then make the script executible by typeing this command at the shell:
+
+chmod u=rwx,g=rx,o=rx $HOME/ipx.sh
+
+This is for Debian or Lindows.
+
+I tried the...
+
+"cat &gt;&gt; EOF
+
+Type my text here
+
+EOF"
+
+...comand to replace the use of echo, but once I used cat, the script 
+woudl stop running and page to screen.
+
+I used dpkg in the grep command trying to keep the original syntax in 
+tact, but kept getting false positives.
+
+I figured that I would let apt-get take care of the package installation 
+search.
+
+I commented out the run level scripts and trust that the mere creation 
+of a script in init.d will cause the netware client to initiate upon reboot.
+
+
+James Leone
+
+
+
+****************************************************************
+! /bin/sh
+VERSION="0.4"
+
+clear
+echo "############################################"
+echo ""
+echo "     Automagic Netware Client for Lindows & Debian GNU/Linux"
+echo ""
+echo "############################################"
+echo "This script will download the necessary packages"
+echo "needed to run an IPX Netware Client in Lindows or Debian"
+echo "This is SUB ALPHA NO SUCESSFUL TEST RUNS YET."
+echo "USE AT YOUR OWN RISK, LICENSED UNDER AUTOMAGIC"
+echo " LICENSE."
+
+# User must be logged in as root.
+if [ "`whoami`" != "root" ]; then
+    echo -e "\nYou must be logged in as root to run this setup."
+    exit 1
+fi
+
+# User must identify his Unix Ethernet Card Number.
+echo -en "\nWhat is the Unix device number of your ethernet card? 
+(Default=eth0)[eth0/eth1/eth2/eth3]"
+    read eth
+
+# Activate apt-get if not so far
+    echo "Activate apt-get"
+        echo -en "\nDo you wish to use apt-get for the first time?[y/n]: "
+    read YN
+    if [ $YN = "y" -o $YN = "Y" ]
+        then
+        apt-get update
+    fi
+
+
+#Install NCPFS    
+    echo "You need ncpfs"
+    echo -en "\nDo you wish to apt-get ncpfs?[y/n]: "
+    read YN
+    if [ $YN = "y" -o $YN = "Y" ]
+        then
+        apt-get install ncpfs
+        apt-get install wajig
+    fi
+
+
+
+# ipxutils package may need to be installed.
+    echo "you need ipx"
+    echo -e "\nipx must be installed if you wish to mount volumes"
+    echo "on Netware 3.x and 4.x servers or do not have IP bound"
+    echo "on your Netware 5 or above servers."
+    echo -en "\nDo you wish to apt-get ipx?[y/n]: "
+    read YN
+    if [ $YN = "y" -o $YN = "Y" ]; then :
+        apt-get install ipx
+    IPX="True"
+    fi
+
+# mars-nwe package must be installed.
+    echo "you need mars-nwe"
+    echo "Mars-nwe must be installed if you wish to set up"
+    echo "connection with a Netware 4 or below server."
+    echo "You will need to download Mars-NWE"
+    echo "via Lynx which we will apt-get."
+    echo "Don't worry if Lynx is already installed,"
+    echo "apt-get can detect this and won't break anything"
+    echo "after Lynx installs, a dialogue box will come up."
+    echo "At this point you are using lynx. Of the packages"
+    echo "listed, please select mars-nwe_0.99.p120-0_i386.deb"
+    echo "when it asks you if you would like to install, say yes"
+
+    echo -en "\n Do you want to continue?[y/n]: "
+    read YN
+    if [ $YN = "y" -o $YN = "Y" ]
+    then
+        apt-get install lynx
+    lynx <A HREF="http://people.debian.org/~pm/pool/main/mars-nwe">http://people.debian.org/~pm/pool/main/mars-nwe</A>
+    cd $HOME
+    wajig install mars-nwe_0.99.pl20-0_i386.deb
+    fi
+
+
+echo
+echo "============================================"
+echo "   Setting permissions for non root users"
+echo "============================================"
+echo -e "\nIn order for non-root users to mount Netware drives,"
+echo -e "you must make the following changes:\n"
+echo -e "\tchmod +s /usr/bin/ncpmount"
+echo -e "\tchmod +s /usr/bin/ncpumount"
+if [ "$IPX" = "True" ]; then
+    echo -e "\tchmod +s /usr/bin/slist"
+fi
+echo
+echo -en "Shall I make these changes for you? [y/n]: "
+read YN
+if [ $YN = "y" -o $YN = "Y" ]
+then
+    echo -e "\nsetting ncpfs commands suid" &gt;&gt; setup.log
+    chmod +s /usr/bin/ncpmount 2&gt;&gt; setup.log
+    chmod +s /usr/bin/ncpumount 2&gt;&gt; setup.log
+    if [ "$IPX" = "True" ]; then
+    chmod +s /usr/bin/slist 2&gt;&gt; setup.log
+    fi
+fi
+
+if [ "$IPX" = "True" ]; then
+    echo -e "\n"
+
+    echo "==========================================="
+     echo " Binding IPX to your network interface"
+        echo " ============================================"
+        echo " You need to bind IPX if your servers are not setup to use 
+native IP."
+        echo " We will also have to create an /etc/init.d/rc.local file"
+        echo " The command will be something like: ipx_interface add -p 
+eth0 802.2"
+        echo " depending on which nic you want to bind and which 
+frametype is"
+        echo " in use in your environment. See the man page for more info"
+
+    
+        echo -en "\nWhich Frametype Would You Like to use? (802.2 is 
+default) [802.2/EtherII/802.3/SNAP]: "
+        read frame
+    echo -e "\nadding ipx interface, frametype $frame:" &gt;&gt; setup.log
+    ipx_interface delall 2&gt;&gt; setup.log
+    ipx_interface add -p $eth $frame 2&gt;&gt; setup.log
+      echo -en "Create the /etc/init.d/rc.local file? and add the 
+commands? [y/n]: "
+        read YN
+    if [ $YN = "y" -o $YN = "Y" ]
+        then
+        touch /etc/init.d/rc.local
+# update-rc.d rc.local start 99 2 3 4 5 .
+        chmod u=rwx,g=rx,o=rx /etc/init.d/rc.local
+        echo "#! /bin/sh" &gt;&gt; /etc/init.d/rc.local
+        echo "ipx_interface delall" &gt;&gt; /etc/init.d/rc.local
+            echo "ipx_interface delall" &gt;&gt; setup.log
+            echo "ipx_interface add -p $eth $frame" &gt;&gt; /etc/init.d/rc.local
+            echo "ipx_interface add -p $eth $frame" &gt;&gt; setup.log
+    fi
+fi
+    echo "==========================================="
+     echo "    Creating A Directory to Place the Mounted"
+    echo "              Novel Server Volumes"
+        echo " ============================================"
+        echo " You need to create a new directory in your computer"
+    echo " in which your netware volumes (AKA mapped Network Drives)"
+        echo " will be accessable by you. This is called mounting the"
+    echo " network drive, and it will appear in the directory you"
+    echo " create here. The mount itself works in the same fashion"
+    echo " that mounting a CDROM drive does, as a subdirectory. Make"
+    echo " sure you have rights to the directory you create. We will"
+    echo " also create a shell script for you to log into the server"
+    echo " with. It will start automatically if placed in"
+    echo " $HOME/.kde/Autostart.&gt;"
+
+    
+        echo -en "\nInto which directory that you own would you like to 
+have your Netware Volumes appear?: "
+        read mountpoint
+    mkdir $mountpoint
+    echo -en "\nPlease enter the name of your server: "
+    read server
+    echo -en "\nPlease enter your password or -n for none: "
+    read password
+    echo -en "\nPlease enter your user name: "
+    read user
+    echo #!/bin/bash &gt;&gt; $HOME/novell.sh
+    echo ncpmount -S $server -U $user $mountpoint $password &gt;&gt; 
+$HOME/novell.sh
+    chmod u=rwx,g=rx,o=rx $HOME/novell.sh
+    echo -en "\nWould you like to copy this script to the KDE Autostart 
+Directory?" [Y/N]
+    read YN
+    if [ $YN = "y" -o $YN = "Y" ]
+        then
+        cp $HOME/novell.sh $HOME/.kde/Autostart
+    fi
+
+
+
+echo "############################################"
+echo " Automagic Netware Client for Linux Installation Complete"
+echo "############################################"
+echo "  Check the setup.log file for error messages"
+
+echo " Setup complete..." &gt;&gt; setup.log
+
+exit
+
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.openprojects.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

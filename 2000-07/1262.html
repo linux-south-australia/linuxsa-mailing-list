@@ -1,0 +1,77 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Trace Route" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Richard Sharpe" -->
+<!-- ToEmail="sharpe@ns.aus.com" -->
+<!-- Date="Sun, 23 Jul 2000 22:58:02 +0930 (CST)" -->
+<!-- Id="Pine.BSF.4.21.0007232246380.47306-100000@augustus.tellurian.com.au" -->
+<!-- Reference="3.0.6.32.20000723142038.00a49940@203.16.214.248" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Trace Route</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Richard Sharpe &lt;<I><A HREF="mailto:sharpe@ns.aus.com">sharpe@ns.aus.com</A></I>&gt;
+  Date: Sun, 23 Jul 2000 22:58:02 +0930 (CST)
+</PRE>
+<H1>Re: Trace Route</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+&gt; UNIX/Linux traceroute uses a UDP echo request ... 
+
+Not quite.  The original traceroute, that is the unix one, sends datagrams
+to the destination using an absurdly small time-to-live (TTL); initially 1.
+TTL is expressed in network hops and when the packet has traversed that
+many routers an ICMP (control message) Time Exceeded message is returned.
+Traceroute measures the time between sending the packet and receiving that
+reply.  Each successive probe has the TTL increased.  The packets that are
+sent are addressed to an "unused" port on the destination.  The destination
+should therefore return an ICMP (control message) Unreachable message, and
+thus traceroute knows when to stop probing.
+
+No port is defined to be unused, and there is every possibility that the
+port that traceeroute addresses it's packet to will be in use by the
+destination machine, and  hence the final ICMP Unreachable will not be
+seen.  (Traceroute will therefore continue to send packets with increasing
+TTLs until some maximum TTL has been reached.)
+
+Some sites filter out ICMP messages in the mistaken belief that this
+improves security.  Traceroute does not work through such filters.
+
+If you are getting no response at all you most likely have an ipfw rule
+dropping ICMP packets.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

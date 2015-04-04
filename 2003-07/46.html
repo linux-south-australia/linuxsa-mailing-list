@@ -1,0 +1,389 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: (Clarification) Re: Some Proposals for a Linux of The Future (tm) :)" -->
+<!-- FromName="'Damien Uern'" -->
+<!-- FromEmail="carrigan_2606@optusnet.com.au" -->
+<!-- ToName="'Adam Smith','LinuxSA'" -->
+<!-- ToEmail="linuxsa@bugman.cx,linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 2 Jul 2003 00:43:05 +0930" -->
+<!-- Id="200307020043.05221.carrigan_2606@optusnet.com.au" -->
+<!-- Reference="20030630145155.GA1548@bugman.cx" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: (Clarification) Re: Some Proposals for a Linux of The Future (tm) :)</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Damien Uern &lt;<I><A HREF="mailto:carrigan_2606@optusnet.com.au">carrigan_2606@optusnet.com.au</A></I>&gt;
+  To  : Adam Smith &lt;<I><A HREF="mailto:linuxsa@bugman.cx">linuxsa@bugman.cx</A></I>&gt;<BR>        LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Wed, 2 Jul 2003 00:43:05 +0930
+</PRE>
+<H1>Re: (Clarification) Re: Some Proposals for a Linux of The Future (tm) :)</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Thanks for your reply Adam,
+
+On Tue, 1 Jul 2003 12:21 am, Adam Smith wrote:
+&gt; On Mon, Jun 30, 2003 at 11:18:13PM +0930, Damien Uern said:
+&gt; &gt; Hello,
+&gt;
+&gt; Well Hi there!
+&gt;
+&gt; &gt; The separation of Administrator-modified configuration files and the
+&gt; &gt; default files installed by the system makes sense to me. But having it in
+&gt; &gt; two totally different locations doesn't, e.g. "/etc and /usr/local/etc".
+&gt; &gt; Forgetting about Unix history for a moment and stepping outside of the
+&gt; &gt; box, if you were to design the filestructure from scratch, where would
+&gt; &gt; you place these two directories?
+&gt;
+&gt; Because it's the history of Unix that has held it together as a scalable
+&gt; operating system for so long.
+&gt;
+&gt; And it makes logical sense to me.
+&gt;
+&gt; /etc for your basic system config files that come with your operating
+&gt; system,
+&gt;
+&gt; /usr/local/etc for all the additional stuff you've added to the system that
+&gt; doesn't come as part of the underlying model.  'man hier' and look up
+&gt; /usr/local.
+&gt;
+&gt; I agree that it can be sometimes confusing, for example:
+&gt;
+&gt; /etc/named/named.conf
+&gt; /usr/local/etc/dhcpd.conf
+&gt;
+&gt; (Yes -- both services are fundamental to most networks, and while
+&gt; named.conf is a file and a service included with a generic install,
+&gt; dhcpd.conf is not, because it's installed, in freebsd's case, from the
+&gt; ports.
+
+And you don't see that as confusing? How on earth is that supposed to make 
+sense? Yes I understand the desire to separate things out for large 
+installations and for NFS mounting partitions from different servers, etc. 
+But really, isn't there a better way? If I was looking for dhcpd.conf, I'd be 
+looking in /etc, not /usr/local/etc. And why does named get it's own 
+directory, but dhcpd doesn't? It's inconsistent!
+
+&gt;
+&gt; &gt; So here are my revised goals:
+&gt; &gt;
+&gt; &gt; 1. Design a logical directory structure within the /etc directory.
+&gt; &gt;    - it must be fairly simple for somebody to look through that directory
+&gt; &gt; to find something without resorting to "locate" or "find".
+&gt;
+&gt; How?
+
+Because it would be structured in a good way. Let's say you wanted to find the 
+configuration file for "samba".
+
+Let's say the path was :
+
+/etc/system/services/samba
+
+and the rest of the directory layout was like in my earlier email. I would be 
+thinking, "well, samba is part of the system, certainly not a user 
+application", so I cd to system, then I think "well, it's a service", then I 
+type "ls" and see "samba" there... ooh I found it!
+
+That's probably a bad example because typing ls /etc | grep samba will show 
+you the samba directory. But it's consistency that I'm after, *all* configs 
+for *all* services will be in /etc/system/services, and the admin will easily 
+get used to and remember that location.
+
+Keep in mind that my example directory tree layout from my earlier email was 
+off the top of my head, I haven't sat down and properly designed it yet (I 
+was hoping to get input from systems administrators).
+
+&gt;
+&gt; Any sort of mixing together of basic configuration files and configs for
+&gt; additional modules would take away the principles of the logical structure
+&gt; that Unix has today.  The same principle exists right now for /bin and
+&gt; /usr/local/bin.  Should we change that aswell?  /bin is for programs that
+&gt; need to be run in multi or single user mode, and /usr/local/bin is used for
+&gt; binaries for added on programs (because that's generally what your /usr
+&gt; partition is for.)
+
+One step at a time my friend :) Let's not go changing everything just yet, I 
+would rather work within the current frame work (afterall, it has worked for 
+a rather long time, but now Unix-like systems are finding new users and 
+should adapt accordingly).
+
+&gt;
+&gt; It is only poor coding by some developers that make things inconsistent, or
+&gt; a user's customized personal preference (for example, some users like to
+&gt; store their applications in completely seperatated directories, including
+&gt; all data, config files and libraries.)
+
+By setting a "standard" and developing an API to help developers adhere to 
+that standard, it will make things a whole lot more consistent. Rather than 
+everybody making their own config file format and dumping wherever the hell 
+they please in /etc or /usr/etc or /usr/local/etc, they will say "hey, here's 
+a library that does it for us, let's get on with actually coding our program 
+and not worrying about writing a parser for the conf file".
+
+&gt;
+&gt; &gt; 2. Design a unified configuration file format.
+&gt; &gt;   - This format must be simple enough to be easily understood by somebody
+&gt; &gt; without them having to refer to a manual
+&gt;
+&gt; Some of what you say here is valid, because there are config files that set
+&gt; options differently, eg:
+&gt;
+&gt; -- from /etc/inetd.conf:
+&gt; ftp     stream  tcp     nowait  root    /usr/libexec/ftpd       ftpd -l
+&gt;
+&gt; -- from /etc/rc.conf:
+&gt; defaultrouter="10.0.0.254"
+&gt; hostname="host.domain.com"
+&gt;
+&gt; -- from /usr/local/etc/wine.conf
+&gt; ;; Floppy Disk Drive
+&gt; [Drive A]
+&gt; "Path" = "/mnt/fd0"
+&gt; "Type" = "floppy"
+&gt; "Label" = "Floppy"
+&gt; "Filesystem" = "win95"
+&gt; "Serial" = "87654321"
+&gt; "Device" = "/dev/fd0"
+&gt;
+&gt; -- from /etc/named/named.conf
+&gt;
+&gt; options {
+&gt;         directory "/etc/namedb";
+&gt;         pid-file "/var/run/named/pid";
+&gt; 	}
+&gt;
+&gt; &gt;   - All configuration files will have a common extension so they can
+&gt; &gt; easily be seen as such (e.g: .conf).
+&gt;
+&gt; There are a few exceptions to this, but you'll probably find that most
+&gt; programs already use a .conf extension, and of those that aren't -- sloppy
+&gt; programming, most likely.
+
+
+Having a standard and an API to take care of that standard makes it easier to 
+not be sloppy.
+
+
+&gt;
+&gt; &gt; 3. Design a simple (probably xml-based) layout file that allows an
+&gt; &gt; application to display (graphically) the configuration options for a
+&gt; &gt; program.
+&gt;
+&gt; Most programs don't utilise a GUI interface because:
+&gt;
+&gt; a) They don't run in a GUI environment
+&gt; b) They have way too many options to display in a GUI
+&gt; c) Their configuration files have extended attributes or macros which are
+&gt; too difficult to display in a GUI
+&gt; d) They are too short to display in a GUI
+&gt; e) There's no point displaying them in a GUI because they are so straight
+&gt; forward.
+
+Why does "webmin" exist? why does the Mandrake tools for configuring the 
+system exist? They exist because people want them. A GUI can't cover 
+everything, but it can cover a lot (the most "popular" options anyway). More 
+advanced options can still be config-file only, and if you have read my 
+earlier emails you will see I discussed a way to do this (public and private 
+variables).
+
+&gt;
+&gt; Are you proposing some sort of registry clone?
+
+The Windows registry is a large binary bloated pig. No I don't want to clone 
+that :) The Windows Registry is, however, a central place where all settings 
+are stored for all programs. My system differs because:
+
+-it is text based
+-based on directory structure and individual files (no single point failure 
+due to corruption, etc)
+-doesn't require a gui to configure
+-customizeable
+
+I am trying to retain the best things from the current system whilst 
+addressing its flaws.
+
+&gt;
+&gt; &gt;   - The file format should be fairly easy to understand, but referring to
+&gt; &gt; a manual in order to write one will be necessary (and possibly to read
+&gt; &gt; one and understand it fully).
+&gt;
+&gt; I suggest we use a text-based format for easy reading, easy parsing, and
+&gt; easy portability from one platform or system to another.
+&gt;
+&gt; &gt;   - It should allow some interpretation by the GUI program so that all
+&gt; &gt; configuration dialogs look consistent. The layout file shouldn't specify
+&gt; &gt; things like "rectangle,200,200", but should just group configuration
+&gt; &gt; variables and specify the type of value they take (like in a programming
+&gt; &gt; language), amongst other things (such as a "display name", visibility,
+&gt; &gt; etc etc).
+&gt;
+&gt; I like consistency as much as the next guy!
+&gt;
+&gt; &gt; I believe something like this could be done if it is managed in stages:
+&gt; &gt;
+&gt; &gt; 1) Discourage hard-coding paths to configuration files so that
+&gt; &gt; configuration files can be placed wherever the user pleases.
+&gt;
+&gt; Above, you wanted a logical and consistent system that allowed us to not
+&gt; have to use tools like find and locate.  Now you say you want us to be able
+&gt; to put our configuration files anywhere we choose?
+
+This is because finding and opening the configuration files is handled by the 
+library. If you really don't want the samba config to be in 
+/etc/system/services/samba, but in /etc/samba, you can just move it. When 
+restarting samba, the library will fail to find the samba config file in the 
+old location, so it will search for it, open the file at the new location and 
+update the path-cache. Samba has no knowledge of the file being moved.
+
+When I say i want a logical and consistent system, I am talking about a 
+written standard, not something enforced at gunpoint. The library will manage 
+and stick to the standard if you want to, or you can do your own thing, it 
+will still cope :) (I've thought about implementation details of this also, 
+it is do-able, IMO).
+
+&gt;
+&gt; &gt; Application accesses these files through a library "say libetc, or
+&gt; &gt; libconfig".
+&gt;
+&gt; So that when we're on a slow link we have to use annoying tools that slow
+&gt; us down.
+
+Nope. A program that has a configuration file, e.g. "samba", uses the library 
+API to open and access the configuration file. If you want to modify the 
+config file with vi over ssh, go ahead.
+
+For a long-haired old hand Unix hippie (and I mean that in the nicest way, 
+being long-haired myself :), not much will change, except that all the config 
+files will look the same (same layout), the /etc directory tree will be 
+different (more organised), and config files can be moved if the sys admin so 
+desires (though that would make the system non-standard). Editing config 
+files and restarting services will not change.
+
+&gt;
+&gt; &gt; 3) Create layout file format and sample application that can parse the
+&gt; &gt; etc tree and provide a GUI for config files that have an accompanying
+&gt; &gt; layout file.
+&gt;
+&gt; I think Microsoft have tried this a few times, and they got their Registry
+&gt; Editor which is a most friendly application to get your head around, not to
+&gt; mention navigate.
+
+Not even close to what I want. In MS world, think of it more like one of those 
+.cpl thingies that sit themselves in the control centre. The difference being 
+that this layout file is not compiled, toolkit independent, and editable with 
+a text editor :) It's a description of a fully fledged GUI with tabs, 
+checkboxes, edit boxes, etc...
+
+&gt;
+&gt; You may argue that once you get used to it, it's easy!  Sure, I know how to
+&gt; find some things in there, but I still find Unix's structure a lot more
+&gt; simplistic than a bloated and overly complicated GUI navigation tool.
+&gt;
+
+I've almost NEVER used the registry editor in Windows (I'm not exactly a 
+Windows PRO, I've been using Linux as my main OS for almost 2 years now 
+(first used it as a home file/print/internet server in 2000). Sure that's not 
+a whole heap of experience with Unix (I've used Solaris at Uni though), but 
+I'm at a point where I understand what's going on (mostly), but I'm not so 
+entrenched in the ways of Unix that I can't let go and think of something 
+better.
+
+&gt; Let's not forget they tried sysconf.exe aswell, which ended up just loading
+&gt; several configuration files into editable windows (which seems logical to
+&gt; me!)
+
+Never heard of it. Despite what you may think, I'm not all that familiar with 
+stuffing around with Windows. I used it to play games, load stuff like 
+Matlab, Word, etc. I didn't tweak it at all (why bother).
+
+&gt;
+&gt; Gnome2 have added a new registry-style configuration editor and I steer
+&gt; clear of that wherever possible.
+
+I'm not after a registry, or registry editor. Just a logical structure for the 
+/etc file tree. Making the task of configuring the system via a GUI becomes 
+an added bonus (and adding a layout file format adds more power and 
+consistency).
+
+&gt;
+&gt; &gt; 4) ???
+&gt;
+&gt; ???
+&gt;
+&gt; &gt; 5) Profit!! :)
+&gt;
+&gt; !
+
+South Park: Underpants Gnomes Business Model.
+
+&gt;
+&gt; &gt; Somewhere in those stages the layout of the /etc directory and the format
+&gt; &gt; of the configuration/layout files should be attempted to be made a
+&gt; &gt; standard (LSB) so as to encourage people to follow it.
+&gt; &gt;
+&gt; &gt; For all those that say "the current system is fine once you know it", I
+&gt; &gt; say how does that make the current system the best possible? How can we
+&gt; &gt; make progress if we stay stationary? (and if you say "if it aint broke
+&gt; &gt; don't fix it", I'm going to scream :) It *IS* broke :)
+&gt;
+&gt; Because it is scalable, and it makes logical sense.  Of all of the things
+&gt; you've described, it seems that it's only the application developers who
+&gt; are breaking the rules of where files should belong, and how they are laid
+&gt; out. Maybe you should explain to them the importance of a logical file
+&gt; system?
+
+How about we make it easier for them to abide by standards than to ignore 
+them? What's easier: Coming up with your own config file format, file 
+location and writing a parser for it, or, using a library that does it for 
+you ?
+
+&gt;
+&gt; I agree to some of what you have said, but certainly not all of it.
+&gt;
+&gt; &gt; Cheers,
+&gt;
+&gt; man hier!
+
+I've read it :)
+
+&gt;
+&gt; Adam
+
+Cheers,
+
+Damien
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

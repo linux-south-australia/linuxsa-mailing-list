@@ -1,0 +1,207 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Samba Q" -->
+<!-- FromName="'Martin de Koning'" -->
+<!-- FromEmail="m1d2k3@ozemail.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="24 Apr 2002 04:35:45 +0930" -->
+<!-- Id="1019588747.1755.3.camel@lister.reddwarf.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Samba Q</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Martin de Koning &lt;<I><A HREF="mailto:m1d2k3@ozemail.com.au">m1d2k3@ozemail.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 24 Apr 2002 04:35:45 +0930
+</PRE>
+<H1>Samba Q</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+I've inherited the admining of a small LAN consisting of a Samba PDC and
+around 40 Win98SE clients.
+
+The problem I have is that group policies does not want to work.
+
+The setup I am trying to create is three basic groups that user's belong
+to. The groups define which shares they have rights to and what logon
+script they are assigned. This all works perfectly.
+
+However I also wish to have one of those groups have a very restricted
+desktop by using a policy template (config.pol) to assign group
+policies.
+
+According to what little documentation I have found on the net, Samba
+(At least 2.07) does not support assigning policies through groups in
+config.pol. But supposedly user based allocations works fine, e.g. a
+user object created for each username which logins into the PDC.
+
+So I have followed a hack mentioned on several web pages. 
+
+They suggest creating different basic config.pol (With just a Default
+Computer and Default User entry) files and then allocating a different
+netlogon share based on the user's group ID. Each of these different
+netlogon shares contain is a different basic config.pol in order to
+differentiate between policy settings.
+
+This all sounds great but it doesn't work for me :(
+
+Details:
+
+Samba v2.2.2
+Win98 Second Edition clients with grouppol.dll.
+
+config.pol created by running poledit.exe on one of the clients and
+choosing a new file. I then modified the default entries created with
+the new file (Default Computer and Default User entries).
+
+Samba can see the correct GID when a user is logged in:
+
+&gt;&gt;&gt;
+bar# smbstatus
+
+Samba version 2.2.2
+Service      uid      gid      pid     machine
+----------------------------------------------
+netlogon     newsamba gstudent  3002   9.7      (192.168.9.7) Wed Apr 17
+01:00:24 2002
+stu_common   newsamba gstudent  3002   9.7      (192.168.9.7) Wed Apr 17
+01:00:15 2002
+newsamba     newsamba gstudent  3002   9.7      (192.168.9.7) Wed Apr 17
+01:00:15 2002
+mdekonin     root     gadmin   11971   9.55     (192.168.9.55) Wed Apr
+17 00:47:14 2002
+
+No locked files
+&lt;&lt;&lt;
+
+Permissions for the config.pol match those for login scripts and allow
+read access to the users.
+
+Samba is also allocating the correct login share and the correct login
+script. It's just that config.pol is not affecting the clients.
+
+Does any Samba gurus have any advice, explanations, answers or critism?
+:)
+
+This is really bugging me.
+
+Cheers
+Martin
+
+P.S. smb.conf attache
+
+# Samba config file 
+# Modified by Martin de Koning
+
+# Global parameters
+[global]
+        workgroup = GLENDALE
+        netbios name = SAMBA
+        server string = Samba Server
+        interfaces = sis0 192.168.1.2/255.255.0.0
+        encrypt passwords = Yes
+        null passwords = Yes
+        log file = /var/log/smbd
+        max log size = 50
+        deadtime = 30
+        keepalive = 60
+        logon script = %G.bat
+        domain logons = Yes
+        os level = 34
+        preferred master = True
+        domain master = True
+        dns proxy = No
+        wins support = Yes
+        invalid users = daemon, operator, bin, uucp, named, sysadm
+        admin users = root, mdekonin
+        map system = Yes
+        map hidden = Yes
+
+[homes]
+        comment = Home Directories
+        read only = No
+        browseable = No
+
+[students]
+        comment = Browseable Home Directories
+        path = /home
+        read only = No
+        writable = Yes
+        browseable = Yes
+        valid users = mdekonin
+
+[stu common]
+        comment = Student Common Files
+        path = /home/STU COMMON
+        read only = No
+        browseable = Yes
+
+[stu writable]
+        comment = Student Writable Share
+        path = /home/STU WRITABLE
+        read only = No
+        browseable = Yes
+
+[staff common]
+        comment = Staff Writable Common Files
+        path = /home/STAFF COMMON
+        read only = No
+        browseable = Yes
+
+[reports]
+        comment = School Reports, staff only
+        path = /home/REPORTS
+        read only = No
+        # guest ok = No
+
+#[scratch]
+        #comment = Old Common Dir/Old Server
+        #path = /home/OLD SERVER
+        #read only = No
+        #guest ok = Yes
+
+[netlogon]
+        comment = The Domain Logon Service
+        path = /home/NETLOGON/%g
+        browseable = Yes
+        locking = No
+        writable = No
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

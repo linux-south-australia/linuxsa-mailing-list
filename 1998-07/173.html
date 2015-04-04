@@ -1,0 +1,161 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: C program" -->
+<!-- FromName="Mark Pulford" -->
+<!-- FromEmail="mark@kyne.com.au" -->
+<!-- ToName="Kevin Thomas" -->
+<!-- ToEmail="kevybabe@bigpond.com" -->
+<!-- Date="Wed, 29 Jul 1998 23:43:54 +0930 (CST)" -->
+<!-- Id="Pine.LNX.3.96.980729222037.6400A-100000@hamster.kyne.com.au" -->
+<!-- Reference="12125758282077@domain1.bigpond.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: C program</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mark Pulford &lt;<I><A HREF="mailto:mark@kyne.com.au">mark@kyne.com.au</A></I>&gt;
+  To  : Kevin Thomas &lt;<I><A HREF="mailto:kevybabe@bigpond.com">kevybabe@bigpond.com</A></I>&gt;
+  Date: Wed, 29 Jul 1998 23:43:54 +0930 (CST)
+</PRE>
+<H1>Re: C program</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, 29 Jul 1998, Kevin Thomas wrote:
+
+&gt; Could somebody show me by example how to use utilize VGA graphics using C ?
+
+-----
+/* simple vgalib example. "gcc -o erk erk.c -lvga" */
+
+#include &lt;vga.h&gt;
+
+void main()
+{
+        int x=1,dx=1;  
+        int y=1,dy=1;   
+        int c=0;
+        
+	/* get vgalib to init itself */
+        vga_init();
+        vga_setmode(G320x200x256);
+        
+	/* If you like asm (who doesn't? :)) you can set the palette
+	   with 0x3c8 & 0x3c9. It works ok for me, but it is probably
+	   better to use the library so it knows the current state of the
+	   vga card. This goes for all the other vga ports too. */
+        for(c=0;c&lt;256;c++)
+                vga_setpalette(c,c&gt;&gt;2,c&gt;&gt;3,c&gt;&gt;4);
+
+        while(!vga_getkey()) {
+                c++;
+                if(x==0 || x==319) dx*=-1;
+                if(y==0 || y==199) dy*=-1;
+                x+=dx;
+                y+=dy;
+
+		/* graph_mem is a pointer which is mmapped to video mem */
+                graph_mem[320*y+x]=c;
+        }
+
+	/* I don't tell svgalib to switch to text mode before I exit since
+	   it messes up my console. However, letting svgalib switch to
+	   text mode by quitting works well. weird. */
+
+	/* vga_setmode(TEXT) */
+
+        return;
+}
+-----
+
+Some other functions of note:
+
+vga_setpalvec(int start,int stop,char *pal)
+vga_getpalvec(int start,int stop,char *pal)
+
+vga_waitretrace()
+
+Calling a function to wait for the vertical retrace probably isn't a good
+idea so you might want to inline it:
+#define WAIT_RETRACE            \
+        __asm__ __volatile__ (" \
+        1: in (%%dx),%%al;      \
+           test $8,%%al;        \
+           jne 1b;              \
+        1: in (%%dx),%%al;      \
+           test $8,%%al;        \
+           je 1b"               \
+        ::"d" (0x3da): "al")
+
+It is ok to use ports here since there is no state for the library to
+remember.
+
+There are a lot of svgalib demos that come with the svgalib source. There
+is also a lot of documentation in there. There are lots of man pages with
+svgalib. I would imagine most distros would put them in with the rest of
+the pages so they can be accessed normally. Red Hat (5.1 at least) puts
+them under /usr/doc/svgalib*/man?. They have a script called "tman" which
+you can use to view them, or you can add "MANPATH /usr/doc/svgalib-1.2.13"
+to your /etc/man.config". If you have a different version of svgalib you
+will need to change the path.
+
+If you want to use any of the vgagl functions you need to include
+"vgagl.h" and link with "-lvgagl" as well. 
+
+If you want to do things in a higher video mode things get more complex.
+320x200 256 is nice because of the way the memory is mapped on the video
+card. In higher modes it takes a lot more to put a pixel on the screen.
+
+You can use functions like vga_drawpixel() and gl_setpixel() but they are
+slower due to added overhead.
+
+If you are drawing to a buffer first you can
+"memcpy(graph_mem,buffer,64000)" to draw to the screen. Similarly you can
+"memset(graph_mem,0,64000)" to clear the screen. 
+
+There are about 200 man pages for Svgalib, so there is a lot more to it
+than the little I have shown here :).
+
+Also, you will need to use root to run the programs (or setuid them) since
+Svgalib needs root to get access to the video card. If the binary is
+setuid it will drop the privileges as soon as it is set up.
+
+If you don't want to use the VGA card directly you could try libGGI. There
+are some RPMS on ftp.ggi-project.org. libGGI will allow your program to
+be displayed on many different targets. This is a pretty simple way to get
+a framebuffer in X. While the KGI isn't recommended at the moment (its
+rather alpha :)), libGGI appears quite stable (for me at least).
+
+Regards,
+Mark
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

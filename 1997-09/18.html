@@ -1,0 +1,114 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: tcsh & executables" -->
+<!-- FromName="Andrae Muys" -->
+<!-- FromEmail="A.Muys@mailbox.uq.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Mon, 8 Sep 1997 15:18:57 +1000 (GMT+1000)" -->
+<!-- Id="Pine.OSF.3.95.970908151841.17840C-100000@dingo.cc.uq.edu.au" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: tcsh & executables</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Andrae Muys &lt;<I><A HREF="mailto:A.Muys@mailbox.uq.edu.au">A.Muys@mailbox.uq.edu.au</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Mon, 8 Sep 1997 15:18:57 +1000 (GMT+1000)
+</PRE>
+<H1>Re: tcsh & executables</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Mon, 8 Sep 1997, Andrew Chesson wrote:
+&gt; 
+&gt; I am running redhat 4.2, and I am running tcsh... I have an annoying 
+&gt; problem that whenever I want to run an executable in the current 
+&gt; directory, I have to preceed the file name with ./
+&gt; 
+&gt; for example if I want to run a.out, I have to run ./a.out tcsh to find 
+&gt; it, otherwise it returns that a.out is an unrecognised command (or 
+&gt; something similar)
+&gt; 
+&gt; Can someone help me rectify this problem, or is it a standard so that 
+&gt; people don't get confused with the same command that is in the path.
+&gt; 
+"It's a feature", and it actually is :).
+
+When you type a command on the command line the shell first looks to see
+if there is a foward slash "/" in the command name.  If it finds one it
+assumes that the command is the name of a file which it then tries to
+execute.  Otherwise it looks in each of the directories in the $PATH
+variable in order for the command, and executes the first one it finds.
+
+So if you just type `a.out`, the shell looks through your $PATH for a file
+called "a.out".  Apparently it dosn't exist there:) so it reports an
+error.  When you type `./a.out` it is now assumes it is the name of a
+file, and as it didn't start with a "/" or a "~", it treats it as a path
+relative to the current directory.
+
+So if you were to put "./" in your $PATH you would always be able to
+execute any file in the current directory.  This however is a security
+hole.  Take for instance the following senario:
+
+J.R.L^Huser has prepended "./" to his $PATH.  W.E.Cyot^H^H^Hracker
+wants to break into his account.  So W.E.C writes a short shell script
+
+-----------------------------------------------
+#!/bin/sh
+cp /bin/bash /tmp/.JRL.shell # the one and only true shell :):):)
+chmod 6111 /tmp/.JRL.shell # sets file permissions to --s--g--x
+                          #                            ^!!!!! SETUID !!!!!
+rm $0          # remove this script
+/bin/ls $@     # executes ls and passes all the parameters passed to this
+               # script to ls.
+-----------------------------------------------
+The then names it 'ls' and leaves it in a directory which has world
+writable permissions.  He then leave the solution to J.R.L^HU's C
+assignment (due tomorrow) in there by 'accident' and 'accidentally' tells
+J.R.U about it.  When J.R.U goes into the directory, and does an `ls`
+looking for the file, this script runs.
+
+Now it looks like normal ls to J.R.U, but there is now a hidden shell in
+/tmp which is SUID JRU.  ANYONE who executes this shell 'becomes' JRU
+automatically.  ie WEC has just broken into JRU's account.
+
+So it is normally a good thing to leave the current directory out of your
+path.  If you are doing coding, and you really really really really don't
+want to go to the horrific lengths of actually typing those two extra
+characters :)&lt;g&gt; put the development directory in your path instead.
+
+ie.  instead of export PATH="$PATH:./"
+try export PATH="$PATH:$HOME/src/myprog"
+
+Ob RTFM: The armidillo, or the safe (both by ORA)
+
+Andrae Muys
+
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

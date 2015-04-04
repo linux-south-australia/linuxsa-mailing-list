@@ -1,0 +1,149 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Logrotate Question" -->
+<!-- FromName="David Drury" -->
+<!-- FromEmail="idavid@smug.adelaide.edu.au" -->
+<!-- ToName="Glen Turner" -->
+<!-- ToEmail="glen.turner@aarnet.edu.au" -->
+<!-- Date="Sun, 6 Feb 2000 22:15:33 +1030 (CST)" -->
+<!-- Id="200002061145.WAA20850@mulder.smug.adelaide.edu.au" -->
+<!-- Reference="389D1524.AEF33F24@aarnet.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Logrotate Question</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Drury &lt;<I><A HREF="mailto:idavid@smug.adelaide.edu.au">idavid@smug.adelaide.edu.au</A></I>&gt;
+  To  : Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  Date: Sun, 6 Feb 2000 22:15:33 +1030 (CST)
+</PRE>
+<H1>Re: Logrotate Question</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hi,
+
+Thanks for the info.
+
+&gt; logrotate was written by Red Hat
+&gt; 
+&gt;   <A HREF="ftp://ftp.redhat.com/pub/redhat/code/logrotate/">ftp://ftp.redhat.com/pub/redhat/code/logrotate/</A>
+
+Ahh that explains the lack of other info in the source.
+
+&gt; getopt is in your Solaris C library.  If
+&gt; 
+&gt;   find /usr/include -name 'getopt.h' -print
+&gt; 
+&gt; doesn't uncover anything, then enter the prototypes
+&gt; from the "man getopt" page.
+
+I'm not sure what you mean by entering the prototypes.
+
+locate getopt.h returns...
+
+/usr/local/src/emacs-20.3/lib-src/getopt.h
+/usr/local/src/fileutils-4.0/lib/getopt.h
+/usr/local/src/findutils-4.1/lib/getopt.h
+/usr/local/src/gcc/gcc-2.95.2/include/getopt.h
+/usr/local/src/gcc/gcc-2.95.2/texinfo/lib/getopt.h
+/usr/local/src/gcc/gcc-2.95.2/texinfo/libtxi/getopt.h
+/usr/local/src/grep-2.3/src/getopt.h
+/usr/local/src/gzip-1.2.4a/getopt.h
+/usr/local/src/patch-2.5.4/getopt.h
+/usr/local/src/tar-1.13/lib/getopt.h
+
+In linux its in
+
+/usr/include.
+
+I tried copying it from /usr/local/src/gcc/gcc-2.95.2/include/ to
+/usr/include, after succesfull compilation of popt optainned from
+mirror.aarnet, and install, here is the result of a make...
+
+ [5] :-)make
+gcc -Wall -D_GNU_SOURCE -DVERSION=\"3.3\"  -g   -c logrotate.c -o
+logrotate.o
+logrotate.c: In function `rotateSingleLog':
+logrotate.c:512: warning: int format, pid_t arg (arg 4)
+logrotate.c: In function `main':
+logrotate.c:835: warning: assignment from incompatible pointer type
+gcc -Wall -D_GNU_SOURCE -DVERSION=\"3.3\"  -g   -c log.c -o log.o
+gcc -Wall -D_GNU_SOURCE -DVERSION=\"3.3\"  -g   -c config.c -o config.o
+config.c: In function `isolateValue':
+config.c:40: warning: implicit declaration of function `isblank'
+config.c: In function `readPath':
+config.c:81: warning: subscript has type `char'
+config.c: In function `readAddress':
+config.c:111: warning: subscript has type `char'
+config.c: In function `readConfigFile':
+config.c:334: warning: subscript has type `char'
+config.c:336: warning: subscript has type `char'
+config.c:389: warning: subscript has type `char'
+config.c:446: warning: subscript has type `char'
+config.c:567: warning: subscript has type `char'
+config.c:576: warning: subscript has type `char'
+config.c:589: warning: subscript has type `char'
+config.c:687: warning: subscript has type `char'
+config.c:732: warning: subscript has type `char'
+gcc -Wall -D_GNU_SOURCE -DVERSION=\"3.3\"  -g   -c basenames.c -o
+basenames.o
+gcc -g  logrotate.o log.o config.o basenames.o -lpopt  -o logrotate
+Undefined                       first referenced
+ symbol                             in file
+isblank                             config.o
+ld: fatal: Symbol referencing errors. No output written to logrotate
+collect2: ld returned 1 exit status
+make: *** [logrotate] Error 1
+
+
+My C is very rusty, but does this mean that I have to do a bit of
+debugging in logrotate.c, or is that an error to ignore, or should I
+investigate that ?
+Would I be right in thinking that the problem is the definition of isblank
+? It is lacking from the config.c file (its not part of getopt.h), but is
+used extensivly in it (but not anywhere else). It doesn't have a man page.
+
+Should I worry about it, and perhaps try and find an equivalent utility.,
+if someone can recommend one ?
+
+cya
+
+-- 
+David Drury
+
+   _______________________________________
+   \ <A HREF="mailto:iddrury@teaching.cs.adelaide.edu.au">iddrury@teaching.cs.adelaide.edu.au</A>  \
+    \    <A HREF="mailto:idavid@smug.adelaide.edu.au">idavid@smug.adelaide.edu.au</A>       \                __________ |
+     \   A "Civil" Engineer now resigned    \        / \___-=O`/|O`/___|
+      \  from the Human Race.                \_______\        / | /     )
+      /  Apply to the above address for      /      `/-==__ _/__|/__=--|
+     /   Resignation Forms.                 /         *      \  |      |
+    /   "Cogito cogito ergo cogito sum."   /                  (o)
+   /______________________________________/
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

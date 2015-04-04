@@ -1,0 +1,101 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: LAN" -->
+<!-- FromName="Darryl Ross" -->
+<!-- FromEmail="rosdr001@lux.levels.unisa.edu.au" -->
+<!-- ToName="Alex Wilkinson" -->
+<!-- ToEmail="lex@senet.com.au" -->
+<!-- Date="Mon, 13 Sep 1999 07:56:04 +0930 (GMT+9:30)" -->
+<!-- Id="Pine.SOL.4.05.9909130745150.16436-100000@lux.levels.unisa.edu.au" -->
+<!-- Reference="37D9D93A.F1801D9A@senet.com.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: LAN</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Darryl Ross &lt;<I><A HREF="mailto:rosdr001@lux.levels.unisa.edu.au">rosdr001@lux.levels.unisa.edu.au</A></I>&gt;
+  To  : Alex Wilkinson &lt;<I><A HREF="mailto:lex@senet.com.au">lex@senet.com.au</A></I>&gt;
+  Date: Mon, 13 Sep 1999 07:56:04 +0930 (GMT+9:30)
+</PRE>
+<H1>Re: LAN</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Sat, 11 Sep 1999, Alex Wilkinson wrote:
+
+&gt; A bit of a late reply I have finally got around to looking at the problem.
+&gt; I added the "default address" into /etc/sysconfig/networks but still that
+&gt; didn't solve
+&gt; my problem.
+&gt; 
+
+You need to *remove* the GATEWAY address in the /etc/sysconfig/networks
+file. Unless you have a really large LAN that has more than 1 class C
+network and you need to talk to people in a different subnet on that LAN,
+you do not need the default route.
+
+The problem you are having is due to the Linux Kernel _not_ removing the
+default route when you try to add a new one. To see if it is going to
+work. Before you log on to the net, try:
+
+localhost:~ # route del default
+
+If this works, and the problem is not there, change the
+/etc/sysconfig/networks file to read (on these two lines):
+
+GATEWAY=
+GATEWAYDEV=
+
+And then bring down your eth0 device:
+
+localhost:~ # ifconfig eth0 down
+
+and bring it up again:
+
+localhost:~ # ifconfig eth0 up
+
+and check your routing table with:
+
+localhost:~ # route -n
+
+You should only have an entry for the loopback device (127.0.0.1) and your
+eth0 device (can't remember what IP you had for that, was it 10.0.0.1?)
+
+If all that doesn't work, then e-mailme privately off-list to
+<A HREF="mailto:darryl@bachblue.com.au">darryl@bachblue.com.au</A> and I'll organise a time to catch up with you and
+see what I can do to solve the problem.
+
+Cheers
+
+Dazz
+
+-- 
+Check out the LinuxSA web pages at <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

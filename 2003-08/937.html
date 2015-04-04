@@ -1,0 +1,156 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: NFS" -->
+<!-- FromName="'James Dean'" -->
+<!-- FromEmail="jfdean@ihug.com.au" -->
+<!-- ToName="'LinuxSA'" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="16 Aug 2003 20:43:14 +0930" -->
+<!-- Id="1061032393.6207.1.camel@localhost.localdomain" -->
+<!-- Reference="1060956636.2823.6.camel@localhost.localdomain" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: NFS</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: James Dean &lt;<I><A HREF="mailto:jfdean@ihug.com.au">jfdean@ihug.com.au</A></I>&gt;
+  To  : LinuxSA &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: 16 Aug 2003 20:43:14 +0930
+</PRE>
+<H1>Re: NFS</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Tankyou all, but it's still not working. from client(james),
+
+	rpcinfo -p dec
+
+gives
+
+   program vers proto   port
+    100000    2   tcp    111  portmapper
+    100000    2   udp    111  portmapper
+    100007    2   udp    840  ypbind
+    100007    1   udp    840  ypbind
+    100007    2   tcp    843  ypbind
+    100007    1   tcp    843  ypbind
+    391002    1   tcp  32768  sgi_fam
+    391002    2   tcp  32768  sgi_fam
+    100024    1   udp    910  status
+    100024    1   tcp    913  status
+    100003    2   udp   2049  nfs
+    100003    3   udp   2049  nfs
+    100021    1   udp  50141  nlockmgr
+    100021    3   udp  50141  nlockmgr
+    100021    4   udp  50141  nlockmgr
+    100005    1   udp    822  mountd
+    100005    1   tcp    825  mountd
+    100005    2   udp    822  mountd
+    100005    2   tcp    825  mountd
+    100005    3   udp    822  mountd
+    100005    3   tcp    825  mountd
+
+	hosts.allow and hosts.deny are empty, and
+
+dec:/etc# exportfs
+/var/mail       192.168.17.0/255.255.255.0
+/home           192.168.17.0/255.255.255.0
+
+
+	Interestingly,
+
+dec:/etc# cat /proc/fs/nfs/exports
+# Version 1.1
+# Path Client(Flags) # IPs
+/home   192.168.17.9(rw,no_root_squash,async,wdelay) # 192.168.17.9
+/home   192.168.17.6(rw,no_root_squash,async,wdelay) # 192.168.17.6
+/var/mail       192.168.17.10(rw,root_squash,async,wdelay) # 192.168.17.10
+/home   192.168.17.10(rw,no_root_squash,async,wdelay) # 192.168.17.10
+
+
+Which are all defunct connections. I added the no_root_squash this morning, though, and it appeared oin all of them.
+
+Please help. pleasepleasepleaseetc.
+
+
+
+
+
+James
+
+
+On Fri, 2003-08-15 at 15:46, Paul Shirren wrote:
+&gt; rpcinfo -p dec should show mountd and portmapper as well as nfs AFAIK
+&gt; 
+&gt; perhaps rpc.mountd isn't running or kernel modules not loaded?
+&gt; 
+&gt; looks good otherwise
+&gt; 
+&gt; James Dean wrote:
+&gt; &gt; Hi,
+&gt; &gt; 
+&gt; &gt; Gotta simple problem, with an obvious solution.
+&gt; &gt; 
+&gt; &gt; I can't mount NFS. I'm getting 
+&gt; &gt; 
+&gt; &gt; [<A HREF="mailto:root@james">root@james</A> /etc]# mount /mnt/home/
+&gt; &gt; mount: RPC: Unable to receive; errno = Connection refused
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; 	relevant bit of fstab:
+&gt; &gt; 
+&gt; &gt; dec:/home               /mnt/home               nfs     rw      0 0
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; 	/etc/exports on dec:
+&gt; &gt; 
+&gt; &gt; /home   *(rw,async)
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; 	/etc/hosts.allow and hosts.deny are empty.
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; [<A HREF="mailto:root@james">root@james</A> /etc]# rpcinfo -p dec
+&gt; &gt; 
+&gt; &gt;     100003    2   udp   2049  nfs
+&gt; &gt;     100003    3   udp   2049  nfs
+&gt; &gt; 
+&gt; &gt; 
+&gt; &gt; I can't see a problem, can anyone else?
+&gt; &gt; 
+&gt; &gt; server (dec) is a Debian sarge machine, client is a fresh new RH9
+&gt; &gt; install which wiped out my old, working, nfs config.
+&gt; &gt; 
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

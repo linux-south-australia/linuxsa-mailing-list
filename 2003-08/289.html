@@ -1,0 +1,297 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: [OT] FreeBSD Newb-blog Part II" -->
+<!-- FromName="'Greg 'groggy' Lehey'" -->
+<!-- FromEmail="grog@lemis.com" -->
+<!-- ToName="'James Leone'" -->
+<!-- ToEmail="jleone@pacbell.net" -->
+<!-- Date="Wed, 6 Aug 2003 10:23:58 +0930" -->
+<!-- Id="20030806005358.GG95375@wantadilla.lemis.com" -->
+<!-- Reference="200307282007.20006.jleone@pacbell.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: [OT] FreeBSD Newb-blog Part II</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Greg  &lt;<I><A HREF="mailto:grog@lemis.com">grog@lemis.com</A></I>&gt;
+  To  : James Leone &lt;<I><A HREF="mailto:jleone@pacbell.net">jleone@pacbell.net</A></I>&gt;
+  Date: Wed, 6 Aug 2003 10:23:58 +0930
+</PRE>
+<H1>Re: [OT] FreeBSD Newb-blog Part II</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Monday, 28 July 2003 at 20:07:19 -0700, James Leone wrote:
+&gt; Mutt
+&gt;
+&gt; Although I was able to get Mutt to work I just have to figure out
+&gt; how to get emacs to wrap at 75 characters. In the meantime, I am
+&gt; using Kmail.
+
+To get Emacs to do things automatically, you need a different mode.
+Which you use is your own choice.  auto-fill-mode sets a wrap at 70
+characters.  To set it at 75, use set-fill-column.
+
+If you want this automatically (which I would strongly recommend), put
+appropriate code in your ~/.emacs file (creating it if it doesn't
+exist).  Here's what I use:
+
+(global-set-key [f8] 'letter-mode)
+(defun letter-mode ()			;this gets called by F8
+  (interactive)
+  (indented-text-mode)				; handle indents correctly
+  (flyspell-mode nil)				; do an on-the-fly spell check (requires ispell)
+  (ispell-change-dictionary "british" nil)	; and don't complain about correct spelling
+;; Round here you might add (set-fill-column 75)
+  (auto-fill-mode nil) )
+
+;; Here's the code I actually use to tidy up replies.  A lot of it
+;; is specific to me (like changing sender addresses and adding
+;; comments at the bottom).
+
+(global-set-key [f11] 'tidy-up-reply)
+
+(defun tidy-up-reply ()
+  (interactive)
+  (letter-mode)
+  (local-set-key "" (quote server-edit))
+  (save-excursion
+    (beginning-of-buffer)
+    (search-forward "
+
+")
+    (save-excursion 
+      (if (or (re-search-backward "@[a-z.]*FreeBSD.org" 0 t)
+	      (re-search-backward "@[a-z.]*FreeBSD.ORG" 0 t)
+	      (re-search-backward "@[a-z.]*freebsd.org" 0 t) )
+	  (be-FreeBSD) ) )
+    (save-excursion 
+      (if (or (re-search-backward "@[a-z.]*NetBSD.org" 0 t)
+	      (re-search-backward "@[a-z.]*NetBSD.ORG" 0 t)
+	      (re-search-backward "@[a-z.]*netbsd.org" 0 t) )
+	  (be-NetBSD) ) )
+    (save-excursion 
+      (if (re-search-backward "@auug.org.au" 0 t)
+	  (be-auugexec) ) )
+    (beginning-of-buffer)
+    (while (re-search-forward "^[]&gt;|]" nil t)
+      (end-of-line)
+      (let ((limit (point))
+	    (braced nil) )
+	(if (looking-at "\\]&gt;")	   ;got a braced expression at the end
+	    (progn (backward-sexp)
+		   (setq braced (char-after (point))) ;save the character as predicate
+		   (delete-char 1)
+		   (insert "~#~")	;make sure we stop here
+		   (setq limit (point)) ) ) ;stop looking at the containing expression
+	(beginning-of-line)
+	(while (looking-at "[]~&gt;|%]")	;just a single quote
+	  (delete-char 1)		;remove it
+	  (insert "&gt;")			;and replace with a &gt;
+	  (while (looking-at "[	 ]+[]~&gt;:|%]") ;more to come
+	    (delete-char 1) ) )		;remove the white space
+	(if (not (looking-at "[ 	]")) ; no space after,
+	    (insert " ") )		;put one in
+	(if braced
+            (replace-regexp "~#~" braced nil) ) ) )
+    ;; remove the host name from the reply.  This shouldn't be done
+    ;; here, it should be done in mutt, but I know how to do it here.
+    (beginning-of-buffer)
+    (replace-regexp "^\\(From.*@\\)[a-z.]*\\(lemis.com\\)" "\\1\\2" nil)
+    (beginning-of-buffer)
+    (replace-regexp "[ 	]+$" "" nil)
+    (beginning-of-buffer)
+    (if (or (re-search-forward "^To:.*questions" nil t)
+	    (re-search-forward "^C[Cc]:.*questions" nil t) )
+	(save-excursion
+	  (if (and (re-search-forward "
+--
+" nil t)
+		   (not (looking-at "When replying")) )
+	      (progn (backward-char 1)
+		     (insert "
+When replying to this message, please copy the original recipients.
+If you don't, I may ignore the reply or reply to the original recipients.
+For more information, see <A HREF="http://www.lemis.com/questions.html">http://www.lemis.com/questions.html</A>" ) ) ) ) )
+
+    (beginning-of-buffer)
+    (search-forward "
+
+") ) )
+
+&gt; Upgrade to KDE.
+&gt;
+&gt; I am not surprised this didn't work, SuSE was chucking wobblies with QT as
+&gt; well.
+
+Hmm.  That's a mess.   You probably need to run portupgrade, but
+that's more pain than you need without my book to help you, and even
+then it's ugly.  Have you tried pkg add -r, or installing it from the
+CD-ROM set?
+
+&gt; Hmmmm. Looks like that isn't going to work. I don't know much about compilers.
+&gt; I decideed to reinstall QT3.0.5 from the FTP site, and it went smoothly. I
+&gt; retried the upgrade same error.
+&gt;
+&gt; So far, here is what happened:
+&gt;
+&gt; 1. The set up program on the cd showed a message indicating that the
+&gt; Xconfiguration failed in the setup screen. I picked the most conservative
+&gt; settings, rebooted my machine and copied over my Linux Xf86config file, and
+&gt; went with the syntax that looked native to FreeBSD if there was a difference.
+&gt; Although I am happy with the resolution, the color is definitely off and the
+&gt; graphics are fuzzy.
+
+That shouldn't happen.  What graphics?  Could it be a rendering
+problem?  Also, check what pixel depth you're using; xdpyinfo will
+tell you that:
+
+   name of display:    wantadilla:0.1
+   version number:    11.0
+   vendor string:    The XFree86 Project, Inc
+   vendor release number:    40200000
+   XFree86 version: 4.2.0
+   maximum request size:  4194300 bytes
+   motion buffer size:  256
+   bitmap unit, bit order, padding:    32, LSBFirst, 32
+   image byte order:    LSBFirst
+   number of supported pixmap formats:    7
+   supported pixmap formats:
+       depth 1, bits per pixel 1, scanline pad 32
+       depth 4, bits per pixel 8, scanline pad 32
+       depth 8, bits per pixel 8, scanline pad 32
+       depth 15, bits per pixel 16, scanline pad 32
+       depth 16, bits per pixel 16, scanline pad 32
+       depth 24, bits per pixel 32, scanline pad 32
+       depth 32, bits per pixel 32, scanline pad 32
+
+Ignore this part: it always appears.
+
+Continuing, 
+
+   screen #0:
+     dimensions:    1280x1024 pixels (433x347 millimeters)
+     resolution:    75x75 dots per inch
+     depths (7):    8, 1, 4, 15, 16, 24, 32
+     root window id:    0x62
+     depth of root window:    8 planes
+
+This is the one that's important.  "Planes" is another way of saying
+"bits per pixel".  If, as in this example, it's only 8, your graphics
+will look terrible.
+
+&gt; 2. I didn't have an option during setup to choose KDE and its window manager,
+&gt; as my default login environment.
+
+You didn't find it.  In the sysinstall "customization" screen you need
+to page down to find the X options.  You can still do this after
+starting the system.
+
+&gt; 3. Sendmail had a strange sleeping error that has gone away but I don't know
+&gt; how
+
+Difficult to comment, except that I've given up on sendmail and now
+recommend postfix.
+
+&gt; 4. After changing my settings to use KDM to log in with, I could not
+&gt; log in at all,
+
+What happened?
+
+&gt; and was forced to simply shut the machine off.
+
+No, you should be able to switch to a vty with Ctrl-Alt-F1,
+Ctrl-Alt-F2, etc.
+
+&gt; I went back into Linux and found a command to let me back in, and
+&gt; then I had to run fsck. After that, my printer settings had gone
+&gt; vanilla and I no longer was required to supply a root
+&gt; password. (Security Anyone?)
+
+It's difficult to guess what happened here.  It's certainly not
+normal.  I'd guess that you blew away something in /etc.  That's
+pretty unusual, but you can help it by turning off quickly without
+shutting down.  If you first wait a minute, the danger of file system
+damage is greatly reduced.
+
+&gt; 5. I don't know how to add Reiser file sysyem support
+
+I do.  You get the Linux code, lock yourself in a room for a few
+months and port it to FreeBSD.  Until somebody does that, there's no
+ReiserFS support.  I don't see it happening: we're happy with UFS.
+
+&gt; 6. I can't set up the cups printers because I am not authorized even though I
+&gt; am logged into the web page as root. 
+
+I don't know CUPS.  Check the permissions of the binaries and the
+documentation.
+
+&gt; In Netscape it just does a Netscape 7 search when I press on
+&gt; anything and I get 997000 search results.
+
+This is a little vague.
+
+&gt; 10. The command I run in Linux to mount the FreeBSD partition does not work.
+&gt; My source is Red Hat verified by the LDP:
+&gt;
+&gt; <A HREF="http://www.redhat.com/archives/redhat-install-list/2003-June/msg01624.html">http://www.redhat.com/archives/redhat-install-list/2003-June/msg01624.html</A>
+&gt; <A HREF="http://tldp.org/HOWTO/Linux+FreeBSD-5.html">http://tldp.org/HOWTO/Linux+FreeBSD-5.html</A>#ss5.1
+
+Linux has problems with large block sizes.  Recent versions of FreeBSD
+have 16 kB blocks, and the Linux UFS support doesn't accept that
+size.  That needs fixing.
+
+&gt; 11. Mutt's word wrap is not behaving
+
+I didn't know mutt had word wrap.  What do you want it to do?  What is
+it doing?
+
+&gt; 12. I have no sound, nothing in the book about it, so I will search the web.
+
+What does dmesg say?
+
+Greg
+--
+Finger <A HREF="mailto:grog@lemis.com">grog@lemis.com</A> for PGP public key
+See complete headers for address and phone numbers
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.0 (FreeBSD)
+
+iD8DBQE/MFGmIubykFB6QiMRAnNmAJ0XZeN0x6Dud5239/GXTMasUMlCOgCfV/A4
+U/a712UzDENGENGb8ehBcaQ=
+=ZIam
+-----END PGP SIGNATURE-----
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

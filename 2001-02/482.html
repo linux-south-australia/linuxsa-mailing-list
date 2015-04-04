@@ -1,0 +1,145 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Syslog remote logging - ipchains" -->
+<!-- FromName="'David Lloyd'" -->
+<!-- FromEmail="lloy0076@rebel.net.au" -->
+<!-- ToName="'Alain Satre'" -->
+<!-- ToEmail="alain@messagebay.com" -->
+<!-- Date="Wed, 14 Feb 2001 14:10:23 +1030" -->
+<!-- Id="3A89FE27.46A938D9@rebel.net.au" -->
+<!-- Reference="3A89CA7D.FB95C76@messagebay.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Syslog remote logging - ipchains</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  To  : Alain Satre &lt;<I><A HREF="mailto:alain@messagebay.com">alain@messagebay.com</A></I>&gt;
+  Date: Wed, 14 Feb 2001 14:10:23 +1030
+</PRE>
+<H1>Re: Syslog remote logging - ipchains</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Alain!
+
+&gt; I have been wanting to use ipchains for a few days now.  Most of my systems run
+&gt; RH6.2 2.2-14, im uping to 2.2-17 soon.  I did take a look at syntax in the man
+&gt; pages, however I still didn't have a clue as to how to write a rule.  I did see some
+&gt; good faq's online about using it, but still had no good examples.
+
+Take it to the latest available kernel (except maybe the 2.4.X series if
+you don't want to get yourself muddled too much at the moment) available
+at your distributor. RedHat have released RPM's for 2.2.18 at least and
+it looks like 2.2.19 is just about to come out. It's at -pre10.
+
+&gt; I will try these, and go from there.  If you could, quickly that is, let me know how
+&gt; to disallow all ftp access to a subnet, but allowing another subnet full access?
+
+You need to understand IP addresses. I'm going to assume that you
+do...so:
+
+[assume the script flushes the rules, sets a policy of deny on all
+default chains (input, output, forward)]
+
+# This allows incoming requests on port 21
+ipchains -A input -i ppp+ -p tcp -s 10.1.1.0/24 $UNP -d $ME 21 -j ACCEPT
+ipchains -A output -i ppp+ -p tcp -s 10.1.1.0/24 21 -d any/0 $UNP -j
+ACCEPT
+
+# This allows the outgoing request on port 20 to other_host
+# Required for non-passive FTP
+# DO NOT enter these two if you only allow passive FTP into your site
+ipchains -A output -i ppp+ -p tcp -s $ME 20 -d any/0 $UNP -j ACCEPT
+ipchains -A input -i ppp+ ! -y -s any/0 $UNP -d $ME 20 -j ACCEPT
+
+# This allows passive FTP
+ipchains -A input -i ppp+ -s any/0 $UNP -d $ME $UNP -j ACCEPT
+ipchains -A output -i ppp+ ! -y -s $ME $UNP -d any/0 $UNP -j ACCEPT
+
+[other bits and pieces]
+
+Now, if you want to log any of this add an "-l". DON'T log the data
+channell or the passive FTP or you'll probably overrun your log file! If
+you want to deny something, then turn the ACCEPT into DENY. So, if you
+wanted to deny 10.0.0.0/24 you could write all the above but substitute
+the ACCEPT for DENY.
+
+Personally, I'd just chuck the incoming requests to port 21. If the FTP
+server won't respond to commands they'd have to find some way of sending
+it commands and then hijacking the session.
+
+You should also look into /etc/ftpaccess which may be an easier but
+higher level way of doing what you need. TCP Wrappers might help you
+too.
+
+Please be aware that if you just set your firewall to default DENY
+everything and only enter the above information you will probably end up
+with an unusable system because DNS, HTTP, POP in or out won't work. So
+be careful when planning your firewall and try not to install it while
+your system is in production.
+
+Or you could be very embarassed!
+
+An alternative - but less secure - way to run a firewall using ipchains
+(or similar packet filtering stuff) is to run it on a default policy of
+ACCEPT and DENY services you don't want to offer. This is much easier to
+set up than a default DENY firewall because you generally don't
+accidentally deny services you wanted.
+
+However, if you forget to block a service that you are running but don't
+want to exposed it's, well, exposed to the world.
+
+With a default DENY firewall, if you forget say that you've got a pop
+server running the world won't be able to talk to it unless you
+explicitly enable it. Look at it this way: it's more secure to enable
+the things you want to enable and deny everything else (whether by
+design or you simply forgot that it's running) than forget to deny
+something that could compromise you.
+
+There are many good HOWTOs on firewalls and principles. A book "Linux
+Firewalls" by Robert Ziegler (New Riders) is also very good.
+
+Please be advised that everyone has a different point of view as to what
+is "secure" and what is "not" and that at the end of the day security is
+a balance between usability and security.
+
+DL
+DSL
+-- 
+Let's get loud, let's get loud,
+Ain't nobody gonna tell me
+Who I'm allowed to do now...
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,89 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Accidentally deleted lost+found.  Does it matter?" -->
+<!-- FromName="David Newall" -->
+<!-- FromEmail="davidn@rebel.net.au" -->
+<!-- ToName="Mark Phillips" -->
+<!-- ToEmail="mark@ist.flinders.edu.au" -->
+<!-- Date="Thu, 13 Jul 2000 23:47:52 +0930 (CST)" -->
+<!-- Id="Pine.BSF.4.21.0007132328050.29619-100000@augustus.tellurian.com.au" -->
+<!-- Reference="20000713170239.A28786@destiny.ist.flinders.edu.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Accidentally deleted lost+found.  Does it matter?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: David Newall &lt;<I><A HREF="mailto:davidn@rebel.net.au">davidn@rebel.net.au</A></I>&gt;
+  To  : Mark Phillips &lt;<I><A HREF="mailto:mark@ist.flinders.edu.au">mark@ist.flinders.edu.au</A></I>&gt;
+  Date: Thu, 13 Jul 2000 23:47:52 +0930 (CST)
+</PRE>
+<H1>Re: Accidentally deleted lost+found.  Does it matter?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Hands up those who remember the large, three volume set of manuals from
+Unix System V which I brought to the meeting a few months ago?  Here's
+why Unix manuals rock and linux sucks:
+
+  "Fsck is a multipass file system check program.  Each file system
+ pass invokes a different phase of the fsck program.  After the
+ initial setup, fsck performs successive phases over each file system
+ performing cleanup, checking blocks and sizes, pathnames, connectivity,
+ reference counts, and the free-block list (possibly rebuilding it)."
+   -- System V/68 Administrator's Guide
+
+This says (obscurely, but quite explicitly later in the manual) that the
+last phase of fsck is reconstructing the free-block list.  If an
+unreferenced file is found (one which appears in no directory), fsck
+creates a link in the lost+found directory, which must appear in the root
+of the file system being checked.  However since the free-list is not known
+to be valid, fsck cannot allocate any blocks to create the directory if it
+does not already exist, or to extend it should it be full.  (Under these
+circumstances fsck offers the chance to delete the file or leave it
+allocated but unreferenced.)
+
+Obviously one must check blocks and sizes before checking the free list
+(the free list is what remains after discovering the blocks in use) but
+there is no reason why the free list cannot be rebuilt before checking
+pathnames and reference counts.  Some versions of fsck do this (e.g. BSD.)
+I don't know (or much care) which way linux does it.
+
+If you wish to pre-allocate a lost+found directory, try this:
+
+ mkdir lost+found
+ cd lost+found
+ for f in 0 1 2 3 4 5 6 7 8 9 a b c d e f; do
+   touch 0$f 1$f 2$f 3$f 4$f 5$f 6$f 7$f 8$f 9$f a$f b$f c$f d$f e$f f$f
+ done
+ rm *
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

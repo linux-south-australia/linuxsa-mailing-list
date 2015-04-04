@@ -1,0 +1,264 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: [OT] Where to purchase Cicso config cable?" -->
+<!-- FromName="'Glen Turner'" -->
+<!-- FromEmail="glen.turner@aarnet.edu.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="eljumad@internode.on.net" -->
+<!-- Date="Mon, 01 Sep 2003 11:36:26 +0930" -->
+<!-- Id="3F52A9A2.7010402@aarnet.edu.au" -->
+<!-- Reference="3F51E9BC.5050106@internode.on.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: [OT] Where to purchase Cicso config cable?</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Glen Turner &lt;<I><A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:eljumad@internode.on.net">eljumad@internode.on.net</A></I>&gt;
+  Date: Mon, 01 Sep 2003 11:36:26 +0930
+</PRE>
+<H1>Re: [OT] Where to purchase Cicso config cable?</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Julian Flint wrote:
+&gt; Hi All,
+&gt; I'm chasing a cable so that I can console into an old cisco router that 
+&gt; I have picked up. Also chasing one of the COM port to RJ45 adapters for 
+&gt; connecting to same router.
+&gt; 
+&gt; Can anyone recommend a vendor (in Adelaide) that sells these? I have 
+&gt; tried both MIMP (referred me to Cisco) and the Cisco office. No luck so 
+&gt; far.
+
+The specs are
+
+Parts:
+   For cable assembly
+     2 of RJ-45 unshielded plugs, suitable for category of cable
+     &lt;15m of Category 3 or better stranded UTP cable
+   For PC adapter assembly
+     1 of 9 pin DB socket/RJ-45 socket adapter
+     3 of machine socket pins for DB-series
+     0.05m of Category 3 stranded patch wire (remove from phone patch cable)
+Tools:
+   RJ-45 crimper
+   DB-series machined pin crimper
+
+
+CABLE DESCRIPTION
+
+A "rolled" RJ-45 patch lead.
+
+These are used to connect from the DB-9/RJ-45 Adapter to a Cisco DCE,
+such as a Console port.
+
+
+CABLE ASSEMBLY
+   A-end: RJ-45 plug
+   B-end: RJ-45 plug
+
+   A-end
+  -------
+   1 Grey
+   2 Orange
+   3 Black
+   4 Red
+   5 Green
+   6 Yellow
+   7 Blue
+   8 Brown
+
+   B-end
+  -------
+   1 Brown
+   2 Blue
+   3 Yellow
+   4 Green
+   5 Red
+   6 Black
+   7 Orange
+   8 Grey
+
+Simplest way to make this is to take a patch cable, cut
+off one end.  Turn the new RJ-45 plug upside down (ie,
+tab to top) and cable with the same colour order as the
+old RJ-45 plug held right-side up (ie, pins facing you,
+cable running away from you, tab to bottom, pins are
+numbered 1 to 8 from right to left).
+
+
+ADAPTER DESCRIPTION
+
+The PC is a RS-232 "data terminal equipment".
+The PC pinout on DB9 plug is
+
+   Pin   RS-232 function
+   ---   ---------------
+    1    Data carrier detect (DCD)
+    2    Receive data (RxD)
+    3    Transmit data (TxD)
+    4    Data terminal ready (DTR)
+    5    Signal ground (SGnd)
+    6    Data set ready (DSR)
+    7    Ready to send (RTS)
+    8    Clear to send (CTS)
+    9    Ring indicator (RI)
+
+The Cisco "Console" is a RS-232 "data communications equipment"
+on a RJ-45 socket with pinout
+
+   Pin  RS-232 DTE function
+   ---  -------------------
+    1   not connected
+    2   DTR
+    3   TxD
+    4   TxSGnd
+    5   RxSGnd
+    6   RxD
+    7   DSR
+    8   not connected
+
+Note that the actual assignments are "reversed", as the Console
+is a DCE but RS-232 signals are always desribed from the DTE's
+point of view.
+
+This trick allows
+  - DCE-DTE (Console-PC) insterconnection using a "rolled" cable
+  - DTE-DTE (Async-PC) interconnection using a "patch" cable
+
+The Cisco "Auxillary" is a RS-232 "data terminal equipment"
+on a RJ-45 socket with pinout
+
+   Pin  RS-232 DTE function
+   ---  -------------------
+    1   RTS
+    2   DTR
+    3   TxD
+    4   TxSGnd
+    5   RxSGnd
+    6   RxD
+    7   DSR
+    8   CTS
+
+Note that the Console port does not have hadnshaking
+(as console messages should go to the bit bucket)
+but the Auxillary port does have handshaking (as
+it is designed to connect a modem).
+
+The Console port is configured at clean system start
+for 9600bps, 8 data bits, no parity, 2 stop bits.
+The Auxillary port is not configured at clean system
+start.
+
+Note: connecting to the Console port implies that
+large cut-and-paste of router configs fails. Connecting
+to the Aux port implies no connectivity if configuration
+clears.
+
+Colour wire to RJ-45 pin assignment on the adapter is
+
+   Pin   Wire colour
+   ---   -----------
+    1    Blue
+    2    Orange
+    3    Black
+    4    Red
+    5    Green
+    6    Yellow
+    7    Brown
+    8    White
+
+The adapter has wiring
+
+  IBM PC/AT COM  Cisco DTE (or DCE via rolled cable)
+   DB-9 socket        RJ-45 socket
+
+    RTS 7----------blue---1 CTS
+
+    DTR 4----------orange-2 DCD
+
+    TxD 3----------black--3 RxD
+
+   SGnd 5-------+--red----4 RxSGnd
+                |
+                +--green--5 TxSGnd
+
+    RxD 2----------yellow-6 TxD
+
+    DCD 1--+-------brown--7 DTR
+           |
+    DSR 6--+
+
+    CTS 8----------white--8 RTS
+
+     RI 9-- not connected
+
+"Cisco DTE" are Auxillary port and Async ports of Cisco 2511.
+These can use a standard "patch" cable.
+
+"Cisco DCE" is Console port.  These use the "rolled" cable
+described above.
+
+
+ADAPTER ASSEMBLY
+
+Remove pins from Red and Green.  Crimp socket pin #1 to Red and
+Green, joining the wires at the pin.
+
+Crimp socket pin #2 to jumper wire.
+
+Remove pin from Brown. Crimp socket pin #3 to jumper wire
+and Brown, joining the wires at the pin.
+
+Insert pins into DB-9 socket following diagram above.
+
+Insert DB9 socket into adapter chassis.
+
+
+NOTE
+
+All of this is derived from public Cisco-published documentation.
+No reverse-engineering or inspection of Cisco parts was
+involved.  (So, I.P-wise, go for it).
+
+-- 
+  Glen Turner         Tel: (08) 8303 3936 or +61 8 8303 3936
+  Network Engineer          Email: <A HREF="mailto:glen.turner@aarnet.edu.au">glen.turner@aarnet.edu.au</A>
+  Australian Academic & Research Network   www.aarnet.edu.au
+-- 
+  linux.conf.au 2004, Adelaide          lca2004.linux.org.au
+  Main conference 14-17 January 2004   Miniconfs from 12 Jan
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

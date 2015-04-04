@@ -1,0 +1,120 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: navigator.appName" -->
+<!-- FromName="'Mike Gratton'" -->
+<!-- FromEmail="mike@vee.net" -->
+<!-- ToName="" -->
+<!-- ToEmail="andrewlord@internode.on.net" -->
+<!-- Date="Tue, 29 Apr 2003 02:07:44 +0930" -->
+<!-- Id="3EAD58D8.1040109@vee.net" -->
+<!-- Reference="200304290127.18169.andrewlord@internode.on.net" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: navigator.appName</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Mike Gratton &lt;<I><A HREF="mailto:mike@vee.net">mike@vee.net</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:andrewlord@internode.on.net">andrewlord@internode.on.net</A></I>&gt;
+  Date: Tue, 29 Apr 2003 02:07:44 +0930
+</PRE>
+<H1>Re: navigator.appName</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+Andrew Lord wrote:
+&gt; 
+&gt; Thanks for your answer.
+&gt;
+
+NP!
+
+&gt; 
+&gt; Excellent.  My JS skills ain't much, but they're improving (painfully) slowly.  
+&gt; I'll give your suggestion a go.
+&gt; 
+
+If you're trying to do cross-browser scripting, then you should be 
+looking to do, in order from worst to best:
+
+1) UA string scanning to determine browser and version. This sucks.
+2) DOM object detection to determine browser and version. This sucks 
+slightly less.
+3) DOM object detection to determine what methods and properties you 
+have available to use. This is the best way.
+
+DOM object detection works by examining the objects you're using to see 
+if it supports the required properties and methods.
+
+For exmple, if you had an HTML document:
+
+&lt;html&gt;&lt;body&gt;&lt;p id="foo"&gt;This is a paragraph&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+
+and you wanted to retrieve a reference to the "p" element, you would do 
+something like:
+
+var foo;
+if (document.getElementById) {
+   // gecko, IE6 (in standards mode), etc
+   foo = document.getElementById("foo");
+} else if (document.all) {
+   // IE6 (in compatibility mode), IE5.x, IE4.x
+   foo = document.all["foo"];
+} else if (document.layers) {
+   // NN 4
+   foo = document.layers["foo"];
+} else {
+   foo = null;
+   alert("Could not get foo!");
+}
+
+Of course, you would probably turn this into a function so you can 
+easily reuse it.
+
+The reason DOM object detection is better than UA sniffing is becuase it 
+will always work, for past, present and future browsers and it is never 
+wrong. You don't need to constantly update your scripts when a new 
+version of a browser comes out. Using nifty Javascript hacks it is 
+possible to provide implementations of the standard DOM methods when 
+missing, so even on crusty browsers like IE4/5, it is becomes possible 
+to use the DOM in an effective way.
+
+HTH,
+/mike
+
+-- 
+Mike Gratton &lt;<A HREF="mailto:mike@vee.net">mike@vee.net</A>&gt;
+   I want you to know, he's not coming back.
+   Blatant self-promotion: &lt;<A HREF="http://web.vee.net/&gt">http://web.vee.net/&gt</A>;
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

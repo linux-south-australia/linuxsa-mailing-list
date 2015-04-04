@@ -1,0 +1,112 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: socket programming - connection refused from recvfrom call" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="'John Lehmann'" -->
+<!-- ToEmail="jplehmann@home.com" -->
+<!-- Date="Sat, 21 Apr 2001 16:09:07 +0930" -->
+<!-- Id="20010421160907.A30673@dog.topology.org" -->
+<!-- Reference="00e001c0c9c4$27251ad0$0200a8c0@asus2k" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: socket programming - connection refused from recvfrom call</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : John Lehmann &lt;<I><A HREF="mailto:jplehmann@home.com">jplehmann@home.com</A></I>&gt;
+  Date: Sat, 21 Apr 2001 16:09:07 +0930
+</PRE>
+<H1>Re: socket programming - connection refused from recvfrom call</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Fri, Apr 20, 2001 at 01:03:06PM -0500, John Lehmann wrote:
+&gt; 
+&gt; I would expect that if X is not 5000, the program execution would block at
+&gt; the recvfrom and wait until a message arrives, however i get the error
+&gt; connection refused. (if you take out the send, the receive does block as
+&gt; expected)  On solaris, this code works as expected though.
+
+
+John,
+
+This isn't all that likely to be relevant, but your situation seems to
+me to be similar to one that I used to find with solaris, but not with
+linux, or vice versa.
+
+I found that if you do a connect() on a UDP socket, a solaris machine
+will generally send an ICMP packet to check is the other machine exists,
+or if the remote socket is on the local host, it will check to see
+if the remote UDP port is open. If this check fails, then the
+UDP connect() fails.
+
+That might not seem relevant.
+But... the documentation for recvfrom says this:
+
+--------------------------------------------------
+       If from is not NULL, and the socket is not connection-ori­
+       ented,  the  source  address  of the message is filled in.
+       The argument fromlen is a value-result parameter, initial­
+       ized  to  the size of the buffer associated with from, and
+       modified on return to indicate  the  actual  size  of  the
+       address stored there.
+
+       The  recv call is normally used only on a connected socket
+       (see connect(2)) and is identical to recvfrom with a  NULL
+       from parameter.                       
+--------------------------------------------------
+
+It's just remotely possible that when you don't specify the 
+from-address in the recvfrom() call, the OS is checking on the
+remote host to see if it's connected, and if not, the implicit
+connect() in your recvfrom() call is failing.
+
+Thus if you specify a remote address in a sendto() function, the
+OS may be remembering that you did this, and assuming that you
+want to do the recvfrom() from that address or something.
+
+To check this, try opening the remote UDP port first, before you
+run your program, and see if that makes the UDP layer happy.
+If so, then probably you are indeed seeing an implicit connect() call.
+
+An alternative method of checking is to run "tcpdump" or ethereal
+on the interface, and see if an ICMP is sent to the remote host,
+and see if an error condition of some sort is returned
+from the remote host when the UDP port is not currently open.
+
+Cheers,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

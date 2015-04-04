@@ -1,0 +1,109 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="netbios DoS" -->
+<!-- FromName="Jake Hawkes" -->
+<!-- FromEmail="jake@infinitylimited.net" -->
+<!-- ToName="LinuxSA Mailing List <linuxsa@linuxsa.org.au>, devteam" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Tue, 02 May 2000 22:27:27 +0930" -->
+<!-- Id="390ED0B7.176EBB15@infinitylimited.net" -->
+<!-- Reference="" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: netbios DoS</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Jake Hawkes &lt;<I><A HREF="mailto:jake@infinitylimited.net">jake@infinitylimited.net</A></I>&gt;
+  To  : LinuxSA Mailing List &lt;linuxsa@linuxsa.org.au&gt;, devteam &lt;<I><A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A></I>&gt;
+  Date: Tue, 02 May 2000 22:27:27 +0930
+</PRE>
+<H1>netbios DoS</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+if you have a share named "c" on a windows computer thats writeable,
+look out.
+
+check for a file c:\network.vbs and c:\network.log
+
+before I go further, this is a general announcement, not directly linux
+related, unless your internet gateway is perhaps linux[1] or you have
+some weird samba entries[2] in your logs.
+
+The story begins:
+Jake thinks that the link is rather slow today, and starts up a tcpdump.
+He notices that he is speaking in the third voice, but didn't care.
+
+The tcpdump had lines like this:
+20:36:31.130000 w.x.y.z.netbios-ns &gt; 208.41.48.109.netbios-ns: udp 50
+20:36:32.390000 w.x.y.z.netbios-ns &gt; 212.58.201.167.netbios-ns: udp 50
+
+where w.x.y.z are IP addresses of various win98 machines.
+
+So Jake and his buddies go and sus out these machines sending out these
+weird netbios shit.
+
+note: no, there weren't any firewalls in place, yes I'm a stupid lump of
+bohemian camel turd for not having any, and yes, I was be implementing
+some RSN.
+
+We descover that there is a process running calles wscript.exe, and it
+is causing the crap.
+
+Wscript is a scripting program that allows you to run vb script in
+win98. The script turns out to be a netbios based DoS trojan. Not very
+well hidden, and easy to recognise, easy to kill, very inefficient, not
+violent enough to be a real problem, but if it gets lucky, it can be a
+pain in the arse.
+
+What it does it construct randomly generated IP addresses (some of them
+are totally bogus, like 5.96.5.122) and try to map a drive to that IPs C
+drive. It then copies  itself there, and into the windows startup group.
+And repeats. But hilariously enough, keeps a log file (network.log).
+
+One machine had a 1.6 meg log file. Bugger.
+
+
+
+[1] tcpdump first told me there was a problem
+
+[2] /var/log/samba/log.smb had an entries like:
+000/04/20 06:47:09, 0] lib/access.c:check_access(253)
+  Denied connection from 123-78-127-216.ip.sirius.com (216.127.78.123)
+
+
+--
+Jake Hawkes, B.Eng (CSE)
+
+"I'm only smart enough to know how stupid I am", Joe Strummer.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,97 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: user accounts" -->
+<!-- FromName="Dan Shearer" -->
+<!-- FromEmail="dan@shearer.org" -->
+<!-- ToName="" -->
+<!-- ToEmail="linuxsa@linuxsa.org.au" -->
+<!-- Date="Wed, 21 Jun 2000 11:48:50 +0930 (CST)" -->
+<!-- Id="Pine.LNX.4.10.10006201854300.32545-100000@localhost.localdomain" -->
+<!-- Reference="200006201744000547.00946E45@10.1.1.105" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: user accounts</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Dan Shearer &lt;<I><A HREF="mailto:dan@shearer.org">dan@shearer.org</A></I>&gt;
+  To  : <A HREF="mailto:linuxsa@linuxsa.org.au">linuxsa@linuxsa.org.au</A>
+  Date: Wed, 21 Jun 2000 11:48:50 +0930 (CST)
+</PRE>
+<H1>Re: user accounts</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Tue, 20 Jun 2000, Matt wrote:
+
+&gt; Is there a central way of managing user accounts, 
+&gt; between different platforms, specifically winnt & linux.
+&gt; Currently there are user accounts on the file server
+&gt; (winnt) and we need to provide email services, which 
+&gt; would be best under linux.
+
+Skip to the last para for a direct answer.
+
+The most seamless way of doing this is with winbind, a recent product of
+the Samba team. It allows NT user and group information to be used
+throughout Linux, by means of nsswitch and PAM. At the moment you have to
+set it up by getting Samba in a slightly tricky way from the HEAD and TNG
+cvs trees, but it does work very well.
+
+The practical implication is that when you (eg) type ls -l the permissions
+are for groups and users who are not known locally, they are held on a
+PDC. You can log on at the "login:" prompt with something like
+"YOURDOMAIN\yourusername" and again, nothing about this is stored on
+Linux.
+
+This is particularly useful for sites where the objection to using Linux
+is that NT is used as the master authentication system. As Matthew Geddes
+points out regularly Samba is getting very close to being a drop-in
+replacement for PDC functionality as well, so conceivably sites that start
+using winbind and NT might end up with all-Linux boxes sharing
+authentication using an all-Microsoft protocol :-)
+
+The only OS this works on is Linux. (One of the reasons for this is that
+none of the core Samba developers use FreeBSD except when they are forced
+to... and as for commercial operating systems, expect them to wake up in a
+year or two!) Interestingly the nsswitch/PAM work is under the BSD license
+in order to make it as easy as possible to port it to other operating
+systems, even though Samba in general is under the GPL.
+
+After all that... for a mail server you don't have to go this far. As I
+think someone already said you can use pam_ntdom for this, ie so long as
+/etc/pam.d/yourmailagent is set up correctly you can get yourmailagent to
+run away and validate users against an NT PDC using pam_ntdom. Latest
+pam_ntdom is at <A HREF="http://www.cb1.com/~lkcl/pam-ntdom.">http://www.cb1.com/~lkcl/pam-ntdom.</A>
+
+Dan
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,101 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: PAM Winbind" -->
+<!-- FromName="'Matthew Geddes'" -->
+<!-- FromEmail="mgeddes@tellurian.com.au" -->
+<!-- ToName="" -->
+<!-- ToEmail="adam.smith@sageautomation.com" -->
+<!-- Date="08 May 2003 14:13:11 +0930" -->
+<!-- Id="1052368992.11486.35.camel@hilarious" -->
+<!-- Reference="20030508041426.GA33985@sageautomation.com" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: PAM Winbind</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Matthew Geddes &lt;<I><A HREF="mailto:mgeddes@tellurian.com.au">mgeddes@tellurian.com.au</A></I>&gt;
+  To  : &lt;<I><A HREF="mailto:adam.smith@sageautomation.com">adam.smith@sageautomation.com</A></I>&gt;
+  Date: 08 May 2003 14:13:11 +0930
+</PRE>
+<H1>Re: PAM Winbind</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Thu, 2003-05-08 at 13:44, Adam Smith wrote:
+&gt; 
+&gt; I'm trying to get a Red Hat 7.3 box to authenticate against an NT4 Domain,
+&gt; with little success so far.
+&gt; 
+&gt; So far I have:
+&gt; 
+&gt; 1)  Configured Samba 2.2.3 (yes, it needs upgrading...)
+&gt; 
+&gt; 2)  Joined the system to the domain
+&gt; 
+&gt; 3)  Loaded winbindd
+&gt; 
+&gt; 4)  Ran 'getent passwd' which returned both the local accounts and the
+&gt; domain accounts;  the domain accounts being in the format of SAGE\username
+&gt; 
+&gt; 5)  Edited /etc/pam.d/login
+&gt; 
+&gt; Now here's the tricky parts.  I've got a better understanding of the way
+&gt; PAM works now, but still can't get it to work correctly.
+&gt; 
+&gt; Examples for systems are all different when I search on Google, and I'm at
+&gt; a loss as to what this file should now look like.
+&gt; 
+&gt; ---/etc/pam.d/login---
+&gt; ----------------------
+&gt; auth       required     /lib/security/pam_securetty.so
+&gt; auth       required     /lib/security/pam_stack.so service=system-auth
+&gt; auth   	   sufficient   /lib/security/pam_winbind.so
+&gt; auth       required     /lib/security/pam_nologin.so
+&gt; account    required     /lib/security/pam_stack.so service=system-auth
+&gt; password   required     /lib/security/pam_stack.so service=system-auth
+&gt; session    required     /lib/security/pam_stack.so service=system-auth
+&gt; session    optional     /lib/security/pam_console.so
+
+I think I heard something somewhere about the order of where the
+pam_winbind.so module goes is important. For some reason I think it was
+supposed to come before pam_unix.
+
+In your case you'd probably want it before pam_stack.so (which is
+required anyway and is probably stopping the pam_winbind.so module from
+being used).
+
+thx,
+Matt
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A> IRC: #linuxsa on irc.freenode.net
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>

@@ -1,0 +1,158 @@
+<HTML>
+<!-- EmailData="Start" -->
+<!-- Version="1.1" -->
+<!-- Subject="Re: Sound Card Support" -->
+<!-- FromName="'Alan Kennington'" -->
+<!-- FromEmail="akenning@dog.topology.org" -->
+<!-- ToName="'David Lloyd'" -->
+<!-- ToEmail="lloy0076@rebel.net.au" -->
+<!-- Date="Wed, 8 Nov 2000 17:15:02 +1030" -->
+<!-- Id="20001108171502.A19012@dog.topology.org" -->
+<!-- Reference="3A08F22C.15FDCA9F@rebel.net.au" -->
+<!-- X-Face="" -->
+<!-- X-URL="" -->
+<!-- EmailData="End" -->
+<HEAD>
+<TITLE>LinuxSA Mailing List: Re: Sound Card Support</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF><H1>LinuxSA Mailing list archives</H1>
+<!-- IndexControl1="Start" -->
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<HR>
+<!-- IndexControl1="End" -->
+<!-- Header="Start" -->
+<PRE>
+  From: Alan Kennington &lt;<I><A HREF="mailto:akenning@dog.topology.org">akenning@dog.topology.org</A></I>&gt;
+  To  : David Lloyd &lt;<I><A HREF="mailto:lloy0076@rebel.net.au">lloy0076@rebel.net.au</A></I>&gt;
+  Date: Wed, 8 Nov 2000 17:15:02 +1030
+</PRE>
+<H1>Re: Sound Card Support</H1>
+<!-- Header="End" -->
+<!-- Body="Start" -->
+<PRE>
+On Wed, Nov 08, 2000 at 04:56:52PM +1030, David Lloyd wrote:
+&gt; 
+&gt; &gt; Has anyone else got a card based on this chip that got MIDI working on
+&gt; &gt; it?
+&gt; 
+&gt; Although I haven't attempted an ALSA download, my MIDI doesn't work
+&gt; either. Can someone tell me whether MIDI is done by the hardware or in
+&gt; software? That is to say, are the MIDI instructions intercepted by the
+&gt; software device driver, translated and sent to the sound card, or do
+&gt; sound cards do that themselves?
+
+Not that I really understand this kind of thing, but....
+
+I've used the ALSA software, and since each kind of card is different,
+it seems like it creates kind of pseudo-devices or pseudo-MIDI-synths
+to which programs like pmidi can send MIDI commands.
+
+Thus when you run "pmidi -l", it lists all of the available
+pseudo-MIDI-devices.
+In my case, I use device 64:0 on my card which uses the es1371 driver
+software.
+
+Here's a list of modules which I used for the pseudo-synths:
+
+=======================================================
+emu:~ # lsmod
+Module                  Size  Used by
+snd-seq                35892   0  (autoclean)
+snd-timer               7488   0  (autoclean) [snd-seq]
+snd-seq-device          3004   0  (autoclean) [snd-seq]
+snd                    33228   0  (autoclean) [snd-seq snd-timer snd-seq-device]
+parport_probe           3204   0  (autoclean)
+parport_pc              7264   1  (autoclean)
+lp                      4572   0  (autoclean)
+parport                 6884   1  (autoclean) [parport_probe parport_pc lp]
+soundcore               2148   0  (autoclean) [snd]
+eepro100               15848   1  (autoclean) 
+=======================================================
+
+But there's also a sort of raw driver for the sound-blaster card that I
+use:
+
+=======================================================
+emu:~ # modprobe es1371
+emu:~ # lsmod
+Module                  Size  Used by
+es1371                 25696   0  (unused)
+snd-seq                35892   0  (autoclean)
+snd-timer               7488   0  (autoclean) [snd-seq]
+snd-seq-device          3004   0  (autoclean) [snd-seq]
+snd                    33228   0  (autoclean) [snd-seq snd-timer snd-seq-device]
+parport_probe           3204   0  (autoclean)
+parport_pc              7264   1  (autoclean)
+lp                      4572   0  (autoclean)
+parport                 6884   1  (autoclean) [parport_probe parport_pc lp]
+soundcore               2148   4  (autoclean) [es1371 snd]
+eepro100               15848   1  (autoclean)  
+=======================================================
+
+The ALSA software loads up drivers like snd-seq-XXXX for each
+sound card, and these are located by ALSA applications.
+
+Hmmm. It seems like although you need to load up es1371.o for things
+like realplayer, it uses the same resource as the snd-card-ens1371.o
+module wants to use. So....
+
+======================================================
+emu:/lib/modules/2.2.16/misc # modprobe snd-card-ens1371
+emu:/lib/modules/2.2.16/misc # lsmod
+Module                  Size  Used by
+snd-card-ens1371        1964   0  (unused)
+snd-seq-midi            2972   0  (unused)
+snd-seq-midi-event      2460   0  [snd-seq-midi]
+snd-ens1371             9036   0  [snd-card-ens1371]
+snd-pcm                27928   0  [snd-ens1371]
+snd-rawmidi             8408   0  [snd-seq-midi snd-ens1371]
+snd-ac97-codec         23840   0  [snd-ens1371]
+snd-mixer              22160   0  [snd-ens1371 snd-ac97-codec]
+snd-seq                35892   0  (autoclean) [snd-seq-midi snd-seq-midi-event]
+snd-timer               7488   0  (autoclean) [snd-pcm snd-seq]
+snd-seq-device          3004   0  (autoclean) [snd-seq-midi snd-rawmidi snd-seq]
+snd                    33228   1  (autoclean) [snd-card-ens1371 snd-seq-midi snd-seq-midi-event snd-ens1371 snd-pcm snd-rawmidi snd-ac97-codec snd-mixer snd-seq snd-timer snd-seq-device]
+parport_probe           3204   0  (autoclean)
+parport_pc              7264   1  (autoclean)
+lp                      4572   0  (autoclean)
+parport                 6884   1  (autoclean) [parport_probe parport_pc lp]
+soundcore               2148   2  (autoclean) [snd]
+eepro100               15848   1  (autoclean)
+emu:/lib/modules/2.2.16/misc # pmidi -l
+ Port     Client name                       Port name
+ 64:0     External MIDI 0                   MIDI 0-0 
+======================================================
+
+So now I get a midi device 64:0 to send midi to, which goes down the
+cable. But you can also set it up to send MIDI to the built-in synths
+inside cards by loading up the right modules.
+
+More info in links on this page:
+<A HREF="http://www.topology.org/midi.html">http://www.topology.org/midi.html</A>
+
+Cheerio,
+Alan Kennington.
+
+-- 
+LinuxSA WWW: <A HREF="http://www.linuxsa.org.au/">http://www.linuxsa.org.au/</A>  IRC: #linuxsa on irc.linux.org.au
+To unsubscribe from the LinuxSA list:
+  mail <A HREF="mailto:linuxsa-request@linuxsa.org.au">linuxsa-request@linuxsa.org.au</A> with "unsubscribe" as the subject
+
+</PRE>
+<!-- Body="End" -->
+<!-- IndexControl2="Start" -->
+<HR>
+Index:
+[<A HREF="thread.html">thread</A>]
+[<A HREF="date.html">date</A>]
+[<A HREF="subject.html">subject</A>]
+[<A HREF="author.html">author</A>]
+[<A HREF="stats.html">stats</A>]
+<!-- IndexControl2="End" -->
+<HR><FONT SIZE=+1>Return to the <A HREF=/mailing-list/>LinuxSA Mailing List Information</A> Page</FONT></BODY>
+</HTML>
